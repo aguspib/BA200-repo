@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="LISMappingsDS" targetNamespace="http://tempuri.org/LISMappingsDS.xsd" xmlns:mstns="http://tempuri.org/LISMappingsDS.xsd" xmlns="http://tempuri.org/LISMappingsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="LISMappingsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="LISMappingsDS" msprop:Generator_UserDSName="LISMappingsDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="vcfgLISMapping" msprop:Generator_TableClassName="vcfgLISMappingDataTable" msprop:Generator_TableVarName="tablevcfgLISMapping" msprop:Generator_TablePropName="vcfgLISMapping" msprop:Generator_RowDeletingName="vcfgLISMappingRowDeleting" msprop:Generator_RowChangingName="vcfgLISMappingRowChanging" msprop:Generator_RowEvHandlerName="vcfgLISMappingRowChangeEventHandler" msprop:Generator_RowDeletedName="vcfgLISMappingRowDeleted" msprop:Generator_UserTableName="vcfgLISMapping" msprop:Generator_RowChangedName="vcfgLISMappingRowChanged" msprop:Generator_RowEvArgName="vcfgLISMappingRowChangeEvent" msprop:Generator_RowClassName="vcfgLISMappingRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ValueId" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ValueId" msprop:Generator_ColumnVarNameInTable="columnValueId" msprop:Generator_ColumnPropNameInTable="ValueIdColumn" msprop:Generator_UserColumnName="ValueId" type="xs:string" minOccurs="0" />
+              <xs:element name="ValueType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ValueType" msprop:Generator_ColumnVarNameInTable="columnValueType" msprop:Generator_ColumnPropNameInTable="ValueTypeColumn" msprop:Generator_UserColumnName="ValueType" type="xs:string" minOccurs="0" />
+              <xs:element name="ValueTypeDesc" msprop:Generator_ColumnVarNameInTable="columnValueTypeDesc" msprop:Generator_ColumnPropNameInRow="ValueTypeDesc" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="ValueTypeDescColumn" msprop:Generator_UserColumnName="ValueTypeDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="LISValue" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="LISValue" msprop:Generator_ColumnVarNameInTable="columnLISValue" msprop:Generator_ColumnPropNameInTable="LISValueColumn" msprop:Generator_UserColumnName="LISValue" type="xs:string" minOccurs="0" />
+              <xs:element name="LongName" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="LongName" msprop:Generator_ColumnVarNameInTable="columnLongName" msprop:Generator_ColumnPropNameInTable="LongNameColumn" msprop:Generator_UserColumnName="LongName" type="xs:string" minOccurs="0" />
+              <xs:element name="LanguageID" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="LanguageID" msprop:Generator_ColumnVarNameInTable="columnLanguageID" msprop:Generator_ColumnPropNameInTable="LanguageIDColumn" msprop:Generator_UserColumnName="LanguageID" type="xs:string" minOccurs="0" />
+              <xs:element name="InUse" msprop:Generator_ColumnVarNameInTable="columnInUse" msprop:Generator_ColumnPropNameInRow="InUse" msprop:Generator_ColumnPropNameInTable="InUseColumn" msprop:Generator_UserColumnName="InUse" type="xs:string" minOccurs="0" />
+              <xs:element name="UniqueSampleType" msprop:Generator_ColumnVarNameInTable="columnUniqueSampleType" msprop:Generator_ColumnPropNameInRow="UniqueSampleType" msprop:Generator_ColumnPropNameInTable="UniqueSampleTypeColumn" msprop:Generator_UserColumnName="UniqueSampleType" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

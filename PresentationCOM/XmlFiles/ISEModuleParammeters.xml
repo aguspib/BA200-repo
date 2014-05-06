@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ISEModuleParammeters>
+  <ResultErrorDescTable digit="2">
+    <ResultErrorDesc>mV Out (Calib/Sample)</ResultErrorDesc>
+  </ResultErrorDescTable>
+  <ResultErrorDescTable digit="3">
+    <ResultErrorDesc>mV Out (Cal A in Calib/Sample Mode, Cal B in Urine Mode)</ResultErrorDesc>
+  </ResultErrorDescTable>
+  <ResultErrorDescTable digit="4">
+    <ResultErrorDesc>mV Noise (Cal B/Sample)</ResultErrorDesc>
+  </ResultErrorDescTable>
+  <ResultErrorDescTable digit="5">
+    <ResultErrorDesc>mV  Noise (Cals A in Calib/Sample Mode, Cal B in Urine Mode).</ResultErrorDesc>
+  </ResultErrorDescTable>
+  <ResultErrorDescTable digit="6">
+    <ResultErrorDesc>Cal A Drift (in Sample Mode, Cal B in Urine Mode)</ResultErrorDesc>
+  </ResultErrorDescTable>
+  <ResultErrorDescTable digit="7">
+    <ResultErrorDesc>Out of Slope/Machine Ranges</ResultErrorDesc>
+  </ResultErrorDescTable>
+  <AffectedElementTable id = "1">
+    <AffectedElements>Li</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "2">
+    <AffectedElements>Na</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "3">
+    <AffectedElements>Li, Na</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "4">
+    <AffectedElements>K</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "5">
+    <AffectedElements>Li, K</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "6">
+    <AffectedElements>K, Na </AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "7">
+    <AffectedElements>Li, Na, K</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "8">
+    <AffectedElements>Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id ="9">
+    <AffectedElements>Li, Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "A">
+    <AffectedElements>Na, Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id= "B">
+    <AffectedElements>Li, Na, Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "C">
+    <AffectedElements>K, Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id = "D">
+    <AffectedElements>Li, K, Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id ="E">
+    <AffectedElements>Na, K, Cl</AffectedElements>
+  </AffectedElementTable>
+  <AffectedElementTable id= "F">
+    <AffectedElements>Li, Na, K, Cl</AffectedElements>
+  </AffectedElementTable>
+  <CancelErrorDescTable code="S">
+    <CancelErrorDesc>Air in Sample/Urine</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="A">
+    <CancelErrorDesc>Air in Calibrant A</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="B">
+    <CancelErrorDesc>Air in Calibrant B</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="C">
+    <CancelErrorDesc>Air in Cleaner</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="M">
+    <CancelErrorDesc>Air in Segment</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="P">
+    <CancelErrorDesc>Pump Cal</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="F">
+    <CancelErrorDesc>No Flow</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="D">
+    <CancelErrorDesc>Bubble Detector</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="R">
+    <CancelErrorDesc>Dallas Read</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="W">
+    <CancelErrorDesc>Dallas Write</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="Q">
+    <CancelErrorDesc>Store Cal Val Error</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="T">
+    <CancelErrorDesc>Command Error</CancelErrorDesc>
+  </CancelErrorDescTable>
+  <CancelErrorDescTable code="N">
+    <CancelErrorDesc>Reagents Pack Missing</CancelErrorDesc>
+  </CancelErrorDescTable>
+</ISEModuleParammeters>
+

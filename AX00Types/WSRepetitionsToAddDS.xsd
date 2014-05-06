@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WSRepetitionsToAddDS" targetNamespace="http://tempuri.org/WSRepetitionsToAddDS.xsd" xmlns:mstns="http://tempuri.org/WSRepetitionsToAddDS.xsd" xmlns="http://tempuri.org/WSRepetitionsToAddDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="WSRepetitionsToAddDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="WSRepetitionsToAddDS" msprop:Generator_UserDSName="WSRepetitionsToAddDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="twksWSRepetitionsToAdd" msprop:Generator_UserTableName="twksWSRepetitionsToAdd" msprop:Generator_RowEvArgName="twksWSRepetitionsToAddRowChangeEvent" msprop:Generator_TableVarName="tabletwksWSRepetitionsToAdd" msprop:Generator_TablePropName="twksWSRepetitionsToAdd" msprop:Generator_RowDeletingName="twksWSRepetitionsToAddRowDeleting" msprop:Generator_RowChangingName="twksWSRepetitionsToAddRowChanging" msprop:Generator_RowDeletedName="twksWSRepetitionsToAddRowDeleted" msprop:Generator_RowEvHandlerName="twksWSRepetitionsToAddRowChangeEventHandler" msprop:Generator_TableClassName="twksWSRepetitionsToAddDataTable" msprop:Generator_RowChangedName="twksWSRepetitionsToAddRowChanged" msprop:Generator_RowClassName="twksWSRepetitionsToAddRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerID" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_UserColumnName="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="WorkSessionID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="WorkSessionID" msprop:Generator_ColumnVarNameInTable="columnWorkSessionID" msprop:Generator_ColumnPropNameInTable="WorkSessionIDColumn" msprop:Generator_UserColumnName="WorkSessionID" type="xs:string" minOccurs="0" />
+              <xs:element name="OrderTestID" msprop:Generator_ColumnVarNameInTable="columnOrderTestID" msprop:Generator_ColumnPropNameInRow="OrderTestID" msprop:Generator_ColumnPropNameInTable="OrderTestIDColumn" msprop:Generator_UserColumnName="OrderTestID" type="xs:int" minOccurs="0" />
+              <xs:element name="PostDilutionType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PostDilutionType" msprop:Generator_ColumnVarNameInTable="columnPostDilutionType" msprop:Generator_ColumnPropNameInTable="PostDilutionTypeColumn" msprop:Generator_UserColumnName="PostDilutionType" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleClass" msprop:Generator_ColumnVarNameInTable="columnSampleClass" msprop:Generator_ColumnPropNameInRow="SampleClass" msprop:Generator_ColumnPropNameInTable="SampleClassColumn" msprop:Generator_UserColumnName="SampleClass" type="xs:string" minOccurs="0" />
+              <xs:element name="RerunNumber" msprop:Generator_ColumnVarNameInTable="columnRerunNumber" msprop:Generator_ColumnPropNameInRow="RerunNumber" msprop:Generator_ColumnPropNameInTable="RerunNumberColumn" msprop:Generator_UserColumnName="RerunNumber" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

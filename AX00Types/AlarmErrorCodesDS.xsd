@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="AlarmErrorCodesDS" targetNamespace="http://tempuri.org/DataSet1.xsd" xmlns:mstns="http://tempuri.org/DataSet1.xsd" xmlns="http://tempuri.org/DataSet1.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="AlarmErrorCodesDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="AlarmErrorCodesDS" msprop:Generator_DataSetName="AlarmErrorCodesDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tfmwAlarmErrorCodes" msprop:Generator_UserTableName="tfmwAlarmErrorCodes" msprop:Generator_RowDeletedName="tfmwAlarmErrorCodesRowDeleted" msprop:Generator_RowChangedName="tfmwAlarmErrorCodesRowChanged" msprop:Generator_RowClassName="tfmwAlarmErrorCodesRow" msprop:Generator_RowChangingName="tfmwAlarmErrorCodesRowChanging" msprop:Generator_RowEvArgName="tfmwAlarmErrorCodesRowChangeEvent" msprop:Generator_RowEvHandlerName="tfmwAlarmErrorCodesRowChangeEventHandler" msprop:Generator_TableClassName="tfmwAlarmErrorCodesDataTable" msprop:Generator_TableVarName="tabletfmwAlarmErrorCodes" msprop:Generator_RowDeletingName="tfmwAlarmErrorCodesRowDeleting" msprop:Generator_TablePropName="tfmwAlarmErrorCodes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AlarmID" msprop:Generator_UserColumnName="AlarmID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnAlarmID" msprop:Generator_ColumnPropNameInTable="AlarmIDColumn" msprop:Generator_ColumnPropNameInRow="AlarmID" type="xs:string" minOccurs="0" />
+              <xs:element name="ErrorCode" msprop:Generator_UserColumnName="ErrorCode" msprop:Generator_ColumnVarNameInTable="columnErrorCode" msprop:Generator_ColumnPropNameInRow="ErrorCode" msprop:Generator_ColumnPropNameInTable="ErrorCodeColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ManagementID" msprop:Generator_UserColumnName="ManagementID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnManagementID" msprop:Generator_ColumnPropNameInTable="ManagementIDColumn" msprop:Generator_ColumnPropNameInRow="ManagementID" type="xs:string" minOccurs="0" />
+              <xs:element name="ResourceID" msprop:Generator_UserColumnName="ResourceID" msprop:Generator_ColumnPropNameInRow="ResourceID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnResourceID" msprop:Generator_ColumnPropNameInTable="ResourceIDColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

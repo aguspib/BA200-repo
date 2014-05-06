@@ -1,0 +1,620 @@
+Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports DevExpress.XtraReports.UI
+Imports DevExpress.XtraCharts
+Imports System.Drawing
+
+Public Class QCIndividualResultsByTestReport
+    Private mTestSampleData As HistoryTestSamplesDS.tqcHistoryTestSamplesRow
+    Private mDateRangeText As String
+    Private mIncludeGraph As Boolean
+    Private mControlsDS As OpenQCResultsDS
+    Private mLabelMEAN As String = ""
+    Private mLabelSD As String = ""
+    Private mResultsDS As QCResultsDS
+
+
+    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, _
+                                               ByVal pControlsDS As OpenQCResultsDS, _
+                                               ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, _
+                                               ByVal pDateRangeText As String, ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
+        mTestSampleData = pTestSampleRow
+        mDateRangeText = pDateRangeText
+        mControlsDS = pControlsDS
+        mResultsDS = pResultsDS
+
+        'Adding the SubReports
+        For Each elem As OpenQCResultsDS.tOpenResultsRow In From c In pControlsDS.tOpenResults.Rows Where c.Selected
+            Dim mQCRep As New QCIndividualResultsByTestControlReport
+            mQCRep.ControlLotID.Value = elem.QCControlLotID
+            mQCRep.SetControlsAndResultsDatasource(pControlsDS, pResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
+
+            Dim mSubReport As New XRSubreport()
+            mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
+            mSubReport.ReportSource = mQCRep
+            Me.Detail1.Controls.Add(mSubReport)
+            mSubReport.TopF = Me.Detail1.HeightF
+            mSubReport.LeftF = 0
+            Me.Detail1.HeightF += mSubReport.HeightF
+        Next
+
+        'Show/Hide the graph
+        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.YOUDEN_GRAPH)
+    End Sub
+
+
+    Private Sub QCIndividualResultsByTestReport_BeforePrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles Me.BeforePrint
+        If Me.DesignMode Then Exit Sub
+
+        'Multilanguage support
+        Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        'Multilanguage. Get texts from DB.
+        XrHeaderLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_QCResultsByTestSampleType", CurrentLanguage)
+        XrLabelTestName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TestName", CurrentLanguage)
+        XrLabelSample.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", CurrentLanguage)
+        XrLabelCalcultationMode.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Calculation_Mode", CurrentLanguage)
+        XrLabelDateRange.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateRange", CurrentLanguage)
+        XrLabelControls.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_Controls_List", CurrentLanguage)
+
+        'The TestSample data
+        XrTestName.Text = mTestSampleData.TestName
+        XrSample.Text = mTestSampleData.SampleType
+        XrMode.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_QC_CALC_MODES_" & mTestSampleData.CalculationMode, CurrentLanguage)
+        XrDateRange.Text = mDateRangeText
+
+        'Show/Hide the graph
+        GroupFooter1.Visible = mIncludeGraph
+
+        If mIncludeGraph Then
+            'Header: Control Level1 Name (Lot) + Control Level2 Name (Lot)
+            XrGraphHeaderLabel.Text = ""
+            For Each ctrl In From elem In mControlsDS.tOpenResults Where elem.Selected
+                If Not String.IsNullOrEmpty(XrGraphHeaderLabel.Text) Then XrGraphHeaderLabel.Text &= " + "
+                XrGraphHeaderLabel.Text &= ctrl.ControlName & " (" & ctrl.LotNumber & ")"
+            Next
+            PrepareYoudenGraph()
+        End If
+    End Sub
+
+#Region "Youden Graph"
+    ''' <summary>
+    ''' Draw a constant line in X-Axis of a Youden Graph
+    ''' </summary>
+    ''' <param name="pName">Title for the Constant line</param>
+    ''' <param name="pDiagram">Diagram in which the Constant line will be added</param>
+    ''' <param name="pValue">Value in X-Axis in which the Constant line will be drawn</param>
+    ''' <param name="pColor">Color for the Constant line</param>
+    ''' <remarks>
+    ''' Created by:  TR 17/06/2011
+    ''' </remarks>
+    Private Sub CreateConstantLineAxisX(ByVal pName As String, ByVal pDiagram As XYDiagram, ByVal pValue As Double, ByVal pColor As Color)
+        Try
+            'Create the constant line
+            Dim constantLine As New ConstantLine(pName)
+            pDiagram.AxisX.ConstantLines.Add(constantLine)
+
+            'Define its axis value
+            constantLine.AxisValue = pValue
+
+            'Customize the behavior of the constant line
+            constantLine.Visible = True
+            constantLine.ShowInLegend = True
+            constantLine.LegendText = pName
+            constantLine.ShowBehind = False
+
+            'Customize the constant line's title
+            constantLine.Title.Visible = True
+            constantLine.Title.Text = pName
+            constantLine.Title.TextColor = pColor
+            constantLine.Title.Antialiasing = False
+            constantLine.Title.ShowBelowLine = False
+            constantLine.Title.Alignment = ConstantLineTitleAlignment.Far
+            constantLine.Title.Font = New Font("Verdana", 8, FontStyle.Bold)
+
+            'Customize the appearance of the constant line.
+            constantLine.Color = pColor
+            constantLine.LineStyle.Thickness = 1
+            constantLine.LineStyle.DashStyle = DashStyle.Solid
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Draw a constant line in Y-Axis of a Youden Graph
+    ''' </summary>
+    ''' <param name="pName">Title for the Constant line</param>
+    ''' <param name="pDiagram">Diagram in which the Constant line will be added</param>
+    ''' <param name="pValue">Value in Y-Axis in which the Constant line will be drawn</param>
+    ''' <param name="pColor">Color for the Constant line</param>
+    ''' <remarks>
+    ''' Created by:  TR 17/06/2011
+    ''' </remarks>
+    Private Sub CreateConstantLineAxisY(ByVal pName As String, ByVal pDiagram As XYDiagram, ByVal pValue As Single, ByVal pColor As Color)
+        Try
+            'Create the constant line
+            Dim constantLine As New ConstantLine(pName)
+            pDiagram.AxisY.ConstantLines.Add(constantLine)
+
+            'Define its axis value
+            constantLine.AxisValue = pValue
+
+            'Customize the behavior of the constant line
+            constantLine.Visible = True
+            constantLine.ShowInLegend = True
+            constantLine.LegendText = pName
+            constantLine.ShowBehind = False
+
+            'Customize the constant line's title
+            constantLine.Title.Visible = True
+            constantLine.Title.Text = pName
+            constantLine.Title.TextColor = pColor
+            constantLine.Title.ShowBelowLine = False
+            constantLine.Title.Antialiasing = False
+            constantLine.Title.Alignment = ConstantLineTitleAlignment.Far
+            constantLine.Title.Font = New Font("Verdana", 8, FontStyle.Bold)
+
+            'Customize the appearance of the constant line.
+            constantLine.Color = pColor
+            constantLine.LineStyle.Thickness = 1
+            constantLine.LineStyle.DashStyle = DashStyle.Solid
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Create the SD Squares in a Youden Graph
+    ''' </summary>
+    ''' <param name="pControl1Mean">Mean of the first selected Control</param>
+    ''' <param name="pControl1SD">SD of the first selected Control</param>
+    ''' <param name="pControl2Mean">Mean of the second selected Control</param>
+    ''' <param name="pControl2SD">SD of the second selected Control</param>
+    ''' <remarks>
+    ''' Created by:  TR 17/06/2011
+    ''' </remarks>
+    Private Sub CreateSquares(ByVal pControl1Mean As Double, ByVal pControl1SD As Double, _
+                              ByVal pControl2Mean As Double, ByVal pControl2SD As Double)
+        Try
+            Dim myLineSeriesView As LineSeriesView
+
+            '****************'
+            '*  Square SD1  *'
+            '****************'
+            Dim series4 As New Series("SD1L1", ViewType.Line)
+            series4.Points.Add(New SeriesPoint((pControl1Mean + pControl1SD), (pControl2Mean + pControl2SD)))
+            series4.Points.Add(New SeriesPoint((pControl1Mean - pControl1SD), (pControl2Mean + pControl2SD)))
+
+            myLineSeriesView = CType(series4.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series4.PointOptions.PointView = PointView.Values
+            series4.ArgumentScaleType = ScaleType.Numerical
+            series4.ValueScaleType = ScaleType.Numerical
+            series4.Label.Visible = False
+
+            Dim series41 As New Series("SD1L2", ViewType.Line)
+            series41.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), pControl2Mean + (pControl2SD)))
+            series41.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), (pControl2Mean - (pControl2SD))))
+
+            myLineSeriesView = CType(series41.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series41.PointOptions.PointView = PointView.Values
+            series41.ArgumentScaleType = ScaleType.Numerical
+            series41.ValueScaleType = ScaleType.Numerical
+            series41.Label.Visible = False
+
+            Dim series42 As New Series("SD1L3", ViewType.Line)
+            series42.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), pControl2Mean - (pControl2SD)))
+            series42.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), (pControl2Mean - (pControl2SD))))
+
+            myLineSeriesView = CType(series42.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series42.PointOptions.PointView = PointView.Values
+            series42.ArgumentScaleType = ScaleType.Numerical
+            series42.ValueScaleType = ScaleType.Numerical
+            series42.Label.Visible = False
+
+            Dim series43 As New Series("SD1L4", ViewType.Line)
+            series43.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), pControl2Mean - (pControl2SD)))
+            series43.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), (pControl2Mean + (pControl2SD))))
+
+            myLineSeriesView = CType(series43.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series43.PointOptions.PointView = PointView.Values
+            series43.ArgumentScaleType = ScaleType.Numerical
+            series43.ValueScaleType = ScaleType.Numerical
+            series43.Label.Visible = False
+
+            '****************'
+            '*  Square SD2  *'
+            '****************'
+            Dim series40 As New Series("SD2L1", ViewType.Line)
+            series40.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), pControl2Mean + 2 * (pControl2SD)))
+            series40.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), (pControl2Mean + 2 * (pControl2SD))))
+
+            myLineSeriesView = CType(series40.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series40.PointOptions.PointView = PointView.Values
+            series40.ArgumentScaleType = ScaleType.Numerical
+            series40.ValueScaleType = ScaleType.Numerical
+            series40.Label.Visible = False
+
+            Dim series410 As New Series("SD2L2", ViewType.Line)
+            series410.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), pControl2Mean + 2 * (pControl2SD)))
+            series410.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), (pControl2Mean - 2 * (pControl2SD))))
+
+            myLineSeriesView = CType(series410.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series410.PointOptions.PointView = PointView.Values
+            series410.ArgumentScaleType = ScaleType.Numerical
+            series410.ValueScaleType = ScaleType.Numerical
+            series410.Label.Visible = False
+
+            Dim series420 As New Series("SD2L3", ViewType.Line)
+            series420.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), pControl2Mean - 2 * (pControl2SD)))
+            series420.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), (pControl2Mean - 2 * (pControl2SD))))
+
+            myLineSeriesView = CType(series420.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series420.PointOptions.PointView = PointView.Values
+            series420.ArgumentScaleType = ScaleType.Numerical
+            series420.ValueScaleType = ScaleType.Numerical
+            series420.Label.Visible = False
+
+            Dim series430 As New Series("SD2L4", ViewType.Line)
+            series430.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), pControl2Mean - 2 * (pControl2SD)))
+            series430.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), (pControl2Mean + 2 * (pControl2SD))))
+
+            myLineSeriesView = CType(series430.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.Thickness = 2
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+
+            series430.PointOptions.PointView = PointView.Values
+            series430.ArgumentScaleType = ScaleType.Numerical
+            series430.ValueScaleType = ScaleType.Numerical
+            series430.Label.Visible = False
+
+            '****************'
+            '*  Square SD3  *'
+            '****************'
+            Dim series50 As New Series("SD3L1", ViewType.Line)
+            series50.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), pControl2Mean + 3 * (pControl2SD)))
+            series50.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), (pControl2Mean + 3 * (pControl2SD))))
+
+            myLineSeriesView = CType(series50.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.Thickness = 2
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+
+            series50.PointOptions.PointView = PointView.Values
+            series50.ArgumentScaleType = ScaleType.Numerical
+            series50.ValueScaleType = ScaleType.Numerical
+            series50.Label.Visible = False
+
+            Dim series51 As New Series("SD3L2", ViewType.Line)
+            series51.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), pControl2Mean + 3 * (pControl2SD)))
+            series51.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), (pControl2Mean - 3 * (pControl2SD))))
+
+            myLineSeriesView = CType(series51.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.Thickness = 2
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+
+            series51.PointOptions.PointView = PointView.Values
+            series51.ArgumentScaleType = ScaleType.Numerical
+            series51.ValueScaleType = ScaleType.Numerical
+            series51.Label.Visible = False
+
+            Dim series52 As New Series("SD3L3", ViewType.Line)
+            series52.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), pControl2Mean - 3 * (pControl2SD)))
+            series52.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), (pControl2Mean - 3 * (pControl2SD))))
+
+            myLineSeriesView = CType(series52.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.Thickness = 2
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+
+            series52.PointOptions.PointView = PointView.Values
+            series52.ArgumentScaleType = ScaleType.Numerical
+            series52.ValueScaleType = ScaleType.Numerical
+            series52.Label.Visible = False
+
+            Dim series53 As New Series("SD3L4", ViewType.Line)
+            series53.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), pControl2Mean - 3 * (pControl2SD)))
+            series53.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), (pControl2Mean + 3 * (pControl2SD))))
+
+            myLineSeriesView = CType(series53.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray
+            myLineSeriesView.LineStyle.Thickness = 2
+            myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
+
+            series53.PointOptions.PointView = PointView.Values
+            series53.ArgumentScaleType = ScaleType.Numerical
+            series53.ValueScaleType = ScaleType.Numerical
+            series53.Label.Visible = False
+
+            '*******************'
+            '*  Diagonal Line  *'
+            '*******************'
+            Dim series60 As New Series("tan45º", ViewType.Line)
+            series60.Points.Add(New SeriesPoint(pControl1Mean - 7 * (pControl1SD), pControl2Mean - 7 * (pControl2SD)))
+            series60.Points.Add(New SeriesPoint(pControl1Mean + 7 * (pControl1SD), (pControl2Mean + 7 * (pControl2SD))))
+
+            myLineSeriesView = CType(series60.View, LineSeriesView)
+            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.Color = Color.Gray   'Color.Red
+            myLineSeriesView.LineStyle.Thickness = 2
+
+            series60.PointOptions.PointView = PointView.Values
+            series60.ArgumentScaleType = ScaleType.Numerical
+            series60.ValueScaleType = ScaleType.Numerical
+            series60.Label.Visible = False
+
+
+            XrYoudenGraph.Series.AddRange(New Series() {series4, series41, series42, series43, series40, series410, _
+                                                        series420, series430, series50, series51, series52, series53, series60})
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub PrepareYoudenGraph()
+        'Multilanguage support
+        Dim currentLanguageGlobal As New GlobalBase
+        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        mLabelSD = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", mCurrentLanguage)
+        mLabelMEAN = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", mCurrentLanguage)
+        XrLabelLast.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LAST_RUNPOINT", mCurrentLanguage)
+
+        'The Graph
+        XrYoudenGraph.Series.Clear()
+        XrYoudenGraph.Legend.Visible = False
+        XrYoudenGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
+        XrYoudenGraph.BackColor = Color.White
+
+        Try
+            'Get the list of selected Controls
+            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a In mControlsDS.tOpenResults _
+                                                                                        Where Not a.IsSelectedNull AndAlso a.Selected _
+                                                                                        Select a).ToList()
+            Dim numOfSelectedCtrls As Integer = mySelectecControlLotList.Count
+            If (numOfSelectedCtrls > 0) Then
+                If (numOfSelectedCtrls > 2) Then
+                    'If there are more than two Control/Lots selected, the last one is unselected
+                    mySelectecControlLotList.Last.Selected = False
+                    numOfSelectedCtrls -= 1
+                End If
+
+                XrYoudenGraph.Series.Add(mySelectecControlLotList.First().ControlNameLotNum, ViewType.Point)
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).ShowInLegend = True
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Label.Visible = False
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).PointOptions.PointView = PointView.Values
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).ValueScaleType = ScaleType.Numerical
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).View.Color = Color.Black
+
+                Dim myDiagram As XYDiagram = CType(XrYoudenGraph.Diagram, XYDiagram)
+                myDiagram.AxisY.ConstantLines.Clear()
+                myDiagram.AxisX.ConstantLines.Clear()
+                myDiagram.AxisY.Range.Auto = False
+                myDiagram.AxisX.Range.Auto = False
+
+                Dim XResultValues As New List(Of Single)
+                If (numOfSelectedCtrls = 1) Then
+                    If (mySelectecControlLotList.First().IsSDNull) Then
+                        'There are not enough Results to drawn the graph
+                        mySelectecControlLotList.First().Selected = False
+                        XrYoudenGraph.Series.Clear()
+                    Else
+                        'Drawn the Youden Graph for the selected Control...
+
+                        'Set Margins
+                        myDiagram.Margins.Right = 40
+
+                        'Set values for X-Axis and Y-Axis
+                        XResultValues = (From a In mResultsDS.tqcResults _
+                                         Where a.QCControlLotID = mySelectecControlLotList.First().QCControlLotID AndAlso _
+                                               a.ControlNameLotNum = mySelectecControlLotList.First().ControlNameLotNum AndAlso _
+                                               Not a.Excluded _
+                                         Select a.VisibleResultValue).ToList()
+
+                        myDiagram.AxisX.Range.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                                                              Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
+                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.Title.Antialiasing = False
+                        myDiagram.AxisX.Title.TextColor = Color.Black
+                        myDiagram.AxisX.Title.Alignment = StringAlignment.Center
+                        myDiagram.AxisX.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
+                        myDiagram.AxisX.Title.Text = mySelectecControlLotList.First().ControlName
+
+                        myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                                                              Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
+                        myDiagram.AxisY.Title.Visible = True
+                        myDiagram.AxisY.Title.Antialiasing = False
+                        myDiagram.AxisY.Title.TextColor = Color.Black
+                        myDiagram.AxisY.Title.Alignment = StringAlignment.Center
+                        myDiagram.AxisY.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
+                        myDiagram.AxisY.Title.Text = mySelectecControlLotList.Last().ControlName
+
+                        'Create the graph squares
+                        CreateSquares(mySelectecControlLotList.First().Mean, mySelectecControlLotList.First().SD, _
+                                      mySelectecControlLotList.Last().Mean, mySelectecControlLotList.Last().SD)
+
+                        'Drawn the points in the graph
+                        For Each qcResultRow As QCResultsDS.tqcResultsRow In From elem In mResultsDS.tqcResults _
+                                                                             Where Not elem.Excluded AndAlso _
+                                                                                   elem.ControlNameLotNum = mySelectecControlLotList.First().ControlNameLotNum
+                            XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Points.Add(New SeriesPoint(qcResultRow.VisibleResultValue, _
+                                                                                                                                qcResultRow.VisibleResultValue))
+                            XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Points(XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Points.Count - 1).Tag = qcResultRow.CalcRunNumber
+                        Next
+
+                        'Create cross lines with the Control Mean
+                        CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
+                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
+                    End If
+
+                ElseIf (numOfSelectedCtrls = 2) Then
+                    If (mySelectecControlLotList.First().IsSDNull OrElse mySelectecControlLotList.Last().IsSDNull) Then
+                        'There are not enough Results to drawn the graph...
+
+                        mySelectecControlLotList.First().Selected = False
+                        mySelectecControlLotList.Last().Selected = False
+
+                        XrYoudenGraph.Series.Clear()
+                    Else
+                        'Drawn the Youden Graph for the pair of selected Controls...
+
+                        'Set Margins
+                        myDiagram.Margins.Right = 40
+
+                        'Set values to X-Axis
+                        XResultValues = (From a In mResultsDS.tqcResults _
+                                         Where a.QCControlLotID = mySelectecControlLotList.First().QCControlLotID AndAlso _
+                                               a.ControlNameLotNum = mySelectecControlLotList.First().ControlNameLotNum AndAlso _
+                                               Not a.Excluded _
+                                         Select a.VisibleResultValue).ToList()
+
+                        Dim MinValue As Single = Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3)
+                        If (MinValue > XResultValues.Min) Then MinValue = XResultValues.Min
+
+                        Dim MaxValue As Single = Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3)
+                        If (MaxValue < XResultValues.Max) Then MaxValue = XResultValues.Max
+
+                        myDiagram.AxisX.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.Title.Antialiasing = False
+                        myDiagram.AxisX.Title.TextColor = Color.Black
+                        myDiagram.AxisX.Title.Alignment = StringAlignment.Center
+                        myDiagram.AxisX.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
+                        myDiagram.AxisX.Title.Text = mySelectecControlLotList.First().ControlName
+
+                        'Set values to Y-Axis
+                        Dim YResultValues As List(Of Single) = (From a In mResultsDS.tqcResults _
+                                                                Where a.QCControlLotID = mySelectecControlLotList.Last().QCControlLotID AndAlso _
+                                                                      a.ControlName = mySelectecControlLotList.Last().ControlName AndAlso _
+                                                                      Not a.Excluded _
+                                                                Select a.VisibleResultValue).ToList()
+
+                        MinValue = Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3)
+                        If (MinValue > YResultValues.Min) Then MinValue = YResultValues.Min
+
+                        MaxValue = Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3)
+                        If (MaxValue < YResultValues.Max) Then MaxValue = YResultValues.Max
+
+                        myDiagram.AxisY.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisY.Title.Visible = True
+                        myDiagram.AxisY.Title.Antialiasing = False
+                        myDiagram.AxisY.Title.TextColor = Color.Black
+                        myDiagram.AxisY.Title.Alignment = StringAlignment.Center
+                        myDiagram.AxisY.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
+                        myDiagram.AxisY.Title.Text = mySelectecControlLotList.Last().ControlName
+
+                        'Create cross lines with the Mean of selected Controls
+                        CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
+                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.Last().Mean, Color.Gray)
+
+                        'Create the graph squares
+                        CreateSquares(mySelectecControlLotList.First().Mean, mySelectecControlLotList.First().SD, _
+                                      mySelectecControlLotList.Last().Mean, mySelectecControlLotList.Last().SD)
+
+                        'Drawn the points in the graph
+                        Dim SecondControlValue As New List(Of QCResultsDS.tqcResultsRow)
+                        For Each qcResultRow As QCResultsDS.tqcResultsRow In From elem In mResultsDS.tqcResults _
+                                                                             Where Not elem.Excluded AndAlso _
+                                                                                   elem.ControlNameLotNum = mySelectecControlLotList.First().ControlNameLotNum
+                            'Get result values for second control.
+                            SecondControlValue = (From a In mResultsDS.tqcResults _
+                                                  Where a.QCControlLotID = mySelectecControlLotList.Last().QCControlLotID AndAlso _
+                                                        a.CalcRunNumber = qcResultRow.CalcRunNumber _
+                                                  Select a).ToList()
+
+                            If (SecondControlValue.Count > 0) Then
+                                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Points.Add(New SeriesPoint(qcResultRow.VisibleResultValue, _
+                                                                                                                                    SecondControlValue.First().VisibleResultValue))
+                                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Points(XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Points.Count - 1).Tag = qcResultRow.CalcRunNumber
+                            End If
+                        Next
+                    End If
+                Else
+                    myDiagram = CType(XrYoudenGraph.Diagram, XYDiagram)
+                    myDiagram.AxisY.ConstantLines.Clear()
+                    myDiagram.AxisX.ConstantLines.Clear()
+
+                    myDiagram.AxisY.Title.Visible = False
+                    myDiagram.AxisX.Title.Visible = False
+
+                End If
+            End If
+
+        Catch ex As Exception
+        End Try
+    End Sub
+
+    Private Sub XrYoudenGraph_CustomDrawSeriesPoint(ByVal sender As System.Object, ByVal e As DevExpress.XtraCharts.CustomDrawSeriesPointEventArgs) Handles XrYoudenGraph.CustomDrawSeriesPoint
+        Try
+            Dim myArgumentValue As String = e.SeriesPoint.Argument.ToString
+
+            'Youden Graph
+            Dim myPoint As SeriesPoint = TryCast(e.SeriesPoint, SeriesPoint)
+            If (Not myPoint Is Nothing AndAlso Not myPoint.Tag Is Nothing) Then
+                e.SeriesDrawOptions.Color = Color.Black
+                With CType(e.SeriesDrawOptions, PointDrawOptions).Marker
+                    'Validate if the n on the tag property is the last to change the icon
+                    If (e.Series.Points(e.Series.Points.Count - 1).Tag = DirectCast(myPoint.Tag, Integer)) Then
+                        '.FillStyle.FillMode = FillMode.Solid
+                        .Kind = MarkerKind.Star
+                        .Size = 14
+                    Else
+                        '.FillStyle.FillMode = FillMode.Solid
+                        .Kind = MarkerKind.Cross
+                        .Size = 7
+                    End If
+                End With
+            End If
+        Catch ex As Exception
+        End Try
+    End Sub
+#End Region
+End Class

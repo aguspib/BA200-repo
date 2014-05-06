@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdjustmentsTextBox.Text" xml:space="preserve">
+    <value>
+{Brazo Reactivo 1}
+
+R1RV:200;    {Posicion referencia - Vertical}
+R1H:364;     {Posici�n Parking - Horizontal}
+R1V:1332;    {REF Posici�n Parking - Vertical}
+R1WS:756;    {Estaci�n de Lavado - Horizontal}
+R1DH:364;    {Dispensaci�n en Rotor - Horizontal}
+R1DV:1332;   {REF Dispensaci�n en Rotor - Vertical}
+R1PH1:1460;  {Rotor de Reactivos Corona 1 - Horizontal}
+R1PV1:1900;  {Rotor de Reactivos Corona 1 Punto m�ximo detecci�n - Vertical}
+R1PH2:1460;  {Rotor de Reactivos Corona 2 - Horizontal}
+R1PV2:1900;  {Rotor de Reactivos Corona 2 Punto m�ximo detecci�n - Vertical}
+
+{Rotor Reactivos}
+
+RR1P1:324;   {Posici�n referencia Pipeteo - Pote 1 en Corona 1 Brazo R1}
+RR1P2:324;   {Posici�n referencia Pipeteo - Pote XX en Corona 2 Brazo R1}
+RR2P1:324;   {Posici�n referencia Pipeteo - Pote 1 en Corona 1 Brazo R2}
+RR2P2:324;   {Posici�n referencia Pipeteo - Pote XX en Corona 2 Brazo R2}
+RRCB:1236;   {Posici�n referencia Codigo de Barras - Pote 1 en C.B.}
+
+{Brazo Reactivo 2}
+
+R2RV:200;    {Posicion referencia - Vertical}
+R2H:364;     {Posici�n Parking - Horizontal}
+R2V:1332;    {REF Posici�n Parking - Vertical}
+R2WS:1675;   {Estaci�n de Lavado - Horizontal}
+R2DH:2050;   {Dispensaci�n en Rotor - Horizontal}
+R2DV:1312;   {REF Dispensaci�n en Rotor - Vertical}
+R2PH1:1460;  {Rotor de Reactivos Corona 1 - Horizontal}
+R2PV1:1900;  {Rotor de Reactivos Corona 1 Punto m�ximo detecci�n - Vertical}
+R2PH2:1460;  {Rotor de Reactivos Corona 2 - Horizontal}
+R2PV2:1900;  {Rotor de Reactivos Corona 2 Punto m�ximo detecci�n - Vertical}
+
+{Brazo Muestra}
+
+M1RV:200;    {Posicion referencia - Vertical}
+M1H:364;     {Posici�n Parking - Horizontal}
+M1V:1332;    {REF Posici�n Parking - Vertical}
+M1RS:2024;   {Estaci�n de Lavado - Horizontal}
+M1DV1:1382;  {REF Dispensaci�n en Rotor Posicion 1 - Vertical}
+M1DH2:2719;  {Dispensaci�n en Rotor Posicion 2 - Horizontal}
+M1DV2:1382;  {REF Dispensaci�n en Rotor Posicion 2 - Vertical}
+M1ISEH:-305; {Dispensaci�n en ISE - Horizontal}
+M1ISEV:2086; {Dispensaci�n en ISE - Vertical}
+M1PH1:1599;  {Rotor de Muestras Corona 1 - Horizontal}
+M1PV1p:1855; {Rotor de Muestras Corona 1 Punto m�ximo detecci�n pedi�trico - Vertical}
+M1PH2:1597;  {Rotor de Muestras Corona 2 - Horizontal}
+M1PV2p:1850; {Rotor de Muestras Corona 2 Punto m�ximo detecci�n pedi�trico - Vertical}
+M1PH3:1578;  {Rotor de Muestras Corona 3 - Horizontal}
+M1PV3p:1851; {Rotor de Muestras Corona 3 Punto m�ximo detecci�n pedi�trico - Vertical}
+M1PV1t:1950; {Rotor de Muestras Corona 1 Punto m�ximo detecci�n tubo - Vertical}
+M1PV2t:1950; {Rotor de Muestras Corona 2 Punto m�ximo detecci�n tubo - Vertical}
+M1PV3t:1950; {Rotor de Muestras Corona 3 Punto m�ximo detecci�n tubo - Vertical}
+M1PI:1560;   {REF Punto Inicial Detecci�n de nivel - Vertical}
+M1DH1:2720;  {Dispensaci�n en Rotor Posicion 1 - Horizontal}
+
+{Rotor Muestras}
+
+RM1P1:3525;  {Posici�n referencia Pipeteo - Pocillo  1 en Corona 1}
+RM1P2:334;   {Posici�n referencia Pipeteo - Pocillo xx en Corona 2}
+RM1P3:344;   {Posici�n referencia Pipeteo - Pocillo xx en Corona 3}
+RMCB:1236;   {Posici�n referencia Codigo de Barras - Pocillo 1 en C.B.}
+
+{Agitador 1}
+
+A1RV:200;    {Posicion referencia - Vertical}
+A1H:364;     {Posici�n Parking - Horizontal}
+A1V:1332;    {REF Posici�n Parking - Vertical}
+A1WS:1292;   {Estaci�n de Lavado - Horizontal}
+A1DH:2276;   {Agitaci�n en rotor - Horizontal}
+A1DV:1721;   {REF Agitaci�n en rotor - Vertical}
+
+{Agitador 2}
+
+A2RV:200;    {Posicion referencia - Vertical}
+A2H:364;     {Posici�n Parking - Horizontal}
+A2V:1332;    {REF Posici�n Parking - Vertical}
+A2WS:166;    {Estaci�n de Lavado - Horizontal}
+A2DH:1716;   {Agitaci�n en rotor - Horizontal}
+A2DV:1721;   {REF Agitaci�n en rotor - Vertical}
+
+{Fotometria}
+
+GFWR1:324;   {Posici�n referencia lectura - Pocillo 1}
+
+{Estaci�n de Lavado}
+
+WSRV:5104;   {Posicion referencia - Vertical}
+WSRR:650;    {Posicion ready relativa a Posicion referencia - Vertical}
+WSSV:1570;   {REF Posicion de inicio ciclo lavado - Vertical}
+WSEV:2235;   {REF Posicion final ciclo lavado - Vertical}
+
+{General Equipo - Termos}
+
+GTR1:38,0;   {Consigna Termo Punta Reactivo 1}
+GTR2:38,2;   {Consigna Termo Punta Reactivo 2}
+GTN1:4,0;    {Consigna Termo Nevera 1}
+GTGF:37,2;   {Consigna Termo Fotometr�a}
+GTH1:60,0;   {Consigna Heater Estaci�n de Lavado}
+
+{Optica}
+
+RRLO:3296;   {Posici�n referencia Lectura Optica}
+RRLOP:0;     {Posición referencia Lectura Optica Polar}
+
+{Depositos}
+
+WSL1:232;    {Nivel Mínimo depósito Solución de Lavado}
+WSL2:857;    {Nivel Máximo depósito Solución de Lavado}
+HCL1:262;    {Nivel Mínimo depósito Alta Contaminacion}
+HCL2:967;    {Nivel Máximo depósito Alta Contaminacion}
+
+{Sistema Fluidico}
+
+DWINPUT:1;   {Entrada Agua Destilada 0-deposito 1-grifo}
+</value>
+  </data>
+</root>

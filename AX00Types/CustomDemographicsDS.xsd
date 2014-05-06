@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CustomDemographicsDS" targetNamespace="http://tempuri.org/CustomDemographicsDS.xsd" xmlns:mstns="http://tempuri.org/CustomDemographicsDS.xsd" xmlns="http://tempuri.org/CustomDemographicsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString2" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString2 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString2" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CustomDemographicsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="CustomDemographicsDS" msprop:Generator_DataSetName="CustomDemographicsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tcfgCustomDemographics" msprop:Generator_UserTableName="tcfgCustomDemographics" msprop:Generator_RowDeletedName="tcfgCustomDemographicsRowDeleted" msprop:Generator_RowChangedName="tcfgCustomDemographicsRowChanged" msprop:Generator_RowClassName="tcfgCustomDemographicsRow" msprop:Generator_RowChangingName="tcfgCustomDemographicsRowChanging" msprop:Generator_RowEvArgName="tcfgCustomDemographicsRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgCustomDemographicsRowChangeEventHandler" msprop:Generator_TableClassName="tcfgCustomDemographicsDataTable" msprop:Generator_TableVarName="tabletcfgCustomDemographics" msprop:Generator_RowDeletingName="tcfgCustomDemographicsRowDeleting" msprop:Generator_TablePropName="tcfgCustomDemographics">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="DemographicID" msprop:Generator_UserColumnName="DemographicID" msprop:Generator_ColumnPropNameInRow="DemographicID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDemographicID" msprop:Generator_ColumnPropNameInTable="DemographicIDColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="DemographicType" msprop:Generator_UserColumnName="DemographicType" msprop:Generator_ColumnPropNameInRow="DemographicType" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDemographicType" msprop:Generator_ColumnPropNameInTable="DemographicTypeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="FixedItemDesc" msprop:Generator_UserColumnName="FixedItemDesc" msprop:Generator_ColumnPropNameInRow="FixedItemDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFixedItemDesc" msprop:Generator_ColumnPropNameInTable="FixedItemDescColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="DemographicDataType" msprop:Generator_UserColumnName="DemographicDataType" msprop:Generator_ColumnPropNameInRow="DemographicDataType" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDemographicDataType" msprop:Generator_ColumnPropNameInTable="DemographicDataTypeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="DemographicMaxLength" msprop:Generator_UserColumnName="DemographicMaxLength" msprop:Generator_ColumnPropNameInRow="DemographicMaxLength" msprop:Generator_ColumnVarNameInTable="columnDemographicMaxLength" msprop:Generator_ColumnPropNameInTable="DemographicMaxLengthColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="DemographicValueList" msprop:Generator_UserColumnName="DemographicValueList" msprop:Generator_ColumnPropNameInRow="DemographicValueList" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDemographicValueList" msprop:Generator_ColumnPropNameInTable="DemographicValueListColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="Status" msprop:Generator_UserColumnName="Status" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInTable="StatusColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

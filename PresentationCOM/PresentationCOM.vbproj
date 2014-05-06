@@ -1,0 +1,1714 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A139D1D6-0C60-4DA2-B073-E73E2F2893D8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Biosystems.Ax00.PresentationCOM</RootNamespace>
+    <AssemblyName>PresentationCOM</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <OptionExplicit>On</OptionExplicit>
+    <OptionCompare>Binary</OptionCompare>
+    <OptionStrict>Off</OptionStrict>
+    <OptionInfer>On</OptionInfer>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>PresentationCOM.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>PresentationCOM.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>PresentationCOM.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>PresentationCOM.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>PresentationCOM.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>PresentationCOM.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.Charts.v10.2.Core, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Data.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.PivotGrid.v10.2.Core, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.RichEdit.v10.2.Core, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Utils.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraBars.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraEditors.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPivotGrid.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPrinting.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v10.2.Extensions, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraRichEdit.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IRestPointUpdateProc.designer.vb">
+      <DependentUpon>IRestPointUpdateProc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IRestPointUpdateProc.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISE\IISECalibHistory.Designer.vb">
+      <DependentUpon>IISECalibHistory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISE\IISECalibHistory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\AutomaticPatientsReport.Designer.vb">
+      <DependentUpon>AutomaticPatientsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\AutomaticPatientsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\HistoricResultsByPatientSampleReport.Designer.vb">
+      <DependentUpon>HistoricResultsByPatientSampleReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\HistoricResultsByPatientSampleReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\PatientsFinalReport.Designer.vb">
+      <DependentUpon>PatientsFinalReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\PatientsFinalReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\QCCumulatedResultsByTestControlReport.Designer.vb">
+      <DependentUpon>QCCumulatedResultsByTestControlReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\QCCumulatedResultsByTestControlReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\QCCumulatedResultsByTestReport.Designer.vb">
+      <DependentUpon>QCCumulatedResultsByTestReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\QCCumulatedResultsByTestReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\QCIndividualResultsByTestControlReport.Designer.vb">
+      <DependentUpon>QCIndividualResultsByTestControlReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\QCIndividualResultsByTestControlReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\QCIndividualResultsByTestReport.Designer.vb">
+      <DependentUpon>QCIndividualResultsByTestReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\QCIndividualResultsByTestReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ResultsByTestReportCompact.Designer.vb">
+      <DependentUpon>ResultsByTestReportCompact.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ResultsByTestReportCompact.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\RotorContentPositionsReport.designer.vb">
+      <DependentUpon>RotorContentPositionsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\RotorContentPositionsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="RuntimePolicyHelper\RuntimePolicyHelper.vb" />
+    <Compile Include="WaitScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IBackground.Designer.vb">
+      <DependentUpon>IBackground.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IBackground.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IBarCodesConfig.Designer.vb">
+      <DependentUpon>IBarCodesConfig.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IBarCodesConfig.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISettings.Designer.vb">
+      <DependentUpon>ISettings.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISettings.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISE\IISEDateElementSelection.Designer.vb">
+      <DependentUpon>IISEDateElementSelection.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISE\IISEDateElementSelection.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISE\IISEUtilities.Designer.vb">
+      <DependentUpon>IISEUtilities.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISE\IISEUtilities.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IInstrumentInfo.Designer.vb">
+      <DependentUpon>IInstrumentInfo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IInstrumentInfo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IAboutBox.Designer.vb">
+      <DependentUpon>IAboutBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IAboutBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\CalibratorsReport.Designer.vb">
+      <DependentUpon>CalibratorsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\CalibratorsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ContaminationsReport.Designer.vb">
+      <DependentUpon>ContaminationsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ContaminationsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\XRDesignMasterForm.Designer.vb">
+      <DependentUpon>XRDesignMasterForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\XRDesignMasterForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\ResultsCalibCurveReport.Designer.vb">
+      <DependentUpon>ResultsCalibCurveReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ResultsCalibCurveReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\SummaryResultsReport.Designer.vb">
+      <DependentUpon>SummaryResultsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\SummaryResultsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ResultsByTestReport.Designer.vb">
+      <DependentUpon>ResultsByTestReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ResultsByTestReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\ResultsByPatientSampleReport.Designer.vb">
+      <DependentUpon>ResultsByPatientSampleReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ResultsByPatientSampleReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Templates\MASTERTEMPLATELS.designer.vb">
+      <DependentUpon>MASTERTEMPLATELS.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Templates\MASTERTEMPLATELS.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\Test\XtraSubReportControls.Designer.vb">
+      <DependentUpon>XtraSubReportControls.vb</DependentUpon>
+    </Compile>
+    <None Include="Reports\Test\XtraSubReportControls.vb">
+      <SubType>Component</SubType>
+    </None>
+    <Compile Include="Reports\Templates\MASTERTEMPLATE.Designer.vb">
+      <DependentUpon>MASTERTEMPLATE.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Templates\MASTERTEMPLATE.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Update\DetectorForm.Designer.vb">
+      <DependentUpon>DetectorForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Update\DetectorForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IAx00Login.Designer.vb">
+      <DependentUpon>IAx00Login.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IAx00Login.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Base Form\BSBaseForm.Designer.vb">
+      <DependentUpon>BSBaseForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Base Form\BSBaseForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IPassword.Designer.vb">
+      <DependentUpon>IPassword.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IPassword.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IConfigGeneral.Designer.vb">
+      <DependentUpon>IConfigGeneral.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IConfigGeneral.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IConfigUsers.designer.vb">
+      <DependentUpon>IConfigUsers.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IConfigUsers.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IAx00StartUp.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IConfigLanguage.Designer.vb">
+      <DependentUpon>IConfigLanguage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IConfigLanguage.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Reports\IBandTemplateReport.designer.vb">
+      <DependentUpon>IBandTemplateReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\IBandTemplateReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\Test\TestsReportDS.vb">
+      <DependentUpon>TestsReportDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\Test\TestsReportDS1.Designer.vb">
+      <DependentUpon>TestsReportDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="Reports\Test\XtraSubReportTest.Designer.vb">
+      <DependentUpon>XtraSubReportTest.vb</DependentUpon>
+    </Compile>
+    <None Include="Reports\Test\XtraSubReportTest.vb">
+      <SubType>Component</SubType>
+    </None>
+    <Compile Include="Reports\XRMainForm.Designer.vb">
+      <DependentUpon>XRMainForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\XRMainForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Reports\XRManager.vb" />
+    <Compile Include="Reports\GenericTableReport.Designer.vb">
+      <DependentUpon>GenericTableReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\GenericTableReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Content Include="Images\BtlInProcessAddSolBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessAddSolBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessAddSolSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessAddSolSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessAddSolSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessAddSolSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessDepletedBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessDepletedBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessDepletedSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessDepletedSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessDepletedSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessDepletedSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessFewVolBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessFewVolBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessFewVolSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessFewVolSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessFewVolSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessFewVolSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessReagBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessReagBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessReagSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessReagSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessReagSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlInProcessReagSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\CompactPrint.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BINPROCESS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Update\bak\Ax00TEM.bak">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IRestPointUpdateProc.resx">
+      <DependentUpon>IRestPointUpdateProc.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISE\IISECalibHistory.resx">
+      <DependentUpon>IISECalibHistory.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\HistoricResultsByPatientSampleReport.resx">
+      <DependentUpon>HistoricResultsByPatientSampleReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\PatientsFinalReport.resx">
+      <DependentUpon>PatientsFinalReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\QCCumulatedResultsByTestControlReport.resx">
+      <DependentUpon>QCCumulatedResultsByTestControlReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\QCCumulatedResultsByTestReport.resx">
+      <DependentUpon>QCCumulatedResultsByTestReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\QCIndividualResultsByTestControlReport.resx">
+      <DependentUpon>QCIndividualResultsByTestControlReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\QCIndividualResultsByTestReport.resx">
+      <DependentUpon>QCIndividualResultsByTestReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Update\DetectorForm.resx">
+      <DependentUpon>DetectorForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WaitScreen.resx">
+      <DependentUpon>WaitScreen.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IBackground.resx">
+      <DependentUpon>IBackground.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IAx00Login.resx">
+      <DependentUpon>IAx00Login.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Base Form\BSBaseForm.resx">
+      <DependentUpon>BSBaseForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IAx00StartUp.resx">
+      <DependentUpon>IAx00StartUp.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IBarCodesConfig.resx">
+      <DependentUpon>IBarCodesConfig.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IConfigGeneral.resx">
+      <DependentUpon>IConfigGeneral.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IConfigUsers.resx">
+      <DependentUpon>IConfigUsers.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IConfigLanguage.resx">
+      <DependentUpon>IConfigLanguage.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IPassword.resx">
+      <DependentUpon>IPassword.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISettings.resx">
+      <DependentUpon>ISettings.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISE\IISEDateElementSelection.resx">
+      <DependentUpon>IISEDateElementSelection.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISE\IISEUtilities.resx">
+      <DependentUpon>IISEUtilities.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IInstrumentInfo.resx">
+      <DependentUpon>IInstrumentInfo.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IAboutBox.resx">
+      <DependentUpon>IAboutBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\CalibratorsReport.resx">
+      <DependentUpon>CalibratorsReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ContaminationsReport.resx">
+      <DependentUpon>ContaminationsReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\XRDesignMasterForm.resx">
+      <DependentUpon>XRDesignMasterForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ResultsCalibCurveReport.resx">
+      <DependentUpon>ResultsCalibCurveReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\SummaryResultsReport.resx">
+      <DependentUpon>SummaryResultsReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ResultsByTestReport.resx">
+      <DependentUpon>ResultsByTestReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ResultsByPatientSampleReport.resx">
+      <DependentUpon>ResultsByPatientSampleReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\IBandTemplateReport.resx">
+      <DependentUpon>IBandTemplateReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Templates\MASTERTEMPLATE.resx">
+      <DependentUpon>MASTERTEMPLATE.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Templates\MASTERTEMPLATELS.resx">
+      <DependentUpon>MASTERTEMPLATELS.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Test\XtraSubReportControls.resx">
+      <DependentUpon>XtraSubReportControls.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\Test\XtraSubReportTest.resx">
+      <DependentUpon>XtraSubReportTest.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\XRMainForm.resx">
+      <DependentUpon>XRMainForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\GenericTableReport.resx">
+      <DependentUpon>GenericTableReport.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Adjustments\FWAdjustments.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\1SD.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\2SD.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\3SD.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AboutBA4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AboutBA4SRV.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AboutLogo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Accept.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AcceptF.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AcceptFBN.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AlertWarningDisable.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ConditioningBtn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ActionClick.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AdditionalSolution.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AddSolSamples.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Adjustment.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\DecreaseButt.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BackgroundMainMonitor_DIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BackgroundReactionRotor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BackgroundReagentsRotor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BackgroundSamplesRotor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BsScadaMotorControl0.png" />
+    <Content Include="Images\Embedded\BsScadaMotorControl1.png" />
+    <Content Include="Images\Embedded\bsScadaPumpControl0.png" />
+    <Content Include="Images\Embedded\bsScadaPumpControl1.png" />
+    <Content Include="Images\Embedded\bsScadaValve3Control0.png" />
+    <Content Include="Images\Embedded\bsScadaValve3Control1.png" />
+    <Content Include="Images\Embedded\bsScadaValve3Control2.png" />
+    <Content Include="Images\Embedded\bsScadaValve3Control3.png" />
+    <Content Include="Images\Embedded\BsScadaValveControl0.png" />
+    <Content Include="Images\Embedded\BsScadaValveControl1.png" />
+    <Content Include="Images\Embedded\CoverAnalyzerOff_DIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverAnalyzerOn_DIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverReactions_DIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverReagents_DIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverSamples_DIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\HostQuery.png" />
+    <Content Include="Images\Embedded\MDIHorizSupport.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\OrderDownload.png" />
+    <Content Include="Images\Embedded\QueryAll.png" />
+    <Content Include="Images\Embedded\ServiceSplash.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\UserSplash.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\HQ.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LISRequest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_WHITE.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_YELLOW.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReadAdj.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Alarm.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\AlertWarning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BackUpDB.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Backward.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BackwardL.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Barcode.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\barcodewarning256.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Blank.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BlueCircle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BlueStart.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Bottom.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlAddSolSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlBarcodeErrSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlBarcodeErrBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlBarcodeErrSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSampleBarCodeError.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSampleBarCodeError_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSampleDepleted_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSampleFinished_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSampleInProcess_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSampleNoInUse_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlSamplePending_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlUnkownSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlUnkownBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlUnkownSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlDepletedSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlDepletedBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlDepletedSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlFewVolSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlFewVolBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlFewVolSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlNotUseSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlNotUseBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlNotUseSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlUnkownSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlDepletedSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlBarcodeErrSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlFewVolSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlNotUseSmallR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\bottle2%28R2%29_SELECTED.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlAddSolSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlUnkownSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\bottle2_CLEAR.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlDepletedSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlBarcodeErrSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlFewVolSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlNotUseSmallR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\bottle2_NOTHING.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\bottle2_SELECTED.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlReagBigD2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlAddSolBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlUnkownBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\bottle3_CLEAR.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlDepletedBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlBarcodeErrBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlFewVolBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlNotUseBigR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\bottle3_NOTHING.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlReagBigD2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlReagSmallD1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlReagSmallD2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlReagSmallD2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlReagSmallD1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlAddSolBigR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlAddSolSmallR1_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BtlAddSolSmallR2_Sel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\BTN_EXCELEXPORT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\CalculatedTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Calibrator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Cancel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\CancelF.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\CancelG.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ChangeRotorBtn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Check.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ChgPW.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Clear.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\clear1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\collapse.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ContinueSessionBtn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Control.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Copy.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\DiamondRed.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Down.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\EditReport.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BA400SRV.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BA4SVR_Login.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BA4USR_Login.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BackgroundMainMonitor-Start.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CumulatedQC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizAlarm.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizAnalyzer.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\Bottle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\Connect.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\Continue.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverAnalyzerOff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverAnalyzerOn.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\AnimatedWait.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BA400USER.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\BackgroundMainMonitor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverReagents.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverReactions.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\CoverSamples.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizInfo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizMonitor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertPause.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertPlay.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizPositioning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertPowerOff.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizProfiles.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizQCCum.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertRecover.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizReset.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizResults.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizSample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertSound.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertStart.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIVertStop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizTests.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizTool.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\MDIHorizWestgard.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Embedded\Panel.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\EmergencyStop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\EmptyImage.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Enter.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Espiral.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\expand.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ExportScript.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Factory.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\FewVolume.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Greencircle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Home.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Home2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Import.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ImportScript.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Info.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BC_ERR.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BC_UKN.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LoadAdj.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OFFSTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OrangeCircle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PatientRoutine.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PatientRoutine.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PatientStat.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PatientStat.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Required.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSDIL.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSDILS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ResultsPatientRoutine.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ResultsPatientStat.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Right.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SaveAll.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ServiceStop.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SolvedAlarm.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Top.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\TubeAdditionalSolution.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Decrease.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Delete.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\DelKey.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Depleted.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Dilutions.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Edit.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Equal.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Eraser.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Exec_Paused.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Export.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ExportHead.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Filter.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\FinalPrint.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Find.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Forward.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ForwardL.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Gear1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Grafico.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Grafico2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Grid_16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Increase.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUse-Test.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUse-UserTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUseControl.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUseOFFSTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUseProfile.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUse_CalculatedTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\InUse_ISETest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ISETest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Left.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BARCODERR.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BDEPLETED.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BLOWER.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BNOINUSE.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BREAGENT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BSELECT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_BWASH.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_DEPLETED.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_FINISH.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_INPROGRESS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_NOINUSE.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_PENDING.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\LEG_SELECT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Locked.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Manual_Repeat.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_BCERR.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_DEPLET.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_FINISH.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_INPROGRESS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_NOTINUSE.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_PENDING.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\MON_LEG_SELECT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\New.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\NO_INUSE.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\OFFSTestButton.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Open.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\plus_16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Positioning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Print.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PrintHead.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\PrintL.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Profile.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacContam.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacDilution.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacFinish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacNotInUse.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacOptic.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSCONT.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSCONTS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSELEC.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSFINI.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSFINIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSNIUS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSNIUSS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSOPTI.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSOPTIS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSR1R2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSR1R2S.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSR1S.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSR1SL.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSR1SLS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSWASH.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\REACPOSWASHS.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacR1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacR1Sample.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacR1SampleR2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReacWashing.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ReagentPos.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Refill.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RemoveFilter.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunDcr.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunDcr_Sent.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunEqu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunEqu_Sent.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunInc.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunInc_Sent.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\RerunNew.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\ResetRotor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SamplePos.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\SamplesNode.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Save.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Stus_Finish.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Stus_Locked.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Stus_WithErrs.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Test.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Uncheck.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Undo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Up.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\UpdateFw.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\UpDown.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\UserTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\VioletCircle.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Volume.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\VolumeTest.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Warning.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\WarninGDisable.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\WarningF.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\WarningG.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\WashingSolution.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\WestgardCum.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\XtraVerticalBar.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Firmware\A400V082.BA4" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.CalibratorsDS.datasource" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.ContaminationsDS.datasource" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.ControlsDS.datasource" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.ResultsDS.datasource" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.TestControlsDS.datasource" />
+    <Content Include="Import\ReadMe.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\Templates\MASTERTEMPLATE.GIF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\Templates\MASTERTEMPLATELS.GIF">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\Templates\MASTERTEMPLATELS.repx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\Templates\MASTERTEMPLATE.repx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="Reports\Test\TestsReportDS.xsc">
+      <DependentUpon>TestsReportDS.xsd</DependentUpon>
+    </None>
+    <None Include="Reports\Test\TestsReportDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestsReportDS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Reports\Test\TestsReportDS.xss">
+      <DependentUpon>TestsReportDS.xsd</DependentUpon>
+    </None>
+    <None Include="required Libraries\ICSharpCode.SharpZipLib.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.ConnectionInfo.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.SmoExtended.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlEnum.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlWmiManagement.dll" />
+    <None Include="required Libraries\SqlServer2008R2\Microsoft.SqlServer.WmiEnum.dll" />
+    <None Include="required Libraries\System.Windows.Forms.DataVisualization.dll" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="required Libraries\wmp.dll" />
+    <Content Include="Reports\Templates\MASTERTEMPLATELS_Empty.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Reports\Templates\MASTERTEMPLATE_Empty.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Update\bak\Ax00.bak">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Update\Task\TaskList.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Update\Task\TaskListDecrypted.xml">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="XmlFiles\ISEModuleParammeters.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XmlFiles\ISEResultsDebugMode.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
+      <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
+      <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\Framework\Framework.vbproj">
+      <Project>{806A1F2F-07C1-43D2-AF67-59ACCF4B5754}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Controls\UserControls\BSControl_Library\BSControls.vbproj">
+      <Project>{24D4D868-1885-4710-A105-9095FE79A2FB}</Project>
+      <Name>BSControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
+      <Project>{51863CF3-A3E9-4E41-8924-C69704796FB9}</Project>
+      <Name>DataAccessLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\History\History.vbproj">
+      <Project>{2F6892A0-72D7-45F6-B429-61DBAD015128}</Project>
+      <Name>History</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3AAF43D5-55D8-4A0B-9FD3-E8841008E13E}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
+      <Project>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</Project>
+      <Name>WorkSession</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FwScriptsManagement\FwScriptsManagement.vbproj">
+      <Project>{0E1F721F-3002-4FAB-9300-3DB5B11A4002}</Project>
+      <Name>FwScriptsManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{052CF005-D448-4768-A25A-48FF53644469}</Project>
+      <Name>UpdateVersion</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

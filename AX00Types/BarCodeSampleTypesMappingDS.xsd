@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="BarCodeSampleTypesMappingDS" targetNamespace="http://tempuri.org/BarCodeSampleTypesMappingDS.xsd" xmlns:mstns="http://tempuri.org/BarCodeSampleTypesMappingDS.xsd" xmlns="http://tempuri.org/BarCodeSampleTypesMappingDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString8" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString8 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString8" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="BarCodeSampleTypesMappingDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="BarCodeSampleTypesMappingDS" msprop:Generator_DataSetName="BarCodeSampleTypesMappingDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tcfgBarCodeSampleTypesMapping" msprop:Generator_UserTableName="tcfgBarCodeSampleTypesMapping" msprop:Generator_RowDeletedName="tcfgBarCodeSampleTypesMappingRowDeleted" msprop:Generator_RowChangedName="tcfgBarCodeSampleTypesMappingRowChanged" msprop:Generator_RowClassName="tcfgBarCodeSampleTypesMappingRow" msprop:Generator_RowChangingName="tcfgBarCodeSampleTypesMappingRowChanging" msprop:Generator_RowEvArgName="tcfgBarCodeSampleTypesMappingRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgBarCodeSampleTypesMappingRowChangeEventHandler" msprop:Generator_TableClassName="tcfgBarCodeSampleTypesMappingDataTable" msprop:Generator_TableVarName="tabletcfgBarCodeSampleTypesMapping" msprop:Generator_RowDeletingName="tcfgBarCodeSampleTypesMappingRowDeleting" msprop:Generator_TablePropName="tcfgBarCodeSampleTypesMapping">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SampleType" msprop:Generator_UserColumnName="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_ColumnPropNameInRow="SampleType" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ActiveSampleType" msprop:Generator_UserColumnName="ActiveSampleType" msprop:Generator_ColumnPropNameInRow="ActiveSampleType" msprop:Generator_ColumnVarNameInTable="columnActiveSampleType" msprop:Generator_ColumnPropNameInTable="ActiveSampleTypeColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="ExternalSampleType" msprop:Generator_UserColumnName="ExternalSampleType" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnExternalSampleType" msprop:Generator_ColumnPropNameInTable="ExternalSampleTypeColumn" msprop:Generator_ColumnPropNameInRow="ExternalSampleType" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="50" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="CodeDesc" msprop:Generator_UserColumnName="CodeDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnCodeDesc" msprop:Generator_ColumnPropNameInTable="CodeDescColumn" msprop:Generator_ColumnPropNameInRow="CodeDesc" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

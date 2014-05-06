@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="CumulatedResultsDS" targetNamespace="http://tempuri.org/CumulatedResultsDS.xsd" xmlns:mstns="http://tempuri.org/CumulatedResultsDS.xsd" xmlns="http://tempuri.org/CumulatedResultsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString1 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString1" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="CumulatedResultsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="CumulatedResultsDS" msprop:Generator_DataSetName="CumulatedResultsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tqcCumulatedResults" msprop:Generator_UserTableName="tqcCumulatedResults" msprop:Generator_RowDeletedName="tqcCumulatedResultsRowDeleted" msprop:Generator_RowChangedName="tqcCumulatedResultsRowChanged" msprop:Generator_RowClassName="tqcCumulatedResultsRow" msprop:Generator_RowChangingName="tqcCumulatedResultsRowChanging" msprop:Generator_RowEvArgName="tqcCumulatedResultsRowChangeEvent" msprop:Generator_RowEvHandlerName="tqcCumulatedResultsRowChangeEventHandler" msprop:Generator_TableClassName="tqcCumulatedResultsDataTable" msprop:Generator_TableVarName="tabletqcCumulatedResults" msprop:Generator_RowDeletingName="tqcCumulatedResultsRowDeleting" msprop:Generator_TablePropName="tqcCumulatedResults">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="QCTestSampleID" msprop:Generator_UserColumnName="QCTestSampleID" msprop:Generator_ColumnVarNameInTable="columnQCTestSampleID" msprop:Generator_ColumnPropNameInRow="QCTestSampleID" msprop:Generator_ColumnPropNameInTable="QCTestSampleIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="QCControlLotID" msprop:Generator_UserColumnName="QCControlLotID" msprop:Generator_ColumnVarNameInTable="columnQCControlLotID" msprop:Generator_ColumnPropNameInRow="QCControlLotID" msprop:Generator_ColumnPropNameInTable="QCControlLotIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnPropNameInRow="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="ControlName" msprop:Generator_UserColumnName="ControlName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnControlName" msprop:Generator_ColumnPropNameInTable="ControlNameColumn" msprop:Generator_ColumnPropNameInRow="ControlName" type="xs:string" minOccurs="0" />
+              <xs:element name="LotNumber" msprop:Generator_UserColumnName="LotNumber" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnLotNumber" msprop:Generator_ColumnPropNameInTable="LotNumberColumn" msprop:Generator_ColumnPropNameInRow="LotNumber" type="xs:string" minOccurs="0" />
+              <xs:element name="CumResultsNum" msprop:Generator_UserColumnName="CumResultsNum" msprop:Generator_ColumnVarNameInTable="columnCumResultsNum" msprop:Generator_ColumnPropNameInRow="CumResultsNum" msprop:Generator_ColumnPropNameInTable="CumResultsNumColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="CumDateTime" msprop:Generator_UserColumnName="CumDateTime" msprop:Generator_ColumnVarNameInTable="columnCumDateTime" msprop:Generator_ColumnPropNameInRow="CumDateTime" msprop:Generator_ColumnPropNameInTable="CumDateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="TotalRuns" msprop:Generator_UserColumnName="TotalRuns" msprop:Generator_ColumnVarNameInTable="columnTotalRuns" msprop:Generator_ColumnPropNameInRow="TotalRuns" msprop:Generator_ColumnPropNameInTable="TotalRunsColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="FirstRunDateTime" msprop:Generator_UserColumnName="FirstRunDateTime" msprop:Generator_ColumnVarNameInTable="columnFirstRunDateTime" msprop:Generator_ColumnPropNameInRow="FirstRunDateTime" msprop:Generator_ColumnPropNameInTable="FirstRunDateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="LastRunDateTime" msprop:Generator_UserColumnName="LastRunDateTime" msprop:Generator_ColumnVarNameInTable="columnLastRunDateTime" msprop:Generator_ColumnPropNameInRow="LastRunDateTime" msprop:Generator_ColumnPropNameInTable="LastRunDateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="SumResults" msprop:Generator_UserColumnName="SumResults" msprop:Generator_ColumnVarNameInTable="columnSumResults" msprop:Generator_ColumnPropNameInRow="SumResults" msprop:Generator_ColumnPropNameInTable="SumResultsColumn" type="xs:double" minOccurs="0" />
+              <xs:element name="SumSQRDResults" msprop:Generator_UserColumnName="SumSQRDResults" msprop:Generator_ColumnVarNameInTable="columnSumSQRDResults" msprop:Generator_ColumnPropNameInRow="SumSQRDResults" msprop:Generator_ColumnPropNameInTable="SumSQRDResultsColumn" type="xs:double" minOccurs="0" />
+              <xs:element name="MeasureUnit" msprop:Generator_UserColumnName="MeasureUnit" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnMeasureUnit" msprop:Generator_ColumnPropNameInTable="MeasureUnitColumn" msprop:Generator_ColumnPropNameInRow="MeasureUnit" type="xs:string" minOccurs="0" />
+              <xs:element name="Mean" msprop:Generator_UserColumnName="Mean" msprop:Generator_ColumnVarNameInTable="columnMean" msprop:Generator_ColumnPropNameInRow="Mean" msprop:Generator_ColumnPropNameInTable="MeanColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="SD" msprop:Generator_UserColumnName="SD" msprop:Generator_ColumnVarNameInTable="columnSD" msprop:Generator_ColumnPropNameInRow="SD" msprop:Generator_ColumnPropNameInTable="SDColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="CV" msprop:Generator_UserColumnName="CV" msprop:Generator_ColumnPropNameInRow="CV" msprop:Generator_ColumnVarNameInTable="columnCV" msprop:Generator_ColumnPropNameInTable="CVColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="MinRange" msprop:Generator_UserColumnName="MinRange" msprop:Generator_ColumnPropNameInRow="MinRange" msprop:Generator_ColumnVarNameInTable="columnMinRange" msprop:Generator_ColumnPropNameInTable="MinRangeColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="MaxRange" msprop:Generator_UserColumnName="MaxRange" msprop:Generator_ColumnPropNameInRow="MaxRange" msprop:Generator_ColumnVarNameInTable="columnMaxRange" msprop:Generator_ColumnPropNameInTable="MaxRangeColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="Range" msprop:Generator_UserColumnName="Range" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnRange" msprop:Generator_ColumnPropNameInTable="RangeColumn" msprop:Generator_ColumnPropNameInRow="Range" type="xs:string" minOccurs="0" />
+              <xs:element name="XMLFileName" msprop:Generator_UserColumnName="XMLFileName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnXMLFileName" msprop:Generator_ColumnPropNameInTable="XMLFileNameColumn" msprop:Generator_ColumnPropNameInRow="XMLFileName" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="16" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="VisibleCumResultNumber" msprop:Generator_UserColumnName="VisibleCumResultNumber" msprop:Generator_ColumnVarNameInTable="columnVisibleCumResultNumber" msprop:Generator_ColumnPropNameInRow="VisibleCumResultNumber" msprop:Generator_ColumnPropNameInTable="VisibleCumResultNumberColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

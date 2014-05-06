@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ImportErrorsLogDS" targetNamespace="http://tempuri.org/ImportErrorsLogDS.xsd" xmlns:mstns="http://tempuri.org/ImportErrorsLogDS.xsd" xmlns="http://tempuri.org/ImportErrorsLogDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="ImportErrorsLogDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="ImportErrorsLogDS" msprop:Generator_UserDSName="ImportErrorsLogDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="twksImportErrorsLog" msprop:Generator_UserTableName="twksImportErrorsLog" msprop:Generator_RowEvArgName="twksImportErrorsLogRowChangeEvent" msprop:Generator_TableVarName="tabletwksImportErrorsLog" msprop:Generator_TablePropName="twksImportErrorsLog" msprop:Generator_RowDeletingName="twksImportErrorsLogRowDeleting" msprop:Generator_RowChangingName="twksImportErrorsLogRowChanging" msprop:Generator_RowDeletedName="twksImportErrorsLogRowDeleted" msprop:Generator_RowEvHandlerName="twksImportErrorsLogRowChangeEventHandler" msprop:Generator_TableClassName="twksImportErrorsLogDataTable" msprop:Generator_RowChangedName="twksImportErrorsLogRowChanged" msprop:Generator_RowClassName="twksImportErrorsLogRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ImportID" msprop:Generator_ColumnVarNameInTable="columnImportID" msprop:Generator_ColumnPropNameInRow="ImportID" msprop:Generator_ColumnPropNameInTable="ImportIDColumn" msprop:Generator_UserColumnName="ImportID" type="xs:int" minOccurs="0" />
+              <xs:element name="ImportDate" msprop:Generator_ColumnVarNameInTable="columnImportDate" msprop:Generator_ColumnPropNameInRow="ImportDate" msprop:Generator_ColumnPropNameInTable="ImportDateColumn" msprop:Generator_UserColumnName="ImportDate" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ErrorCode" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ErrorCode" msprop:Generator_ColumnVarNameInTable="columnErrorCode" msprop:Generator_ColumnPropNameInTable="ErrorCodeColumn" msprop:Generator_UserColumnName="ErrorCode" type="xs:string" minOccurs="0" />
+              <xs:element name="ErrorMessage" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ErrorMessage" msprop:Generator_ColumnVarNameInTable="columnErrorMessage" msprop:Generator_ColumnPropNameInTable="ErrorMessageColumn" msprop:Generator_UserColumnName="ErrorMessage" type="xs:string" minOccurs="0" />
+              <xs:element name="LineNumber" msprop:Generator_ColumnVarNameInTable="columnLineNumber" msprop:Generator_ColumnPropNameInRow="LineNumber" msprop:Generator_ColumnPropNameInTable="LineNumberColumn" msprop:Generator_UserColumnName="LineNumber" type="xs:int" minOccurs="0" />
+              <xs:element name="LineText" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LineText" msprop:Generator_ColumnVarNameInTable="columnLineText" msprop:Generator_ColumnPropNameInTable="LineTextColumn" msprop:Generator_UserColumnName="LineText" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

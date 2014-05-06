@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="DBIntegrityDS" targetNamespace="http://tempuri.org/DBIntegrityDS.xsd" xmlns:mstns="http://tempuri.org/DBIntegrityDS.xsd" xmlns="http://tempuri.org/DBIntegrityDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="DBIntegrityDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="DBIntegrityDS" msprop:Generator_UserDSName="DBIntegrityDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="IntegrityValidation" msprop:Generator_TableClassName="IntegrityValidationDataTable" msprop:Generator_TableVarName="tableIntegrityValidation" msprop:Generator_TablePropName="IntegrityValidation" msprop:Generator_RowDeletingName="IntegrityValidationRowDeleting" msprop:Generator_RowChangingName="IntegrityValidationRowChanging" msprop:Generator_RowEvHandlerName="IntegrityValidationRowChangeEventHandler" msprop:Generator_RowDeletedName="IntegrityValidationRowDeleted" msprop:Generator_UserTableName="IntegrityValidation" msprop:Generator_RowChangedName="IntegrityValidationRowChanged" msprop:Generator_RowEvArgName="IntegrityValidationRowChangeEvent" msprop:Generator_RowClassName="IntegrityValidationRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Version" msprop:Generator_ColumnVarNameInTable="columnVersion" msprop:Generator_ColumnPropNameInRow="Version" msprop:Generator_ColumnPropNameInTable="VersionColumn" msprop:Generator_UserColumnName="Version" type="xs:float" minOccurs="0" />
+              <xs:element name="Label" msprop:Generator_ColumnVarNameInTable="columnLabel" msprop:Generator_ColumnPropNameInRow="Label" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="LabelColumn" msprop:Generator_UserColumnName="Label" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="Script" msprop:Generator_ColumnVarNameInTable="columnScript" msprop:Generator_ColumnPropNameInRow="Script" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="ScriptColumn" msprop:Generator_UserColumnName="Script" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="Result" msprop:Generator_ColumnVarNameInTable="columnResult" msprop:Generator_ColumnPropNameInRow="Result" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="ResultColumn" msprop:Generator_UserColumnName="Result" type="xs:string" default="" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SRVResultsServiceDecodedDS" targetNamespace="http://tempuri.org/SRVResultsServiceDecodedDS.xsd" xmlns:mstns="http://tempuri.org/SRVResultsServiceDecodedDS.xsd" xmlns="http://tempuri.org/SRVResultsServiceDecodedDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="SRVResultsServiceDecodedDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="SRVResultsServiceDecodedDS" msprop:Generator_DataSetName="SRVResultsServiceDecodedDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="srv_thrsResultsService" msprop:Generator_UserTableName="srv_thrsResultsService" msprop:Generator_RowDeletedName="srv_thrsResultsServiceRowDeleted" msprop:Generator_RowChangedName="srv_thrsResultsServiceRowChanged" msprop:Generator_RowClassName="srv_thrsResultsServiceRow" msprop:Generator_RowChangingName="srv_thrsResultsServiceRowChanging" msprop:Generator_RowEvArgName="srv_thrsResultsServiceRowChangeEvent" msprop:Generator_RowEvHandlerName="srv_thrsResultsServiceRowChangeEventHandler" msprop:Generator_TableClassName="srv_thrsResultsServiceDataTable" msprop:Generator_TableVarName="tablesrv_thrsResultsService" msprop:Generator_RowDeletingName="srv_thrsResultsServiceRowDeleting" msprop:Generator_TablePropName="srv_thrsResultsService">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ResultServiceID" msprop:Generator_UserColumnName="ResultServiceID" msprop:Generator_ColumnPropNameInRow="ResultServiceID" msprop:Generator_ColumnVarNameInTable="columnResultServiceID" msprop:Generator_ColumnPropNameInTable="ResultServiceIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TaskDesc" msdata:ReadOnly="true" msprop:Generator_UserColumnName="TaskDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTaskDesc" msprop:Generator_ColumnPropNameInTable="TaskDescColumn" msprop:Generator_ColumnPropNameInRow="TaskDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="ActionDesc" msprop:Generator_UserColumnName="ActionDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnActionDesc" msprop:Generator_ColumnPropNameInTable="ActionDescColumn" msprop:Generator_ColumnPropNameInRow="ActionDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="Data" msprop:Generator_UserColumnName="Data" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnData" msprop:Generator_ColumnPropNameInTable="DataColumn" msprop:Generator_ColumnPropNameInRow="Data" type="xs:string" minOccurs="0" />
+              <xs:element name="Comments" msprop:Generator_UserColumnName="Comments" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnComments" msprop:Generator_ColumnPropNameInTable="CommentsColumn" msprop:Generator_ColumnPropNameInRow="Comments" type="xs:string" minOccurs="0" />
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnPropNameInRow="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_ColumnPropNameInRow="TS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="Recommendations" msprop:Generator_UserColumnName="Recommendations" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnRecommendations" msprop:Generator_ColumnPropNameInTable="RecommendationsColumn" msprop:Generator_ColumnPropNameInRow="Recommendations" type="xs:string" minOccurs="0" />
+              <xs:element name="isModified" msprop:Generator_UserColumnName="isModified" msprop:Generator_ColumnVarNameInTable="columnisModified" msprop:Generator_ColumnPropNameInRow="isModified" msprop:Generator_ColumnPropNameInTable="isModifiedColumn" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

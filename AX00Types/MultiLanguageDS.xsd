@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MultiLanguageDS" targetNamespace="http://tempuri.org/MultiLanguageDS.xsd" xmlns:mstns="http://tempuri.org/MultiLanguageDS.xsd" xmlns="http://tempuri.org/MultiLanguageDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString1 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString1" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MultiLanguageDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="MultiLanguageDS" msprop:Generator_UserDSName="MultiLanguageDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tfmwMultiLanguageResources" msprop:Generator_TableClassName="tfmwMultiLanguageResourcesDataTable" msprop:Generator_RowEvArgName="tfmwMultiLanguageResourcesRowChangeEvent" msprop:Generator_TablePropName="tfmwMultiLanguageResources" msprop:Generator_TableVarName="tabletfmwMultiLanguageResources" msprop:Generator_RowEvHandlerName="tfmwMultiLanguageResourcesRowChangeEventHandler" msprop:Generator_RowDeletingName="tfmwMultiLanguageResourcesRowDeleting" msprop:Generator_RowChangingName="tfmwMultiLanguageResourcesRowChanging" msprop:Generator_RowDeletedName="tfmwMultiLanguageResourcesRowDeleted" msprop:Generator_UserTableName="tfmwMultiLanguageResources" msprop:Generator_RowChangedName="tfmwMultiLanguageResourcesRowChanged" msprop:Generator_RowClassName="tfmwMultiLanguageResourcesRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ResourceID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ResourceID" msprop:Generator_ColumnVarNameInTable="columnResourceID" msprop:Generator_ColumnPropNameInTable="ResourceIDColumn" msprop:Generator_UserColumnName="ResourceID" type="xs:string" minOccurs="0" />
+              <xs:element name="LanguageID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LanguageID" msprop:Generator_ColumnVarNameInTable="columnLanguageID" msprop:Generator_ColumnPropNameInTable="LanguageIDColumn" msprop:Generator_UserColumnName="LanguageID" type="xs:string" minOccurs="0" />
+              <xs:element name="ResourceText" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ResourceText" msprop:Generator_ColumnVarNameInTable="columnResourceText" msprop:Generator_ColumnPropNameInTable="ResourceTextColumn" msprop:Generator_UserColumnName="ResourceText" type="xs:string" minOccurs="0" />
+              <xs:element name="ApplicationVersion" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ApplicationVersion" msprop:Generator_ColumnVarNameInTable="columnApplicationVersion" msprop:Generator_ColumnPropNameInTable="ApplicationVersionColumn" msprop:Generator_UserColumnName="ApplicationVersion" type="xs:string" minOccurs="0" />
+              <xs:element name="Translated" msprop:Generator_ColumnVarNameInTable="columnTranslated" msprop:Generator_ColumnPropNameInRow="Translated" msprop:Generator_ColumnPropNameInTable="TranslatedColumn" msprop:Generator_UserColumnName="Translated" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" msprop:Generator_UserColumnName="TS_DateTime" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

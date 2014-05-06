@@ -1,0 +1,1351 @@
+Option Strict On
+Option Explicit On
+
+Imports System.Data.SqlClient
+Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Global.TO
+Imports Biosystems.Ax00.Global.GlobalEnumerates
+
+Namespace Biosystems.Ax00.DAL.DAO
+
+    Partial Public Class tparTestsDAO
+        Inherits DAOBase
+
+
+#Region "CRUD Methods"
+
+        ''' <summary>
+        ''' Create new Standard Tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsDS">Typed DataSet TestsDS with the list of Tests to add</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  TR 24/02/2010
+        ''' Modified by: SA 28/10/2010 - Added N preffix for multilanguage of field TS_User; when TS_User is not informed in the
+        '''                              DS, then get the UserName of the current loggged User. Mandatory fields have to be informed,
+        '''                              they do not allow NULL values
+        '''              TR 09/05/2013 - Add new column LISValue used to indicate the mapping with list values.
+        ''' </remarks>
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsDS As TestsDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+                    Dim values As String = " "
+                    Dim keys As String = "(TestID, TestName, ShortName, TestPosition, PreloadedTest, MeasureUnit, AnalysisMode," & _
+                                         " ReagentsNumber, ReactionType, ReplicatesNumber, DecimalsAllowed, TurbidimetryFlag, " & _
+                                         " AbsorbanceFlag, ReadingMode, FirstReadingCycle, SecondReadingCycle, MainWavelength, " & _
+                                         " ReferenceWavelength, BlankMode, BlankReplicates, KineticBlankLimit, ProzoneRatio, " & _
+                                         " ProzoneTime1, ProzoneTime2, InUse, TestVersionNumber, TestVersionDateTime, TS_User, " & _
+                                         " TS_DateTime, LISValue) "
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+
+                    For Each tpartestsDR As TestsDS.tparTestsRow In pTestsDS.tparTests
+                        values = ""
+                        values &= tpartestsDR.TestID.ToString() & ","
+                        values &= "N'" & tpartestsDR.TestName.ToString().Replace("'", "''").TrimEnd().TrimStart() & "',"
+                        values &= "N'" & tpartestsDR.ShortName.ToString().Replace("'", "''").TrimEnd().TrimStart() & "',"
+                        values &= tpartestsDR.TestPosition.ToString() & ","
+                        values &= "'" & tpartestsDR.PreloadedTest.ToString().Replace("'", "''") & "',"
+                        values &= "'" & tpartestsDR.MeasureUnit.ToString().Replace("'", "''") & "',"
+                        values &= "'" & tpartestsDR.AnalysisMode.ToString().Replace("'", "''") & "',"
+                        values &= tpartestsDR.ReagentsNumber.ToString() & " ,"
+                        values &= "'" & tpartestsDR.ReactionType.ToString().Replace("'", "''") & "',"
+                        values &= tpartestsDR.ReplicatesNumber.ToString() & ","
+                        values &= tpartestsDR.DecimalsAllowed.ToString() & ","
+                        values &= "'" & tpartestsDR.TurbidimetryFlag.ToString().Replace("'", "''") & "',"
+
+                        If (tpartestsDR.IsAbsorbanceFlagNull) Then
+                            values &= "0, "
+                        Else
+                            values &= "'" & tpartestsDR.AbsorbanceFlag.ToString() & "',"
+                        End If
+
+                        values &= "'" & tpartestsDR.ReadingMode.ToString().Replace("'", "''") & "',"
+                        values &= "" & tpartestsDR.FirstReadingCycle.ToString() & ", "
+
+                        If (tpartestsDR.IsSecondReadingCycleNull OrElse tpartestsDR.SecondReadingCycle = 0) Then
+                            values &= "NULL,"
+                        Else
+                            values &= "" & tpartestsDR.SecondReadingCycle.ToString() & ", "
+                        End If
+
+                        values &= "'" & tpartestsDR.MainWavelength.ToString().Replace("'", "''") & "',"
+                        If (tpartestsDR.IsReferenceWavelengthNull) Then
+                            values &= "NULL,"
+                        Else
+                            values &= "'" & tpartestsDR.ReferenceWavelength.ToString().Replace("'", "''") & "',"
+                        End If
+
+                        If tpartestsDR.IsBlankModeNull Then
+                            values &= "NULL,"
+                        Else
+                            values &= "'" & tpartestsDR.BlankMode.ToString().Replace("'", "''") & "',"
+                        End If
+                        If tpartestsDR.IsBlankReplicatesNull Then
+                            values &= "NULL,"
+                        Else
+                            values &= tpartestsDR.BlankReplicates.ToString() & ","
+                        End If
+                        If tpartestsDR.IsKineticBlankLimitNull Then
+                            values &= "NULL,"
+                        Else
+                            values &= ReplaceNumericString(tpartestsDR.KineticBlankLimit) & ","
+                        End If
+                        If tpartestsDR.IsProzoneRatioNull Then
+                            values &= "NULL,"
+                        Else
+                            values &= ReplaceNumericString(tpartestsDR.ProzoneRatio) & ","
+                        End If
+                        If tpartestsDR.IsProzoneTime1Null Then
+                            values &= "NULL,"
+                        Else
+                            values &= tpartestsDR.ProzoneTime1.ToString() & ","
+                        End If
+                        If tpartestsDR.IsProzoneTime2Null Then
+                            values &= "NULL,"
+                        Else
+                            values &= tpartestsDR.ProzoneTime2.ToString() & ","
+                        End If
+
+                        If tpartestsDR.IsInUseNull Then
+                            values &= "0, "
+                        Else
+                            values &= "'" & tpartestsDR.InUse.ToString().Replace("'", "''") & "',"
+                        End If
+
+                        If tpartestsDR.IsTestVersionNumberNull Then
+                            values &= "0, "
+                        Else
+                            values &= tpartestsDR.TestVersionNumber.ToString() & ","
+                        End If
+                        If tpartestsDR.IsTestVersionDateTimeNull Then
+                            values &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        Else
+                            values &= " '" & tpartestsDR.TestVersionDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        End If
+
+                        If (tpartestsDR.IsTS_UserNull) Then
+                            Dim myGlobalBase As New GlobalBase
+                            values &= " N'" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', "
+                        Else
+                            values &= " N'" & tpartestsDR.TS_User.ToString().Replace("'", "''") & "',"
+                        End If
+
+                        If (tpartestsDR.IsTS_DateTimeNull) Then
+                            values &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        Else
+                            values &= " '" & tpartestsDR.TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        End If
+
+                        If (tpartestsDR.IsLISValueNull) Then
+                            values &= "NULL"
+                        Else
+                            values &= " N'" & tpartestsDR.LISValue & "' "
+                        End If
+
+                        cmdText = "INSERT INTO tparTests  " & keys & " VALUES (" & values & ")"
+                        cmd.CommandText = cmdText
+
+                        myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                        myGlobalDataTO.HasError = False
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.Create", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Update Standard Tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsDS">Typed DataSet TestsDS with the list of Tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  TR 24/02/2010
+        ''' Modified by: SA 28/10/2010 - Added N preffix for multilanguage of field TS_User; when TS_User is not informed in the
+        '''                              DS, then get the UserName of the current loggged User. Mandatory fields have to be informed,
+        '''                              they do not allow NULL values.
+        '''              TR 09/05/2013 - Add new column LISValue used to indicate the mapping with list values.
+        ''' </remarks>
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsDS As TestsDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+                    Dim values As String = " "
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+
+                    For Each tpartestsDR As TestsDS.tparTestsRow In pTestsDS.tparTests
+                        values = ""
+                        values &= " TestID = " & tpartestsDR.TestID.ToString() & ", "
+                        values &= " TestName = N'" & tpartestsDR.TestName.ToString().Replace("'", "''").TrimEnd().TrimStart() & "', "
+                        values &= " ShortName = N'" & tpartestsDR.ShortName.ToString().Replace("'", "''").TrimEnd().TrimStart() & "', "
+                        values &= " TestPosition = " & tpartestsDR.TestPosition.ToString() & ", "
+                        values &= " MeasureUnit = '" & tpartestsDR.MeasureUnit.ToString().Replace("'", "''") & "', "
+                        values &= " AnalysisMode = '" & tpartestsDR.AnalysisMode.ToString().Replace("'", "''") & "', "
+                        values &= " ReagentsNumber = " & tpartestsDR.ReagentsNumber.ToString() & ", "
+                        values &= " ReactionType = '" & tpartestsDR.ReactionType.ToString().Replace("'", "''") & "', "
+                        values &= " ReplicatesNumber = " & tpartestsDR.ReplicatesNumber.ToString() & ", "
+                        values &= " DecimalsAllowed = " & tpartestsDR.DecimalsAllowed.ToString() & ", "
+                        values &= " TurbidimetryFlag = '" & tpartestsDR.TurbidimetryFlag.ToString() & "', "
+
+                        values &= " AbsorbanceFlag = "
+                        If tpartestsDR.IsAbsorbanceFlagNull Then
+                            values &= " 0,"
+                        Else
+                            values &= " '" & tpartestsDR.AbsorbanceFlag.ToString().Replace("'", "''") & "', "
+                        End If
+
+                        values &= " ReadingMode = '" & tpartestsDR.ReadingMode.ToString().Replace("'", "''") & "', "
+                        values &= " FirstReadingCycle = " & tpartestsDR.FirstReadingCycle.ToString() & ", "
+
+                        values &= " SecondReadingCycle = "
+                        If tpartestsDR.IsSecondReadingCycleNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= tpartestsDR.SecondReadingCycle.ToString() & ", "
+                        End If
+
+                        values &= " MainWavelength = '" & tpartestsDR.MainWavelength.ToString().Replace("'", "''") & "', "
+
+                        values &= " ReferenceWavelength = "
+                        If tpartestsDR.IsReferenceWavelengthNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= " '" & tpartestsDR.ReferenceWavelength.ToString().Replace("'", "''") & "', "
+                        End If
+
+                        values &= " BlankMode = "
+                        If tpartestsDR.IsBlankModeNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= " '" & tpartestsDR.BlankMode.ToString().Replace("'", "''") & "', "
+                        End If
+
+                        values &= " BlankReplicates = "
+                        If tpartestsDR.IsBlankReplicatesNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= tpartestsDR.BlankReplicates.ToString() & ", "
+                        End If
+
+                        values &= " KineticBlankLimit = "
+                        If tpartestsDR.IsKineticBlankLimitNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= ReplaceNumericString(tpartestsDR.KineticBlankLimit) & ", "
+                        End If
+
+                        values &= " ProzoneRatio = "
+                        If tpartestsDR.IsProzoneRatioNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= ReplaceNumericString(tpartestsDR.ProzoneRatio) & ", "
+                        End If
+
+                        values &= " ProzoneTime1 = "
+                        If tpartestsDR.IsProzoneTime1Null Then
+                            values &= " NULL, "
+                        Else
+                            values &= tpartestsDR.ProzoneTime1.ToString() & ", "
+                        End If
+
+                        values &= " ProzoneTime2 = "
+                        If tpartestsDR.IsProzoneTime2Null Then
+                            values &= " NULL, "
+                        Else
+                            values &= tpartestsDR.ProzoneTime2.ToString() & ", "
+                        End If
+
+                        values &= " LISValue = N'"
+                        If tpartestsDR.IsLISValueNull Then
+                            values &= " NULL, "
+                        Else
+                            values &= tpartestsDR.LISValue.ToString() & "', "
+                        End If
+
+                        If Not tpartestsDR.IsTestVersionNumberNull Then
+                            values &= " TestVersionNumber = " & tpartestsDR.TestVersionNumber.ToString() & ","
+                        End If
+                        If Not tpartestsDR.IsTestVersionDateTimeNull Then
+                            values &= " TestVersionDateTime = '" & tpartestsDR.TestVersionDateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        End If
+
+                        If tpartestsDR.IsTS_UserNull Then
+                            Dim myGlobalBase As New GlobalBase
+                            values &= " TS_User = N'" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', "
+                        Else
+                            values &= " TS_User = N'" & tpartestsDR.TS_User.ToString().Replace("'", "''") & "', "
+                        End If
+
+                        If tpartestsDR.IsTS_DateTimeNull Then
+                            values &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
+                        Else
+                            values &= " TS_DateTime = '" & tpartestsDR.TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
+                        End If
+
+                        cmdText = " UPDATE tparTests SET " & values & _
+                                  " WHERE  TestID = " & tpartestsDR.TestID.ToString()
+
+                        cmd.CommandText = cmdText
+                        myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.Update", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Delete the specified Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  TR 16/03/2010
+        ''' </remarks>
+        Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+                    Dim cmd As New SqlCommand
+
+                    cmdText &= " DELETE FROM  tparTests "
+                    cmdText &= " WHERE TestID = " & pTestID
+
+                    cmd.CommandText = cmdText
+                    cmd.Connection = pDBConnection
+
+                    myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                    myGlobalDataTO.HasError = False
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.Delete", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get all basic parameters of the specified Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing all basic parameters 
+        '''          of the informed Test</returns>
+        ''' <remarks>
+        ''' Created by:  SA 09/02/2010
+        ''' Modified by: DL 19/02/2010
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
+                                                " WHERE  TestID = " & pTestID
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Read all information needed for Biochemical calculations for an Standard Test/SampleType
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Identifier of an Standard Test</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS with all data needed for Biochemical calculations</returns>
+        ''' <remarks>
+        ''' Created by:  AG 03/07/2012
+        ''' Modified by: SA 12/07/2012 - Changed the query to get also fields ActiveRangeType, CalibratorType, CalibrationFactor and
+        '''                              SampleTypeAlternative from table tparTestSamples
+        ''' </remarks>
+        Public Function ReadForCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.TestVersionNumber, T.AnalysisMode, T.AbsorbanceFlag, T.ReactionType, T.ReadingMode, T.ReagentsNumber, " & vbCrLf & _
+                                                       " T.FirstReadingCycle, T.SecondReadingCycle, T.MainWavelength, T.ReferenceWavelength, T.KineticBlankLimit, " & vbCrLf & _
+                                                       " T.ProzoneTime1, T.ProzoneTime2, T.ProzoneRatio, T.BlankMode, V.ReagentVolume, V.IncPostReagentVolume, " & vbCrLf & _
+                                                       " V.RedPostReagentVolume, V.ReagentNumber, S.SampleVolume, S.AbsorbanceDilutionFactor, S.PredilutionUseFlag, " & vbCrLf & _
+                                                       " S.PredilutionFactor, S.BlankAbsorbanceLimit, S.IncPostdilutionFactor, S.IncPostSampleVolume, S.RedPostdilutionFactor, " & vbCrLf & _
+                                                       " S.RedPostSampleVolume, S.LinearityLimit, S.DetectionLimit, S.SubstrateDepletionValue, S.SlopeFactorA, S.SlopeFactorB, " & vbCrLf & _
+                                                       " S.FactorUpperLimit, S.FactorLowerLimit, S.ActiveRangeType, S.CalibratorType, S.CalibrationFactor, " & vbCrLf & _
+                                                       " S.SampleTypeAlternative " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestSamples S ON T.TestID = S.TestID " & vbCrLf & _
+                                                                   " INNER JOIN tparTestReagentsVolumes V ON S.TestID = V.TestID AND S.SampleType = V.SampleType " & vbCrLf & _
+                                                " WHERE  T.TestID = " & pTestID.ToString & vbCrLf & _
+                                                " AND    S.SampleType = '" & pSampleType.Trim & "' " & vbCrLf & _
+                                                " ORDER BY V.ReagentNumber "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.testCalculations)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get all  parameters of the specified Test and sample Type
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing all basic parameters 
+        '''          of the informed Test</returns>
+        ''' <remarks>
+        ''' Created by:  TR 09/12/2010
+        ''' </remarks>
+        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
+                                               ByVal pTestID As Integer, _
+                                               ByVal pSampleType As String) As GlobalDataTO
+
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        cmdText &= "SELECT T.*, TS.SampleType " & vbCrLf
+                        cmdText &= "  FROM tparTests T, tparTestSamples TS " & vbCrLf
+                        cmdText &= " WHERE T.TestID = " & pTestID & vbCrLf
+                        cmdText &= "   AND TS.TestID = T.TestID" & vbCrLf
+                        cmdText &= "   AND TS.SampleType = '" & pSampleType & "'"
+
+                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
+                        cmd.CommandText = cmdText
+                        cmd.Connection = dbConnection
+
+                        Dim da As New SqlClient.SqlDataAdapter(cmd)
+                        Dim result As New TestsDS()
+                        da.Fill(result.tparTests)
+
+                        myGlobalDataTO.SetDatos = result
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadByTestIDSampleType", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get data of a Standard Test searching by Test Short Name
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pShortName">Test Short Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing all basic parameters 
+        '''          of the informed Test</returns>
+        ''' <remarks>
+        ''' Created by:  TR 16/11/2010
+        ''' Modified by: SA 21/12/2011 - Added N preffix for multilanguage of filter ShortName
+        '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' </remarks>
+        Public Function ReadByShortName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pShortName As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
+                                                " WHERE  UPPER(ShortName) = UPPER(N'" & pShortName.Replace("'", "''") & "')"
+                        '" WHERE  UPPER(ShortName) = N'" & pShortName.Replace("'", "''").ToUpper & "'"
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, " tparTestsDAO.ReadByShortName ", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get all Standard Tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing all Standard Tests sorted by position</returns>
+        ''' <remarks>
+        ''' Created by:  TR 08/02/2010
+        ''' </remarks>
+        Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
+                                                " ORDER BY TestPosition "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadAll", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Search test data for the informed Test Name
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestName">Test Name to search by</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing data of the 
+        '''          informed Test</returns>
+        ''' <remarks>
+        ''' Created by:  SA 13/09/2010
+        ''' Modified by: SA 28/10/2010 - Added N preffix for field TestName when use it in the where clause
+        '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' </remarks>
+        Public Function ReadByTestName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestName As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & _
+                                                " WHERE  UPPER(TestName) = UPPER(N'" & pTestName.Replace("'", "''") & "') "
+                        '" WHERE  UPPER(TestName) = N'" & pTestName.Replace("'", "''").ToUpper & "' "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadByTestName", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Special method that update only the test position.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pListTestPositionTO">List of TestID and TestPosition.</param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by:  TR 29/03/2010
+        ''' </remarks>
+        Public Function UpdateTestPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pListTestPositionTO As List(Of TestPositionTO)) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+                    Dim values As String = " "
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+
+                    For Each myTestPosTO As TestPositionTO In pListTestPositionTO
+                        values = ""
+                        values &= " TestPosition = "
+                        values &= myTestPosTO.TestPosition
+
+                        cmdText = " UPDATE tparTests SET " & values & _
+                                  " WHERE  TestID = " & myTestPosTO.TestID.ToString()
+
+                        cmd.CommandText = cmdText
+                        myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.UpdateTestPosition", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Set value of flag InUse for all Standard Tests added/removed from the Active WorkSession 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pFlag">Value of the InUse Flag to set</param>
+        ''' <param name="pUpdateForExcluded">Optional parameter. When True, it means the InUse will be set to False
+        '''                                  only for Standard Tests that have been excluded from the active WorkSession</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  GDS 10/05/2010 
+        ''' Modified by: SA  09/06/2010 - Added new optional parameter to reuse this method to set InUse=False for Standard Tests
+        '''                               that have been excluded from the active WorkSession  
+        ''' </remarks>
+        Public Function UpdateInUseFlag(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
+                                        ByVal pAnalyzerID As String, ByVal pFlag As Boolean, _
+                                        Optional ByVal pUpdateForExcluded As Boolean = False) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String
+                    If (Not pUpdateForExcluded) Then
+                        cmdText = " UPDATE tparTests " & vbCrLf & _
+                                  " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                                  " WHERE  TestID IN (SELECT DISTINCT TestID " & vbCrLf & _
+                                                    " FROM   vwksWSOrderTests " & vbCrLf & _
+                                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                    " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                    " AND    TestType      = 'STD')" & vbCrLf
+
+                    Else
+                        cmdText = " UPDATE tparTests " & vbCrLf & _
+                                  " SET    InUse = 0 " & vbCrLf & _
+                                  " WHERE  TestID NOT IN (SELECT DISTINCT TestID " & vbCrLf & _
+                                                        " FROM   vwksWSOrderTests " & vbCrLf & _
+                                                        " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                        " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                        " AND    TestType      = 'STD') " & vbCrLf & _
+                                  " AND    InUse = 1 " & vbCrLf
+                    End If
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+                    cmd.CommandText = cmdText
+
+                    myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Update the field InUse by TestID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pTestID"></param>
+        ''' <param name="pInUseFlag"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 08/05/2013</remarks>
+        Public Function UpdateInUseByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pInUseFlag As Boolean) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+                    cmdText = " UPDATE tparTests " & vbCrLf & _
+                              " SET    InUse = " & Convert.ToInt32(IIf(pInUseFlag, 1, 0)) & vbCrLf & _
+                              " WHERE  TestID = " & pTestID.ToString
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+                    cmd.CommandText = cmdText
+
+                    myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.UpdateInUseByTestID", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Update the LISValue by the testID.
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pTestID">Test ID.</param>
+        ''' <param name="pLISValue">LIS Value.</param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' CREATED BY: TR 04/03/2013
+        ''' </remarks>
+        Public Function UpdateLISValueByTestID(ByVal pDBConnection As SqlClient.SqlConnection, pTestID As Integer, pLISValue As String) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String
+                    cmdText = " UPDATE tparTests " & Environment.NewLine & _
+                              " SET    LISValue = N'" & pLISValue & "'" & Environment.NewLine & _
+                              " WHERE  TestID = " & pTestID
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+                    cmd.CommandText = cmdText
+
+                    myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.UpdateLISValueByTestID", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+
+#End Region
+
+#Region "Other Methods"
+        ''' <summary>
+        ''' Get all Standard Biosystems Tests (PreloadedTest = TRUE) or all Standard User Tests (PreloadedTest = FALSE),
+        ''' depending on value of parameter pPreloadedTest
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pPreloadedTest">True to get Biosystems Tests; False to get User Tests</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS with the list of obtained Tests</returns>
+        ''' <remarks>
+        ''' Created by: TR 23/03/2011
+        ''' </remarks>
+        Public Function ReadByPreloadedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreloadedTest As Boolean) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
+                                                " WHERE PreloadedTest = " & Convert.ToInt32(IIf(pPreloadedTest, 1, 0)) & vbCrLf
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadByPreloadedTest", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get information of all Standard Tests/SampleTypes using Quality Control (those with QCActive=True)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <remarks>
+        ''' Created by:  DL 06/04/2011
+        ''' Modified by: SA 10/05/2011 - Removed field ControlID from the SQL
+        ''' </remarks>
+        Public Function GetAllWithQCActive(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.TestID, T.ShortName, T.TestName, T.DecimalsAllowed, T.PreloadedTest, T.TestPosition, T.InUse, " & vbCrLf & _
+                                                       " TS.SampleType, TS.RejectionCriteria, TS.QCActive, TS.FactoryCalib, 0 AS ActiveControl, " & vbCrLf & _
+                                                       " MD.FixedItemDesc As MeasureUnit " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
+                                                                   " INNER JOIN tcfgMasterData MD  ON T.MeasureUnit = MD.ItemID " & vbCrLf & _
+                                                " WHERE  TS.QCActive = 1 " & vbCrLf & _
+                                                " AND    MD.SubTableID = '" & MasterDataEnum.TEST_UNITS.ToString & "' " & vbCrLf & _
+                                                " ORDER BY TS.SampleType, T.TestPosition "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetAllWithQCActive", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get all Standard Tests/SampleTypes currently linked to the specified Control 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pControlID">Control Identifier</param>
+        ''' <remarks>
+        ''' Created by:  DL 06/04/2011
+        ''' Modified by: SA 10/05/2011 - Removed field ControlID from the SQL
+        '''              SA 18/06/2012 - Filter Test Controls by TestType = STD
+        ''' </remarks>
+        Public Function GetAllByControl(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pControlID As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT T.TestID, T.ShortName, T.TestName, T.DecimalsAllowed, T.PreloadedTest, T.TestPosition, T.InUse, " & vbCrLf & _
+                                                       " TS.SampleType, TS.RejectionCriteria, TS.QCActive, TS.FactoryCalib, TC.ActiveControl, " & vbCrLf & _
+                                                       " MD.FixedItemDesc As MeasureUnit " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestSamples TS  ON T.TestID = TS.TestID " & vbCrLf & _
+                                                                   " INNER JOIN tparTestControls TC ON TS.TestID = TC.TestID AND TS.SampleType = TC.SampleType " & vbCrLf & _
+                                                                   " INNER JOIN tcfgMasterData MD   ON T.MeasureUnit = MD.ItemID " & vbCrLf & _
+                                                " WHERE  TC.ControlID  = " & pControlID & vbCrLf & _
+                                                " AND    TC.TestType   = 'STD' " & vbCrLf & _
+                                                " AND    MD.SubTableID = '" & MasterDataEnum.TEST_UNITS.ToString & "' " & vbCrLf & _
+                                                " ORDER BY TS.SampleType, T.TestPosition "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetAllByControl", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the list of all Standard Tests for the specified Sample Type. When a SampleClass is informed, then 
+        ''' only Test/SampleType with Controls or Experimental Calibrators defined are returned 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pSampleTypeCode">Sample Type to filter the Tests</param>
+        ''' <param name="pSampleClass">Optional parameter. When informed, get only Test/SampleType for which Controls or Calibrators
+        '''                            have been defined</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS with the list of obtained Tests</returns>
+        ''' <remarks>
+        ''' Modified by: TR 05/02/2010 - Add more functionality, to validate the controls sample type code.
+        '''              TR 08/02/2010 - Change the method sing and add the pSampleClass parameter to add more functionality
+        '''                              And validate the sampleClass to change the select value.
+        '''              SA 16/02/2010 - Changed query filter when pSampleClass = CALIB: only Test/SampleType using Experimental
+        '''                              Calibrators or Alternative Calibrators based in an Experimental one should be returned
+        '''              SA 19/05/2010 - Changed query to get also field ShortName
+        '''              DL 14/10/2010 - Added new optional parameter for the Test Type and modified the SQL to apply this new filter
+        '''              SA 18/10/2010 - Changed the SQL for Calculated Tests, to include also the management of Calculated Tests with
+        '''                              multiple Sample Types
+        '''              SA 22/10/2010 - Remove the last two changes applied: this function is used only to load the available STD Tests
+        '''                              filtered by SampleType for the informed SampleClass. Removed also optional parameter for TestProfileID
+        '''                              due to this function is not called from the screen of Programming Test Profiles anymore. Name changed 
+        '''                              to GetBySampleType
+        '''              TR 10/03/2011 - Add the factory Calib on the select (TS.FactoryCalib)
+        '''              SA 27/04/2011 - Changed query filter when SampleClass is CTRL
+        '''              SA 21/06/2011 - Added new filter when SampleClass is CTRL: the Test/SampleType has to have at least an ActiveControl
+        '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+        '''              TR 29/04/2014 - BT #1494 Adde the EnableStatus column, use to indicate if the Test is complete or incomplete programming.
+        ''' </remarks>
+        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleTypeCode As String, _
+                                        Optional ByVal pSampleClass As String = "") As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.TestID AS TestID, T.ShortName, T.TestName, T.TestPosition, T.PreloadedTest, " & vbCrLf & _
+                                                       " TS.NumberOfControls, TS.FactoryCalib, TS.EnableStatus " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
+                                                " WHERE  UPPER(TS.SampleType) = '" & pSampleTypeCode & "' " & vbCrLf
+                        '" WHERE  UPPER(TS.SampleType) = '" & pSampleTypeCode.ToUpper & "' " & vbCrLf
+
+                        Select Case (pSampleClass)
+                            Case "CTRL"
+                                cmdText &= " AND TS.QCActive = 1 and TS.NumberOfControls > 0 " & vbCrLf & _
+                                           " AND (SELECT COUNT(*) FROM tparTestControls TC " & vbCrLf & _
+                                                " WHERE TC.TestID = TS.TestID AND TC.SampleType = TS.SampleType AND TC.ActiveControl = 1) > 0 " & vbCrLf
+                                Exit Select
+                            Case "CALIB"
+                                cmdText &= " AND (TS.CalibratorType = 'EXPERIMENT' " & vbCrLf & _
+                                           " OR  (TS.CalibratorType = 'ALTERNATIV' AND (SELECT CalibratorType FROM tparTestSamples TS2 " & vbCrLf & _
+                                                                                      " WHERE  TS2.TestID     = TS.TestID " & vbCrLf & _
+                                                                                      " AND    TS2.SampleType = TS.SampleTypeAlternative) = 'EXPERIMENT')) " & vbCrLf
+                                Exit Select
+                        End Select
+                        cmdText &= " ORDER BY T.TestPosition "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetBySampleType", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the last created Test Identifier for User's defined Standard Tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pFirstTestID">First value allowed for ID of User's defined Standard Tests</param>
+        ''' <param name="pIsPreloaded">Indicate if the new test is preloaded or not.</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: TR 03/03/2010
+        ''' MODIFIED BY: TR 05/02/2013 -Add the optional parameter IsPreloaded to get the Test Id for preloaded test.
+        ''' </remarks>
+        Public Function GetLastTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFirstTestID As Integer, _
+                                                                Optional pIsPreloaded As Boolean = False) As GlobalDataTO
+
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(TestID) FROM tparTests WHERE TestID >= " & pFirstTestID
+                        'If preloaded the filter by PreloadedTest.
+                        If pIsPreloaded Then
+                            cmdText &= " AND PreloadedTest = 1"
+                        End If
+
+                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
+                        cmd.CommandText = cmdText
+                        cmd.Connection = dbConnection
+
+                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetLastTestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the last Test Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: TR 03/03/2010
+        ''' </remarks>
+        Public Function GetLastTestPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(TestPosition) FROM tparTests "
+
+                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
+                        cmd.CommandText = cmdText
+                        cmd.Connection = dbConnection
+
+                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetLastTestPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get all not InUse Tests not linked to the specified Calibrator, that is, all Tests that can be
+        ''' linked to it 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCalibratorID">Calibrator Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS with the list of Tests</returns>
+        ''' <remarks>
+        ''' Created by: TR 04/06/2010
+        ''' </remarks>
+        Public Function GetTestToSetCalibrator(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalibratorID As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ShortName, T.SpecialTest, T.DecimalsAllowed, TS.SampleType, TS.CalibratorType " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
+                                                " WHERE  T.InUse = 0 " & vbCrLf & _
+                                                " AND    T.SpecialTest = 0 " & vbCrLf & _
+                                                " AND   (TS.CalibratorType = 'FACTOR' " & vbCrLf & _
+                                                " OR     T.TestID NOT IN (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
+                                                                        " WHERE CalibratorID = " & pCalibratorID.ToString & ")) " & vbCrLf & _
+                                                " AND   (TS.CalibratorType = 'ALTERNATIV' " & vbCrLf & _
+                                                " OR     T.TestID NOT IN (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
+                                                                        " WHERE CalibratorID = " & pCalibratorID.ToString & ")) " & vbCrLf
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetTestToSetCalibrator", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get all Test/Sample Type using an Experimental Calibrator
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier; optional parameter</param>
+        ''' <param name="pSampleType">SampleType Code; optional parameter</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS with the list of obtained Tests</returns>
+        ''' <remarks>
+        ''' Created by:  TR 15/02/2011
+        ''' Modified by: TR 22/07/2011 - On the WHERE clause, added condition "AND TC.SampleType = TS.SampleType"
+        '''              SA 21/12/2011 - Query changed to ANSI SQL sintax
+        '''              SA 15/11/2012 - Added optional parameters to allow get data of and specific TestID/SampleType
+        ''' </remarks>
+        Public Function GetCalibratorTestSampleList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pTestID As Integer = -1, _
+                                                    Optional ByVal pSampleType As String = "") As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ShortName, T.SpecialTest, T.DecimalsAllowed, T.InUse, " & vbCrLf & _
+                                                       " T.TestVersionNumber, T.TestVersionDateTime, TS.SampleType, TS.CalibratorType, " & vbCrLf & _
+                                                       " TS.EnableStatus, C.CalibratorID, C.CalibratorName, TC.TestCalibratorID " & vbCrLf & _
+                                                " FROM tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
+                                                                 " INNER JOIN tparTestCalibrators TC ON TS.TestID = TC.TestID " & vbCrLf & _
+                                                                                                   " AND TS.SampleType = TC.SampleType " & vbCrLf & _
+                                                                 " INNER JOIN tparCalibrators C ON TC.CalibratorID = C.CalibratorID " & vbCrLf
+
+                        If (pTestID <> -1 AndAlso pSampleType.Trim <> String.Empty) Then cmdText &= " WHERE TS.TestID = " & pTestID.ToString & vbCrLf & _
+                                                                                                    " AND   TS.SampleType = '" & pSampleType.Trim & "' " & vbCrLf
+                        cmdText &= " ORDER BY C.CalibratorID "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetCalibratorTestSampleList", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Read all Tests programmed as Contaminators
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestContaminationsDS with all Contaminator Tests</returns>
+        ''' <remarks>
+        ''' Created by:  AG 15/12/2010
+        ''' </remarks>
+        Public Function ReadAllContaminators(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.TestID, T.TestName, C.ContaminationID " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestReagents TR ON T.TestID = TR.TestID " & vbCrLf & _
+                                                                   " LEFT OUTER JOIN tparContaminations C ON TR.ReagentID = C.ReagentContaminatorID " & vbCrLf & _
+                                                " WHERE  C.ContaminationID IS NOT NULL " & vbCrLf & _
+                                                " ORDER BY T.TestPosition "
+
+                        Dim myTestContaminatorsDS As New TestContaminationsDS
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestContaminatorsDS.tparContaminations)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestContaminatorsDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadAllContaminators", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+#End Region
+    End Class
+End Namespace

@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AdjustmentsMasterData" xml:space="preserve">
+    <value>{Brazo Reactivo 1}
+
+R1RV:200;   {Posicion referencia - Vertical}
+R1H:364;    {Posición Parking - Horizontal}
+R1V:1332;   {REF Posición Parking - Vertical}
+ R1SV:1200;    {Posición Segura para movimiento Horizontal - Vertical} 
+ R1WH:9100;   {Estación de Lavado - Horizontal}
+  R1WVR:4160;  {Estación de Lavado - Vertical Relativo a R1SV}
+ R1DH:10883;    {Dispensación en Rotor - Horizontal}
+ R1DV:7150;   {REF Dispensación en Rotor - Vertical}
+  R1PH1:7050;  {Rotor de Reactivos Corona 1 - Horizontal}
+  R1PH2:5660;  {Rotor de Reactivos Corona 2 - Horizontal}
+ R1PV1:16800; {Rotor de Reactivos Corona 1 Punto máximo detección - Vertical}
+ R1PV2:16800; {Rotor de Reactivos Corona 2 Punto máximo detección - Vertical}
+ R1PI:4300;   {REF Punto Inicial Detección de nivel - Vertical}
+
+{Brazo Reactivo 2}
+
+R2RV:200;   {Posicion referencia - Vertical}
+R2H:364;    {Posición Parking - Horizontal}
+R2V:1332;   {REF Posición Parking - Vertical}
+ R2SV:1200;   {Posición Segura para movimiento Horizontal - Vertical} 
+ R2WH:10770; {Estación de Lavado - Horizontal}
+  R2WVR:4160; {Estación de Lavado - Vertical Relativo a R1SV}
+ R2DH:12553;  {Dispensación en Rotor - Horizontal}
+ R2DV:7150;  {REF Dispensación en Rotor - Vertical}
+  R2PH1:9080; {Rotor de Reactivos Corona 1 - Horizontal}
+  R2PH2:8270; {Rotor de Reactivos Corona 2 - Horizontal}
+ R2PV1:16800; {Rotor de Reactivos Corona 1 Punto máximo detección - Vertical}
+ R2PV2:16800; {Rotor de Reactivos Corona 2 Punto máximo detección - Vertical}
+ R2PI:4300;  {REF Punto Inicial Detección de nivel - Vertical}
+
+{Brazo Muestra}
+
+M1RV:200;    {Posicion referencia - Vertical}
+M1H:364;     {Posición Parking - Horizontal}
+M1V:1332;    {REF Posición Parking - Vertical}
+ M1SV:1200;    {Posición Segura para movimiento Horizontal - Vertical} 
+ M1WH:12610;   {Estación de Lavado - Horizontal}
+  M1WVR:4160;  {Estación de Lavado - Vertical Relativo a R1SV}
+ M1DH1:16769;  {Dispensación en Rotor Posicion 1 - Horizontal}
+ M1DV1:7474;  {REF Dispensación en Rotor Posicion 1 - Vertical}
+ M1DH2:16160;  {Dispensación en Rotor Posicion 2 - Horizontal}
+ M1DV2:8050;  {REF Dispensación en Rotor Posicion 2 - Vertical}
+ M1ISEH:-40; {Dispensación en ISE - Horizontal}
+M1ISEV:5000; {Dispensación en ISE - Vertical}
+  M1PH1:10640;  {Rotor de Muestras Corona 1 - Horizontal}
+ M1PV1p:12670; {Rotor de Muestras Corona 1 Punto máximo detección pediátrico - Vertical}
+ M1PV1t:16400; {Rotor de Muestras Corona 1 Punto máximo detección tubo - Vertical}
+  M1PH2:9980;  {Rotor de Muestras Corona 2 - Horizontal}
+ M1PV2p:12300; {Rotor de Muestras Corona 2 Punto máximo detección pediátrico - Vertical}
+ M1PV2t:16400; {Rotor de Muestras Corona 2 Punto máximo detección tubo - Vertical}
+  M1PH3:8720;  {Rotor de Muestras Corona 3 - Horizontal}
+ M1PV3p:12300; {Rotor de Muestras Corona 3 Punto máximo detección pediátrico - Vertical}
+ M1PV3t:16400; {Rotor de Muestras Corona 3 Punto máximo detección tubo - Vertical}
+ M1PI:4400;   {REF Punto Inicial Detección de nivel - Vertical}
+ M1RPI:4000;  {REF Punto Inicial Detección de nivel - Vertical - En Rotor de Reacciones}
+
+{Agitador 1}
+
+A1RV:200;   {Posicion referencia - Vertical}
+A1H:364;    {Posición Parking - Horizontal}
+A1V:1332;   {REF Posición Parking - Vertical}
+ A1SV:11480;{Posición Segura para movimiento Horizontal - Vertical} 
+ A1WH:70;   {Estación de Lavado - Horizontal}
+ A1WVR:5330; {Estación de Lavado - Vertical Relativo a R1SV}
+ A1DH:3315;  {Agitación en rotor - Horizontal}
+ A1DV:18180; {REF Agitación en rotor - Vertical}
+
+{Agitador 2}
+
+A2RV:200;   {Posicion referencia - Vertical}
+A2H:364;    {Posición Parking - Horizontal}
+A2V:1332;   {REF Posición Parking - Vertical}
+ A2SV:11600; {Posición Segura para movimiento Horizontal - Vertical} 
+ A2WH:155;   {Estación de Lavado - Horizontal}
+ A2WVR:5430; {Estación de Lavado - Vertical Relativo a R1SV}
+ A2DH:3868;  {Agitación en rotor - Horizontal}
+ A2DV:18300;  {REF Agitación en rotor - Vertical}
+
+{Rotor Reactivos}
+
+  RR1P1:5558;  {Posición referencia Pipeteo - Pote 1 en Corona 1 Brazo R1} 
+  RR1P2:6924;  {Posición referencia Pipeteo - Pote 45 en Corona 2 Brazo R1} 
+  RR2P1:3881;  {Posición referencia Pipeteo - Pote 1 en Corona 1 Brazo R2} 
+  RR2P2:3791;  {Posición referencia Pipeteo - Pote 45 en Corona 2 Brazo R2} 
+  RRCB:11540;  {Posición referencia Codigo de Barras - Pote 1 en C.B.}
+
+{Rotor Muestras}
+
+  RM1P1:5710;  {Posición referencia Pipeteo - Pocillo  1 en Corona 1} 
+  RM1P2:6210;  {Posición referencia Pipeteo - Pocillo 46 en Corona 2} 
+  RM1P3:6920;  {Posición referencia Pipeteo - Pocillo 91 en Corona 3} 
+  RMCB:31260;  {Posición referencia Codigo de Barras - Pocillo 1 en C.B.}
+
+{Fotometria}
+
+ GFWR1:7881;   {Posición referencia lectura - Pocillo 1 en óptica} 
+
+{Estación de Lavado}
+
+WSRV:-100;   {Posicion referencia - Vertical}
+ WSEV:2040;  {REF Posicion final vaciado pocillos - Vertical}
+WSRR:820;   {Posicion ready previa a vaciado pocillos - Vertical =WSEV-1500}
+WSSV:1020;  {REF Posicion final para llenado pocillos - Vertical =WSEV-1300}
+
+
+{General Equipo - Termos} 
+
+GTR1:50.0;  {Consigna Termo Punta Reactivo 1}
+GTOR1:37.0; {Objetivo Termo Punta Reactivo 1}
+GTR2:50.0;  {Consigna Termo Punta Reactivo 2}
+GTOR2:37.0; {Objetivo Termo Punta Reactivo 2}
+GTN1:4.0;   {Consigna Termo Nevera 1}
+GTON1:7.0;  {Objetivo Termo Nevera 1}
+GTGF:37.0;  {Consigna Termo Fotometría}
+GTOGF:37.0; {Objetivo Termo Fotometría}
+GTH1:45.0;  {Consigna Heater Estación de Lavado}
+GTOH1:45.0; {Objetivo Heater Estación de Lavado}
+
+{Detección de Nivel - Sensibilidad}
+
+DM1S:1.0;   {Sensibilidad Detección Muestra 1}
+DR1S:2.0;   {Sensibilidad Detección Reactivo 1}
+DR2S:2.0;   {Sensibilidad Detección Reactivo 2}
+
+{Balanzas de Residuos Alta Cont. y Washing Solution}
+
+GWMI:1100;  {Minimo Balanza residuos alta contaminación}
+GWMA:1500;  {Maximo Balanza residuos alta contaminación}
+GSMI:1200;  {Minimo Balanza Washing Solution}
+GSMA:1600;  {Maximo Balanza Washing Solution}
+
+
+{DAC's Fotometria}
+{Valores de Referencia!!}
+ILED1:365;	{Led posicion 1}
+ILED2:365;	{Led posicion 2}
+ILED3:365;	{Led posicion 3}
+ILED4:365;	{Led posicion 4}
+ILED5:365;	{Led posicion 5}
+ILED6:365;	{Led posicion 6}
+ILED7:365;	{Led posicion 7}
+ILED8:365;	{Led posicion 8}
+ILED9:365;	{Led posicion 9}
+ILED10:365;	{Led posicion 10}
+ILED11:365;	{Led posicion 11}
+
+{Covers}
+
+CLOT:1;	{Deteccion de Clot}
+MCOV:1;		{Tapa analizador desactivada}
+PHCOV:1;	{Tapa reacciones desactivada}
+RCOV:1;		{Tapa reactivos desactivada}
+SCOV:1;		{Tapa muestras desactivada}
+
+{ISE Module}
+
+SEXC:1;		{Parámetro interno FW - Sample Excess}
+ISEINS:1;	{Instalación ISE}
+
+CHECKAJ:3C8E;</value>
+    <comment>Master data Adjustments Values (SGM 24/11/2011)</comment>
+  </data>
+</root>

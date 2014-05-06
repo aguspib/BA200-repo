@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="AnalyzerLedPositionsDS" targetNamespace="http://tempuri.org/TestControlsDS.xsd" xmlns:mstns="http://tempuri.org/TestControlsDS.xsd" xmlns="http://tempuri.org/TestControlsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString3" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString3 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString3" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="AnalyzerLedPositionsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="AnalyzerLedPositionsDS" msprop:Generator_DataSetName="AnalyzerLedPositionsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tcfgAnalyzerLedPositions" msprop:Generator_UserTableName="tcfgAnalyzerLedPositions" msprop:Generator_RowDeletedName="tcfgAnalyzerLedPositionsRowDeleted" msprop:Generator_RowChangedName="tcfgAnalyzerLedPositionsRowChanged" msprop:Generator_RowClassName="tcfgAnalyzerLedPositionsRow" msprop:Generator_RowChangingName="tcfgAnalyzerLedPositionsRowChanging" msprop:Generator_RowEvArgName="tcfgAnalyzerLedPositionsRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgAnalyzerLedPositionsRowChangeEventHandler" msprop:Generator_TableClassName="tcfgAnalyzerLedPositionsDataTable" msprop:Generator_TableVarName="tabletcfgAnalyzerLedPositions" msprop:Generator_RowDeletingName="tcfgAnalyzerLedPositionsRowDeleting" msprop:Generator_TablePropName="tcfgAnalyzerLedPositions">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="LedPosition" msprop:Generator_UserColumnName="LedPosition" msprop:Generator_ColumnVarNameInTable="columnLedPosition" msprop:Generator_ColumnPropNameInRow="LedPosition" msprop:Generator_ColumnPropNameInTable="LedPositionColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="WaveLength" msprop:Generator_UserColumnName="WaveLength" msprop:Generator_ColumnVarNameInTable="columnWaveLength" msprop:Generator_ColumnPropNameInRow="WaveLength" msprop:Generator_ColumnPropNameInTable="WaveLengthColumn" type="xs:short" minOccurs="0" />
+              <xs:element name="Status" msprop:Generator_UserColumnName="Status" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnPropNameInTable="StatusColumn" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

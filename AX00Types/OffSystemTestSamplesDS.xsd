@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="OffSystemTestSamplesDS" targetNamespace="http://tempuri.org/OffSystemTestSamplesDS.xsd" xmlns:mstns="http://tempuri.org/OffSystemTestSamplesDS.xsd" xmlns="http://tempuri.org/OffSystemTestSamplesDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString4" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString4 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString4" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="OffSystemTestSamplesDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="OffSystemTestSamplesDS" msprop:Generator_DataSetName="OffSystemTestSamplesDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tparOffSystemTestSamples" msprop:Generator_UserTableName="tparOffSystemTestSamples" msprop:Generator_RowDeletedName="tparOffSystemTestSamplesRowDeleted" msprop:Generator_RowChangedName="tparOffSystemTestSamplesRowChanged" msprop:Generator_RowClassName="tparOffSystemTestSamplesRow" msprop:Generator_RowChangingName="tparOffSystemTestSamplesRowChanging" msprop:Generator_RowEvArgName="tparOffSystemTestSamplesRowChangeEvent" msprop:Generator_RowEvHandlerName="tparOffSystemTestSamplesRowChangeEventHandler" msprop:Generator_TableClassName="tparOffSystemTestSamplesDataTable" msprop:Generator_TableVarName="tabletparOffSystemTestSamples" msprop:Generator_RowDeletingName="tparOffSystemTestSamplesRowDeleting" msprop:Generator_TablePropName="tparOffSystemTestSamples">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OffSystemTestID" msprop:Generator_UserColumnName="OffSystemTestID" msprop:Generator_ColumnPropNameInRow="OffSystemTestID" msprop:Generator_ColumnVarNameInTable="columnOffSystemTestID" msprop:Generator_ColumnPropNameInTable="OffSystemTestIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="SampleType" msprop:Generator_UserColumnName="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_ColumnVarNameInTable="columnSampleType" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="DefaultValue" msprop:Generator_UserColumnName="DefaultValue" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="DefaultValue" msprop:Generator_ColumnPropNameInTable="DefaultValueColumn" msprop:Generator_ColumnVarNameInTable="columnDefaultValue" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="ActiveRangeType" msprop:Generator_UserColumnName="ActiveRangeType" msprop:nullValue="_throw" msprop:Generator_ColumnPropNameInRow="ActiveRangeType" msprop:Generator_ColumnPropNameInTable="ActiveRangeTypeColumn" msprop:Generator_ColumnVarNameInTable="columnActiveRangeType" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

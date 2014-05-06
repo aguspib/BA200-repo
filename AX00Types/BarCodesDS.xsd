@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="BarCodesDS" targetNamespace="http://tempuri.org/BarCodesDS.xsd" xmlns:mstns="http://tempuri.org/BarCodesDS.xsd" xmlns="http://tempuri.org/BarCodesDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="BarCodesDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="BarCodesDS" msprop:Generator_UserDSName="BarCodesDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="vcfgSamplesBarCodesConfiguration" msprop:Generator_UserTableName="vcfgSamplesBarCodesConfiguration" msprop:Generator_RowEvArgName="vcfgSamplesBarCodesConfigurationRowChangeEvent" msprop:Generator_TableVarName="tablevcfgSamplesBarCodesConfiguration" msprop:Generator_TablePropName="vcfgSamplesBarCodesConfiguration" msprop:Generator_RowDeletingName="vcfgSamplesBarCodesConfigurationRowDeleting" msprop:Generator_RowChangingName="vcfgSamplesBarCodesConfigurationRowChanging" msprop:Generator_RowDeletedName="vcfgSamplesBarCodesConfigurationRowDeleted" msprop:Generator_RowEvHandlerName="vcfgSamplesBarCodesConfigurationRowChangeEventHandler" msprop:Generator_TableClassName="vcfgSamplesBarCodesConfigurationDataTable" msprop:Generator_RowChangedName="vcfgSamplesBarCodesConfigurationRowChanged" msprop:Generator_RowClassName="vcfgSamplesBarCodesConfigurationRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CodeID" msprop:Generator_ColumnVarNameInTable="columnCodeID" msprop:Generator_ColumnPropNameInRow="CodeID" msprop:Generator_ColumnPropNameInTable="CodeIDColumn" msprop:Generator_UserColumnName="CodeID" type="xs:int" minOccurs="0" />
+              <xs:element name="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" minOccurs="0" />
+              <xs:element name="Status" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInRow="Status" msprop:Generator_ColumnPropNameInTable="StatusColumn" msprop:Generator_UserColumnName="Status" type="xs:boolean" minOccurs="0" />
+              <xs:element name="CheckValue" msprop:Generator_ColumnVarNameInTable="columnCheckValue" msprop:Generator_ColumnPropNameInRow="CheckValue" msprop:Generator_ColumnPropNameInTable="CheckValueColumn" msprop:Generator_UserColumnName="CheckValue" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DecodedSamplesFields" msprop:Generator_UserTableName="DecodedSamplesFields" msprop:Generator_RowEvArgName="DecodedSamplesFieldsRowChangeEvent" msprop:Generator_TableVarName="tableDecodedSamplesFields" msprop:Generator_TablePropName="DecodedSamplesFields" msprop:Generator_RowDeletingName="DecodedSamplesFieldsRowDeleting" msprop:Generator_RowChangingName="DecodedSamplesFieldsRowChanging" msprop:Generator_RowDeletedName="DecodedSamplesFieldsRowDeleted" msprop:Generator_RowEvHandlerName="DecodedSamplesFieldsRowChangeEventHandler" msprop:Generator_TableClassName="DecodedSamplesFieldsDataTable" msprop:Generator_RowChangedName="DecodedSamplesFieldsRowChanged" msprop:Generator_RowClassName="DecodedSamplesFieldsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ExternalPID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ExternalPID" msprop:Generator_ColumnVarNameInTable="columnExternalPID" msprop:Generator_ColumnPropNameInTable="ExternalPIDColumn" msprop:Generator_UserColumnName="ExternalPID" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleType" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_UserColumnName="SampleType" type="xs:string" minOccurs="0" />
+              <xs:element name="ExternalSampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ExternalSampleType" msprop:Generator_ColumnVarNameInTable="columnExternalSampleType" msprop:Generator_ColumnPropNameInTable="ExternalSampleTypeColumn" msprop:Generator_UserColumnName="ExternalSampleType" type="xs:string" minOccurs="0" />
+              <xs:element name="PatientID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PatientID" msprop:Generator_ColumnVarNameInTable="columnPatientID" msprop:Generator_ColumnPropNameInTable="PatientIDColumn" msprop:Generator_UserColumnName="PatientID" type="xs:string" minOccurs="0" />
+              <xs:element name="BarcodeInfo" msprop:Generator_ColumnVarNameInTable="columnBarcodeInfo" msprop:Generator_ColumnPropNameInRow="BarcodeInfo" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="BarcodeInfoColumn" msprop:Generator_UserColumnName="BarcodeInfo" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DecodedReagentsFields" msprop:Generator_UserTableName="DecodedReagentsFields" msprop:Generator_RowEvArgName="DecodedReagentsFieldsRowChangeEvent" msprop:Generator_TableVarName="tableDecodedReagentsFields" msprop:Generator_TablePropName="DecodedReagentsFields" msprop:Generator_RowDeletingName="DecodedReagentsFieldsRowDeleting" msprop:Generator_RowChangingName="DecodedReagentsFieldsRowChanging" msprop:Generator_RowDeletedName="DecodedReagentsFieldsRowDeleted" msprop:Generator_RowEvHandlerName="DecodedReagentsFieldsRowChangeEventHandler" msprop:Generator_TableClassName="DecodedReagentsFieldsDataTable" msprop:Generator_RowChangedName="DecodedReagentsFieldsRowChanged" msprop:Generator_RowClassName="DecodedReagentsFieldsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="CodeTest" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="CodeTest" msprop:Generator_ColumnVarNameInTable="columnCodeTest" msprop:Generator_ColumnPropNameInTable="CodeTestColumn" msprop:Generator_UserColumnName="CodeTest" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="BottleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="BottleType" msprop:Generator_ColumnVarNameInTable="columnBottleType" msprop:Generator_ColumnPropNameInTable="BottleTypeColumn" msprop:Generator_UserColumnName="BottleType" type="xs:string" minOccurs="0" />
+              <xs:element name="ReagentType" msprop:Generator_ColumnVarNameInTable="columnReagentType" msprop:Generator_ColumnPropNameInRow="ReagentType" msprop:Generator_ColumnPropNameInTable="ReagentTypeColumn" msprop:Generator_UserColumnName="ReagentType" type="xs:int" minOccurs="0" />
+              <xs:element name="MonthExpedition" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="MonthExpedition" msprop:Generator_ColumnVarNameInTable="columnMonthExpedition" msprop:Generator_ColumnPropNameInTable="MonthExpeditionColumn" msprop:Generator_UserColumnName="MonthExpedition" type="xs:string" minOccurs="0" />
+              <xs:element name="YearExpedition" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="YearExpedition" msprop:Generator_ColumnVarNameInTable="columnYearExpedition" msprop:Generator_ColumnPropNameInTable="YearExpeditionColumn" msprop:Generator_UserColumnName="YearExpedition" type="xs:string" minOccurs="0" />
+              <xs:element name="BottleLotNumber" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="BottleLotNumber" msprop:Generator_ColumnVarNameInTable="columnBottleLotNumber" msprop:Generator_ColumnPropNameInTable="BottleLotNumberColumn" msprop:Generator_UserColumnName="BottleLotNumber" type="xs:string" minOccurs="0" />
+              <xs:element name="LotNumber" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LotNumber" msprop:Generator_ColumnVarNameInTable="columnLotNumber" msprop:Generator_ColumnPropNameInTable="LotNumberColumn" msprop:Generator_UserColumnName="LotNumber" type="xs:string" minOccurs="0" />
+              <xs:element name="CheckDigit" msprop:Generator_ColumnVarNameInTable="columnCheckDigit" msprop:Generator_ColumnPropNameInRow="CheckDigit" msprop:Generator_ColumnPropNameInTable="CheckDigitColumn" msprop:Generator_UserColumnName="CheckDigit" type="xs:int" minOccurs="0" />
+              <xs:element name="IsReagentFlag" msprop:Generator_ColumnVarNameInTable="columnIsReagentFlag" msprop:Generator_ColumnPropNameInRow="IsReagentFlag" msprop:Generator_ColumnPropNameInTable="IsReagentFlagColumn" msprop:Generator_UserColumnName="IsReagentFlag" type="xs:boolean" minOccurs="0" />
+              <xs:element name="IsExternalReagentFlag" msprop:Generator_ColumnVarNameInTable="columnIsExternalReagentFlag" msprop:Generator_ColumnPropNameInRow="IsExternalReagentFlag" msprop:Generator_ColumnPropNameInTable="IsExternalReagentFlagColumn" msprop:Generator_UserColumnName="IsExternalReagentFlag" type="xs:boolean" minOccurs="0" />
+              <xs:element name="ReagentID" msprop:Generator_ColumnVarNameInTable="columnReagentID" msprop:Generator_ColumnPropNameInRow="ReagentID" msprop:Generator_ColumnPropNameInTable="ReagentIDColumn" msprop:Generator_UserColumnName="ReagentID" type="xs:int" minOccurs="0" />
+              <xs:element name="ReagentNumber" msprop:Generator_ColumnVarNameInTable="columnReagentNumber" msprop:Generator_ColumnPropNameInRow="ReagentNumber" msprop:Generator_ColumnPropNameInTable="ReagentNumberColumn" msprop:Generator_UserColumnName="ReagentNumber" type="xs:int" minOccurs="0" />
+              <xs:element name="SolutionCode" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SolutionCode" msprop:Generator_ColumnVarNameInTable="columnSolutionCode" msprop:Generator_ColumnPropNameInTable="SolutionCodeColumn" msprop:Generator_UserColumnName="SolutionCode" type="xs:string" minOccurs="0" />
+              <xs:element name="BottleVolume" msprop:Generator_ColumnVarNameInTable="columnBottleVolume" msprop:Generator_ColumnPropNameInRow="BottleVolume" msprop:Generator_ColumnPropNameInTable="BottleVolumeColumn" msprop:Generator_UserColumnName="BottleVolume" type="xs:float" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

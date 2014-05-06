@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WSOrderTestsDS" targetNamespace="http://tempuri.org/WSOrderTestsDS.xsd" xmlns:mstns="http://tempuri.org/WSOrderTestsDS.xsd" xmlns="http://tempuri.org/WSOrderTestsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString2" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString2 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString2" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="WSOrderTestsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="WSOrderTestsDS" msprop:Generator_UserDSName="WSOrderTestsDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="twksWSOrderTests" msprop:Generator_UserTableName="twksWSOrderTests" msprop:Generator_RowEvArgName="twksWSOrderTestsRowChangeEvent" msprop:Generator_TableVarName="tabletwksWSOrderTests" msprop:Generator_TablePropName="twksWSOrderTests" msprop:Generator_RowDeletingName="twksWSOrderTestsRowDeleting" msprop:Generator_RowChangingName="twksWSOrderTestsRowChanging" msprop:Generator_RowDeletedName="twksWSOrderTestsRowDeleted" msprop:Generator_RowEvHandlerName="twksWSOrderTestsRowChangeEventHandler" msprop:Generator_TableClassName="twksWSOrderTestsDataTable" msprop:Generator_RowChangedName="twksWSOrderTestsRowChanged" msprop:Generator_RowClassName="twksWSOrderTestsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="WorkSessionID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="WorkSessionID" msprop:Generator_ColumnVarNameInTable="columnWorkSessionID" msprop:Generator_ColumnPropNameInTable="WorkSessionIDColumn" msprop:Generator_UserColumnName="WorkSessionID" type="xs:string" minOccurs="0" />
+              <xs:element name="OrderTestID" msprop:Generator_ColumnVarNameInTable="columnOrderTestID" msprop:Generator_ColumnPropNameInRow="OrderTestID" msprop:Generator_ColumnPropNameInTable="OrderTestIDColumn" msprop:Generator_UserColumnName="OrderTestID" type="xs:int" minOccurs="0" />
+              <xs:element name="ToSendFlag" msprop:Generator_ColumnVarNameInTable="columnToSendFlag" msprop:Generator_ColumnPropNameInRow="ToSendFlag" msprop:Generator_ColumnPropNameInTable="ToSendFlagColumn" msprop:Generator_UserColumnName="ToSendFlag" type="xs:boolean" minOccurs="0" />
+              <xs:element name="OpenOTFlag" msprop:Generator_ColumnVarNameInTable="columnOpenOTFlag" msprop:Generator_ColumnPropNameInRow="OpenOTFlag" msprop:Generator_ColumnPropNameInTable="OpenOTFlagColumn" msprop:Generator_UserColumnName="OpenOTFlag" type="xs:boolean" default="false" minOccurs="0" />
+              <xs:element name="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_UserColumnName="TS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" msprop:Generator_UserColumnName="TS_DateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="CtrlsSendingGroup" msprop:Generator_ColumnVarNameInTable="columnCtrlsSendingGroup" msprop:Generator_ColumnPropNameInRow="CtrlsSendingGroup" msprop:Generator_ColumnPropNameInTable="CtrlsSendingGroupColumn" msprop:Generator_UserColumnName="CtrlsSendingGroup" type="xs:int" minOccurs="0" />
+              <xs:element name="TestType" msprop:Generator_ColumnVarNameInTable="columnTestType" msprop:Generator_ColumnPropNameInRow="TestType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="TestTypeColumn" msprop:Generator_UserColumnName="TestType" type="xs:string" minOccurs="0" />
+              <xs:element name="TestID" msprop:Generator_ColumnVarNameInTable="columnTestID" msprop:Generator_ColumnPropNameInRow="TestID" msprop:Generator_ColumnPropNameInTable="TestIDColumn" msprop:Generator_UserColumnName="TestID" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="HisWSCalcTestRelations" targetNamespace="http://tempuri.org/HisWSCalcTestRelations.xsd" xmlns:mstns="http://tempuri.org/HisWSCalcTestRelations.xsd" xmlns="http://tempuri.org/HisWSCalcTestRelations.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="HisWSCalcTestRelations" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="HisWSCalcTestRelations" msprop:Generator_UserDSName="HisWSCalcTestRelations" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="thisWSCalcTestsRelations" msprop:Generator_UserTableName="thisWSCalcTestsRelations" msprop:Generator_RowDeletedName="thisWSCalcTestsRelationsRowDeleted" msprop:Generator_TableClassName="thisWSCalcTestsRelationsDataTable" msprop:Generator_RowChangedName="thisWSCalcTestsRelationsRowChanged" msprop:Generator_RowClassName="thisWSCalcTestsRelationsRow" msprop:Generator_RowChangingName="thisWSCalcTestsRelationsRowChanging" msprop:Generator_RowEvArgName="thisWSCalcTestsRelationsRowChangeEvent" msprop:Generator_RowEvHandlerName="thisWSCalcTestsRelationsRowChangeEventHandler" msprop:Generator_TablePropName="thisWSCalcTestsRelations" msprop:Generator_TableVarName="tablethisWSCalcTestsRelations" msprop:Generator_RowDeletingName="thisWSCalcTestsRelationsRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnPropNameInRow="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="WorkSessionID" msprop:Generator_UserColumnName="WorkSessionID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnWorkSessionID" msprop:Generator_ColumnPropNameInTable="WorkSessionIDColumn" msprop:Generator_ColumnPropNameInRow="WorkSessionID" type="xs:string" minOccurs="0" />
+              <xs:element name="HistOrderTestIDCALC" msprop:Generator_UserColumnName="HistOrderTestIDCALC" msprop:Generator_ColumnPropNameInRow="HistOrderTestIDCALC" msprop:Generator_ColumnVarNameInTable="columnHistOrderTestIDCALC" msprop:Generator_ColumnPropNameInTable="HistOrderTestIDCALCColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="HistOrderTestID" msprop:Generator_UserColumnName="HistOrderTestID" msprop:Generator_ColumnPropNameInRow="HistOrderTestID" msprop:Generator_ColumnVarNameInTable="columnHistOrderTestID" msprop:Generator_ColumnPropNameInTable="HistOrderTestIDColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

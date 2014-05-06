@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ISETestsDS" targetNamespace="http://tempuri.org/ISETestsDS.xsd" xmlns:mstns="http://tempuri.org/ISETestsDS.xsd" xmlns="http://tempuri.org/ISETestsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString4" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString4 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString4" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="ISETestsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="ISETestsDS" msprop:Generator_UserDSName="ISETestsDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tparISETests" msprop:Generator_UserTableName="tparISETests" msprop:Generator_RowEvArgName="tparISETestsRowChangeEvent" msprop:Generator_TableVarName="tabletparISETests" msprop:Generator_TablePropName="tparISETests" msprop:Generator_RowDeletingName="tparISETestsRowDeleting" msprop:Generator_RowChangingName="tparISETestsRowChanging" msprop:Generator_RowDeletedName="tparISETestsRowDeleted" msprop:Generator_RowEvHandlerName="tparISETestsRowChangeEventHandler" msprop:Generator_TableClassName="tparISETestsDataTable" msprop:Generator_RowChangedName="tparISETestsRowChanged" msprop:Generator_RowClassName="tparISETestsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ISETestID" msprop:Generator_ColumnVarNameInTable="columnISETestID" msprop:Generator_ColumnPropNameInRow="ISETestID" msprop:Generator_ColumnPropNameInTable="ISETestIDColumn" msprop:Generator_UserColumnName="ISETestID" type="xs:int" minOccurs="0" />
+              <xs:element name="ISE_ResultID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ISE_ResultID" msprop:Generator_ColumnVarNameInTable="columnISE_ResultID" msprop:Generator_ColumnPropNameInTable="ISE_ResultIDColumn" msprop:Generator_UserColumnName="ISE_ResultID" type="xs:string" minOccurs="0" />
+              <xs:element name="Name" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Name" msprop:Generator_ColumnVarNameInTable="columnName" msprop:Generator_ColumnPropNameInTable="NameColumn" msprop:Generator_UserColumnName="Name" type="xs:string" minOccurs="0" />
+              <xs:element name="ShortName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ShortName" msprop:Generator_ColumnVarNameInTable="columnShortName" msprop:Generator_ColumnPropNameInTable="ShortNameColumn" msprop:Generator_UserColumnName="ShortName" type="xs:string" minOccurs="0" />
+              <xs:element name="Units" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Units" msprop:Generator_ColumnVarNameInTable="columnUnits" msprop:Generator_ColumnPropNameInTable="UnitsColumn" msprop:Generator_UserColumnName="Units" type="xs:string" minOccurs="0" />
+              <xs:element name="ISE_Units" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ISE_Units" msprop:Generator_ColumnVarNameInTable="columnISE_Units" msprop:Generator_ColumnPropNameInTable="ISE_UnitsColumn" msprop:Generator_UserColumnName="ISE_Units" type="xs:string" minOccurs="0" />
+              <xs:element name="InUse" msprop:Generator_ColumnVarNameInTable="columnInUse" msprop:Generator_ColumnPropNameInRow="InUse" msprop:Generator_ColumnPropNameInTable="InUseColumn" msprop:Generator_UserColumnName="InUse" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_UserColumnName="TS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" msprop:Generator_UserColumnName="TS_DateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="Enabled" msprop:Generator_ColumnVarNameInTable="columnEnabled" msprop:Generator_ColumnPropNameInRow="Enabled" msprop:Generator_ColumnPropNameInTable="EnabledColumn" msprop:Generator_UserColumnName="Enabled" type="xs:boolean" minOccurs="0" />
+              <xs:element name="Decimals" msprop:Generator_ColumnVarNameInTable="columnDecimals" msprop:Generator_ColumnPropNameInRow="Decimals" msprop:Generator_ColumnPropNameInTable="DecimalsColumn" msprop:Generator_UserColumnName="Decimals" type="xs:int" minOccurs="0" />
+              <xs:element name="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleType" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_UserColumnName="SampleType" type="xs:string" minOccurs="0" />
+              <xs:element name="RejectionCriteria" msprop:Generator_ColumnVarNameInTable="columnRejectionCriteria" msprop:Generator_ColumnPropNameInRow="RejectionCriteria" msprop:Generator_ColumnPropNameInTable="RejectionCriteriaColumn" msprop:Generator_UserColumnName="RejectionCriteria" type="xs:float" minOccurs="0" />
+              <xs:element name="NumberOfControls" msprop:Generator_ColumnVarNameInTable="columnNumberOfControls" msprop:Generator_ColumnPropNameInRow="NumberOfControls" msprop:Generator_ColumnPropNameInTable="NumberOfControlsColumn" msprop:Generator_UserColumnName="NumberOfControls" type="xs:int" minOccurs="0" />
+              <xs:element name="QCActive" msprop:Generator_ColumnVarNameInTable="columnQCActive" msprop:Generator_ColumnPropNameInRow="QCActive" msprop:Generator_ColumnPropNameInTable="QCActiveColumn" msprop:Generator_UserColumnName="QCActive" type="xs:boolean" minOccurs="0" />
+              <xs:element name="ActiveControl" msprop:Generator_ColumnVarNameInTable="columnActiveControl" msprop:Generator_ColumnPropNameInRow="ActiveControl" msprop:Generator_ColumnPropNameInTable="ActiveControlColumn" msprop:Generator_UserColumnName="ActiveControl" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TestPosition" msprop:Generator_ColumnVarNameInTable="columnTestPosition" msprop:Generator_ColumnPropNameInRow="TestPosition" msprop:Generator_ColumnPropNameInTable="TestPositionColumn" msprop:Generator_UserColumnName="TestPosition" type="xs:int" minOccurs="0" />
+              <xs:element name="LISValue" msprop:Generator_ColumnVarNameInTable="columnLISValue" msprop:Generator_ColumnPropNameInRow="LISValue" msprop:Generator_ColumnPropNameInTable="LISValueColumn" msprop:Generator_UserColumnName="LISValue" type="xs:string" default="" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

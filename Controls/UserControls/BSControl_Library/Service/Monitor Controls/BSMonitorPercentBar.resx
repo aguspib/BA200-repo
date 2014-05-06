@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="IndicatorWidget1.InstrumentationStream" xml:space="preserve">
+    <value>&lt;?xml version="1.0" encoding="utf-16" standalone="yes"?&gt;&lt;root type="PerpetuumSoft.Instrumentation.Model.Instrument" id="1" version="2" Size="2893.75;890.625" GridStep="50" RecalculateAll="true" Name="Instrument" MeasureUnit="Pixel"&gt;&lt;Parameters type="PerpetuumSoft.Instrumentation.Model.ParameterCollection" id="2" /&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="3" /&gt;&lt;Elements type="PerpetuumSoft.Instrumentation.Model.ElementCollection" id="4"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.Guide" id="5" StartPoint="289.375;534.375" RecalculateAll="true" Name="Guide" EndPoint="2604.375;534.375"&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="6"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="7" Expression="[0.9 * Instrument.Size.Width, 0.6 * Instrument.Size.Height]" PropertyName="EndPoint" /&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="8" Expression="[0.1* Instrument.Size.Width, 0.6 * Instrument.Size.Height]" PropertyName="StartPoint" /&gt;&lt;/Expressions&gt;&lt;Elements type="PerpetuumSoft.Instrumentation.Model.ElementCollection" id="9"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.Scale" id="10" Name="Scale" RecalculateAll="true"&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="11" /&gt;&lt;Elements type="PerpetuumSoft.Instrumentation.Model.ElementCollection" id="12"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.Slider" id="13" Name="Slider" RecalculateAll="true"&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="14" /&gt;&lt;Elements type="PerpetuumSoft.Instrumentation.Model.ElementCollection" id="15"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.RangedLevel" id="16" StartWidth="623.4375" RecalculateAll="true" Distance="311.71875" Style="Default" AlignmentMode="Near" Name="RangeBack" EndWidth="623.4375"&gt;&lt;Stroke type="PerpetuumSoft.Framework.Drawing.SimpleStroke" id="17" Width="1" Color="DarkGray" /&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="18"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="19" Expression="0.7 * Instrument.Size.Height" PropertyName="EndWidth" /&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="20" Expression="0.7 * Instrument.Size.Height" PropertyName="StartWidth" /&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="21" Expression="RangeBack.StartWidth/2" PropertyName="Distance" /&gt;&lt;/Expressions&gt;&lt;Colors type="PerpetuumSoft.Instrumentation.Model.Drawing.ColorSectionCollection" id="22" /&gt;&lt;Fill type="PerpetuumSoft.Framework.Drawing.MultiGradientFill" id="23" Angle="90"&gt;&lt;Colors type="PerpetuumSoft.Framework.Drawing.GradientColorCollection" id="24"&gt;&lt;Item type="PerpetuumSoft.Framework.Drawing.GradientColor" id="25" Portion="0" Color="LightGray" /&gt;&lt;Item type="PerpetuumSoft.Framework.Drawing.GradientColor" id="26" Portion="0.75308641975308643" Color="White" /&gt;&lt;Item type="PerpetuumSoft.Framework.Drawing.GradientColor" id="27" Portion="1" Color="Silver" /&gt;&lt;/Colors&gt;&lt;/Fill&gt;&lt;/Item&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.RangedLevel" id="28" StartWidth="436.40625" RecalculateAll="true" Distance="-218.203125" Style="Default" Value="100" BreakEventsBubbling="true" Name="RangeFront" EndWidth="436.40625"&gt;&lt;Stroke type="PerpetuumSoft.Framework.Drawing.SimpleStroke" id="29" Width="1" Color="Transparent" /&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="30"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="31" Expression="0.7 * RangeBack.StartWidth" PropertyName="EndWidth" /&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="32" Expression="0.7 * RangeBack.StartWidth" PropertyName="StartWidth" /&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="33" Expression="-RangeFront.StartWidth/2" PropertyName="Distance" /&gt;&lt;/Expressions&gt;&lt;Colors type="PerpetuumSoft.Instrumentation.Model.Drawing.ColorSectionCollection" id="34" /&gt;&lt;Fill type="PerpetuumSoft.Framework.Drawing.MultiGradientFill" id="35" Angle="90"&gt;&lt;Colors type="PerpetuumSoft.Framework.Drawing.GradientColorCollection" id="36"&gt;&lt;Item type="PerpetuumSoft.Framework.Drawing.GradientColor" id="37" Portion="0" Color="LimeGreen" /&gt;&lt;Item type="PerpetuumSoft.Framework.Drawing.GradientColor" id="38" Portion="0.3271604938271605" Color="Honeydew" /&gt;&lt;Item type="PerpetuumSoft.Framework.Drawing.GradientColor" id="39" Portion="1" Color="LightGreen" /&gt;&lt;/Colors&gt;&lt;/Fill&gt;&lt;/Item&gt;&lt;/Elements&gt;&lt;/Item&gt;&lt;/Elements&gt;&lt;/Item&gt;&lt;/Elements&gt;&lt;/Item&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.Label" id="40" Text="0%" Size="2315;436.40625" RecalculateAll="true" Style="Default" Center="1446.875;534.375" Name="LabelValue"&gt;&lt;Stroke type="PerpetuumSoft.Framework.Drawing.SimpleStroke" id="41" Width="1" Color="Transparent" /&gt;&lt;Font type="PerpetuumSoft.Framework.Drawing.FontDescriptor" id="42" FamilyName="Verdana" Size="72" Underline="Off" Strikeout="Off" Italic="Off" Bold="On" /&gt;&lt;Expressions type="PerpetuumSoft.Instrumentation.Model.ExpressionBindingCollection" id="43"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="44" Expression="[Guide.StartPoint.X+(Guide.EndPoint.X - Guide.StartPoint.X)/2,Guide.EndPoint.Y]" PropertyName="Center" /&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Model.ExpressionBinding" id="45" Expression="[Guide.EndPoint.X - Guide.StartPoint.X, 1*RangeFront.EndWidth]" PropertyName="Size" /&gt;&lt;/Expressions&gt;&lt;Fill type="PerpetuumSoft.Framework.Drawing.SolidFill" id="46" Color="SteelBlue" /&gt;&lt;/Item&gt;&lt;/Elements&gt;&lt;Styles type="PerpetuumSoft.Instrumentation.Styles.StyleCollection" id="47"&gt;&lt;Item type="PerpetuumSoft.Instrumentation.Styles.Style" id="48" Name="Default"&gt;&lt;Stroke type="PerpetuumSoft.Framework.Drawing.SimpleStroke" id="49" Width="1" /&gt;&lt;Font type="PerpetuumSoft.Framework.Drawing.FontDescriptor" id="50" FamilyName="Microsoft Sans Serif" /&gt;&lt;/Item&gt;&lt;/Styles&gt;&lt;/root&gt;</value>
+  </data>
+</root>

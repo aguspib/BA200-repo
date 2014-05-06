@@ -1,0 +1,1132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{64905D6A-E7B9-4798-AD76-2A0BC58A9AF6}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>PesentationLayer.My.MyApplication</StartupObject>
+    <RootNamespace>PesentationLayer</RootNamespace>
+    <AssemblyName>BA400User</AssemblyName>
+    <MyType>WindowsForms</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <ManifestCertificateThumbprint>2EA7343C16DC630DBC11C73CB6459A4DEC0251E2</ManifestCertificateThumbprint>
+    <ManifestKeyFile>PresentationLayer_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <ApplicationIcon>BA400USER.ico</ApplicationIcon>
+    <TargetZone>LocalIntranet</TargetZone>
+    <TargetFrameworkProfile />
+    <PublishUrl>C:\Ax00 SetupFiles\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Background</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <UpdateUrl>http://Master/Ax00Update/</UpdateUrl>
+    <TargetCulture>en</TargetCulture>
+    <ProductName>AX400</ProductName>
+    <PublisherName>Biosystems</PublisherName>
+    <ApplicationRevision>75</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>BA400User.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>BA400User.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>BA400User.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>BA400User.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>BA400User.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>BA400User.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.Charts.v10.2.Core, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Data.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.DXCore.Controls.Data.v6.3, Version=10.2.4.0, Culture=neutral, PublicKeyToken=35c9f04b7764aa3d" />
+    <Reference Include="DevExpress.DXCore.Controls.Utils.v6.3, Version=10.2.4.0, Culture=neutral, PublicKeyToken=35c9f04b7764aa3d, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Utils.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraBars.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraCharts.v10.2.UI, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraEditors.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraGrid.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraNavBar.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPrinting.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v10.2.Extensions, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraRichEdit.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.SqlServer.Smo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Visual Studio 2012\Projects\UpdateModuleTest\UpdateModuleTest\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\System.Windows.Forms.DataVisualization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Net.Mail" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="HQBarcode.Designer.vb">
+      <DependentUpon>HQBarcode.vb</DependentUpon>
+    </Compile>
+    <Compile Include="HQBarcode.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IConfigLIS.Designer.vb">
+      <DependentUpon>IConfigLIS.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IConfigLIS.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IConfigLISMapping.Designer.vb">
+      <DependentUpon>IConfigLISMapping.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IConfigLISMapping.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ICreateRestorePoint.designer.vb">
+      <DependentUpon>ICreateRestorePoint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ICreateRestorePoint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IHisBlankCalibResults.Designer.vb">
+      <DependentUpon>IHisBlankCalibResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IHisBlankCalibResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IHisResults.Designer.vb">
+      <DependentUpon>IHisResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IHisResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IConditioning.Designer.vb">
+      <DependentUpon>IConditioning.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IConditioning.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IHisAlarms.Designer.vb">
+      <DependentUpon>IHisAlarms.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IHisAlarms.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IISEResultsHistory.Designer.vb">
+      <DependentUpon>IISEResultsHistory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IISEResultsHistory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IISEResultsHistoryGraph.Designer.vb">
+      <DependentUpon>IISEResultsHistoryGraph.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IISEResultsHistoryGraph.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSTestSelectionWarning.Designer.vb">
+      <DependentUpon>IWSTestSelectionWarning.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSTestSelectionWarning.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IBarCodeEdit.Designer.vb">
+      <DependentUpon>IBarCodeEdit.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IBarCodeEdit.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IQCAddManualResultsAux.Designer.vb">
+      <DependentUpon>IQCAddManualResultsAux.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IQCAddManualResultsAux.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IQCCumulateControlResults.Designer.vb">
+      <DependentUpon>IQCCumulateControlResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IQCCumulateControlResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IQCGraphs.Designer.vb">
+      <DependentUpon>IQCGraphs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IQCGraphs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResultsAbsCurve.Designer.vb">
+      <DependentUpon>IResultsAbsCurve.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IResults\IResultsBlanksDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResultsCalibratorsDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResultsControlsDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResultsExperimentalsDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResultsSamplesDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResultsSamplesListDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResultsTestsListDataGridView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISATReport.Designer.vb">
+      <DependentUpon>ISATReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISATReport.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISortingTestsAux.Designer.vb">
+      <DependentUpon>ISortingTestsAux.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISortingTestsAux.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWarningAfectedElements.Designer.vb">
+      <DependentUpon>IWarningAfectedElements.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWarningAfectedElements.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\Historycal.Designer.vb">
+      <DependentUpon>Historycal.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IMonitor\Historycal.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorRotors.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorISETab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorReactionsTab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorAlarmsTab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitor.Designer.vb">
+      <DependentUpon>IMonitor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IMonitor\IMonitor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorMainTab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorReagentsTab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorSamplesTab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IMonitor\IMonitorStatesTab.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgControls.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgControls.Designer.vb">
+      <DependentUpon>IProgControls.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IQCResultsEditionAux.Designer.vb">
+      <DependentUpon>IQCResultsEditionAux.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IQCResultsEditionAux.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSIncompleteSamplesAuxScreen.Designer.vb">
+      <DependentUpon>IWSIncompleteSamplesAuxScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="MainMDI\MDICommEvents.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainMDI\MDIVerticalButtons.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="QCResultsReview.Designer.vb">
+      <DependentUpon>IQCResultsReview.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IQCResultsReview.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IChangeRotor.Designer.vb">
+      <DependentUpon>IChangeRotor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IChangeRotor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IQCCumulatedReview.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IQCCumulatedReview.Designer.vb">
+      <DependentUpon>IQCCumulatedReview.vb</DependentUpon>
+    </Compile>
+    <Compile Include="StartupUSER.designer.vb">
+      <DependentUpon>StartupUSER.vb</DependentUpon>
+    </Compile>
+    <Compile Include="StartupUSER.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgCalibrator.Designer.vb">
+      <DependentUpon>IProgCalibrator.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgCalibrator.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResultsAbsCurve.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Temp\ApplicationLogView.Designer.vb">
+      <DependentUpon>ApplicationLogView.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Temp\ApplicationLogView.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ILegend.Designer.vb">
+      <DependentUpon>ILegend.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ILegend.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgAuxTestContaminations.Designer.vb">
+      <DependentUpon>IProgAuxTestContaminations.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgAuxTestContaminations.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgISETest.designer.vb">
+      <DependentUpon>IProgISETest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgISETest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ILotChangeAuxScreen.Designer.vb">
+      <DependentUpon>ILotChangeAuxScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ILotChangeAuxScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResultsRecover.Designer.vb">
+      <DependentUpon>IResultsRecover.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IResultsRecover.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Temp\ToIntegrate.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ILISUtilities.Designer.vb">
+      <DependentUpon>ILISUtilities.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ILISUtilities.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\ISECodeGenerator.Designer.vb">
+      <DependentUpon>ISECodeGenerator.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\ISECodeGenerator.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\FormStressGrids.Designer.vb">
+      <DependentUpon>FormStressGrids.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\FormStressGrids.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\ISE_Test.Designer.vb">
+      <DependentUpon>ISE_Test.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\ISE_Test.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgOffSystemTest.Designer.vb">
+      <DependentUpon>IProgOffSystemTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgOffSystemTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgTest.designer.vb">
+      <DependentUpon>IProgTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgTestContaminations.Designer.vb">
+      <DependentUpon>IProgTestContaminations.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgTestContaminations.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\Form_XBC.Designer.vb">
+      <DependentUpon>Form_XBC.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\Form_XBC.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISATReportLoad.designer.vb">
+      <DependentUpon>ISATReportLoad.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISATReportLoad.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgCalculatedTest.Designer.vb">
+      <DependentUpon>IProgCalculatedTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgCalculatedTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResultsCalibCurve.designer.vb">
+      <DependentUpon>IResultsCalibCurve.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IResultsCalibCurve.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResultsSummaryTable.Designer.vb">
+      <DependentUpon>IResultsSummaryTable.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IResultsSummaryTable.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BSControls\BSResultsChart.Designer.vb">
+      <DependentUpon>BSResultsChart.vb</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="BSControls\BSResultsChart.vb">
+      <SubType>UserControl</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="TestForms\QCSimulator.Designer.vb">
+      <DependentUpon>QCSimulator.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\QCSimulator.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\UpdateProcessValidation.Designer.vb">
+      <DependentUpon>UpdateProcessValidation.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\UpdateProcessValidation.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSImportLIMSErrors.Designer.vb">
+      <DependentUpon>IWSImportLIMSErrors.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSImportLIMSErrors.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSNotPosWarning.Designer.vb">
+      <DependentUpon>IWSNotPosWarning.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSNotPosWarning.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AppConfigSetup\AppConfiguration.Designer.vb">
+      <DependentUpon>AppConfiguration.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AppConfigSetup\AppConfiguration.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\Ax00MainForm.designer.vb">
+      <DependentUpon>Ax00MainForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\Ax00MainForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainMDI\IAx00MainMDI.designer.vb">
+      <DependentUpon>IAx00MainMDI.vb</DependentUpon>
+    </Compile>
+    <Compile Include="MainMDI\IAx00MainMDI.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSManualRepetition.Designer.vb">
+      <DependentUpon>IWSManualRepetition.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSManualRepetition.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgPatientData.designer.vb">
+      <DependentUpon>IProgPatientData.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgPatientData.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResults\IResults.Designer.vb">
+      <DependentUpon>IResults.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IResults\IResults.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSDeleteAuxScreen.Designer.vb">
+      <DependentUpon>IWSDeleteAuxScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSDeleteAuxScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\LIS_Test.Designer.vb">
+      <DependentUpon>LIS_Test.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\LIS_Test.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSLoadSaveAuxScreen.Designer.vb">
+      <DependentUpon>IWSLoadSaveAuxScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSLoadSaveAuxScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Temp\Ax00MainMenuForm.Designer.vb">
+      <DependentUpon>Ax00MainMenuForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Temp\Ax00MainMenuForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IResultsOffSystemsTest.Designer.vb">
+      <DependentUpon>IResultsOffSystemsTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IResultsOffSystemsTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSTestSelectionAuxScreen.Designer.vb">
+      <DependentUpon>IWSTestSelectionAuxScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSTestSelectionAuxScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSRotorPositions.Designer.vb">
+      <DependentUpon>IWSRotorPositions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSRotorPositions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\COMMS_Test.Designer.vb">
+      <DependentUpon>COMMS_Test.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\COMMS_Test.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IProgTestProfiles.designer.vb">
+      <DependentUpon>IProgTestProfiles.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IProgTestProfiles.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="TestForms\XmlEncrypt.Designer.vb">
+      <DependentUpon>XmlEncrypt.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\XmlEncrypt.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\InstallerForm.Designer.vb">
+      <DependentUpon>InstallerForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\InstallerForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSSampleRequest.Designer.vb">
+      <DependentUpon>IWSSampleRequest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IWSSampleRequest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IWSIncompleteSamplesAuxScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HQBarcode.resx">
+      <DependentUpon>HQBarcode.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IConfigLIS.resx">
+      <DependentUpon>IConfigLIS.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IConfigLISMapping.resx">
+      <DependentUpon>IConfigLISMapping.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ICreateRestorePoint.resx">
+      <DependentUpon>ICreateRestorePoint.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IHisBlankCalibResults.resx">
+      <DependentUpon>IHisBlankCalibResults.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IHisResults.resx">
+      <DependentUpon>IHisResults.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IConditioning.resx">
+      <DependentUpon>IConditioning.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IHisAlarms.resx">
+      <DependentUpon>IHisAlarms.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IISEResultsHistory.resx">
+      <DependentUpon>IISEResultsHistory.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IISEResultsHistoryGraph.resx">
+      <DependentUpon>IISEResultsHistoryGraph.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSTestSelectionWarning.resx">
+      <DependentUpon>IWSTestSelectionWarning.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IBarCodeEdit.resx">
+      <DependentUpon>IBarCodeEdit.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IQCAddManualResultsAux.resx">
+      <DependentUpon>IQCAddManualResultsAux.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IQCCumulateControlResults.resx">
+      <DependentUpon>IQCCumulateControlResults.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IQCGraphs.resx">
+      <DependentUpon>IQCGraphs.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IQCResultsReview.resx">
+      <DependentUpon>IQCResultsReview.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IResultsAbsCurve.resx">
+      <DependentUpon>IResultsAbsCurve.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISATReport.resx">
+      <DependentUpon>ISATReport.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISortingTestsAux.resx">
+      <DependentUpon>ISortingTestsAux.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWarningAfectedElements.resx">
+      <DependentUpon>IWarningAfectedElements.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IMonitor\Historycal.resx">
+      <DependentUpon>Historycal.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSIncompleteSamplesAuxScreen.resx">
+      <DependentUpon>IWSIncompleteSamplesAuxScreen.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="IMonitor\IMonitor.resx">
+      <DependentUpon>IMonitor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgControls.resx">
+      <DependentUpon>IProgControls.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IQCResultsEditionAux.resx">
+      <DependentUpon>IQCResultsEditionAux.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IChangeRotor.resx">
+      <DependentUpon>IChangeRotor.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IQCCumulatedReview.resx">
+      <DependentUpon>IQCCumulatedReview.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StartupUSER.resx">
+      <DependentUpon>StartupUSER.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgCalibrator.resx">
+      <DependentUpon>IProgCalibrator.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Temp\ApplicationLogView.resx">
+      <DependentUpon>ApplicationLogView.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ILegend.resx">
+      <DependentUpon>ILegend.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgAuxTestContaminations.resx">
+      <DependentUpon>IProgAuxTestContaminations.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgISETest.resx">
+      <DependentUpon>IProgISETest.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ILotChangeAuxScreen.resx">
+      <DependentUpon>ILotChangeAuxScreen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IResultsRecover.resx">
+      <DependentUpon>IResultsRecover.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ILISUtilities.resx">
+      <DependentUpon>ILISUtilities.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\ISECodeGenerator.resx">
+      <DependentUpon>ISECodeGenerator.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\FormStressGrids.resx">
+      <DependentUpon>FormStressGrids.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\ISE_Test.resx">
+      <DependentUpon>ISE_Test.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgOffSystemTest.resx">
+      <DependentUpon>IProgOffSystemTest.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgTest.resx">
+      <DependentUpon>IProgTest.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgTestContaminations.resx">
+      <DependentUpon>IProgTestContaminations.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\Form_XBC.resx">
+      <DependentUpon>Form_XBC.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISATReportLoad.resx">
+      <DependentUpon>ISATReportLoad.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgCalculatedTest.resx">
+      <DependentUpon>IProgCalculatedTest.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IResultsCalibCurve.resx">
+      <DependentUpon>IResultsCalibCurve.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IResultsSummaryTable.resx">
+      <DependentUpon>IResultsSummaryTable.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BSControls\BSResultsChart.resx">
+      <DependentUpon>BSResultsChart.vb</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\QCSimulator.resx">
+      <DependentUpon>QCSimulator.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\UpdateProcessValidation.resx">
+      <DependentUpon>UpdateProcessValidation.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSImportLIMSErrors.resx">
+      <DependentUpon>IWSImportLIMSErrors.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSNotPosWarning.resx">
+      <DependentUpon>IWSNotPosWarning.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="AppConfigSetup\AppConfiguration.resx">
+      <DependentUpon>AppConfiguration.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\Ax00MainForm.resx">
+      <DependentUpon>Ax00MainForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainMDI\IAx00MainMDI.resx">
+      <DependentUpon>IAx00MainMDI.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSManualRepetition.resx">
+      <DependentUpon>IWSManualRepetition.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgPatientData.resx">
+      <DependentUpon>IProgPatientData.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IResults\IResults.resx">
+      <DependentUpon>IResults.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSDeleteAuxScreen.resx">
+      <DependentUpon>IWSDeleteAuxScreen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\LIS_Test.resx">
+      <DependentUpon>LIS_Test.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSLoadSaveAuxScreen.resx">
+      <DependentUpon>IWSLoadSaveAuxScreen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Temp\Ax00MainMenuForm.resx">
+      <DependentUpon>Ax00MainMenuForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IResultsOffSystemsTest.resx">
+      <DependentUpon>IResultsOffSystemsTest.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSTestSelectionAuxScreen.resx">
+      <DependentUpon>IWSTestSelectionAuxScreen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSRotorPositions.resx">
+      <DependentUpon>IWSRotorPositions.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\COMMS_Test.resx">
+      <DependentUpon>COMMS_Test.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IProgTestProfiles.resx">
+      <DependentUpon>IProgTestProfiles.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\XmlEncrypt.resx">
+      <DependentUpon>XmlEncrypt.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\InstallerForm.resx">
+      <DependentUpon>InstallerForm.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IWSSampleRequest.resx">
+      <DependentUpon>IWSSampleRequest.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
+      <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
+      <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\Framework\Framework.vbproj">
+      <Project>{806A1F2F-07C1-43D2-AF67-59ACCF4B5754}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Calculations\Calculations.vbproj">
+      <Project>{053CFFD3-17B1-4A95-AF8C-FF4B6DE08809}</Project>
+      <Name>Calculations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Controls\UserControls\BSControl_Library\BSControls.vbproj">
+      <Project>{24D4D868-1885-4710-A105-9095FE79A2FB}</Project>
+      <Name>BSControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Controls\UserControls\BSCSharpControls\BSCSharpControls.csproj">
+      <Project>{D205362A-E6D6-4904-B146-8427E2BFD146}</Project>
+      <Name>BSCSharpControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
+      <Project>{51863CF3-A3E9-4E41-8924-C69704796FB9}</Project>
+      <Name>DataAccessLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FwScriptsManagement\FwScriptsManagement.vbproj">
+      <Project>{0E1F721F-3002-4FAB-9300-3DB5B11A4002}</Project>
+      <Name>FwScriptsManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\History\History.vbproj">
+      <Project>{2F6892A0-72D7-45F6-B429-61DBAD015128}</Project>
+      <Name>History</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InfoAnalyzer\InfoAnalyzer.vbproj">
+      <Project>{6471EE6C-C00C-4DB6-881C-BFCA99ABA928}</Project>
+      <Name>InfoAnalyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LIS\LIS.vbproj">
+      <Project>{58927dcc-ef37-4214-82cb-3832c9cc5f1c}</Project>
+      <Name>LIS</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3AAF43D5-55D8-4A0B-9FD3-E8841008E13E}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PresentationCOM\PresentationCOM.vbproj">
+      <Project>{A139D1D6-0C60-4DA2-B073-E73E2F2893D8}</Project>
+      <Name>PresentationCOM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{052CF005-D448-4768-A25A-48FF53644469}</Project>
+      <Name>UpdateVersion</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
+      <Project>{A883608A-3D41-4339-9C2F-FEEA18BEFB68}</Project>
+      <Name>WorkSession</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="BusinessObjects.CrystalReports.10.5">
+      <Visible>False</Visible>
+      <ProductName>Crystal Reports Basic for Visual Studio 2008 %28x86, x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.ReportViewer.8.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Studio 2008 Report Viewer</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Sql.Server.Express.9.2">
+      <Visible>False</Visible>
+      <ProductName>SQL Server 2005 Express Edition SP2 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Adjustments\FWAdjustments.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="BA400USER.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\ReadMe.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TEUS00048-01-ESP.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TEUS00048-01-FRA.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TEUS00048-01-ING.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TEUS00048-01-ITA.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TEUS00048-01-POR.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.AbsorbanceDS.datasource" />
+    <None Include="My Project\DataSources\PesentationLayer.My.MyApplication.datasource" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="Firmware\a25v2v360-rev14.bin">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="required Libraries\Microsoft.SqlServer.ConnectionInfo.dll">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="stdole">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+    <PublishFile Include="Update\Task\TaskList.xml">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Import\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

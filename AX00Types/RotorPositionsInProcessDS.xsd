@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="RotorPositionsInProcessDS" targetNamespace="http://tempuri.org/RotorPositionsInProcessDS.xsd" xmlns:mstns="http://tempuri.org/RotorPositionsInProcessDS.xsd" xmlns="http://tempuri.org/RotorPositionsInProcessDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="RotorPositionsInProcessDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="RotorPositionsInProcessDS" msprop:Generator_UserDSName="RotorPositionsInProcessDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="twksWSRotorPositionsInProcess" msprop:Generator_TableClassName="twksWSRotorPositionsInProcessDataTable" msprop:Generator_TableVarName="tabletwksWSRotorPositionsInProcess" msprop:Generator_RowChangedName="twksWSRotorPositionsInProcessRowChanged" msprop:Generator_TablePropName="twksWSRotorPositionsInProcess" msprop:Generator_RowDeletingName="twksWSRotorPositionsInProcessRowDeleting" msprop:Generator_RowChangingName="twksWSRotorPositionsInProcessRowChanging" msprop:Generator_RowEvHandlerName="twksWSRotorPositionsInProcessRowChangeEventHandler" msprop:Generator_RowDeletedName="twksWSRotorPositionsInProcessRowDeleted" msprop:Generator_RowClassName="twksWSRotorPositionsInProcessRow" msprop:Generator_UserTableName="twksWSRotorPositionsInProcess" msprop:Generator_RowEvArgName="twksWSRotorPositionsInProcessRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerID" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_UserColumnName="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="RotorType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="RotorType" msprop:Generator_ColumnVarNameInTable="columnRotorType" msprop:Generator_ColumnPropNameInTable="RotorTypeColumn" msprop:Generator_UserColumnName="RotorType" type="xs:string" minOccurs="0" />
+              <xs:element name="CellNumber" msprop:Generator_ColumnVarNameInTable="columnCellNumber" msprop:Generator_ColumnPropNameInRow="CellNumber" msprop:Generator_ColumnPropNameInTable="CellNumberColumn" msprop:Generator_UserColumnName="CellNumber" type="xs:int" minOccurs="0" />
+              <xs:element name="InProcessTestsNumber" msprop:Generator_ColumnVarNameInTable="columnInProcessTestsNumber" msprop:Generator_ColumnPropNameInRow="InProcessTestsNumber" msprop:Generator_ColumnPropNameInTable="InProcessTestsNumberColumn" msprop:Generator_UserColumnName="InProcessTestsNumber" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

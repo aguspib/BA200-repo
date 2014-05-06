@@ -1,0 +1,765 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9020DEA1-7692-4CC7-9BE8-A1CF129CD1C2}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>PesentationLayer.My.MyApplication</StartupObject>
+    <RootNamespace>PesentationLayer</RootNamespace>
+    <AssemblyName>Ax00Service</AssemblyName>
+    <MyType>WindowsForms</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <ManifestCertificateThumbprint>2EA7343C16DC630DBC11C73CB6459A4DEC0251E2</ManifestCertificateThumbprint>
+    <ManifestKeyFile>PresentationLayer_TemporaryKey.pfx</ManifestKeyFile>
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <ApplicationIcon>AboutBA4SRV.ico</ApplicationIcon>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetZone>LocalIntranet</TargetZone>
+    <TargetFrameworkProfile />
+    <PublishUrl>C:\Ax00 SetupFiles\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Background</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <UpdateUrl>http://Master/Ax00Update/</UpdateUrl>
+    <TargetCulture>en</TargetCulture>
+    <ProductName>AX400</ProductName>
+    <PublisherName>Biosystems</PublisherName>
+    <ApplicationRevision>75</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <BootstrapperComponentsLocation>Relative</BootstrapperComponentsLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Ax00Service.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <Optimize>true</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Ax00Service.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>Ax00Service.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>Ax00Service.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>Ax00Service.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>Ax00Service.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevExpress.Charts.v10.2.Core, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Data.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.DXCore.Controls.Data.v6.3, Version=10.2.4.0, Culture=neutral, PublicKeyToken=35c9f04b7764aa3d" />
+    <Reference Include="DevExpress.DXCore.Controls.Utils.v6.3, Version=10.2.4.0, Culture=neutral, PublicKeyToken=35c9f04b7764aa3d" />
+    <Reference Include="DevExpress.DXCore.Controls.XtraEditors.v6.3, Version=10.2.4.0, Culture=neutral, PublicKeyToken=35c9f04b7764aa3d" />
+    <Reference Include="DevExpress.Utils.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraCharts.v10.2.UI, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraEditors.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraGrid.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraRichEdit.v10.2, Version=10.2.4.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\WINDOWS\assembly\GAC_MSIL\DevExpress.XtraRichEdit.v10.2\10.2.4.0__b88d1754d700e49a\DevExpress.XtraRichEdit.v10.2.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Web.Extensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Net.Mail" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AnalyzerInfo.Designer.vb">
+      <DependentUpon>AnalyzerInfo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerInfo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ax00ServiceMainMDI.designer.vb">
+      <DependentUpon>Ax00ServiceMainMDI.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Ax00ServiceMainMDI.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Base Service Form\BSAdjustmentBaseForm.Designer.vb">
+      <DependentUpon>BSAdjustmentBaseForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Base Service Form\BSAdjustmentBaseForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Historic\IHistoricalReports.Designer.vb">
+      <DependentUpon>IHistoricalReports.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Historic\IHistoricalReports.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IErrorCodes.Designer.vb">
+      <DependentUpon>IErrorCodes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="IErrorCodes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ISATReportSRV.Designer.vb">
+      <DependentUpon>ISATReportSRV.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ISATReportSRV.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IChangeRotorSRV.Designer.vb">
+      <DependentUpon>IChangeRotorSRV.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IChangeRotorSRV.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IInstrumentUpdateUtil.Designer.vb">
+      <DependentUpon>IInstrumentUpdateUtil.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IInstrumentUpdateUtil.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\ILevelDetectionTest.Designer.vb">
+      <DependentUpon>ILevelDetectionTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ILevelDetectionTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IBarCodeAdjustments.Designer.vb">
+      <DependentUpon>IBarCodeAdjustments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IBarCodeAdjustments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IMotorsPumpsValvesTest.designer.vb">
+      <DependentUpon>IMotorsPumpsValvesTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IMotorsPumpsValvesTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\ICycleCountScreen.Designer.vb">
+      <DependentUpon>ICycleCountScreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ICycleCountScreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IDemoMode.Designer.vb">
+      <DependentUpon>IDemoMode.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IDemoMode.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IPhotometryAdjustments.Designer.vb">
+      <DependentUpon>IPhotometryAdjustments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IPhotometryAdjustments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IPositionsAdjustments.Designer.vb">
+      <DependentUpon>IPositionsAdjustments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IPositionsAdjustments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IStressModeTest.Designer.vb">
+      <DependentUpon>IStressModeTest.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IStressModeTest.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\ITankLevelsAdjustments.Designer.vb">
+      <DependentUpon>ITankLevelsAdjustments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\ITankLevelsAdjustments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Screens\IThermosAdjustments.Designer.vb">
+      <DependentUpon>IThermosAdjustments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Screens\IThermosAdjustments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StartupSRV.Designer.vb">
+      <DependentUpon>StartupSRV.vb</DependentUpon>
+    </Compile>
+    <Compile Include="StartupSRV.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\DebugTrace.Designer.vb">
+      <DependentUpon>DebugTrace.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\DebugTrace.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\FormSergio.Designer.vb">
+      <DependentUpon>FormSergio.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\FormSergio.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\IMsgBox.Designer.vb">
+      <DependentUpon>IMsgBox.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\IMsgBox.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestCrearScripts.Designer.vb">
+      <DependentUpon>TestCrearScripts.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\TestCrearScripts.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="FwScriptsEdition.designer.vb">
+      <DependentUpon>FwScriptsEdition.vb</DependentUpon>
+    </Compile>
+    <Compile Include="FwScriptsEdition.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\FormXavi.Designer.vb">
+      <DependentUpon>FormXavi.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\FormXavi.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestForm.Designer.vb">
+      <DependentUpon>TestForm.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\TestForm.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestISEMonitor.Designer.vb">
+      <DependentUpon>TestISEMonitor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\TestISEMonitor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestPDF.Designer.vb">
+      <DependentUpon>TestPDF.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\TestPDF.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TestForms\TestSimulatorAX00.Designer.vb">
+      <DependentUpon>TestSimulatorAX00.vb</DependentUpon>
+    </Compile>
+    <Compile Include="TestForms\TestSimulatorAX00.vb">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AnalyzerInfo.resx">
+      <DependentUpon>AnalyzerInfo.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ax00ServiceMainMDI.resx">
+      <DependentUpon>Ax00ServiceMainMDI.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Base Service Form\BSAdjustmentBaseForm.resx">
+      <DependentUpon>BSAdjustmentBaseForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Historic\IHistoricalReports.resx">
+      <DependentUpon>IHistoricalReports.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IErrorCodes.resx">
+      <DependentUpon>IErrorCodes.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ISATReportSRV.resx">
+      <DependentUpon>ISATReportSRV.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="Screens\IChangeRotorSRV.resx">
+      <DependentUpon>IChangeRotorSRV.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IInstrumentUpdateUtil.resx">
+      <DependentUpon>IInstrumentUpdateUtil.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ILevelDetectionTest.resx">
+      <DependentUpon>ILevelDetectionTest.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IBarCodeAdjustments.resx">
+      <DependentUpon>IBarCodeAdjustments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IMotorsPumpsValvesTest.resx">
+      <DependentUpon>IMotorsPumpsValvesTest.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ICycleCountScreen.resx">
+      <DependentUpon>ICycleCountScreen.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IDemoMode.resx">
+      <DependentUpon>IDemoMode.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IPhotometryAdjustments.resx">
+      <DependentUpon>IPhotometryAdjustments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IPositionsAdjustments.resx">
+      <DependentUpon>IPositionsAdjustments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IStressModeTest.resx">
+      <DependentUpon>IStressModeTest.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\ITankLevelsAdjustments.resx">
+      <DependentUpon>ITankLevelsAdjustments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screens\IThermosAdjustments.resx">
+      <DependentUpon>IThermosAdjustments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StartupSRV.resx">
+      <DependentUpon>StartupSRV.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\DebugTrace.resx">
+      <DependentUpon>DebugTrace.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\FormSergio.resx">
+      <DependentUpon>FormSergio.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\IMsgBox.resx">
+      <DependentUpon>IMsgBox.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\TestCrearScripts.resx">
+      <DependentUpon>TestCrearScripts.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FwScriptsEdition.resx">
+      <DependentUpon>FwScriptsEdition.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\FormXavi.resx">
+      <DependentUpon>FormXavi.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\TestForm.resx">
+      <DependentUpon>TestForm.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\TestISEMonitor.resx">
+      <DependentUpon>TestISEMonitor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\TestPDF.resx">
+      <DependentUpon>TestPDF.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestForms\TestSimulatorAX00.resx">
+      <DependentUpon>TestSimulatorAX00.vb</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="BusinessObjects.CrystalReports.10.5">
+      <Visible>False</Visible>
+      <ProductName>Crystal Reports Basic for Visual Studio 2008 %28x86, x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.ReportViewer.8.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft Visual Studio 2008 Report Viewer</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Sql.Server.Express.9.2">
+      <Visible>False</Visible>
+      <ProductName>SQL Server 2005 Express Edition SP2 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AboutBA4SRV.ico" />
+    <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData.xml" />
+    <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData_2012_10_11.xml" />
+    <Content Include="FwScripts\Factory\DES_FactoryFwScriptsData_2012_05_02.xml" />
+    <Content Include="FwScripts\Factory\FactoryFwScriptsData.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="FwScripts\Factory\FactoryFwScriptsData_2012_10_11.xml">
+    </Content>
+    <Content Include="FwScripts\Factory\FactoryFwScriptsData_2012_05_02.xml">
+    </Content>
+    <None Include="Fonts\CONSOLA.TTF" />
+    <None Include="Fonts\CONSOLAB.TTF" />
+    <None Include="Fonts\Digiface.ttf" />
+    <Content Include="InfoDocs\Adjustments_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\ArmPositions_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Barcode_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\BaseLine_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\CollisionTest_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Demo_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Estress_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\FirmwareUpdate_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\ISEModule_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Metrology_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\MotorPumpsValves_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\NeedlesTermo_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\NOV1_InternalBottle_SPA.xps">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\OpticCentering_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\RotorTermo_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Scales_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\WashStationPosition_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\WashStationTermo_SPA.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TESE000012-01-ESP.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="HelpFiles\TESE000012-01-ING.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Adjustments_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\ArmPositions_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Barcode_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\BaseLine_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\CollisionTest_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Demo_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Estress_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\FirmwareUpdate_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\ISEModule_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Metrology_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\MotorPumpsValves_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\NeedlesTermo_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\NOV1_InternalBottle-ENG.xps">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\OpticCentering_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\RotorTermo_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\Scales_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\WashStationPosition_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InfoDocs\WashStationTermo_ENG.xps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="InfoDocs\NO V1_test botellas internas-ENG.xps" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.SRVAdjustmentsDS+tsrvAdjustmentsDataTable.datasource" />
+    <None Include="My Project\DataSources\Biosystems.Ax00.Types.SRVAdjustmentsDS.datasource" />
+    <None Include="Resources\Biosystemslogo.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <PublishFile Include="Firmware\a25v2v360-rev14.bin">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="required Libraries\Microsoft.SqlServer.ConnectionInfo.dll">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>File</FileType>
+    </PublishFile>
+    <PublishFile Include="stdole">
+      <Visible>False</Visible>
+      <Group>
+      </Group>
+      <TargetPath>
+      </TargetPath>
+      <PublishState>Include</PublishState>
+      <IncludeHash>True</IncludeHash>
+      <FileType>Assembly</FileType>
+    </PublishFile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
+      <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
+      <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{BC01C1BD-2A93-4002-B74F-7BCF9793309D}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BussinessLayer\Framework\Framework.vbproj">
+      <Project>{806A1F2F-07C1-43D2-AF67-59ACCF4B5754}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Controls\UserControls\BSControl_Library\BSControls.vbproj">
+      <Project>{24D4D868-1885-4710-A105-9095FE79A2FB}</Project>
+      <Name>BSControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Controls\UserControls\BSCSharpControls\BSCSharpControls.csproj">
+      <Project>{D205362A-E6D6-4904-B146-8427E2BFD146}</Project>
+      <Name>BSCSharpControls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.vbproj">
+      <Project>{51863CF3-A3E9-4E41-8924-C69704796FB9}</Project>
+      <Name>DataAccessLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FwScriptsManagement\FwScriptsManagement.vbproj">
+      <Project>{0E1F721F-3002-4FAB-9300-3DB5B11A4002}</Project>
+      <Name>FwScriptsManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\History\History.vbproj">
+      <Project>{2f6892a0-72d7-45f6-b429-61dbad015128}</Project>
+      <Name>History</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\InfoAnalyzer\InfoAnalyzer.vbproj">
+      <Project>{6471EE6C-C00C-4DB6-881C-BFCA99ABA928}</Project>
+      <Name>InfoAnalyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3AAF43D5-55D8-4A0B-9FD3-E8841008E13E}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PresentationCOM\PresentationCOM.vbproj">
+      <Project>{A139D1D6-0C60-4DA2-B073-E73E2F2893D8}</Project>
+      <Name>PresentationCOM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UpdateVersion\UpdateVersion.vbproj">
+      <Project>{052CF005-D448-4768-A25A-48FF53644469}</Project>
+      <Name>UpdateVersion</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WorkSession\WorkSession.vbproj">
+      <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
+      <Name>WorkSession</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="AxWMPLib">
+      <Guid>{6BF52A50-394A-11D3-B153-00C04F79FAA6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>aximp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

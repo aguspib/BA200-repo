@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MaxOrderTestsValuesDS" targetNamespace="http://tempuri.org/MaxOrderTestsValuesDS.xsd" xmlns:mstns="http://tempuri.org/MaxOrderTestsValuesDS.xsd" xmlns="http://tempuri.org/MaxOrderTestsValuesDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MaxOrderTestsValuesDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="MaxOrderTestsValuesDS" msprop:Generator_UserDSName="MaxOrderTestsValuesDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="MaxOrderTestsValues" msprop:Generator_UserTableName="MaxOrderTestsValues" msprop:Generator_RowDeletedName="MaxOrderTestsValuesRowDeleted" msprop:Generator_TableClassName="MaxOrderTestsValuesDataTable" msprop:Generator_RowChangedName="MaxOrderTestsValuesRowChanged" msprop:Generator_RowClassName="MaxOrderTestsValuesRow" msprop:Generator_RowChangingName="MaxOrderTestsValuesRowChanging" msprop:Generator_RowEvArgName="MaxOrderTestsValuesRowChangeEvent" msprop:Generator_RowEvHandlerName="MaxOrderTestsValuesRowChangeEventHandler" msprop:Generator_TablePropName="MaxOrderTestsValues" msprop:Generator_TableVarName="tableMaxOrderTestsValues" msprop:Generator_RowDeletingName="MaxOrderTestsValuesRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="MaxRowsAllowed" msprop:Generator_UserColumnName="MaxRowsAllowed" msprop:Generator_ColumnPropNameInRow="MaxRowsAllowed" msprop:Generator_ColumnVarNameInTable="columnMaxRowsAllowed" msprop:Generator_ColumnPropNameInTable="MaxRowsAllowedColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="CurrentRowsNumValue" msprop:Generator_UserColumnName="CurrentRowsNumValue" msprop:Generator_ColumnPropNameInRow="CurrentRowsNumValue" msprop:Generator_ColumnVarNameInTable="columnCurrentRowsNumValue" msprop:Generator_ColumnPropNameInTable="CurrentRowsNumValueColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="CurrentNumOrdersValue" msprop:Generator_UserColumnName="CurrentNumOrdersValue" msprop:Generator_ColumnPropNameInRow="CurrentNumOrdersValue" msprop:Generator_ColumnVarNameInTable="columnCurrentNumOrdersValue" msprop:Generator_ColumnPropNameInTable="CurrentNumOrdersValueColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

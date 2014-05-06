@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SavedWSDS" targetNamespace="http://tempuri.org/SavedWSDS.xsd" xmlns:mstns="http://tempuri.org/SavedWSDS.xsd" xmlns="http://tempuri.org/SavedWSDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="SavedWSDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="SavedWSDS" msprop:Generator_DataSetName="SavedWSDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tparSavedWS" msprop:Generator_UserTableName="tparSavedWS" msprop:Generator_RowDeletedName="tparSavedWSRowDeleted" msprop:Generator_RowChangedName="tparSavedWSRowChanged" msprop:Generator_RowClassName="tparSavedWSRow" msprop:Generator_RowChangingName="tparSavedWSRowChanging" msprop:Generator_RowEvArgName="tparSavedWSRowChangeEvent" msprop:Generator_RowEvHandlerName="tparSavedWSRowChangeEventHandler" msprop:Generator_TableClassName="tparSavedWSDataTable" msprop:Generator_TableVarName="tabletparSavedWS" msprop:Generator_RowDeletingName="tparSavedWSRowDeleting" msprop:Generator_TablePropName="tparSavedWS">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SavedWSID" msprop:Generator_UserColumnName="SavedWSID" msprop:Generator_ColumnVarNameInTable="columnSavedWSID" msprop:Generator_ColumnPropNameInRow="SavedWSID" msprop:Generator_ColumnPropNameInTable="SavedWSIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="SavedWSName" msprop:Generator_UserColumnName="SavedWSName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SavedWSName" msprop:Generator_ColumnPropNameInTable="SavedWSNameColumn" msprop:Generator_ColumnVarNameInTable="columnSavedWSName" type="xs:string" minOccurs="0" />
+              <xs:element name="FromLIMS" msprop:Generator_UserColumnName="FromLIMS" msprop:Generator_ColumnPropNameInRow="FromLIMS" msprop:Generator_ColumnVarNameInTable="columnFromLIMS" msprop:Generator_ColumnPropNameInTable="FromLIMSColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_ColumnVarNameInTable="columnTS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

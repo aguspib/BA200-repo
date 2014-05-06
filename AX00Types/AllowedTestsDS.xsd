@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="AllowedTestsDS" targetNamespace="http://tempuri.org/AllowedTestsDS.xsd" xmlns:mstns="http://tempuri.org/AllowedTestsDS.xsd" xmlns="http://tempuri.org/AllowedTestsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="AllowedTestsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="AllowedTestsDS" msprop:Generator_DataSetName="AllowedTestsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tparAllowedTests" msprop:Generator_UserTableName="tparAllowedTests" msprop:Generator_RowDeletedName="tparAllowedTestsRowDeleted" msprop:Generator_RowChangedName="tparAllowedTestsRowChanged" msprop:Generator_RowClassName="tparAllowedTestsRow" msprop:Generator_RowChangingName="tparAllowedTestsRowChanging" msprop:Generator_RowEvArgName="tparAllowedTestsRowChangeEvent" msprop:Generator_RowEvHandlerName="tparAllowedTestsRowChangeEventHandler" msprop:Generator_TableClassName="tparAllowedTestsDataTable" msprop:Generator_TableVarName="tabletparAllowedTests" msprop:Generator_RowDeletingName="tparAllowedTestsRowDeleting" msprop:Generator_TablePropName="tparAllowedTests">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TestTypeCode" msprop:Generator_UserColumnName="TestTypeCode" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestTypeCode" msprop:Generator_ColumnPropNameInTable="TestTypeCodeColumn" msprop:Generator_ColumnVarNameInTable="columnTestTypeCode" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleTypeCode" msprop:Generator_UserColumnName="SampleTypeCode" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleTypeCode" msprop:Generator_ColumnPropNameInTable="SampleTypeCodeColumn" msprop:Generator_ColumnVarNameInTable="columnSampleTypeCode" type="xs:string" minOccurs="0" />
+              <xs:element name="TestCode" msprop:Generator_UserColumnName="TestCode" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestCode" msprop:Generator_ColumnPropNameInTable="TestCodeColumn" msprop:Generator_ColumnVarNameInTable="columnTestCode" type="xs:string" minOccurs="0" />
+              <xs:element name="TestName" msprop:Generator_UserColumnName="TestName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestName" msprop:Generator_ColumnPropNameInTable="TestNameColumn" msprop:Generator_ColumnVarNameInTable="columnTestName" type="xs:string" minOccurs="0" />
+              <xs:element name="PreloadedTest" msprop:Generator_UserColumnName="PreloadedTest" msprop:Generator_ColumnVarNameInTable="columnPreloadedTest" msprop:Generator_ColumnPropNameInRow="PreloadedTest" msprop:Generator_ColumnPropNameInTable="PreloadedTestColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="IconPath" msprop:Generator_UserColumnName="IconPath" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnIconPath" msprop:Generator_ColumnPropNameInTable="IconPathColumn" msprop:Generator_ColumnPropNameInRow="IconPath" type="xs:string" minOccurs="0" />
+              <xs:element name="FactoryCalib" msprop:Generator_UserColumnName="FactoryCalib" msprop:Generator_ColumnPropNameInRow="FactoryCalib" msprop:Generator_ColumnVarNameInTable="columnFactoryCalib" msprop:Generator_ColumnPropNameInTable="FactoryCalibColumn" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

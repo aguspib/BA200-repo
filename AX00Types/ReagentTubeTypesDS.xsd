@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ReagentTubeTypesDS" targetNamespace="http://tempuri.org/ReagentTubeTypesDS.xsd" xmlns:mstns="http://tempuri.org/ReagentTubeTypesDS.xsd" xmlns="http://tempuri.org/ReagentTubeTypesDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString3" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString3 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString3" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="ReagentTubeTypesDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="ReagentTubeTypesDS" msprop:Generator_DataSetName="ReagentTubeTypesDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="ReagentTubeTypes" msprop:Generator_UserTableName="ReagentTubeTypes" msprop:Generator_RowDeletedName="ReagentTubeTypesRowDeleted" msprop:Generator_RowChangedName="ReagentTubeTypesRowChanged" msprop:Generator_RowClassName="ReagentTubeTypesRow" msprop:Generator_RowChangingName="ReagentTubeTypesRowChanging" msprop:Generator_RowEvArgName="ReagentTubeTypesRowChangeEvent" msprop:Generator_RowEvHandlerName="ReagentTubeTypesRowChangeEventHandler" msprop:Generator_TableClassName="ReagentTubeTypesDataTable" msprop:Generator_TableVarName="tableReagentTubeTypes" msprop:Generator_RowDeletingName="ReagentTubeTypesRowDeleting" msprop:Generator_TablePropName="ReagentTubeTypes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TubeCode" msprop:Generator_UserColumnName="TubeCode" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTubeCode" msprop:Generator_ColumnPropNameInTable="TubeCodeColumn" msprop:Generator_ColumnPropNameInRow="TubeCode" type="xs:string" minOccurs="0" />
+              <xs:element name="TubeVolume" msprop:Generator_UserColumnName="TubeVolume" msprop:Generator_ColumnPropNameInRow="TubeVolume" msprop:Generator_ColumnVarNameInTable="columnTubeVolume" msprop:Generator_ColumnPropNameInTable="TubeVolumeColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="RealVolume" msprop:Generator_UserColumnName="RealVolume" msprop:Generator_ColumnPropNameInRow="RealVolume" msprop:Generator_ColumnVarNameInTable="columnRealVolume" msprop:Generator_ColumnPropNameInTable="RealVolumeColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="NumOfBottles" msprop:Generator_UserColumnName="NumOfBottles" msprop:Generator_ColumnPropNameInRow="NumOfBottles" msprop:Generator_ColumnVarNameInTable="columnNumOfBottles" msprop:Generator_ColumnPropNameInTable="NumOfBottlesColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="FixedTubeName" msprop:Generator_UserColumnName="FixedTubeName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFixedTubeName" msprop:Generator_ColumnPropNameInTable="FixedTubeNameColumn" msprop:Generator_ColumnPropNameInRow="FixedTubeName" type="xs:string" minOccurs="0" />
+              <xs:element name="LangDescription" msprop:Generator_UserColumnName="LangDescription" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnLangDescription" msprop:Generator_ColumnPropNameInTable="LangDescriptionColumn" msprop:Generator_ColumnPropNameInRow="LangDescription" type="xs:string" minOccurs="0" />
+              <xs:element name="ManualUseFlag" msprop:Generator_UserColumnName="ManualUseFlag" msprop:Generator_ColumnVarNameInTable="columnManualUseFlag" msprop:Generator_ColumnPropNameInRow="ManualUseFlag" msprop:Generator_ColumnPropNameInTable="ManualUseFlagColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="RotorType" msprop:Generator_UserColumnName="RotorType" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnRotorType" msprop:Generator_ColumnPropNameInTable="RotorTypeColumn" msprop:Generator_ColumnPropNameInRow="RotorType" type="xs:string" minOccurs="0" />
+              <xs:element name="RingNumber" msprop:Generator_UserColumnName="RingNumber" msprop:Generator_ColumnVarNameInTable="columnRingNumber" msprop:Generator_ColumnPropNameInRow="RingNumber" msprop:Generator_ColumnPropNameInTable="RingNumberColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="Section" msprop:Generator_UserColumnName="Section" msprop:Generator_ColumnPropNameInRow="Section" msprop:Generator_ColumnVarNameInTable="columnSection" msprop:Generator_ColumnPropNameInTable="SectionColumn" type="xs:float" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

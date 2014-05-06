@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="UserDataDS" targetNamespace="http://tempuri.org/UserDataDS.xsd" xmlns:mstns="http://tempuri.org/UserDataDS.xsd" xmlns="http://tempuri.org/UserDataDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="UserDataDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="UserDataDS" msprop:Generator_DataSetName="UserDataDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tcfgUserData" msprop:Generator_UserTableName="tcfgUserData" msprop:Generator_RowDeletedName="tcfgUserDataRowDeleted" msprop:Generator_RowChangedName="tcfgUserDataRowChanged" msprop:Generator_RowClassName="tcfgUserDataRow" msprop:Generator_RowChangingName="tcfgUserDataRowChanging" msprop:Generator_RowEvArgName="tcfgUserDataRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgUserDataRowChangeEventHandler" msprop:Generator_TableClassName="tcfgUserDataDataTable" msprop:Generator_TableVarName="tabletcfgUserData" msprop:Generator_RowDeletingName="tcfgUserDataRowDeleting" msprop:Generator_TablePropName="tcfgUserData">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="UserName" msprop:Generator_UserColumnName="UserName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnUserName" msprop:Generator_ColumnPropNameInTable="UserNameColumn" msprop:Generator_ColumnPropNameInRow="UserName" type="xs:string" minOccurs="0" />
+              <xs:element name="UserFirstName" msprop:Generator_UserColumnName="UserFirstName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UserFirstName" msprop:Generator_ColumnPropNameInTable="UserFirstNameColumn" msprop:Generator_ColumnVarNameInTable="columnUserFirstName" type="xs:string" minOccurs="0" />
+              <xs:element name="UserLastName" msprop:Generator_UserColumnName="UserLastName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UserLastName" msprop:Generator_ColumnPropNameInTable="UserLastNameColumn" msprop:Generator_ColumnVarNameInTable="columnUserLastName" type="xs:string" minOccurs="0" />
+              <xs:element name="Password" msprop:Generator_UserColumnName="Password" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnPassword" msprop:Generator_ColumnPropNameInTable="PasswordColumn" msprop:Generator_ColumnPropNameInRow="Password" type="xs:string" minOccurs="0" />
+              <xs:element name="NewPassword" msprop:Generator_UserColumnName="NewPassword" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnNewPassword" msprop:Generator_ColumnPropNameInTable="NewPasswordColumn" msprop:Generator_ColumnPropNameInRow="NewPassword" type="xs:string" minOccurs="0" />
+              <xs:element name="InternalUser" msprop:Generator_UserColumnName="InternalUser" msprop:Generator_ColumnPropNameInRow="InternalUser" msprop:Generator_ColumnVarNameInTable="columnInternalUser" msprop:Generator_ColumnPropNameInTable="InternalUserColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="UserLevel" msprop:Generator_UserColumnName="UserLevel" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnUserLevel" msprop:Generator_ColumnPropNameInTable="UserLevelColumn" msprop:Generator_ColumnPropNameInRow="UserLevel" type="xs:string" minOccurs="0" />
+              <xs:element name="UserLevelDesc" msprop:Generator_UserColumnName="UserLevelDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnUserLevelDesc" msprop:Generator_ColumnPropNameInTable="UserLevelDescColumn" msprop:Generator_ColumnPropNameInRow="UserLevelDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="MaxTestsNum" msprop:Generator_UserColumnName="MaxTestsNum" msprop:Generator_ColumnPropNameInRow="MaxTestsNum" msprop:Generator_ColumnVarNameInTable="columnMaxTestsNum" msprop:Generator_ColumnPropNameInTable="MaxTestsNumColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_ColumnPropNameInRow="TS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="IsService" msprop:Generator_UserColumnName="IsService" msprop:Generator_ColumnPropNameInRow="IsService" msprop:Generator_ColumnVarNameInTable="columnIsService" msprop:Generator_ColumnPropNameInTable="IsServiceColumn" type="xs:boolean" default="false" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

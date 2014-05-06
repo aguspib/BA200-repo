@@ -1,0 +1,343 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{51863CF3-A3E9-4E41-8924-C69704796FB9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>DataAccessLayer</AssemblyName>
+    <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>DataAccessLayer.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>DataAccessLayer.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>DataAccessLayer.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>DataAccessLayer.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>DataAccessLayer.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>DataAccessLayer.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SqlServer.ConnectionInfo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.ConnectionInfo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Management.Sdk.Sfc, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.Management.Sdk.Sfc.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.Smo, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SmoExtended, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.SmoExtended.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlEnum.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.SqlWmiManagement, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.SqlWmiManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.SqlServer.WmiEnum, Version=10.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\PresentationCOM\required Libraries\SqlServer2008R2\Microsoft.SqlServer.WmiEnum.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BarCodesDAO.vb" />
+    <Compile Include="History\thisAdjustBaseLinesDAO.vb" />
+    <Compile Include="History\thisAnalyzerWorkSessionsDAO.vb" />
+    <Compile Include="History\thisCalibratorsDAO.vb" />
+    <Compile Include="History\thisOffSystemTestSamplesDAO.vb" />
+    <Compile Include="History\thisReagentsDAO.vb" />
+    <Compile Include="History\thisTestCalibratorsValuesDAO.vb" />
+    <Compile Include="History\thisTestSamplesDAO.vb" />
+    <Compile Include="History\thisWSAnalyzerAlarmsDAO.vb" />
+    <Compile Include="History\thisWSCalcTestsRelationsDAO.vb" />
+    <Compile Include="History\thisWSCurveResultsDAO.vb" />
+    <Compile Include="History\thisWSExecutionsDAO.vb" />
+    <Compile Include="History\thisWSOrderTestsDAO.vb" />
+    <Compile Include="History\thisWSReadingsDAO.vb" />
+    <Compile Include="History\thisWSResultsDAO.vb" />
+    <Compile Include="Integrity\IntegrityDAO.vb" />
+    <Compile Include="tcfgReportsTestsSortingDAO.vb" />
+    <Compile Include="tcfgReportTemplatesDAO.vb" />
+    <Compile Include="tfmwHelpFilesSettingDAO.vb" />
+    <Compile Include="tfmwInfoDocumentsDAO.vb" />
+    <Compile Include="tcfgBarCodeSampleTypesMappingDAO.vb" />
+    <Compile Include="tfmwScreensDAO.vb" />
+    <Compile Include="History\thisCalculatedTestsDAO.vb" />
+    <Compile Include="History\thisCalibISEDAO.vb" />
+    <Compile Include="History\thisISETestSamplesDAO.vb" />
+    <Compile Include="History\thisPatientsDAO.vb" />
+    <Compile Include="tfmwVersionsDAO.vb" />
+    <Compile Include="tfmwXmlMessagesDAO.vb" />
+    <Compile Include="tinfoISEDAO.vb" />
+    <Compile Include="twksOrderTestsLISInfoDAO.vb" />
+    <Compile Include="twksWSBarcodePositionsWithNoRequestsDAO.vb" />
+    <Compile Include="tfmwRecommendationsDAO.vb" />
+    <Compile Include="thrsRecommendationsServiceDAO.vb" />
+    <Compile Include="thisReagentBottlesDAO.vb" />
+    <Compile Include="thrsResultsServiceDAO.vb" />
+    <Compile Include="twksWSPausedOrderTestsDAO.vb" />
+    <Compile Include="tcfgAnalyzerReactionsRotorDAO.vb" />
+    <Compile Include="tparPreviousTestControlLotsDAO.vb" />
+    <Compile Include="tparPreviousControlLotsDAO.vb" />
+    <Compile Include="tcfgAnalyzerManagerFlagsDAO.vb" />
+    <Compile Include="tfmwAdjustmentsDAO.vb" />
+    <Compile Include="tadjPreliminaryHomesDAO.vb" />
+    <Compile Include="tfmwMultilanguageResourcesDAO.vb" />
+    <Compile Include="tfmwSpecialTestsSettingsDAO.vb" />
+    <Compile Include="DAO\tcfgAnalyzerLedPositionsDAO.vb" />
+    <Compile Include="tfmwAlarmsDAO.vb" />
+    <Compile Include="tfmwSwFlagsDAO.vb" />
+    <Compile Include="To_DeleteAG_DAO.vb" />
+    <Compile Include="tparISETestSamplesDAO.vb" />
+    <Compile Include="tparISETestsDAO.vb" />
+    <Compile Include="tparOffSystemTestSamplesDAO.vb" />
+    <Compile Include="tparOffSystemTestsDAO.vb" />
+    <Compile Include="tparTestSamplesMultirulesDAO.vb" />
+    <Compile Include="tqcCumulatedResultsDAO.vb" />
+    <Compile Include="tqcHistoryControlLotsDAO.vb" />
+    <Compile Include="tqcHistoryTestControlLotsDAO.vb" />
+    <Compile Include="tqcHistoryTestSamplesDAO.vb" />
+    <Compile Include="tqcHistoryTestSamplesRulesDAO.vb" />
+    <Compile Include="tqcLastCumulatedValuesDAO.vb" />
+    <Compile Include="tqcResultAlarmsDAO.vb" />
+    <Compile Include="tqcResultsDAO.vb" />
+    <Compile Include="tqcRunsGroupsDAO.vb" />
+    <Compile Include="twksImportErrorsLogDAO.vb" />
+    <Compile Include="twksResultAlarmsDAO.vb" />
+    <Compile Include="twksWSExecutionAlarmsDAO.vb" />
+    <Compile Include="twksWSReactionsRotorDAO.vb" />
+    <Compile Include="twksWSRepetitionsToAddDAO.vb">
+    </Compile>
+    <Compile Include="twksWSRotorPositionsInProcessDAO.vb" />
+    <Compile Include="twksXmlMessagesDAO.vb" />
+    <Compile Include="UpdateVersion\CalculatedTestUpdateDAO.vb" />
+    <Compile Include="UpdateVersion\CalibratorUpdateDAO.vb" />
+    <Compile Include="UpdateVersion\ContaminationsUpdateDAO.vb" />
+    <Compile Include="UpdateVersion\ISETestUpdateDAO.vb" />
+    <Compile Include="UpdateVersion\TestParametersUpdateDAO.vb" />
+    <Compile Include="vcfgLISMappingsDAO.vb" />
+    <Compile Include="vparAllTestByTypeDAO.vb" />
+    <Compile Include="vwksOperateCalculatedTestDAO.vb" />
+    <Compile Include="tcalcExecutionsPartialResultsDAO.vb" />
+    <Compile Include="tcalcExecutionsR1ResultsDAO.vb" />
+    <Compile Include="tcfgAnalyzerSettingsDAO.vb" />
+    <Compile Include="tparSavedWSDAO.vb" />
+    <Compile Include="tparSavedWSOrderTestsDAO.vb" />
+    <Compile Include="tparTestRefRangesDAO.vb" />
+    <Compile Include="twksCurveResultsDAO.vb" />
+    <Compile Include="twksOrderCalculatedTestsDAO.vb" />
+    <Compile Include="twksWSAnalyzerAlarmsDAO.vb" />
+    <Compile Include="twksWSBLinesByWellDAO.vb" />
+    <Compile Include="twksWSExecutionsDAO.vb" />
+    <Compile Include="twksWSPreparationsDAO.vb" />
+    <Compile Include="twksWSReadingsDAO.vb" />
+    <Compile Include="tparTestReagentsVolumeDAO.vb" />
+    <Compile Include="twksWSBLinesDAO.vb" />
+    <Compile Include="tfmwSwParametersDAO.vb" />
+    <Compile Include="tcfgMasterDataDAO.vb" />
+    <Compile Include="tparContaminationsDAO.vb" />
+    <Compile Include="DAO\ApplicationSettingGeneratedDAO.vb" />
+    <Compile Include="DAOBase.vb" />
+    <Compile Include="DAO\tparPatientsGeneratedDAO.vb" />
+    <Compile Include="DAO\tparTestProfilesGeneratedDAO.vb" />
+    <Compile Include="DAO\tparTestControlsGeneratedDAO.vb" />
+    <Compile Include="DAO\tparTestSamplesGeneratedDAO.vb" />
+    <Compile Include="DAO\twksOrdersGeneratedDAO.vb" />
+    <Compile Include="DAO\twksOrderTestsGeneratedDAO.vb" />
+    <Compile Include="DAO\twksWorkSessionsGeneratedDAO.vb" />
+    <Compile Include="DatabaseManagement\DBManager.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="tcfgAnalyzersDAO.vb" />
+    <Compile Include="tcfgCustomDemographicsDAO.vb" />
+    <Compile Include="tcfgUserDataDAO.vb" />
+    <Compile Include="tcfgUserSettingsDAO.vb" />
+    <Compile Include="tfmwAnalyzerModelRotorsConfigDAO.vb" />
+    <Compile Include="tfmwAnalyzerModelTubesByRingDAO.vb" />
+    <Compile Include="tfmwFieldLimitsDAO.vb" />
+    <Compile Include="tfmwGeneralSettingsDAO.vb" />
+    <Compile Include="tfmwMessagesDAO.vb" />
+    <Compile Include="tfmwPreloadedMasterDataDAO.vb" />
+    <Compile Include="tfmwReagentTubeTypesDAO.vb" />
+    <Compile Include="tfmwScreenBlocksDAO.vb" />
+    <Compile Include="tfmwScreenBlockStatusDAO.vb" />
+    <Compile Include="tfmwUsersLevelDAO.vb" />
+    <Compile Include="tparCalculatedTestsDAO.vb" />
+    <Compile Include="tparCalibratorsDAO.vb" />
+    <Compile Include="tparControlsDAO.vb" />
+    <Compile Include="tparFormulasDAO.vb" />
+    <Compile Include="tparPatientsDAO.vb" />
+    <Compile Include="tparReagentsDAO.vb" />
+    <Compile Include="tparTestCalibratorsDAO.vb" />
+    <Compile Include="tparTestCalibratorValuesDAO.vb" />
+    <Compile Include="tparTestProfilesDAO.vb" />
+    <Compile Include="tparTestProfileTestsDAO.vb" />
+    <Compile Include="tparTestControlsDAO.vb" />
+    <Compile Include="tparTestReagentsDAO.vb" />
+    <Compile Include="tparTestSamplesDAO.vb" />
+    <Compile Include="tparTestsDAO.vb" />
+    <Compile Include="tparVirtualRotorsDAO.vb" />
+    <Compile Include="tparVirtualRotorsPositionsDAO.vb" />
+    <Compile Include="twksOrderDemographicsDAO.vb" />
+    <Compile Include="twksOrdersDAO.vb" />
+    <Compile Include="twksOrderTestDAO.vb" />
+    <Compile Include="twksWSAnalyzersDAO.vb" />
+    <Compile Include="twksWSNotInUseRotorPositionsDAO.vb" />
+    <Compile Include="twksWSRequiredElemByOrderTestDAO.vb" />
+    <Compile Include="twksResultsDAO.vb" />
+    <Compile Include="twksWorkSessionsDAO.vb" />
+    <Compile Include="twksWSOrderTestsDAO.vb" />
+    <Compile Include="twksWSRotorContentByPositionDAO.vb" />
+    <Compile Include="twksWSRequiredElementsDAO.vb" />
+    <Compile Include="twksWSRequiredElementsTubesDAO.vb" />
+    <Compile Include="vwksOrderCalculatedTestsDAO.vb" />
+    <Compile Include="vwksPreparationsPositionDataDAO.vb" />
+    <Compile Include="vwksPreparationsTestDataDAO.vb" />
+    <Compile Include="vwksWSOrderTestsDAO.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Global\Global\Global.vbproj">
+      <Project>{5D65020C-C2D7-4AC3-B557-223FC290E526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

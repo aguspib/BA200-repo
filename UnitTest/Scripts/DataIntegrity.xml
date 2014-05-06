@@ -1,0 +1,2512 @@
+<?xml version="1.0" standalone="yes"?>
+<DBIntegrityDS xmlns="http://tempuri.org/DBIntegrityDS.xsd">
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Removed ApplicationSetting Table</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM sys.objects
+      WHERE object_id = OBJECT_ID(N'[dbo].[ApplicationSetting]')
+      AND type in (N'U')) = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Data validation in tfmwMultiLanguageResources Table</Label>
+    <Script>
+      DECLARE @Resultado AS Table
+      (
+      [ResourceID] [varchar](35) NOT NULL,
+      [LanguageID] [varchar](15) NOT NULL,
+      [ResourceText] [nvarchar](255) NOT NULL,
+      [ApplicationVersion] [varchar](20) NULL,
+      [Translated] [bit] NULL,
+      [TS_DateTime] [datetime] NULL,
+      [OnlyService] [bit] NOT NULL,
+      [CreationDate] [datetime] NULL,
+      [CreationUser] [varchar](5) NULL,
+      [TranslatedDate] [datetime] NULL,
+      [TranslatedUser] [varchar](5) NULL,
+      [TS_User] [varchar](5) NULL,
+      [DBName] [varchar](15)
+      )
+      INSERT INTO @Resultado([ResourceID]
+      ,[LanguageID]
+      ,[ResourceText]
+      ,[ApplicationVersion]
+      ,[Translated]
+      ,[TS_DateTime]
+      ,[OnlyService]
+      ,[CreationDate]
+      ,[CreationUser]
+      ,[TranslatedDate]
+      ,[TranslatedUser]
+      ,[TS_User]
+      ,[DBName])
+      SELECT * , 'Ax00' AS DBName
+      FROM (
+      SELECT *
+      FROM [Ax00].[dbo].[tfmwMultiLanguageResources]
+      EXCEPT
+      SELECT *
+      FROM [Ax00TEM].[dbo].[tfmwMultiLanguageResources] ) AS T
+      UNION ALL
+      SELECT *, 'Ax00TEM' AS DBName
+      FROM (
+      SELECT *
+      FROM [Ax00TEM].[dbo].[tfmwMultiLanguageResources]
+      EXCEPT
+      SELECT *
+      FROM [Ax00].[dbo].[tfmwMultiLanguageResources]) AS  T
+
+      IF (SELECT COUNT(*) FROM @Resultado) = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>'BiosystemsID' Column added to Calculated Tests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'BiosystemsID') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Set BiosystemsID = 1 in CalculatedTests for preloaded tests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM Ax00.dbo.tparCalculatedTests TC WHERE TC.BiosystemsID >= 0) = (SELECT COUNT(*) FROM Ax00.dbo.tparCalculatedTests TC WHERE TC.PreloadedCalculatedTest = 1))
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>All Reagents are marked as Preloaded Reagent</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM Ax00.dbo.tparReagents WHERE PreloadedReagent = 0 ) = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Create xmlMessages Table</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM sys.objects
+      WHERE object_id = OBJECT_ID(N'[dbo].[twksXMLMessages]')
+      AND type in (N'U')) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>'LISRequest' Column added to Order Tests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'LISRequest') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>'LockedByLIS' Column added to Executions</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSExecutions' AND sc.name = 'LockedByLIS') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The view vparAllTestsByType is created</Label>
+    <Script>
+      USE [AX00]
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vparAllTestsByType')) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The LISView field is added to tables tparTests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'LISValue') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The LISView field is added to tables tparISETests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'LISValue') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The LISView field is added to tables tparCalculatedTests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'LISValue') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The LISView field is added to tables tparOffSystemTests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'LISValue') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The LISView field is added to tables tcfgMasterData</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tcfgMasterData' AND sc.name = 'LISValue') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>The LISView field is informed in tcfgMasterData</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM Ax00.dbo.tcfgMasterData WHERE LISValue IS NULL AND (SubTableID = 'SAMPLE_TYPES' OR SubTableID = 'TEST_UNITS')) >= 1
+      SELECT 'False'
+      ELSE
+      SELECT 'True'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Create new view vcfgLISMappings</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vcfgLISMappings') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Create new LIS configuration settings</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE
+      [SettingID] = 'LIS_HOST_QUERY' OR
+      [SettingID] = 'LIS_ACCEPT_UNSOLICITED' OR
+      [SettingID] = 'LIS_DOWNLOAD_ONRUNNING' OR
+      [SettingID] = 'LIS_WORKING_MODE_RERUNS' OR
+      [SettingID] = 'LIS_WORKING_MODE_REFLEX_TESTS' OR
+      [SettingID] = 'LIS_UPLOAD_UNSOLICITED_PAT_RES' OR
+      [SettingID] = 'LIS_UPLOAD_UNSOLICITED_QC_RES' OR
+      [SettingID] = 'LIS_ENABLE_COMMS' OR
+      [SettingID] = 'LIS_DATA_TRANSMISSION_TYPE' OR
+      [SettingID] = 'LIS_HOST_NAME' OR
+      [SettingID] = 'LIS_TCP_PORT' OR
+      [SettingID] = 'LIS_TCP_PORT2' OR
+      [SettingID] = 'LIS_STORAGE_RECEPTION_MAX_MSG' OR
+      [SettingID] = 'LIS_STORAGE_TRANS_MAX_MSG' OR
+      [SettingID] = 'LIS_BAx00maxTimeToRespond' OR
+      [SettingID] = 'LIS_PROTOCOL_NAME' OR
+      [SettingID] = 'LIS_IHE_COMPLIANT' OR
+      [SettingID] = 'LIS_CODEPAGE' OR
+      [SettingID] = 'LIS_HOST_QUERY_PACKAGE' OR
+      [SettingID] = 'LIS_maxTimeWaitingForResponse' OR
+      [SettingID] = 'LIS_maxTimeWaitingForACK' OR
+      [SettingID] = 'LIS_HOST_ID' OR
+      [SettingID] = 'LIS_HOST_PROVIDER' OR
+      [SettingID] = 'LIS_INSTRUMENT_ID' OR
+      [SettingID] = 'LIS_INSTRUMENT_PROVIDER' OR
+      [SettingID] = 'LIS_FIELD_SEPARATOR_HL7' OR
+      [SettingID] = 'LIS_COMP_SEPARATOR_HL7' OR
+      [SettingID] = 'LIS_REP_SEPARATOR_HL7' OR
+      [SettingID] = 'LIS_SPEC_SEPARATOR_HL7' OR
+      [SettingID] = 'LIS_SUBC_SEPARATOR_HL7' OR
+      [SettingID] = 'LIS_FIELD_SEPARATOR_ASTM' OR
+      [SettingID] = 'LIS_COMP_SEPARATOR_ASTM' OR
+      [SettingID] = 'LIS_REP_SEPARATOR_ASTM' OR
+      [SettingID] = 'LIS_SPEC_SEPARATOR_ASTM' OR
+      [SettingID] = 'LIS_LOG_FOLDER' OR
+      [SettingID] = 'LIS_LOW_LEVEL_LOG') = 36
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Create new LIS preloaded master data</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwPreloadedMasterData] WHERE [SubTableID] = 'WS_MODE_RERUNS' or [SubTableID] = 'LIS_PROTOCOL' or [SubTableID] = 'LIS_DATA_TRANS_HL7' or [SubTableID] = 'LIS_DATA_TRANS_ASTM') = 10
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist SettingID BARCODE_SAMPLEID_FLAG On tcfgUserSettings </Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgUserSettings]
+      WHERE SettingID = 'BARCODE_SAMPLEID_FLAG' AND SettingDataType = 'BOOLEAN'
+      AND Status = '1') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist for change in Start WS with read barcode functionality</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      WHERE MessageID = 'CONFIRM_BARCODE_WARNING') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>'ExternalQC' Column added to Order Tests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'ExternalQC') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS parameters for LIS</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].tfmwSwParameters WHERE [ParameterName] = 'LIS_STORAGE_TRANS_FOLDER'
+      or [ParameterName] = 'LIS_STORAGE_RECEPTION_FOLDER'
+      or [ParameterName] = 'APP_NAME_FOR_LIS'
+      or [ParameterName] = 'CHANNELID_FOR_LIS'
+      or [ParameterName] = 'LIS_RELEASECHANNEL_TIMEOUT') = 5
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS limits for LIS</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].tfmwFieldLimits WHERE LimitID = 'LIS_HOSTQUERY_PACK_LIMIT'
+      or LimitID = 'LIS_PORTS_LIMIT'
+      or LimitID = 'LIS_SIZE_STORAGE_LIMIT'
+      or LimitID = 'LIS_TIMER_LIMIT') = 4
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Column LISStatus Added on Table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U'
+      AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'LISStatus') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Column BarcodeInfo Added on Table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U'
+      AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'BarcodeInfo') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate column ExternalPID size on table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF (SELECT character_maximum_length from information_schema.columns
+      WHERE table_name = 'twksWSBarcodePositionsWithNoRequests' AND column_name = 'ExternalPID') = 30
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Column MessageID Added on Table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U'
+      AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'MessageID') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate column SavedWSName size on table tparSavedWS</Label>
+    <Script>
+      IF (SELECT character_maximum_length from information_schema.columns
+      WHERE table_name = 'tparSavedWS' and column_name = 'SavedWSName') = 40
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS Sample Status ASKING Exist on preloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'LIS_SAMPLE_STATUS' AND ItemID = 'ASKING') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS Sample Status COMPLETED Exist on preloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'LIS_SAMPLE_STATUS' AND ItemID = 'COMPLETED') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS Sample Status NOINFO Exist on preloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'LIS_SAMPLE_STATUS' AND ItemID = 'NOINFO') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS Sample Status PENDING Exist on preloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'LIS_SAMPLE_STATUS' AND ItemID = 'PENDING') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS Sample Status REJECTED Exist on preloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'LIS_SAMPLE_STATUS' AND ItemID = 'REJECTED') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS Sample Status UNDELIVERED Exist on preloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'LIS_SAMPLE_STATUS' AND ItemID = 'UNDELIVERED') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Create new LIS Files Mode</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE
+      [SettingID] = 'LIS_WITHFILES_MODE') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>LIS parameters export modes MANUAL_EXPORT_FILENAME And ONLINE_EXPORT_FILENAME</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [AX00].[dbo].tfmwSwParameters WHERE [ParameterName] = 'MANUAL_EXPORT_FILENAME'
+      or [ParameterName] = 'ONLINE_EXPORT_FILENAME') = 2
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Add LISMessageID field to twksResults</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksResults' AND sc.name = 'LISMessageID') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist column LISStatus on table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'twksWSBarcodePositionsWithNoRequests') = 1)
+      BEGIN
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE so.xtype = 'U' AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'LISStatus') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist column BarcodeInfo on table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'twksWSBarcodePositionsWithNoRequests') = 1)
+      BEGIN
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE so.xtype = 'U' AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'BarcodeInfo') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist column MessageID on table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'twksWSBarcodePositionsWithNoRequests') = 1)
+      BEGIN
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE so.xtype = 'U' AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'MessageID') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist column ExternalPID on table twksWSBarcodePositionsWithNoRequests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'twksWSBarcodePositionsWithNoRequests') = 1)
+      BEGIN
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE so.xtype = 'U' AND so.name = 'twksWSBarcodePositionsWithNoRequests' AND sc.name = 'ExternalPID') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_HOST_QUERY Setting Type and Default Value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_QUERY' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_ACCEPT_UNSOLICITED Setting Type and Default Value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_ACCEPT_UNSOLICITED' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_DOWNLOAD_ONRUNNING Setting Type and Default Value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_DOWNLOAD_ONRUNNING' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_WORKING_MODE_RERUNS Setting Type and Default Value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WORKING_MODE_RERUNS' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'BOTH' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_WORKING_MODE_REFLEX_TESTS Setting Type and Default Value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WORKING_MODE_REFLEX_TESTS' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '0' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_UPLOAD_UNSOLICITED_PAT_RES Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [AX00].[dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_UPLOAD_UNSOLICITED_PAT_RES' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_UPLOAD_UNSOLICITED_QC_RES Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_UPLOAD_UNSOLICITED_QC_RES' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '0' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_ENABLE_COMMS Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_ENABLE_COMMS' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '0' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_DATA_TRANSMISSION_TYPE Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_DATA_TRANSMISSION_TYPE' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'TCPIP-Client' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_HOST_NAME Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_NAME' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'localhost' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_TCP_PORT Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_TCP_PORT' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '1024' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_TCP_PORT2 Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_TCP_PORT2' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '5000' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_STORAGE_RECEPTION_MAX_MSG Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_STORAGE_RECEPTION_MAX_MSG' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '9999' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_STORAGE_TRANS_MAX_MSG Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_STORAGE_TRANS_MAX_MSG' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '9999' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_BAx00maxTimeToRespond Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_STORAGE_TRANS_MAX_MSG' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '9999' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_BAx00maxTimeToRespond Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_BAx00maxTimeToRespond' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '1' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_PROTOCOL_NAME Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_PROTOCOL_NAME' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'ASTM' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_IHE_COMPLIANT Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_IHE_COMPLIANT' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '1' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_CODEPAGE Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_CODEPAGE' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '28591' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_HOST_QUERY_PACKAGE Setting Type.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_QUERY_PACKAGE' AND [SettingDataType]= 'INTEGER') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_maxTimeWaitingForResponse Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_maxTimeWaitingForResponse' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '10' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_maxTimeWaitingForACK Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_maxTimeWaitingForACK' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '60' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_HOST_ID Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_ID' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'Host' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_HOST_ID Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_PROVIDER' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'Host provider' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_INSTRUMENT_ID Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_INSTRUMENT_ID' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'BA400' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_INSTRUMENT_PROVIDER Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_INSTRUMENT_PROVIDER' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'Biosystems' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_FIELD_SEPARATOR_HL7 Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_FIELD_SEPARATOR_HL7' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '|' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_COMP_SEPARATOR_HL7 Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_COMP_SEPARATOR_HL7' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '^' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_REP_SEPARATOR_HL7 Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_REP_SEPARATOR_HL7' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '~' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_SPEC_SEPARATOR_HL7 Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_SPEC_SEPARATOR_HL7' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '\' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_SUBC_SEPARATOR_HL7 Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_SUBC_SEPARATOR_HL7' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '&amp;' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_FIELD_SEPARATOR_ASTM Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_FIELD_SEPARATOR_ASTM' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '|' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_COMP_SEPARATOR_ASTM Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_COMP_SEPARATOR_ASTM' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '^' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_REP_SEPARATOR_ASTM Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_REP_SEPARATOR_ASTM' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '\' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_SPEC_SEPARATOR_ASTM Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_SPEC_SEPARATOR_ASTM' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = '&amp;' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_LOG_FOLDER Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_LOG_FOLDER' AND [SettingDataType]= 'CHAR' AND [CurrentValue] = 'C:\TEMP' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_LOW_LEVEL_LOG Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_LOW_LEVEL_LOG' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '0' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>
+      Rows on tparSavedWSOrderTests 'PatientIDType','AwosID','SpecimenID', 'ESOrderID',
+      'LISOrderID', 'ESPatientID','LISPatientID', 'CalcTestIDs','CalcTestNames', 'ExternalQC'
+    </Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE so.xtype = 'U' AND so.name = 'tparSavedWSOrderTests' AND sc.name IN ('PatientIDType',
+      'AwosID','SpecimenID', 'ESOrderID', 'LISOrderID', 'ESPatientID','LISPatientID', 'CalcTestIDs',
+      'CalcTestNames', 'ExternalQC')) = 10
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Table twksOrderTestsLISInfo Exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'twksOrderTestsLISInfo') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the LIS_WITHFILES_MODE Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_WITHFILES_MODE' AND [SettingDataType]= 'BOOLEAN' AND [CurrentValue] = '0' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>New Column LISMessageID on table twksResults </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksResults' AND sc.name = 'LISMessageID') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate parameter MANUAL_EXPORT_FILENAME default value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'MANUAL_EXPORT_FILENAME' AND [ValueText] = 'EXP' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate parameter ONLINE_EXPORT_FILENAME default value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'ONLINE_EXPORT_FILENAME' AND [ValueText] = 'ONLINE' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate parameter LIS_LOG_MAX_DAYS exists</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'LIS_LOG_MAX_DAYS') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate parameter 'SpecimenIDList' in 'twksWSRequiredElements' exists</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSRequiredElements' AND sc.name = 'SpecimenIDList') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate parameter LIS_NAME exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'LIS_NAME') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate parameter WDOG_TIME_BARCODE_SCAN exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'WDOG_TIME_BARCODE_SCAN') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISMessageID exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'thisWSResults') = 1)
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSResults' AND sc.name = 'LISMessageID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISRequest exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISRequest') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field ExternalQC exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'ExternalQC') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field SpecimenID  exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'SpecimenID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field AwosID exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'AwosID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field ESOrderID exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'ESOrderID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field ESPatientID exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'ESPatientID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISOrderID exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISOrderID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISPatientID exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISPatientID') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISTestName exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISTestName') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISSampleType exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISSampleType') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate if field LISUnits exit on table thisWSResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISUnits') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate VIEW vhisWSResults exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vhisWSResults') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate  setting LIS_TRACE_LEVEL exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_TRACE_LEVEL') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate setting LIS_MAX_ORDER_DOWNLOAD_RUNNING exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_MAX_ORDER_DOWNLOAD_RUNNING') = 1)
+      Select 'True'
+      ELSE
+      Select 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate LISValue is not null on tpartTest Table.</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'LISValue') = 1
+      BEGIN
+      IF (SELECT COUNT(*) FROM tparTests WHERE LISValue  IS NULL) = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate LISValue is not null on tparISETests Table.</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'LISValue') = 1
+      BEGIN
+      IF (SELECT COUNT(*) FROM tparISETests WHERE LISValue  IS NULL) = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate LISValue is not null on tparCalculatedTests Table.</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'LISValue') = 1
+      BEGIN
+      IF (SELECT COUNT(*) FROM tparCalculatedTests WHERE LISValue  IS NULL) = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+      END
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Message error to LIS Storage limits inside Config settings LIS screen</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      WHERE MessageID = 'LIS_STORAGE_LIMIT') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Message error information about Reset WS functionality</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      WHERE MessageID = 'RESET_WS_FAILED') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Message MSG_REMOVE_NOTINUSE exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'REMOVE_NOTINUSE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist Sample Type SEM (Semen) on tcfgBarCodeSampleTypesMapping Table</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].dbo.tcfgBarCodeSampleTypesMapping WHERE SampleType = 'SEM') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Exist Sample Type LIQ (Biological Liquid) on tcfgBarCodeSampleTypesMapping Table</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].dbo.tcfgBarCodeSampleTypesMapping WHERE SampleType = 'LIQ') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Message LIS_MAPPING_WARNING exist on tfmwMessages Table </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'LIS_MAPPING_WARNING') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Message LIS_DUPLICATED_NAME exist on tfmwMessages Table </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'LIS_DUPLICATED_NAME') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Sample Type LIQ exist on master data </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].tcfgMasterData WHERE SubTableID = 'SAMPLE_TYPES' AND ItemID = 'LIQ') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Sample Type SEM exist on master data </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].tcfgMasterData WHERE SubTableID = 'SAMPLE_TYPES' AND ItemID = 'SEM') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validating field DeletedTestFlag exists in table tparSavedWSOrderTests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparSavedWSOrderTests' AND sc.name = 'DeletedTestFlag') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validating HQ Icon exist on tfmwPreloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].tfmwPreloadedMasterData WHERE SubtableID = 'ICON_PATHS' AND ItemID = 'HQ' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate new value for parameter MAX_REACTROTOR_DAYS = 7 </Label>
+    <Script>
+      IF( (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwSwParameters] WHERE ParameterName ='MAX_REACTROTOR_DAYS' AND ValueNumeric = 7) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.0</Version>
+    <Label>Validate the barcode max size is 30</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'BARCODE_FULL_TOTAL' AND  CurrentValue = '30')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Validate the sample volume for STD TEST GAMMA-GT </Label>
+    <Script>
+      IF (SELECT COUNT(*)  FROM [Ax00].[dbo].[tparTestSamples] WHERE TestID = 30 AND SampleType = 'SER' AND SampleVolume = 20)= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Validate SP DeleteHistPatientData Exist</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM sys.sql_modules AS sm JOIN sys.objects AS o ON sm.object_id = o.object_id WHERE OBJECT_NAME(sm.object_id) = 'DeleteHistPatientData')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Table thisWSReadings is Empty</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM thisWSReadings)= 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Table thisWSExecutions is Empty</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM thisWSExecutions)= 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Table thisAdjustBaseLines is Empty</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM thisAdjustBaseLines)= 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Validate New dilution value 9 to 10 (URN)</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM  tparISETestSamples WHERE SampleType_ResultID = 'URN' AND ISE_DilutionFactor = 10)> 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Add LISValue field to tfmwAlarms</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwAlarms' AND sc.name = 'LISValue') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Validate LISValue informed for REMARK Alarms</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM  tfmwAlarms WHERE AlarmType = 'REMARK' AND LISValue = NULL)> 0
+      SELECT 'False'
+      ELSE
+      SELECT 'True'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>The AUTO_WS_WITH_LIS_MODE user setting is included</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tcfgUserSettings WHERE SettingID = 'AUTO_WS_WITH_LIS_MODE') > 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>The AUTO_LIS_WAIT_TIME user setting is included</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tcfgUserSettings WHERE SettingID = 'AUTO_LIS_WAIT_TIME') > 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>The AUTO_LIS_MAX_ITERA parameter is included</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName = 'AUTO_LIS_MAX_ITERA') > 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>LIS_PORTS_LIMIT has change the max value</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwFieldLimits WHERE LimitID = 'LIS_PORTS_LIMIT' and MaxValue = 20000) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>new limit LIS_MAX_WAIT_ORDERS_LIMIT exists</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwFieldLimits WHERE LimitID = 'LIS_MAX_WAIT_ORDERS_LIMIT') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message MSG_AUTOLIS_LIS_NOT_READY exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_LIS_NOT_READY') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message MSG_AUTOLIS_NO_TUBES_FOUND exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_NO_TUBES_FOUND') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message MSG_AUTOLIS_BARCODE_DISABLED exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_BARCODE_DISABLED') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message MSG_BARCODE_AUTOLIS_WARNING exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'BARCODE_AUTOLIS_WARNING') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message MSG_AUTOLIS_ALL_ORDERS_WRONG exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_ALL_ORDERS_WRONG') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message AUTOLIS_NO_TUBES_MATCHED exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_NO_TUBES_MATCHED') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Validate user Setting AUTOMATIC_EXPORT and current value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgUserSettings] WHERE SettingID = 'AUTOMATIC_EXPORT' AND CurrentValue = 1) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Validate view vwksResultsCTRL Exist</Label>
+    <Script>
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vwksResultsCTRL]'))
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.1</Version>
+    <Label>Message AUTOLIS_WAITING_ORDERS exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_WAITING_ORDERS') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate AUTOLIS_BARCODE_ERROR Creation</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_BARCODE_ERROR') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate the LIS_HOST_QUERY_PACKAGE Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_QUERY_PACKAGE' AND [SettingDataType]= 'INTEGER' AND [CurrentValue] = '10' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate the AUTO_LIS_WAIT_TIME Setting Type and Default Value.</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'AUTO_LIS_WAIT_TIME' AND CurrentValue = 60) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>new limit LIS_MAX_WAIT_ORDERS_LIMIT Limits values </Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwFieldLimits WHERE LimitID = 'LIS_MAX_WAIT_ORDERS_LIMIT' AND MinValue = 10 AND MaxValue = 600 AND DefaultValue = 60 ) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Expiration Date Change FROM Smalldatetime To DateTime </Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE so.xtype = 'U'  AND so.name = 'tparCalibrators' AND sc.name = 'ExpirationDate' and sc.xtype = 61) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate the barcode external INI fixed value is 1</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'BARCODE_EXTERNAL_INI' AND  CurrentValue = '1')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate the barcode external END fixed value is 30</Label>
+    <Script>
+      IF (SELECT COUNT (*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'BARCODE_EXTERNAL_END' AND  CurrentValue = '30')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Create new auto report configuration settings</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE
+      [SettingID] = 'AUT_RESULTS_FREQ' OR
+      [SettingID] = 'AUT_RESULTS_TYPE') = 2
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Create new preloaded master data for auto report</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwPreloadedMasterData] WHERE [SubTableID] = 'AUT_RESULTS_TYPE' or [SubTableID] = 'AUT_RESULTS_FREQ') = 5
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>New icon CompactPrint</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND ItemID = 'COMPACTPRINT') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate AUT_RESULTS_PRINT Status</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'AUT_RESULTS_PRINT' AND Status = 1) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Exist Setting AUT_RESULTS_FREQ</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'AUT_RESULTS_FREQ') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Exist Setting AUT_RESULTS_TYPE</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE SettingID = 'AUT_RESULTS_TYPE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Create new view vcfgTestSortingForReports</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vcfgTestSortingForReports') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate BL_WELLREJECT_SD new value</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwSwParameters]  WHERE ParameterName = 'BL_WELLREJECT_SD' AND ValueNumeric = 0.035) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>2.11</Version>
+    <Label>Validate BL_WELLREJECT_INI_SD new value</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwSwParameters]  WHERE ParameterName = 'BL_WELLREJECT_INI_SD' AND ValueNumeric = 0.035) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Data validation in tfmwVersions Table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.0'
+      AND ServiceSoftware = '1.2.0'AND FirmwareScripts = '1.1.0'AND Firmware = '2.06')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Settings ID BARCODE_SAMPLEID_FLAG and assigne same value as Sample type flag. </Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tcfgUserSettings WHERE SettingID = 'BARCODE_SAMPLEID_FLAG'
+      AND CurrentValue = (SELECT CurrentValue  FROM tcfgUserSettings WHERE SettingID = 'BARCODE_SAMPLETYPE_FLAG')
+      AND Status  = (SELECT Status  FROM tcfgUserSettings WHERE SettingID = 'BARCODE_SAMPLETYPE_FLAG')) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New Columns Pause on table twksWSReadings exist</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U'
+      AND so.name = 'twksWSReadings' AND sc.name = 'Pause') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>RUNNINGPAUSE Exist on all BlockID on table tfmwScreenBlockStatus</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwScreenBlockStatus WHERE ScreenID='WKS001' AND AppStatus='RUNNINGPAUSE')= 19
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New ENDprocess SW flag</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].tfmwSwFlags WHERE FlagID = 'ENDprocess') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE AppStatus value in table tfmwScreenBlockStatus ON BlockID = TREEDRAGDROP</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwScreenBlockStatus WHERE  ScreenID = 'WKS001' AND
+      BlockID = 'TREEDRAGDROP' AND AppStatus = 'STANDBY' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE BlockEnabled value in table tfmwScreenBlockStatus ON BlockID = IN ('SCROLL', 'INFOAREA') AND AppStatus = 'EMPTY' </Label>
+    <Script>
+      IF ((select count(*) FROM tfmwScreenBlockStatus  WHERE ScreenID = 'WKS001' AND AppStatus = 'EMPTY'
+      AND DataLoaded = 0 AND BlockID IN ('SCROLL', 'INFOAREA') AND BlockEnabled = 1) = 2 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE BlockEnabled value in table tfmwScreenBlockStatus ON BlockID = 'WARNING' AND AppStatus = 'EMPTY' </Label>
+    <Script>
+      IF ((select count(*) FROM tfmwScreenBlockStatus  WHERE ScreenID = 'WKS001' AND AppStatus = 'EMPTY'
+      AND DataLoaded = 0 AND BlockID = 'WARNING' AND BlockEnabled = 0) = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE BlockEnabled value in table tfmwScreenBlockStatus ON BlockID IN ('SCROLL', 'INFOAREA') AND AppStatus = 'EMPTY' </Label>
+    <Script>
+      IF ((select count(*) FROM tfmwScreenBlockStatus WHERE ScreenID = 'WKS001' AND AppStatus = 'PENDING'
+      AND DataLoaded = 0 AND BlockID IN ('SCROLL', 'INFOAREA') AND BlockEnabled = 1) = 2 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE BlockEnabled value in table tfmwScreenBlockStatus ON BlockID = 'WARNING' AND AppStatus = 'STANDBY' </Label>
+    <Script>
+      IF ((select count(*) FROM tfmwScreenBlockStatus WHERE ScreenID = 'WKS001' AND AppStatus = 'STANDBY' AND DataLoaded = 1
+      AND BlockID = 'RESET' AND BlockEnabled = 1) = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE BlockEnabled value in table tfmwScreenBlockStatus ON BlockID = 'WARNING' AND AppStatus = 'SAMPLINGSTOP' </Label>
+    <Script>
+      IF ((select count(*) FROM tfmwScreenBlockStatus WHERE ScreenID = 'WKS001' AND AppStatus = 'SAMPLINGSTOP' AND DataLoaded = 1
+      AND BlockID = 'RESET' AND BlockEnabled = 1) = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE New Alarm Exist WS_PAUSE_MODE_WARN </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwAlarms WHERE AlarmID = 'WS_PAUSE_MODE_WARN') = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>VALIDATE new min limit value for READING2_CYCLES </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM  tfmwFieldLimits   WHERE LimitID = 'READING2_CYCLES' AND  MinValue = 36) = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Exist MESSAGEID PAUSE_IN_RUNNING ON tfrmwMessages</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages]
+      WHERE MessageID = 'PAUSE_IN_RUNNING') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>DATA TYPE OF COLUMN RunNumber IN TABLE tqcResultAlarms IS INT(xtype=56)</Label>
+    <Script>
+      IF (SELECT sc.xtype FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tqcResultAlarms' AND sc.name = 'RunNumber') = 56
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>PRIMARY KEY OF tqcResultAlarms IS CREATED</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tqcResultAlarms') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>DATA TYPE OF COLUMN RunNumber IN TABLE tqcResults IS INT(xtype=56)</Label>
+    <Script>
+      IF (SELECT sc.xtype FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tqcResults' AND sc.name = 'RunNumber') = 56
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>PRIMARY KEY OF tqcResults IS CREATED</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tqcResults') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>FOREING KEY BETWEEN tqcResultAlarms AND tqcResults IS CREATED</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'F' AND name = 'FK_tqcResultAlarms_tqcResults') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>ROTORDRAGDROP Allow on pause mode value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM Ax00.dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'ROTORDRAGDROP' AND BlockEnableD = 1)=1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>CHANGESIZE Allow on pause mode value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM Ax00.dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'CHANGESIZE' AND BlockEnableD = 1)=1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>DELETE Allow on pause mode value</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM Ax00.dbo.tfmwScreenBlockStatus WHERE AppStatus ='RUNNINGPAUSE' AND BlockID = 'DELETE' AND BlockEnableD = 1)=1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Validate R1+SAMPLES readings for calculations with pause new parameter (default value = 0, readings nearest R2)</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwSwParameters]  WHERE ParameterName = 'R1SAMPLE1STREADINGSFORCALC' AND ValueNumeric = 0) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Update table ParameterName set the new values on calculation formula for Arms Adjustments by ZRef Offsets</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwSwParameters]
+      WHERE (ParameterName = 'SRV_REFZ_R1SV_OFFSET' AND ValueNumeric = -50 or
+      ParameterName = 'SRV_REFZ_R2SV_OFFSET' AND ValueNumeric = -50 or
+      ParameterName = 'SRV_REFZ_M1SV_OFFSET' AND ValueNumeric = -50)) = 3
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Update table ParameterName set the new value to delete application logs from service sw</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [dbo].[tfmwSwParameters]
+      WHERE ParameterName = 'SRV_MONTHS_DELETE_LOG' AND ValueNumeric = 2) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>DATA TYPE OF COLUMN ReadingNumber IN TABLE twksWSReadings IS INT(xtype=56)</Label>
+    <Script>
+      IF (SELECT sc.xtype FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSReadings' AND sc.name = 'ReadingNumber') = 56
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>PRIMARY KEY OF twksWSReadings IS CREATED</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_twksWSReadings_1') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>CREATE NEW TABLE twksWSRotorPositionsInProcess</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'twksWSRotorPositionsInProcess') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Added special tests settings for TestID = 19</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSpecialTestsSettings WHERE TestID = 19 AND SampleType = 'SER' and SettingName = 'CRITICAL_PAUSEMODE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Added special tests settings for TestID = 20</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSpecialTestsSettings WHERE TestID = 20 AND SampleType = 'SER' and SettingName = 'CRITICAL_PAUSEMODE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Added MessageID CRITICAL_TESTS_PAUSEMODE</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'CRITICAL_TESTS_PAUSEMODE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Added New Block ID on tfmwScreenBlocks</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwScreenBlocks WHERE ScreenID='WKS001' AND BlockID='MANUALBARCODE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Validate All Manual Barcode Status </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwScreenBlockStatus WHERE ScreenID='WKS001' AND BlockID='MANUALBARCODE') = 8)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Message RES_RECOVER_INPAUSE exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'RES_RECOVER_INPAUSE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>'OrderToExport' Column added to vwksWSOrderTests</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksWSOrderTests' AND sc.name = 'OrderToExport') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>CALCIUM CPC Code Test Is 511</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tparReagents WHERE CodeTest = 511 ) = 2
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>TABLE tparContaminationWashings DOES NOT EXIST</Label>
+    <Script>
+      IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[tparContaminationWashings]') AND type in (N'U'))
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>FK_twksImportErrorsLog_tfmwMessages is Removed</Label>
+    <Script>
+      IF OBJECT_ID('FK_twksImportErrorsLog_tfmwMessages', 'F') IS NULL
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>MaxLength of column ResourceText in table tfmwMultilanguageResources has been changed from 255 to 500</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.xtype = 'U' AND so.name = 'tfmwMultilanguageResources' AND sc.name = 'ResourceText' AND sc.xtype = 231 AND sc.prec = 500) > 0)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New column Status has been added to table thisReagentsBottles</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisReagentsBottles' AND sc.name = 'Status') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New column PatientID has been added to view vwksCalcResults</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksCalcResults' AND sc.name = 'PatientID') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Get field PatientID or SampleID (the informed one) as PatientID from subview vwksResults</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscomments sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksCompleteResults' AND text LIKE '%ISNULL(PatientID, SampleID)%AS PatientID%') > 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Get field PatientID from subview vwksCalcResults instead of return Null</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscomments sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksCompleteResults' AND text LIKE '%NULL AS PatientID,%') = 0
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New Parameter MAX_APP_MEMORYUSAGE has been added to table tfmwSwParameters</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName = 'MAX_APP_MEMORYUSAGE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New Parameter MAX_SQL_MEMORYUSAGE has been added to table tfmwSwParameters</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName = 'MAX_SQL_MEMORYUSAGE') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New Parameter MAX_RESULTSTOEXPORT_HIST has been added to table tfmwSwParameters</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName = 'MAX_RESULTSTOEXPORT_HIST') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New value 7 for Parameter MAX_DAYS_IN_PREVIOUSLOG</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName = 'MAX_DAYS_IN_PREVIOUSLOG' AND ValueNumeric = 7) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>'RerunNumber' Columns added to vwksWSExecutionsAlarms</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksWSExecutionsAlarms' AND sc.name = 'OrderTestID') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+  <Version>3.0</Version>
+  <Label>'RerunNumber' Columns added to vwksWSExecutionsAlarms</Label>
+  <Script>
+    IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksWSExecutionsAlarms' AND sc.name = 'RerunNumber') = 1
+    SELECT 'True'
+    ELSE
+    SELECT 'False'
+  </Script>
+  <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New view vwksMonitorWSTabSTDISE</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksMonitorWSTabSTDISE') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>New view vwksMonitorWSTabOFFSCALC</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vwksMonitorWSTabOFFSCALC') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>Extend the timeout by ISE commmand instructions to 1500 instead of 1000</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName = 'ISE_CMD_TIMEOUT' AND ValueNumeric = 1500) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>      
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>'TestLongName' Column added to vwksResultsCTRL</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'V' AND so.name = 'vwksResultsCTRL' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>'TestLongName' Column added to vhisTestSamples</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'V' AND so.name = 'vhisTestSamples' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>'TestLongName' Column added to vhisWSResults</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>'TestLongName' Column added to vwksCompleteResults</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'V' AND so.name = 'vwksCompleteResults' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+</DBIntegrityDS>

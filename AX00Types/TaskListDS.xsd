@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="TaskListDS" targetNamespace="http://tempuri.org/TaskListDS.xsd" xmlns:mstns="http://tempuri.org/TaskListDS.xsd" xmlns="http://tempuri.org/TaskListDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="TaskListDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="TaskListDS" msprop:Generator_UserDSName="TaskListDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="CommonTask" msprop:Generator_TableClassName="CommonTaskDataTable" msprop:Generator_TableVarName="tableCommonTask" msprop:Generator_RowChangedName="CommonTaskRowChanged" msprop:Generator_TablePropName="CommonTask" msprop:Generator_RowDeletingName="CommonTaskRowDeleting" msprop:Generator_RowChangingName="CommonTaskRowChanging" msprop:Generator_RowEvHandlerName="CommonTaskRowChangeEventHandler" msprop:Generator_RowDeletedName="CommonTaskRowDeleted" msprop:Generator_RowClassName="CommonTaskRow" msprop:Generator_UserTableName="CommonTask" msprop:Generator_RowEvArgName="CommonTaskRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="StructureScript" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="StructureScript" msprop:Generator_ColumnVarNameInTable="columnStructureScript" msprop:Generator_ColumnPropNameInTable="StructureScriptColumn" msprop:Generator_UserColumnName="StructureScript" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="UpdateScript" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UpdateScript" msprop:Generator_ColumnVarNameInTable="columnUpdateScript" msprop:Generator_ColumnPropNameInTable="UpdateScriptColumn" msprop:Generator_UserColumnName="UpdateScript" type="xs:string" default="" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="AppVersion" msprop:Generator_TableClassName="AppVersionDataTable" msprop:Generator_TableVarName="tableAppVersion" msprop:Generator_RowChangedName="AppVersionRowChanged" msprop:Generator_TablePropName="AppVersion" msprop:Generator_RowDeletingName="AppVersionRowDeleting" msprop:Generator_RowChangingName="AppVersionRowChanging" msprop:Generator_RowEvHandlerName="AppVersionRowChangeEventHandler" msprop:Generator_RowDeletedName="AppVersionRowDeleted" msprop:Generator_RowClassName="AppVersionRow" msprop:Generator_UserTableName="AppVersion" msprop:Generator_RowEvArgName="AppVersionRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Version" msprop:Generator_ColumnVarNameInTable="columnVersion" msprop:Generator_ColumnPropNameInRow="Version" msprop:Generator_ColumnPropNameInTable="VersionColumn" msprop:Generator_UserColumnName="Version" type="xs:float" minOccurs="0" />
+              <xs:element name="StructureScript" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="StructureScript" msprop:Generator_ColumnVarNameInTable="columnStructureScript" msprop:Generator_ColumnPropNameInTable="StructureScriptColumn" msprop:Generator_UserColumnName="StructureScript" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="UpdateScript" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UpdateScript" msprop:Generator_ColumnVarNameInTable="columnUpdateScript" msprop:Generator_ColumnPropNameInTable="UpdateScriptColumn" msprop:Generator_UserColumnName="UpdateScript" type="xs:string" default="" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

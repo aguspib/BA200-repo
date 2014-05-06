@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<ISEDebugResultsDS xmlns="http://tempuri.org/ISEDebugResultsDS.xsd">
+  <DebugResults>
+    <Cycle></Cycle>
+    <PatientID></PatientID><!-- Value only for Samples Or Urine (SER URN)-->
+    <ISEResult></ISEResult>
+    <WorkSessionID></WorkSessionID>
+    <DateTime></DateTime>
+  </DebugResults>
+</ISEDebugResultsDS>

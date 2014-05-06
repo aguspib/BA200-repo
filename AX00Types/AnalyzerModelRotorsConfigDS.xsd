@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="AnalyzerModelRotorsConfigDS" targetNamespace="http://tempuri.org/AnalyzerModelRotorsConfigDS.xsd" xmlns:mstns="http://tempuri.org/AnalyzerModelRotorsConfigDS.xsd" xmlns="http://tempuri.org/AnalyzerModelRotorsConfigDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString3" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString3 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString3" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="AnalyzerModelRotorsConfigDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="AnalyzerModelRotorsConfigDS" msprop:Generator_DataSetName="AnalyzerModelRotorsConfigDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tfmwAnalyzerModelRotorsConfig" msprop:Generator_UserTableName="tfmwAnalyzerModelRotorsConfig" msprop:Generator_RowDeletedName="tfmwAnalyzerModelRotorsConfigRowDeleted" msprop:Generator_RowChangedName="tfmwAnalyzerModelRotorsConfigRowChanged" msprop:Generator_RowClassName="tfmwAnalyzerModelRotorsConfigRow" msprop:Generator_RowChangingName="tfmwAnalyzerModelRotorsConfigRowChanging" msprop:Generator_RowEvArgName="tfmwAnalyzerModelRotorsConfigRowChangeEvent" msprop:Generator_RowEvHandlerName="tfmwAnalyzerModelRotorsConfigRowChangeEventHandler" msprop:Generator_TableClassName="tfmwAnalyzerModelRotorsConfigDataTable" msprop:Generator_TableVarName="tabletfmwAnalyzerModelRotorsConfig" msprop:Generator_RowDeletingName="tfmwAnalyzerModelRotorsConfigRowDeleting" msprop:Generator_TablePropName="tfmwAnalyzerModelRotorsConfig">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerModel" msprop:Generator_UserColumnName="AnalyzerModel" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerModel" msprop:Generator_ColumnPropNameInTable="AnalyzerModelColumn" msprop:Generator_ColumnVarNameInTable="columnAnalyzerModel" type="xs:string" minOccurs="0" />
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnPropNameInRow="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="RotorType" msprop:Generator_UserColumnName="RotorType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="RotorType" msprop:Generator_ColumnPropNameInTable="RotorTypeColumn" msprop:Generator_ColumnVarNameInTable="columnRotorType" type="xs:string" minOccurs="0" />
+              <xs:element name="RingNumber" msprop:Generator_UserColumnName="RingNumber" msprop:Generator_ColumnPropNameInRow="RingNumber" msprop:Generator_ColumnVarNameInTable="columnRingNumber" msprop:Generator_ColumnPropNameInTable="RingNumberColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="RingPositions" msprop:Generator_UserColumnName="RingPositions" msprop:Generator_ColumnPropNameInRow="RingPositions" msprop:Generator_ColumnVarNameInTable="columnRingPositions" msprop:Generator_ColumnPropNameInTable="RingPositionsColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="FirstCellNumber" msprop:Generator_UserColumnName="FirstCellNumber" msprop:Generator_ColumnPropNameInRow="FirstCellNumber" msprop:Generator_ColumnVarNameInTable="columnFirstCellNumber" msprop:Generator_ColumnPropNameInTable="FirstCellNumberColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="LastCellNumber" msprop:Generator_UserColumnName="LastCellNumber" msprop:Generator_ColumnPropNameInRow="LastCellNumber" msprop:Generator_ColumnVarNameInTable="columnLastCellNumber" msprop:Generator_ColumnPropNameInTable="LastCellNumberColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="BarcodeReaderFlag" msprop:Generator_UserColumnName="BarcodeReaderFlag" msprop:Generator_ColumnPropNameInRow="BarcodeReaderFlag" msprop:Generator_ColumnVarNameInTable="columnBarcodeReaderFlag" msprop:Generator_ColumnPropNameInTable="BarcodeReaderFlagColumn" type="xs:boolean" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

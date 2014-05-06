@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="AnalyzerSettingsDS" targetNamespace="http://tempuri.org/AnalyzerSettingsDS.xsd" xmlns:mstns="http://tempuri.org/AnalyzerSettingsDS.xsd" xmlns="http://tempuri.org/AnalyzerSettingsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="AnalyzerSettingsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="AnalyzerSettingsDS" msprop:Generator_DataSetName="AnalyzerSettingsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tcfgAnalyzerSettings" msprop:Generator_UserTableName="tcfgAnalyzerSettings" msprop:Generator_RowDeletedName="tcfgAnalyzerSettingsRowDeleted" msprop:Generator_RowChangedName="tcfgAnalyzerSettingsRowChanged" msprop:Generator_RowClassName="tcfgAnalyzerSettingsRow" msprop:Generator_RowChangingName="tcfgAnalyzerSettingsRowChanging" msprop:Generator_RowEvArgName="tcfgAnalyzerSettingsRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgAnalyzerSettingsRowChangeEventHandler" msprop:Generator_TableClassName="tcfgAnalyzerSettingsDataTable" msprop:Generator_TableVarName="tabletcfgAnalyzerSettings" msprop:Generator_RowDeletingName="tcfgAnalyzerSettingsRowDeleting" msprop:Generator_TablePropName="tcfgAnalyzerSettings">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:Generator_ColumnPropNameInRow="AnalyzerID" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="SettingID" msprop:Generator_UserColumnName="SettingID" msprop:Generator_ColumnPropNameInRow="SettingID" msprop:Generator_ColumnVarNameInTable="columnSettingID" msprop:Generator_ColumnPropNameInTable="SettingIDColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="SettingDataType" msprop:Generator_UserColumnName="SettingDataType" msprop:Generator_ColumnVarNameInTable="columnSettingDataType" msprop:Generator_ColumnPropNameInRow="SettingDataType" msprop:Generator_ColumnPropNameInTable="SettingDataTypeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="CurrentValue" msprop:Generator_UserColumnName="CurrentValue" msprop:nullValue="_throw" msprop:Generator_ColumnVarNameInTable="columnCurrentValue" msprop:Generator_ColumnPropNameInTable="CurrentValueColumn" msprop:Generator_ColumnPropNameInRow="CurrentValue" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

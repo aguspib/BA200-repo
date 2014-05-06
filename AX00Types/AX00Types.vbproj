@@ -1,0 +1,3282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Biosystems.Ax00.Types</RootNamespace>
+    <AssemblyName>AX00Types</AssemblyName>
+    <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>AX00Types.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>AX00Types.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>AX00Types.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>AX00Types.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>AX00Types.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>AX00Types.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AlarmsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AlarmsDS.vb">
+      <DependentUpon>AlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AllowedTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AllowedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AllowedTestsDS.vb">
+      <DependentUpon>AllowedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AllTestsByTypeDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AllTestsByTypeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerManagerDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalyzerManagerDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerManagerDS.vb">
+      <DependentUpon>AnalyzerManagerDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerManagerFlagsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalyzerManagerFlagsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerModelRotorsConfigDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalyzerModelRotorsConfigDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerModelTubesByRingDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalyzerModelTubesByRingDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerReactionsRotorDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalyzerReactionsRotorDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzersDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AnalyzersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzersDS.vb">
+      <DependentUpon>AnalyzersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ApplicationLogDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationLogDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ApplicationSettingDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationSettingDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="BarCodeSampleTypesMappingDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BarCodeSampleTypesMappingDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="BarCodesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BarCodesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="BarCodesDS.vb">
+      <DependentUpon>BarCodesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CalculatedTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CalculatedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CalibratorsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CalibratorsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CalibratorsDS.vb">
+      <DependentUpon>CalibratorsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CellPositionInformationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CellPositionInformationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CellPositionInformationDS.vb">
+      <DependentUpon>CellPositionInformationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ContaminationsAuxCuDS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ContaminationsAuxCuDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ContaminationsAuxR1DS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ContaminationsAuxR1DS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ContaminationsDS.vb">
+      <DependentUpon>ContaminationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ControlsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ControlsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ContaminationsDS.Designer.vb">
+      <DependentUpon>ContaminationsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="BaseLinesDS.Designer.vb">
+      <DependentUpon>BaseLinesDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="BaseLinesDS.vb">
+      <DependentUpon>BaseLinesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerLedPositionsDS.Designer.vb">
+      <DependentUpon>AnalyzerLedPositionsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="AbsorbanceDS.Designer.vb">
+      <DependentUpon>AbsorbanceDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="AbsorbanceDS.vb">
+      <DependentUpon>AbsorbanceDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AnalyzerModelDS.Designer.vb">
+      <DependentUpon>AnalyzerModelDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="AnalyzerSettingsDS.Designer.vb">
+      <DependentUpon>AnalyzerSettingsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="AnalyzerSettingsDS.vb">
+      <DependentUpon>AnalyzerSettingsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="BarcodePositionsWithNoRequestsDS.Designer.vb">
+      <DependentUpon>BarcodePositionsWithNoRequestsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="BarcodePositionsWithNoRequestsDS.vb">
+      <DependentUpon>BarcodePositionsWithNoRequestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="AlarmErrorCodesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AlarmErrorCodesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DBIntegrityDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DBIntegrityDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="GraphDS.Designer.vb">
+      <DependentUpon>GraphDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="GraphDS.vb">
+      <DependentUpon>GraphDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HelpFilesSettingDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HelpFilesSettingDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisAdjustBaseLinesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisAdjustBaseLinesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisCalculatedTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisCalculatedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisCalculatedTestsDS.vb">
+      <DependentUpon>HisCalculatedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisCalibratorsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisCalibratorsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisISETestSamplesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisISETestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisOFFSTestSamplesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisOFFSTestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisReagentsBottlesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisReagentsBottlesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisTestSamplesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisTestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryISECalibrationsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryISECalibrationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryISECalibrationsDS.vb">
+      <DependentUpon>HistoryISECalibrationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisPatientDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisPatientDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisReagentsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisReagentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisTestCalibratorsValuesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisTestCalibratorsValuesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSAnalyzerAlarmsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSAnalyzerAlarmsDS.vb">
+      <DependentUpon>HisWSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSCalcTestRelations.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSCalcTestRelations.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSCurveResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSCurveResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSExecutionsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSExecutionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSOrderTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSOrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSOrderTestsDS.vb">
+      <DependentUpon>HisWSOrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSReadingsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSReadingsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HisWSResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HisWSResultsDS.vb">
+      <DependentUpon>HisWSResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ISEInformationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ISEInformationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="LISMappingsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LISMappingsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsDS.vb">
+      <DependentUpon>OrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsLISInfoDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTestsLISInfoDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCResultsForWestgardDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QCResultsForWestgardDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCSummaryByTestSampleDS.vb">
+      <DependentUpon>QCSummaryByTestSampleDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportsTestsSortingDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReportsTestsSortingDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportTemplatesDS.Designer.vb">
+      <DependentUpon>ReportTemplatesDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="RotorPositionsInProcessDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RotorPositionsInProcessDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ScreenBlockDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScreenBlockDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ScreenDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScreenDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVInfoDocumentsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVInfoDocumentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVInfoDocumentsDS.vb">
+      <DependentUpon>SRVInfoDocumentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVRecommendationsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVRecommendationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVRecommendationsServiceDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVRecommendationsServiceDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVResultsServiceDecodedDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVResultsServiceDecodedDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVResultsServiceDecodedDS.vb">
+      <DependentUpon>SRVResultsServiceDecodedDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVResultsServiceDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVResultsServiceDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVResultsServiceDS.vb">
+      <DependentUpon>SRVResultsServiceDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TaskListDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TaskListDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TemporalTableDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TemporalTableDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TimeEstimationDS.vb">
+      <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="VersionsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VersionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCCumulatedSummaryDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QCCumulatedSummaryDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCSummaryByTestSampleDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QCSummaryByTestSampleDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReactionRotorDetailsDS.Designer.vb">
+      <DependentUpon>ReactionRotorDetailsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CumulatedResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CumulatedResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryControlLotsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryControlLotsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryQCInformationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryQCInformationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryTestControlLotsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryTestControlLotsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryTestSamplesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryTestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="HistoryTestSamplesRulesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>HistoryTestSamplesRulesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="LegendDS.Designer.vb">
+      <DependentUpon>LegendDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="LegendDS.vb">
+      <DependentUpon>LegendDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OpenQCResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OpenQCResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCResultAlarms.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QCResultAlarms.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCResultsCalculationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QCResultsCalculationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCResultsCalculationDS.vb">
+      <DependentUpon>QCResultsCalculationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="QCResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>QCResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ResultInformationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResultInformationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="RunsGroupsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RunsGroupsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVAdjustmentsDS.vb">
+      <DependentUpon>SRVAdjustmentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SwFlagsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SwFlagsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestSamplesMultirulesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestSamplesMultirulesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UIRefreshDS.vb">
+      <DependentUpon>UIRefreshDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ViewWSAbsorbanceDS.Designer.vb">
+      <DependentUpon>ViewWSAbsorbanceDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ISEDebugResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ISEDebugResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ISEDebugResultsDS.vb">
+      <DependentUpon>ISEDebugResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OffSystemTestsResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OffSystemTestsResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsForExecutionsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTestsForExecutionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReactionsRotorDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReactionsRotorDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVAdjustmentsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVAdjustmentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Service\SRVPreliminaryHomesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SRVPreliminaryHomesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ViewWSAbsorbanceDS.vb">
+      <DependentUpon>ViewWSAbsorbanceDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSAnalyzerAlarmsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DependenciesElementsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DependenciesElementsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ImportErrorsLogDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ImportErrorsLogDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ImportErrorsLogDS.vb">
+      <DependentUpon>ImportErrorsLogDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ISETestSamplesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ISETestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ISETestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ISETestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MultiLanguageDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MultiLanguageDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MultiLanguageDS.vb">
+      <DependentUpon>MultiLanguageDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OffSystemTestSamplesDS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OffSystemTestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OffSystemTestsDS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OffSystemTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SpecialTestsSettingsDS.Designer.vb">
+      <DependentUpon>SpecialTestsSettingsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="SpecialTestsSettingsDS.vb">
+      <DependentUpon>SpecialTestsSettingsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="FormulasDS.vb">
+      <DependentUpon>FormulasDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="LanguagesConfigDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LanguagesConfigDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OperateCalculatedTestDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OperateCalculatedTestDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderCalculatedTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderCalculatedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsNotClosedDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTestsNotClosedDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestWSAnalyzerDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTestWSAnalyzerDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestContaminationsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestContaminationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TimeEstimationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UIRefreshDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UIRefreshDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UserDataDS.vb">
+      <DependentUpon>UserDataDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSAnalyzersDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSAnalyzersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSExecutionsInfoDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSExecutionsInfoDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSNoPosRequiredElementsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSNoPosRequiredElementsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSPausedOrderTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSPausedOrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRepetitionsToAddDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSRepetitionsToAddDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ResultAlarmsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResultAlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ResultsDS.vb">
+      <DependentUpon>ResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestRefRangesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestRefRangesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestRefRangesDS.vb">
+      <DependentUpon>TestRefRangesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UserSettingDS.Designer.vb">
+      <DependentUpon>UserSettingDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CurveResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CurveResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ExecutionsR1ResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ExecutionsR1ResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MaxOrderTestsValuesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MaxOrderTestsValuesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MaxOrderTestsValuesDS.vb">
+      <DependentUpon>MaxOrderTestsValuesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="PreparationsPositionDataDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PreparationsPositionDataDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="PreparationsTestDataDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PreparationsTestDataDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SavedWSDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SavedWSDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SavedWSOrderTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SavedWSOrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestCalibratorsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestCalibratorsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestControlsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestControlsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestReagentsVolumesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestReagentsVolumesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="twksWSReadingsDS.Designer.vb">
+      <DependentUpon>twksWSReadingsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="TestCalibratorValuesDS.Designer.vb">
+      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="TestCalibratorValuesDS.vb">
+      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ParametersDS.Designer.vb">
+      <DependentUpon>ParametersDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ParametersDS.vb">
+      <DependentUpon>ParametersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ExecutionsDS.Designer.vb">
+      <DependentUpon>ExecutionsDS.xsd</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="CustomDemographicsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomDemographicsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="CustomDemographicsLANGDS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CustomDemographicsLANGDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ExecutionsDS.vb">
+      <DependentUpon>ExecutionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="FieldLimitsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FieldLimitsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="FormulasDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FormulasDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="GeneralSettingsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GeneralSettingsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="InstalledApplicationDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InstalledApplicationDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="LastBlankCalibratorDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>LastBlankCalibratorDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="LastBlankCalibratorDS.vb">
+      <DependentUpon>LastBlankCalibratorDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MasterDataDS.Designer.vb">
+      <DependentUpon>MasterDataDS.xsd</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="MasterDataDS.vb">
+      <DependentUpon>MasterDataDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MessagesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MessagesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="MessagesDS.vb">
+      <DependentUpon>MessagesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="OrderDemographicsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderDemographicsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderDemographicsDS.vb">
+      <DependentUpon>OrderDemographicsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderDetailsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderDetailsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderDetailsDS.vb">
+      <DependentUpon>OrderDetailsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrdersDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrdersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrdersDS.vb">
+      <DependentUpon>OrdersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsDetailsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTestsDetailsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsDetailsDS.vb">
+      <DependentUpon>OrderTestsDetailsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="OrderTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>OrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="PatientFilterCriteriaDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PatientFilterCriteriaDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="PatientsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PatientsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReagentsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReagentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReagentTubeTypesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReagentTubeTypesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="RealVolumeDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RealVolumeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="RealVolumeDS.vb">
+      <DependentUpon>RealVolumeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="RequiredReagentsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RequiredReagentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ResultsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResultsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="RingCellNumbersDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RingCellNumbersDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SampleClassesByTestDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SampleClassesByTestDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="PreloadedMasterDataDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PreloadedMasterDataDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ScannedCellsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScannedCellsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ScreenBlockStatusDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ScreenBlockStatusDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SelectedTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>SelectedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="SelectedTestsDS.vb">
+      <DependentUpon>SelectedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestProfilesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestProfilesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestProfileTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestProfileTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestReagentsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestReagentsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestReplicatesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestReplicatesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestReplicatesDS.vb">
+      <DependentUpon>TestReplicatesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestSampleCalibratorDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestSampleCalibratorDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TestSamplesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TestSamplesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TubesBySampleTypeDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>TubesBySampleTypeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="TubesBySampleTypeDS.vb">
+      <DependentUpon>TubesBySampleTypeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UserDataDS1.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UserDataDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UserSettingDS.vb">
+      <DependentUpon>UserSettingDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="UsersLevelDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UsersLevelDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ViewOrderCalculatedTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ViewOrderCalculatedTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ViewWSOrderTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ViewWSOrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="VirtualRotorPosititionsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VirtualRotorPosititionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="VirtualRotorPosititionsDS.vb">
+      <DependentUpon>VirtualRotorPosititionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="VirtualRotorsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>VirtualRotorsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSessionResult.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WorkSessionResult.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSessionResult.vb">
+      <DependentUpon>WorkSessionResult.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSessionResultDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WorkSessionResultDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSessionResultDS.vb">
+      <DependentUpon>WorkSessionResultDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSessionsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WorkSessionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSessionsDS.vb">
+      <DependentUpon>WorkSessionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSAdditionalElementsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSAdditionalElementsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSElementsByOrderTestDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSElementsByOrderTestDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSExecutionAlarmsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSExecutionAlarmsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSOrderTestsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSOrderTestsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSOrderTestsForExecutionsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSOrderTestsForExecutionsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSPreparationsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSPreparationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSPreparationsDS.vb">
+      <DependentUpon>WSPreparationsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElemByOrderTestDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSRequiredElemByOrderTestDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElemByOrderTestDS.vb">
+      <DependentUpon>WSRequiredElemByOrderTestDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElementsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSRequiredElementsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElementsDS.vb">
+      <DependentUpon>WSRequiredElementsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElementsTreeDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSRequiredElementsTreeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElementsTreeDS.vb">
+      <DependentUpon>WSRequiredElementsTreeDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRequiredElementsTubesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSRequiredElementsTubesDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRotorContentByPositionDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WSRotorContentByPositionDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="WSRotorContentByPositionDS.vb">
+      <DependentUpon>WSRotorContentByPositionDS.xsd</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AlarmsDS.xsc">
+      <DependentUpon>AlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AlarmsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AlarmsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AlarmsDS.xss">
+      <DependentUpon>AlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AllowedTestsDS.xsc">
+      <DependentUpon>AllowedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AllowedTestsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AllowedTestsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AllowedTestsDS.xss">
+      <DependentUpon>AllowedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AllTestsByTypeDS.xsc">
+      <DependentUpon>AllTestsByTypeDS.xsd</DependentUpon>
+    </None>
+    <None Include="AllTestsByTypeDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AllTestsByTypeDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AllTestsByTypeDS.xss">
+      <DependentUpon>AllTestsByTypeDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerManagerDS.xsc">
+      <DependentUpon>AnalyzerManagerDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerManagerDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerManagerDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AnalyzerManagerDS.xss">
+      <DependentUpon>AnalyzerManagerDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerManagerFlagsDS.xsc">
+      <DependentUpon>AnalyzerManagerFlagsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerManagerFlagsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerManagerFlagsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AnalyzerManagerFlagsDS.xss">
+      <DependentUpon>AnalyzerManagerFlagsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerModelRotorsConfigDS.xsc">
+      <DependentUpon>AnalyzerModelRotorsConfigDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerModelRotorsConfigDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerModelRotorsConfigDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AnalyzerModelRotorsConfigDS.xss">
+      <DependentUpon>AnalyzerModelRotorsConfigDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerModelTubesByRingDS.xsc">
+      <DependentUpon>AnalyzerModelTubesByRingDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerModelTubesByRingDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerModelTubesByRingDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AnalyzerModelTubesByRingDS.xss">
+      <DependentUpon>AnalyzerModelTubesByRingDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerReactionsRotorDS.xsc">
+      <DependentUpon>AnalyzerReactionsRotorDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerReactionsRotorDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerReactionsRotorDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AnalyzerReactionsRotorDS.xss">
+      <DependentUpon>AnalyzerReactionsRotorDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzersDS.xsc">
+      <DependentUpon>AnalyzersDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzersDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzersDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AnalyzersDS.xss">
+      <DependentUpon>AnalyzersDS.xsd</DependentUpon>
+    </None>
+    <None Include="app.config" />
+    <None Include="ApplicationLogDS.xsc">
+      <DependentUpon>ApplicationLogDS.xsd</DependentUpon>
+    </None>
+    <None Include="ApplicationLogDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ApplicationLogDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ApplicationLogDS.xss">
+      <DependentUpon>ApplicationLogDS.xsd</DependentUpon>
+    </None>
+    <None Include="ApplicationSettingDS.xsc">
+      <DependentUpon>ApplicationSettingDS.xsd</DependentUpon>
+    </None>
+    <None Include="ApplicationSettingDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ApplicationSettingDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ApplicationSettingDS.xss">
+      <DependentUpon>ApplicationSettingDS.xsd</DependentUpon>
+    </None>
+    <None Include="BarCodeSampleTypesMappingDS.xsc">
+      <DependentUpon>BarCodeSampleTypesMappingDS.xsd</DependentUpon>
+    </None>
+    <None Include="BarCodeSampleTypesMappingDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>BarCodeSampleTypesMappingDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="BarCodeSampleTypesMappingDS.xss">
+      <DependentUpon>BarCodeSampleTypesMappingDS.xsd</DependentUpon>
+    </None>
+    <None Include="BarCodesDS.xsc">
+      <DependentUpon>BarCodesDS.xsd</DependentUpon>
+    </None>
+    <None Include="BarCodesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>BarCodesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="BarCodesDS.xss">
+      <DependentUpon>BarCodesDS.xsd</DependentUpon>
+    </None>
+    <None Include="CalculatedTestsDS.xsc">
+      <DependentUpon>CalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CalculatedTestsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CalculatedTestsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="CalculatedTestsDS.xss">
+      <DependentUpon>CalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CalibratorsDS.xsc">
+      <DependentUpon>CalibratorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CalibratorsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CalibratorsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="CalibratorsDS.xss">
+      <DependentUpon>CalibratorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CellPositionInformationDS.xsc">
+      <DependentUpon>CellPositionInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="CellPositionInformationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CellPositionInformationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="CellPositionInformationDS.xss">
+      <DependentUpon>CellPositionInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="ContaminationsAuxCuDS.xsc">
+      <DependentUpon>ContaminationsAuxCuDS.xsd</DependentUpon>
+    </None>
+    <None Include="ContaminationsAuxCuDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ContaminationsAuxCuDS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ContaminationsAuxCuDS.xss">
+      <DependentUpon>ContaminationsAuxCuDS.xsd</DependentUpon>
+    </None>
+    <None Include="ContaminationsAuxR1DS.xsc">
+      <DependentUpon>ContaminationsAuxR1DS.xsd</DependentUpon>
+    </None>
+    <None Include="ContaminationsAuxR1DS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ContaminationsAuxR1DS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ContaminationsAuxR1DS.xss">
+      <DependentUpon>ContaminationsAuxR1DS.xsd</DependentUpon>
+    </None>
+    <None Include="ControlsDS.xsc">
+      <DependentUpon>ControlsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ControlsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ControlsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ControlsDS.xss">
+      <DependentUpon>ControlsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ContaminationsDS.xsc">
+      <DependentUpon>ContaminationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ContaminationsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ContaminationsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ContaminationsDS.xss">
+      <DependentUpon>ContaminationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="BaseLinesDS.xsc">
+      <DependentUpon>BaseLinesDS.xsd</DependentUpon>
+    </None>
+    <None Include="BaseLinesDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>BaseLinesDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="BaseLinesDS.xss">
+      <DependentUpon>BaseLinesDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerLedPositionsDS.xsc">
+      <DependentUpon>AnalyzerLedPositionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerLedPositionsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerLedPositionsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AnalyzerLedPositionsDS.xss">
+      <DependentUpon>AnalyzerLedPositionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AbsorbanceDS.xsc">
+      <DependentUpon>AbsorbanceDS.xsd</DependentUpon>
+    </None>
+    <None Include="AbsorbanceDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AbsorbanceDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AbsorbanceDS.xss">
+      <DependentUpon>AbsorbanceDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerModelDS.xsc">
+      <DependentUpon>AnalyzerModelDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerModelDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerModelDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AnalyzerModelDS.xss">
+      <DependentUpon>AnalyzerModelDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerSettingsDS.xsc">
+      <DependentUpon>AnalyzerSettingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AnalyzerSettingsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AnalyzerSettingsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="AnalyzerSettingsDS.xss">
+      <DependentUpon>AnalyzerSettingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="BarcodePositionsWithNoRequestsDS.xsc">
+      <DependentUpon>BarcodePositionsWithNoRequestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="BarcodePositionsWithNoRequestsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>BarcodePositionsWithNoRequestsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="BarcodePositionsWithNoRequestsDS.xss">
+      <DependentUpon>BarcodePositionsWithNoRequestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="AlarmErrorCodesDS.xsc">
+      <DependentUpon>AlarmErrorCodesDS.xsd</DependentUpon>
+    </None>
+    <None Include="AlarmErrorCodesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>AlarmErrorCodesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="AlarmErrorCodesDS.xss">
+      <DependentUpon>AlarmErrorCodesDS.xsd</DependentUpon>
+    </None>
+    <None Include="DBIntegrityDS.xsc">
+      <DependentUpon>DBIntegrityDS.xsd</DependentUpon>
+    </None>
+    <None Include="DBIntegrityDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DBIntegrityDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="DBIntegrityDS.xss">
+      <DependentUpon>DBIntegrityDS.xsd</DependentUpon>
+    </None>
+    <None Include="GraphDS.xsc">
+      <DependentUpon>GraphDS.xsd</DependentUpon>
+    </None>
+    <None Include="GraphDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GraphDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="GraphDS.xss">
+      <DependentUpon>GraphDS.xsd</DependentUpon>
+    </None>
+    <None Include="HelpFilesSettingDS.xsc">
+      <DependentUpon>HelpFilesSettingDS.xsd</DependentUpon>
+    </None>
+    <None Include="HelpFilesSettingDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HelpFilesSettingDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HelpFilesSettingDS.xss">
+      <DependentUpon>HelpFilesSettingDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisAdjustBaseLinesDS.xsc">
+      <DependentUpon>HisAdjustBaseLinesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisAdjustBaseLinesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisAdjustBaseLinesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisAdjustBaseLinesDS.xss">
+      <DependentUpon>HisAdjustBaseLinesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisCalculatedTestsDS.xsc">
+      <DependentUpon>HisCalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisCalculatedTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisCalculatedTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisCalculatedTestsDS.xss">
+      <DependentUpon>HisCalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisCalibratorsDS.xsc">
+      <DependentUpon>HisCalibratorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisCalibratorsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisCalibratorsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisCalibratorsDS.xss">
+      <DependentUpon>HisCalibratorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisISETestSamplesDS.xsc">
+      <DependentUpon>HisISETestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisISETestSamplesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisISETestSamplesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisISETestSamplesDS.xss">
+      <DependentUpon>HisISETestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisOFFSTestSamplesDS.xsc">
+      <DependentUpon>HisOFFSTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisOFFSTestSamplesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisOFFSTestSamplesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisOFFSTestSamplesDS.xss">
+      <DependentUpon>HisOFFSTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisReagentsBottlesDS.xsc">
+      <DependentUpon>HisReagentsBottlesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisReagentsBottlesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisReagentsBottlesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisReagentsBottlesDS.xss">
+      <DependentUpon>HisReagentsBottlesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisTestSamplesDS.xsc">
+      <DependentUpon>HisTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisTestSamplesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisTestSamplesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisTestSamplesDS.xss">
+      <DependentUpon>HisTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryISECalibrationsDS.xsc">
+      <DependentUpon>HistoryISECalibrationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryISECalibrationsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HistoryISECalibrationsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HistoryISECalibrationsDS.xss">
+      <DependentUpon>HistoryISECalibrationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisPatientDS.xsc">
+      <DependentUpon>HisPatientDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisPatientDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisPatientDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisPatientDS.xss">
+      <DependentUpon>HisPatientDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisReagentsDS.xsc">
+      <DependentUpon>HisReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisReagentsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisReagentsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisReagentsDS.xss">
+      <DependentUpon>HisReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisTestCalibratorsValuesDS.xsc">
+      <DependentUpon>HisTestCalibratorsValuesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisTestCalibratorsValuesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisTestCalibratorsValuesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisTestCalibratorsValuesDS.xss">
+      <DependentUpon>HisTestCalibratorsValuesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSAnalyzerAlarmsDS.xsc">
+      <DependentUpon>HisWSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSAnalyzerAlarmsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSAnalyzerAlarmsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSAnalyzerAlarmsDS.xss">
+      <DependentUpon>HisWSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSCalcTestRelations.xsc">
+      <DependentUpon>HisWSCalcTestRelations.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSCalcTestRelations.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSCalcTestRelations.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSCalcTestRelations.xss">
+      <DependentUpon>HisWSCalcTestRelations.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSCurveResultsDS.xsc">
+      <DependentUpon>HisWSCurveResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSCurveResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSCurveResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSCurveResultsDS.xss">
+      <DependentUpon>HisWSCurveResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSExecutionsDS.xsc">
+      <DependentUpon>HisWSExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSExecutionsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSExecutionsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSExecutionsDS.xss">
+      <DependentUpon>HisWSExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSOrderTestsDS.xsc">
+      <DependentUpon>HisWSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSOrderTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSOrderTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSOrderTestsDS.xss">
+      <DependentUpon>HisWSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSReadingsDS.xsc">
+      <DependentUpon>HisWSReadingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSReadingsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSReadingsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSReadingsDS.xss">
+      <DependentUpon>HisWSReadingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSResultsDS.xsc">
+      <DependentUpon>HisWSResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HisWSResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HisWSResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HisWSResultsDS.xss">
+      <DependentUpon>HisWSResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISEInformationDS.xsc">
+      <DependentUpon>ISEInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISEInformationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ISEInformationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ISEInformationDS.xss">
+      <DependentUpon>ISEInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="LISMappingsDS.xsc">
+      <DependentUpon>LISMappingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="LISMappingsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LISMappingsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="LISMappingsDS.xss">
+      <DependentUpon>LISMappingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsLISInfoDS.xsc">
+      <DependentUpon>OrderTestsLISInfoDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsLISInfoDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderTestsLISInfoDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderTestsLISInfoDS.xss">
+      <DependentUpon>OrderTestsLISInfoDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultsForWestgardDS.xsc">
+      <DependentUpon>QCResultsForWestgardDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultsForWestgardDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QCResultsForWestgardDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="QCResultsForWestgardDS.xss">
+      <DependentUpon>QCResultsForWestgardDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportsTestsSortingDS.xsc">
+      <DependentUpon>ReportsTestsSortingDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportsTestsSortingDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReportsTestsSortingDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ReportsTestsSortingDS.xss">
+      <DependentUpon>ReportsTestsSortingDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportTemplatesDS.xsc">
+      <DependentUpon>ReportTemplatesDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportTemplatesDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReportTemplatesDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReportTemplatesDS.xss">
+      <DependentUpon>ReportTemplatesDS.xsd</DependentUpon>
+    </None>
+    <None Include="RotorPositionsInProcessDS.xsc">
+      <DependentUpon>RotorPositionsInProcessDS.xsd</DependentUpon>
+    </None>
+    <None Include="RotorPositionsInProcessDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RotorPositionsInProcessDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="RotorPositionsInProcessDS.xss">
+      <DependentUpon>RotorPositionsInProcessDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScreenBlockDS.xsc">
+      <DependentUpon>ScreenBlockDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScreenBlockDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ScreenBlockDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ScreenBlockDS.xss">
+      <DependentUpon>ScreenBlockDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScreenDS.xsc">
+      <DependentUpon>ScreenDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScreenDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ScreenDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ScreenDS.xss">
+      <DependentUpon>ScreenDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVInfoDocumentsDS.xsc">
+      <DependentUpon>SRVInfoDocumentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVInfoDocumentsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVInfoDocumentsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVInfoDocumentsDS.xss">
+      <DependentUpon>SRVInfoDocumentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVRecommendationsDS.xsc">
+      <DependentUpon>SRVRecommendationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVRecommendationsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVRecommendationsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVRecommendationsDS.xss">
+      <DependentUpon>SRVRecommendationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVRecommendationsServiceDS.xsc">
+      <DependentUpon>SRVRecommendationsServiceDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVRecommendationsServiceDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVRecommendationsServiceDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVRecommendationsServiceDS.xss">
+      <DependentUpon>SRVRecommendationsServiceDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVResultsServiceDecodedDS.xsc">
+      <DependentUpon>SRVResultsServiceDecodedDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVResultsServiceDecodedDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVResultsServiceDecodedDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVResultsServiceDecodedDS.xss">
+      <DependentUpon>SRVResultsServiceDecodedDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVResultsServiceDS.xsc">
+      <DependentUpon>SRVResultsServiceDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVResultsServiceDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVResultsServiceDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVResultsServiceDS.xss">
+      <DependentUpon>SRVResultsServiceDS.xsd</DependentUpon>
+    </None>
+    <None Include="TaskListDS.xsc">
+      <DependentUpon>TaskListDS.xsd</DependentUpon>
+    </None>
+    <None Include="TaskListDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TaskListDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TaskListDS.xss">
+      <DependentUpon>TaskListDS.xsd</DependentUpon>
+    </None>
+    <None Include="TemporalTableDS.xsc">
+      <DependentUpon>TemporalTableDS.xsd</DependentUpon>
+    </None>
+    <None Include="TemporalTableDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TemporalTableDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TemporalTableDS.xss">
+      <DependentUpon>TemporalTableDS.xsd</DependentUpon>
+    </None>
+    <None Include="VersionsDS.xsc">
+      <DependentUpon>VersionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="VersionsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>VersionsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="VersionsDS.xss">
+      <DependentUpon>VersionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCCumulatedSummaryDS.xsc">
+      <DependentUpon>QCCumulatedSummaryDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCCumulatedSummaryDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QCCumulatedSummaryDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="QCCumulatedSummaryDS.xss">
+      <DependentUpon>QCCumulatedSummaryDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCSummaryByTestSampleDS.xsc">
+      <DependentUpon>QCSummaryByTestSampleDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCSummaryByTestSampleDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QCSummaryByTestSampleDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="QCSummaryByTestSampleDS.xss">
+      <DependentUpon>QCSummaryByTestSampleDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReactionRotorDetailsDS.xsc">
+      <DependentUpon>ReactionRotorDetailsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReactionRotorDetailsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReactionRotorDetailsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ReactionRotorDetailsDS.xss">
+      <DependentUpon>ReactionRotorDetailsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CumulatedResultsDS.xsc">
+      <DependentUpon>CumulatedResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CumulatedResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CumulatedResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="CumulatedResultsDS.xss">
+      <DependentUpon>CumulatedResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryControlLotsDS.xsc">
+      <DependentUpon>HistoryControlLotsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryControlLotsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HistoryControlLotsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HistoryControlLotsDS.xss">
+      <DependentUpon>HistoryControlLotsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryQCInformationDS.xsc">
+      <DependentUpon>HistoryQCInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryQCInformationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HistoryQCInformationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HistoryQCInformationDS.xss">
+      <DependentUpon>HistoryQCInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryTestControlLotsDS.xsc">
+      <DependentUpon>HistoryTestControlLotsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryTestControlLotsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HistoryTestControlLotsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HistoryTestControlLotsDS.xss">
+      <DependentUpon>HistoryTestControlLotsDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryTestSamplesDS.xsc">
+      <DependentUpon>HistoryTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryTestSamplesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HistoryTestSamplesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HistoryTestSamplesDS.xss">
+      <DependentUpon>HistoryTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryTestSamplesRulesDS.xsc">
+      <DependentUpon>HistoryTestSamplesRulesDS.xsd</DependentUpon>
+    </None>
+    <None Include="HistoryTestSamplesRulesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>HistoryTestSamplesRulesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="HistoryTestSamplesRulesDS.xss">
+      <DependentUpon>HistoryTestSamplesRulesDS.xsd</DependentUpon>
+    </None>
+    <None Include="LegendDS.xsc">
+      <DependentUpon>LegendDS.xsd</DependentUpon>
+    </None>
+    <None Include="LegendDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LegendDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="LegendDS.xss">
+      <DependentUpon>LegendDS.xsd</DependentUpon>
+    </None>
+    <None Include="OpenQCResultsDS.xsc">
+      <DependentUpon>OpenQCResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OpenQCResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OpenQCResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OpenQCResultsDS.xss">
+      <DependentUpon>OpenQCResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultAlarms.xsc">
+      <DependentUpon>QCResultAlarms.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultAlarms.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QCResultAlarms.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="QCResultAlarms.xss">
+      <DependentUpon>QCResultAlarms.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultsCalculationDS.xsc">
+      <DependentUpon>QCResultsCalculationDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultsCalculationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QCResultsCalculationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="QCResultsCalculationDS.xss">
+      <DependentUpon>QCResultsCalculationDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultsDS.xsc">
+      <DependentUpon>QCResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="QCResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>QCResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="QCResultsDS.xss">
+      <DependentUpon>QCResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ResultInformationDS.xsc">
+      <DependentUpon>ResultInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="ResultInformationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResultInformationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ResultInformationDS.xss">
+      <DependentUpon>ResultInformationDS.xsd</DependentUpon>
+    </None>
+    <None Include="RunsGroupsDS.xsc">
+      <DependentUpon>RunsGroupsDS.xsd</DependentUpon>
+    </None>
+    <None Include="RunsGroupsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RunsGroupsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="RunsGroupsDS.xss">
+      <DependentUpon>RunsGroupsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SwFlagsDS.xsc">
+      <DependentUpon>SwFlagsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SwFlagsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SwFlagsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="SwFlagsDS.xss">
+      <DependentUpon>SwFlagsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestSamplesMultirulesDS.xsc">
+      <DependentUpon>TestSamplesMultirulesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestSamplesMultirulesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestSamplesMultirulesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestSamplesMultirulesDS.xss">
+      <DependentUpon>TestSamplesMultirulesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestsDS.xsc">
+      <DependentUpon>TestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestsDS.xss">
+      <DependentUpon>TestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ViewWSAbsorbanceDS.xsc">
+      <DependentUpon>ViewWSAbsorbanceDS.xsd</DependentUpon>
+    </None>
+    <None Include="ViewWSAbsorbanceDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ViewWSAbsorbanceDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ViewWSAbsorbanceDS.xss">
+      <DependentUpon>ViewWSAbsorbanceDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISEDebugResultsDS.xsc">
+      <DependentUpon>ISEDebugResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISEDebugResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ISEDebugResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ISEDebugResultsDS.xss">
+      <DependentUpon>ISEDebugResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OffSystemTestsResultsDS.xsc">
+      <DependentUpon>OffSystemTestsResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OffSystemTestsResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OffSystemTestsResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OffSystemTestsResultsDS.xss">
+      <DependentUpon>OffSystemTestsResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsForExecutionsDS.xsc">
+      <DependentUpon>OrderTestsForExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsForExecutionsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderTestsForExecutionsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderTestsForExecutionsDS.xss">
+      <DependentUpon>OrderTestsForExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReactionsRotorDS.xsc">
+      <DependentUpon>ReactionsRotorDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReactionsRotorDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReactionsRotorDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ReactionsRotorDS.xss">
+      <DependentUpon>ReactionsRotorDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVAdjustmentsDS.xsc">
+      <DependentUpon>SRVAdjustmentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVAdjustmentsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVAdjustmentsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVAdjustmentsDS.xss">
+      <DependentUpon>SRVAdjustmentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVPreliminaryHomesDS.xsc">
+      <DependentUpon>SRVPreliminaryHomesDS.xsd</DependentUpon>
+    </None>
+    <None Include="Service\SRVPreliminaryHomesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SRVPreliminaryHomesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Service\SRVPreliminaryHomesDS.xss">
+      <DependentUpon>SRVPreliminaryHomesDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSAnalyzerAlarmsDS.xsc">
+      <DependentUpon>WSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSAnalyzerAlarmsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSAnalyzerAlarmsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSAnalyzerAlarmsDS.xss">
+      <DependentUpon>WSAnalyzerAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="DependenciesElementsDS.xsc">
+      <DependentUpon>DependenciesElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="DependenciesElementsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DependenciesElementsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="DependenciesElementsDS.xss">
+      <DependentUpon>DependenciesElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ImportErrorsLogDS.xsc">
+      <DependentUpon>ImportErrorsLogDS.xsd</DependentUpon>
+    </None>
+    <None Include="ImportErrorsLogDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ImportErrorsLogDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ImportErrorsLogDS.xss">
+      <DependentUpon>ImportErrorsLogDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISETestSamplesDS.xsc">
+      <DependentUpon>ISETestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISETestSamplesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ISETestSamplesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ISETestSamplesDS.xss">
+      <DependentUpon>ISETestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISETestsDS.xsc">
+      <DependentUpon>ISETestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ISETestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ISETestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ISETestsDS.xss">
+      <DependentUpon>ISETestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="MultiLanguageDS.xsc">
+      <DependentUpon>MultiLanguageDS.xsd</DependentUpon>
+    </None>
+    <None Include="MultiLanguageDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MultiLanguageDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="MultiLanguageDS.xss">
+      <DependentUpon>MultiLanguageDS.xsd</DependentUpon>
+    </None>
+    <None Include="OffSystemTestSamplesDS.xsc">
+      <DependentUpon>OffSystemTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="OffSystemTestSamplesDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OffSystemTestSamplesDS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OffSystemTestSamplesDS.xss">
+      <DependentUpon>OffSystemTestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="OffSystemTestsDS.xsc">
+      <DependentUpon>OffSystemTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OffSystemTestsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OffSystemTestsDS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OffSystemTestsDS.xss">
+      <DependentUpon>OffSystemTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SpecialTestsSettingsDS.xsc">
+      <DependentUpon>SpecialTestsSettingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SpecialTestsSettingsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SpecialTestsSettingsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="SpecialTestsSettingsDS.xss">
+      <DependentUpon>SpecialTestsSettingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="LanguagesConfigDS.xsc">
+      <DependentUpon>LanguagesConfigDS.xsd</DependentUpon>
+    </None>
+    <None Include="LanguagesConfigDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LanguagesConfigDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="LanguagesConfigDS.xss">
+      <DependentUpon>LanguagesConfigDS.xsd</DependentUpon>
+    </None>
+    <None Include="OperateCalculatedTestDS.xsc">
+      <DependentUpon>OperateCalculatedTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="OperateCalculatedTestDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OperateCalculatedTestDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OperateCalculatedTestDS.xss">
+      <DependentUpon>OperateCalculatedTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderCalculatedTestsDS.xsc">
+      <DependentUpon>OrderCalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderCalculatedTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderCalculatedTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderCalculatedTestsDS.xss">
+      <DependentUpon>OrderCalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsNotClosedDS.xsc">
+      <DependentUpon>OrderTestsNotClosedDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsNotClosedDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderTestsNotClosedDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderTestsNotClosedDS.xss">
+      <DependentUpon>OrderTestsNotClosedDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestWSAnalyzerDS.xsc">
+      <DependentUpon>OrderTestWSAnalyzerDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestWSAnalyzerDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderTestWSAnalyzerDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderTestWSAnalyzerDS.xss">
+      <DependentUpon>OrderTestWSAnalyzerDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestContaminationsDS.xsc">
+      <DependentUpon>TestContaminationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestContaminationsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestContaminationsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestContaminationsDS.xss">
+      <DependentUpon>TestContaminationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TimeEstimationDS.xsc">
+      <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
+    </None>
+    <None Include="TimeEstimationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TimeEstimationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TimeEstimationDS.xss">
+      <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
+    </None>
+    <None Include="UIRefreshDS.xsc">
+      <DependentUpon>UIRefreshDS.xsd</DependentUpon>
+    </None>
+    <None Include="UIRefreshDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UIRefreshDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="UIRefreshDS.xss">
+      <DependentUpon>UIRefreshDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSAnalyzersDS.xsc">
+      <DependentUpon>WSAnalyzersDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSAnalyzersDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSAnalyzersDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSAnalyzersDS.xss">
+      <DependentUpon>WSAnalyzersDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSExecutionsInfoDS.xsc">
+      <DependentUpon>WSExecutionsInfoDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSExecutionsInfoDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSExecutionsInfoDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSExecutionsInfoDS.xss">
+      <DependentUpon>WSExecutionsInfoDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSNoPosRequiredElementsDS.xsc">
+      <DependentUpon>WSNoPosRequiredElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSNoPosRequiredElementsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSNoPosRequiredElementsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSNoPosRequiredElementsDS.xss">
+      <DependentUpon>WSNoPosRequiredElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSPausedOrderTestsDS.xsc">
+      <DependentUpon>WSPausedOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSPausedOrderTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSPausedOrderTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSPausedOrderTestsDS.xss">
+      <DependentUpon>WSPausedOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRepetitionsToAddDS.xsc">
+      <DependentUpon>WSRepetitionsToAddDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRepetitionsToAddDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSRepetitionsToAddDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSRepetitionsToAddDS.xss">
+      <DependentUpon>WSRepetitionsToAddDS.xsd</DependentUpon>
+    </None>
+    <None Include="ResultAlarmsDS.xsc">
+      <DependentUpon>ResultAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ResultAlarmsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResultAlarmsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ResultAlarmsDS.xss">
+      <DependentUpon>ResultAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestRefRangesDS.xsc">
+      <DependentUpon>TestRefRangesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestRefRangesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestRefRangesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestRefRangesDS.xss">
+      <DependentUpon>TestRefRangesDS.xsd</DependentUpon>
+    </None>
+    <None Include="UserSettingDS.xsc">
+      <DependentUpon>UserSettingDS.xsd</DependentUpon>
+    </None>
+    <None Include="UserSettingDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UserSettingDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="UserSettingDS.xss">
+      <DependentUpon>UserSettingDS.xsd</DependentUpon>
+    </None>
+    <None Include="CurveResultsDS.xsc">
+      <DependentUpon>CurveResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CurveResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CurveResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="CurveResultsDS.xss">
+      <DependentUpon>CurveResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ExecutionsR1ResultsDS.xsc">
+      <DependentUpon>ExecutionsR1ResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ExecutionsR1ResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ExecutionsR1ResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ExecutionsR1ResultsDS.xss">
+      <DependentUpon>ExecutionsR1ResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="MaxOrderTestsValuesDS.xsc">
+      <DependentUpon>MaxOrderTestsValuesDS.xsd</DependentUpon>
+    </None>
+    <None Include="MaxOrderTestsValuesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MaxOrderTestsValuesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="MaxOrderTestsValuesDS.xss">
+      <DependentUpon>MaxOrderTestsValuesDS.xsd</DependentUpon>
+    </None>
+    <None Include="PreparationsPositionDataDS.xsc">
+      <DependentUpon>PreparationsPositionDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="PreparationsPositionDataDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PreparationsPositionDataDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="PreparationsPositionDataDS.xss">
+      <DependentUpon>PreparationsPositionDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="PreparationsTestDataDS.xsc">
+      <DependentUpon>PreparationsTestDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="PreparationsTestDataDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PreparationsTestDataDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="PreparationsTestDataDS.xss">
+      <DependentUpon>PreparationsTestDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="SavedWSDS.xsc">
+      <DependentUpon>SavedWSDS.xsd</DependentUpon>
+    </None>
+    <None Include="SavedWSDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SavedWSDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="SavedWSDS.xss">
+      <DependentUpon>SavedWSDS.xsd</DependentUpon>
+    </None>
+    <None Include="SavedWSOrderTestsDS.xsc">
+      <DependentUpon>SavedWSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SavedWSOrderTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SavedWSOrderTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="SavedWSOrderTestsDS.xss">
+      <DependentUpon>SavedWSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestCalibratorsDS.xsc">
+      <DependentUpon>TestCalibratorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestCalibratorsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestCalibratorsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestCalibratorsDS.xss">
+      <DependentUpon>TestCalibratorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestControlsDS.xsc">
+      <DependentUpon>TestControlsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestControlsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestControlsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestControlsDS.xss">
+      <DependentUpon>TestControlsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestReagentsVolumesDS.xsc">
+      <DependentUpon>TestReagentsVolumesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestReagentsVolumesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestReagentsVolumesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestReagentsVolumesDS.xss">
+      <DependentUpon>TestReagentsVolumesDS.xsd</DependentUpon>
+    </None>
+    <None Include="twksWSReadingsDS.xsc">
+      <DependentUpon>twksWSReadingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="twksWSReadingsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>twksWSReadingsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="twksWSReadingsDS.xss">
+      <DependentUpon>twksWSReadingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestCalibratorValuesDS.xsc">
+      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestCalibratorValuesDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestCalibratorValuesDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="TestCalibratorValuesDS.xss">
+      <DependentUpon>TestCalibratorValuesDS.xsd</DependentUpon>
+    </None>
+    <None Include="ParametersDS.xsc">
+      <DependentUpon>ParametersDS.xsd</DependentUpon>
+    </None>
+    <None Include="ParametersDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ParametersDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ParametersDS.xss">
+      <DependentUpon>ParametersDS.xsd</DependentUpon>
+    </None>
+    <None Include="ExecutionsDS.xsc">
+      <DependentUpon>ExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ExecutionsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ExecutionsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ExecutionsDS.xss">
+      <DependentUpon>ExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CustomDemographicsDS.xsc">
+      <DependentUpon>CustomDemographicsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CustomDemographicsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CustomDemographicsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="CustomDemographicsDS.xss">
+      <DependentUpon>CustomDemographicsDS.xsd</DependentUpon>
+    </None>
+    <None Include="CustomDemographicsLANGDS.xsc">
+      <DependentUpon>CustomDemographicsLANGDS.xsd</DependentUpon>
+    </None>
+    <None Include="CustomDemographicsLANGDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>CustomDemographicsLANGDS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="CustomDemographicsLANGDS.xss">
+      <DependentUpon>CustomDemographicsLANGDS.xsd</DependentUpon>
+    </None>
+    <None Include="FieldLimitsDS.xsc">
+      <DependentUpon>FieldLimitsDS.xsd</DependentUpon>
+    </None>
+    <None Include="FieldLimitsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FieldLimitsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="FieldLimitsDS.xss">
+      <DependentUpon>FieldLimitsDS.xsd</DependentUpon>
+    </None>
+    <None Include="FormulasDS.xsc">
+      <DependentUpon>FormulasDS.xsd</DependentUpon>
+    </None>
+    <None Include="FormulasDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>FormulasDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="FormulasDS.xss">
+      <DependentUpon>FormulasDS.xsd</DependentUpon>
+    </None>
+    <None Include="GeneralSettingsDS.xsc">
+      <DependentUpon>GeneralSettingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="GeneralSettingsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GeneralSettingsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="GeneralSettingsDS.xss">
+      <DependentUpon>GeneralSettingsDS.xsd</DependentUpon>
+    </None>
+    <None Include="InstalledApplicationDS.xsc">
+      <DependentUpon>InstalledApplicationDS.xsd</DependentUpon>
+    </None>
+    <None Include="InstalledApplicationDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>InstalledApplicationDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="InstalledApplicationDS.xss">
+      <DependentUpon>InstalledApplicationDS.xsd</DependentUpon>
+    </None>
+    <None Include="LastBlankCalibratorDS.xsc">
+      <DependentUpon>LastBlankCalibratorDS.xsd</DependentUpon>
+    </None>
+    <None Include="LastBlankCalibratorDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>LastBlankCalibratorDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="LastBlankCalibratorDS.xss">
+      <DependentUpon>LastBlankCalibratorDS.xsd</DependentUpon>
+    </None>
+    <None Include="MasterDataDS.xsc">
+      <DependentUpon>MasterDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="MasterDataDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MasterDataDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="MasterDataDS.xss">
+      <DependentUpon>MasterDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="MessagesDS.xsc">
+      <DependentUpon>MessagesDS.xsd</DependentUpon>
+    </None>
+    <None Include="MessagesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>MessagesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="MessagesDS.xss">
+      <DependentUpon>MessagesDS.xsd</DependentUpon>
+    </None>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderDemographicsDS.xsc">
+      <DependentUpon>OrderDemographicsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderDemographicsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderDemographicsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderDemographicsDS.xss">
+      <DependentUpon>OrderDemographicsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderDetailsDS.xsc">
+      <DependentUpon>OrderDetailsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderDetailsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderDetailsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderDetailsDS.xss">
+      <DependentUpon>OrderDetailsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrdersDS.xsc">
+      <DependentUpon>OrdersDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrdersDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrdersDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrdersDS.xss">
+      <DependentUpon>OrdersDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsDetailsDS.xsc">
+      <DependentUpon>OrderTestsDetailsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsDetailsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderTestsDetailsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderTestsDetailsDS.xss">
+      <DependentUpon>OrderTestsDetailsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsDS.xsc">
+      <DependentUpon>OrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="OrderTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>OrderTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="OrderTestsDS.xss">
+      <DependentUpon>OrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="PatientFilterCriteriaDS.xsc">
+      <DependentUpon>PatientFilterCriteriaDS.xsd</DependentUpon>
+    </None>
+    <None Include="PatientFilterCriteriaDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PatientFilterCriteriaDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="PatientFilterCriteriaDS.xss">
+      <DependentUpon>PatientFilterCriteriaDS.xsd</DependentUpon>
+    </None>
+    <None Include="PatientsDS.xsc">
+      <DependentUpon>PatientsDS.xsd</DependentUpon>
+    </None>
+    <None Include="PatientsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PatientsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="PatientsDS.xss">
+      <DependentUpon>PatientsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReagentsDS.xsc">
+      <DependentUpon>ReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReagentsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReagentsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ReagentsDS.xss">
+      <DependentUpon>ReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReagentTubeTypesDS.xsc">
+      <DependentUpon>ReagentTubeTypesDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReagentTubeTypesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReagentTubeTypesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ReagentTubeTypesDS.xss">
+      <DependentUpon>ReagentTubeTypesDS.xsd</DependentUpon>
+    </None>
+    <None Include="RealVolumeDS.xsc">
+      <DependentUpon>RealVolumeDS.xsd</DependentUpon>
+    </None>
+    <None Include="RealVolumeDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RealVolumeDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="RealVolumeDS.xss">
+      <DependentUpon>RealVolumeDS.xsd</DependentUpon>
+    </None>
+    <None Include="RequiredReagentsDS.xsc">
+      <DependentUpon>RequiredReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="RequiredReagentsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RequiredReagentsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="RequiredReagentsDS.xss">
+      <DependentUpon>RequiredReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ResultsDS.xsc">
+      <DependentUpon>ResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ResultsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ResultsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ResultsDS.xss">
+      <DependentUpon>ResultsDS.xsd</DependentUpon>
+    </None>
+    <None Include="RingCellNumbersDS.xsc">
+      <DependentUpon>RingCellNumbersDS.xsd</DependentUpon>
+    </None>
+    <None Include="RingCellNumbersDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>RingCellNumbersDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="RingCellNumbersDS.xss">
+      <DependentUpon>RingCellNumbersDS.xsd</DependentUpon>
+    </None>
+    <None Include="SampleClassesByTestDS.xsc">
+      <DependentUpon>SampleClassesByTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="SampleClassesByTestDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SampleClassesByTestDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="SampleClassesByTestDS.xss">
+      <DependentUpon>SampleClassesByTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="PreloadedMasterDataDS.xsc">
+      <DependentUpon>PreloadedMasterDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="PreloadedMasterDataDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>PreloadedMasterDataDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="PreloadedMasterDataDS.xss">
+      <DependentUpon>PreloadedMasterDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScannedCellsDS.xsc">
+      <DependentUpon>ScannedCellsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScannedCellsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ScannedCellsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ScannedCellsDS.xss">
+      <DependentUpon>ScannedCellsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScreenBlockStatusDS.xsc">
+      <DependentUpon>ScreenBlockStatusDS.xsd</DependentUpon>
+    </None>
+    <None Include="ScreenBlockStatusDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ScreenBlockStatusDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ScreenBlockStatusDS.xss">
+      <DependentUpon>ScreenBlockStatusDS.xsd</DependentUpon>
+    </None>
+    <None Include="SelectedTestsDS.xsc">
+      <DependentUpon>SelectedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="SelectedTestsDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>SelectedTestsDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="SelectedTestsDS.xss">
+      <DependentUpon>SelectedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestProfilesDS.xsc">
+      <DependentUpon>TestProfilesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestProfilesDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestProfilesDS.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="TestProfilesDS.xss">
+      <DependentUpon>TestProfilesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestProfileTestsDS.xsc">
+      <DependentUpon>TestProfileTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestProfileTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestProfileTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestProfileTestsDS.xss">
+      <DependentUpon>TestProfileTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestReagentsDS.xsc">
+      <DependentUpon>TestReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestReagentsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestReagentsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestReagentsDS.xss">
+      <DependentUpon>TestReagentsDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestReplicatesDS.xsc">
+      <DependentUpon>TestReplicatesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestReplicatesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestReplicatesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestReplicatesDS.xss">
+      <DependentUpon>TestReplicatesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestSampleCalibratorDS.xsc">
+      <DependentUpon>TestSampleCalibratorDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestSampleCalibratorDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestSampleCalibratorDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestSampleCalibratorDS.xss">
+      <DependentUpon>TestSampleCalibratorDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestSamplesDS.xsc">
+      <DependentUpon>TestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TestSamplesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TestSamplesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TestSamplesDS.xss">
+      <DependentUpon>TestSamplesDS.xsd</DependentUpon>
+    </None>
+    <None Include="TubesBySampleTypeDS.xsc">
+      <DependentUpon>TubesBySampleTypeDS.xsd</DependentUpon>
+    </None>
+    <None Include="TubesBySampleTypeDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>TubesBySampleTypeDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="TubesBySampleTypeDS.xss">
+      <DependentUpon>TubesBySampleTypeDS.xsd</DependentUpon>
+    </None>
+    <None Include="UserDataDS.xsc">
+      <DependentUpon>UserDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="UserDataDS.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UserDataDS1.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="UserDataDS.xss">
+      <DependentUpon>UserDataDS.xsd</DependentUpon>
+    </None>
+    <None Include="UsersLevelDS.xsc">
+      <DependentUpon>UsersLevelDS.xsd</DependentUpon>
+    </None>
+    <None Include="UsersLevelDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UsersLevelDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="UsersLevelDS.xss">
+      <DependentUpon>UsersLevelDS.xsd</DependentUpon>
+    </None>
+    <None Include="ViewOrderCalculatedTestsDS.xsc">
+      <DependentUpon>ViewOrderCalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ViewOrderCalculatedTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ViewOrderCalculatedTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ViewOrderCalculatedTestsDS.xss">
+      <DependentUpon>ViewOrderCalculatedTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ViewWSOrderTestsDS.xsc">
+      <DependentUpon>ViewWSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ViewWSOrderTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ViewWSOrderTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ViewWSOrderTestsDS.xss">
+      <DependentUpon>ViewWSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="VirtualRotorPosititionsDS.xsc">
+      <DependentUpon>VirtualRotorPosititionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="VirtualRotorPosititionsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>VirtualRotorPosititionsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="VirtualRotorPosititionsDS.xss">
+      <DependentUpon>VirtualRotorPosititionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="VirtualRotorsDS.xsc">
+      <DependentUpon>VirtualRotorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="VirtualRotorsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>VirtualRotorsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="VirtualRotorsDS.xss">
+      <DependentUpon>VirtualRotorsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WorkSessionResult.xsc">
+      <DependentUpon>WorkSessionResult.xsd</DependentUpon>
+    </None>
+    <None Include="WorkSessionResult.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WorkSessionResult.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="WorkSessionResult.xss">
+      <DependentUpon>WorkSessionResult.xsd</DependentUpon>
+    </None>
+    <None Include="WorkSessionResultDS.xsc">
+      <DependentUpon>WorkSessionResultDS.xsd</DependentUpon>
+    </None>
+    <None Include="WorkSessionResultDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WorkSessionResultDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WorkSessionResultDS.xss">
+      <DependentUpon>WorkSessionResultDS.xsd</DependentUpon>
+    </None>
+    <None Include="WorkSessionsDS.xsc">
+      <DependentUpon>WorkSessionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WorkSessionsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WorkSessionsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WorkSessionsDS.xss">
+      <DependentUpon>WorkSessionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSAdditionalElementsDS.xsc">
+      <DependentUpon>WSAdditionalElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSAdditionalElementsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSAdditionalElementsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSAdditionalElementsDS.xss">
+      <DependentUpon>WSAdditionalElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSElementsByOrderTestDS.xsc">
+      <DependentUpon>WSElementsByOrderTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSElementsByOrderTestDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSElementsByOrderTestDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSElementsByOrderTestDS.xss">
+      <DependentUpon>WSElementsByOrderTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSExecutionAlarmsDS.xsc">
+      <DependentUpon>WSExecutionAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSExecutionAlarmsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSExecutionAlarmsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSExecutionAlarmsDS.xss">
+      <DependentUpon>WSExecutionAlarmsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSOrderTestsDS.xsc">
+      <DependentUpon>WSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSOrderTestsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSOrderTestsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSOrderTestsDS.xss">
+      <DependentUpon>WSOrderTestsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSOrderTestsForExecutionsDS.xsc">
+      <DependentUpon>WSOrderTestsForExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSOrderTestsForExecutionsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSOrderTestsForExecutionsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSOrderTestsForExecutionsDS.xss">
+      <DependentUpon>WSOrderTestsForExecutionsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSPreparationsDS.xsc">
+      <DependentUpon>WSPreparationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSPreparationsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSPreparationsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSPreparationsDS.xss">
+      <DependentUpon>WSPreparationsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElemByOrderTestDS.xsc">
+      <DependentUpon>WSRequiredElemByOrderTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElemByOrderTestDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSRequiredElemByOrderTestDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSRequiredElemByOrderTestDS.xss">
+      <DependentUpon>WSRequiredElemByOrderTestDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElementsDS.xsc">
+      <DependentUpon>WSRequiredElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElementsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSRequiredElementsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSRequiredElementsDS.xss">
+      <DependentUpon>WSRequiredElementsDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElementsTreeDS.xsc">
+      <DependentUpon>WSRequiredElementsTreeDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElementsTreeDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSRequiredElementsTreeDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSRequiredElementsTreeDS.xss">
+      <DependentUpon>WSRequiredElementsTreeDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElementsTubesDS.xsc">
+      <DependentUpon>WSRequiredElementsTubesDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRequiredElementsTubesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSRequiredElementsTubesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSRequiredElementsTubesDS.xss">
+      <DependentUpon>WSRequiredElementsTubesDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRotorContentByPositionDS.xsc">
+      <DependentUpon>WSRotorContentByPositionDS.xsd</DependentUpon>
+    </None>
+    <None Include="WSRotorContentByPositionDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>WSRotorContentByPositionDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="WSRotorContentByPositionDS.xss">
+      <DependentUpon>WSRotorContentByPositionDS.xsd</DependentUpon>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="History\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

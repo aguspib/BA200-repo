@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="WSPausedOrderTestsDS" targetNamespace="http://tempuri.org/WSPausedOrderTestsDS.xsd" xmlns:mstns="http://tempuri.org/WSPausedOrderTestsDS.xsd" xmlns="http://tempuri.org/WSPausedOrderTestsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="WSPausedOrderTestsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_DataSetName="WSPausedOrderTestsDS" msprop:Generator_UserDSName="WSPausedOrderTestsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="twksWSPausedOrderTests" msprop:Generator_UserTableName="twksWSPausedOrderTests" msprop:Generator_RowDeletedName="twksWSPausedOrderTestsRowDeleted" msprop:Generator_TableClassName="twksWSPausedOrderTestsDataTable" msprop:Generator_RowChangedName="twksWSPausedOrderTestsRowChanged" msprop:Generator_RowClassName="twksWSPausedOrderTestsRow" msprop:Generator_RowChangingName="twksWSPausedOrderTestsRowChanging" msprop:Generator_RowEvArgName="twksWSPausedOrderTestsRowChangeEvent" msprop:Generator_RowEvHandlerName="twksWSPausedOrderTestsRowChangeEventHandler" msprop:Generator_TablePropName="twksWSPausedOrderTests" msprop:Generator_TableVarName="tabletwksWSPausedOrderTests" msprop:Generator_RowDeletingName="twksWSPausedOrderTestsRowDeleting">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnPropNameInRow="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="WorkSessionID" msprop:Generator_UserColumnName="WorkSessionID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnWorkSessionID" msprop:Generator_ColumnPropNameInTable="WorkSessionIDColumn" msprop:Generator_ColumnPropNameInRow="WorkSessionID" type="xs:string" minOccurs="0" />
+              <xs:element name="OrderTestID" msprop:Generator_UserColumnName="OrderTestID" msprop:Generator_ColumnPropNameInRow="OrderTestID" msprop:Generator_ColumnVarNameInTable="columnOrderTestID" msprop:Generator_ColumnPropNameInTable="OrderTestIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="RerunNumber" msprop:Generator_UserColumnName="RerunNumber" msprop:Generator_ColumnPropNameInRow="RerunNumber" msprop:Generator_ColumnVarNameInTable="columnRerunNumber" msprop:Generator_ColumnPropNameInTable="RerunNumberColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

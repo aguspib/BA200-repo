@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="TimeEstimationDS" targetNamespace="http://tempuri.org/TimeEstimationDS.xsd" xmlns:mstns="http://tempuri.org/TimeEstimationDS.xsd" xmlns="http://tempuri.org/TimeEstimationDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections />
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="TimeEstimationDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="TimeEstimationDS" msprop:Generator_DataSetName="TimeEstimationDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="TestTimeValues" msprop:Generator_UserTableName="TestTimeValues" msprop:Generator_RowDeletedName="TestTimeValuesRowDeleted" msprop:Generator_RowChangedName="TestTimeValuesRowChanged" msprop:Generator_RowClassName="TestTimeValuesRow" msprop:Generator_RowChangingName="TestTimeValuesRowChanging" msprop:Generator_RowEvArgName="TestTimeValuesRowChangeEvent" msprop:Generator_RowEvHandlerName="TestTimeValuesRowChangeEventHandler" msprop:Generator_TableClassName="TestTimeValuesDataTable" msprop:Generator_TableVarName="tableTestTimeValues" msprop:Generator_RowDeletingName="TestTimeValuesRowDeleting" msprop:Generator_TablePropName="TestTimeValues">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="ExecutionID" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="ExecutionID" msprop:Generator_ColumnVarNameInTable="columnExecutionID" msprop:Generator_ColumnPropNameInRow="ExecutionID" msprop:Generator_ColumnPropNameInTable="ExecutionIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="AnalyzerID" msprop:Generator_UserColumnName="AnalyzerID" msprop:nullValue="_throw" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_ColumnPropNameInRow="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleClass" msprop:Generator_UserColumnName="SampleClass" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleClass" msprop:Generator_ColumnPropNameInTable="SampleClassColumn" msprop:Generator_ColumnVarNameInTable="columnSampleClass" type="xs:string" minOccurs="0" />
+              <xs:element name="OrderID" msprop:Generator_UserColumnName="OrderID" msprop:Generator_ColumnVarNameInTable="columnOrderID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="OrderID" msprop:Generator_ColumnPropNameInTable="OrderIDColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="OrderTestID" msprop:Generator_UserColumnName="OrderTestID" msprop:Generator_ColumnVarNameInTable="columnOrderTestID" msprop:Generator_ColumnPropNameInRow="OrderTestID" msprop:Generator_ColumnPropNameInTable="OrderTestIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ExecutionStatus" msprop:Generator_UserColumnName="ExecutionStatus" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ExecutionStatus" msprop:Generator_ColumnPropNameInTable="ExecutionStatusColumn" msprop:Generator_ColumnVarNameInTable="columnExecutionStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="ExecutionType" msprop:Generator_UserColumnName="ExecutionType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ExecutionType" msprop:Generator_ColumnPropNameInTable="ExecutionTypeColumn" msprop:Generator_ColumnVarNameInTable="columnExecutionType" type="xs:string" minOccurs="0" />
+              <xs:element name="TestID" msprop:Generator_UserColumnName="TestID" msprop:Generator_ColumnVarNameInTable="columnTestID" msprop:Generator_ColumnPropNameInRow="TestID" msprop:Generator_ColumnPropNameInTable="TestIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="SampleType" msprop:Generator_UserColumnName="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_ColumnPropNameInRow="SampleType" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="PredilutionUseFlag" msprop:Generator_UserColumnName="PredilutionUseFlag" msprop:Generator_ColumnPropNameInRow="PredilutionUseFlag" msprop:Generator_ColumnVarNameInTable="columnPredilutionUseFlag" msprop:Generator_ColumnPropNameInTable="PredilutionUseFlagColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="PredilutionMode" msprop:Generator_UserColumnName="PredilutionMode" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnPredilutionMode" msprop:Generator_ColumnPropNameInTable="PredilutionModeColumn" msprop:Generator_ColumnPropNameInRow="PredilutionMode" type="xs:string" minOccurs="0" />
+              <xs:element name="TestCycles" msprop:Generator_UserColumnName="TestCycles" msprop:Generator_ColumnVarNameInTable="columnTestCycles" msprop:Generator_ColumnPropNameInRow="TestCycles" msprop:Generator_ColumnPropNameInTable="TestCyclesColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="LastReadingCycle" msprop:Generator_UserColumnName="LastReadingCycle" msprop:Generator_ColumnVarNameInTable="columnLastReadingCycle" msprop:Generator_ColumnPropNameInRow="LastReadingCycle" msprop:Generator_ColumnPropNameInTable="LastReadingCycleColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="SendingTime" msprop:Generator_UserColumnName="SendingTime" msprop:Generator_ColumnPropNameInRow="SendingTime" msprop:Generator_ColumnVarNameInTable="columnSendingTime" msprop:Generator_ColumnPropNameInTable="SendingTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="RemainingTime" msprop:Generator_UserColumnName="RemainingTime" msprop:Generator_ColumnVarNameInTable="columnRemainingTime" msprop:Generator_ColumnPropNameInRow="RemainingTime" msprop:Generator_ColumnPropNameInTable="RemainingTimeColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="NumPreparations" msprop:Generator_UserColumnName="NumPreparations" msprop:Generator_ColumnVarNameInTable="columnNumPreparations" msprop:Generator_ColumnPropNameInRow="NumPreparations" msprop:Generator_ColumnPropNameInTable="NumPreparationsColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

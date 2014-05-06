@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="BarcodePositionsWithNoRequestsDS" targetNamespace="http://tempuri.org/BarcodePositionsWithNoRequestsDS.xsd" xmlns:mstns="http://tempuri.org/BarcodePositionsWithNoRequestsDS.xsd" xmlns="http://tempuri.org/BarcodePositionsWithNoRequestsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString1" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString1 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString1" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="BarcodePositionsWithNoRequestsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="BarcodePositionsWithNoRequestsDS" msprop:Generator_UserDSName="BarcodePositionsWithNoRequestsDS">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="twksWSBarcodePositionsWithNoRequests" msprop:Generator_UserTableName="twksWSBarcodePositionsWithNoRequests" msprop:Generator_RowEvArgName="twksWSBarcodePositionsWithNoRequestsRowChangeEvent" msprop:Generator_TableVarName="tabletwksWSBarcodePositionsWithNoRequests" msprop:Generator_TablePropName="twksWSBarcodePositionsWithNoRequests" msprop:Generator_RowDeletingName="twksWSBarcodePositionsWithNoRequestsRowDeleting" msprop:Generator_RowChangingName="twksWSBarcodePositionsWithNoRequestsRowChanging" msprop:Generator_RowDeletedName="twksWSBarcodePositionsWithNoRequestsRowDeleted" msprop:Generator_RowEvHandlerName="twksWSBarcodePositionsWithNoRequestsRowChangeEventHandler" msprop:Generator_TableClassName="twksWSBarcodePositionsWithNoRequestsDataTable" msprop:Generator_RowChangedName="twksWSBarcodePositionsWithNoRequestsRowChanged" msprop:Generator_RowClassName="twksWSBarcodePositionsWithNoRequestsRow">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="AnalyzerID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerID" msprop:Generator_ColumnVarNameInTable="columnAnalyzerID" msprop:Generator_ColumnPropNameInTable="AnalyzerIDColumn" msprop:Generator_UserColumnName="AnalyzerID" type="xs:string" minOccurs="0" />
+              <xs:element name="WorkSessionID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="WorkSessionID" msprop:Generator_ColumnVarNameInTable="columnWorkSessionID" msprop:Generator_ColumnPropNameInTable="WorkSessionIDColumn" msprop:Generator_UserColumnName="WorkSessionID" type="xs:string" minOccurs="0" />
+              <xs:element name="WSStatus" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="WSStatus" msprop:Generator_ColumnVarNameInTable="columnWSStatus" msprop:Generator_ColumnPropNameInTable="WSStatusColumn" msprop:Generator_UserColumnName="WSStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="RotorType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="RotorType" msprop:Generator_ColumnVarNameInTable="columnRotorType" msprop:Generator_ColumnPropNameInTable="RotorTypeColumn" msprop:Generator_UserColumnName="RotorType" type="xs:string" minOccurs="0" />
+              <xs:element name="RingNumber" msprop:Generator_ColumnVarNameInTable="columnRingNumber" msprop:Generator_ColumnPropNameInRow="RingNumber" msprop:Generator_ColumnPropNameInTable="RingNumberColumn" msprop:Generator_UserColumnName="RingNumber" type="xs:int" minOccurs="0" />
+              <xs:element name="CellNumber" msprop:Generator_ColumnVarNameInTable="columnCellNumber" msprop:Generator_ColumnPropNameInRow="CellNumber" msprop:Generator_ColumnPropNameInTable="CellNumberColumn" msprop:Generator_UserColumnName="CellNumber" type="xs:int" minOccurs="0" />
+              <xs:element name="ExternalPID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ExternalPID" msprop:Generator_ColumnVarNameInTable="columnExternalPID" msprop:Generator_ColumnPropNameInTable="ExternalPIDColumn" msprop:Generator_UserColumnName="ExternalPID" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleType" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_UserColumnName="SampleType" type="xs:string" minOccurs="0" />
+              <xs:element name="StatFlag" msprop:Generator_ColumnVarNameInTable="columnStatFlag" msprop:Generator_ColumnPropNameInRow="StatFlag" msprop:Generator_ColumnPropNameInTable="StatFlagColumn" msprop:Generator_UserColumnName="StatFlag" type="xs:boolean" minOccurs="0" />
+              <xs:element name="PatientID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PatientID" msprop:Generator_ColumnVarNameInTable="columnPatientID" msprop:Generator_ColumnPropNameInTable="PatientIDColumn" msprop:Generator_UserColumnName="PatientID" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleTypeDesc" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleTypeDesc" msprop:Generator_ColumnVarNameInTable="columnSampleTypeDesc" msprop:Generator_ColumnPropNameInTable="SampleTypeDescColumn" msprop:Generator_UserColumnName="SampleTypeDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="CompletedFlag" msprop:Generator_ColumnVarNameInTable="columnCompletedFlag" msprop:Generator_ColumnPropNameInRow="CompletedFlag" msprop:Generator_ColumnPropNameInTable="CompletedFlagColumn" msprop:Generator_UserColumnName="CompletedFlag" type="xs:boolean" minOccurs="0" />
+              <xs:element name="NotSampleType" msprop:Generator_ColumnVarNameInTable="columnNotSampleType" msprop:Generator_ColumnPropNameInRow="NotSampleType" msprop:Generator_ColumnPropNameInTable="NotSampleTypeColumn" msprop:Generator_UserColumnName="NotSampleType" type="xs:boolean" default="false" minOccurs="0" />
+              <xs:element name="BarCodeInfo" msprop:Generator_ColumnVarNameInTable="columnBarCodeInfo" msprop:Generator_ColumnPropNameInRow="BarCodeInfo" msprop:Generator_ColumnPropNameInTable="BarCodeInfoColumn" msprop:Generator_UserColumnName="BarCodeInfo" type="xs:string" minOccurs="0" />
+              <xs:element name="LISStatus" msprop:Generator_ColumnVarNameInTable="columnLISStatus" msprop:Generator_ColumnPropNameInRow="LISStatus" msprop:Generator_ColumnPropNameInTable="LISStatusColumn" msprop:Generator_UserColumnName="LISStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="Selected" msprop:Generator_ColumnVarNameInTable="columnSelected" msprop:Generator_ColumnPropNameInRow="Selected" msprop:Generator_ColumnPropNameInTable="SelectedColumn" msprop:Generator_UserColumnName="Selected" type="xs:boolean" default="false" minOccurs="0" />
+              <xs:element name="SampleClassIcon" msprop:Generator_ColumnVarNameInTable="columnSampleClassIcon" msprop:Generator_ColumnPropNameInRow="SampleClassIcon" msprop:Generator_ColumnPropNameInTable="SampleClassIconColumn" msprop:Generator_UserColumnName="SampleClassIcon" type="xs:base64Binary" minOccurs="0" />
+              <xs:element name="ShowOnPosition" msprop:Generator_ColumnVarNameInTable="columnShowOnPosition" msprop:Generator_ColumnPropNameInRow="ShowOnPosition" msprop:Generator_ColumnPropNameInTable="ShowOnPositionColumn" msprop:Generator_UserColumnName="ShowOnPosition" type="xs:int" default="0" />
+              <xs:element name="MessageId" msprop:Generator_ColumnVarNameInTable="columnMessageId" msprop:Generator_ColumnPropNameInRow="MessageId" msprop:Generator_ColumnPropNameInTable="MessageIdColumn" msprop:Generator_UserColumnName="MessageId" type="xs:string" minOccurs="0" />
+              <xs:element name="CellStatus" msprop:Generator_ColumnVarNameInTable="columnCellStatus" msprop:Generator_ColumnPropNameInRow="CellStatus" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="CellStatusColumn" msprop:Generator_UserColumnName="CellStatus" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

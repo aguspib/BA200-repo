@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="PatientFilterCriteriaDS" targetNamespace="http://tempuri.org/PatientFilterCriteriaDS.xsd" xmlns:mstns="http://tempuri.org/PatientFilterCriteriaDS.xsd" xmlns="http://tempuri.org/PatientFilterCriteriaDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="PatientFilterCriteriaDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="PatientFilterCriteriaDS" msprop:Generator_DataSetName="PatientFilterCriteriaDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tparPatientFilterCriteria" msprop:Generator_UserTableName="tparPatientFilterCriteria" msprop:Generator_RowDeletedName="tparPatientFilterCriteriaRowDeleted" msprop:Generator_RowChangedName="tparPatientFilterCriteriaRowChanged" msprop:Generator_RowClassName="tparPatientFilterCriteriaRow" msprop:Generator_RowChangingName="tparPatientFilterCriteriaRowChanging" msprop:Generator_RowEvArgName="tparPatientFilterCriteriaRowChangeEvent" msprop:Generator_RowEvHandlerName="tparPatientFilterCriteriaRowChangeEventHandler" msprop:Generator_TableClassName="tparPatientFilterCriteriaDataTable" msprop:Generator_TableVarName="tabletparPatientFilterCriteria" msprop:Generator_RowDeletingName="tparPatientFilterCriteriaRowDeleting" msprop:Generator_TablePropName="tparPatientFilterCriteria">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="PatientID" msprop:Generator_UserColumnName="PatientID" msprop:Generator_ColumnPropNameInRow="PatientID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnPatientID" msprop:Generator_ColumnPropNameInTable="PatientIDColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="Gender" msprop:Generator_UserColumnName="Gender" msprop:Generator_ColumnPropNameInRow="Gender" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnGender" msprop:Generator_ColumnPropNameInTable="GenderColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="HisLis" msdata:Caption="FirstName" msprop:Generator_UserColumnName="HisLis" msprop:Generator_ColumnPropNameInRow="HisLis" msprop:Generator_ColumnVarNameInTable="columnHisLis" msprop:Generator_ColumnPropNameInTable="HisLisColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="FirstName" msprop:Generator_UserColumnName="FirstName" msprop:Generator_ColumnPropNameInRow="FirstName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFirstName" msprop:Generator_ColumnPropNameInTable="FirstNameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="LastName" msprop:Generator_UserColumnName="LastName" msprop:Generator_ColumnPropNameInRow="LastName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnLastName" msprop:Generator_ColumnPropNameInTable="LastNameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="AgeFrom" msdata:Caption="DateOfBirth" msprop:Generator_UserColumnName="AgeFrom" msprop:Generator_ColumnPropNameInRow="AgeFrom" msprop:Generator_ColumnVarNameInTable="columnAgeFrom" msprop:Generator_ColumnPropNameInTable="AgeFromColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="AgeTo" msdata:Caption="Age" msprop:Generator_UserColumnName="AgeTo" msprop:Generator_ColumnPropNameInRow="AgeTo" msprop:Generator_ColumnVarNameInTable="columnAgeTo" msprop:Generator_ColumnPropNameInTable="AgeToColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="DobFrom" msdata:Caption="ExternalArrivalDate" msprop:Generator_UserColumnName="DobFrom" msprop:Generator_ColumnPropNameInRow="DobFrom" msprop:Generator_ColumnVarNameInTable="columnDobFrom" msprop:Generator_ColumnPropNameInTable="DobFromColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="DobTo" msdata:Caption="PerformedBy" msprop:Generator_UserColumnName="DobTo" msprop:Generator_ColumnPropNameInRow="DobTo" msprop:Generator_ColumnVarNameInTable="columnDobTo" msprop:Generator_ColumnPropNameInTable="DobToColumn" type="xs:dateTime" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

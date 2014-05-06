@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="MasterDataDS" targetNamespace="http://tempuri.org/MasterDataDS.xsd" xmlns:mstns="http://tempuri.org/MasterDataDS.xsd" xmlns="http://tempuri.org/MasterDataDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="MasterDataDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="MasterDataDS" msprop:Generator_DataSetName="MasterDataDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="tcfgMasterData" msprop:Generator_UserTableName="tcfgMasterData" msprop:Generator_RowDeletedName="tcfgMasterDataRowDeleted" msprop:Generator_RowChangedName="tcfgMasterDataRowChanged" msprop:Generator_RowClassName="tcfgMasterDataRow" msprop:Generator_RowChangingName="tcfgMasterDataRowChanging" msprop:Generator_RowEvArgName="tcfgMasterDataRowChangeEvent" msprop:Generator_RowEvHandlerName="tcfgMasterDataRowChangeEventHandler" msprop:Generator_TableClassName="tcfgMasterDataDataTable" msprop:Generator_TableVarName="tabletcfgMasterData" msprop:Generator_RowDeletingName="tcfgMasterDataRowDeleting" msprop:Generator_TablePropName="tcfgMasterData">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="SubTableID" msprop:Generator_UserColumnName="SubTableID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SubTableID" msprop:Generator_ColumnPropNameInTable="SubTableIDColumn" msprop:Generator_ColumnVarNameInTable="columnSubTableID" type="xs:string" minOccurs="0" />
+              <xs:element name="ItemID" msprop:Generator_UserColumnName="ItemID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnItemID" msprop:Generator_ColumnPropNameInTable="ItemIDColumn" msprop:Generator_ColumnPropNameInRow="ItemID" type="xs:string" minOccurs="0" />
+              <xs:element name="Status" msprop:Generator_UserColumnName="Status" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnStatus" msprop:Generator_ColumnPropNameInTable="StatusColumn" msprop:Generator_ColumnPropNameInRow="Status" type="xs:string" minOccurs="0" />
+              <xs:element name="FixedItemDesc" msprop:Generator_UserColumnName="FixedItemDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFixedItemDesc" msprop:Generator_ColumnPropNameInTable="FixedItemDescColumn" msprop:Generator_ColumnPropNameInRow="FixedItemDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="LangItemDesc" msprop:Generator_UserColumnName="LangItemDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnLangItemDesc" msprop:Generator_ColumnPropNameInTable="LangItemDescColumn" msprop:Generator_ColumnPropNameInRow="LangItemDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_ColumnPropNameInRow="TS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ItemIDDesc" msdata:ReadOnly="true" msdata:Expression="ItemID+'-' + FixedItemDesc" msprop:Generator_UserColumnName="ItemIDDesc" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnItemIDDesc" msprop:Generator_ColumnPropNameInTable="ItemIDDescColumn" msprop:Generator_ColumnPropNameInRow="ItemIDDesc" type="xs:string" minOccurs="0" />
+              <xs:element name="Code" msprop:Generator_UserColumnName="Code" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnCode" msprop:Generator_ColumnPropNameInTable="CodeColumn" msprop:Generator_ColumnPropNameInRow="Code" type="xs:string" minOccurs="0" />
+              <xs:element name="Description" msprop:Generator_UserColumnName="Description" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDescription" msprop:Generator_ColumnPropNameInTable="DescriptionColumn" msprop:Generator_ColumnPropNameInRow="Description" type="xs:string" minOccurs="0" />
+              <xs:element name="Position" msprop:Generator_UserColumnName="Position" msprop:Generator_ColumnPropNameInRow="Position" msprop:Generator_ColumnVarNameInTable="columnPosition" msprop:Generator_ColumnPropNameInTable="PositionColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

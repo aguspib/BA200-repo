@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{5D65020C-C2D7-4AC3-B557-223FC290E526}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>AX00Global</AssemblyName>
+    <MyType>Windows</MyType>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>AX00Global.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>AX00Global.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>AX00Global.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>AX00Global.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>AX00Global.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>AX00Global.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.5.452, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\PresentationCOM\required Libraries\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ApplicationLogManager\ApplicationLog.vb" />
+    <Compile Include="ApplicationLogManager\DAOBase.vb" />
+    <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />
+    <Compile Include="Extensions.vb" />
+    <Compile Include="FwAdjustments\ArmTO.vb" />
+    <Compile Include="FwAdjustments\FwAdjustmentsDataTO.vb" />
+    <Compile Include="FwAdjustments\FwAdjustmentsDelegate.vb" />
+    <Compile Include="FwAdjustments\PositionTO.vb" />
+    <Compile Include="PCInfoReader.vb" />
+    <Compile Include="FwScripts\AnalyzerFwScriptsTO.vb" />
+    <Compile Include="FwScripts\InstructionTO.vb" />
+    <Compile Include="FwScripts\ScreenTO.vb" />
+    <Compile Include="FwScripts\FwScriptsDataTO.vb" />
+    <Compile Include="FwScripts\FwScriptTO.vb" />
+    <Compile Include="PerformanceCounters\AXPerformanceCounters.vb" />
+    <Compile Include="PerformanceCounters\SystemCounter.vb" />
+    <Compile Include="TO\AllowedLIMSValuesTO.vb" />
+    <Compile Include="TO\FWUpdateRequestTO.vb" />
+    <Compile Include="TO\FWUpdateResponseTO.vb" />
+    <Compile Include="TO\ISE\ISEMonitorTO.vb" />
+    <Compile Include="TO\ISE\ISEResultsDataTO.vb" />
+    <Compile Include="TO\ISE\ISEErrorTO.vb" />
+    <Compile Include="TO\ISE\ISECommadTO.vb" />
+    <Compile Include="TO\ISE\ISEDallasSNTO.vb" />
+    <Compile Include="TO\ISE\ISEDallasPage01TO.vb" />
+    <Compile Include="TO\ISE\ISEDallasPage00TO.vb" />
+    <Compile Include="TO\DeletedCalibratorTO.vb" />
+    <Compile Include="TO\DeletedControlTO.vb" />
+    <Compile Include="TO\ISE\ISECalibratorResultTO.vb" />
+    <Compile Include="TO\ISE\ISEResultTO.vb" />
+    <Compile Include="TO\LimsExceptionTO.vb" />
+    <Compile Include="TO\LimsResultTO.vb" />
+    <Compile Include="TO\OpticCenterDataTO.vb" />
+    <Compile Include="TO\PhotometryDataTO.vb" />
+    <Compile Include="TO\PrepWithProblemTO.vb" />
+    <Compile Include="TO\StressDataTO.vb" />
+    <Compile Include="TO\UTILCommandTO.vb" />
+    <Compile Include="TO\XMLMessagesTO.vb" />
+    <Compile Include="Utilities.vb" />
+    <Compile Include="GlobalBase.vb" />
+    <Compile Include="GlobalEnumerates.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Security\Security.vb" />
+    <Compile Include="SystemInfo\SystemInfoManager.vb" />
+    <Compile Include="GlobalDataTO.vb" />
+    <Compile Include="TO\ApplicationInfoSessionTO.vb" />
+    <Compile Include="TO\ApplicationLogTO.vb" />
+    <Compile Include="TO\DeletedTestProgramingTO.vb" />
+    <Compile Include="TO\DeletedTestReagentsVolumeTO.vb" />
+    <Compile Include="GlobalConstants.vb" />
+    <Compile Include="TO\InstructionsParameterTO.vb" />
+    <Compile Include="TO\ParametersTO.vb" />
+    <Compile Include="TO\SystemInfoGeneratedTO.vb" />
+    <Compile Include="TO\TestPositionTO.vb" />
+    <Compile Include="TO\TubeSizeTO.vb" />
+    <Compile Include="TO\LimsWorkSessionTO.vb" />
+    <Compile Include="TO\NodeStructureGeneratedVO.vb" />
+    <Compile Include="TO\ReagentTO.vb" />
+    <Compile Include="TO\SpecialSolutionTO.vb" />
+    <Compile Include="TO\WSRequiredElementsTO.vb" />
+    <Compile Include="xmlHelper.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
+      <Project>{3B617EBF-0488-46BD-AB56-094F81D0E4C3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="OrderDetailsDS" targetNamespace="http://tempuri.org/OrderDetailsDS.xsd" xmlns:mstns="http://tempuri.org/OrderDetailsDS.xsd" xmlns="http://tempuri.org/OrderDetailsDS.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:annotation>
+    <xs:appinfo source="urn:schemas-microsoft-com:xml-msdatasource">
+      <DataSource DefaultConnectionIndex="0" FunctionsComponentName="QueriesTableAdapter" Modifier="AutoLayout, AnsiClass, Class, Public" SchemaSerializationMode="IncludeSchema" xmlns="urn:schemas-microsoft-com:xml-msdatasource">
+        <Connections>
+          <Connection AppSettingsObjectName="MySettings" AppSettingsPropertyName="Ax00_DEVConnectionString3" ConnectionStringObject="" IsAppSettingsProperty="true" Modifier="Assembly" Name="Ax00_DEVConnectionString3 (MySettings)" ParameterPrefix="@" PropertyReference="ApplicationSettings.Biosystems.Ax00.Types.My.MySettings.GlobalReference.Default.Ax00_DEVConnectionString3" Provider="System.Data.SqlClient" />
+        </Connections>
+        <Tables />
+        <Sources />
+      </DataSource>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element name="OrderDetailsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="OrderDetailsDS" msprop:Generator_DataSetName="OrderDetailsDS" msprop:EnableTableAdapterManager="true">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="OrderDetails" msprop:Generator_UserTableName="OrderDetails" msprop:Generator_RowDeletedName="OrderDetailsRowDeleted" msprop:Generator_RowChangedName="OrderDetailsRowChanged" msprop:Generator_RowClassName="OrderDetailsRow" msprop:Generator_RowChangingName="OrderDetailsRowChanging" msprop:Generator_RowEvArgName="OrderDetailsRowChangeEvent" msprop:Generator_RowEvHandlerName="OrderDetailsRowChangeEventHandler" msprop:Generator_TableClassName="OrderDetailsDataTable" msprop:Generator_TableVarName="tableOrderDetails" msprop:Generator_RowDeletingName="OrderDetailsRowDeleting" msprop:Generator_TablePropName="OrderDetails">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OrderID" msprop:Generator_UserColumnName="OrderID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnOrderID" msprop:Generator_ColumnPropNameInTable="OrderIDColumn" msprop:Generator_ColumnPropNameInRow="OrderID" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleClass" msprop:Generator_UserColumnName="SampleClass" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnSampleClass" msprop:Generator_ColumnPropNameInTable="SampleClassColumn" msprop:Generator_ColumnPropNameInRow="SampleClass" type="xs:string" minOccurs="0" />
+              <xs:element name="StatFlag" msprop:Generator_UserColumnName="StatFlag" msprop:Generator_ColumnVarNameInTable="columnStatFlag" msprop:Generator_ColumnPropNameInRow="StatFlag" msprop:Generator_ColumnPropNameInTable="StatFlagColumn" type="xs:boolean" minOccurs="0" />
+              <xs:element name="PatientID" msprop:Generator_UserColumnName="PatientID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnPatientID" msprop:Generator_ColumnPropNameInTable="PatientIDColumn" msprop:Generator_ColumnPropNameInRow="PatientID" type="xs:string" minOccurs="0" />
+              <xs:element name="FirstName" msprop:Generator_UserColumnName="FirstName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnFirstName" msprop:Generator_ColumnPropNameInTable="FirstNameColumn" msprop:Generator_ColumnPropNameInRow="FirstName" type="xs:string" minOccurs="0" />
+              <xs:element name="LastName" msprop:Generator_UserColumnName="LastName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnLastName" msprop:Generator_ColumnPropNameInTable="LastNameColumn" msprop:Generator_ColumnPropNameInRow="LastName" type="xs:string" minOccurs="0" />
+              <xs:element name="OrderDateTime" msprop:Generator_UserColumnName="OrderDateTime" msprop:Generator_ColumnVarNameInTable="columnOrderDateTime" msprop:Generator_ColumnPropNameInRow="OrderDateTime" msprop:Generator_ColumnPropNameInTable="OrderDateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="OrderStatus" msprop:Generator_UserColumnName="OrderStatus" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnOrderStatus" msprop:Generator_ColumnPropNameInTable="OrderStatusColumn" msprop:Generator_ColumnPropNameInRow="OrderStatus" type="xs:string" minOccurs="0" />
+              <xs:element name="ExternalOID" msprop:Generator_UserColumnName="ExternalOID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnExternalOID" msprop:Generator_ColumnPropNameInTable="ExternalOIDColumn" msprop:Generator_ColumnPropNameInRow="ExternalOID" type="xs:string" minOccurs="0" />
+              <xs:element name="ExternalDateTime" msprop:Generator_UserColumnName="ExternalDateTime" msprop:Generator_ColumnVarNameInTable="columnExternalDateTime" msprop:Generator_ColumnPropNameInRow="ExternalDateTime" msprop:Generator_ColumnPropNameInTable="ExternalDateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="ExportDateTime" msprop:Generator_UserColumnName="ExportDateTime" msprop:Generator_ColumnVarNameInTable="columnExportDateTime" msprop:Generator_ColumnPropNameInRow="ExportDateTime" msprop:Generator_ColumnPropNameInTable="ExportDateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="TS_User" msprop:Generator_UserColumnName="TS_User" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_ColumnPropNameInRow="TS_User" type="xs:string" minOccurs="0" />
+              <xs:element name="TS_DateTime" msprop:Generator_UserColumnName="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="SequenceNumber" msprop:Generator_UserColumnName="SequenceNumber" msprop:Generator_ColumnVarNameInTable="columnSequenceNumber" msprop:Generator_ColumnPropNameInRow="SequenceNumber" msprop:Generator_ColumnPropNameInTable="SequenceNumberColumn" type="xs:int" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="OrderDemographicsDetails" msprop:Generator_UserTableName="OrderDemographicsDetails" msprop:Generator_RowDeletedName="OrderDemographicsDetailsRowDeleted" msprop:Generator_RowChangedName="OrderDemographicsDetailsRowChanged" msprop:Generator_RowClassName="OrderDemographicsDetailsRow" msprop:Generator_RowChangingName="OrderDemographicsDetailsRowChanging" msprop:Generator_RowEvArgName="OrderDemographicsDetailsRowChangeEvent" msprop:Generator_RowEvHandlerName="OrderDemographicsDetailsRowChangeEventHandler" msprop:Generator_TableClassName="OrderDemographicsDetailsDataTable" msprop:Generator_TableVarName="tableOrderDemographicsDetails" msprop:Generator_RowDeletingName="OrderDemographicsDetailsRowDeleting" msprop:Generator_TablePropName="OrderDemographicsDetails">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OrderID" msprop:Generator_UserColumnName="OrderID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnOrderID" msprop:Generator_ColumnPropNameInTable="OrderIDColumn" msprop:Generator_ColumnPropNameInRow="OrderID" type="xs:string" minOccurs="0" />
+              <xs:element name="DemographicID" msprop:Generator_UserColumnName="DemographicID" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDemographicID" msprop:Generator_ColumnPropNameInTable="DemographicIDColumn" msprop:Generator_ColumnPropNameInRow="DemographicID" type="xs:string" minOccurs="0" />
+              <xs:element name="DemographicValue" msprop:Generator_UserColumnName="DemographicValue" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnDemographicValue" msprop:Generator_ColumnPropNameInTable="DemographicValueColumn" msprop:Generator_ColumnPropNameInRow="DemographicValue" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="OrderTestsDetails" msprop:Generator_UserTableName="OrderTestsDetails" msprop:Generator_RowDeletedName="OrderTestsDetailsRowDeleted" msprop:Generator_RowChangedName="OrderTestsDetailsRowChanged" msprop:Generator_RowClassName="OrderTestsDetailsRow" msprop:Generator_RowChangingName="OrderTestsDetailsRowChanging" msprop:Generator_RowEvArgName="OrderTestsDetailsRowChangeEvent" msprop:Generator_RowEvHandlerName="OrderTestsDetailsRowChangeEventHandler" msprop:Generator_TableClassName="OrderTestsDetailsDataTable" msprop:Generator_TableVarName="tableOrderTestsDetails" msprop:Generator_RowDeletingName="OrderTestsDetailsRowDeleting" msprop:Generator_TablePropName="OrderTestsDetails">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="OrderTestID" msdata:ReadOnly="true" msdata:AutoIncrement="true" msdata:AutoIncrementSeed="-1" msdata:AutoIncrementStep="-1" msprop:Generator_UserColumnName="OrderTestID" msprop:Generator_ColumnVarNameInTable="columnOrderTestID" msprop:Generator_ColumnPropNameInRow="OrderTestID" msprop:Generator_ColumnPropNameInTable="OrderTestIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TestType" msprop:Generator_UserColumnName="TestType" msprop:Generator_ColumnVarNameInTable="columnTestType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestType" msprop:Generator_ColumnPropNameInTable="TestTypeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="TestID" msprop:Generator_UserColumnName="TestID" msprop:Generator_ColumnVarNameInTable="columnTestID" msprop:Generator_ColumnPropNameInRow="TestID" msprop:Generator_ColumnPropNameInTable="TestIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TestName" msprop:Generator_UserColumnName="TestName" msprop:Generator_ColumnVarNameInTable="columnTestName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestName" msprop:Generator_ColumnPropNameInTable="TestNameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="SampleType" msprop:Generator_UserColumnName="SampleType" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleType" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="20" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="OrderTestStatus" msprop:Generator_UserColumnName="OrderTestStatus" msprop:Generator_ColumnVarNameInTable="columnOrderTestStatus" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="OrderTestStatus" msprop:Generator_ColumnPropNameInTable="OrderTestStatusColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TubeType" msprop:Generator_UserColumnName="TubeType" msprop:Generator_ColumnVarNameInTable="columnTubeType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TubeType" msprop:Generator_ColumnPropNameInTable="TubeTypeColumn" minOccurs="0">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:maxLength value="10" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="TubeTypeName" msprop:Generator_UserColumnName="TubeTypeName" msprop:nullValue="_empty" msprop:Generator_ColumnVarNameInTable="columnTubeTypeName" msprop:Generator_ColumnPropNameInTable="TubeTypeNameColumn" msprop:Generator_ColumnPropNameInRow="TubeTypeName" type="xs:string" minOccurs="0" />
+              <xs:element name="ReplicatesNumber" msprop:Generator_UserColumnName="ReplicatesNumber" msprop:Generator_ColumnVarNameInTable="columnReplicatesNumber" msprop:Generator_ColumnPropNameInRow="ReplicatesNumber" msprop:Generator_ColumnPropNameInTable="ReplicatesNumberColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TestProfileID" msprop:Generator_UserColumnName="TestProfileID" msprop:Generator_ColumnVarNameInTable="columnTestProfileID" msprop:Generator_ColumnPropNameInRow="TestProfileID" msprop:Generator_ColumnPropNameInTable="TestProfileIDColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="TestProfileName" msprop:Generator_UserColumnName="TestProfileName" msprop:Generator_ColumnVarNameInTable="columnTestProfileName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestProfileName" msprop:Generator_ColumnPropNameInTable="TestProfileNameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="TotalNumber" msprop:Generator_UserColumnName="TotalNumber" msprop:Generator_ColumnVarNameInTable="columnTotalNumber" msprop:Generator_ColumnPropNameInRow="TotalNumber" msprop:Generator_ColumnPropNameInTable="TotalNumberColumn" type="xs:int" minOccurs="0" />
+              <xs:element name="ListOfNames" msprop:Generator_UserColumnName="ListOfNames" msprop:Generator_ColumnVarNameInTable="columnListOfNames" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ListOfNames" msprop:Generator_ColumnPropNameInTable="ListOfNamesColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="CalibratorType" msprop:Generator_UserColumnName="CalibratorType" msprop:Generator_ColumnVarNameInTable="columnCalibratorType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="CalibratorType" msprop:Generator_ColumnPropNameInTable="CalibratorTypeColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="CalibratorFactor" msprop:Generator_UserColumnName="CalibratorFactor" msprop:Generator_ColumnVarNameInTable="columnCalibratorFactor" msprop:Generator_ColumnPropNameInRow="CalibratorFactor" msprop:Generator_ColumnPropNameInTable="CalibratorFactorColumn" type="xs:float" minOccurs="0" />
+              <xs:element name="CalibratorName" msprop:Generator_UserColumnName="CalibratorName" msprop:Generator_ColumnVarNameInTable="columnCalibratorName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="CalibratorName" msprop:Generator_ColumnPropNameInTable="CalibratorNameColumn" type="xs:string" minOccurs="0" />
+              <xs:element name="AlternativeSampleType" msdata:ReadOnly="true" msprop:Generator_UserColumnName="AlternativeSampleType" msprop:Generator_ColumnVarNameInTable="columnAlternativeSampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AlternativeSampleType" msprop:Generator_ColumnPropNameInTable="AlternativeSampleTypeColumn" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
