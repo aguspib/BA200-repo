@@ -24,10 +24,14 @@
     <GenerateManifests>false</GenerateManifests>
     <SignManifests>false</SignManifests>
     <ApplicationIcon>AboutBA4SRV.ico</ApplicationIcon>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
     <TargetZone>LocalIntranet</TargetZone>
     <TargetFrameworkProfile />
     <PublishUrl>C:\Ax00 SetupFiles\</PublishUrl>
