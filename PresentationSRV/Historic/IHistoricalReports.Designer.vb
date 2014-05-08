@@ -422,7 +422,6 @@ Partial Class IHistoricalReports
         Me.GridView1.OptionsView.EnableAppearanceEvenRow = True
         Me.GridView1.OptionsView.EnableAppearanceOddRow = True
         Me.GridView1.OptionsView.ShowGroupPanel = False
-        Me.GridView1.PaintStyleName = "WindowsXP"
         '
         'BsMessagesPanel
         '
@@ -492,7 +491,7 @@ Partial Class IHistoricalReports
         Me.Controls.Add(Me.SearchGroupBox)
         Me.Controls.Add(Me.BsTitleLabel)
         Me.Cursor = System.Windows.Forms.Cursors.Default
-        Me.LookAndFeel.SkinName = "Blue"
+        Me.LookAndFeel.SkinName = "Seven Classic"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "IHistoricalReports"
         Me.Text = "HistoricalReports"
