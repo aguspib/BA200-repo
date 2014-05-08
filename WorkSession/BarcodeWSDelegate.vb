@@ -1864,16 +1864,16 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     'TR 10/04/2014 BT#1583 -'Validate Expiration Date
-                                    If (Not myHasError) Then
-                                        Dim myExpirationDate As Date
-                                        'Add to year expiration the 2000 to avoid error of 1900
-                                        myYearExpedition = "20" & myYearExpedition
-                                        Date.TryParse("01" & "-" & myMonthExpedition & "-" & myYearExpedition, myExpirationDate)
-                                        If myExpirationDate = Date.MinValue Then
-                                            myHasError = True
-                                            myErrMsg = "Invalid Expiration Date"
-                                        End If
-                                    End If
+                                    ' If (Not myHasError) Then
+                                    'Dim myExpirationDate As Date
+                                    ''Add to year expiration the 2000 to avoid error of 1900
+                                    'myYearExpedition = "20" & myYearExpedition
+                                    'Date.TryParse("01" & "-" & myMonthExpedition & "-" & myYearExpedition, myExpirationDate)
+                                    'If myExpirationDate = Date.MinValue Then
+                                    '                                    myHasError = True
+                                    'myErrMsg = "Invalid Expiration Date"
+                                    'End If
+                                    'End If
                                     'TR 10/04/2014 BT#1583 -END
 
                                     'Get BOTTLE NUMBER field

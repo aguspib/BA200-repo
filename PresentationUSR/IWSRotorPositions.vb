@@ -3038,8 +3038,14 @@ Public Class IWSRotorPositions
                                     End If
                                     'TR 10/04/2014 BT#1583
 
-                                    'Set the lot number to shown on report
-                                    row("LotNumber") = myReagent.First().LotNumber
+                                    'TR 06/05/2014 -Validate if LotNumber is a valid number to show on report
+                                    If IsNumeric(myReagent.First().LotNumber) AndAlso CInt(myReagent.First().LotNumber) > 0 Then
+                                        'Set the lot number to shown on report
+                                        row("LotNumber") = myReagent.First().LotNumber
+                                    Else
+                                        row("LotNumber") = ""
+                                    End If
+                                    'TR 06/05/2014 -END
                                 End If
                             End If
                             'TR 28/03/2014 #1562 -END
