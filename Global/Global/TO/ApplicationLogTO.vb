@@ -10,6 +10,7 @@ Namespace Biosystems.Ax00.Global.TO
         Private LogMessageAttribute As String
         Private LogModuleAttribute As String
         Private LogTypeAttribute As EventLogEntryType
+        Private LogThreadIdAttribute As Integer
 #End Region
 
 #Region "Properties"
@@ -74,6 +75,21 @@ Namespace Biosystems.Ax00.Global.TO
             End Set
         End Property
 
+        ''' <summary>
+        ''' Use to indicate the current Thread Id 
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Property LogThreadId() As Integer
+            Get
+                Return LogThreadIdAttribute
+            End Get
+            Set(ByVal value As Integer)
+                LogThreadIdAttribute = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Constructor"
@@ -83,10 +99,7 @@ Namespace Biosystems.Ax00.Global.TO
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub New()
-            LogDateAttribute = DateTime.MinValue
-            LogMessageAttribute = ""
-            LogModuleAttribute = ""
-            LogTypeAttribute = EventLogEntryType.Information
+            Me.New(DateTime.MinValue, "", "", EventLogEntryType.Information)
         End Sub
 
         ''' <summary>
@@ -102,6 +115,7 @@ Namespace Biosystems.Ax00.Global.TO
             LogMessageAttribute = MyLogMessage
             LogModuleAttribute = MyLogModule
             LogTypeAttribute = MyLogType
+            LogThreadIdAttribute = Threading.Thread.CurrentThread.ManagedThreadId
         End Sub
 
 #End Region
