@@ -635,6 +635,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 11/02/2014 - BT #1506
+        ''' Modified by: SA 15/05/2014 - BT #1628 ==> Changed the call to function GetOpenDBTransaction for a call to function GetOpenDBConnection 
+        '''                                           (a DB Transaction is managed for each block of 100 updates, then the first one is not needed)
         ''' </remarks>
         Public Function DecryptDataAfterRSAT(ByVal pPatientsToUpdateDS As PatientsDS) As GlobalDataTO
             Dim openDBConn As Boolean = False
@@ -647,7 +649,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim maxInserts As Integer = 100
                 Dim cmdText As New StringBuilder()
 
-                myGlobalDataTO = GetOpenDBTransaction(dbConnection)
+                myGlobalDataTO = GetOpenDBConnection(dbConnection)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
