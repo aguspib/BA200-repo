@@ -516,56 +516,65 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <summary>
         ''' Compares the Application's version to the SAT Report's version
         ''' </summary>
-        ''' <param name="pAppVersion"></param>
-        ''' <param name="pSATReportVersion"></param>
-        ''' <returns></returns>
-        ''' <remarks>Created by SG 13/10/10</remarks>
+        ''' <param name="pAppVersion">String containing the ApplicationVersion returned for function GetSoftwareVersion composed of fields
+        '''                           Major.Minor.Build. Revision field is never included</param>
+        ''' <param name="pSATReportVersion">String containing the ApplicationVersion in file Version.txt. This string will contain the Revision
+        '''                                 field (Major.Minor.Build.Revision) but only when it has a value greater than zero</param>
+        ''' <returns>GlobalDataTO containing an String value indicating the result of the ApplicationVersion comparison: 
+        '''           ** SAT and APP Version are equal OR 
+        '''           ** SAT Version is greater than APP Version OR
+        '''           ** SAT Version is less than APP Version
+        '''          If the comparison cannot be done, a MISSING_DATA Error is returned
+        ''' </returns>
+        ''' <remarks>
+        ''' Created by:  SG 13/10/2010
+        ''' Modified by: SA 15/05/2014 - BT #1617 ==> When SAT Version contains the Revision field, ignore it when comparing the SAT Version 
+        '''                                           with the current ApplicationVersion
+        ''' </remarks>
         Public Function CompareSATandAPPversions(ByVal pAppVersion As String, ByVal pSATReportVersion As String) As GlobalDataTO
-
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
 
             Try
                 Dim myAppVersion As String() = pAppVersion.Split(CChar("."))
                 Dim mySATVersion As String() = pSATReportVersion.Split(CChar("."))
 
-                If myAppVersion.Length > 0 And mySATVersion.Length > 0 And myAppVersion.Length = mySATVersion.Length Then
-                    For v As Integer = 0 To myAppVersion.Length - 1
-                        Dim app As Integer = CInt(myAppVersion(v))
-                        Dim sat As Integer = CInt(mySATVersion(v))
-                        If sat <> app Then
-                            If sat > app Then
-                                myGlobal.SetDatos = GlobalEnumerates.SATReportVersionComparison.UpperThanAPP
-                            ElseIf sat < app Then
-                                myGlobal.SetDatos = GlobalEnumerates.SATReportVersionComparison.LowerThanAPP
+                If (myAppVersion.Length > 0 AndAlso mySATVersion.Length > 0) Then
+                    If (myAppVersion.Length = mySATVersion.Length OrElse myAppVersion.Length = (mySATVersion.Length - 1)) Then
+                        Dim app As Integer = 0
+                        Dim sat As Integer = 0
+
+                        For v As Integer = 0 To myAppVersion.Length - 1
+                            app = CInt(myAppVersion(v))
+                            sat = CInt(mySATVersion(v))
+
+                            If (sat <> app) Then
+                                If (sat > app) Then
+                                    myGlobal.SetDatos = GlobalEnumerates.SATReportVersionComparison.UpperThanAPP
+                                ElseIf (sat < app) Then
+                                    myGlobal.SetDatos = GlobalEnumerates.SATReportVersionComparison.LowerThanAPP
+                                End If
+                                Exit For
                             End If
-                            Exit For
-                        End If
+                        Next
 
-                        If myGlobal.SetDatos IsNot Nothing Then
-                            Exit For
-                        End If
-                    Next
-
-                    If myGlobal.SetDatos Is Nothing Then
-                        myGlobal.SetDatos = GlobalEnumerates.SATReportVersionComparison.EqualsAPP
+                        If (myGlobal.SetDatos Is Nothing) Then myGlobal.SetDatos = GlobalEnumerates.SATReportVersionComparison.EqualsAPP
+                    Else
+                        myGlobal.HasError = True
+                        myGlobal.ErrorCode = "MISSING_DATA"
                     End If
                 Else
                     myGlobal.HasError = True
                     myGlobal.ErrorCode = "MISSING_DATA"
                 End If
-
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
             End Try
-
             Return myGlobal
-
         End Function
 
         ''' <summary>
@@ -603,7 +612,5 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myGlobal
 
         End Function
-
     End Class
-
 End Namespace
