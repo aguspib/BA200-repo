@@ -830,10 +830,13 @@ Public Class ISATReportLoad
     ''' 
     ''' </summary>
     ''' <remarks>
-    ''' Created by  : SG 08/10/2010
-    ''' Modified by : XB 07/05/2013 - Release LIS channels in order to recreate LIS channel according with the settings configured on ReportSAT just loaded
-    '''               TR 24/05/2013 - Validate the LIS trace level. If the value saved on the DB is the same the machine has configure on the registry.
-    '''               XB 17/06/2013 - No restore points are deleted at v2.0. In the future we design a screen to clean them
+    ''' Created by: SG 08/10/2010
+    ''' Modified by: XB 07/05/2013 - Release LIS channels in order to recreate LIS channel according with the settings configured on ReportSAT just loaded
+    '''              TR 24/05/2013 - Validate the LIS trace level. If the value saved on the DB is the same the machine has configure on the registry.
+    '''              XB 17/06/2013 - No restore points are deleted at v2.0. In the future we design a screen to clean them
+    '''              SA 15/05/2014 - BT #1617 ==> When Property RestorePointMode = TRUE, the full path of the Restore Point file has an error (a double slash) 
+    '''                                           and due to that, it is not processed. The error has been fixed to recover functionality of this screen in mode
+    '''                                           Restore Point
     ''' </remarks>
     Private Sub bsOKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsOKButton.Click
         ' XBC 04/07/2012 - Indicate Load Rsat START on Application LOG.
@@ -900,14 +903,15 @@ Public Class ISATReportLoad
                     myRestoreDataPath = "\RestorePoints\"
                 End If
 
-                Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                'BT #1617 - The path is wrong. The "\" added before myRestoreDataPath produces a double slash due to the value in myRestoreDataPath contains a slash on the left
+                Dim myRestoringFile As String = Application.StartupPath & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                'Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
 
                 myGlobal = LoadSATReport(myRestoringFile)
                 'END AG 16/11/2010
 
                 If myGlobal.HasError Then
                     Cursor = Cursors.Default
-                    'ShowMessage(Me.Name & ".bsOKButton_Click", GlobalEnumerates.Messages.SAT_LOAD_RESTORE_POINT_ERROR.ToString)
                     ShowMessage(myGlobal.ErrorCode, myGlobal.ErrorMessage)
                 Else ' If process finished successfully then delete the restore point!
                     ' XB - 17/06/2013 - No restore points are deleted at v2.0. In the future we design a screen to clean them

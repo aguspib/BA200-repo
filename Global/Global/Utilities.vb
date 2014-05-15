@@ -739,13 +739,13 @@ Namespace Biosystems.Ax00.Global
 
             Try
                 'Verify in which type of process this function has been called: SAT Report Generation or Application Update
-                If (pActionProcess = GlobalEnumerates.SATReportActions.SAT_REPORT) Then
+                If (pActionProcess = GlobalEnumerates.SATReportActions.SAT_UPDATE) Then
+                    'Function has been called for Application Update ==> The SW Version is the one informed in pAppVersion parameter
+                    myGlobal.SetDatos = pAppVersion
+                Else
                     'Function has been called for SAT Report Generation ==> The SW Version is obtained from the DLL
                     Dim myUtil As New Utilities
                     myGlobal = myUtil.GetSoftwareVersion(False, pForRSATFromServiceSW)
-                Else
-                    'Function has been called for Application Update ==> The SW Version is the one informed in pAppVersion parameter
-                    myGlobal.SetDatos = pAppVersion
                 End If
 
                 'Write the SW Version in the Version.txt file
