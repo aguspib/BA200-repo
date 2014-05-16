@@ -180,6 +180,7 @@ Public Class ISATReportLoad
 
                     'BT #1631 - Return REPORT_SAT_VERSION_IS_HIGHER as ErrorCode instead of as ErrorMessage
                     myGlobal.ErrorCode = GlobalEnumerates.Messages.REPORT_SAT_VERSION_IS_HIGHER.ToString()
+
                     'myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                     'myGlobal.ErrorMessage = GlobalEnumerates.Messages.REPORT_SAT_VERSION_IS_HIGHER.ToString()
                     Return myGlobal
