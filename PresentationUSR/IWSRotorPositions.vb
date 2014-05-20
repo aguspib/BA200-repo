@@ -359,9 +359,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub ReleaseElement()
         Try
-            isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
-            sourceNode = Nothing
-            RotorsTabs = Nothing
+                       isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
             ' XB 17/01/2014
             For Each myControl As Control In Me.SamplesTab.Controls
@@ -405,66 +403,43 @@ Public Class IWSRotorPositions
             End If
 
             'AG 01/08/2012 - add more controls
+
             listReqElements = Nothing
             AllTubeSizeList = Nothing
             myRotorContentByPositionDSForm = Nothing
             mySelectedElementInfo = Nothing
             myPosControlList = Nothing
             sourceNode = Nothing
+            RotorsTabs = Nothing
             'mdiAnalyzerCopy = Nothing 'not this variable
-            bsElementsTreeView = Nothing
+
             ReagentPictureBox.Image = Nothing
-            ReagentPictureBox = Nothing
             ReagentsTab.Appearance.PageClient.Image = Nothing
             SamplesTab.Appearance.PageClient.Image = Nothing
-            RotorsTabs = Nothing
             bsCalibratorPictureBox.Image = Nothing
-            bsCalibratorPictureBox = Nothing
             bsControlPictureBox.Image = Nothing
-            bsControlPictureBox = Nothing
             bsStatPictureBox.Image = Nothing
-            bsStatPictureBox = Nothing
             bsRoutinePictureBox.Image = Nothing
-            bsRoutinePictureBox = Nothing
             bsDilutedPictureBox.Image = Nothing
-            bsDilutedPictureBox = Nothing
             bsTubeAddSolPictureBox.Image = Nothing
-            bsTubeAddSolPictureBox = Nothing
             AdditionalSolPictureBox.Image = Nothing
-            AdditionalSolPictureBox = Nothing
             bsDepletedPictureBox.Image = Nothing
-            bsDepletedPictureBox = Nothing
             LowVolPictureBox.Image = Nothing
-            LowVolPictureBox = Nothing
             NoInUsePictureBox.Image = Nothing
-            NoInUsePictureBox = Nothing
             LegendBarCodeErrorRGImage.Image = Nothing
-            LegendBarCodeErrorRGImage = Nothing
             LegendUnknownImage.Image = Nothing
-            LegendUnknownImage = Nothing
             SelectedPictureBox.Image = Nothing
-            SelectedPictureBox = Nothing
             bsReagentsMoveFirstPositionButton.Image = Nothing
-            bsReagentsMoveFirstPositionButton = Nothing
             bsReagentsDecreaseButton.Image = Nothing
-            bsReagentsDecreaseButton = Nothing
             bsReagentsIncreaseButton.Image = Nothing
             bsReagentsMoveLastPositionButton.Image = Nothing
-            bsReagentsMoveLastPositionButton = Nothing
             bsReagentsRefillPosButton.Image = Nothing
-            bsReagentsRefillPosButton = Nothing
             bsReagentsCheckVolumePosButton.Image = Nothing
-            bsReagentsCheckVolumePosButton = Nothing
             bsReagentsDeletePosButton.Image = Nothing
-            bsReagentsDeletePosButton = Nothing
             bsSamplesMoveFirstPositionButton.Image = Nothing
-            bsSamplesMoveFirstPositionButton = Nothing
             bsSamplesDecreaseButton.Image = Nothing
-            bsSamplesDecreaseButton = Nothing
             bsSamplesIncreaseButton.Image = Nothing
-            bsSamplesIncreaseButton = Nothing
             bsSamplesMoveLastPositionButton.Image = Nothing
-            bsSamplesMoveLastPositionButton = Nothing
 
             'AG 10/09/2013 - Do not release the buttons in the bottom bar (causes a ugly visual effect)
             'So comment these lines
@@ -506,7 +481,141 @@ Public Class IWSRotorPositions
             autoWSCreationTimer = Nothing
             'AG 02/01/2014 - BT #1433
 
-            GC.Collect()
+            '--- Detach variable defined using WithEvents ---
+            bsScreenTimer = Nothing
+            bsScreenToolTips = Nothing
+            bsErrorProvider1 = Nothing
+            FunctionalityArea = Nothing
+            BarcodeWarningButton = Nothing
+            bsAcceptButton = Nothing
+            bsScanningButton = Nothing
+            bsCheckRotorVolumeButton = Nothing
+            bsWarningsButton = Nothing
+            bsPrintButton = Nothing
+            bsSaveVRotorButton = Nothing
+            bsLoadVRotorButton = Nothing
+            bsResetRotorButton = Nothing
+            bsReagentAutoPosButton = Nothing
+            bsSamplesAutoPosButton = Nothing
+            RotorsTabs = Nothing
+            SamplesTab = Nothing
+            PanelControl1 = Nothing
+            PanelControl2 = Nothing
+            bsSamplesLegendGroupBox = Nothing
+            bsTubeAddSolLabel = Nothing
+            bsTubeAddSolPictureBox = Nothing
+            bsLegendDilutedLabel = Nothing
+            bsDilutedPictureBox = Nothing
+            bsLegendRoutineLabel = Nothing
+            bsLegendStatLabel = Nothing
+            bsLegendControlsLabel = Nothing
+            bsLegendCalibratorsLabel = Nothing
+            bsRoutinePictureBox = Nothing
+            bsStatPictureBox = Nothing
+            bsControlPictureBox = Nothing
+            bsCalibratorPictureBox = Nothing
+            bsSamplesLegendLabel = Nothing
+            bsSamplesPositionInfoGroupBox = Nothing
+            SamplesStatusTextBox = Nothing
+            bsSamplesStatusLabel = Nothing
+            bsSamplesPositionInfoLabel = Nothing
+            bsSamplesDeletePosButton = Nothing
+            bsSamplesMoveLastPositionButton = Nothing
+            bsSamplesRefillPosButton = Nothing
+            bsSamplesIncreaseButton = Nothing
+            bsTubeSizeComboBox = Nothing
+            bsSamplesBarcodeTextBox = Nothing
+            bsSamplesDecreaseButton = Nothing
+            bsDiluteStatusTextBox = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsSamplesMoveFirstPositionButton = Nothing
+            bsSampleNumberTextBox = Nothing
+            bsSampleIDTextBox = Nothing
+            bsSampleContentTextBox = Nothing
+            bsSampleRingNumTextBox = Nothing
+            bsSampleCellTextBox = Nothing
+            bsTubeSizeLabel = Nothing
+            bsSamplesBarcodeLabel = Nothing
+            bsDiluteStatusLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsSamplesNumberLabel = Nothing
+            bsSampleIDLabel = Nothing
+            bsSamplesContentLabel = Nothing
+            bsSamplesRingNumLabel = Nothing
+            bsSamplesCellLabel = Nothing
+            ReagentsTab = Nothing
+            PanelControl6 = Nothing
+            PanelControl7 = Nothing
+            bsReagentsLegendGroupBox = Nothing
+            LegReagentSelLabel = Nothing
+            SelectedPictureBox = Nothing
+            LegendUnknownImage = Nothing
+            bsUnknownLabel = Nothing
+            LegendBarCodeErrorRGImage = Nothing
+            bsBarcodeErrorRGLabel = Nothing
+            LowVolPictureBox = Nothing
+            ReagentPictureBox = Nothing
+            bsLegReagLowVolLabel = Nothing
+            bsLegReagentLabel = Nothing
+            bsLegReagAdditionalSol = Nothing
+            bsLegReagNoInUseLabel = Nothing
+            bsLegReagDepleteLabel = Nothing
+            AdditionalSolPictureBox = Nothing
+            NoInUsePictureBox = Nothing
+            bsDepletedPictureBox = Nothing
+            bsReagentsLegendLabel = Nothing
+            bsReagentsPositionInfoGroupBox = Nothing
+            bsReagStatusLabel = Nothing
+            ReagStatusTextBox = Nothing
+            bsReagentsCellTextBox = Nothing
+            bsReagentsCellLabel = Nothing
+            bsReagentsDeletePosButton = Nothing
+            bsTeststLeftTextBox = Nothing
+            bsReagentsRefillPosButton = Nothing
+            bsCurrentVolTextBox = Nothing
+            bsReagentsCheckVolumePosButton = Nothing
+            bsTestsLeftLabel = Nothing
+            bsCurrentVolLabel = Nothing
+            bsBottleSizeComboBox = Nothing
+            bsBottleSizeLabel = Nothing
+            bsExpirationDateTextBox = Nothing
+            bsReagentsPositionInfoLabel = Nothing
+            bsReagentsMoveLastPositionButton = Nothing
+            bsReagentsBarCodeTextBox = Nothing
+            bsTestNameTextBox = Nothing
+            bsReagentsIncreaseButton = Nothing
+            bsReagentsNumberTextBox = Nothing
+            bsReagentsDecreaseButton = Nothing
+            bsReagentNameTextBox = Nothing
+            bsReagentsMoveFirstPositionButton = Nothing
+            bsReagentsContentTextBox = Nothing
+            bsReagentsRingNumTextBox = Nothing
+            bsExpirationDateLabel = Nothing
+            bsReagentsBarCodeLabel = Nothing
+            bsTestNameLabel = Nothing
+            bsReagentsNumberLabel = Nothing
+            bsReagentNameLabel = Nothing
+            bsReagentsContentLabel = Nothing
+            bsReagentsRingNumLabel = Nothing
+            BsGroupBox1 = Nothing
+            BsRefresh = Nothing
+            BsLabel3 = Nothing
+            BsLabel2 = Nothing
+            BsLabel1 = Nothing
+            BsRotationAngle = Nothing
+            BsLeft = Nothing
+            BsRotate2 = Nothing
+            BsTop1 = Nothing
+            BsRotate1 = Nothing
+            BsLeft2 = Nothing
+            BsTop2 = Nothing
+            BsLeft1 = Nothing
+            BsTop = Nothing
+            bsElementsTreeView = Nothing
+            bsRequiredElementsLabel = Nothing
+            '------------------------------------------------
+
+            'GC.Collect()
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
@@ -8682,7 +8791,7 @@ Public Class IWSRotorPositions
                 isClosingFlag = True
                 IAx00MainMDI.StopMarqueeProgressBar()
 
-                ReleaseElement() 'AG 09/07/2013
+                'ReleaseElement() 'AG 09/07/2013
                 'RH 09/02/2011
                 If (Not Me.Tag Is Nothing) Then
                     'A PerformClick() method was executed

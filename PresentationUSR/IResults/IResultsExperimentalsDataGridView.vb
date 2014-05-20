@@ -29,6 +29,8 @@ Imports System.ComponentModel
 
 Partial Class IResults
 
+    Dim CollapseColumnExperimentals As New bsDataGridViewCollapseColumn
+
 #Region "ExperimentalsDataGridView Methods"
     ''' <summary>
     ''' Initialize the DataGridView for Experimental Results
@@ -45,12 +47,13 @@ Partial Class IResults
 
             bsExperimentalsDataGridView.Columns.Clear()
 
-            Dim CollapseColumn As New bsDataGridViewCollapseColumn
-            With CollapseColumn
+            'Dim CollapseColumn As New bsDataGridViewCollapseColumn
+            With CollapseColumnExperimentals
                 .Name = CollapseColName
                 AddHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
             End With
-            bsExperimentalsDataGridView.Columns.Add(CollapseColumn)
+            bsExperimentalsDataGridView.Columns.Add(CollapseColumnExperimentals)
+
 
             'Dim OkColumn As New DataGridViewCheckBoxColumn
             Dim OkColumn As New DataGridViewImageColumn
