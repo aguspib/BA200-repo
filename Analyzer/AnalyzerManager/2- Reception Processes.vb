@@ -4736,8 +4736,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Processes the ISE procedures
         ''' </summary>
         ''' <remarks>
-        ''' Created by SGM 07/03/2012
+        ''' Created by  SGM 07/03/2012
         ''' Modified by SGM 16/01/2013 - Bug #1108
+        '''              XB 20/05/2014 - Add protections #1614
         ''' </remarks>
         Private Function ProcessISEManagerProcedures() As GlobalDataTO
 
@@ -4754,8 +4755,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Select Case MyClass.ISE_Manager.CurrentProcedure
 
                         Case ISEManager.ISEProcedures.Test
-                            If MyClass.ISE_Manager.CurrentCommandTO.TestType = ISECycles.URINE1 Then
-                                MyClass.ISE_Manager.CurrentCommandTO = New ISECommandTO(ISECycles.URINE2)
+                            If MyClass.ISE_Manager.CurrentCommandTO IsNot Nothing Then      ' #1614
+                                If MyClass.ISE_Manager.CurrentCommandTO.TestType = ISECycles.URINE1 Then
+                                    MyClass.ISE_Manager.CurrentCommandTO = New ISECommandTO(ISECycles.URINE2)
+                                End If
                             End If
 
                         Case ISEManager.ISEProcedures.SingleReadCommand
