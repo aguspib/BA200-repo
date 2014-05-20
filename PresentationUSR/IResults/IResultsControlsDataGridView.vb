@@ -29,6 +29,8 @@ Imports DevExpress.Utils
 
 Partial Class IResults
 
+    Dim CollapseColumnControls As New bsDataGridViewCollapseColumn
+
 #Region "ControlsDataGridView Methods"
     ''' <summary>
     ''' 
@@ -45,12 +47,12 @@ Partial Class IResults
 
             bsControlsDataGridView.Columns.Clear()
 
-            Dim CollapseColumn As New bsDataGridViewCollapseColumn
-            With CollapseColumn
+            'Dim CollapseColumn As New bsDataGridViewCollapseColumn
+            With CollapseColumnControls
                 .Name = CollapseColName
                 AddHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
             End With
-            bsControlsDataGridView.Columns.Add(CollapseColumn)
+            bsControlsDataGridView.Columns.Add(CollapseColumnControls)
 
             'dl 23/09/2011
             'Dim OkColumn As New DataGridViewCheckBoxColumn

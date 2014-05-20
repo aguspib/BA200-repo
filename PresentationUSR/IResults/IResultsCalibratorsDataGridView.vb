@@ -30,6 +30,8 @@ Imports System.Runtime.InteropServices
 
 Partial Class IResults
 
+    Dim CollapseColumnCalibrators As New bsDataGridViewCollapseColumn
+
 #Region "CalibratorsDataGridView Methods"
     ''' <summary>
     ''' 
@@ -55,12 +57,12 @@ Partial Class IResults
             'CalibratorsDataGridView.EditingControl.Padding = New Padding(3)
             'CalibratorsDataGridView.EditingControl.PreProcessMessage()
 
-            Dim CollapseColumn As New bsDataGridViewCollapseColumn
-            With CollapseColumn
+            'Dim CollapseColumn As New bsDataGridViewCollapseColumn
+            With CollapseColumnCalibrators
                 .Name = CollapseColName
                 AddHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
             End With
-            bsCalibratorsDataGridView.Columns.Add(CollapseColumn)
+            bsCalibratorsDataGridView.Columns.Add(CollapseColumnCalibrators)
 
             'dl 23/09/2011
             'Dim OkColumn As New DataGridViewCheckBoxColumn
