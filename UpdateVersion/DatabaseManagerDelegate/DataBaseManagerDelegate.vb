@@ -41,9 +41,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 'myLogAcciones.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
 
                 If DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then
-                    'BT #1632 - Before start the update process, execute the temporary script used to change the structure of 
-                    '           ApplicationLog Table(tfmwApplicationLog)
-                    AddThreadIDColToApplicationLogTable()
+                    'BT #1632 - Before start the update process, execute temporary scripts used to change the structure of tables that have to 
+                    '           be already updated when the UpdateVersion process starts (f.i. ApplicationLog Table --> tfmwApplicationLog)
+                    ExecuteScriptsBeforeUpdate()
 
                     initialTimeUpdate = Now 'Set the start time 
                     Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
@@ -478,14 +478,15 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #Region "TEMPORARY FUNCTIONS TO UPDATE STRUCTURE FOR v3.0.1"
         ''' <summary>
-        ''' Execute scripts to add new column ThreadID to table tfmwApplicationLog
+        ''' Execute scripts that cannot be included in the UpdateVersion process (tables that have to be already updated when the UpdateVersion process starts):
+        ''' ** Script to add new column ThreadID to table tfmwApplicationLog
         ''' </summary>
         ''' <returns>Boolean value indicating if the scripts execution finished successfully (True) or with error (False)</returns>
         ''' <remarks>
         ''' Created by: SA 16/05/2014 - BT #1632 ==> This change cannot be included in the normal Update Version process, due to it changes the structure of 
         '''                                          Application Log table, and several functions write in the Log before the process update the table
         ''' </remarks>
-        Public Function AddThreadIDColToApplicationLogTable() As Boolean
+        Public Function ExecuteScriptsBeforeUpdate() As Boolean
             Dim sqlExecResult As Boolean = True
             Try
                 Dim myDBManager As New DBManager
@@ -494,7 +495,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Catch ex As Exception
                 sqlExecResult = False
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManagerDelegate.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManagerDelegate.ExecuteScriptsBeforeUpdate", EventLogEntryType.Error, False)
             End Try
             Return sqlExecResult
         End Function
