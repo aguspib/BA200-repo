@@ -154,6 +154,8 @@ Public Class ISATReportLoad
     ''' <returns></returns>
     ''' <remarks>
     ''' Created by: SG 08/10/2010
+    ''' Modified by: SA 16/05/2014 - BT #1631 ==> When pVersionComparison indicates that SAT Report Version is higher than Application Version,
+    '''                                           return REPORT_SAT_VERSION_IS_HIGHER as ErrorCode instead of as ErrorMessage
     ''' </remarks>
     Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
@@ -175,8 +177,12 @@ Public Class ISATReportLoad
                     'ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.REPORT_SAT_VERSION_IS_HIGHER.ToString)
                     myGlobal.HasError = True
                     myGlobal.SetDatos = Nothing
-                    myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                    myGlobal.ErrorMessage = GlobalEnumerates.Messages.REPORT_SAT_VERSION_IS_HIGHER.ToString()
+
+                    'BT #1631 - Return REPORT_SAT_VERSION_IS_HIGHER as ErrorCode instead of as ErrorMessage
+                    myGlobal.ErrorCode = GlobalEnumerates.Messages.REPORT_SAT_VERSION_IS_HIGHER.ToString()
+
+                    'myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                    'myGlobal.ErrorMessage = GlobalEnumerates.Messages.REPORT_SAT_VERSION_IS_HIGHER.ToString()
                     Return myGlobal
 
                     'REPORT VERSION <= APPLICATION VERSION
@@ -830,10 +836,15 @@ Public Class ISATReportLoad
     ''' 
     ''' </summary>
     ''' <remarks>
-    ''' Created by  : SG 08/10/2010
-    ''' Modified by : XB 07/05/2013 - Release LIS channels in order to recreate LIS channel according with the settings configured on ReportSAT just loaded
-    '''               TR 24/05/2013 - Validate the LIS trace level. If the value saved on the DB is the same the machine has configure on the registry.
-    '''               XB 17/06/2013 - No restore points are deleted at v2.0. In the future we design a screen to clean them
+    ''' Created by: SG 08/10/2010
+    ''' Modified by: XB 07/05/2013 - Release LIS channels in order to recreate LIS channel according with the settings configured on ReportSAT just loaded
+    '''              TR 24/05/2013 - Validate the LIS trace level. If the value saved on the DB is the same the machine has configure on the registry.
+    '''              XB 17/06/2013 - No restore points are deleted at v2.0. In the future we design a screen to clean them
+    '''              SA 15/05/2014 - BT #1617 ==> When Property RestorePointMode = TRUE, the full path of the Restore Point file has an error (a double slash).  
+    '''                                           When function LoadSATReport returns an error, it is not shown because function ShowMessage is called with 
+    '''                                           parameters in wrong order; besides, the function does not return the correct ErrorCode. Changes: removed the 
+    '''                                           double slash + replace the ErrorCode for SAT_LOAD_RESTORE_POINT_ERROR, which is the specific for this screen +
+    '''                                           call function ShowMessage with parameters in the correct order
     ''' </remarks>
     Private Sub bsOKButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsOKButton.Click
         ' XBC 04/07/2012 - Indicate Load Rsat START on Application LOG.
@@ -900,15 +911,22 @@ Public Class ISATReportLoad
                     myRestoreDataPath = "\RestorePoints\"
                 End If
 
-                Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                'BT #1631 - The path is wrong. The "\" added before myRestoreDataPath produces a double slash due to the value in myRestoreDataPath contains a slash on the left
+                Dim myRestoringFile As String = Application.StartupPath & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
+                'Dim myRestoringFile As String = Application.StartupPath & "\" & myRestoreDataPath & Me.bsSATDirListBox.SelectedItem.ToString & myZipExtension
 
                 myGlobal = LoadSATReport(myRestoringFile)
                 'END AG 16/11/2010
 
-                If myGlobal.HasError Then
+                If (myGlobal.HasError) Then
                     Cursor = Cursors.Default
-                    'ShowMessage(Me.Name & ".bsOKButton_Click", GlobalEnumerates.Messages.SAT_LOAD_RESTORE_POINT_ERROR.ToString)
-                    ShowMessage(myGlobal.ErrorCode, myGlobal.ErrorMessage)
+
+                    'BT #1631 - Replace the ErrorCode returned for the ErrorCode specific for Restore Error; 
+                    '           call ShowMessage with parameters in the correct order
+                    If (myGlobal.ErrorCode = "MISSING_DATA") Then myGlobal.ErrorCode = "SAT_LOAD_RESTORE_POINT_ERROR"
+                    ShowMessage(Me.Name, myGlobal.ErrorCode, myGlobal.ErrorMessage)
+                    'ShowMessage(myGlobal.ErrorCode, myGlobal.ErrorMessage)
+
                 Else ' If process finished successfully then delete the restore point!
                     ' XB - 17/06/2013 - No restore points are deleted at v2.0. In the future we design a screen to clean them
                     'If File.Exists(myRestoringFile) Then File.Delete(myRestoringFile) 'AG 16/11/2010

@@ -129,6 +129,33 @@ Namespace Biosystems.Ax00.Global
             End Get
         End Property
 
+        'SA 15/05/2014 - BT #1617 ==> New property to return the full path for the exe file of UserSW. A new Global Setting with the name
+        '                             of the exe file has been also created (named as UserSwExeName)
+        Public ReadOnly Property UserSwExeFullPath() As String
+            Get
+                Dim myFullPath As String = Path.GetFullPath(My.Settings.UserSwExeName)
+
+#If DEBUG Then
+                'DEBUG MODE
+                If (myFullPath.Contains(My.Settings.ServiceProjectName)) Then
+                    Return myFullPath.Replace(My.Settings.ServiceProjectName, My.Settings.UserProjectName)
+                Else
+                    Return myFullPath
+                End If
+#Else
+                'RELEASE MODE
+                If (myFullPath.Contains(My.Settings.ServiceProjectName)) Then
+                    Return myFullPath.Replace(My.Settings.ServiceProjectName, My.Settings.UserProjectName)
+
+                ElseIf (myFullPath.Contains(My.Settings.ServicePath)) Then
+                    Return myFullPath.Replace(My.Settings.ServicePath, My.Settings.UserPath)
+
+                Else
+                    Return myFullPath
+                End If
+#End If
+            End Get
+        End Property
 
         Shared ReadOnly Property ImagesPath() As String
             Get

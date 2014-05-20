@@ -24,22 +24,27 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' Method incharge to start the database Update and instalation process.
         ''' </summary>
         ''' <remarks>
-        ''' CREATED BY: TR
-        ''' Modified AG: 16/01/2013 v1.0.1 evaluate if successfully or not and continue business (see update version process design)
-        '''          TR  29/01/2013 v1.0.1 -Add the new parameter pLoadingRSAT to inidicate if user is loading a RSAT.
+        ''' Created by:  TR
+        ''' Modified by: AG 16/01/2013 v1.0.1 - Evaluate if successfully or not and continue business (see update version process design)
+        '''              TR 29/01/2013 v1.0.1 - Add the new parameter pLoadingRSAT to indicate if user is loading a RSAT
+        '''              SA 16/05/2014 - BT #1632 ==> Before start the update process, execute the temporary script used to change the structure 
+        '''                                           of ApplicationLog table (tfmwApplicationLog)    
         ''' </remarks>
-        Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, _
-                                              ByVal DBLogin As String, ByVal DBPassword As String, _
-                                              Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+        Public Function InstallUpdateProcess(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal DBLogin As String, _
+                                             ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
+
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myLogAcciones As New ApplicationLogManager()
             Dim myDBUpdateManager As New DataBaseUpdateManagerDelegate
-            'TR Variable used to validate the time 
-            Dim initialTimeUpdate As New DateTime
+            Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
             Try
                 'myLogAcciones.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
 
                 If DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then
+                    'BT #1632 - Before start the update process, execute the temporary script used to change the structure of 
+                    '           ApplicationLog Table(tfmwApplicationLog)
+                    AddThreadIDColToApplicationLogTable()
+
                     initialTimeUpdate = Now 'Set the start time 
                     Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
                     myLogAcciones.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
@@ -471,6 +476,29 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #End Region
 
-    End Class
+#Region "TEMPORARY FUNCTIONS TO UPDATE STRUCTURE FOR v3.0.1"
+        ''' <summary>
+        ''' Execute scripts to add new column ThreadID to table tfmwApplicationLog
+        ''' </summary>
+        ''' <returns>Boolean value indicating if the scripts execution finished successfully (True) or with error (False)</returns>
+        ''' <remarks>
+        ''' Created by: SA 16/05/2014 - BT #1632 ==> This change cannot be included in the normal Update Version process, due to it changes the structure of 
+        '''                                          Application Log table, and several functions write in the Log before the process update the table
+        ''' </remarks>
+        Public Function AddThreadIDColToApplicationLogTable() As Boolean
+            Dim sqlExecResult As Boolean = True
+            Try
+                Dim myDBManager As New DBManager
+                sqlExecResult = myDBManager.AddThreadIDColToApplicationLogTable()
 
+            Catch ex As Exception
+                sqlExecResult = False
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManagerDelegate.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
+            End Try
+            Return sqlExecResult
+        End Function
+#End Region
+
+    End Class
 End Namespace

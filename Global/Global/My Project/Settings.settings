@@ -21,10 +21,10 @@
       <Value Profile="(Default)">C:\Program Files\Biosystems\</Value>
     </Setting>
     <Setting Name="ServicePath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\Service\</Value>
+      <Value Profile="(Default)">\Service Sw\</Value>
     </Setting>
     <Setting Name="UserPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\User\</Value>
+      <Value Profile="(Default)">\User Sw\</Value>
     </Setting>
     <Setting Name="ImagesPath" Type="System.String" Scope="User">
       <Value Profile="(Default)">\Images\</Value>
@@ -187,6 +187,15 @@
     </Setting>
     <Setting Name="SynapseLogFileName" Type="System.String" Scope="User">
       <Value Profile="(Default)">SynapseEventLog</Value>
+    </Setting>
+    <Setting Name="UserSwExeName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">BA400User.exe</Value>
+    </Setting>
+    <Setting Name="UserProjectName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PresentationUSR</Value>
+    </Setting>
+    <Setting Name="ServiceProjectName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">PresentationSRV</Value>
     </Setting>
   </Settings>
 </SettingsFile>

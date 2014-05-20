@@ -1126,6 +1126,53 @@ Namespace Biosystems.Ax00.DAL
 
 #End Region
 
+#Region "TEMPORARY FUNCTIONS TO UPDATE STRUCTURE FOR v3.0.1"
+
+        ''' <summary>
+        ''' Execute scripts to add new column ThreadID to table tfmwApplicationLog
+        ''' </summary>
+        ''' <returns>Boolean value indicating if the scripts execution finished successfully (True) or with error (False)</returns>
+        ''' <remarks>
+        ''' Created by: SA 16/05/2014 - BT #1632 ==> This change cannot be included in the normal Update Version process, due to it changes the structure of 
+        '''                                          Application Log table, and several functions write in the Log before the process update the table
+        ''' </remarks>
+        Public Function AddThreadIDColToApplicationLogTable() As Boolean
+            Dim sqlExecResult As Boolean = True
+
+            Try
+                Using connection As New SqlClient.SqlConnection(DAOBase.GetConnectionString())
+                    Dim dbCmd As New SqlClient.SqlCommand
+                    dbCmd.Connection = connection
+
+                    Try
+                        connection.Open()
+                        dbCmd.CommandText = "  IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id " & vbCrLf
+                        dbCmd.CommandText &= "      WHERE so.xtype = 'U' AND so.name = 'tfmwApplicationLog' AND sc.name = 'ThreadID') = 0) " & vbCrLf
+                        dbCmd.CommandText &= " BEGIN " & vbCrLf
+                        dbCmd.CommandText &= "   ALTER TABLE [dbo].[tfmwApplicationLog] ADD [ThreadID] [int] NULL " & vbCrLf
+                        dbCmd.CommandText &= " END " & vbCrLf
+
+                        dbCmd.ExecuteNonQuery()
+
+                    Catch ex As Exception
+                        sqlExecResult = False
+                        Dim myLogAcciones As New ApplicationLogManager()
+                        myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DBManager.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
+                    Finally
+                        If (connection.State = ConnectionState.Open) Then connection.Close()
+                    End Try
+                    dbCmd = Nothing
+                End Using
+
+            Catch ex As Exception
+                sqlExecResult = False
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DBManager.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
+            End Try
+            Return sqlExecResult
+        End Function
+#End Region
+
     End Class
 
 End Namespace
