@@ -1692,6 +1692,10 @@ Namespace Biosystems.Ax00.Global
             CRITICAL_TESTS_PAUSEMODE 'AG + JV #1391 26/11/2013
             RES_RECOVER_INPAUSE 'AG 28/11/2013 - #1397
 
+            'TR 06/05/2014 BT #1612 Indicate there was an error saving a received reading.-**UNCOMMENT Version 3.0.1**-
+            'READING_NOT_SAVED
+            'TR 06/05/2014 BT #1612 -END
+
         End Enum
 
         Public Enum SourceScreen
