@@ -2594,6 +2594,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by SGM 16/01/2013 - Bug #1108
         '''             XB  30/04/2014 - Add protection on CALB operation if FW answers ISE! by error instead of CAL Results or ERC - Task #1614
         '''             XB  20/05/2014 - Add more protections against not expected answers from Firmware - Task #1614
+        '''             XB  20/05/2014 - Fix Bug #1629
         ''' </remarks>
         Private Function ManageISEProcedureFinished(Optional ByVal pForcedResult As ISEProcedureResult = ISEProcedureResult.None) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2660,11 +2661,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                                   LastElectrodesCalibrationErrorAttr)
                                     End If
 
+                                    ' XB 30/04/2014 - Task #1629
+                                    MyClass.IsCalibrationNeeded = True
+
                                     ' XB 30/04/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
                                     LastISEResult.IsCancelError = True
                                     pForcedResult = ISEProcedureResult.Exception
+                                    MyClass.IsCalibrationNeeded = True
                                     ' XB 30/04/2014 - Task #1614
                                 End If
 
@@ -2692,11 +2697,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                              LastPumpsCalibrationResultAttr, LastPumpsCalibrationErrorAttr)
                                     End If
 
+                                    ' XB 30/04/2014 - Task #1629
+                                    MyClass.IsPumpCalibrationNeeded = True
+
                                     ' XB 20/05/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
                                     LastISEResult.IsCancelError = True
                                     pForcedResult = ISEProcedureResult.Exception
+                                    MyClass.IsPumpCalibrationNeeded = True
                                     ' XB 20/05/2014 - Task #1614
                                 End If
                             Case ISECommands.SHOW_PUMP_CAL
@@ -2722,6 +2731,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                                LastBubbleCalibrationDateAttr, _
                                                                                LastBubbleCalibrationResultAttr, LastBubbleCalibrationErrorAttr)
                                     End If
+
+                                    ' XB 30/04/2014 - Task #1629
+                                    MyClass.IsBubbleCalibrationNeeded = True
 
                                     ' XB 20/05/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
@@ -2941,11 +2953,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
                             'JB 28/08/2012 - End
 
+                            ' XB 30/04/2014 - Task #1629
+                            MyClass.IsCalibrationNeeded = True
+
                             ' XB 30/04/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
                             LastISEResult.IsCancelError = True
                             pForcedResult = ISEProcedureResult.Exception
+                            MyClass.IsCalibrationNeeded = True
                             ' XB 30/04/2014 - Task #1614
                         End If
 
@@ -2966,11 +2982,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                      LastPumpsCalibrationResultAttr, LastPumpsCalibrationErrorAttr)
                             End If
 
+                            ' XB 30/04/2014 - Task #1629
+                            MyClass.IsPumpCalibrationNeeded = True
+
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
                             LastISEResult.IsCancelError = True
                             pForcedResult = ISEProcedureResult.Exception
+                            MyClass.IsPumpCalibrationNeeded = True
                             ' XB 20/05/2014 - Task #1614
                         End If
 
@@ -2990,6 +3010,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                        LastBubbleCalibrationResultAttr, LastBubbleCalibrationErrorAttr)
 
                             End If
+
+                            ' XB 30/04/2014 - Task #1629
+                            MyClass.IsBubbleCalibrationNeeded = True
 
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
