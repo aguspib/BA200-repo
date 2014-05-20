@@ -2593,6 +2593,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by  SGM 08/03/2012
         ''' Modified by SGM 16/01/2013 - Bug #1108
         '''             XB  30/04/2014 - Add protection on CALB operation if FW answers ISE! by error instead of CAL Results or ERC - Task #1614
+        '''             XB  20/05/2014 - Add more protections against not expected answers from Firmware - Task #1614
         ''' </remarks>
         Private Function ManageISEProcedureFinished(Optional ByVal pForcedResult As ISEProcedureResult = ISEProcedureResult.None) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2690,6 +2691,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                              LastPumpsCalibrationDateAttr, _
                                                                              LastPumpsCalibrationResultAttr, LastPumpsCalibrationErrorAttr)
                                     End If
+
+                                    ' XB 20/05/2014 - Task #1614
+                                ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                    ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                                    LastISEResult.IsCancelError = True
+                                    pForcedResult = ISEProcedureResult.Exception
+                                    ' XB 20/05/2014 - Task #1614
                                 End If
                             Case ISECommands.SHOW_PUMP_CAL
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
@@ -2714,16 +2722,53 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                                LastBubbleCalibrationDateAttr, _
                                                                                LastBubbleCalibrationResultAttr, LastBubbleCalibrationErrorAttr)
                                     End If
+
+                                    ' XB 20/05/2014 - Task #1614
+                                ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                    ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                                    LastISEResult.IsCancelError = True
+                                    pForcedResult = ISEProcedureResult.Exception
+                                    ' XB 20/05/2014 - Task #1614
                                 End If
 
                             Case ISECommands.READ_mV
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)
 
+                                ' XB 20/05/2014 - Task #1614
+                                If Not isFinished Then
+                                    If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                        ' This is an error. ISE must answer AMV or BMV or an ERC, but no this instruction: <ISE!>
+                                        LastISEResult.IsCancelError = True
+                                        pForcedResult = ISEProcedureResult.Exception
+                                    End If
+                                End If
+                                ' XB 20/05/2014 - Task #1614
+
                             Case ISECommands.READ_PAGE_0_DALLAS
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT00)
 
+                                ' XB 20/05/2014 - Task #1614
+                                If Not isFinished Then
+                                    If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                        ' This is an error. ISE must answer DDT00 but no this instruction: <ISE!>
+                                        LastISEResult.IsCancelError = True
+                                        pForcedResult = ISEProcedureResult.Exception
+                                    End If
+                                End If
+                                ' XB 20/05/2014 - Task #1614
+
                             Case ISECommands.READ_PAGE_1_DALLAS
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01)
+
+                                ' XB 20/05/2014 - Task #1614
+                                If Not isFinished Then
+                                    If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                        ' This is an error. ISE must answer DDT01 but no this instruction: <ISE!>
+                                        LastISEResult.IsCancelError = True
+                                        pForcedResult = ISEProcedureResult.Exception
+                                    End If
+                                End If
+                                ' XB 20/05/2014 - Task #1614
 
                             Case ISECommands.VERSION_CHECKSUM
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ISV)
@@ -2785,6 +2830,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             MyClass.IsISEInitializationDoneAttr = True
                             MyClass.IsISEInitiatedOKAttr = False
                             RaiseEvent ISEConnectionFinished(False)
+
+                            ' XB 20/05/2014 - Task #1614
+                        ElseIf MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV AndAlso LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                            ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
+                            LastISEResult.IsCancelError = True
+                            pForcedResult = ISEProcedureResult.Exception
+                            MyClass.IsISEInitializationDoneAttr = True
+                            MyClass.IsISEInitiatedOKAttr = False
+                            RaiseEvent ISEConnectionFinished(False)
+                            ' XB 20/05/2014 - Task #1614
                         End If
 
                     Case ISEProcedures.ActivateModule
@@ -2819,6 +2874,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         '    MyClass.CheckReagentsPackVolumeEnough()
                         'End If
 
+                        ' XB 20/05/2014 - Task #1614
+                        If Not isFinished Then
+                            If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                ' This is an error. ISE must answer a DDT01 or an ERC, but no this instruction: <ISE!>
+                                LastISEResult.IsCancelError = True
+                                pForcedResult = ISEProcedureResult.Exception
+                            End If
+                        End If
+                        ' XB 20/05/2014 - Task #1614
+
                     Case ISEProcedures.CheckReagentsPack
                         isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01))
                         If isFinished Then
@@ -2843,6 +2908,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'end SGM 21/09/2012
                         End If
 
+                        ' XB 20/05/2014 - Task #1614
+                        If Not isFinished Then
+                            If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
+                                LastISEResult.IsCancelError = True
+                                pForcedResult = ISEProcedureResult.Exception
+                            End If
+                        End If
+                        ' XB 20/05/2014 - Task #1614
 
                     Case ISEProcedures.CalibrateElectrodes
                         isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
@@ -2892,6 +2966,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                      LastPumpsCalibrationResultAttr, LastPumpsCalibrationErrorAttr)
                             End If
 
+                            ' XB 20/05/2014 - Task #1614
+                        ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                            ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                            LastISEResult.IsCancelError = True
+                            pForcedResult = ISEProcedureResult.Exception
+                            ' XB 20/05/2014 - Task #1614
                         End If
 
                         ' XBC 27/09/2012
@@ -2911,6 +2991,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             End If
 
+                            ' XB 20/05/2014 - Task #1614
+                        ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                            ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                            LastISEResult.IsCancelError = True
+                            pForcedResult = ISEProcedureResult.Exception
+                            ' XB 20/05/2014 - Task #1614
                         End If
 
                     Case ISEProcedures.Clean

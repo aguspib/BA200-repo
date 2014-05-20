@@ -325,7 +325,7 @@ Public Class IResults
         If OpenForms > 0 Then
             OpenForms -= 1
         End If
-        ReleaseElement()
+        'ReleaseElement()
     End Sub
 
     ''' <summary>
@@ -1044,6 +1044,7 @@ Public Class IResults
             Dim tb As TextBox = CType(e.Control, TextBox)
 
             If Not tb Is Nothing Then
+                RemoveHandler tb.KeyPress, AddressOf dgvTextBox_KeyPress
                 AddHandler tb.KeyPress, AddressOf dgvTextBox_KeyPress
             End If
 
@@ -5595,14 +5596,7 @@ Public Class IResults
             'mdiAnalyzerCopy = Nothing 'not this variable
             copyRefreshDS = Nothing
 
-            'Controls (grids & buttons with images)
-            bsBlanksDataGridView = Nothing
-            bsCalibratorsDataGridView = Nothing
-            bsControlsDataGridView = Nothing
-            bsExperimentalsDataGridView = Nothing
-            SamplesXtraGridView = Nothing
-            bsSamplesListDataGridView = Nothing
-            bsTestsListDataGridView = Nothing
+            'Buttons with images
 
             PrintReportButton.Image = Nothing
             PrintCompactReportButton.Image = Nothing
@@ -5628,7 +5622,77 @@ Public Class IResults
             HISPictureBox.Image = Nothing
             'TR 25/09/2013 #memory
 
-            GC.Collect()
+            With CollapseColumnControls
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            With CollapseColumnExperimentals
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            With CollapseColumnCalibrators
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            With CollapseColumnBlanks
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            '--- Detach variable defined using WithEvents ---
+            bsErrorProvider1 = Nothing
+            bsProgTestToolTips = Nothing
+            bsPanel2 = Nothing
+            bsPanel4 = Nothing
+            Cycle = Nothing
+            Abs1 = Nothing
+            Abs2 = Nothing
+            Diff = Nothing
+            OrderToExportCheckBox = Nothing
+            OrderToPrintCheckBox = Nothing
+            STATImage = Nothing
+            ExitButton = Nothing
+            bsXlsresults = Nothing
+            ExportButton = Nothing
+            OffSystemResultsButton = Nothing
+            SendManRepButton = Nothing
+            bsResultFormGroupBox = Nothing
+            bsSamplesResultsTabControl = Nothing
+            bsExperimentalsTabPage = Nothing
+            bsExperimentalsDataGridView = Nothing
+            bsResultsTabControl = Nothing
+            bsBlanksTabPage = Nothing
+            bsBlanksDataGridView = Nothing
+            bsCalibratorsTabPage = Nothing
+            bsCalibratorsDataGridView = Nothing
+            bsControlsTabPage = Nothing
+            bsControlsDataGridView = Nothing
+            bsTestDetailsTabControl = Nothing
+            bsSamplesTab = Nothing
+            bsSamplesListDataGridView = Nothing
+            bsTestsTabTage = Nothing
+            bsTestsListDataGridView = Nothing
+            bsResultsFormLabel = Nothing
+            bsTestPanel = Nothing
+            PrintTestButton = Nothing
+            bsSamplesPanel = Nothing
+            PrintReportButton = Nothing
+            SummaryButton = Nothing
+            PrintSampleButton = Nothing
+            XtraSamplesTabPage = Nothing
+            SamplesXtraGrid = Nothing
+            SamplesXtraGridView = Nothing
+            ToolTipController1 = Nothing
+            AlarmsDS1 = Nothing
+            PrintCompactReportButton = Nothing
+            PrintTestBlankButton = Nothing
+            PrintTestCtrlButton = Nothing
+            '------------------------------------------------
+
+            'GC.Collect() 
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
