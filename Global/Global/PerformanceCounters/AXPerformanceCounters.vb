@@ -31,7 +31,8 @@ Namespace Biosystems.Ax00.Global
         'AG 24/02/2014 - #1520
         Public ReadOnly Property LimitExceeded As Boolean
             Get
-                Return limitExceededFlag
+                'Return limitExceededFlag
+                Return False
             End Get
         End Property
         'AG 24/02/2014 - #1520

@@ -2509,4 +2509,15 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.01</Version>
+    <Label>'ThreadId' Columns added to tfmwApplicationLog</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'tfmwApplicationLog' AND sc.name = 'ThreadId') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
