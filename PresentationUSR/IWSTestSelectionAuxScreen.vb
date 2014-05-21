@@ -107,28 +107,23 @@ Public Class IWSTestSelectionAuxScreen
 
     Private WorkingModelAttribute As String = GlbSourceScreen.STANDARD.ToString
     Private ControlIDAttribute As Integer = -1
-    ' TR 28/04/2014 BT#1494 -Use to indicate if there are any test with incomplete programming.
+
+    'TR 28/04/2014 BT #1494 - Used to indicate if at least one of the selected STANDARD Tests have incomplete programming
     Private IncompleteTestAttribute As Boolean = False
 #End Region
 
 #Region "Properties"
-
     ''' <summary>
-    ''' ' TR 28/04/2014 BT#1494 -Use to indicate if there are any test with incomplete programming
+    ''' Screen property to indicate if at least one of the selected STANDARD Tests have incomplete programming
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks>CREATED BY TR 28/04/2014</remarks>
-    Public Property IncompleteTest() As Boolean
-        Set(ByVal value As Boolean)
-            IncompleteTestAttribute = value
-        End Set
+    ''' <remarks>
+    ''' Created by: TR 28/04/2014 - BT #1494
+    ''' </remarks>
+    Public ReadOnly Property IncompleteTest() As Boolean
         Get
             Return IncompleteTestAttribute
         End Get
     End Property
-
-
 
     ''' <summary>
     ''' Code of the SampleClass (sent from the previous screen).  Needed to filter the Tests to shown
@@ -1810,7 +1805,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' Modified by: SA 02/11/2010 - Removed call to MarkSelectedProfilesOnTreeView
     '''              TR 10/03/2011 - Inform also field FactoryCalib in the DS of STD Tests
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested 
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkTestListGridView(ByVal pTestsDS As TestsDS)
         Try
@@ -1899,15 +1894,13 @@ Public Class IWSTestSelectionAuxScreen
 
                         If (qSearchTest.Count = 1) Then
                             qSearchTest.First.Selected = True
-                            'SGM 13/03/2013
-                            'qSearchTest.First.OTStatus = selTestRow.OTStatus
-                            If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+
+                            'SG 13/03/2013
+                            If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                 qSearchTest.First.OTStatus = "LISLOCK"
                             Else
                                 qSearchTest.First.OTStatus = selTestRow.OTStatus
                             End If
-                            'end SGM 13/03/2013
-
 
                             'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
                             If (SampleClassAttribute = "PATIENT") Then
@@ -1983,7 +1976,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' Modified by: SA 02/11/2010 - Inform TestProfileID and TestProfileName when the previously selected Calculated
     '''                              Tests have these fields informed
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkCalcTestListGridView(ByVal pCalcTestsDS As CalculatedTestsDS)
         Try
@@ -2078,14 +2071,12 @@ Public Class IWSTestSelectionAuxScreen
                                 If (calcTestROW.TestID = selTestRow.TestID) Then
                                     calcTestROW.Selected = True
 
-                                    'SGM 13/03/2013
-                                    'calcTestROW.OTStatus = selTestRow.OTStatus
-                                    If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+                                    'SG 13/03/2013
+                                    If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                         calcTestROW.OTStatus = "LISLOCK"
                                     Else
                                         calcTestROW.OTStatus = selTestRow.OTStatus
                                     End If
-                                    'end SGM 13/03/2013
 
                                     If (Not selTestRow.IsTestProfileIDNull) Then
                                         calcTestROW.TestProfileID = selTestRow.TestProfileID
@@ -2145,7 +2136,7 @@ Public Class IWSTestSelectionAuxScreen
     '''              SA 19/06/2012 - When informed, save value of field NumberOfControls in the DS containing all ISE Tests
     '''                              (needed to verify ISE Controls partially selected)
     '''              XB 27/07/2012 - ISE Tests Disabled by volume not enough functionallity is canceled
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkISETestListGridView(ByVal pISETestsDS As ISETestsDS)
         Try
@@ -2219,14 +2210,12 @@ Public Class IWSTestSelectionAuxScreen
                             If (iseTestROW.TestID = selTestRow.TestID) Then
                                 iseTestROW.Selected = True
 
-                                'SGM 13/03/2013
-                                'iseTestROW.OTStatus = selTestRow.OTStatus
-                                If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+                                'SG 13/03/2013
+                                If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                     iseTestROW.OTStatus = "LISLOCK"
                                 Else
                                     iseTestROW.OTStatus = selTestRow.OTStatus
                                 End If
-                                'end SGM 13/03/2013
 
                                 If (Not selTestRow.IsTestProfileIDNull) Then
                                     iseTestROW.TestProfileID = selTestRow.TestProfileID
@@ -2318,7 +2307,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' <remarks>
     ''' Created by:  DL 29/11/2010
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkOffSystemTestListGridView(ByVal pOffSystemTestsDS As OffSystemTestsDS)
         Try
@@ -2388,15 +2377,13 @@ Public Class IWSTestSelectionAuxScreen
                             If (offsystemTestROW.TestID = selTestRow.TestID) Then
                                 offsystemTestROW.Selected = True
 
-                                'SGM 13/03/2013
-                                'offsystemTestROW.OTStatus = selTestRow.OTStatus
-                                If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+                                'SG 13/03/2013
+                                If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                     offsystemTestROW.OTStatus = "LISLOCK"
                                 Else
                                     offsystemTestROW.OTStatus = selTestRow.OTStatus
                                 End If
-                                'end SGM 13/03/2013
-
+                               
                                 If (Not selTestRow.IsTestProfileIDNull) Then
                                     offsystemTestROW.TestProfileID = selTestRow.TestProfileID
                                     offsystemTestROW.TestProfileName = selTestRow.TestProfileName
@@ -2498,7 +2485,10 @@ Public Class IWSTestSelectionAuxScreen
     '''              SA 08/05/2013 - If fields SampleID and SampleIDType are informed in the entry SelectedTestsDS, save them also 
     '''                              in the returned SelectedTestsDS (this functionality is required when this screen is used from 
     '''                              HQBarcode screen; in any other case, those fields are not informed)
-    '''              TR 28/04/2014 - BT #1494 Validate if selecte test is completed (programming complete) before including to list.
+    '''              TR 28/04/2014 - BT #1494 ==> For each STANDARD Test marked as selected, validate if it has a completed Calibration programming 
+    '''                                           before add it to the final list of selected Tests. Besides, set value of screen attribute 
+    '''                                           IncompleteTestAttribute to TRUE to notify the User that some of the selected Tests were removed 
+    '''                                           due to they have an incomplete Calibration programming 
     ''' </remarks>
     Private Sub AcceptTestSelection()
         Try
@@ -2521,61 +2511,58 @@ Public Class IWSTestSelectionAuxScreen
             ListOfSelectedTestsAttribute = New SelectedTestsDS
 
             
-            'TR 28/04/2014  BT #1494 -Get the list of Standard Tests that have been selected and incompleted programming to unselected
+            'BT #1494 - Get the list of Standard Tests that have been selected but have an incomplete Calibration programming to unselect them
             Dim qSelStdTests As List(Of SelectedTestsDS.SelectedTestTableRow)
             Dim qTestInFormula As List(Of FormulasDS.tparFormulasRow)
             Dim qSelCalcTests As List(Of SelectedTestsDS.SelectedTestTableRow)
             Dim lstCalculatedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
             Dim myCalTestName As String = String.Empty
-            Dim BelongCalcTest As Boolean = False 'Indicate the test belong to a calculated test
+            Dim belongCalcTest As Boolean = False 'Indicate the Test is included in the Formula of one or more Calculated Tests
 
-            'Get the list of elements with enable status = false (incomplete programming)
+            'Get the list of selected STD Tests having EnableStatus = False (those marked with incomplete Calibration programming)
             qSelStdTests = (From a As SelectedTestsDS.SelectedTestTableRow In standardTestList.SelectedTestTable _
                            Where a.Selected = True AndAlso a.EnableStatus = False _
                           Select a).ToList()
-            If qSelStdTests.Count > 0 Then
-                'Go throught each incomplet element and unmark from the list.
-                For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelStdTests
-                    BelongCalcTest = False 'initialize as false 
 
-                    If Not selectedRow.IsCalcTestIDsNull Then
+            If (qSelStdTests.Count > 0) Then
+                For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelStdTests
+                    belongCalcTest = False
+
+                    If (Not selectedRow.IsCalcTestIDsNull) Then
+                        'The STD Test is included in the Formula of one or more selected Calculated Tests
                         myCalTestName = selectedRow.CalcTestNames
-                        BelongCalcTest = True ' belong to a calcualted test
+                        belongCalcTest = True
                     End If
 
-                    'Validate if the test is belong to calculated test unmark the afected calculated test from the list
-                    If myCalTestName <> "" Then
-                        'For each calculate test do the unselect process.
+                    If (myCalTestName <> String.Empty) Then
+                        'Unmark all Calculated Tests in which Formula the STD Test is included
                         For Each calcTestName As String In myCalTestName.Split(CChar(","))
-
                             lstCalculatedTest = (From b In calculatedTestList.SelectedTestTable _
-                                Where b.TestType = "CALC" AndAlso b.TestName = calcTestName Select b).ToList
+                                                Where b.TestType = "CALC" AndAlso b.TestName = calcTestName _
+                                               Select b).ToList
 
-                            If lstCalculatedTest.Count > 0 Then
+                            If (lstCalculatedTest.Count > 0) Then
                                 MarkUnMarkCalculatedTestCell(lstCalculatedTest.First().Row, lstCalculatedTest.First().Col, True, lstCalculatedTest)
                             End If
                         Next
                     End If
 
-                    If BelongCalcTest Then
-                        ' set the selected value to true bechaus on previous actios 
-                        ' value change to false and whe need to remove the STD test
-                        selectedRow.Selected = True
-                    End If
+                    'Set Selected = TRUE to allow unmark the STD Tests (needed because in the previous action it is possible than the Selected 
+                    'value of this Test was set to FALSE)
+                    If (belongCalcTest) Then selectedRow.Selected = True
 
-                    'Unselect from list the incomplete programming test.
+                    'Finally, unmark the STD Test to remove it from the list of selected Tests
                     MarkUnMarkSelectedCell(selectedRow.Row, selectedRow.Col)
                 Next
 
+                'At least an STD Test with incomplete Calibration programming was selected and removed. Set to TRUE the property that allow the WS Samples 
+                'Requests Screen to notify the final User that some of the chosen Tests cannot be selected 
                 IncompleteTestAttribute = True
-
             Else
                 IncompleteTestAttribute = False
             End If
-            'TR 28/04/2014 BT #1494 -END
 
             'Get the list of Standard Tests that have been selected...
-            'Dim qSelStdTests As List(Of SelectedTestsDS.SelectedTestTableRow)
             qSelStdTests = (From a As SelectedTestsDS.SelectedTestTableRow In standardTestList.SelectedTestTable _
                            Where a.Selected = True OrElse a.PartiallySelected = True _
                           Select a).ToList()

@@ -6102,8 +6102,9 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Modified by: RH 19/10/2010 - Introduced the Using statement
-    '''              TR 28/04/2014 - BT #1494 Validate when the auxiliari Test selection screen is close if there are any incomplete programming test
-    '''                              from selection and show message.
+    '''              TR 28/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
+    '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
+    '''                                           incomplete) and in this case shows a warning message
     ''' </remarks>
     Private Sub SearchTestsForCalibrators()
         Try
@@ -6142,11 +6143,9 @@ Public Class IWSSampleRequest
                 If (myForm.DialogResult = DialogResult.OK) Then
                     Cursor = Cursors.WaitCursor
 
-                    ' TR 28/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                    If myForm.IncompleteTest Then
-                        ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                    End If
-                    ' TR 28/04/2014 BT#1494 -END.
+                    'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                    '          that notify the User they was removed from the list of Selected Tests
+                    If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForCalibrators", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
 
                     If (Not myForm.ListOfSelectedTests Is Nothing) Then
                         Dim myGlobalDataTO As GlobalDataTO
@@ -6194,6 +6193,9 @@ Public Class IWSSampleRequest
     '''              TR 11/03/2013 - Inform LISRequest in SelectedTestsDS with the same value it has for the
     '''                              corresponding Order Test.
     '''              TR 17/05/2013 - Inform optional parameters when calling function AddControlOrderTests
+    '''              TR 28/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
+    '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
+    '''                                           incomplete) and in this case shows a warning message
     ''' </remarks>
     Private Sub SearchTestsForControls()
         Try
@@ -6257,11 +6259,10 @@ Public Class IWSSampleRequest
                 If (myForm.DialogResult = DialogResult.OK) Then
                     Cursor = Cursors.WaitCursor
 
-                    ' TR 28/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                    If myForm.IncompleteTest Then
-                        ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                    End If
-                    ' TR 28/04/2014 BT#1494 -END.
+                    'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                    '          that notify the User they was removed from the list of Selected Tests
+                    If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForControls", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
+
 
                     If (Not myForm.ListOfSelectedTests Is Nothing) Then
                         Dim myGlobalDataTO As GlobalDataTO
@@ -6303,8 +6304,11 @@ Public Class IWSSampleRequest
     ''' Modified by: RH 19/10/2010 - Introduced the Using statement
     '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     '''              XB 06/03/2013 - Implement again ToUpper because is not redundant but using invariant mode
-    '''              TR 29/04/2014 - BT #1494 Validate when the auxiliari Test selection screen is close if there are any incomplete programming test
-    '''                              from selection.
+    '''              TR 29/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
+    '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
+    '''                                           incomplete) and in this case shows a warning message
+    '''              SA 20/05/2014 - BT #1494 ==> Added validation of Screen Property IncompleteTest for patientCase = 3 (n rows selected in Patient Samples grid having 
+    '''                                           different Tests and belonging to different Patients)
     ''' </remarks>
     Private Sub SearchTestsForPatientSamples()
         Try
@@ -6385,11 +6389,9 @@ Public Class IWSSampleRequest
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
 
-                                ' TR 28/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                                If myForm.IncompleteTest Then
-                                    ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                                End If
-                                ' TR 28/04/2014 BT#1494 -END.
+                                'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '          that notify the User they was removed from the list of Selected Tests
+                                If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
 
                                 'Calculate the maximun AutoNumeric PatientSample currently in the grid when the Order(s) to add 
                                 'are for unknown Patients
@@ -6444,11 +6446,11 @@ Public Class IWSSampleRequest
                             If (myForm.DialogResult = Windows.Forms.DialogResult.OK) Then
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
-                                ' TR 29/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                                If myForm.IncompleteTest Then
-                                    ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                                End If
-                                ' TR 29/04/2014 BT#1494 -END.
+
+                                'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '          that notify the User they was removed from the list of Selected Tests
+                                If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
+
                                 If (Not myForm.ListOfSelectedTests Is Nothing) Then
                                     'Delete all Open Patient Order Tests that are not in the list of selected Tests for the active StatFlag, Sample Type, SampleID
                                     Dim myOrderTestsDelegate As New OrderTestsDelegate
@@ -6512,8 +6514,12 @@ Public Class IWSSampleRequest
                             If (myForm.DialogResult = Windows.Forms.DialogResult.OK) Then
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
-                                Dim myOrderTestsDelegate As New OrderTestsDelegate
 
+                                'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '          that notify the User they was removed from the list of Selected Tests
+                                If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
+
+                                Dim myOrderTestsDelegate As New OrderTestsDelegate
                                 If (Not myForm.ListOfSelectedTests Is Nothing) Then
                                     Dim currentSampleID As String = ""
                                     Dim currentStatFlag As Boolean = False

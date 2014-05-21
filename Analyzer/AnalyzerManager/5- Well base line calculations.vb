@@ -134,6 +134,24 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '2) Call the biochemical readings treatment
                 'resultData = ProcessBiochemicalReadings(Nothing, pInstructionReceived)
                 resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
+
+                'TR 06/05/2014 BT#1612-**UNCOMMENT Version 3.0.1**-
+                'If resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString() Then
+                '    myLogAcciones.CreateLogActivity("2º try saving the reading due to previous error. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                '                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                '    'Try to save the reading one more time 
+                '    resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
+
+                '    If resultData.HasError Then
+                '        myLogAcciones.CreateLogActivity("2º try saving the reading FAIL!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                '                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                '    Else
+                '        myLogAcciones.CreateLogActivity("2º try saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                '                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                '    End If
+                'End If
+                'TR 06/05/2014 BT#1612 -END
+
                 myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
                 StartTime = Now
 
@@ -634,6 +652,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
                             Else
                                 If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                                'TR 06/05/2014 BT#1612 'Indicate there was an error saving the reading -**UNCOMMENT Version 3.0.1**-
+                                'myglobal.errorcode = globalenumerates.messages.reading_not_saved.tostring()
+
+                                'mylogacciones.createlogactivity("there was an error saving the reading, do a rollback and set error code = reading_not_saved. " & _
+                                '                                now.subtract(starttime).totalmilliseconds.tostringwithdecimals(0), _
+                                '                                "analyzermanager.processbiochemicalreadingsnew", eventlogentrytype.warning, false)
+                                'TR 06/05/2014 BT#1612 -END
+
                             End If
                         End If
                     End If

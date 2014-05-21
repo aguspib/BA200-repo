@@ -870,7 +870,10 @@ Public Class ISATReportLoad
                 myGlobal = LoadSATReport(Me.bsSelectedTextBox.Text.Trim)
                 If myGlobal.HasError Then
                     Cursor = Cursors.Default
-                    ShowMessage(myGlobal.ErrorCode, myGlobal.ErrorMessage)
+                    'BT #1631 - Replace the ErrorCode returned for the ErrorCode specific for Restore Error; 
+                    '           call ShowMessage with parameters in the correct order
+                    'ShowMessage(myGlobal.ErrorCode, myGlobal.ErrorMessage)
+                    ShowMessage(Me.Name, myGlobal.ErrorCode, myGlobal.ErrorMessage)
                 Else
                     'DL 31/05/2013
                     Dim myLogMaxDays As Integer = 30

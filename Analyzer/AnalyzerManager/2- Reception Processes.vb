@@ -5200,7 +5200,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pISEResult"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 02/08/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 02/08/2012
+        ''' Modified by XB 20/05/2014 - Fix BT #1629
+        ''' </remarks>
         Public Function BlockISEPreparationByElectrode(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISEResult As ISEResultTO, ByVal pWorkSessionId As String, ByVal pAnalyzerID As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Try
@@ -5213,7 +5216,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     isLiAffected = (isLiAffected Or (E.Affected.Contains("Li"))) And MyClass.ISE_Manager.IsLiEnabledByUser
                     isNaAffected = isNaAffected Or (E.Affected.Contains("Na"))
                     isKAffected = isKAffected Or (E.Affected.Contains("K"))
-                    isClAffected = isLiAffected Or (E.Affected.Contains("Cl"))
+                    isClAffected = isClAffected Or (E.Affected.Contains("Cl"))
                 Next
 
                 Dim myExecutionsDelegate As New ExecutionsDelegate
