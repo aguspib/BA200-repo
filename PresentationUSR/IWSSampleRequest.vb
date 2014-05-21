@@ -6307,8 +6307,8 @@ Public Class IWSSampleRequest
     '''              TR 29/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
     '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
     '''                                           incomplete) and in this case shows a warning message
-    '''              SA 20/05/2014 - BT #1494 ==> Added validation of Screen Property IncompleteTest for patientCase = 3 (n rows selected in Patient Samples grid having 
-    '''                                           different Tests and belonging to different Patients)
+    '''              SA 20/05/2014 - BT #1633 ==> Added validation of Screen Property IncompleteTest for patientCase = 3 (n rows selected in Patient Samples grid having 
+    '''                                           different Tests and belonging to different Patients). This change should have been included in BT #1494
     ''' </remarks>
     Private Sub SearchTestsForPatientSamples()
         Try
@@ -6515,8 +6515,8 @@ Public Class IWSSampleRequest
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
 
-                                'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
-                                '          that notify the User they was removed from the list of Selected Tests
+                                'BT #1633 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '           that notify the User they was removed from the list of Selected Tests
                                 If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
 
                                 Dim myOrderTestsDelegate As New OrderTestsDelegate

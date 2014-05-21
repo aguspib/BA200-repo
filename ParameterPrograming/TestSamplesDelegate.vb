@@ -103,15 +103,18 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update the EnableStatus by TestID and Sample Type
+        ''' Update the Enable Status for the specified Test ID and Sample Type
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <param name="pEnableStatus">Status</param>
-        ''' <returns></returns>
+        ''' <param name="pEnableStatus">New value for field EnableStatus</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: TR 17/02/2011
+        ''' Created by:  TR 17/02/2011
+        ''' Modified by: SA 21/05/2014 - BT #1633 ==> Once the EnableStatus of the specified TestID/SampleType has been updated, the EnableStatus of 
+        '''                                           the same TestID but other SampleTypes using the Calibrator of the informed SampleType as ALTERNATIVE
+        '''                                           is also updated with the same value. 
         ''' </remarks>
         Public Function UpdateTestSampleEnableStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                      ByVal pSampleType As String, ByVal pEnableStatus As Boolean) As GlobalDataTO
@@ -119,12 +122,18 @@ Namespace Biosystems.Ax00.BL
             Dim dbConnection As New SqlClient.SqlConnection
             Try
                 myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'Update the Enable Status of the specified Test/SampleType 
                         Dim myTestSamplesDAO As New tparTestSamplesDAO()
-
                         myGlobalDataTO = myTestSamplesDAO.UpdateTestSampleEnableStatus(dbConnection, pTestID, pSampleType, pEnableStatus)
+
+                        'BT #1633 - Update also the Enable Status of all Sample Types defined for the informed Test and using as Alternative 
+                        '           Calibrator the one defined for the informed Sample Type
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myTestSamplesDAO.UpdateEnableStatusForALTERNATIVECalib(dbConnection, pTestID, pSampleType, pEnableStatus)
+                        End If
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -148,9 +157,7 @@ Namespace Biosystems.Ax00.BL
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
-
             Return myGlobalDataTO
-
         End Function
 
         ''' <summary>
