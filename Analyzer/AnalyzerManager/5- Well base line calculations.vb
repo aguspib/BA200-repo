@@ -135,22 +135,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'resultData = ProcessBiochemicalReadings(Nothing, pInstructionReceived)
                 resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
 
-                'TR 06/05/2014 BT#1612-**UNCOMMENT Version 3.0.1**-
-                'If resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString() Then
-                '    myLogAcciones.CreateLogActivity("2º try saving the reading due to previous error. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                '                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
-                '    'Try to save the reading one more time 
-                '    resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
+                'AG 21/05/2014 activate code: TR 06/05/2014 BT#1612, #1634 -**UNCOMMENT Version 3.0.1**-
+                If resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString() Then
+                    myLogAcciones.CreateLogActivity("2º try saving the reading due to previous error. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                    'Try to save the reading one more time 
+                    resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
 
-                '    If resultData.HasError Then
-                '        myLogAcciones.CreateLogActivity("2º try saving the reading FAIL!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                '                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
-                '    Else
-                '        myLogAcciones.CreateLogActivity("2º try saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                '                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
-                '    End If
-                'End If
-                'TR 06/05/2014 BT#1612 -END
+                    If resultData.HasError Then
+                        myLogAcciones.CreateLogActivity("2º try saving the reading FAILED!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                    Else
+                        myLogAcciones.CreateLogActivity("2º try saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                    End If
+                End If
+                'TR 06/05/2014 BT#1612, #1634 -END
 
                 myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
                 StartTime = Now
@@ -389,6 +389,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                        ByRef pReadingCycleStatus As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim instructionSavedFlag As Boolean = False 'AG 21/05/2014 BT#1612, #1634 (update TR initial design)
 
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -620,7 +621,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'Finally, prepare the UI Refresh for the Execution
                             myGlobal = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED, myReadingRow.ExecutionID, myReadingRow.ReadingNumber, Nothing, False)
-                            If (myGlobal.HasError) Then Exit For
+                            'AG 21/05/2014 BT#1612, #1634 (comment next line applies only for #1634 - If this method (used only for real time presentation refresh) returns error do not stop saving process. Skip the error!!)
+                            'If (myGlobal.HasError) Then Exit For
+                            If (myGlobal.HasError) Then myGlobal.HasError = False 'skip error in function PrepareUIRefreshEvent
                         End If
                     End If
                 Next i
@@ -650,17 +653,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Rollback or Commit the DB Transaction depending if an error was raised or not
                             If (Not myGlobal.HasError) Then
                                 If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                                instructionSavedFlag = True 'AG 21/05/2014 BT#1612, #1634 (flag indicates instruction saved OK)
                             Else
                                 If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                                'TR 06/05/2014 BT#1612 'Indicate there was an error saving the reading -**UNCOMMENT Version 3.0.1**-
-                                'myglobal.errorcode = globalenumerates.messages.reading_not_saved.tostring()
-
-                                'mylogacciones.createlogactivity("there was an error saving the reading, do a rollback and set error code = reading_not_saved. " & _
-                                '                                now.subtract(starttime).totalmilliseconds.tostringwithdecimals(0), _
-                                '                                "analyzermanager.processbiochemicalreadingsnew", eventlogentrytype.warning, false)
-                                'TR 06/05/2014 BT#1612 -END
-
                             End If
                         End If
                     End If
@@ -958,9 +953,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadings", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+
+                'AG 21/05/2014 BT#1612, #1634 (change TR initial design) Indicate there was an error and instruction has not been saved -**UNCOMMENT Version 3.0.1**-
+                If Not instructionSavedFlag Then
+                    myGlobal.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString()
+                    myGlobal.HasError = True
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("There was an error and the ANSPHR instruction had not been saved. Set error code = READING_NOT_SAVED! ", _
+                                "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Warning, False)
+                End If
+                'TR 06/05/2014 BT#1612 -END
+
             End Try
             Return myGlobal
         End Function
