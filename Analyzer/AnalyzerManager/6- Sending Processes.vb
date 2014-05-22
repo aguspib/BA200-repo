@@ -58,8 +58,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'myUI_RefreshDS.Clear()
                 ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
 
-                mySecondaryUI_RefreshEvent.Clear()
-                mySecondaryUI_RefreshDS.Clear()
+                'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                'mySecondaryUI_RefreshEvent.Clear()
+                'mySecondaryUI_RefreshDS.Clear()
 
                 'AG 29/03/2012 - clear freeze alarms
                 If analyzerFREEZEFlagAttribute AndAlso Not pFromRecoveryResults Then

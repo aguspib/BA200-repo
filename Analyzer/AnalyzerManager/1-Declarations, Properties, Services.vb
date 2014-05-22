@@ -40,13 +40,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '    (so use variables myUI_RefreshEvent, myUI_RefreshDS and eventDataPendingToTriggerFlag)
         ' 2) But some instructions (ANSPHR) are treated using 2 threads (main thread for chemical reactions and secondary for well base line). Both generates differents event refresh when finish
         '    (so use variables myUI_RefreshEvent, myUI_RefreshDS and eventDataPendingToTriggerFlag for the main thread)
-        '    (and use mySecondaryUI_RefreshEvent, mySecondaryUI_RefreshDS and secondaryEventDataPendingToTriggerFlag for the secondary thread)
+        '    (and use mySecondaryUI_RefreshEvent, mySecondaryUI_RefreshDS and secondaryEventDataPendingToTriggerFlag for the secondary thread) --> REJECTED!!!! In running refreshs are added in 1 DSet and event is triggered 1 time each machine cycle
         Private myUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
         Private myUI_RefreshDS As New UIRefreshDS
         Private eventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
-        Private mySecondaryUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
-        Private mySecondaryUI_RefreshDS As New UIRefreshDS
-        Private secondaryEventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
+
+        'AG 22/05/2014 - #1637 Clear code, comment non used variables that could make read code difficult
+        'Private mySecondaryUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
+        'Private mySecondaryUI_RefreshDS As New UIRefreshDS
+        'Private secondaryEventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
         'AG 07/10/2011
 
 
@@ -2109,7 +2111,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pMainThread Then
                     eventDataPendingToTriggerFlag = False
                 Else
-                    secondaryEventDataPendingToTriggerFlag = False
+                    'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                    'secondaryEventDataPendingToTriggerFlag = False
                 End If
 
             Catch ex As Exception
@@ -2201,10 +2204,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
                             End If
 
-                            If Not secondaryEventDataPendingToTriggerFlag Then
-                                mySecondaryUI_RefreshEvent.Clear()
-                                mySecondaryUI_RefreshDS.Clear()
-                            End If
+                            'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                            'If Not secondaryEventDataPendingToTriggerFlag Then
+                            '    mySecondaryUI_RefreshEvent.Clear()
+                            '    mySecondaryUI_RefreshDS.Clear()
+                            'End If
 
                             InitializeTimerControl(WAITING_TIME_OFF) 'AG 13/02/2012 - disable waiting time control if active
 
