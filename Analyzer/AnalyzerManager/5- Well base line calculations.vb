@@ -95,7 +95,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Raise event for UI refrsh
                     'If Not resultData.HasError Then
                     'Now do not use the secondary refresh (mySecondaryUI_RefreshDS, mySecondaryUI_RefreshEvent) use always the primary (myUI_RefreshDS, myUI_RefreshEvent)
-                    If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+
+                    'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                    ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
+
                     RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
                     'eventDataPendingToTriggerFlag = False 'AG 07/10/2011 - inform not exists information in UI_RefreshDS to be send to the event
                     'End If

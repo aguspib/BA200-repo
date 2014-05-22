@@ -54,8 +54,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_ERR) Then
                     myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_ERR)
                 End If
-                myUI_RefreshEvent.Clear()
-                myUI_RefreshDS.Clear()
+                'myUI_RefreshEvent.Clear()
+                'myUI_RefreshDS.Clear()
+                ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
+
                 mySecondaryUI_RefreshEvent.Clear()
                 mySecondaryUI_RefreshDS.Clear()
 

@@ -4226,6 +4226,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return myglobal
         End Function
 
+        ''' <summary>
+        ''' Clear the user interface refresh information but with functionality for lock multithreads
+        ''' </summary>
+        ''' <param name="pMultiThreadLock">Use SyncLock or not</param>
+        ''' <param name="pForceClear">Clear always or only if no refresh to perform</param>
+        ''' <remarks>AG 22/05/2014 - #1637</remarks>
+        Private Sub ClearRefreshDataSets(ByVal pMultiThreadLock As Boolean, ByVal pForceClear As Boolean)
+            Try
+                If pMultiThreadLock Then
+                    SyncLock lockThis
+                        If pForceClear Then 'Clear always
+                            myUI_RefreshEvent.Clear()
+                            myUI_RefreshDS.Clear()
+                        ElseIf myUI_RefreshEvent.Count = 0 Then 'Clear only if no refresh to perform
+                            myUI_RefreshDS.Clear()
+                        End If
+                    End SyncLock
+                Else
+                    If pForceClear Then
+                        myUI_RefreshEvent.Clear()
+                        myUI_RefreshDS.Clear()
+                    ElseIf myUI_RefreshEvent.Count = 0 Then
+                        myUI_RefreshDS.Clear()
+                    End If
+                End If
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ClearRefreshDataSets", EventLogEntryType.Error, False)
+            End Try
+        End Sub
+
 #End Region
 
 #Region "ISE (Send and Receive Results)"

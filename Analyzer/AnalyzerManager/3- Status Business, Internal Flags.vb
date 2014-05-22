@@ -1270,7 +1270,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) <> "INPROCESS" Then
-                            If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                            'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                            ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
                             RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
                         End If
 
