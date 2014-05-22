@@ -4109,28 +4109,32 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 'AG 03/07/2012 - Running Cycles lost - Solution!
-                ''myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
-                ''If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                ''    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
                 If Not pReactionsRotorWellDS Is Nothing Then
-                    'If (Not dbConnection Is Nothing) Then
-                    If pMainThreadIsUsedFlag Then
-                        eventDataPendingToTriggerFlag = True 'exists information in UI_RefreshDS pending to be send to the event
-                        If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
-                    Else
-                        secondaryEventDataPendingToTriggerFlag = True 'exists information in UI_RefreshDS pending to be send to the event
-                        If Not mySecondaryUI_RefreshEvent.Contains(pUI_EventType) Then mySecondaryUI_RefreshEvent.Add(pUI_EventType)
-                    End If
+
+                    'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                    'If pMainThreadIsUsedFlag Then
+                    '    eventDataPendingToTriggerFlag = True 'exists information in UI_RefreshDS pending to be send to the event
+                    '    If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
+                    'Else
+                    '    secondaryEventDataPendingToTriggerFlag = True 'exists information in UI_RefreshDS pending to be send to the event
+                    '    If Not mySecondaryUI_RefreshEvent.Contains(pUI_EventType) Then mySecondaryUI_RefreshEvent.Add(pUI_EventType)
+                    'End If
+                    eventDataPendingToTriggerFlag = True 'exists information in UI_RefreshDS pending to be send to the event
+                    If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
+                    'AG 22/05/2014 - #1637
 
                     'Case (some reactions rotor well ... has changed)
                     Dim myNewRow As UIRefreshDS.ReactionWellStatusChangedRow
                     For Each row As ReactionsRotorDS.twksWSReactionsRotorRow In pReactionsRotorWellDS.twksWSReactionsRotor.Rows
 
-                        If pMainThreadIsUsedFlag Then
-                            myNewRow = myUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
-                        Else
-                            myNewRow = mySecondaryUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
-                        End If
+                        'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                        'If pMainThreadIsUsedFlag Then
+                        '    myNewRow = myUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
+                        'Else
+                        '    myNewRow = mySecondaryUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
+                        'End If
+                        myNewRow = myUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
+                        'AG 22/05/2014 - #1637
 
                         With myNewRow
                             .BeginEdit()
@@ -4144,19 +4148,25 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             .EndEdit()
                         End With
 
-                        If pMainThreadIsUsedFlag Then
-                            myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
-                        Else
-                            mySecondaryUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
-                        End If
+                        'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                        'If pMainThreadIsUsedFlag Then
+                        '    myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
+                        'Else
+                        '    mySecondaryUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
+                        'End If
+                        myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
+                        'AG 22/05/2014 - #1637
 
                     Next
 
-                    If pMainThreadIsUsedFlag Then
-                        myUI_RefreshDS.AcceptChanges()
-                    Else
-                        mySecondaryUI_RefreshDS.AcceptChanges()
-                    End If
+                    'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                    'If pMainThreadIsUsedFlag Then
+                    '    myUI_RefreshDS.AcceptChanges()
+                    'Else
+                    '    mySecondaryUI_RefreshDS.AcceptChanges()
+                    'End If
+                    myUI_RefreshDS.AcceptChanges()
+                    'AG 22/05/2014 - #1637 Clear code. Comment dead code
                 End If
 
                 'AG 03/07/2012 - Running Cycles lost - Solution!
