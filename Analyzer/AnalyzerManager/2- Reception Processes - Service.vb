@@ -3202,7 +3202,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pCpuId"></param>
         ''' <param name="pCpuValue"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by XBC 08/06/2011</remarks>
+        ''' <remarks>Created by XBC 08/06/2011
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function PrepareUIRefreshEventCpu(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                               ByVal pCpuId As GlobalEnumerates.CPU_ELEMENTS, ByVal pCpuValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
@@ -3224,18 +3226,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             If pCpuId <> Nothing Then
                                 Dim myNewCpuChangeRow As UIRefreshDS.CPUValueChangedRow
-                                myNewCpuChangeRow = myUI_RefreshDS.CPUValueChanged.NewCPUValueChangedRow
-                                With myNewCpuChangeRow
-                                    .BeginEdit()
-                                    .ElementID = pCpuId.ToString
-                                    .Value = pCpuValue.ToString()
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.CPUValueChanged.AddCPUValueChangedRow(myNewCpuChangeRow)
+                                SyncLock myUI_RefreshDS.CPUValueChanged 'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                                    myNewCpuChangeRow = myUI_RefreshDS.CPUValueChanged.NewCPUValueChangedRow
+                                    With myNewCpuChangeRow
+                                        .BeginEdit()
+                                        .ElementID = pCpuId.ToString
+                                        .Value = pCpuValue.ToString()
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.CPUValueChanged.AddCPUValueChangedRow(myNewCpuChangeRow)
+                                    myUI_RefreshDS.CPUValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
                             End If
                         End If
-
-                        myUI_RefreshDS.AcceptChanges()
+                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
 
@@ -3265,7 +3269,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pManifoldId"></param>
         ''' <param name="pManifoldValue"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 24/05/2011</remarks>
+        ''' <remarks>Created by SGM 24/05/2011
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function PrepareUIRefreshEventManifold(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                               ByVal pManifoldId As GlobalEnumerates.MANIFOLD_ELEMENTS, ByVal pManifoldValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
@@ -3287,21 +3293,23 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             If pManifoldId <> Nothing Then
                                 Dim myNewManifoldChangeRow As UIRefreshDS.ManifoldValueChangedRow
-                                myNewManifoldChangeRow = myUI_RefreshDS.ManifoldValueChanged.NewManifoldValueChangedRow
-                                With myNewManifoldChangeRow
-                                    .BeginEdit()
-                                    .ElementID = pManifoldId.ToString
-                                    .Value = pManifoldValue.ToString()
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.ManifoldValueChanged.AddManifoldValueChangedRow(myNewManifoldChangeRow)
+                                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                                SyncLock myUI_RefreshDS.ManifoldValueChanged
+                                    myNewManifoldChangeRow = myUI_RefreshDS.ManifoldValueChanged.NewManifoldValueChangedRow
+                                    With myNewManifoldChangeRow
+                                        .BeginEdit()
+                                        .ElementID = pManifoldId.ToString
+                                        .Value = pManifoldValue.ToString()
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.ManifoldValueChanged.AddManifoldValueChangedRow(myNewManifoldChangeRow)
+                                    myUI_RefreshDS.ManifoldValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
                             End If
                         End If
-
-                        myUI_RefreshDS.AcceptChanges()
+                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
-
                 End If
 
             Catch ex As Exception
@@ -3328,7 +3336,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pFluidicsId"></param>
         ''' <param name="pFluidicsValue"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 24/05/2011</remarks>
+        ''' <remarks>Created by SGM 24/05/2011
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function PrepareUIRefreshEventFluidics(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                                         ByVal pFluidicsId As GlobalEnumerates.FLUIDICS_ELEMENTS, ByVal pFluidicsValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
@@ -3350,18 +3360,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             If pFluidicsId <> Nothing Then
                                 Dim myNewFluidicsChangeRow As UIRefreshDS.FluidicsValueChangedRow
-                                myNewFluidicsChangeRow = myUI_RefreshDS.FluidicsValueChanged.NewFluidicsValueChangedRow
-                                With myNewFluidicsChangeRow
-                                    .BeginEdit()
-                                    .ElementID = pFluidicsId.ToString
-                                    .Value = pFluidicsValue.ToString
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.FluidicsValueChanged.AddFluidicsValueChangedRow(myNewFluidicsChangeRow)
+                                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                                SyncLock myUI_RefreshDS.FluidicsValueChanged
+                                    myNewFluidicsChangeRow = myUI_RefreshDS.FluidicsValueChanged.NewFluidicsValueChangedRow
+                                    With myNewFluidicsChangeRow
+                                        .BeginEdit()
+                                        .ElementID = pFluidicsId.ToString
+                                        .Value = pFluidicsValue.ToString
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.FluidicsValueChanged.AddFluidicsValueChangedRow(myNewFluidicsChangeRow)
+                                    myUI_RefreshDS.FluidicsValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
                             End If
                         End If
 
-                        myUI_RefreshDS.AcceptChanges()
+                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
 
@@ -3391,7 +3405,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pPhotometricsId"></param>
         ''' <param name="pPhotometricsValue"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 24/05/2011</remarks>
+        ''' <remarks>Created by SGM 24/05/2011
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function PrepareUIRefreshEventPhotometrics(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                                         ByVal pPhotometricsId As GlobalEnumerates.PHOTOMETRICS_ELEMENTS, ByVal pPhotometricsValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
@@ -3413,18 +3429,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             If pPhotometricsId <> Nothing Then
                                 Dim myNewPhotometricsChangeRow As UIRefreshDS.PhotometricsValueChangedRow
-                                myNewPhotometricsChangeRow = myUI_RefreshDS.PhotometricsValueChanged.NewPhotometricsValueChangedRow
-                                With myNewPhotometricsChangeRow
-                                    .BeginEdit()
-                                    .ElementID = pPhotometricsId.ToString
-                                    .Value = pPhotometricsValue.ToString
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.PhotometricsValueChanged.AddPhotometricsValueChangedRow(myNewPhotometricsChangeRow)
+                                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                                SyncLock myUI_RefreshDS.PhotometricsValueChanged
+                                    myNewPhotometricsChangeRow = myUI_RefreshDS.PhotometricsValueChanged.NewPhotometricsValueChangedRow
+                                    With myNewPhotometricsChangeRow
+                                        .BeginEdit()
+                                        .ElementID = pPhotometricsId.ToString
+                                        .Value = pPhotometricsValue.ToString
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.PhotometricsValueChanged.AddPhotometricsValueChangedRow(myNewPhotometricsChangeRow)
+                                    myUI_RefreshDS.PhotometricsValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
                             End If
                         End If
 
-                        myUI_RefreshDS.AcceptChanges()
+                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
 
@@ -3452,7 +3472,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pDBConnection"></param>
         ''' <param name="pUI_EventType"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 24/05/2011</remarks>
+        ''' <remarks>Created by SGM 24/05/2011
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function PrepareUIRefreshEventCycles(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                      ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                               ByVal pCycleItemId As GlobalEnumerates.CYCLE_ELEMENTS, _
@@ -3470,7 +3492,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (Not dbConnection Is Nothing) Then
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
-
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
                         If pUI_EventType = GlobalEnumerates.UI_RefreshEvents.HWCYCLES_CHANGED Then
@@ -3479,20 +3500,24 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             If pCycleItemId <> Nothing And pCycleSubSystemID <> Nothing And pCycleUnits <> Nothing And IsNumeric(pCyclesValue) Then
                                 Dim myNewCyclesChangeRow As UIRefreshDS.CyclesValuesChangedRow
-                                myNewCyclesChangeRow = myUI_RefreshDS.CyclesValuesChanged.NewCyclesValuesChangedRow
-                                With myNewCyclesChangeRow
-                                    .BeginEdit()
-                                    .ItemID = pCycleItemId.ToString
-                                    .SubSystemID = pCycleSubSystemID.ToString
-                                    .CycleUnits = pCycleUnits.ToString
-                                    .CyclesCount = CLng(pCyclesValue)
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.CyclesValuesChanged.AddCyclesValuesChangedRow(myNewCyclesChangeRow)
+                                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                                SyncLock myUI_RefreshDS.CyclesValuesChanged
+                                    myNewCyclesChangeRow = myUI_RefreshDS.CyclesValuesChanged.NewCyclesValuesChangedRow
+                                    With myNewCyclesChangeRow
+                                        .BeginEdit()
+                                        .ItemID = pCycleItemId.ToString
+                                        .SubSystemID = pCycleSubSystemID.ToString
+                                        .CycleUnits = pCycleUnits.ToString
+                                        .CyclesCount = CLng(pCyclesValue)
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.CyclesValuesChanged.AddCyclesValuesChangedRow(myNewCyclesChangeRow)
+                                    myUI_RefreshDS.CyclesValuesChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
                             End If
                         End If
 
-                        myUI_RefreshDS.AcceptChanges()
+                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
 

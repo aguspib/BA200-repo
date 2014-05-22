@@ -386,6 +386,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              new ByRef parameter, and inform the Pause status when saving the received Readings
         '''              AG 22/11/2013 - #1397 During 'Recovery Results' in pause mode call method SaveReadings instead of SaverReadingsNEW (it checks if exists before call 
         '''                              the insert in DAO)
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
         ''' </remarks>
         Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                        ByVal pInstructionReceived As List(Of InstructionParameterTO), _
@@ -427,8 +428,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If (limitList.Count > 0) Then totalReadingsNumber = CInt(limitList.First.MaxValue) - internalReadingsOffset
                 'limitList = Nothing 'AG 24/10/2013
 
-                'Clear DS used for update of presentation layer (only the proper data table)
-                myUI_RefreshDS.ReceivedReadings.Clear()
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ReceivedReadings
+                    myUI_RefreshDS.ReceivedReadings.Clear() 'Clear DS used for update of presentation layer (only the proper data table)
+                End SyncLock
 
                 'Process all Readings received
                 Dim myUtility As New Utilities()

@@ -3836,6 +3836,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>25/11/2010 AG: EXECUTION_STATUS case
         ''' AG 09/02/2011 - add NEW READINGS RECEIVED case 
         ''' AG 14/03/2011 - add NEW_ALARMS_RECEIVED case 
+        ''' AG 22/05/2014 - #1637 Reorder code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
         Private Function PrepareUIRefreshEvent(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                                ByVal pExecutionID As Integer, ByVal pReadingNumber As Integer, _
@@ -3852,69 +3853,75 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
 
-                        'If pUI_EventType <> GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED Then
-                        '    myUI_RefreshEvent = pUI_EventType 'Inform the class variable
-                        'ElseIf myUI_RefreshEvent = GlobalEnumerates.UI_RefreshEvents.NONE And pUI_EventType = GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED Then
-                        '    myUI_RefreshEvent = GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED
-                        'End If
+                        'AG 22/05/2014 - #1637 reorder code to use easily SyncLock
+                        'Next code was inside Select Case
+                        Dim local_DS As New UIRefreshDS
+                        If pUI_EventType = UI_RefreshEvents.EXECUTION_STATUS OrElse pUI_EventType = UI_RefreshEvents.RESULTS_CALCULATED Then
+                            Dim exeDelegate As New ExecutionsDelegate
+                            myglobal = exeDelegate.GetExecutionStatusChangeInfo(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, pExecutionID)
+                            If Not myglobal.HasError And Not myglobal.SetDatos Is Nothing Then
+                                local_DS = CType(myglobal.SetDatos, UIRefreshDS)
+                            End If
+                        End If
+                        'AG 22/05/2014
+
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
-
-
-                        'AG 01/04/2011
-
                         Select Case pUI_EventType
                             'Case (execution sent), (execution calculated)
                             Case GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED
-                                Dim exeDelegate As New ExecutionsDelegate
-                                myglobal = exeDelegate.GetExecutionStatusChangeInfo(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, pExecutionID)
                                 If Not myglobal.HasError And Not myglobal.SetDatos Is Nothing Then
-                                    Dim local_DS As New UIRefreshDS
-                                    local_DS = CType(myglobal.SetDatos, UIRefreshDS)
-
                                     'Import new rows into the general class DataSet
                                     If local_DS.ExecutionStatusChanged.Rows.Count > 0 Then
                                         'AG 14/03/2014 - #1533
                                         'For Each row As UIRefreshDS.ExecutionStatusChangedRow In local_DS.ExecutionStatusChanged.Rows
                                         '    myUI_RefreshDS.ExecutionStatusChanged.ImportRow(row)
                                         'Next
-                                        myUI_RefreshDS.ExecutionStatusChanged.Merge(local_DS.ExecutionStatusChanged)
-                                        'AG 14/03/2014 - #1533
+                                        SyncLock myUI_RefreshDS.ExecutionStatusChanged 'AG 22/05/2014 - #1637 Use exclusive lock over myUI_RefreshDS variables
+                                            myUI_RefreshDS.ExecutionStatusChanged.Merge(local_DS.ExecutionStatusChanged)
+                                            'AG 14/03/2014 - #1533
+                                            myUI_RefreshDS.ExecutionStatusChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                        End SyncLock
                                     End If
                                 End If
 
                                 'Case (new result instruction has been received)
                             Case GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED
                                 Dim myNewReadRow As UIRefreshDS.ReceivedReadingsRow
-                                myNewReadRow = myUI_RefreshDS.ReceivedReadings.NewReceivedReadingsRow
-                                With myNewReadRow
-                                    .BeginEdit()
-                                    .WorkSessionID = WorkSessionIDAttribute
-                                    .AnalyzerID = AnalyzerIDAttribute
-                                    .ExecutionID = pExecutionID
-                                    .ReadingNumber = pReadingNumber
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.ReceivedReadings.AddReceivedReadingsRow(myNewReadRow)
+                                SyncLock myUI_RefreshDS.ReceivedReadings 'AG 22/05/2014 - #1637 Use exclusive lock over myUI_RefreshDS variables
+                                    myNewReadRow = myUI_RefreshDS.ReceivedReadings.NewReceivedReadingsRow
+                                    With myNewReadRow
+                                        .BeginEdit()
+                                        .WorkSessionID = WorkSessionIDAttribute
+                                        .AnalyzerID = AnalyzerIDAttribute
+                                        .ExecutionID = pExecutionID
+                                        .ReadingNumber = pReadingNumber
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.ReceivedReadings.AddReceivedReadingsRow(myNewReadRow)
+                                    myUI_RefreshDS.ReceivedReadings.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
 
                                 'Case (new alarms instruction has been received)
                             Case GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED
                                 Dim myNewAlarmRow As UIRefreshDS.ReceivedAlarmsRow
-                                myNewAlarmRow = myUI_RefreshDS.ReceivedAlarms.NewReceivedAlarmsRow
-                                With myNewAlarmRow
-                                    .BeginEdit()
-                                    .WorkSessionID = WorkSessionIDAttribute
-                                    .AnalyzerID = AnalyzerIDAttribute
-                                    .AlarmID = pAlarmID
-                                    .AlarmStatus = pAlarmStatus
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.ReceivedAlarms.AddReceivedAlarmsRow(myNewAlarmRow)
-
+                                SyncLock myUI_RefreshDS.ReceivedAlarms 'AG 22/05/2014 - #1637 Use exclusive lock over myUI_RefreshDS variables
+                                    myNewAlarmRow = myUI_RefreshDS.ReceivedAlarms.NewReceivedAlarmsRow
+                                    With myNewAlarmRow
+                                        .BeginEdit()
+                                        .WorkSessionID = WorkSessionIDAttribute
+                                        .AnalyzerID = AnalyzerIDAttribute
+                                        .AlarmID = pAlarmID
+                                        .AlarmStatus = pAlarmStatus
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.ReceivedAlarms.AddReceivedAlarmsRow(myNewAlarmRow)
+                                    myUI_RefreshDS.ReceivedAlarms.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                                End SyncLock
                             Case Else
 
                         End Select
-                        myUI_RefreshDS.AcceptChanges()
 
+                        'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                     End If
                 End If
@@ -3962,7 +3969,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>25/11/2010 AG 
         ''' AG 30/03/2011 - add case ROTORPOSITION_CHANGED (use new method signature)
         ''' add case SENSORVALUE_CHANGED 
-        ''' AG 22/09/2011 - add case BARCODE_POSITION_READ 
+        ''' AG 22/09/2011 - add case BARCODE_POSITION_READ
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
         Private Function PrepareUIRefreshEventNum2(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                                ByVal pRotorType As String, ByVal pCellNumber As Integer, ByVal pStatus As String, ByVal pElementStatus As String, _
@@ -3974,12 +3982,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                'myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
-                'If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                '    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
                 eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
                 If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
@@ -3987,27 +3989,31 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Case (some rotor positions status, volume, ... has changed)
                     Case GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ
                         Dim myNewRotorPositionRow As UIRefreshDS.RotorPositionsChangedRow
-                        myNewRotorPositionRow = myUI_RefreshDS.RotorPositionsChanged.NewRotorPositionsChangedRow
-                        With myNewRotorPositionRow
-                            .BeginEdit()
-                            .WorkSessionID = WorkSessionIDAttribute
-                            .AnalyzerID = AnalyzerIDAttribute
-                            .RotorType = pRotorType
-                            .CellNumber = pCellNumber
-                            If pStatus <> "" Then .Status = pStatus Else .SetStatusNull()
-                            If String.Compare(pElementStatus, "", False) <> 0 Then .ElementStatus = pElementStatus Else .SetElementStatusNull()
-                            If pRealVolume <> -1 Then .RealVolume = pRealVolume Else .SetRealVolumeNull()
-                            If pTestsLeft <> -1 Then .RemainingTestsNumber = pTestsLeft Else .SetRemainingTestsNumberNull()
-                            If pBarCodeInfo <> "" Then .BarCodeInfo = pBarCodeInfo Else .SetBarCodeInfoNull()
-                            If pBarCodeStatus <> "" Then .BarcodeStatus = pBarCodeStatus Else .SetBarcodeStatusNull()
-                            If pScannedPosition = Nothing Then .SetScannedPositionNull() Else .ScannedPosition = pScannedPosition
-                            If pElementID <> -1 Then .ElementID = pElementID Else .SetElementIDNull()
-                            If pMultiTubeNumber <> -1 Then .MultiTubeNumber = pMultiTubeNumber Else .SetMultiTubeNumberNull()
-                            If pTubeType <> "" Then .TubeType = pTubeType Else .SetTubeTypeNull()
-                            If pTubeContent <> "" Then .TubeContent = pTubeContent Else .SetTubeContentNull()
-                            .EndEdit()
-                        End With
-                        myUI_RefreshDS.RotorPositionsChanged.AddRotorPositionsChangedRow(myNewRotorPositionRow)
+                        'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                        SyncLock myUI_RefreshDS.RotorPositionsChanged
+                            myNewRotorPositionRow = myUI_RefreshDS.RotorPositionsChanged.NewRotorPositionsChangedRow
+                            With myNewRotorPositionRow
+                                .BeginEdit()
+                                .WorkSessionID = WorkSessionIDAttribute
+                                .AnalyzerID = AnalyzerIDAttribute
+                                .RotorType = pRotorType
+                                .CellNumber = pCellNumber
+                                If pStatus <> "" Then .Status = pStatus Else .SetStatusNull()
+                                If String.Compare(pElementStatus, "", False) <> 0 Then .ElementStatus = pElementStatus Else .SetElementStatusNull()
+                                If pRealVolume <> -1 Then .RealVolume = pRealVolume Else .SetRealVolumeNull()
+                                If pTestsLeft <> -1 Then .RemainingTestsNumber = pTestsLeft Else .SetRemainingTestsNumberNull()
+                                If pBarCodeInfo <> "" Then .BarCodeInfo = pBarCodeInfo Else .SetBarCodeInfoNull()
+                                If pBarCodeStatus <> "" Then .BarcodeStatus = pBarCodeStatus Else .SetBarcodeStatusNull()
+                                If pScannedPosition = Nothing Then .SetScannedPositionNull() Else .ScannedPosition = pScannedPosition
+                                If pElementID <> -1 Then .ElementID = pElementID Else .SetElementIDNull()
+                                If pMultiTubeNumber <> -1 Then .MultiTubeNumber = pMultiTubeNumber Else .SetMultiTubeNumberNull()
+                                If pTubeType <> "" Then .TubeType = pTubeType Else .SetTubeTypeNull()
+                                If pTubeContent <> "" Then .TubeContent = pTubeContent Else .SetTubeContentNull()
+                                .EndEdit()
+                            End With
+                            myUI_RefreshDS.RotorPositionsChanged.AddRotorPositionsChangedRow(myNewRotorPositionRow)
+                            myUI_RefreshDS.RotorPositionsChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                        End SyncLock
 
                     Case GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED
                         'This case prepare DS 
@@ -4016,60 +4022,40 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If pSensorId <> Nothing Then
                             Dim myNewSensorChangeRow As UIRefreshDS.SensorValueChangedRow
 
-                            ' XBC 26/10/2011
-                            'myNewSensorChangeRow = myUI_RefreshDS.SensorValueChanged.NewSensorValueChangedRow
-                            'With myNewSensorChangeRow
-                            '    .BeginEdit()
-                            '    .SensorID = pSensorId.ToString
-                            '    .Value = pSensorValue
-                            '    .EndEdit()
-                            'End With
-                            'myUI_RefreshDS.SensorValueChanged.AddSensorValueChangedRow(myNewSensorChangeRow)
-
+                            'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
                             Dim lnqRes As List(Of UIRefreshDS.SensorValueChangedRow)
-                            lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged _
-                                      Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0 _
-                                      Select a).ToList
+                            SyncLock myUI_RefreshDS.SensorValueChanged
+                                lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged _
+                                          Where String.Compare(a.SensorID, pSensorId.ToString, False) = 0 _
+                                          Select a).ToList
 
-                            If lnqRes.Count > 0 Then
-                                ' update value previously created
-                                'For Each row As UIRefreshDS.SensorValueChangedRow In myUI_RefreshDS.SensorValueChanged.Rows
-                                '    If row.SensorID = pSensorId.ToString Then
-                                '        row.Value = pSensorValue
-                                '        Exit For
-                                '    End If
-                                'Next
-                                lnqRes(0).BeginEdit()
-                                lnqRes(0).Value = pSensorValue
-                                lnqRes(0).EndEdit()
-                                lnqRes(0).AcceptChanges()
+                                If lnqRes.Count > 0 Then
+                                    lnqRes(0).BeginEdit()
+                                    lnqRes(0).Value = pSensorValue
+                                    lnqRes(0).EndEdit()
+                                    lnqRes(0).AcceptChanges()
 
-                            Else
-                                ' insert new value
-                                myNewSensorChangeRow = myUI_RefreshDS.SensorValueChanged.NewSensorValueChangedRow
-                                With myNewSensorChangeRow
-                                    .BeginEdit()
-                                    .SensorID = pSensorId.ToString
-                                    .Value = pSensorValue
-                                    .EndEdit()
-                                End With
-                                myUI_RefreshDS.SensorValueChanged.AddSensorValueChangedRow(myNewSensorChangeRow)
-                                myUI_RefreshDS.SensorValueChanged.AcceptChanges()
-                            End If
+                                Else
+                                    ' insert new value
+                                    myNewSensorChangeRow = myUI_RefreshDS.SensorValueChanged.NewSensorValueChangedRow
+                                    With myNewSensorChangeRow
+                                        .BeginEdit()
+                                        .SensorID = pSensorId.ToString
+                                        .Value = pSensorValue
+                                        .EndEdit()
+                                    End With
+                                    myUI_RefreshDS.SensorValueChanged.AddSensorValueChangedRow(myNewSensorChangeRow)
+                                    myUI_RefreshDS.SensorValueChanged.AcceptChanges()
+                                End If
+                            End SyncLock
                             lnqRes = Nothing 'AG 02/08/2012 - free memory
                             ' XBC 26/10/2011
                         End If
 
-
-
                     Case Else
 
                 End Select
-                myUI_RefreshDS.AcceptChanges()
-
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                'End If
-                'End If
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
             Catch ex As Exception
                 myglobal.HasError = True
@@ -4078,12 +4064,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum2", EventLogEntryType.Error, False)
-                'Finally
-
             End Try
-
-            'We have used Exit Try so we have to sure the connection becomes properly closed here
-            'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 03/07/2012 - Running Cycles lost - Solution!
             Return myglobal
         End Function
 
@@ -4101,6 +4082,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns>globalDataTo indicating if there has been error or not</returns>
         ''' <remarks>
         ''' AG 03/06/2011 - add case REACTIONS_WELL_STATUS_CHANGED (use new method signature)
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
         Private Function PrepareUIRefreshEventNum3(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                                ByVal pReactionsRotorWellDS As ReactionsRotorDS, ByVal pMainThreadIsUsedFlag As Boolean) As GlobalDataTO
@@ -4133,29 +4115,35 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'Else
                         '    myNewRow = mySecondaryUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
                         'End If
-                        myNewRow = myUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
                         'AG 22/05/2014 - #1637
 
-                        With myNewRow
-                            .BeginEdit()
-                            If Not row.IsAnalyzerIDNull Then .AnalyzerID = row.AnalyzerID
-                            If Not row.IsWellNumberNull Then .WellNumber = row.WellNumber
-                            If Not row.IsRotorTurnNull Then .RotorTurn = row.RotorTurn
-                            If Not row.IsWellContentNull Then .WellContent = row.WellContent
-                            If Not row.IsWellStatusNull Then .WellStatus = row.WellStatus
-                            If Not row.IsExecutionIDNull Then .ExecutionID = row.ExecutionID
-                            If Not row.IsRejectedFlagNull Then .RejectedFlag = row.RejectedFlag
-                            .EndEdit()
-                        End With
+                        'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                        SyncLock myUI_RefreshDS.ReactionWellStatusChanged
+                            myNewRow = myUI_RefreshDS.ReactionWellStatusChanged.NewReactionWellStatusChangedRow
 
-                        'AG 22/05/2014 - #1637 Clear code. Comment dead code
-                        'If pMainThreadIsUsedFlag Then
-                        '    myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
-                        'Else
-                        '    mySecondaryUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
-                        'End If
-                        myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
-                        'AG 22/05/2014 - #1637
+                            With myNewRow
+                                .BeginEdit()
+                                If Not row.IsAnalyzerIDNull Then .AnalyzerID = row.AnalyzerID
+                                If Not row.IsWellNumberNull Then .WellNumber = row.WellNumber
+                                If Not row.IsRotorTurnNull Then .RotorTurn = row.RotorTurn
+                                If Not row.IsWellContentNull Then .WellContent = row.WellContent
+                                If Not row.IsWellStatusNull Then .WellStatus = row.WellStatus
+                                If Not row.IsExecutionIDNull Then .ExecutionID = row.ExecutionID
+                                If Not row.IsRejectedFlagNull Then .RejectedFlag = row.RejectedFlag
+                                .EndEdit()
+                            End With
+
+                            'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                            'If pMainThreadIsUsedFlag Then
+                            '    myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
+                            'Else
+                            '    mySecondaryUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
+                            'End If
+                            myUI_RefreshDS.ReactionWellStatusChanged.AddReactionWellStatusChangedRow(myNewRow)
+                            'AG 22/05/2014 - #1637
+
+                            myUI_RefreshDS.ReactionWellStatusChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                        End SyncLock
 
                     Next
 
@@ -4165,8 +4153,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Else
                     '    mySecondaryUI_RefreshDS.AcceptChanges()
                     'End If
-                    myUI_RefreshDS.AcceptChanges()
                     'AG 22/05/2014 - #1637 Clear code. Comment dead code
+
+                    'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+
                 End If
 
                 'AG 03/07/2012 - Running Cycles lost - Solution!
@@ -4189,36 +4179,49 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return myglobal
         End Function
 
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pUI_EventType"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWS"></param>
+        ''' <param name="pOrderList"></param>
+        ''' <returns></returns>
+        ''' <remarks> Created ??
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function PrepareUIRefreshEventNum4(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
                                                ByVal pAnalyzerID As String, ByVal pWS As String, ByVal pOrderList As List(Of String)) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                'AG 03/07/2012 - Running Cycles lost - Solution!
-                ''myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
-                ''If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                ''    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
-
                 'If (Not dbConnection Is Nothing) Then
                 eventDataPendingToTriggerFlag = True 'exists information in UI_RefreshDS pending to be send to the event
                 If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
                 Dim myNewRow As UIRefreshDS.AutoReportRow
-                For Each order As String In pOrderList
-                    myNewRow = myUI_RefreshDS.AutoReport.NewAutoReportRow()
-                    With myNewRow
-                        .BeginEdit()
-                        .AnalyzerID = pAnalyzerID
-                        .OrderID = order
-                        '.OrderTestID = cal??
-                        .WorkSessionID = pWS
-                        '.RerunNumber = cal??
-                        .EndEdit()
-                    End With
-                    myUI_RefreshDS.AutoReport.AddAutoReportRow(myNewRow)
-                Next
-                myUI_RefreshDS.AcceptChanges()
+
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.AutoReport
+                    For Each order As String In pOrderList
+                        myNewRow = myUI_RefreshDS.AutoReport.NewAutoReportRow()
+                        With myNewRow
+                            .BeginEdit()
+                            .AnalyzerID = pAnalyzerID
+                            .OrderID = order
+                            '.OrderTestID = cal??
+                            .WorkSessionID = pWS
+                            '.RerunNumber = cal??
+                            .EndEdit()
+                        End With
+                        myUI_RefreshDS.AutoReport.AddAutoReportRow(myNewRow)
+                        myUI_RefreshDS.AutoReport.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                    Next
+                End SyncLock
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
             Catch ex As Exception
                 myglobal.HasError = True
@@ -4227,12 +4230,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventNum4", EventLogEntryType.Error, False)
-                'Finally
-
             End Try
-
-            'We have used Exit Try so we have to sure the connection becomes properly closed here
-            'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 03/07/2012 - Running Cycles lost - Solution!
             Return myglobal
         End Function
 

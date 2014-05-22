@@ -40,6 +40,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 30/11/2012 - Do not inform the attribute endRunAlreadySentFlagAttribute as TRUE when call the ManageAnalyzer with ENDRUN or when you add it to the queue
         '''                 This flag will be informed once the instruction has been really sent. Current code causes that sometimes the ENDRUN instruction is added to
         '''                 queue but how the flag is informed before send the instruction it wont never be sent!!
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
         ''' </remarks>
         Private Function ManageAlarms(ByVal pdbConnection As SqlClient.SqlConnection, _
                                       ByVal pAlarmIDList As List(Of GlobalEnumerates.Alarms), _
@@ -881,7 +882,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim newRowFlag As Boolean = False
                 index = 0
 
-                myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ReceivedAlarms
+                    myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
+                End SyncLock
 
                 'Get the alarms defined with OKType = False (never are marked as solved)
                 Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In _
@@ -3194,7 +3198,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 02/06/2011 - creation </remarks>
+        ''' <remarks>XBC 02/06/2011 - creation
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceFWInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.FW_INFO, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3203,32 +3209,35 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Generate UI_Refresh Firmware values dataset
                 Dim myNewFirmwareValuesRow As UIRefreshDS.FirmwareValueChangedRow
-                myNewFirmwareValuesRow = myUI_RefreshDS.FirmwareValueChanged.NewFirmwareValueChangedRow
-                With myNewFirmwareValuesRow
-                    .BeginEdit()
-                    .ElementID = pElements(GlobalEnumerates.FW_INFO.ID)
-                    .BoardSerialNumber = pElements(GlobalEnumerates.FW_INFO.SMC)
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.FirmwareValueChanged
+                    myNewFirmwareValuesRow = myUI_RefreshDS.FirmwareValueChanged.NewFirmwareValueChangedRow
+                    With myNewFirmwareValuesRow
+                        .BeginEdit()
+                        .ElementID = pElements(GlobalEnumerates.FW_INFO.ID)
+                        .BoardSerialNumber = pElements(GlobalEnumerates.FW_INFO.SMC)
 
-                    .RepositoryVersion = pElements(GlobalEnumerates.FW_INFO.RV)
-                    .RepositoryCRCResult = pElements(GlobalEnumerates.FW_INFO.CRC)
-                    .RepositoryCRCValue = pElements(GlobalEnumerates.FW_INFO.CRCV)
-                    .RepositoryCRCSize = pElements(GlobalEnumerates.FW_INFO.CRCS)
+                        .RepositoryVersion = pElements(GlobalEnumerates.FW_INFO.RV)
+                        .RepositoryCRCResult = pElements(GlobalEnumerates.FW_INFO.CRC)
+                        .RepositoryCRCValue = pElements(GlobalEnumerates.FW_INFO.CRCV)
+                        .RepositoryCRCSize = pElements(GlobalEnumerates.FW_INFO.CRCS)
 
-                    .BoardFirmwareVersion = pElements(GlobalEnumerates.FW_INFO.FWV)
-                    .BoardFirmwareCRCResult = pElements(GlobalEnumerates.FW_INFO.FWCRC)
-                    .BoardFirmwareCRCValue = pElements(GlobalEnumerates.FW_INFO.FWCRCV)
-                    .BoardFirmwareCRCSize = pElements(GlobalEnumerates.FW_INFO.FWCRCS)
+                        .BoardFirmwareVersion = pElements(GlobalEnumerates.FW_INFO.FWV)
+                        .BoardFirmwareCRCResult = pElements(GlobalEnumerates.FW_INFO.FWCRC)
+                        .BoardFirmwareCRCValue = pElements(GlobalEnumerates.FW_INFO.FWCRCV)
+                        .BoardFirmwareCRCSize = pElements(GlobalEnumerates.FW_INFO.FWCRCS)
 
-                    .BoardHardwareVersion = pElements(GlobalEnumerates.FW_INFO.HWV)
+                        .BoardHardwareVersion = pElements(GlobalEnumerates.FW_INFO.HWV)
 
-                    If .ElementID = GlobalEnumerates.POLL_IDs.CPU.ToString Then
-                        .AnalyzerSerialNumber = pElements(GlobalEnumerates.FW_INFO.ASN)
-                    End If
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.FirmwareValueChanged.AddFirmwareValueChangedRow(myNewFirmwareValuesRow)
-
-                myUI_RefreshDS.AcceptChanges()
+                        If .ElementID = GlobalEnumerates.POLL_IDs.CPU.ToString Then
+                            .AnalyzerSerialNumber = pElements(GlobalEnumerates.FW_INFO.ASN)
+                        End If
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.FirmwareValueChanged.AddFirmwareValueChangedRow(myNewFirmwareValuesRow)
+                    myUI_RefreshDS.FirmwareValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -3559,7 +3568,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 31/05/2011 - creation </remarks>
+        ''' <remarks>XBC 31/05/2011 - creation
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceSwArmsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.ARMS_ELEMENTS, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3568,22 +3579,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Generate UI_Refresh Arms values dataset
                 Dim myNewArmsValuesRow As UIRefreshDS.ArmValueChangedRow
-                myNewArmsValuesRow = myUI_RefreshDS.ArmValueChanged.NewArmValueChangedRow
-                With myNewArmsValuesRow
-                    .BeginEdit()
-                    .ArmID = pElements(GlobalEnumerates.ARMS_ELEMENTS.ID)
-                    .BoardTemp = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.TMP), Single)
-                    .MotorHorizontal = pElements(GlobalEnumerates.ARMS_ELEMENTS.MH)
-                    .MotorHorizontalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MHH)
-                    .MotorHorizontalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MHA), Single)
-                    .MotorVertical = pElements(GlobalEnumerates.ARMS_ELEMENTS.MV)
-                    .MotorVerticalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MVH)
-                    .MotorVerticalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MVA), Single)
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.ArmValueChanged.AddArmValueChangedRow(myNewArmsValuesRow)
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ArmValueChanged
+                    myNewArmsValuesRow = myUI_RefreshDS.ArmValueChanged.NewArmValueChangedRow
+                    With myNewArmsValuesRow
+                        .BeginEdit()
+                        .ArmID = pElements(GlobalEnumerates.ARMS_ELEMENTS.ID)
+                        .BoardTemp = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.TMP), Single)
+                        .MotorHorizontal = pElements(GlobalEnumerates.ARMS_ELEMENTS.MH)
+                        .MotorHorizontalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MHH)
+                        .MotorHorizontalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MHA), Single)
+                        .MotorVertical = pElements(GlobalEnumerates.ARMS_ELEMENTS.MV)
+                        .MotorVerticalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MVH)
+                        .MotorVerticalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MVA), Single)
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.ArmValueChanged.AddArmValueChangedRow(myNewArmsValuesRow)
 
-                myUI_RefreshDS.AcceptChanges()
+                    'myUI_RefreshDS.AcceptChanges()
+                    myUI_RefreshDS.ArmValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
 
                 'Generate UI_Refresh event ARMSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.ARMSVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.ARMSVALUE_CHANGED)
@@ -3606,31 +3621,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 01/06/2011 - creation </remarks>
+        ''' <remarks>XBC 01/06/2011 - creation 
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceSwProbesInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.PROBES_ELEMENTS, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 'Generate UI_Refresh Arms Probes dataset
                 Dim myNewprobesValuesRow As UIRefreshDS.ProbeValueChangedRow
-                myNewprobesValuesRow = myUI_RefreshDS.ProbeValueChanged.NewProbeValueChangedRow
-                With myNewprobesValuesRow
-                    .BeginEdit()
-                    .ProbeID = pElements(GlobalEnumerates.PROBES_ELEMENTS.ID)
-                    .BoardTemp = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.TMP), Single)
-                    .DetectionStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.DST)
-                    .DetectionFrequency = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DFQ), Single)
-                    .Detection = pElements(GlobalEnumerates.PROBES_ELEMENTS.D)
-                    .LastInternalRate = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DCV), Single)
-                    .ThermistorValue = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTH), Single)
-                    .ThermistorDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTHD), Single)
-                    .HeaterStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.PH)
-                    .HeaterDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PHD), Single)
-                    .CollisionDetector = pElements(GlobalEnumerates.PROBES_ELEMENTS.CD)
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.ProbeValueChanged.AddProbeValueChangedRow(myNewprobesValuesRow)
 
-                myUI_RefreshDS.AcceptChanges()
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ProbeValueChanged
+                    myNewprobesValuesRow = myUI_RefreshDS.ProbeValueChanged.NewProbeValueChangedRow
+                    With myNewprobesValuesRow
+                        .BeginEdit()
+                        .ProbeID = pElements(GlobalEnumerates.PROBES_ELEMENTS.ID)
+                        .BoardTemp = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.TMP), Single)
+                        .DetectionStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.DST)
+                        .DetectionFrequency = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DFQ), Single)
+                        .Detection = pElements(GlobalEnumerates.PROBES_ELEMENTS.D)
+                        .LastInternalRate = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DCV), Single)
+                        .ThermistorValue = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTH), Single)
+                        .ThermistorDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTHD), Single)
+                        .HeaterStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.PH)
+                        .HeaterDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PHD), Single)
+                        .CollisionDetector = pElements(GlobalEnumerates.PROBES_ELEMENTS.CD)
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.ProbeValueChanged.AddProbeValueChangedRow(myNewprobesValuesRow)
+                    myUI_RefreshDS.ProbeValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                 'Generate UI_Refresh event PROBESSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED)
@@ -3653,44 +3674,49 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 01/06/2011 - creation </remarks>
+        ''' <remarks>XBC 01/06/2011 - creation
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceSwRotorsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.ROTORS_ELEMENTS, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 'Generate UI_Refresh Rotors values dataset
                 Dim myNewRotorsValuesRow As UIRefreshDS.RotorValueChangedRow
-                myNewRotorsValuesRow = myUI_RefreshDS.RotorValueChanged.NewRotorValueChangedRow
-                With myNewRotorsValuesRow
-                    .BeginEdit()
-                    .RotorID = pElements(GlobalEnumerates.ROTORS_ELEMENTS.ID)
-                    .BoardTemp = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.TMP), Single)
-                    .Motor = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MR)
-                    .MotorHome = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRH)
-                    .MotorPosition = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRA), Single)
-                    .ThermistorFridgeValue = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTH), Single)
-                    .ThermistorFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTHD), Single)
-                    .PeltiersFridgeStatus = pElements(GlobalEnumerates.ROTORS_ELEMENTS.FH)
-                    .PeltiersFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FHD), Single)
-                    .PeltiersFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1), Single)
-                    .PeltiersFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1D), Single)
-                    .PeltiersFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2), Single)
-                    .PeltiersFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2D), Single)
-                    .PeltiersFan3Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3), Single)
-                    .PeltiersFan3Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3D), Single)
-                    .PeltiersFan4Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4), Single)
-                    .PeltiersFan4Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4D), Single)
-                    .FrameFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1), Single)
-                    .FrameFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1D), Single)
-                    .FrameFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2), Single)
-                    .FrameFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2D), Single)
-                    .Cover = pElements(GlobalEnumerates.ROTORS_ELEMENTS.RC)
-                    .BarCodeStatus = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.CB), Single)
-                    .BarcodeError = pElements(GlobalEnumerates.ROTORS_ELEMENTS.CBE)
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.RotorValueChanged.AddRotorValueChangedRow(myNewRotorsValuesRow)
+                SyncLock myUI_RefreshDS.RotorValueChanged
+                    myNewRotorsValuesRow = myUI_RefreshDS.RotorValueChanged.NewRotorValueChangedRow
+                    With myNewRotorsValuesRow
+                        .BeginEdit()
+                        .RotorID = pElements(GlobalEnumerates.ROTORS_ELEMENTS.ID)
+                        .BoardTemp = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.TMP), Single)
+                        .Motor = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MR)
+                        .MotorHome = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRH)
+                        .MotorPosition = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRA), Single)
+                        .ThermistorFridgeValue = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTH), Single)
+                        .ThermistorFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTHD), Single)
+                        .PeltiersFridgeStatus = pElements(GlobalEnumerates.ROTORS_ELEMENTS.FH)
+                        .PeltiersFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FHD), Single)
+                        .PeltiersFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1), Single)
+                        .PeltiersFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1D), Single)
+                        .PeltiersFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2), Single)
+                        .PeltiersFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2D), Single)
+                        .PeltiersFan3Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3), Single)
+                        .PeltiersFan3Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3D), Single)
+                        .PeltiersFan4Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4), Single)
+                        .PeltiersFan4Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4D), Single)
+                        .FrameFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1), Single)
+                        .FrameFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1D), Single)
+                        .FrameFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2), Single)
+                        .FrameFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2D), Single)
+                        .Cover = pElements(GlobalEnumerates.ROTORS_ELEMENTS.RC)
+                        .BarCodeStatus = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.CB), Single)
+                        .BarcodeError = pElements(GlobalEnumerates.ROTORS_ELEMENTS.CBE)
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.RotorValueChanged.AddRotorValueChangedRow(myNewRotorsValuesRow)
+                    myUI_RefreshDS.RotorValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
 
-                myUI_RefreshDS.AcceptChanges()
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                 'Generate UI_Refresh event ROTORSSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.ROTORSVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.ROTORSVALUE_CHANGED)
