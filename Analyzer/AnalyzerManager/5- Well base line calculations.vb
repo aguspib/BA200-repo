@@ -603,15 +603,33 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 completeReadingsFlag = (CType(myGlobal.SetDatos, twksWSReadingsDS).twksWSReadings.Count > 0)
                             End If
 
-                            If (Not validReadingFlag OrElse myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
-                                'Update fields ValidReadings and CompleteReadings for the Execution
+                            'AG 22/05/2014 - #1634 - If CompleteReadings is FALSE do not update it to TRUE (the error flag cannot be removed or calculations will call and exception could appear)
+                            ' EXCEPTION: when the 1st reading is received the flag must be set to TRUE
+                            'Make it in two IFs, do not mixed because condition is wrong
+                            'If (Not validReadingFlag OrElse myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
+                            '    myExecutionDS.twksWSExecutions(0).BeginEdit()
+                            '    myExecutionDS.twksWSExecutions(0).ValidReadings = validReadingFlag
+                            '    myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
+                            '    myExecutionDS.twksWSExecutions(0).EndEdit()
+                            '    executionUpdated = True
+                            'End If
+
+                            '1- Update ValidRedingFlag (1st reading initiate value, else evaluate it but if current value is FALSE do not change it!!!)
+                            If ((myReadingNumber - internalReadingsOffset) = 1) OrElse (Not validReadingFlag AndAlso myExecutionDS.twksWSExecutions(0).ValidReadings <> validReadingFlag) Then
                                 myExecutionDS.twksWSExecutions(0).BeginEdit()
                                 myExecutionDS.twksWSExecutions(0).ValidReadings = validReadingFlag
-                                myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
                                 myExecutionDS.twksWSExecutions(0).EndEdit()
-
                                 executionUpdated = True
                             End If
+
+                            '2- Update CompleteReadings (1st reading set to TRUE, else evaluate it but if current value is FALSE do not change it!!!)
+                            If ((myReadingNumber - internalReadingsOffset) = 1) OrElse (Not completeReadingsFlag AndAlso myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
+                                myExecutionDS.twksWSExecutions(0).BeginEdit()
+                                myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
+                                myExecutionDS.twksWSExecutions(0).EndEdit()
+                                executionUpdated = True
+                            End If
+                            'AG 22/05/2014 - #1634
 
                             'Move the Execution to the DS containing all processed Executions
                             allExecutionsDS.twksWSExecutions.ImportRow(myExecutionDS.twksWSExecutions(0))

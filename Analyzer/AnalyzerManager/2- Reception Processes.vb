@@ -3509,6 +3509,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
                             End If
 
+                            'AG 22/05/2014 #1634 - NOTE, NO CHANGES! Here we should set executions flags (ValidReadings = TRUE and CompleteReadings = TRUE) but
+                            'method UpdateStatus is called in more places, so we decide to initiate these flags when 1st reading is received (method ProcessBiochemicalReadingsNEW)
+                            'Flags ThermoWarningFlag and ClotValue will be reevaluate when readings are received too
+
                             'Update fields ExecutionStatus and PreparationID for all Executions in DS ExecutionsDS and Commit or Rollback the opened DB TRANSACTION
                             myGlobal = exeDelegate.UpdateStatus(dbConnection, myExecutionsDS)
 
