@@ -4363,6 +4363,7 @@ Partial Public Class IAx00MainMDI
     ''' Modified by XB 22/10/2013 - PMCL check is performed always (although there are no ISE preparations on WS) - BT #1343
     '''             XB 28/03/2014 - When ISE is no ready (for instance, by timeout), only displays one msg to User (ManageReceptionEvent), not here and go on - task #1485
     '''             XB 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587
+    '''             XB 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
     ''' </remarks>
     Private Function VerifyISEConditioningBeforeRunning(ByRef pWSExecutionsCreatedFlag As Boolean) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
@@ -4396,73 +4397,94 @@ Partial Public Class IAx00MainMDI
                             Else
                                 ' XB 28/03/2014
 
-                                ' Activate buzzer
-                                If Not MDIAnalyzerManager Is Nothing Then
-                                    MDIAnalyzerManager.StartAnalyzerRinging()
-                                    System.Threading.Thread.Sleep(500)
-                                End If
-
+                                '  XB 23/05/2014 - #1638
+                                Dim TestsByTypeIntoWS As String = ""
                                 If (CType(myGlobal.SetDatos, Boolean)) Then
-                                    'ISE Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
-                                    'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
-
-                                    ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
-                                    'userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                    If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
-                                        userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                    Else
-                                        userAnswer = Windows.Forms.DialogResult.Yes
-                                    End If
-                                    ' XB 20/11/2013
-
-                                    WarningAreadyShown = True
-
-                                    If (userAnswer = DialogResult.Yes) Then
-                                        'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
-                                        updateExecutions = True
-                                        EnableButtonAndMenus(False)
-                                    Else
-                                        EnableButtonAndMenus(True, True)   ' XB 07/11/2013
-                                        Application.DoEvents()
+                                    TestsByTypeIntoWS = "STD"
+                                    myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                        If (CType(myGlobal.SetDatos, Boolean)) Then
+                                            TestsByTypeIntoWS = "ALL"
+                                        End If
                                     End If
                                 Else
-                                    'ISE Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
-                                    'the WS can not be started
+                                    TestsByTypeIntoWS = "ISE"
+                                End If
 
-                                    ' XB 21/11/2013 - In Pause mode, WS must go on
-                                    'userAnswer = DialogResult.No
-                                    If MDIAnalyzerManager.AllowScanInRunning Then
-                                        userAnswer = DialogResult.Yes
+                                If TestsByTypeIntoWS <> "STD" Then
+                                    '  XB 23/05/2014 - #1638
+
+
+                                    ' Activate buzzer
+                                    If Not MDIAnalyzerManager Is Nothing Then
+                                        MDIAnalyzerManager.StartAnalyzerRinging()
+                                        System.Threading.Thread.Sleep(500)
+                                    End If
+
+                                    If TestsByTypeIntoWS = "ALL" Then
+                                        'ISE Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
+                                        'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
+
+                                        ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
+                                        'userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
+                                        If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                            userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
+                                        Else
+                                            userAnswer = Windows.Forms.DialogResult.Yes
+                                        End If
+                                        ' XB 20/11/2013
+
+                                        WarningAreadyShown = True
+
+                                        If (userAnswer = DialogResult.Yes) Then
+                                            'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
+                                            updateExecutions = True
+                                            EnableButtonAndMenus(False)
+                                        Else
+                                            updateExecutions = True '  XB 23/05/2014 - Lock ISE preparations always #1638
+                                            EnableButtonAndMenus(True, True)   ' XB 07/11/2013
+                                            Application.DoEvents()
+                                        End If
                                     Else
-                                        userAnswer = DialogResult.No
-                                    End If
-                                    ' XB 21/11/2013
+                                        'ISE Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
+                                        'the WS can not be started
 
-                                    ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
-                                    WarningAreadyShown = True
+                                        ' XB 21/11/2013 - In Pause mode, WS must go on
+                                        'userAnswer = DialogResult.No
+                                        If MDIAnalyzerManager.AllowScanInRunning Then
+                                            userAnswer = DialogResult.Yes
+                                        Else
+                                            userAnswer = DialogResult.No
+                                        End If
+                                        ' XB 21/11/2013
 
-                                    'All ISE Pending Tests will be blocked
-                                    updateExecutions = True
-                                End If
+                                        ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
+                                        WarningAreadyShown = True
 
-                                ' Close buzzer
-                                If Not MDIAnalyzerManager Is Nothing Then
-                                    MDIAnalyzerManager.StopAnalyzerRinging()
-                                    System.Threading.Thread.Sleep(500)
-                                End If
-
-                                If (updateExecutions) Then
-                                    If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                                        Dim myExecutionsDelegate As New ExecutionsDelegate
-                                        myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
+                                        'All ISE Pending Tests will be blocked
+                                        updateExecutions = True
                                     End If
 
-                                    If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
-                                        'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
-                                        Dim myDummyUIRefresh As New UIRefreshDS
-                                        IMonitor.UpdateWSState(myDummyUIRefresh)
+                                    ' Close buzzer
+                                    If Not MDIAnalyzerManager Is Nothing Then
+                                        MDIAnalyzerManager.StopAnalyzerRinging()
+                                        System.Threading.Thread.Sleep(500)
                                     End If
-                                End If
+
+                                    If (updateExecutions) Then
+                                        If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                                            Dim myExecutionsDelegate As New ExecutionsDelegate
+                                            myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
+                                        End If
+
+                                        If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
+                                            'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
+                                            Dim myDummyUIRefresh As New UIRefreshDS
+                                            IMonitor.UpdateWSState(myDummyUIRefresh)
+                                        End If
+                                    End If
+
+                                End If    '  XB 23/05/2014 - #1638
 
 
                             End If ' XB 28/03/2014
@@ -4470,7 +4492,7 @@ Partial Public Class IAx00MainMDI
 
                         End If
 
-                        ' ISE self-maintenance
+                            ' ISE self-maintenance
                     Else
                         ' Check if ISE Pumps calibration is required
                         myGlobal = MDIAnalyzerManager.ISE_Manager.CheckPumpsCalibrationIsNeeded
@@ -4615,6 +4637,7 @@ Partial Public Class IAx00MainMDI
                                                 EnableButtonAndMenus(False)
 
                                             Else
+                                                updateExecutions = True '  XB 23/05/2014 - Lock ISE preparations always #1638
                                                 EnableButtonAndMenus(True, True)   ' XB 07/11/2013
                                                 Application.DoEvents()
                                             End If
