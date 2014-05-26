@@ -278,7 +278,7 @@ Public Class TestISEMonitor
                                                   myCalElectroDate, myCalElectroString1, myCalElectroString2, myCalElectroResult1OK, myCalElectroResult2OK, myCalElectroRecomm, _
                                                   myCalPumpsdate, myCalPumpsString, myCalPumpsResultOK, myCalPumpsRecomm, _
                                                   myCalBubbledate, myCalBubbleString, myCalBubbleResultOK, myCalBubbleRecomm, _
-                                                  myCleanDate, myCleanRecomm, True, False)
+                                                  myCleanDate, myCleanRecomm, True, False, 4, 24)
 
 
             myGlobal.SetDatos = myMonitorData

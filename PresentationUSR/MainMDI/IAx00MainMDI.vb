@@ -4361,9 +4361,10 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>
     ''' Created by  AG 15/07/2013
     ''' Modified by XB 22/10/2013 - PMCL check is performed always (although there are no ISE preparations on WS) - BT #1343
-    '''             XB 28/03/2014 - When ISE is no ready (for instance, by timeout), only displays one msg to User (ManageReceptionEvent), not here and go on - task #1485
-    '''             XB 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587
-    '''             XB 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
+    '''             XB 28/03/2014 - When ISE is no ready (for instance, by timeout), only displays one msg to User (ManageReceptionEvent), not here and go on - BT #1485
+    '''             XB 28/04/2014 - Improve Initial Purges sends before StartWS - BT #1587
+    '''             XB 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - BT #1638
+    '''             XB 23/05/2014 - Not execute WS if there are no Executions - BT #1640
     ''' </remarks>
     Private Function VerifyISEConditioningBeforeRunning(ByRef pWSExecutionsCreatedFlag As Boolean) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
@@ -4943,6 +4944,23 @@ Partial Public Class IAx00MainMDI
                             If Not myGlobal.HasError Then
                                 pWSExecutionsCreatedFlag = True
                                 Me.StartSessionisPending = False
+
+                                ' XB 23/05/2014 - BT #1640
+                                'Check if there are pending executions
+                                Dim myWSDelegate As New WorkSessionsDelegate
+                                Dim pendingExecutionsLeft As Boolean = False
+                                Dim executionsNumber As Integer = 0
+                                myGlobal = myWSDelegate.StartedWorkSessionFlag(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, executionsNumber, pendingExecutionsLeft)
+
+                                If Not pendingExecutionsLeft AndAlso MDIAnalyzerManager.AllowScanInRunning Then
+                                    pendingExecutionsLeft = True 'Set this flag to TRUE so user could ACCEPT message (continue in same status) or CANCEL message (and return to running normal mode)
+                                End If
+                                If Not pendingExecutionsLeft Then
+                                    userAnswer = Windows.Forms.DialogResult.No
+                                    ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED2.ToString)
+                                End If
+                                ' XB 23/05/2014 - BT #1640
+
                             End If
                             ' XBC 12/04/2013
 
@@ -4950,12 +4968,14 @@ Partial Public Class IAx00MainMDI
                     End If
                     'end SGM 01/10/2012
 
-                    MDIAnalyzerManager.ISE_Manager.WorkSessionIsRunning = True
+                    If userAnswer = Windows.Forms.DialogResult.Yes Then ' XB 23/05/2014
+                        MDIAnalyzerManager.ISE_Manager.WorkSessionIsRunning = True
 
-                    'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                    'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
-                    ' Update date for the ISE test executed while running
-                    MDIAnalyzerManager.ISE_Manager.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
+                        'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
+                        'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                        ' Update date for the ISE test executed while running
+                        MDIAnalyzerManager.ISE_Manager.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
+                    End If
                 End If
 
             End If

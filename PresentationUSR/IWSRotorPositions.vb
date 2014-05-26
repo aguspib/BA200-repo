@@ -6265,6 +6265,7 @@ Public Class IWSRotorPositions
     '''              SA 10/04/2014 - BT #1584 ==> When the Analyzer is in PAUSE mode, flag createWSInRunning has to be set to FALSE although the Analyzer 
     '''                                           Status is Running. This is to allow block/unblock Executions when elements have been unpositioned/positioned 
     '''                                           during the Pause
+    '''              XB 23/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6300,7 +6301,13 @@ Public Class IWSRotorPositions
                                 If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                                     Dim isNeeded As Boolean = CBool(resultData.SetDatos)
                                     If isNeeded Then
-                                        iseModuleReady = False
+
+                                        ' XB 23/05/2014 - BT #1639
+                                        If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                                           (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                            iseModuleReady = False
+                                        End If
+                                        ' XB 23/05/2014 - BT #1639
 
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
