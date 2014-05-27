@@ -8201,6 +8201,7 @@ Partial Public Class IAx00MainMDI
     '''              SA 09/09/2013 - Write a warning in the application LOG if the process of creation a new Empty WS was stopped due to a previous one still exists
     '''              SA 21/03/2014 - BT #1545 ==> Changes to divide AddWorkSession process in several DB Transactions. When value of global flag 
     '''                                           NEWAddWorkSession is TRUE, call new version of function AddWorkSession
+    '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     ''' </remarks>
     Public Sub OpenMonitorForm(ByRef FormToClose As Form, Optional ByVal pAutomaticProcessFlag As Boolean = False)
         Try
@@ -8300,11 +8301,12 @@ Partial Public Class IAx00MainMDI
             If (BsTimerWUp.Enabled) Then BsTimerWUp_Tick(Nothing, Nothing)
 
 
-            ' XB 22/11/2013 - Task #1394
-            If DisplayISELockedPreparationsWarningAttribute Then
-                DisplayISELockedPreparationsWarningAttribute = False
-                ShowMessage(Me.Name, "ISE_NEW_TEST_LOCKED")
-            End If
+            ' XB 27/05/2014 - BT #1638
+            '' XB 22/11/2013 - Task #1394
+            'If DisplayISELockedPreparationsWarningAttribute Then
+            '    DisplayISELockedPreparationsWarningAttribute = False
+            '    ShowMessage(Me.Name, "ISE_NEW_TEST_LOCKED")
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMonitorForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -8316,19 +8318,20 @@ Partial Public Class IAx00MainMDI
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Procedure to set value to SetDisplayISELockedPreparations attribute from another forms
-    ''' </summary>
-    ''' <param name="pValue"></param>
-    ''' <remarks>Create by XB 22/11/2013 - Task #1394</remarks>
-    Public Sub SetDisplayISELockedPreparationsWarning(ByVal pValue As Boolean)
-        Try
-            DisplayISELockedPreparationsWarningAttribute = pValue
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDisplayISELockedPreparationsWarning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".SetDisplayISELockedPreparationsWarning ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
+    ' XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
+    ' ''' <summary>
+    ' ''' Procedure to set value to SetDisplayISELockedPreparations attribute from another forms
+    ' ''' </summary>
+    ' ''' <param name="pValue"></param>
+    ' ''' <remarks>Create by XB 22/11/2013 - Task #1394</remarks>
+    'Public Sub SetDisplayISELockedPreparationsWarning(ByVal pValue As Boolean)
+    '    Try
+    '        DisplayISELockedPreparationsWarningAttribute = pValue
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDisplayISELockedPreparationsWarning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".SetDisplayISELockedPreparationsWarning ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
 
     ''' <summary>
     ''' Opens the WS Monitor form.
