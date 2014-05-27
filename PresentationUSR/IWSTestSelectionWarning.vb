@@ -121,6 +121,23 @@ Public Class IWSTestSelectionWarning
         End Try
     End Sub
 
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsExitButton = Nothing
+            bsScreenToolTips = Nothing
+            bsNotPosWarningGroupBox = Nothing
+            bsTitleLabel = Nothing
+            MemoEdit1 = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"

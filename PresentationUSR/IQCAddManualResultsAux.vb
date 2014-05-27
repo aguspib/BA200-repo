@@ -440,6 +440,27 @@ Public Class IQCAddManualResultsAux
         End Try
         Return myResult
     End Function
+
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsAddManualResultsGroupBox = Nothing
+            bsAddManualResultLabel = Nothing
+            bsNewResultGridView = Nothing
+            bsExitButton = Nothing
+            bsAcceptButton = Nothing
+            myToolTipsControl = Nothing
+            bsNumSerieNumericUpDown = Nothing
+            bsNumSerieLabel = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"

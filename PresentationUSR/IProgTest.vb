@@ -9847,7 +9847,234 @@ Public Class IProgTest
         Return myFielLimits
     End Function
 
+    Private Sub ReleaseElements()
+        Try
 
+            '--- Detach variable defined using WithEvents ---
+            DeleteButton = Nothing
+            EditButton = Nothing
+            AddButton = Nothing
+            PrintTestButton = Nothing
+            TestDetailsTabs = Nothing
+            ProcedureTab = Nothing
+            CalibrationTab = Nothing
+            MultipleCalibRadioButton = Nothing
+            FactorRadioButton = Nothing
+            AddCalibratorButton = Nothing
+            XLabel = Nothing
+            CalibrationFactorTextBox = Nothing
+            BlankReplicatesLabel = Nothing
+            CalibratorReplicatesLabels = Nothing
+            AlternativeCalComboBox = Nothing
+            TestListView = Nothing
+            TestDescriptionTextBox = Nothing
+            VolR1Label = Nothing
+            VolSampleLabel = Nothing
+            FilterReferenceLabel = Nothing
+            FilterMainLabel = Nothing
+            ReadingModeLabel = Nothing
+            ReadingModeCombo = Nothing
+            ReferenceFilterCombo = Nothing
+            MainFilterCombo = Nothing
+            WashSolVolUpDown = Nothing
+            VolR1UpDown = Nothing
+            VolR2UpDown = Nothing
+            SampleVolUpDown = Nothing
+            SamUnitLabel = Nothing
+            VolR2Label = Nothing
+            VolWashLabel = Nothing
+            Reading1Label = Nothing
+            WashUnitLabel = Nothing
+            R1UnitLabel = Nothing
+            VolumesGroupBox = Nothing
+            R2UnitLabel = Nothing
+            TimesGroupBox = Nothing
+            Reading2Label = Nothing
+            CycleLabel = Nothing
+            FirstReadingSecUpDown = Nothing
+            FirstReadingCycleUpDown = Nothing
+            SecondsLabel = Nothing
+            SecondReadingSecUpDown = Nothing
+            Div1 = Nothing
+            PredilutionModeLabel = Nothing
+            PredilutionModeCombo = Nothing
+            PredilutionFactorTextBox = Nothing
+            PredilutionFactorCheckBox = Nothing
+            AutoRepetitionCheckbox = Nothing
+            SaveButton = Nothing
+            BlankReplicatesUpDown = Nothing
+            CalReplicatesUpDown = Nothing
+            ExitButton = Nothing
+            SelectedSampleTypeCombo = Nothing
+            BlankTypesLabel = Nothing
+            BlankTypesCombo = Nothing
+            OptionsTab = Nothing
+            PostDilutionFactorGroupbox = Nothing
+            IncPostDilutionFactorTextBox = Nothing
+            MultLabel = Nothing
+            IncreaseLabel = Nothing
+            DivReduce = Nothing
+            RedPostDilutionFactorTextBox = Nothing
+            ReducedLabel = Nothing
+            DetectionUnitLabel = Nothing
+            LinearityUnitLabel = Nothing
+            ValueLabel = Nothing
+            DetectionLimitLabel = Nothing
+            LinearityLimitLabel = Nothing
+            KineticBlanKLimitLabel = Nothing
+            BlankAbsorbanceLimintLabel = Nothing
+            SecondReadingCycleUpDown = Nothing
+            BsErrorProvider1 = Nothing
+            BlankAbsorbanceUpDown = Nothing
+            LinearityUpDown = Nothing
+            DetectionUpDown = Nothing
+            MaxValueLabel = Nothing
+            MinValueLabel = Nothing
+            ProzonePercentUpDown = Nothing
+            BLabel = Nothing
+            ALabel = Nothing
+            PercentLabel = Nothing
+            SubstrateDepletionLabel = Nothing
+            SlopeFunctionLabel = Nothing
+            SlopeBUpDown = Nothing
+            SlopeAUpDown = Nothing
+            ProzoneT2UpDown = Nothing
+            ProzoneT1UpDown = Nothing
+            ProzoneEffectLabel = Nothing
+            T2Label = Nothing
+            T1Label = Nothing
+            BsLabel1 = Nothing
+            TestLabel = Nothing
+            BsPanel1 = Nothing
+            BsPanel2 = Nothing
+            AlternativeCalibRadioButton = Nothing
+            CalibrationModeLabel = Nothing
+            bsCalibratorValuesCurveLabel = Nothing
+            bsBlankModeLabel = Nothing
+            FactorLimitsLabel = Nothing
+            FactorUpperLimitUpDown = Nothing
+            FactorLowerLimitUpDown = Nothing
+            RepetitionRangeLabel = Nothing
+            RerunUpperLimitUpDown = Nothing
+            RerunLowerLimitUpDown = Nothing
+            Separa1 = Nothing
+            RepetitionRangeUnitLabel = Nothing
+            SpecificCalibInfoGroupBox = Nothing
+            BsCalibNumberTextBox = Nothing
+            ConcentrationGridView = Nothing
+            CalibNumber = Nothing
+            Concentration = Nothing
+            Factor = Nothing
+            CalibCurveInfoGroupBox = Nothing
+            YAxisCombo = Nothing
+            YaxisLabel = Nothing
+            XAxisCombo = Nothing
+            XaxisLabel = Nothing
+            CurveTypeCombo = Nothing
+            DecreasingRadioButton = Nothing
+            IncreasingRadioButton = Nothing
+            NumCalibratorLabel = Nothing
+            Separa2 = Nothing
+            ReferenceRangesLabel = Nothing
+            bsScreenToolTips = Nothing
+            GeneralTab = Nothing
+            AbsCheckBox = Nothing
+            ReactionTypeCombo = Nothing
+            ReplicatesUpDown = Nothing
+            DecimalsUpDown = Nothing
+            ReportsNameTextBox = Nothing
+            TurbidimetryCheckBox = Nothing
+            ReportNameLabel = Nothing
+            ReplicatesLabel = Nothing
+            ReactionTypeLabel = Nothing
+            DecimalsLabel = Nothing
+            UnitsLabel = Nothing
+            UnitsCombo = Nothing
+            DeleteSampleTypeButton = Nothing
+            SampleTypeLabel = Nothing
+            AnalysisModeCombo = Nothing
+            ShortNameTextBox = Nothing
+            AnalysisModeLabel = Nothing
+            ShortNameLabel = Nothing
+            TestNameTextBox = Nothing
+            NameLabel = Nothing
+            CancelButton = Nothing
+            CalibratorLotTextBox = Nothing
+            CalibratorNameTextBox = Nothing
+            LBL_CalibratorName = Nothing
+            LBL_ExpDate_Full = Nothing
+            LBL_Lot = Nothing
+            CalibratorExpirationDate = Nothing
+            KineticBlankUpDown = Nothing
+            SampleTypePlus2 = Nothing
+            DiluentLabel = Nothing
+            DiluentComboBox = Nothing
+            BsGroupBox1 = Nothing
+            BsGroupBox2 = Nothing
+            QCTabPage = Nothing
+            QCValuesLabel = Nothing
+            BsLabel2 = Nothing
+            ControlValuesGroupBox = Nothing
+            QCActiveCheckBox = Nothing
+            RejectionCriteriaLabel = Nothing
+            QCRejectionCriteria = Nothing
+            QCReplicNumberNumeric = Nothing
+            ControlReplicatesNumberLabel = Nothing
+            BsGroupBox3 = Nothing
+            TestProgHelpProvider = Nothing
+            BsLabel3 = Nothing
+            CalculationModeGroupBox = Nothing
+            QCMinNumSeries = Nothing
+            MinimumNumSeries = Nothing
+            StaticRadioButton = Nothing
+            ManualRadioButton = Nothing
+            SixSigmaValuesGroupBox = Nothing
+            RulesToApplyGroupBox = Nothing
+            BsCheckbox1 = Nothing
+            BsCheckbox2 = Nothing
+            BsCheckbox3 = Nothing
+            BsCheckbox4 = Nothing
+            BsCheckbox5 = Nothing
+            BsCheckbox6 = Nothing
+            SDLabel = Nothing
+            BsGroupBox4 = Nothing
+            BsLabel4 = Nothing
+            x22CheckBox = Nothing
+            s13CheckBox = Nothing
+            s12CheckBox = Nothing
+            BsGroupBox5 = Nothing
+            BsCheckbox8 = Nothing
+            BsCheckbox9 = Nothing
+            x22 = Nothing
+            x10CheckBox = Nothing
+            s41CheckBox = Nothing
+            r4sCheckBox = Nothing
+            QCErrorAllowable = Nothing
+            ErrorAllowableLabel = Nothing
+            ControlsSelectionLabel = Nothing
+            BsButton1 = Nothing
+            UsedControlsGridView = Nothing
+            AddControls = Nothing
+            DeleteControlButton = Nothing
+            BsDataGridView1 = Nothing
+            BsNumericUpDown1 = Nothing
+            BsNumericUpDown4 = Nothing
+            TubesBySampleTypeDS1 = Nothing
+            bsTestRefRanges = Nothing
+            BsRadioButton1 = Nothing
+            SubstrateDepleUpDown = Nothing
+            BsHelpProvider1 = Nothing
+            CopyTestButton = Nothing
+            SampleTypeCheckList = Nothing
+            SampleTypeCboEx = Nothing
+            SampleTypeCboAux = Nothing
+            AddControlLabel = Nothing
+            '------------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
 
 #End Region
 
@@ -14624,8 +14851,4 @@ Public Class IProgTest
     'End Sub
 #End Region
 
-
-    Private Sub OptionsTab_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OptionsTab.Click
-
-    End Sub
 End Class

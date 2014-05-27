@@ -1037,7 +1037,7 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub ReleaseElement()
         Try
-            isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+            'isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
             NoImage = Nothing
             SatImage = Nothing
@@ -2069,6 +2069,10 @@ Public Class IMonitor
         Next
 
         'Application.DoEvents() 'AG 21/02/2014 - #1516 Comment because sometimes cause internal exceptions
+    End Sub
+
+    Private Sub IMonitor_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        isClosingFlag = True
     End Sub
 
     Private Sub bsEndWarmUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsEndWarmUp.Click

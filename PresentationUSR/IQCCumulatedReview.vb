@@ -1207,6 +1207,48 @@ Public Class IQCCumulatedReview
         End Try
         Return myResult
     End Function
+
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsTestSampleListView = Nothing
+            bsTestSampleGroupBox = Nothing
+            bsTestSampleTypeLabel = Nothing
+            bsCalculationCriteriaGroupBox = Nothing
+            bsDateFromDateTimePick = Nothing
+            bsDateFromLabel = Nothing
+            bsCumulatedResultsLabel = Nothing
+            bsDateToDateTimePick = Nothing
+            bsDateToLabel = Nothing
+            bsSearchButton = Nothing
+            bsExitButton = Nothing
+            bsCumulatedSeriesLabel = Nothing
+            bsScreenErrorProvider = Nothing
+            bsPrintButton = Nothing
+            bsResultControlLotGridView = Nothing
+            bsCumulatedXtraTab = Nothing
+            ValuesXtraTab = Nothing
+            bsResultsDetailsGridView = Nothing
+            GraphXtraTab = Nothing
+            bsDeleteCumulateSeries = Nothing
+            bsMeanChartControl = Nothing
+            bsLegendGB = Nothing
+            bsFirstCtrlLotPictureBox = Nothing
+            bsFirstCtrlLotLabel = Nothing
+            bsSecondCtrlLotLabel = Nothing
+            bsSecondCtrlLotPictureBox = Nothing
+            bsThirdCtrlLotLabel = Nothing
+            bsThirdCtrlLotPictureBox = Nothing
+            bsScreenToolTips = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"

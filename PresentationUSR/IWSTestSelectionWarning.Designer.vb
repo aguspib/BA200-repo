@@ -7,6 +7,7 @@ Partial Class IWSTestSelectionWarning
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
+                ReleaseElements()
                 components.Dispose()
             End If
         Finally
