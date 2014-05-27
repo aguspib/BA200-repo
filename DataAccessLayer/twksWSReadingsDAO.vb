@@ -463,7 +463,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.Delete", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReadingsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

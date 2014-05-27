@@ -13,6 +13,7 @@ Partial Class IMonitor
             End If
         Finally
             MyBase.Dispose(disposing)
+            isClosingFlag = False
         End Try
     End Sub
 

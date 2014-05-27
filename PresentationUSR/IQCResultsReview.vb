@@ -1772,6 +1772,58 @@ Public Class IQCResultsReview
         End Try
     End Sub
 
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsTestSampleListView = Nothing
+            bsTestSampleGroupBox = Nothing
+            bsTestSampleTypeLabel = Nothing
+            bsCalculationCriteriaGroupBox = Nothing
+            bsDateFromDateTimePick = Nothing
+            bsDateFromLabel = Nothing
+            bsCalculationCriteriaLabel = Nothing
+            bsMultirulesApplication2Combo = Nothing
+            bsMultirulesApplication1Combo = Nothing
+            bsMultirulesApplicationLabel = Nothing
+            bsDateToDateTimePick = Nothing
+            bsDateToLabel = Nothing
+            bsNumberOfSeriesNumeric = Nothing
+            bsSearchButton = Nothing
+            bsCalculationModeCombo = Nothing
+            bsCalculationModeLabel = Nothing
+            bsRejectionNumeric = Nothing
+            bsRejectionLabel = Nothing
+            bsRulesGroupbox = Nothing
+            bs22SCheckBox = Nothing
+            bs13SCheckBox = Nothing
+            bs12SCheckBox = Nothing
+            bsSDLabel = Nothing
+            bs10XmCheckBox = Nothing
+            bsR4SCheckBox = Nothing
+            bsExitButton = Nothing
+            bs41SCheckBox = Nothing
+            bsResultsByCtrlGroupBox = Nothing
+            bsControlLotLabel = Nothing
+            bsResultControlLotGridView = Nothing
+            bsResultsDetailsGridView = Nothing
+            bsIndividualResultDetLabel = Nothing
+            bsResultErrorProv = Nothing
+            bsDeleteButtom = Nothing
+            bsAddButtom = Nothing
+            bsEditButtom = Nothing
+            bsCumulateButton = Nothing
+            bsPrintButton = Nothing
+            bsGraphsButton = Nothing
+            bsControlLotResultsLabel = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"

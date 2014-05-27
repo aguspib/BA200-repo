@@ -3631,6 +3631,87 @@ Public Class IWSTestSelectionAuxScreen
         Return myResult.ToString()
     End Function
 
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsAcceptButton = Nothing
+            bsAdviceGroupBox = Nothing
+            bsWarningMessageLabel = Nothing
+            bsWarningIconPictureBox = Nothing
+            bsTestSelectionLabel = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsSampleTypeLabel = Nothing
+            bsTestProfilesLabel = Nothing
+            bsCalcTestsLabel = Nothing
+            bsStandardTestsLabel = Nothing
+            bsTestListDataGridView = Nothing
+            bsCalcTestDataGridView = Nothing
+            bsProfilesTreeView = Nothing
+            bsPatientTextBox = Nothing
+            bsPatientLabel = Nothing
+            bsTestSelectionAreaGroupBox = Nothing
+            bsLegendGroupBox = Nothing
+            bsPartialSelectedLabel = Nothing
+            bsDifPriorityLabel = Nothing
+            bsInProcessLabel = Nothing
+            bsDeletedLabel = Nothing
+            bsUnselectedLabel = Nothing
+            bsSelectedLabel = Nothing
+            bsDifPriorityButton = Nothing
+            bsSelectButton = Nothing
+            bsPartialSelectedButton = Nothing
+            bsUnselectedButton = Nothing
+            bsDeletedButton = Nothing
+            bsInProcessButton = Nothing
+            bsScreenToolTips = Nothing
+            bsCancelButton = Nothing
+            bsISETestDataGridView = Nothing
+            bsISETestsLabel = Nothing
+            bsOffSystemTestDataGridView = Nothing
+            bsOffSystemTestsLabel = Nothing
+            bsLegendLabel = Nothing
+            bsLegendModel2GroupBox = Nothing
+            bsLegendModel2Label = Nothing
+            bsUnselectedModel2Label = Nothing
+            bsSelectedInUseModel2Label = Nothing
+            bsDeletedModel2Label = Nothing
+            bsSelectedModel2Label = Nothing
+            bsSelectModel2Button = Nothing
+            bsUnselectedModel2Button = Nothing
+            bsDeletedModel2Button = Nothing
+            bsSelectedInUseModel2Button = Nothing
+            bsSampleTypeComboBox = Nothing
+            Column1 = Nothing
+            Column2 = Nothing
+            Column3 = Nothing
+            Column4 = Nothing
+            Column5 = Nothing
+            DataGridViewButtonColumn9 = Nothing
+            DataGridViewButtonColumn10 = Nothing
+            DataGridViewButtonColumn11 = Nothing
+            DataGridViewButtonColumn12 = Nothing
+            DataGridViewButtonColumn13 = Nothing
+            DataGridViewButtonColumn1 = Nothing
+            DataGridViewButtonColumn2 = Nothing
+            DataGridViewButtonColumn3 = Nothing
+            DataGridViewButtonColumn4 = Nothing
+            DataGridViewButtonColumn14 = Nothing
+            DataGridViewButtonColumn5 = Nothing
+            DataGridViewButtonColumn6 = Nothing
+            DataGridViewButtonColumn7 = Nothing
+            DataGridViewButtonColumn8 = Nothing
+            DataGridViewButtonColumn15 = Nothing
+            bsLISRequestedLabel = Nothing
+            bsLISRequestedButton = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Methods for Second Screen Model"

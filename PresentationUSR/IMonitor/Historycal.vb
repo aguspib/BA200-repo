@@ -244,6 +244,44 @@ Public Class Historycal
         End If
     End Sub
 
+    Private Sub ReleaseElements()
+        Try
+            MonitorTabs = Nothing
+            MainTab = Nothing
+            StatesTab = Nothing
+            SamplesTab = Nothing
+            ReagentsTab = Nothing
+            ReactionsTab = Nothing
+            ISETab = Nothing
+            AlarmsTab = Nothing
+            splitContainerControl1 = Nothing
+            bsAlarmsGroupBox = Nothing
+            bsTitleLabel = Nothing
+            bsAlarmsDataGridView = Nothing
+            BsGroupBox12 = Nothing
+            bsMaxDateDateTimePicker = Nothing
+            bsMinDateDateTimePicker = Nothing
+            bsAnalyzerIDComboBox = Nothing
+            bsTypeComboBox = Nothing
+            bsActiveComboBox = Nothing
+            bsWorkSessionIDComboBox = Nothing
+            BsLabel25 = Nothing
+            BsPanel8 = Nothing
+            bsClearButton = Nothing
+            bsMaxDateLabel = Nothing
+            bsAnalyzerIDLabel = Nothing
+            bsMinDateLabel = Nothing
+            bsTypeLabel = Nothing
+            bsActiveLabel = Nothing
+            BsLabel17 = Nothing
+            bsPanel2 = Nothing
+            ExitButton = Nothing
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
 #End Region
 
 #Region "Events"

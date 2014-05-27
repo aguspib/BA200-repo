@@ -566,6 +566,60 @@ Public Class IQCGraphs
         End Try
         Return myResult
     End Function
+
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsGraphicalResultsGroupBox = Nothing
+            bsGraphicalResultLabel = Nothing
+            bsSDLabel = Nothing
+            bsRejectionLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsTestLabel = Nothing
+            bsGraphicalAreaGroupBox = Nothing
+            bsYoudenRB = Nothing
+            bsLeveyJenningsRB = Nothing
+            bsResultByControlLabel = Nothing
+            bsResultControlLotGridView = Nothing
+            bsExitButton = Nothing
+            bsPrintButton = Nothing
+            bsQCResultChartControl = Nothing
+            bsLegendGroupBox = Nothing
+            bsToolTipController = Nothing
+            bsTestNameTextBox = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsRejectionTextBox = Nothing
+            bsEventLog = Nothing
+            bsSecondCtrlLotPictureBox = Nothing
+            bsFirstCtrlLotLabel = Nothing
+            bsSecondCtrlLotLabel = Nothing
+            bsFirstCtrlLotPictureBox = Nothing
+            bsThirdCtrlLotLabel = Nothing
+            bsThirdCtrlLotPictureBox = Nothing
+            bsWarningPictureBox = Nothing
+            bsWarningLabel = Nothing
+            bsErrorLabel = Nothing
+            bsErrorPictureBox = Nothing
+            bsGraphTypeLabel = Nothing
+            bsLegendYoudenGB = Nothing
+            bsLastPointLabel = Nothing
+            bsLastRunPintImage = Nothing
+            bsControlLotResultsLabel = Nothing
+            bs3SDLabel = Nothing
+            bs3SDPictureBox = Nothing
+            bs2SDLabel = Nothing
+            bs2SDPictureBox = Nothing
+            bs1SDLabel = Nothing
+            bs1SDPictureBox = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Methods for LEVEY-JENNINGS Graph"
