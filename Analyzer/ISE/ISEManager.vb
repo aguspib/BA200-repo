@@ -3463,7 +3463,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Refreshes the current Monitor Data
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by XB 23/05/2014 - BT #1639 - Display Calibrations Expired Data times
+        ''' </remarks>
         Public Function RefreshMonitorDataTO() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3604,6 +3606,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
 
+                ' XB 26/05/2014 - BT #1639
+                Dim myCalElectrodesExpiredTime As Integer = 4
+                myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CALB_HOURS_NEEDED)
+                If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
+                    myCalElectrodesExpiredTime = CInt(myGlobal.SetDatos)
+                End If
 
                 Dim myCalPumpsdate As DateTime = MyClass.LastPumpsCalibrationDate
                 Dim myCalPumpsString As String = MyClass.LastPumpsCalibrationResult
@@ -3617,6 +3625,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else
                         isError = True
                     End If
+                End If
+
+                ' XB 26/05/2014 - BT #1639
+                Dim myCalPumpsExpiredTime As Integer = 24
+                myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_PUMPCAL_HOURS_NEEDED)
+                If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
+                    myCalPumpsExpiredTime = CInt(myGlobal.SetDatos)
                 End If
 
                 'SGM 25/07/2012 Bubble detector
@@ -3646,7 +3661,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                           myCalElectroDate, myCalElectroString1, myCalElectroString2, myCalElectroResult1OK, myCalElectroResult2OK, myCalElectroRecomm, _
                                                           myCalPumpsdate, myCalPumpsString, myCalPumpsResultOK, myCalPumpsRecomm, _
                                                           myCalBubbledate, myCalBubbleString, myCalBubbleResultOK, myCalBubbleRecomm, _
-                                                          myCleanDate, myCleanRecomm, IsISEInitiatedOK, IsLongTermDeactivation)
+                                                          myCleanDate, myCleanRecomm, IsISEInitiatedOK, IsLongTermDeactivation, myCalElectrodesExpiredTime, myCalPumpsExpiredTime)
 
                     MyClass.MonitorDataTOAttr = myMonitorData
 
@@ -4749,7 +4764,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Checks if a new Electrodes calibration is needed
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 12/03/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 12/03/2012
+        ''' Modified by XB 23/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+        ''' </remarks>
         Public Function CheckElectrodesCalibrationIsNeeded() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -4782,6 +4800,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'End If
 
                 MyClass.IsCalibrationNeeded = IsNeeded
+
+                If IsNeeded Then RaiseEvent ISEMonitorDataChanged() ' XB 23/05/2014 - BT #1639
 
                 myGlobal.SetDatos = IsNeeded
 

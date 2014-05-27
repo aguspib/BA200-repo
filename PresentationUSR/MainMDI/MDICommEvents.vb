@@ -51,6 +51,7 @@ Partial Public Class IAx00MainMDI
     '''              AG - 07/01/2014 - refactoring code in CommEvents partial class inherits form
     '''              XB - 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
     '''              XB - 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587
+    '''              XB - 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
     ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pInstructionReceived As String, _
                                          ByVal pTreated As Boolean, _
@@ -491,54 +492,79 @@ Partial Public Class IAx00MainMDI
                                         myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
                                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
 
-                                            ' XB 23/07/2013 - Activate buzzer
-                                            If Not MDIAnalyzerManager Is Nothing Then
-                                                MDIAnalyzerManager.StartAnalyzerRinging()
-                                                System.Threading.Thread.Sleep(500)
-                                            End If
-                                            ' XB 23/07/2013
-
+                                            '  XB 23/05/2014 - #1638
+                                            Dim TestsByTypeIntoWS As String = ""
                                             If (CType(myGlobal.SetDatos, Boolean)) Then
-                                                'ISE Calibrations are wrong so Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
-                                                'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
-                                                Dim userAnswer As DialogResult
-
-                                                ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
-                                                'userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                                If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
-                                                    userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                                Else
-                                                    userAnswer = Windows.Forms.DialogResult.Yes
+                                                TestsByTypeIntoWS = "STD"
+                                                myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
+                                                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                                    If (CType(myGlobal.SetDatos, Boolean)) Then
+                                                        TestsByTypeIntoWS = "ALL"
+                                                    End If
                                                 End If
-                                                ' XB 20/11/2013
-
-                                                Application.DoEvents()
-                                                If (userAnswer = DialogResult.Yes) Then
-                                                    'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
-                                                    executeSTD = True
-                                                    LockISE = True
-                                                    EnableButtonAndMenus(False)
-                                                    Me.SkipPMCL = True ' XB 22/10/2013
-                                                Else
-                                                    EnableButtonAndMenus(True, True)   ' XB 07/11/2013
-                                                    Application.DoEvents()
-                                                End If
-
                                             Else
-                                                'ISE Calibrations are wrong so Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
-                                                'the WS can not be started
-                                                ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
-                                                Application.DoEvents()
-                                                'All ISE Pending Tests will be blocked
-                                                LockISE = True
+                                                TestsByTypeIntoWS = "ISE"
                                             End If
 
-                                            ' XB 23/07/2013 - Close buzzer
-                                            If Not MDIAnalyzerManager Is Nothing Then
-                                                MDIAnalyzerManager.StopAnalyzerRinging()
-                                                System.Threading.Thread.Sleep(500)
-                                            End If
-                                            ' XB 22/07/2013
+                                            If TestsByTypeIntoWS = "STD" Then
+                                                ' Only STD
+                                                executeSTD = True
+                                                EnableButtonAndMenus(False)
+                                                Me.SkipPMCL = True
+                                            Else
+                                                '  XB 23/05/2014 - #1638
+
+                                                ' XB 23/07/2013 - Activate buzzer
+                                                If Not MDIAnalyzerManager Is Nothing Then
+                                                    MDIAnalyzerManager.StartAnalyzerRinging()
+                                                    System.Threading.Thread.Sleep(500)
+                                                End If
+                                                ' XB 23/07/2013
+
+                                                If TestsByTypeIntoWS = "ALL" Then
+                                                    'ISE Calibrations are wrong so Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
+                                                    'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
+                                                    Dim userAnswer As DialogResult
+
+                                                    ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
+                                                    'userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
+                                                    If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                                        userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
+                                                    Else
+                                                        userAnswer = Windows.Forms.DialogResult.Yes
+                                                    End If
+                                                    ' XB 20/11/2013
+
+                                                    Application.DoEvents()
+                                                    If (userAnswer = DialogResult.Yes) Then
+                                                        'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
+                                                        executeSTD = True
+                                                        LockISE = True
+                                                        EnableButtonAndMenus(False)
+                                                        Me.SkipPMCL = True ' XB 22/10/2013
+                                                    Else
+                                                        LockISE = True '  XB 23/05/2014 - Lock ISE preparations always #1638
+                                                        EnableButtonAndMenus(True, True)   ' XB 07/11/2013
+                                                        Application.DoEvents()
+                                                    End If
+
+                                                Else
+                                                    'ISE Calibrations are wrong so Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
+                                                    'the WS can not be started
+                                                    ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
+                                                    Application.DoEvents()
+                                                    'All ISE Pending Tests will be blocked
+                                                    LockISE = True
+                                                End If
+
+                                                ' XB 23/07/2013 - Close buzzer
+                                                If Not MDIAnalyzerManager Is Nothing Then
+                                                    MDIAnalyzerManager.StopAnalyzerRinging()
+                                                    System.Threading.Thread.Sleep(500)
+                                                End If
+                                                ' XB 22/07/2013
+
+                                            End If    '  XB 23/05/2014 - #1638
 
                                         End If
 

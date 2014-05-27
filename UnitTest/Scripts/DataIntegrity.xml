@@ -2520,4 +2520,15 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.01</Version>
+    <Label>Message MSG_ONLY_ISE_WS_NOT_STARTED2 exist</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'ONLY_ISE_WS_NOT_STARTED2') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>

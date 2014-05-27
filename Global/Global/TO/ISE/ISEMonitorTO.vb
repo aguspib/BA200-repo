@@ -79,6 +79,10 @@ Namespace Biosystems.Ax00.Global
         Private CleanRecommendedAttr As Boolean
         Private CleanDateAttr As DateTime
 
+        ' XB 26/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+        Private CAL_ElectrodesCalibExpiredTimeAttr As Integer
+        Private CAL_PumpsCalibExpiredTimeAttr As Integer
+
         'Tubing
         Private TUB_PumpInstallDateAttr As DateTime
         Private TUB_FluidInstallDateAttr As DateTime
@@ -125,7 +129,9 @@ Namespace Biosystems.Ax00.Global
                         ByVal pCleanDate As DateTime, _
                         ByVal pCleanRecommended As Boolean, _
                         ByVal pInitiatedOK As Boolean, _
-                        ByVal pIsLongTermDeactivation As Boolean)
+                        ByVal pIsLongTermDeactivation As Boolean, _
+                        ByVal pCAL_ElectrodesCalibExpiredTime As Integer, _
+                        ByVal pCAL_PumpsCalibExpiredTime As Integer)
 
 
             'ByVal pLI_Enabled As Boolean, _
@@ -180,6 +186,11 @@ Namespace Biosystems.Ax00.Global
             IsLongTermDeactivationAttr = pIsLongTermDeactivation
 
             HasDataAttr = True
+
+
+            ' XB 26/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+            CAL_ElectrodesCalibExpiredTimeAttr = pCAL_ElectrodesCalibExpiredTime
+            CAL_PumpsCalibExpiredTimeAttr = pCAL_PumpsCalibExpiredTime
 
         End Sub
 
@@ -421,6 +432,19 @@ Namespace Biosystems.Ax00.Global
             End Get
         End Property
 
+
+        ' XB 26/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+        Public ReadOnly Property CAL_ElectrodesCalibExpiredTime() As Integer
+            Get
+                Return CAL_ElectrodesCalibExpiredTimeAttr
+            End Get
+        End Property
+
+        Public ReadOnly Property CAL_PumpsCalibExpiredTime() As Integer
+            Get
+                Return CAL_PumpsCalibExpiredTimeAttr
+            End Get
+        End Property
 #End Region
 
 

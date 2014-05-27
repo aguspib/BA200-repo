@@ -153,7 +153,10 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <remarks>Created by SGM 17/02/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 17/02/2012
+        ''' Modified by XB 26/05/2014 - BT #1639 - Display Calibrations Expired Data times
+        ''' </remarks>
         Public Sub RefreshFieldsData(ByVal pISEMonitorData As ISEMonitorTO)
             Try
                 Dim myUtil As New Utilities
@@ -358,6 +361,14 @@ Namespace Biosystems.Ax00.Controls.UserControls
                                 Me.CALElectrodesIcon1.BackgroundImage = MyClass.GetIconImage(IconImages.Warning)
                                 CheckRecommended = True
                             End If
+
+                            ' XB 26/05/2014 - BT #1639
+                            If Not CheckRecommended Then
+                                Dim myNeededTime As DateTime
+                                Dim myHours As Integer = .CAL_ElectrodesCalibExpiredTime
+                                myNeededTime = .CAL_ElectrodesCalibDate.AddHours(myHours)
+                                CheckRecommended = (DateTime.Now >= myNeededTime)
+                            End If
                         Else
                             'Me.CALElectrodesIcon1.BackgroundImage = MyClass.GetIconImage(IconImages.Warning)
                             CheckRecommended = True
@@ -394,6 +405,14 @@ Namespace Biosystems.Ax00.Controls.UserControls
                                 Me.CALPumpsWarningLabel.Text = MyClass.GetWarningLabel(WarningElements.CAL_Error)
                                 Me.CALPumpsIcon.BackgroundImage = MyClass.GetIconImage(IconImages.Warning)
                                 CheckRecommended = True
+                            End If
+
+                            ' XB 26/05/2014 - BT #1639
+                            If Not CheckRecommended Then
+                                Dim myNeededTime As DateTime
+                                Dim myHours As Integer = .CAL_PumpsCalibExpiredTime
+                                myNeededTime = .CAL_PumpsCalibDate.AddHours(myHours)
+                                CheckRecommended = (DateTime.Now >= myNeededTime)
                             End If
                         Else
                             'Me.CALPumpsIcon.BackgroundImage = MyClass.GetIconImage(IconImages.Warning)
