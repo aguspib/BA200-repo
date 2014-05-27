@@ -1272,6 +1272,7 @@ Namespace Biosystems.Ax00.Global
             NUMERIC_ONLY
             ONE_LAB_CODE
             ONLY_ISE_WS_NOT_STARTED
+            ONLY_ISE_WS_NOT_STARTED2
             OVERWRITE_FILE
             PASSWORD_CONFIRMATION
             PASSWORD_DUPLICATED
