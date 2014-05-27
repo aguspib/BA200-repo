@@ -6265,7 +6265,8 @@ Public Class IWSRotorPositions
     '''              SA 10/04/2014 - BT #1584 ==> When the Analyzer is in PAUSE mode, flag createWSInRunning has to be set to FALSE although the Analyzer 
     '''                                           Status is Running. This is to allow block/unblock Executions when elements have been unpositioned/positioned 
     '''                                           during the Pause
-    '''              XB 23/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+    '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+    '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6358,7 +6359,9 @@ Public Class IWSRotorPositions
 
                         ' XB 22/11/2013 - Task #1394
                         'Me.UIThread(Function() ShowMessage(Me.Name, "ISE_NEW_TEST_LOCKED"))
-                        Me.UIThread(Sub() IAx00MainMDI.SetDisplayISELockedPreparationsWarning(True))
+
+                        ' XB 27/05/2014 - BT #1638
+                        'Me.UIThread(Sub() IAx00MainMDI.SetDisplayISELockedPreparationsWarning(True))
 
                         'DL 15/05/2013
                         'ISE preparations locked'. 

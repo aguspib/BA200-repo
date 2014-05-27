@@ -1660,21 +1660,47 @@ Public Class IProgTestContaminations
     ''' Release elements not handle by the GC.
     ''' </summary>
     ''' <remarks>CREATED BY: TR 02/08/2012
-    ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+    ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElements is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
+
         Try
+            '--- Detach variable defined using WithEvents ---
             isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
             R1TestsDS = Nothing
             R2TestsDS = Nothing
-            bsR1ContaminatedDataGridView = Nothing
+            bsTestListGroupBox = Nothing
+            bsContaminatorsListLabel = Nothing
+            bsTestContaminatorsListView = Nothing
+            bsPrintButton = Nothing
+            bsEditButton = Nothing
+            bsExitButton = Nothing
+            bsContaminatedDetailsGroupBox = Nothing
+            bsSaveButton = Nothing
+            bsCancelButton = Nothing
+            bsContaminesAllR1Checkbox = Nothing
+            bsR1GroupBox = Nothing
+            bsContaminationsLabel = Nothing
+            bsR2GroupBox = Nothing
+            bsContaminesAllR2Checkbox = Nothing
+            bsCuvettesGroupBox = Nothing
+            bsContaminatesCuvettesCheckbox = Nothing
+            bsWashingSolR2ComboBox = Nothing
+            bsWashingSolR2Label = Nothing
+            bsWashingSolR1ComboBox = Nothing
+            bsWashingSolR1Label = Nothing
             bsR2ContaminatedDataGridView = Nothing
-            GC.Collect()
-
+            bsR1ContaminatedDataGridView = Nothing
+            bsSummaryByTestButton = Nothing
+            bsScreenToolTips = Nothing
+            bsDeleteButton = Nothing
+            '----------------------------------------------
+            'GC.Collect()
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+        
     End Sub
 
 #End Region
@@ -1949,12 +1975,4 @@ Public Class IProgTestContaminations
 
 #End Region
 
-    Private Sub IProgTestContaminations_FormClosed(ByVal sender As System.Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles MyBase.FormClosed
-        Try
-            ReleaseElement()
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IProgTestContaminations_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".IProgTestContaminations_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
 End Class

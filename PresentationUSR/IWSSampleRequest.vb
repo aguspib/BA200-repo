@@ -5214,7 +5214,46 @@ Public Class IWSSampleRequest
 
             'mdiAnalyzerCopy = Nothing 'not this variable
 
-            GC.Collect()
+            '--- Detach variable defined using WithEvents ---
+            bsOrderDetailsGroupBox = Nothing
+            bsNumOrdersNumericUpDown = Nothing
+            bsNumOrdersLabel = Nothing
+            bsStatCheckbox = Nothing
+            bsSampleClassComboBox = Nothing
+            bsSampleClassLabel = Nothing
+            bsPatientSearchButton = Nothing
+            bsPatientIDTextBox = Nothing
+            bsPatientIDLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsSampleTypeComboBox = Nothing
+            bsSearchTestsButton = Nothing
+            bsOpenRotorButton = Nothing
+            bsSampleClassesTabControl = Nothing
+            PatientsTab = Nothing
+            OtherSamplesTab = Nothing
+            bsSaveWSButton = Nothing
+            bsLoadWSButton = Nothing
+            bsPrepareWSLabel = Nothing
+            bsAcceptButton = Nothing
+            bsDelPatientsButton = Nothing
+            bsDelControlsButton = Nothing
+            bsDelCalibratorsButton = Nothing
+            bsLIMSImportButton = Nothing
+            bsLIMSErrorsButton = Nothing
+            bsScreenToolTips = Nothing
+            bsAllPatientsCheckBox = Nothing
+            bsAllBlkCalCheckBox = Nothing
+            bsAllCtrlsCheckBox = Nothing
+            bsBlkCalibDataGridView = Nothing
+            bsControlOrdersDataGridView = Nothing
+            bsPatientOrdersDataGridView = Nothing
+            bsOffSystemResultsButton = Nothing
+            bsScanningButton = Nothing
+            bsBarcodeWarningButton = Nothing
+            bsErrorProvider1 = Nothing
+            '------------------------------------------------
+
+            'GC.Collect()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -5624,7 +5663,7 @@ Public Class IWSSampleRequest
                             'Open the WS Monitor form and close this one
                             IAx00MainMDI.OpenMonitorForm(Me)
                         End If
-                        GC.Collect()
+                        'GC.Collect()
                     Else
                         'In case of Error, set Enabled=True for all controls that can be activated
                         ChangeControlsStatusByProgressBar(True)
@@ -7979,14 +8018,15 @@ Public Class IWSSampleRequest
     '******************************************
     '* SCREEN EVENTS                          *
     '******************************************
-    Private Sub WS_Preparation_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
-        Try
-            ReleaseElements()
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".WS_Preparation_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
+
+    'Private Sub WS_Preparation_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+    '    Try
+    '        ReleaseElements()
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".WS_Preparation_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+    '    End Try
+    'End Sub
 
     Private Sub WS_Preparation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -8344,7 +8384,5 @@ Public Class IWSSampleRequest
     'End Sub
 #End Region
 
-    Private Sub bsPatientIDLabel_Click(sender As Object, e As EventArgs) Handles bsPatientIDLabel.Click
 
-    End Sub
 End Class

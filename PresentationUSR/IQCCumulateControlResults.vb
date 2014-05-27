@@ -1013,6 +1013,35 @@ Public Class IQCCumulateControlResults
         End Try
     End Sub
 
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsControlListGroupBox = Nothing
+            bsControlsListLabel = Nothing
+            bsControlsListView = Nothing
+            bsExitButton = Nothing
+            bsControlGroupBox = Nothing
+            bsLotNumberLabel = Nothing
+            bsResultsByTestSampleLabel = Nothing
+            bsTestListGrid = Nothing
+            bsScreenToolTips = Nothing
+            bsCurrentLotNumberTextBox = Nothing
+            bsPrintButton = Nothing
+            bsEditButton = Nothing
+            bsCumulateButton = Nothing
+            bsCancelButton = Nothing
+            bsTestListToCumGrid = Nothing
+            bsDataToCumLabel = Nothing
+            bsLastCumValuesLabel = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"
