@@ -527,7 +527,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 localBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
                                 'Get the BaseLineID for the base lines with adjust (from table twksWSBLines)
-                                myGlobal = Me.GetCurrentBaseLineID(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True)
+                                myGlobal = Me.GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 myAdjustBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
@@ -540,6 +540,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myExecutionDS.twksWSExecutions(0).EndEdit()
 
                                 executionUpdated = True
+
+                                'AG 28/05/2014 - #1644 - When 1st reading is received remove all previous readings linked with this execution
+                                myGlobal = myReadingsDelegate.Delete(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionDS)
+                                'AG 28/05/2014
+
                             End If
 
                             'Verify if it is needed to activate ThermoWarningFlag for the Execution

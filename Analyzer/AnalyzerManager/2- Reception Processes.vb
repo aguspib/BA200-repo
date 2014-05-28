@@ -3516,11 +3516,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Update fields ExecutionStatus and PreparationID for all Executions in DS ExecutionsDS and Commit or Rollback the opened DB TRANSACTION
                             myGlobal = exeDelegate.UpdateStatus(dbConnection, myExecutionsDS)
 
-                            'AG 02/10/2012 - When the execution is updated to INPROCESS remove all his readings (only for STD_TESTS)
-                            If Not myGlobal.HasError Then
-                                Dim readingsDlg As New WSReadingsDelegate
-                                myGlobal = readingsDlg.Delete(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionsDS)
-                            End If
+                            'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
+                            ''AG 02/10/2012 - When the execution is updated to INPROCESS remove all his readings (only for STD_TESTS)
+                            'If Not myGlobal.HasError Then
+                            '    Dim readingsDlg As New WSReadingsDelegate
+                            '    myGlobal = readingsDlg.Delete(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionsDS)
+                            'End If
 
                             If (Not myGlobal.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed
