@@ -7929,6 +7929,12 @@ Partial Public Class IAx00MainMDI
                     If (TypeOf ActiveMdiChild Is IMonitor) Then
                         IMonitor.HideActiveAlerts()
                     End If
+
+                    'AG 28/05/2014 - New trace
+                    If (Not FormToClose Is Nothing AndAlso TypeOf FormToClose Is IMonitor) Then
+                        CreateLogActivity("Start Closing IMonitor", Name & ".OpenMDIChildForm", EventLogEntryType.Information, False)
+                    End If
+
                     FormToClose.Close()
                     FormToClose = Nothing
                     Application.DoEvents()

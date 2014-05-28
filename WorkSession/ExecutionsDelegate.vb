@@ -6152,9 +6152,11 @@ Namespace Biosystems.Ax00.BL
                 'pWorkInRuuningMode = TRUE ->  Recalculate status for all existing executions with status PENDING or LOCKED
                 'Table twksWSExecutions is updated at this point
                 If (Not calledForRerun) Then
-                    'In RUNNING Mode, delete all Readings of all LOCKED Executions 
-                    Dim myReadingsDelegate As New WSReadingsDelegate
-                    resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
+
+                    'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
+                    ''In RUNNING Mode, delete all Readings of all LOCKED Executions 
+                    'Dim myReadingsDelegate As New WSReadingsDelegate
+                    'resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
 
                     'resultData = RecalculateStatusForNotDeletedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
                     resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
@@ -7152,9 +7154,11 @@ Namespace Biosystems.Ax00.BL
                         'pWorkInRuuningMode = TRUE ->  Recalculate status for all existing executions with status PENDING or LOCKED
                         'Table twksWSExecutions is updated at this point
                         If (Not calledForRerun) Then
-                            'In RUNNING Mode, delete all Readings of all LOCKED Executions 
-                            Dim myReadingsDelegate As New WSReadingsDelegate
-                            resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
+
+                            'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
+                            ''In RUNNING Mode, delete all Readings of all LOCKED Executions 
+                            'Dim myReadingsDelegate As New WSReadingsDelegate
+                            'resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
 
                             'resultData = RecalculateStatusForNotDeletedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
                             resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)

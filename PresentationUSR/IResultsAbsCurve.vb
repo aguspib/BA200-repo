@@ -2348,7 +2348,7 @@ Public Class IResultsAbsCurve
                 MaxValueForXAxis = 75
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetMaxValueForXAxisFromReplicatesDS", EventLogEntryType.Warning, GetApplicationInfoSession().ActivateSystemLog)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetMaxValueForXAxisFromReplicatesDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MaxValueForXAxis = 75
         End Try
     End Sub

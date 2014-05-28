@@ -5208,9 +5208,6 @@ Public Class IWSSampleRequest
             myIconNonStatFlag = Nothing
             myFactorTextBox = Nothing
 
-            bsBlkCalibDataGridView = Nothing
-            bsControlOrdersDataGridView = Nothing
-            bsPatientOrdersDataGridView = Nothing
 
             'mdiAnalyzerCopy = Nothing 'not this variable
 

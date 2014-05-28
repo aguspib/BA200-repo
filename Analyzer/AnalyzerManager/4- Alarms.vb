@@ -2323,7 +2323,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pSensors "></param>
         ''' <returns></returns>
-        ''' <remarks>AG 14/04/2011 - creation - Tested PENDING</remarks>
+        ''' <remarks>
+        ''' Created by  AG 14/04/2011
+        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved
+        ''' </remarks>
         Private Function UserSwANSINFTreatment(ByVal pSensors As Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
@@ -2415,6 +2418,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         alarmStatus = True
                     Else 'Closed
                         alarmStatus = False
+
+                        ' XB 27/05/2014 - BT #1630
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
+                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" OrElse _
+                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
+                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS"
+                            End If
+                        End If
+                        ' XB 27/05/2014 - BT #1630
                     End If
 
                     'Update the class attribute SensorValuesAttribute
@@ -2446,6 +2458,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         alarmStatus = True
                     Else 'Closed
                         alarmStatus = False
+
+                        ' XB 27/05/2014 - BT #1630
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
+                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" OrElse _
+                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
+                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS"
+                            End If
+                        End If
+                        ' XB 27/05/2014 - BT #1630
                     End If
 
                     'Update the class attribute SensorValuesAttribute

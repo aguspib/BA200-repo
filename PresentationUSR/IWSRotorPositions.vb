@@ -8777,6 +8777,9 @@ Public Class IWSRotorPositions
         Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
+            'AG 28/05/2014 - New trace
+            myLogAcciones.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
+
             'BT #1520 - Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters (a warning message is NOT shown 
             '           if at least one of them has been exceeded)
             Dim pCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
@@ -8787,8 +8790,8 @@ Public Class IWSRotorPositions
             myGlobal = CreateExecutionsProcess(True, createExecutionsFlag)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!! IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            'AG 28/05/2014 - change text  'AG 18/02/2014 - #1505 - Change text!!!
+            myLogAcciones.CreateLogActivity("IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -8830,8 +8833,8 @@ Public Class IWSRotorPositions
             pCounters = Nothing
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("FINAL! High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!! IWSROTORPositions CLOSED (Complete2): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            'AG 28/05/2014 - change text 'AG 18/02/2014 - #1505 - Change text!!!
+            myLogAcciones.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         End Try
