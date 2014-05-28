@@ -9,10 +9,9 @@ Partial Class IWSSampleRequest
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
-                ReleaseElements()
                 components.Dispose()
-                'GC.SuppressFinalize(Me)
             End If
+            ReleaseElements()
         Finally
             MyBase.Dispose(disposing)
         End Try

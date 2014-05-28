@@ -482,6 +482,7 @@ Public Class IMonitor
     Private Sub RefreshCommonArea(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             'Dim StartTime As DateTime = Now
+            If isClosingFlag Then Exit Sub ' XB 27/05/2014 - #1496 No refresh if screen is closing
 
             'LEDs AREA
             UpdateLeds()
@@ -2069,10 +2070,6 @@ Public Class IMonitor
         Next
 
         'Application.DoEvents() 'AG 21/02/2014 - #1516 Comment because sometimes cause internal exceptions
-    End Sub
-
-    Private Sub IMonitor_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        isClosingFlag = True
     End Sub
 
     Private Sub bsEndWarmUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsEndWarmUp.Click

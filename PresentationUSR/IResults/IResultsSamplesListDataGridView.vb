@@ -264,7 +264,10 @@ Partial Class IResults
             bsSamplesListDataGridView_Click(Nothing, Nothing)
 
             'TR 30/09/2013
-            bsSamplesListDataGridView.Refresh()
+            If (Not isClosingFlag) Then
+                bsSamplesListDataGridView.Refresh()
+            End If
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Name & " UpdateSamplesListDataGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
