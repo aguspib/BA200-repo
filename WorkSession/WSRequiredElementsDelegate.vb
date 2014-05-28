@@ -433,7 +433,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Get the number of Elements belonging to the specified Work Session that have been still non positioned in an Analyzer Rotor
         ''' </summary>

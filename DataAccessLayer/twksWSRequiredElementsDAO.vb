@@ -710,7 +710,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT * FROM twksWSRequiredElements " & vbCrLf & _
                                                 " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND    TubeContent = '" & pTubeContent & "' " & vbCrLf & _
-                                                " AND    SolutionCode = '" & pSolutionCode & "' " & vbCrLf
+                                                " AND    SolutionCode = '" & pSolutionCode.Trim & "' " & vbCrLf
 
                         Dim resultData As New WSRequiredElementsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

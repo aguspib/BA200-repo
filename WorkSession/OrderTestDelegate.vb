@@ -7603,23 +7603,28 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Count the number of Patient Samples requested for the WorkSession and corresponding to Tests/SampleTypes 
-        ''' with a programmed automatic dilution that has to be done with the specified Dilution Solution
+        ''' Get the list of Dilution Solutions needed for automatic dilutions programmed for Tests/SampleTypes requested for Patient Samples 
+        ''' in the specified WorkSession
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <param name="pOrderTestsList">List of Order Tests included in a WorkSession</param>
         ''' <param name="pWorkSessionID">Work Session Identifier. Optional parameter</param>
-        ''' <param name="pDiluentSol">Code of the Diluent Solution for the automatic predilution</param>
-        ''' <returns>GlobalDataTO containing an integer value with the number of requested Patient Samples of
-        '''          Tests/SampleTypes with a programmed automatic dilution using the specified Diluent Solution</returns>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestSamplesDS with the list of Dilution Solutions needed for automatic dilutions 
+        '''          programmed for Tests/SampleTypes requested for Patient Samples in the specified WorkSession</returns>
         ''' <remarks>
         ''' Created by:  SA 15/10/2010
         ''' Modified by: SA 26/01/2011 - Add new parameter to specify the Diluent Solution, and pass it when calling
         '''                              the function in the DAO class
         '''              SA 01/09/2011 - Changed the function template
+        '''              SA 28/05/2014 - BT #1519 ==> Changes to get all Dilution Solutions needed in the specified Work Session instead of 
+        '''                                           verify for an specific Dilution Solution if it is needed for automatic predilutions of 
+        '''                                           one or more Tests requested for Patient Samples in the Work Session:
+        '''                                           * Parameter pDiluentSolution has been removed
+        '''                                           * Return value has been changed from INTEGER to a typed DataSet TestSamplesDS containing the
+        '''                                             list of Dilution Solutions needed in the Work Session
         ''' </remarks>
         Public Function VerifyAutomaticDilutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestsList As String, _
-                                                 ByVal pDiluentSol As String, Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                                 Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -7628,9 +7633,8 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'Count how many Test/SampleTypes with automatic dilutions have been requested 
                         Dim orderTestsData As New TwksOrderTestsDAO
-                        resultData = orderTestsData.VerifyAutomaticDilutions(dbConnection, pOrderTestsList, pDiluentSol, pWorkSessionID)
+                        resultData = orderTestsData.VerifyAutomaticDilutions(dbConnection, pOrderTestsList, pWorkSessionID)
                     End If
                 End If
             Catch ex As Exception
