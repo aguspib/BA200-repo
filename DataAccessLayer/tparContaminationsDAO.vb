@@ -398,7 +398,7 @@ Partial Public Class tparContaminationsDAO
                     Dim myContaminationsDS As New ContaminationsDS
                     Using dbCmd As New SqlCommand(cmdText, dbConnection)
                         Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                            dbDataAdapter.Fill(myContaminationsDS.ReagentsContaminations)
+                            dbDataAdapter.Fill(myContaminationsDS.tparContaminations)
                         End Using
                     End Using
 

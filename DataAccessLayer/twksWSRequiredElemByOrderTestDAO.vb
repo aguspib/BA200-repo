@@ -554,7 +554,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " INSERT INTO twksWSRequiredElemByOrderTest (OrderTestID, ElementID, StatFlag) " & vbCrLf & _
-                                            " SELECT DISTINCT WSOT.OrderTestID, RE.ElementID,  WSOT.StatFlag " & vbCrLf & _
+                                            " SELECT DISTINCT OT.OrderTestID, RE.ElementID,  O.StatFlag " & vbCrLf & _
                                             " FROM   twksWSRequiredElements RE INNER JOIN tparContaminations CT " & vbCrLf & _
                                                                                      " ON (RE.SolutionCode = CT.WashingSolutionR1 OR RE.SolutionCode = CT.WashingSolutionR2) " & vbCrLf & _
                                                                              " INNER JOIN tparTestReagents TR " & vbCrLf & _

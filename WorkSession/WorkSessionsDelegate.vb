@@ -379,6 +379,7 @@ Namespace Biosystems.Ax00.BL
                                                 'If an error has happen during the process finish the adding process
                                                 If (Not isOK) Then Exit For
                                             Next
+                                            dilutionSolutionsList = Nothing
                                         End If
                                     End If
                                 End If
@@ -444,7 +445,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Get the list of Washing Solutions needed to avoid Contaminations in the Work Session
                         Dim myContaminationsDelegate As New ContaminationsDelegate
-                        dataToReturn = myContaminationsDelegate.GetWSContaminationsWithWASH(Nothing, pWorkSessionID, pAnalyzerID)
+                        dataToReturn = myContaminationsDelegate.GetWSContaminationsWithWASH(dbConnection, pWorkSessionID, pAnalyzerID)
                         isOK = (Not dataToReturn.HasError)
 
                         If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
@@ -531,6 +532,7 @@ Namespace Biosystems.Ax00.BL
                                                 'If an error has happen during the process finish the adding process
                                                 If (Not isOK) Then Exit For
                                             Next
+                                            contaminationWashSolutionsList = Nothing
                                         End If
                                     End If
                                 End If
@@ -755,8 +757,10 @@ Namespace Biosystems.Ax00.BL
         '''                               CreateEmptyWSStopped to TRUE and write a Warning message in the application Log
         '''               SA 27/05/2014 - BT #1519 ==> Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
         '''                                            Dilution Solutions for a call to the new specific function AddWSElementsForDilutionSolutions
-        '''                                            Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
-        '''                                            Washing Solutions for a call to the new specific function AddWSElementsForWashingSolutions
+        '''                                        ==> Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
+        '''                                            Washing Solutions for a call to the new specific function AddWSElementsForWashingSolutions. Besides, call the
+        '''                                            function after the call to function to add the required Reagents (AddWSElementsForReagents), because to check 
+        '''                                            the possible Contaminations the Reagents have to be already created as required Elements
         ''' </remarks>
         Public Function AddWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSOrderTestsList As WSOrderTestsDS, _
                                        ByVal pCreateWS As Boolean, Optional ByVal pAnalyzerID As String = "", Optional ByVal pCurrentWSStatus As String = "", _
@@ -866,14 +870,14 @@ Namespace Biosystems.Ax00.BL
                                     'Add Required Elements for all the available Diluent Solutions
                                     dataToReturn = AddWSElementsForDilutionSolutions(dbConnection, workSessionID, orderTestsList)
 
-                                    'Add Required Elements for all the available Washing Solutions
-                                    If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForWashingSolutions(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
-
                                     'Add Required Elements for all the available ISE Washing Solutions
                                     If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForISEWashing(dbConnection, workSessionID, orderTestsList)
 
                                     'Add required Elements for all the Reagents needed according the list of Order Tests
                                     If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForReagents(dbConnection, workSessionID, orderTestsList, pCreateWS, pAnalyzerID)
+
+                                    'Add Required Elements for all the available Washing Solutions
+                                    If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForWashingSolutions(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
 
                                     'Add required Elements for all the Controls needed according the list of Order Tests
                                     If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForControls(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
@@ -6804,7 +6808,9 @@ Namespace Biosystems.Ax00.BL
         '''               SA 27/05/2014 - BT #1519 ==> Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
         '''                                            Dilution Solutions for a call to the new specific function AddWSElementsForDilutionSolutions
         '''                                            Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
-        '''                                            Washing Solutions for a call to the new specific function AddWSElementsForWashingSolutions
+        '''                                            Washing Solutions for a call to the new specific function AddWSElementsForWashingSolutions.  Besides, call the
+        '''                                            function after the call to function to add the required Reagents (AddWSElementsForReagents), because to check 
+        '''                                            the possible Contaminations the Reagents have to be already created as required Elements
         ''' </remarks>
         Public Function AddWorkSession_NEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSOrderTestsList As WSOrderTestsDS, _
                                            ByVal pCreateWS As Boolean, ByVal pAnalyzerID As String, Optional ByVal pCurrentWSStatus As String = "", _
@@ -6907,14 +6913,14 @@ Namespace Biosystems.Ax00.BL
                             'Add Required Elements for all the available Diluent Solutions
                             dataToReturn = AddWSElementsForDilutionSolutions(dbConnection, workSessionID, orderTestsList)
 
-                            'Add Required Elements for all the available Washing Solutions
-                            If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForWashingSolutions(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
-
                             'Add Required Elements for all the available ISE Washing Solutions
                             If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForISEWashing(dbConnection, workSessionID, orderTestsList)
 
                             'Add required Elements for all the Reagents needed according the list of Order Tests
                             If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForReagents(dbConnection, workSessionID, orderTestsList, pCreateWS, pAnalyzerID)
+
+                            'Add Required Elements for all the available Washing Solutions
+                            If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForWashingSolutions(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
 
                             'Add required Elements for all the Controls needed according the list of Order Tests
                             If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForControls(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
