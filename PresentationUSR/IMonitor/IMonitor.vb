@@ -2068,6 +2068,8 @@ Public Class IMonitor
             End If
         Next
 
+        CreateLogActivity("IMonitor CLOSED (Complete)", "IMonitor.Monitor_FormClosed", EventLogEntryType.Information, False) 'AG 28/05/2014 - New trace
+
         'Application.DoEvents() 'AG 21/02/2014 - #1516 Comment because sometimes cause internal exceptions
     End Sub
 
