@@ -140,17 +140,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 21/05/2014 activate code: TR 06/05/2014 BT#1612, #1634 -**UNCOMMENT Version 3.0.1**-
                 If resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString() Then
-                    myLogAcciones.CreateLogActivity("2º try saving the reading due to previous error. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                    myLogAcciones.CreateLogActivity("Try saving the reading again... ", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     'Try to save the reading one more time 
                     resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
 
                     If resultData.HasError Then
-                        myLogAcciones.CreateLogActivity("2º try saving the reading FAILED!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                        myLogAcciones.CreateLogActivity("2º attempt saving readings FAILED!!!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     Else
-                        myLogAcciones.CreateLogActivity("2º try saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                    "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Warning, False)
+                        myLogAcciones.CreateLogActivity("2º attempt saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     End If
                 End If
                 'TR 06/05/2014 BT#1612, #1634 -END
@@ -987,7 +984,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myGlobal.HasError = True
                     Dim myLogAcciones As New ApplicationLogManager()
                     myLogAcciones.CreateLogActivity("There was an error and the ANSPHR instruction had not been saved. Set error code = READING_NOT_SAVED! ", _
-                                "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Warning, False)
+                                "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                 End If
                 'TR 06/05/2014 BT#1612 -END
 

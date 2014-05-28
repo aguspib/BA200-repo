@@ -4654,7 +4654,7 @@ Namespace Biosystems.Ax00.LISCommunications
                         'Sample Type 
                         resultData = myLISMappingDelegate.GetLISSampleType(pConfigMappingDS, myResultRow.SampleType)
                         If resultData.HasError Then
-                            myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Sample Type is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Warning, False)
+                            myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Sample Type is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
                             itMustSetToNotSent = True
                         Else
                             myMappedSampleType = CStr(resultData.SetDatos)
@@ -4664,7 +4664,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             'Test Id 
                             resultData = myAllTestMappingDelegate.GetLISTestID(pTestMappingDS, myResultRow.TestID, myResultRow.TestType)
                             If resultData.HasError Then
-                                myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Test ID is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Warning, False)
+                                myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Test ID is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
                                 itMustSetToNotSent = True
                             Else
                                 myMappedTestId = CStr(resultData.SetDatos)
