@@ -2325,7 +2325,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by  AG 14/04/2011
-        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved
+        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
         ''' </remarks>
         Private Function UserSwANSINFTreatment(ByVal pSensors As Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)) As GlobalDataTO
 
@@ -2419,20 +2419,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else 'Closed
                         alarmStatus = False
 
-                        ' XB 27/05/2014 - BT #1630
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" OrElse _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS"
-                            End If
+                        'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) AndAlso _
+                           (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
+                            alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
-                        ' XB 27/05/2014 - BT #1630
+                        'AG 29/05/2014 - BT #1630
                     End If
 
                     'Update the class attribute SensorValuesAttribute
                     UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT, pSensors(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT), False)
 
-                    If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
+                    'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
+                    'If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
+                    If alarmStatus AndAlso Not waterDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
                         myLogAcciones.CreateLogActivity("Water deposit empty!! Enable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
@@ -2461,20 +2461,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else 'Closed
                         alarmStatus = False
 
-                        ' XB 27/05/2014 - BT #1630
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" OrElse _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS"
-                            End If
+                        'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) AndAlso _
+                           (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
+                            alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
-                        ' XB 27/05/2014 - BT #1630
+                        'AG 29/05/2014 - BT #1630
+
                     End If
 
                     'Update the class attribute SensorValuesAttribute
                     UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT, pSensors(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT), False)
 
-                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
+                    'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
+                    'If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
+                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
                         myLogAcciones.CreateLogActivity("Waste deposit full!! Enable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
