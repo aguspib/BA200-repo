@@ -707,6 +707,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentWSStatus">Current Status of the WS to update. Optional parameter; when informed, it allows to known if the 
         '''                                status have to be updated, which happen in following cases: from OPEN to PENDING and from
         '''                                CLOSED to INPROCESS; in the rest of cases a status change is not needed</param>
+        ''' <param name="pSearchNotInUseElements">When True, it indicates the process has to verify if there are not In Use positions in the WorkSession 
+        '''                                       that corresponds to the new added Patient elements</param>
         ''' <returns>GlobalDataTO containing error information and, when a new WorkSession has been created or updated, a typed DataSet WorkSessionDS, 
         '''          containing the identifier of the Work Session and its current Status, and also information about the Analyzer in which the 
         '''          Work Session is or will be executed</returns>
@@ -6758,6 +6760,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentWSStatus">Current Status of the WS to update. Optional parameter; when informed, it allows to known if the 
         '''                                status have to be updated, which happen in following cases: from OPEN to PENDING and from
         '''                                CLOSED to INPROCESS; in the rest of cases a status change is not needed</param>
+        ''' <param name="pSearchNotInUseElements">When True, it indicates the process has to verify if there are not In Use positions in the WorkSession 
+        '''                                       that corresponds to the new added Patient elements</param>
         ''' <returns>GlobalDataTO containing error information and, when a WorkSession has been created or updated, a typed DataSet WorkSessionDS, 
         '''          containing the identifier of the Work Session and its current Status, and also information about the Analyzer in which the 
         '''          Work Session is or will be executed</returns>
