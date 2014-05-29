@@ -475,6 +475,9 @@ Public Class BSBaseForm
                             'Error Message 
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Error)
 
+                            ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
+                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+
                             'ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "Information") Then
                         ElseIf (myMessageType = "Information") Then
                             'Information Message 
@@ -494,6 +497,9 @@ Public Class BSBaseForm
                         ElseIf (myMessageType = "FailureAudit") Then
                             'System Error Message - FailureAudit
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Stop)
+
+                            ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
+                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
 
                             'ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "Warning") Then
                         ElseIf (myMessageType = "Warning") Then
