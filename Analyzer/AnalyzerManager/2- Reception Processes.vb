@@ -1564,9 +1564,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                                           Code included in section labelled as (2.2) has been re-written to make it more clear. 
         '''                                           Added a new call to ReagentsOnBoardDelegate.ReagentBottleManagement in section labelled as (2.3), to allow
         '''                                           save the DEPLETED Status when the Instruction indicates the Detection Level has failed
-        '''              SA 28/05/2014 - BT #1627 ==> Added changes to avoid call functions that are specific for REAGENTS (f.i. functions of ReagentsOnBoardManagement,  
-        '''                                           CalculateBottleVolumeTestLeft, ...) when DILUTION and/or WASHING SOLUTIONS are dispensed. Current code just verify
-        '''                                           the Rotor Type, but not the Bottle content. Changes have been made in section labelled (2.2) ==> (2.3) PENDING!! 
+        '''              SA 28/05/2014 - BT #1627 ==> Added changes to avoid call functions that are specific for REAGENTS (functions of ReagentsOnBoardManagement)  
+        '''                                           when DILUTION and/or WASHING SOLUTIONS are dispensed. Current code just verify the Rotor Type, but not the 
+        '''                                           Bottle content. Changes have been made in section labelled (2.2) 
         ''' </remarks>
         Private Function ProcessArmStatusRecived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -1753,12 +1753,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Calculate the real volume test left for the bottle in position myBottlePos (using LevelControl value myLevelControl)
                     If (myRotorName = "REAGENTS") Then 'For reagents
                         Dim reagOnBoard As New ReagentsOnBoardDelegate
-
-                        'BT #1627 - Call this function only when Reagent1 or Reagent2 have been dispensed, skip it for Dilution and Washing Solutions
-                        If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R1.ToString Or myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R2.ToString) Then
-                            myGlobal = reagOnBoard.CalculateBottleVolumeTestLeft(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, myLevelControl, realVolume, testLeft)
-                        End If
-
+                        myGlobal = reagOnBoard.CalculateBottleVolumeTestLeft(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, myLevelControl, realVolume, testLeft)
+                        
                         'BT #1443 - Calculate the new Position Status according the value of the Level Control returned by the Analyzer
                         Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
                                                                                      Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _

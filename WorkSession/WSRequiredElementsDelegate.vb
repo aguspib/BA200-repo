@@ -83,8 +83,8 @@ Namespace Biosystems.Ax00.BL
         '''                                 "INCOMPLETE" as ElementStatus
         '''              SA 02/03/2012    - Undo the previous change; when the total positioned volume of the informed Element is zero, then return "NOPOS"
         '''                                 as ElementStatus
-        '''              SA 28/05/2014    - BT #1627 ==> Calculate Status only when the required Element is a REAGENT; do not calculate it for DILUTION or 
-        '''                                              WASHING Solutions
+        '''              SA 29/05/2014    - BT #1627 ==> The final validation comparing the required volume against the total positioned volume must be done
+        '''                                              only for Reagents; for Dilution and Washing Solutions the required volume is unknown
         ''' </remarks>
         Public Function CalculateReagentStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                                                ByVal pElementID As Integer, ByVal pNotForClear As Boolean) As GlobalDataTO
@@ -103,33 +103,34 @@ Namespace Biosystems.Ax00.BL
                             Dim myRequiredVolume As WSRequiredElementsDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
 
                             If (myRequiredVolume.twksWSRequiredElements.Rows.Count > 0) Then
-                                'BT #1627 - Calculate Status only when the required Element is a REAGENT; do not calculate it for DILUTION or WASHING Solutions
-                                If (myRequiredVolume.twksWSRequiredElements(0).TubeContent = "REAGENT") Then
-                                    'Get the positioned volume and the number of positioned bottles of each different bottle type for the required Reagent
-                                    Dim myRotorContentByPosition As New WSRotorContentByPositionDelegate
-                                    resultData = myRotorContentByPosition.GetPositionedReagentVolume(dbConnection, pAnalyzerID, pRotorType, pElementID)
+                                'Get the positioned volume and the number of positioned bottles of each different bottle type for the required Reagent
+                                Dim myRotorContentByPosition As New WSRotorContentByPositionDelegate
+                                resultData = myRotorContentByPosition.GetPositionedReagentVolume(dbConnection, pAnalyzerID, pRotorType, pElementID)
 
-                                    If (Not resultData.HasError) Then
-                                        Dim myTotalVolume As Integer = 0
-                                        If (Not resultData.SetDatos Is DBNull.Value) Then myTotalVolume = CType(resultData.SetDatos, Integer)
+                                If (Not resultData.HasError) Then
+                                    Dim myTotalVolume As Integer = 0
+                                    If (Not resultData.SetDatos Is DBNull.Value) Then myTotalVolume = CType(resultData.SetDatos, Integer)
 
-                                        Dim reagentStatus As String = "POS"
-                                        If (Not pNotForClear) Then
-                                            reagentStatus = "NOPOS"
-                                        ElseIf (myTotalVolume = 0) Then
-                                            reagentStatus = "NOPOS"   '"INCOMPLETE"
-                                        End If
+                                    Dim reagentStatus As String = "POS"
+                                    If (Not pNotForClear) Then
+                                        reagentStatus = "NOPOS"
+                                    ElseIf (myTotalVolume = 0) Then
+                                        reagentStatus = "NOPOS"
+                                    End If
 
+                                    'BT #1627 - The validation comparing the required volume against the total positioned volume must be done
+                                    '           only for Reagents; for Dilution and Washing Solutions the required volume is unknown
+                                    If (myRequiredVolume.twksWSRequiredElements.First.TubeContent = "REAGENT") Then
                                         'Validate the required volume and the total volume to know if the Element is incomplete
                                         If (myTotalVolume > 0 AndAlso myRequiredVolume.twksWSRequiredElements(0).RequiredVolume > myTotalVolume) Then
                                             reagentStatus = "INCOMPLETE"
                                         ElseIf (myTotalVolume > 0 AndAlso myRequiredVolume.twksWSRequiredElements(0).RequiredVolume <= myTotalVolume) Then
                                             reagentStatus = "POS"
                                         End If
-
-                                        resultData.SetDatos = reagentStatus
-                                        resultData.HasError = False
                                     End If
+
+                                    resultData.SetDatos = reagentStatus
+                                    resultData.HasError = False
                                 End If
                             End If
                         End If
