@@ -1557,13 +1557,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''              SA 15/11/2012 - Before calling function ReagentBottleManagement, if field BarcodeInfo is not NULL, check 
         '''                              also it is informed (different of an empty string)
         '''              AG 18/11/2013 - (#1385) Decrement the number of tests using the positions for sample or reagent2 or arm r2 washing
-        '''              JV 09/01/2014 - BT #1443 Add Status value in his
+        '''              JV 09/01/2014 - BT #1443 ==> Added Status value in his
         '''              SA 20/01/2014 - BT #1443 ==> Changes made previously for this same item did not work due to the Position Status passed when call function 
         '''                                           ReagentsOnBoardDelegate.ReagentBottleManagement was the current Position Status instead of the re-calculated 
         '''                                           Position Status (according value of the LevelControl informed for the Analyzer in the received Instruction).
         '''                                           Code included in section labelled as (2.2) has been re-written to make it more clear. 
         '''                                           Added a new call to ReagentsOnBoardDelegate.ReagentBottleManagement in section labelled as (2.3), to allow
         '''                                           save the DEPLETED Status when the Instruction indicates the Detection Level has failed
+        '''              SA 28/05/2014 - BT #1627 ==> Added changes to avoid call functions that are specific for REAGENTS (functions of ReagentsOnBoardManagement)  
+        '''                                           when DILUTION and/or WASHING SOLUTIONS are dispensed. Current code just verify the Rotor Type, but not the 
+        '''                                           Bottle content. Changes have been made in section labelled (2.2) 
         ''' </remarks>
         Private Function ProcessArmStatusRecived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -1751,7 +1754,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (myRotorName = "REAGENTS") Then 'For reagents
                         Dim reagOnBoard As New ReagentsOnBoardDelegate
                         myGlobal = reagOnBoard.CalculateBottleVolumeTestLeft(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, myLevelControl, realVolume, testLeft)
-
+                        
                         'BT #1443 - Calculate the new Position Status according the value of the Level Control returned by the Analyzer
                         Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
                                                                                      Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _
@@ -1776,50 +1779,53 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
                         limitList = Nothing
 
-                        'Validate and update Volumes in the Reagents Historic Table (verify if the Bottle has to be locked due to an invalid refill
-                        If (Not myGlobal.HasError) Then
-                            If (rcp_DS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso (Not rcp_DS.twksWSRotorContentByPosition(0).IsBarCodeInfoNull) AndAlso _
-                               (rcp_DS.twksWSRotorContentByPosition(0).BarCodeInfo <> String.Empty) Then
-                                'BT #1443 - Added the new calculated Position Status to save it Reagents Historic Table (newPositionStatus, not current Rotor Position) 
-                                myGlobal = reagOnBoard.ReagentBottleManagement(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, _
-                                                                               rcp_DS.twksWSRotorContentByPosition(0).BarCodeInfo, _
-                                                                               newPositionStatus, realVolume)
+                        'BT #1627 - Execute this block only when Reagent1 or Reagent2 have been dispensed, skip it for Dilution and Washing Solutions
+                        If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R1.ToString Or myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R2.ToString) Then
+                            'Validate and update Volumes in the Reagents Historic Table (verify if the Bottle has to be locked due to an invalid refill
+                            If (Not myGlobal.HasError) Then
+                                If (rcp_DS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso (Not rcp_DS.twksWSRotorContentByPosition(0).IsBarCodeInfoNull) AndAlso _
+                                   (rcp_DS.twksWSRotorContentByPosition(0).BarCodeInfo <> String.Empty) Then
+                                    'BT #1443 - Added the new calculated Position Status to save it Reagents Historic Table (newPositionStatus, not current Rotor Position) 
+                                    myGlobal = reagOnBoard.ReagentBottleManagement(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, _
+                                                                                   rcp_DS.twksWSRotorContentByPosition(0).BarCodeInfo, _
+                                                                                   newPositionStatus, realVolume)
 
-                                If (Not myGlobal.HasError) Then
-                                    myBottleStatus = myGlobal.SetDatos.ToString()
+                                    If (Not myGlobal.HasError) Then
+                                        myBottleStatus = myGlobal.SetDatos.ToString()
 
-                                    If (myBottleStatus = "LOCKED") Then
-                                        newPositionStatus = myBottleStatus
+                                        If (myBottleStatus = "LOCKED") Then
+                                            newPositionStatus = myBottleStatus
 
-                                        'Add the Alarm of Bottle blocked due to an invalid refill was detected only if the previous Position Status was not LOCKED
-                                        If (initialRotorPositionStatus <> "LOCKED") Then
-                                            Dim myExecution As Integer = 0
-                                            Dim addInfoInvalidRefill As String = String.Empty
+                                            'Add the Alarm of Bottle blocked due to an invalid refill was detected only if the previous Position Status was not LOCKED
+                                            If (initialRotorPositionStatus <> "LOCKED") Then
+                                                Dim myExecution As Integer = 0
+                                                Dim addInfoInvalidRefill As String = String.Empty
 
-                                            myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, ActiveWorkSession, ActiveAnalyzer)
-                                            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                                                Dim lockedBottleExecDS As ExecutionsDS = DirectCast(myGlobal.SetDatos, ExecutionsDS)
-
-                                                If (lockedBottleExecDS.twksWSExecutions.Rows.Count > 0) AndAlso (Not lockedBottleExecDS.twksWSExecutions(0).IsExecutionIDNull) Then
-                                                    myExecution = lockedBottleExecDS.twksWSExecutions(0).ExecutionID
-                                                End If
-
-                                                'Get the information needed and add the Alarm to the Alarms List
-                                                myGlobal = exec_delg.EncodeAdditionalInfo(dbConnection, ActiveAnalyzer, ActiveWorkSession, myExecution, myBottlePos, _
-                                                                                          GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, reagentNumberWithNoVolume)
+                                                myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, ActiveWorkSession, ActiveAnalyzer)
                                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                                                    addInfoInvalidRefill = CType(myGlobal.SetDatos, String)
-                                                    PrepareLocalAlarmList(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, True, alarmList, alarmStatusList, addInfoInvalidRefill, alarmAdditionalInfoList, False)
+                                                    Dim lockedBottleExecDS As ExecutionsDS = DirectCast(myGlobal.SetDatos, ExecutionsDS)
+
+                                                    If (lockedBottleExecDS.twksWSExecutions.Rows.Count > 0) AndAlso (Not lockedBottleExecDS.twksWSExecutions(0).IsExecutionIDNull) Then
+                                                        myExecution = lockedBottleExecDS.twksWSExecutions(0).ExecutionID
+                                                    End If
+
+                                                    'Get the information needed and add the Alarm to the Alarms List
+                                                    myGlobal = exec_delg.EncodeAdditionalInfo(dbConnection, ActiveAnalyzer, ActiveWorkSession, myExecution, myBottlePos, _
+                                                                                              GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, reagentNumberWithNoVolume)
+                                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                                        addInfoInvalidRefill = CType(myGlobal.SetDatos, String)
+                                                        PrepareLocalAlarmList(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, True, alarmList, alarmStatusList, addInfoInvalidRefill, alarmAdditionalInfoList, False)
+                                                    End If
                                                 End If
                                             End If
                                         End If
                                     End If
                                 End If
                             End If
-                        End If
 
-                        If (Not myGlobal.HasError AndAlso (realVolume <> 60 OrElse testLeft <> 0)) Then
-                            changesInPosition = True
+                            If (Not myGlobal.HasError AndAlso (realVolume <> 60 OrElse testLeft <> 0)) Then
+                                changesInPosition = True
+                            End If
                         End If
                     Else
                         realVolume = 0

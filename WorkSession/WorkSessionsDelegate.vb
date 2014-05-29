@@ -268,30 +268,23 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Add all Elements required for the available Additional Solutions of the specified type in a Work Session
+        ''' Add all Dilution Solutions needed to execute automatic predilutions as required Work Session Elements 
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pSolutionType">Type of additional Solution: Special, Washing, ...</param>
         ''' <param name="pOrderTestsList">List of identifiers of all Order Tests included in the Work Session that have to be executed in an 
         '''                               Analyzer, separated by commas</param>
         ''' <returns>Global object containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA
-        ''' Modified by: VR 15/12/2009 (TESTED : PENDING)
-        '''              VR 17/12/2009 (TESTED : OK)
-        '''              VR 29/12/2009 - Changed the Constant Value to Enum Value
-        '''              SA 04/01/2010 - Changed the way of open the DB Connection to the new template
-        '''              SA 04/01/2010 - Code changed to fulfill the design, fix errors and to make it more simple
-        '''              SA 03/03/2010 - Changes to fix errors due to changes in returned data type of several called functions
-        '''              SA 09/03/2010 - Changes due the return type of function GenerateElementID has been modified
-        '''              SA 15/10/2010 - When the processed Special Solution is SALINESOL and the calculated required volume is zero, then call 
-        '''                              function VerifyAutomaticDilutions; if that functions returns a value greater than zero, then add a small 
-        '''                              bottle of SALINESOL as required WS Element
-        '''              SA 16/02/2012 - Removed parameter pConstantVolumes
+        ''' Created by:  SA 27/05/2014 - BT #1519 ==> Code to add to the Work Session all needed Dilution Solutions was extracted from the previous used function
+        '''                                           AddWSElementsForAdditionalSolutions (which was used for DilutionSolutions and also for WashingSolutions) although 
+        '''                                           with following changes:
+        '''                                           * Saline Solution has to be treated in the same way than the rest of Dilution Solutions (the If to exclude SALINESOL
+        '''                                             from the process was removed)
+        '''                                           * When the Dilution Solution in process already exist as required Element in the active WorkSession, the Update is not needed
         ''' </remarks>
-        Public Function AddWSElementsForAdditionalSolutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-                                                            ByVal pSolutionType As PreloadedMasterDataEnum, ByVal pOrderTestsList As String) As GlobalDataTO
+        Public Function AddWSElementsForDilutionSolutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
+                                                          ByVal pOrderTestsList As String) As GlobalDataTO
             Dim dataToReturn As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -302,205 +295,246 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim isOK As Boolean = True
 
-                        'Get the minimum size for bottles of Reagents and Additional Solutions
-                        Dim reagentTubeSizesData As New ReagentTubeTypesDelegate
-                        dataToReturn = reagentTubeSizesData.GetMinimumBottleSize(dbConnection)
+                        'Get the list of Dilution Solutions needed for automatic predilutions in the active WorkSession
+                        Dim orderTestsDelegate As New OrderTestsDelegate
+                        dataToReturn = orderTestsDelegate.VerifyAutomaticDilutions(dbConnection, pOrderTestsList, pWorkSessionID)
                         isOK = (Not dataToReturn.HasError)
 
                         If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                            Dim minimumBottleSize As Single = CType(dataToReturn.SetDatos, Single)
+                            Dim diluentSolutionsDS As TestSamplesDS = DirectCast(dataToReturn.SetDatos, TestSamplesDS)
 
-                            'Get the list of available Additional Solutions of the informed type from table of Preloaded Master Data
+                            Dim preloadedDataDS As PreloadedMasterDataDS
                             Dim preloadedData As New PreloadedMasterDataDelegate
-                            dataToReturn = preloadedData.GetList(Nothing, pSolutionType)
-                            isOK = (Not dataToReturn.HasError)
 
-                            If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                                Dim preloadedDataDS As PreloadedMasterDataDS = DirectCast(dataToReturn.SetDatos, PreloadedMasterDataDS)
+                            If (diluentSolutionsDS.tparTestSamples.Rows.Count > 0) Then
+                                'Get the list of available Dilution Solutions from table of Preloaded Master Data
+                                dataToReturn = preloadedData.GetList(Nothing, GlobalEnumerates.PreloadedMasterDataEnum.DIL_SOLUTIONS)
+                                isOK = (Not dataToReturn.HasError)
 
-                                If (preloadedDataDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
-                                    Dim tubeContent As String = String.Empty
+                                If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                                    preloadedDataDS = DirectCast(dataToReturn.SetDatos, PreloadedMasterDataDS)
 
-                                    If (pSolutionType = PreloadedMasterDataEnum.SPECIAL_SOLUTIONS) OrElse _
-                                       (pSolutionType = PreloadedMasterDataEnum.DIL_SOLUTIONS) Then
-                                        tubeContent = "SPEC_SOL"
-                                    ElseIf (pSolutionType = PreloadedMasterDataEnum.WASHING_SOLUTIONS) Then
-                                        tubeContent = "WASH_SOL"
-                                    End If
+                                    If (preloadedDataDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+                                        'Get the minimum size for bottles of Reagents and Additional Solutions
+                                        Dim reagentTubeSizesData As New ReagentTubeTypesDelegate
+                                        dataToReturn = reagentTubeSizesData.GetMinimumBottleSize(dbConnection)
+                                        isOK = (Not dataToReturn.HasError)
 
-                                    Dim wsElementDataDS As New WSRequiredElementsDS
-                                    Dim wsElementFoundDS As New WSRequiredElementsDS
-                                    Dim wsElementData As New WSRequiredElementsDelegate
+                                        If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                                            Dim minimumBottleSize As Single = CType(dataToReturn.SetDatos, Single)
 
-                                    'Process each Additional Solution of the specified type
-                                    Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow
-                                    wsElementsRow = wsElementDataDS.twksWSRequiredElements.NewtwksWSRequiredElementsRow
-                                    wsElementDataDS.twksWSRequiredElements.Rows.Add(wsElementsRow)
+                                            'Prepare a local DataSet WSRequiredElementsDS with one row to be used to check for each Dilution Solution if
+                                            'it already exists as a required Element in the active Work Session
+                                            Dim wsElementDataDS As New WSRequiredElementsDS
+                                            Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow
+                                            wsElementsRow = wsElementDataDS.twksWSRequiredElements.NewtwksWSRequiredElementsRow
+                                            wsElementDataDS.twksWSRequiredElements.Rows.Add(wsElementsRow)
 
-                                    Dim i As Integer = 1
-                                    Dim requiredVolume As Single = 0
-                                    Dim residualVolume As Single = 0
-                                    Dim numAutoDilutions As Integer = 0
-                                    Dim solutionInWS As Boolean = False
-                                    Dim addSolutionElement As Boolean = True
-                                    Dim orderTestData As New OrderTestsDelegate
+                                            Dim wsElementFoundDS As New WSRequiredElementsDS
+                                            Dim wsElementData As New WSRequiredElementsDelegate
+                                            Dim dilutionSolutionsList As List(Of TestSamplesDS.tparTestSamplesRow)
 
-                                    Do While (i <= preloadedDataDS.tfmwPreloadedMasterData.Rows.Count) AndAlso (isOK)
-                                        'Verify if there is a Required Element for the Additional Solution in the WorkSession;
-                                        'fill a row in a local DataSet WSRequiredElements informing values for the Additional Solution in process
-                                        If (preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID <> "WASHSOL3") Then
-                                            wsElementsRow.WorkSessionID = pWorkSessionID
-                                            wsElementsRow.TubeContent = tubeContent
-                                            wsElementsRow.SolutionCode = preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID
+                                            'For each available Dilution Solution, check if it is needed in the active WorkSession (if it exists in the TestSamplesDS
+                                            'previouly obtained) and in this case, check if it already exists as required Element in the active Work Session:
+                                            '** If the Dilution Solution exists as required Element, nothing to do
+                                            '** Otherwise, the Dilution Solution is added as a new required Element
+                                            For Each dilutionSol As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In preloadedDataDS.tfmwPreloadedMasterData
+                                                'Check if the Dilution Solution is in the list of Dilution Solutions needed in the active WorkSession
+                                                dilutionSolutionsList = (From a As TestSamplesDS.tparTestSamplesRow In diluentSolutionsDS.tparTestSamples _
+                                                                        Where a.DiluentSolution = dilutionSol.ItemID _
+                                                                       Select a).ToList
 
-                                            dataToReturn = wsElementData.ExistRequiredElement(dbConnection, wsElementDataDS)
-                                            isOK = (Not dataToReturn.HasError)
+                                                If (dilutionSolutionsList.Count > 0) Then
+                                                    'Fill a row in a local DataSet WSRequiredElements informing values for the Dilution Solution in process
+                                                    wsElementsRow.WorkSessionID = pWorkSessionID
+                                                    wsElementsRow.TubeContent = "SPEC_SOL"
+                                                    wsElementsRow.SolutionCode = dilutionSol.ItemID
 
-                                            If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                                                solutionInWS = False
-
-                                                wsElementFoundDS = DirectCast(dataToReturn.SetDatos, WSRequiredElementsDS)
-                                                If (wsElementFoundDS.twksWSRequiredElements.Rows.Count = 0) Then
-                                                    'If a Required Element was not found in the WS for the Additional Solution in process, then
-                                                    'the next ElementID has to be generated and informed in the correspondent field in the row
-                                                    dataToReturn = wsElementData.GenerateElementID(dbConnection)
+                                                    'Verify if the Dilution Solution already exists as Required Element in the WorkSession
+                                                    dataToReturn = wsElementData.ExistRequiredElement(dbConnection, wsElementDataDS)
                                                     isOK = (Not dataToReturn.HasError)
 
                                                     If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                                                        wsElementsRow.ElementID = DirectCast(dataToReturn.SetDatos, Integer)
-                                                    End If
-                                                Else
-                                                    'A Required Element was found in the WS for the Additional Solution in process
-                                                    solutionInWS = True
-                                                    wsElementsRow.ElementID = wsElementFoundDS.twksWSRequiredElements(0).ElementID
-                                                End If
+                                                        wsElementFoundDS = DirectCast(dataToReturn.SetDatos, WSRequiredElementsDS)
 
-                                                'To control if an Element has to be created/updated for the Additional Solution in process
-                                                addSolutionElement = True
-
-                                                'Get the required total volume of the Additional Solution
-                                                requiredVolume = 0
-                                                If (pSolutionType = PreloadedMasterDataEnum.SPECIAL_SOLUTIONS) Then
-                                                    dataToReturn = orderTestData.GetSpecialSolutionVolume(dbConnection, pOrderTestsList, _
-                                                                                                          preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID.Trim, _
-                                                                                                          pWorkSessionID)
-                                                    isOK = (Not dataToReturn.HasError)
-                                                    If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                                                        requiredVolume = DirectCast(dataToReturn.SetDatos, Single)
-
-                                                        'When no volume is required...
-                                                        If (requiredVolume = 0) Then
-                                                            'If the Special Solution is Distilled Water, at least a small bottle is needed 
-                                                            '(for Base Line executions)
-                                                            If (String.Compare(preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID, "DISTW", False) = 0) Then
-                                                                If (solutionInWS) Then
-                                                                    'If a bottle of Distilled Water is already in the WS, nothing to do, go to 
-                                                                    'process the following Special Solution in the list
-                                                                    addSolutionElement = False
-                                                                Else
-                                                                    'A small bottle will be added; the required volume will be the real bottle volume
-                                                                    'TODO: get the residual volume for bottles to calculate the real volume of the smallest bottle
-                                                                    residualVolume = 0
-                                                                    requiredVolume = minimumBottleSize - residualVolume
-                                                                End If
-                                                            ElseIf (String.Compare(preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID, "SALINESOL", False) = 0) Then
-                                                                'If the Special Solution is Saline Solution and it has not still been added as required
-                                                                'WS Element, then verify if Patient Samples for Tests/SampleTypes with programmed automatic
-                                                                'dilutions with Saline Solution have been requested in the WS
-                                                                If (solutionInWS) Then
-                                                                    'If a bottle of Saline Solution is already in the WS, nothing to do, go to 
-                                                                    'process the following Special Solution in the list
-                                                                    addSolutionElement = False
-                                                                Else
-                                                                    'Count automatic dilutions
-                                                                    dataToReturn = orderTestData.VerifyAutomaticDilutions(dbConnection, pOrderTestsList, "SALINESOL", pWorkSessionID)
-                                                                    isOK = (Not dataToReturn.HasError)
-
-                                                                    If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                                                                        numAutoDilutions = DirectCast(dataToReturn.SetDatos, Integer)
-                                                                        If (numAutoDilutions = 0) Then
-                                                                            'If there are not automatic dilutions in the WS, nothing to do, go to 
-                                                                            'process the following Special Solution in the list
-                                                                            addSolutionElement = False
-                                                                        Else
-                                                                            'A small bottle will be added; the required volume will be the real bottle volume
-                                                                            'TODO: get the residual volume for bottles to calculate the real volume of the smallest bottle
-                                                                            residualVolume = 0
-                                                                            requiredVolume = minimumBottleSize - residualVolume
-                                                                        End If
-                                                                    End If
-                                                                End If
-                                                            Else
-                                                                'For other Special Solutions, when they are not needed in the WorkSession, then
-                                                                'the correspondent Element is not created
-                                                                addSolutionElement = False
-                                                            End If
-                                                        End If
-                                                    End If
-
-                                                ElseIf (pSolutionType = PreloadedMasterDataEnum.DIL_SOLUTIONS) Then
-                                                    'Saline Solution is ignored due to it was verified as Special Solution
-                                                    If (String.Compare(preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID, "SALINESOL", False) <> 0) Then
-                                                        'If the Diluent Solution is not Saline Solution and it has not still been added as required
-                                                        'WS Element, then verify if Patient Samples for Tests/SampleTypes with programmed automatic
-                                                        'dilutions with this diluent have been requested in the WS
-                                                        If (solutionInWS) Then
-                                                            'If a bottle of the Diluent Solution is already in the WS, nothing to do, go to 
-                                                            'process the following Diluent Solution in the list
-                                                            addSolutionElement = False
-                                                        Else
-                                                            'Count automatic dilutions
-                                                            dataToReturn = orderTestData.VerifyAutomaticDilutions(dbConnection, pOrderTestsList, _
-                                                                                                                  preloadedDataDS.tfmwPreloadedMasterData(i - 1).ItemID.Trim, _
-                                                                                                                  pWorkSessionID)
+                                                        If (wsElementFoundDS.twksWSRequiredElements.Rows.Count = 0) Then
+                                                            'The Dilution Solution does not exist as required Element in the active Work Session
+                                                            'Generate the next ElementID and inform it in the correspondent field in the row; 
+                                                            'inform also RequiredVolume = minBottleSize and ElementStatus = NOPOS
+                                                            dataToReturn = wsElementData.GenerateElementID(dbConnection)
                                                             isOK = (Not dataToReturn.HasError)
 
                                                             If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                                                                numAutoDilutions = DirectCast(dataToReturn.SetDatos, Int32)
-                                                                If (numAutoDilutions = 0) Then
-                                                                    'If there are not automatic dilutions with the Diluent Solution in the WS, nothing to do, 
-                                                                    'go to process the following Diluent Solution in the list
-                                                                    addSolutionElement = False
-                                                                Else
-                                                                    'A small bottle will be added; the required volume will be the real bottle volume
-                                                                    'TODO: get the residual volume for bottles to calculate the real volume of the smallest bottle
-                                                                    residualVolume = 0
-                                                                    requiredVolume = minimumBottleSize - residualVolume
+                                                                wsElementsRow.ElementID = DirectCast(dataToReturn.SetDatos, Integer)
+                                                                wsElementsRow.RequiredVolume = minimumBottleSize
+                                                                wsElementsRow.ElementStatus = "NOPOS"
+
+                                                                'Add the Dilution Solution to the list of required Elements for the specified Work Session
+                                                                dataToReturn = wsElementData.AddRequiredElement(dbConnection, wsElementDataDS)
+                                                            End If
+                                                        End If
+                                                    End If
+                                                End If
+
+                                                'If an error has happen during the process finish the adding process
+                                                If (Not isOK) Then Exit For
+                                            Next
+                                            dilutionSolutionsList = Nothing
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If (isOK) Then
+                            'When the Database Transaction was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Transaction was opened locally, then it is undone (Rollback is executed)
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Transacction was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                dataToReturn = New GlobalDataTO()
+                dataToReturn.HasError = True
+                dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForDilutionSolutions", EventLogEntryType.Error, False)
+            Finally
+                'When Database Connection was opened locally, it has to be closed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return dataToReturn
+        End Function
+
+        ''' <summary>
+        ''' Add all Washing Solutions needed to avoid Contaminations (between Reagents and/or of Reactions Rotor Wells) as required Work Session Elements
+        ''' </summary>
+        ''' <param name="pDBConnection">Open Database Connection</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pOrderTestsList">List of identifiers of all Order Tests included in the Work Session that have to be executed in an Analyzer,
+        '''                               separated by commas</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <returns>Global object containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 27/05/2014 - BT #1519 ==> Code to add to the Work Session all needed Washing Solutions was extracted from the previous used function
+        '''                                           AddWSElementsForAdditionalSolutions (which was used for DilutionSolutions and also for WashingSolutions) although 
+        '''                                           with following changes:
+        '''                                           * Instead of adding all available Washing Solutions to the active WorkSession, add only the Washing Solutions needed
+        '''                                             to avoid Contaminations (between Reagents and/or of Reactions Rotor Wells) in the active WorkSession. 
+        '''                                           * Added new parameter to inform the Analyzer Identifier (pAnalyzerID)
+        ''' </remarks>
+        Public Function AddWSElementsForWashingSolutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pOrderTestsList As String, _
+                                                         ByVal pAnalyzerID As String) As GlobalDataTO
+            Dim dataToReturn As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                dataToReturn = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim isOK As Boolean = True
+
+                        'Get the list of Washing Solutions needed to avoid Contaminations in the Work Session
+                        Dim myContaminationsDelegate As New ContaminationsDelegate
+                        dataToReturn = myContaminationsDelegate.GetWSContaminationsWithWASH(dbConnection, pWorkSessionID, pAnalyzerID)
+                        isOK = (Not dataToReturn.HasError)
+
+                        If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                            Dim contaminationsDS As ContaminationsDS = DirectCast(dataToReturn.SetDatos, ContaminationsDS)
+
+                            Dim preloadedDataDS As PreloadedMasterDataDS
+                            Dim preloadedData As New PreloadedMasterDataDelegate
+
+                            If (contaminationsDS.tparContaminations.Rows.Count > 0) Then
+                                'Get the list of available Washing Solutions from table of Preloaded Master Data
+                                dataToReturn = preloadedData.GetList(Nothing, GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS)
+                                isOK = (Not dataToReturn.HasError)
+
+                                If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                                    preloadedDataDS = DirectCast(dataToReturn.SetDatos, PreloadedMasterDataDS)
+
+                                    If (preloadedDataDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+                                        'Get the minimum size for bottles of Reagents and Additional Solutions
+                                        Dim reagentTubeSizesData As New ReagentTubeTypesDelegate
+                                        dataToReturn = reagentTubeSizesData.GetMinimumBottleSize(dbConnection)
+                                        isOK = (Not dataToReturn.HasError)
+
+                                        If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                                            Dim minimumBottleSize As Single = CType(dataToReturn.SetDatos, Single)
+
+                                            'Prepare a local DataSet WSRequiredElementsDS with one row to be used to check for each Washing Solution if
+                                            'it already exists as a required Element in the active Work Session
+                                            Dim wsElementDataDS As New WSRequiredElementsDS
+                                            Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow
+                                            wsElementsRow = wsElementDataDS.twksWSRequiredElements.NewtwksWSRequiredElementsRow
+                                            wsElementDataDS.twksWSRequiredElements.Rows.Add(wsElementsRow)
+
+                                            Dim wsElementFoundDS As New WSRequiredElementsDS
+                                            Dim wsElementData As New WSRequiredElementsDelegate
+                                            Dim contaminationWashSolutionsList As List(Of ContaminationsDS.tparContaminationsRow)
+
+                                            'For each available Washing Solution, check if it is needed in the active WorkSession to avoid Contaminations (if it exists
+                                            'in the ContaminationsDS previouly obtained) and in this case, check if it already exists as required Element in the active 
+                                            'Work Session:
+                                            '** If the Washing Solution exists as required Element, nothing to do
+                                            '** Otherwise, the Washing Solution is added as a new required Element
+                                            For Each washingSol As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In preloadedDataDS.tfmwPreloadedMasterData
+                                                'WASHSOL3 is the ISE Washing Solution and it is ignored in this process
+                                                If (washingSol.ItemID <> "WASHSOL3") Then
+                                                    'Check if the Washing Solution is in the list of Washing Solutions needed to avoid Contaminations in the active WorkSession
+                                                    contaminationWashSolutionsList = (From a As ContaminationsDS.tparContaminationsRow In contaminationsDS.tparContaminations _
+                                                                                     Where (Not a.IsWashingSolutionR1Null AndAlso a.WashingSolutionR1 = washingSol.ItemID) _
+                                                                                    OrElse (Not a.IsWashingSolutionR2Null AndAlso a.WashingSolutionR2 = washingSol.ItemID) _
+                                                                                    Select a).ToList
+
+                                                    If (contaminationWashSolutionsList.Count > 0) Then
+                                                        'Fill a row in a local DataSet WSRequiredElements informing values for the Washing Solution in process
+                                                        wsElementsRow.WorkSessionID = pWorkSessionID
+                                                        wsElementsRow.TubeContent = "WASH_SOL"
+                                                        wsElementsRow.SolutionCode = washingSol.ItemID
+
+                                                        'Verify if the Washing Solution already exists as Required Element in the WorkSession
+                                                        dataToReturn = wsElementData.ExistRequiredElement(dbConnection, wsElementDataDS)
+                                                        isOK = (Not dataToReturn.HasError)
+
+                                                        If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                                                            wsElementFoundDS = DirectCast(dataToReturn.SetDatos, WSRequiredElementsDS)
+
+                                                            If (wsElementFoundDS.twksWSRequiredElements.Rows.Count = 0) Then
+                                                                'The Washing Solution does not exist as required Element in the active Work Session
+                                                                'Generate the next ElementID and inform it in the correspondent field in the row; 
+                                                                'inform also RequiredVolume = minBottleSize and ElementStatus = NOPOS
+                                                                dataToReturn = wsElementData.GenerateElementID(dbConnection)
+                                                                isOK = (Not dataToReturn.HasError)
+
+                                                                If (isOK AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                                                                    wsElementsRow.ElementID = DirectCast(dataToReturn.SetDatos, Integer)
+                                                                    wsElementsRow.RequiredVolume = minimumBottleSize
+                                                                    wsElementsRow.ElementStatus = "NOPOS"
+
+                                                                    'Add the Washing Solution to the list of required Elements for the specified Work Session
+                                                                    dataToReturn = wsElementData.AddRequiredElement(dbConnection, wsElementDataDS)
                                                                 End If
                                                             End If
                                                         End If
                                                     End If
-                                                    'Else
-                                                    'TODO: pending calculate required volume for the rest of Solution Types
                                                 End If
 
-                                                'If an Element has to be added/updated for the Additional Solution in process
-                                                If (addSolutionElement) Then
-                                                    If (solutionInWS) Then
-                                                        'Update the Additional Solution required volume by adding to it the calculated for the
-                                                        'Order Tests added to the Work Session
-                                                        wsElementsRow.RequiredVolume = wsElementFoundDS.twksWSRequiredElements(0).RequiredVolume + requiredVolume
-
-                                                        'Set in the DataSet the same Element Status the Additional Solution has currently
-                                                        '(if not, the Status is missing when Update the Element information)
-                                                        wsElementsRow.ElementStatus = wsElementFoundDS.twksWSRequiredElements(0).ElementStatus
-
-                                                        'Update data of the existing Required Element
-                                                        dataToReturn = wsElementData.Update(dbConnection, wsElementDataDS)
-                                                    Else
-                                                        'Add the Additional Solution and inform the required volume and the status of the Element to add
-                                                        wsElementsRow.RequiredVolume = requiredVolume
-                                                        wsElementsRow.ElementStatus = "NOPOS"
-
-                                                        'Add the Additional Solution to the list of required Elements for the specified Work Session
-                                                        dataToReturn = wsElementData.AddRequiredElement(dbConnection, wsElementDataDS)
-                                                    End If
-                                                    isOK = (Not dataToReturn.HasError)
-                                                End If
-                                            End If
+                                                'If an error has happen during the process finish the adding process
+                                                If (Not isOK) Then Exit For
+                                            Next
+                                            contaminationWashSolutionsList = Nothing
                                         End If
-                                        i += 1
-                                    Loop
+                                    End If
                                 End If
                             End If
                         End If
@@ -524,7 +558,7 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForAdditionalSolutions", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForWashingSolutions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -673,6 +707,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentWSStatus">Current Status of the WS to update. Optional parameter; when informed, it allows to known if the 
         '''                                status have to be updated, which happen in following cases: from OPEN to PENDING and from
         '''                                CLOSED to INPROCESS; in the rest of cases a status change is not needed</param>
+        ''' <param name="pSearchNotInUseElements">When True, it indicates the process has to verify if there are not In Use positions in the WorkSession 
+        '''                                       that corresponds to the new added Patient elements</param>
         ''' <returns>GlobalDataTO containing error information and, when a new WorkSession has been created or updated, a typed DataSet WorkSessionDS, 
         '''          containing the identifier of the Work Session and its current Status, and also information about the Analyzer in which the 
         '''          Work Session is or will be executed</returns>
@@ -721,6 +757,12 @@ Namespace Biosystems.Ax00.BL
         '''                               happened in several customers, and it is probably due to thread synchronization problems) 
         '''               SA 09/09/2013 - When function was called to create an EMPTY WS but there is already a WorkSession in table twksWorkSessions, set new field
         '''                               CreateEmptyWSStopped to TRUE and write a Warning message in the application Log
+        '''               SA 27/05/2014 - BT #1519 ==> Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
+        '''                                            Dilution Solutions for a call to the new specific function AddWSElementsForDilutionSolutions
+        '''                                        ==> Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
+        '''                                            Washing Solutions for a call to the new specific function AddWSElementsForWashingSolutions. Besides, call the
+        '''                                            function after the call to function to add the required Reagents (AddWSElementsForReagents), because to check 
+        '''                                            the possible Contaminations the Reagents have to be already created as required Elements
         ''' </remarks>
         Public Function AddWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSOrderTestsList As WSOrderTestsDS, _
                                        ByVal pCreateWS As Boolean, Optional ByVal pAnalyzerID As String = "", Optional ByVal pCurrentWSStatus As String = "", _
@@ -828,19 +870,16 @@ Namespace Biosystems.Ax00.BL
                             If (Not dataToReturn.HasError) Then
                                 If (orderTestsList.Trim <> "") Then
                                     'Add Required Elements for all the available Diluent Solutions
-                                    dataToReturn = AddWSElementsForAdditionalSolutions(dbConnection, workSessionID, PreloadedMasterDataEnum.DIL_SOLUTIONS, _
-                                                                                       orderTestsList)
-
-                                    'Add Required Elements for all the available Washing Solutions
-                                    If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForAdditionalSolutions(dbConnection, workSessionID, _
-                                                                                                                           PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
-                                                                                                                           orderTestsList)
+                                    dataToReturn = AddWSElementsForDilutionSolutions(dbConnection, workSessionID, orderTestsList)
 
                                     'Add Required Elements for all the available ISE Washing Solutions
                                     If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForISEWashing(dbConnection, workSessionID, orderTestsList)
 
                                     'Add required Elements for all the Reagents needed according the list of Order Tests
                                     If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForReagents(dbConnection, workSessionID, orderTestsList, pCreateWS, pAnalyzerID)
+
+                                    'Add Required Elements for all the available Washing Solutions
+                                    If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForWashingSolutions(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
 
                                     'Add required Elements for all the Controls needed according the list of Order Tests
                                     If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForControls(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
@@ -6721,6 +6760,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentWSStatus">Current Status of the WS to update. Optional parameter; when informed, it allows to known if the 
         '''                                status have to be updated, which happen in following cases: from OPEN to PENDING and from
         '''                                CLOSED to INPROCESS; in the rest of cases a status change is not needed</param>
+        ''' <param name="pSearchNotInUseElements">When True, it indicates the process has to verify if there are not In Use positions in the WorkSession 
+        '''                                       that corresponds to the new added Patient elements</param>
         ''' <returns>GlobalDataTO containing error information and, when a WorkSession has been created or updated, a typed DataSet WorkSessionDS, 
         '''          containing the identifier of the Work Session and its current Status, and also information about the Analyzer in which the 
         '''          Work Session is or will be executed</returns>
@@ -6768,6 +6809,12 @@ Namespace Biosystems.Ax00.BL
         '''               SA 09/09/2013 - When function was called to create an EMPTY WS but there is already a WorkSession in table twksWorkSessions, set new field
         '''                               CreateEmptyWSStopped to TRUE and write a Warning message in the application Log
         '''               SA 19/03/2014 - BT #1545 ==> Changes to divide AddWorkSession process in several DB Transactions
+        '''               SA 27/05/2014 - BT #1519 ==> Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
+        '''                                            Dilution Solutions for a call to the new specific function AddWSElementsForDilutionSolutions
+        '''                                            Changed call to function AddWSElementsForAdditionalSolutions to add required Elements for all the available 
+        '''                                            Washing Solutions for a call to the new specific function AddWSElementsForWashingSolutions.  Besides, call the
+        '''                                            function after the call to function to add the required Reagents (AddWSElementsForReagents), because to check 
+        '''                                            the possible Contaminations the Reagents have to be already created as required Elements
         ''' </remarks>
         Public Function AddWorkSession_NEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSOrderTestsList As WSOrderTestsDS, _
                                            ByVal pCreateWS As Boolean, ByVal pAnalyzerID As String, Optional ByVal pCurrentWSStatus As String = "", _
@@ -6868,19 +6915,16 @@ Namespace Biosystems.Ax00.BL
                         'DB TRANSACTION #1 - Add the list of Required Elements for all Order Tests that have been sent to positioning
                         If (Not dbConnection Is Nothing) Then
                             'Add Required Elements for all the available Diluent Solutions
-                            dataToReturn = AddWSElementsForAdditionalSolutions(dbConnection, workSessionID, PreloadedMasterDataEnum.DIL_SOLUTIONS, _
-                                                                               orderTestsList)
-
-                            'Add Required Elements for all the available Washing Solutions
-                            If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForAdditionalSolutions(dbConnection, workSessionID, _
-                                                                                                                   PreloadedMasterDataEnum.WASHING_SOLUTIONS, _
-                                                                                                                   orderTestsList)
+                            dataToReturn = AddWSElementsForDilutionSolutions(dbConnection, workSessionID, orderTestsList)
 
                             'Add Required Elements for all the available ISE Washing Solutions
                             If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForISEWashing(dbConnection, workSessionID, orderTestsList)
 
                             'Add required Elements for all the Reagents needed according the list of Order Tests
                             If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForReagents(dbConnection, workSessionID, orderTestsList, pCreateWS, pAnalyzerID)
+
+                            'Add Required Elements for all the available Washing Solutions
+                            If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForWashingSolutions(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
 
                             'Add required Elements for all the Controls needed according the list of Order Tests
                             If (Not dataToReturn.HasError) Then dataToReturn = AddWSElementsForControls(dbConnection, workSessionID, orderTestsList, pAnalyzerID)
