@@ -233,6 +233,10 @@ Namespace Biosystems.Ax00.DAL
         ''' <remarks>
         ''' Modified by: RH 10/11/2010
         '''              RH 18/05/2011
+        '''              SA 30/05/2014 - BT #1643 ==> When the RestoreDB has been successfully executed, do not write a trace in the 
+        '''                                           ApplicationLog table: if the RSAT is from a previous version and the structure of 
+        '''                                           this table has been changed, the INSERT will fail. The structure of this table is 
+        '''                                           updated later, before beginning the UpdateVersion process
         ''' </remarks>
         Public Shared Function RestoreDataBase(ByVal ServerName As String, ByVal DataBaseName As String, _
                                                ByVal DBLogin As String, ByVal DBPassword As String, _
@@ -302,7 +306,8 @@ Namespace Biosystems.Ax00.DAL
 
                     result = True
 
-                    myLogAcciones.CreateLogActivity("Restore " & BackUpFileName & " Database OK", "RestoreDataBase", EventLogEntryType.Information, False)
+                    'BT #1643 - No writes in ApplicationLog table after the RESTORE: the table structure can be different
+                    'myLogAcciones.CreateLogActivity("Restore " & BackUpFileName & " Database OK", "RestoreDataBase", EventLogEntryType.Information, False)
                 Else
                     Throw New Exception("Unable to set DB to Single User.")
                 End If
