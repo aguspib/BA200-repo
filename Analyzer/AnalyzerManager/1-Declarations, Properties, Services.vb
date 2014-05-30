@@ -4394,14 +4394,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                     Dim myLogAcciones As New ApplicationLogManager()
                                                     myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Information, False)
 
+                                                    'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (runningMode + new parameter AllowScanInRunning)
                                                     'Verify is the current Analyzer Status is RUNNING ==> BT #1584: ...and it is not in PAUSE
-                                                    Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-                                                                                  Not AllowScanInRunning)
+                                                    'Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+                                                    '                              Not AllowScanInRunning)
+                                                    ''Create the Executions
+                                                    'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    '                                                String.Empty, iseModuleReady)
+                                                    Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
 
                                                     'Create the Executions
                                                     resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
-                                                                                                    String.Empty, iseModuleReady)
-                                                    'AG 31/04/2014 - #1565
+                                                                                                    String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
+                                                    'AG 30/05/2014 #1644
+
 
                                                 End If 'AG 01/04/2014 - #1565
 

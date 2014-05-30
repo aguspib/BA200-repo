@@ -5061,8 +5061,10 @@ Partial Public Class IAx00MainMDI
                 CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
                 Dim myExecutionDelegate As New ExecutionsDelegate
                 Dim createWSInRunning As Boolean = (MDIAnalyzerManager.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+
+                'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter AllowScanInRunning)
                 myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, MDIAnalyzerManager.ActiveAnalyzer, MDIAnalyzerManager.ActiveWorkSession, _
-                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes)
+                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, MDIAnalyzerManager.AllowScanInRunning)
                 ' XB 16/04/2014 - #1599
 
                 'refresh WS grid

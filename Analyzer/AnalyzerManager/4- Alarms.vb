@@ -2325,7 +2325,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by  AG 14/04/2011
-        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved
+        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
         ''' </remarks>
         Private Function UserSwANSINFTreatment(ByVal pSensors As Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)) As GlobalDataTO
 
@@ -2337,7 +2337,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myAlarmStatusList As New List(Of Boolean)
                 Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                 Dim alarmStatus As Boolean = False
-
+                Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 add traces informing when deposit sensors activate/deactivate timers
 
                 'Get General cover (parameter index 3)
                 Dim myIntValue As Integer = 0
@@ -2419,23 +2419,25 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else 'Closed
                         alarmStatus = False
 
-                        ' XB 27/05/2014 - BT #1630
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" OrElse _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS"
-                            End If
+                        'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) AndAlso _
+                           (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
+                            alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
-                        ' XB 27/05/2014 - BT #1630
+                        'AG 29/05/2014 - BT #1630
                     End If
 
                     'Update the class attribute SensorValuesAttribute
                     UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT, pSensors(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT), False)
 
-                    If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
+                    'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
+                    'If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
+                    If alarmStatus AndAlso Not waterDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
+                        myLogAcciones.CreateLogActivity("Water deposit empty!! Enable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
                     ElseIf Not alarmStatus AndAlso waterDepositTimer.Enabled Then
+                        myLogAcciones.CreateLogActivity("Water deposit OK!! Disable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = False  'Deactivate timer
                     End If
                     'AG 01/12/2011
@@ -2459,23 +2461,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else 'Closed
                         alarmStatus = False
 
-                        ' XB 27/05/2014 - BT #1630
-                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "PAUSED" OrElse _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "PAUSED" Then
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) = "INPROCESS"
-                            End If
+                        'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) AndAlso _
+                           (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
+                            alarmStatus = True ' Keep alarm until user clicks confirmation
                         End If
-                        ' XB 27/05/2014 - BT #1630
+                        'AG 29/05/2014 - BT #1630
+
                     End If
 
                     'Update the class attribute SensorValuesAttribute
                     UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT, pSensors(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT), False)
 
-                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
+                    'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
+                    'If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
+                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
+                        myLogAcciones.CreateLogActivity("Waste deposit full!! Enable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
                     ElseIf Not alarmStatus AndAlso wasteDepositTimer.Enabled Then
+                        myLogAcciones.CreateLogActivity("Waste deposit OK!! Disable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = False  'Deactivate timer
                     End If
                     'AG 01/12/2011
@@ -2568,15 +2573,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'NOTE: Here do not place different code for service or user because this method is called only for the user Software
                     myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
 
-                    'AG 18/06/2012 - The ansinf instruction is saved to log only when new alarms are generated or solved
+                    'AG 18/06/2012 - The ANSINF instruction is saved to log only when new alarms are generated or solved
                     '                Previous code only saved it when new alarms were generated
                     'Dim newNoProbeTemperatureAlarms As List(Of Boolean)
                     'newNoProbeTemperatureAlarms = (From a As Boolean In myAlarmStatusList Where a = True Select a).ToList
                     'If newNoProbeTemperatureAlarms.Count > 0 Then
 
                     If myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
+                        'Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 declare at the beginning
+                        myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         instrAddedToLogFlag = True
                     End If
                     'End If
@@ -5308,6 +5313,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
+                    'AG 29/05/2014 - #1630
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("Waste deposit full too much time!! Generate alarm WASTE_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
+
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
@@ -5348,6 +5357,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
+                    'AG 29/05/2014 - #1630
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("Water deposit empty too much time!! Generate alarm WATER_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
+
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
