@@ -482,7 +482,8 @@ Public Class IMonitor
     Private Sub RefreshCommonArea(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             'Dim StartTime As DateTime = Now
-            If isClosingFlag Then Exit Sub ' XB 27/05/2014 - #1496 No refresh if screen is closing
+            'If isClosingFlag Then Exit Sub ' XB 27/05/2014 - #1496 No refresh if screen is closing
+            If (Me.IsDisposed) Then Exit Sub
 
             'LEDs AREA
             UpdateLeds()
@@ -898,7 +899,8 @@ Public Class IMonitor
         Try
             RefreshDoneField = False 'RH 28/03/2012
 
-            If isClosingFlag Then Return 'AG 03/04/2012
+            'If isClosingFlag Then Return 'AG 03/04/2012
+            If (Me.IsDisposed) Then Exit Sub
 
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
@@ -985,6 +987,7 @@ Public Class IMonitor
                     mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
                     Me.BsIseMonitor.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
                     BsISELongTermDeactivated.Visible = (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEModuleInstalled AndAlso MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation)
+
                     Me.ISETab.Refresh()
 
                     'Debug.Print("iMonitor.BsIseMonitor.RefreshFieldsData: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 05/06/2012 - time estimation
@@ -1447,6 +1450,8 @@ Public Class IMonitor
             'ISELed.StateIndex = rnd.Next Mod 4
             'A400Led.StateIndex = rnd.Next Mod 4
             'FridgeStateLed.StateIndex = rnd.Next Mod 4
+            If (Me.IsDisposed) Then Exit Sub
+
 
             If (Not mdiAnalyzerCopy Is Nothing) Then
                 Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = mdiAnalyzerCopy.AnalyzerStatus

@@ -2533,7 +2533,8 @@ Partial Public Class IMonitor
     ''' </remarks>
     Private Sub UpdateRotorTreeViewArea(ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, Optional ByVal pRotorType As String = "")
         Try
-            If isClosingFlag Then Exit Sub ' IT 27/05/2014 - #1496 No refresh if screen is closing
+            'If isClosingFlag Then Exit Sub ' IT 27/05/2014 - #1496 No refresh if screen is closing
+            If (Me.IsDisposed) Then Exit Sub
 
             Dim myGlobalDataTO As GlobalDataTO
             Dim myNotInUseRPDelegate As New WSNotInUseRotorPositionsDelegate()

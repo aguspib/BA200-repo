@@ -5,6 +5,7 @@ Partial Class IMonitor
     'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+        CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         Try
             If disposing AndAlso components IsNot Nothing Then
                 ReleaseElement()
@@ -15,6 +16,7 @@ Partial Class IMonitor
             MyBase.Dispose(disposing)
             isClosingFlag = False
         End Try
+        CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
     End Sub
 
     'Required by the Windows Form Designer
