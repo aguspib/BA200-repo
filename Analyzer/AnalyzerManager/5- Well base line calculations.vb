@@ -542,7 +542,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 executionUpdated = True
 
                                 'AG 28/05/2014 - #1644 - When 1st reading is received remove all previous readings linked with this execution
-                                myGlobal = myReadingsDelegate.Delete(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionDS)
+                                If myReadingNumber = 1 Then
+                                    myLogAcciones.CreateLogActivity("Call myReadingsDelegate.Delete ", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                                    myGlobal = myReadingsDelegate.Delete(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionDS)
+                                End If
                                 'AG 28/05/2014
 
                             End If
@@ -671,6 +674,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'Recovery results during pause mode scenario
                                 If (Not myGlobal.HasError) Then myGlobal = myReadingsDelegate.SaveReadings(dbConnection, myReadingDS)
                             Else
+                                myLogAcciones.CreateLogActivity("Call myReadingsDelegate.SaveReadingsNEW", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+
                                 'Normal scenario
                                 If (Not myGlobal.HasError) Then myGlobal = myReadingsDelegate.SaveReadingsNEW(dbConnection, myReadingDS)
                             End If
