@@ -1729,12 +1729,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim rcp_DS As New WSRotorContentByPositionDS
                 Dim rcp_del As New WSRotorContentByPositionDelegate
                 Dim initialRotorPositionStatus As String = String.Empty
+                Dim elementTubeContent As String = String.Empty 'AG 30/05/2014 #1627
 
                 myGlobal = rcp_del.ReadByRotorTypeAndCellNumber(dbConnection, myRotorName, myBottlePos, WorkSessionIDAttribute, AnalyzerIDAttribute)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     rcp_DS = DirectCast(myGlobal.SetDatos, WSRotorContentByPositionDS)
                     If (rcp_DS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                         If (Not rcp_DS.twksWSRotorContentByPosition(0).IsStatusNull) Then initialRotorPositionStatus = rcp_DS.twksWSRotorContentByPosition(0).Status
+                        If (Not rcp_DS.twksWSRotorContentByPosition(0).IsTubeContentNull) Then elementTubeContent = rcp_DS.twksWSRotorContentByPosition(0).TubeContent 'AG 30/05/2014 #1627
                     End If
                 End If
 
@@ -1780,7 +1782,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         limitList = Nothing
 
                         'BT #1627 - Execute this block only when Reagent1 or Reagent2 have been dispensed, skip it for Dilution and Washing Solutions
-                        If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R1.ToString Or myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.R2.ToString) Then
+                        If (elementTubeContent = "REAGENT") Then
                             'Validate and update Volumes in the Reagents Historic Table (verify if the Bottle has to be locked due to an invalid refill
                             If (Not myGlobal.HasError) Then
                                 If (rcp_DS.twksWSRotorContentByPosition.Rows.Count > 0) AndAlso (Not rcp_DS.twksWSRotorContentByPosition(0).IsBarCodeInfoNull) AndAlso _
@@ -2030,7 +2032,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'TR 28/09/2012
 
                             'BT #1443 - Only when Bottle Status is DEPLETED, call the function to update the Status in the Reagents Historic Table
-                            If (myRotorName = "REAGENTS" AndAlso myBottleStatus = "DEPLETED") Then
+                            '#1627 - Add elementTubeContent = "REAGENT" 
+                            If (myRotorName = "REAGENTS" AndAlso myBottleStatus = "DEPLETED") AndAlso elementTubeContent = "REAGENT" Then
                                 Debug.Print("DETECTION FAILS: BOTTLE STATUS --> " & myBottleStatus.ToString())
 
                                 Dim reagOnBoard As New ReagentsOnBoardDelegate
