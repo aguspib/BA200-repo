@@ -6277,10 +6277,17 @@ Public Class IWSRotorPositions
             Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
+            'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks
             'Verify is the current Analyzer Status is RUNNING ==> BT #1584: ...and it is not in PAUSE
             Dim createWSInRunning As Boolean = False
-            If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-                                                                          Not mdiAnalyzerCopy.AllowScanInRunning)
+            'If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+            '                                                              Not mdiAnalyzerCopy.AllowScanInRunning)
+            Dim pauseMode As Boolean = False
+            If (Not mdiAnalyzerCopy Is Nothing) Then
+                createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+            End If
+            'AG 30/05/2014 #1644
 
             'SGM 07/09/2012 - Check if there is any pending ISE Calibration
             Dim iseModuleReady As Boolean = True
@@ -6345,8 +6352,8 @@ Public Class IWSRotorPositions
             'Generate the WS Executions
             'Dim resultData As GlobalDataTO
             Dim myExecutionDelegate As New ExecutionsDelegate
-            'resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady)
-            resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes) 'SGM 07/09/2012 - inform affected electrodes for locking them
+            'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter pauseMode)
+            resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
 
             If (resultData.HasError) Then
                 ErrorOnCreateWSExecutions = String.Format("{0}|{1}", resultData.ErrorCode, resultData.ErrorMessage)

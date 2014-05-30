@@ -5233,8 +5233,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status PENDING or LOCKED in the specified Analyzer Work Session (when not Running)
-        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status LOCKED in the specified Analyzer Work Session (when Running)
+        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status PENDING or LOCKED in the specified Analyzer Work Session (when StandBy or pause mode)
+        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status LOCKED in the specified Analyzer Work Session (when Running normal)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -5245,9 +5245,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  SA 05/07/2012
         ''' AG 25/03/2013 - return also LockedByLIS
+        ''' AG 30/05/2014 - #1644 add parameter pPauseMode
         ''' </remarks>
         Public Function GetPendingAndLockedGroupedExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                             ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean) As GlobalDataTO
+                                                             ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean, ByVal pPauseMode As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -5268,9 +5269,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
 
-                        If Not pWorkInRunningMode Then
+                        If Not pWorkInRunningMode OrElse pPauseMode Then 'AG 30/05/2014 - #1644 in standBy or in pause mode
                             cmdText += " AND   (ExecutionStatus = 'PENDING' OR ExecutionStatus = 'LOCKED') " & vbCrLf
-                        Else
+                        Else 'In normal running
                             cmdText += " AND   (ExecutionStatus = 'LOCKED') " & vbCrLf
                         End If
                         cmdText += " ORDER BY SampleClass, OrderTestID, RerunNumber " & vbCrLf

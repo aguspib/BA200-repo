@@ -2444,8 +2444,14 @@ Public Class IISEUtilities
                                    String.Compare(Me.WSStatusAttribute, "OPEN", False) <> 0 Then
 
                                     'Verify is the current Analyzer Status is RUNNING
+                                    'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (running mode and pause mode in different flags)
                                     Dim createWSInRunning As Boolean = False
-                                    If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                                    Dim pauseMode As Boolean = False
+                                    If (Not mdiAnalyzerCopy Is Nothing) Then
+                                        createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                                        pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+                                    End If
+
 
                                     'SGM 25/09/2012 - check if any calibration is needed
                                     Dim isReady As Boolean = False
@@ -2456,7 +2462,7 @@ Public Class IISEUtilities
                                     End If
                                     CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                                     myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, MyClass.mdiAnalyzerCopy.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
-                                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes)
+                                                                                  createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
                                     If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                                     'end SGM 25/09/2012
                                     myAffectedElectrodes = Nothing 'AG 19/02/2014 - #1514
@@ -4491,8 +4497,14 @@ Public Class IISEUtilities
                        MyClass.WSStatusAttribute <> "OPEN" Then
 
                         'Verify is the current Analyzer Status is RUNNING
+                        'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (running mode and pause mode in different flags)
                         Dim createWSInRunning As Boolean = False
-                        If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                        Dim pauseMode As Boolean = False
+                        If (Not mdiAnalyzerCopy Is Nothing) Then
+                            createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                            pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+                        End If
+
 
                         'SGM 25/09/2012 - check if any calibration is needed
                         Dim isReady As Boolean = False
@@ -4506,7 +4518,7 @@ Public Class IISEUtilities
                             CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                             Dim myExecutionDelegate As New ExecutionsDelegate
                             myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, MyClass.mdiAnalyzerCopy.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
-                                                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes)
+                                                                              createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
                         End If
                         If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                         'end SGM 25/09/2012

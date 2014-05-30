@@ -139,6 +139,7 @@ Namespace Biosystems.Ax00.Calculations
                         Dim myLogAcciones As New ApplicationLogManager()
                         myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageRepetitions", EventLogEntryType.Information, False)
                         Debug.Print("Manage Repetitions!!! - RunningMode: " & pRunningMode)
+                        'NOTE: AG 30/05/2014 #1644 - No changes made here! When add reruns the new parameter pauseMode is not required
                         myGlobal = myExecutionDelegate.CreateWSExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pRunningMode, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady)
                         'AG 31/03/2014 - #1565
 
