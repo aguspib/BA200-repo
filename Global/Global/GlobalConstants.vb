@@ -3,6 +3,10 @@ Option Strict On
 
 Namespace Biosystems.Ax00.Global
     Public Class GlobalConstants
+
+        '**********************
+        '**** GLOBAL FLAGs ****
+        '**********************
         Public Shared CreateWSExecutionsWithMultipleTransactions As Boolean = False 'AG 24/03/2014 - #1545 - Create executions using multiple transactions
 
         '*** PROVISIONAL: BT #1545 ==> ONLY WHILE DEVELOPMENT OF NEW ADD WS PROCESS (USING SEVERAL DB TRANSACTIONS) ***'
@@ -20,6 +24,9 @@ Namespace Biosystems.Ax00.Global
         Public Shared MaxFileLogSize As Long = -1       'DL 27/01/2012
 
 
+        '**************************
+        '**** GLOBAL CONSTANTs ****
+        '**************************
         'AG 21/04/2010 - There arent preparation pending to sent the analyzer
         Public Const NO_PENDING_PREPARATION_FOUND As Integer = -1
         Public Const ADDITIONALINFO_ALARM_SEPARATOR As String = "|" 'Field twksWSAnalyzerAlarms.AdditionalInfo has several fields informed separated using this character
@@ -115,5 +122,11 @@ Namespace Biosystems.Ax00.Global
         Public Const SQLDeadLockException As String = "-2146232060" ' XB 20/03/2014 - #1548
         Public Const ObjRefException As String = "-2147467261" ' XB 26/03/2014 - #1548
         Public Const NullReferenceException As String = "-2146233069" ' XB 26/03/2014 - #1548
+
+
+        'AG 02/06/2014 - #1644 constants for global createWSexecutions semaphore
+        Public Const SEMAPHORE_TOUT_CREATE_EXECUTIONS As Integer = 10000 '10 sec
+        Public Const SEMAPHORE_BUSY As Integer = 0
+
     End Class
 End Namespace

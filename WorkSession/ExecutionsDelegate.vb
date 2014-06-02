@@ -7082,15 +7082,18 @@ Namespace Biosystems.Ax00.BL
         '''              AG 19/02/2014 - #1514 improvements memory app/sql
         '''              AG 20/03/2014 - #1545 call create WS executions method with multiple transactions
         '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
+        '''              AG 02/06/2014 - #1644 new optional parameter pAutoRerunFlag (when TRUE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
         ''' </remarks> 
         Public Function CreateWSExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                            ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
                                            Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False) As GlobalDataTO
+                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
+                                           Optional ByVal pManualRerunFlag As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
+                If pManualRerunFlag Then GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS) 'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
 
                 'AG 20/03/2014 - #1545 - call the new create execution method that uses multiple transactions
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
@@ -7903,6 +7906,7 @@ Namespace Biosystems.Ax00.BL
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+                If pManualRerunFlag Then GlobalSemaphores.createWSExecutionsSemaphore.Release() 'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
             End Try
             Return resultData
         End Function

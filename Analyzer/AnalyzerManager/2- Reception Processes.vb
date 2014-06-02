@@ -783,59 +783,67 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             '    wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
                             'End If
 
-                            ' XB 15/10/2013 - Add PauseAlreadySentFlagAttribute + PAUSE_START and PAUSE_END also activate startDoWorker flag - BT #1318
-                            'AG 19/11/2013 - #1396-b Add also BARCODE_ACTION_RECEIVED
-                            If Not endRunAlreadySentFlagAttribute AndAlso Not abortAlreadySentFlagAttribute AndAlso Not PauseAlreadySentFlagAttribute Then
-                                Dim startDoWorker As Boolean = False
-                                Select Case AnalyzerCurrentActionAttribute
-                                    Case AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED, AnalyzerManagerAx00Actions.PREDILUTED_TEST_RECEIVED, AnalyzerManagerAx00Actions.ISE_TEST_RECEIVED, _
-                                        AnalyzerManagerAx00Actions.SKIP_START, AnalyzerManagerAx00Actions.WASHING_RUN_START, AnalyzerManagerAx00Actions.START_INSTRUCTION_START, AnalyzerManagerAx00Actions.START_INSTRUCTION_END, _
-                                        AnalyzerManagerAx00Actions.PAUSE_START, AnalyzerManagerAx00Actions.PAUSE_END, AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED
+                            'AG 02/06/2014 - #1644 check if create WS executions semaphore is busy or ready (if busy we cannot process readings)
+                            'Sw will evaluate to process last reading next cycle!
+                            Dim semaphoreFree As Boolean = GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_BUSY)
+                            If semaphoreFree Then
+                                'AG 02/06/2014 - #1644
 
-                                        startDoWorker = True
+                                ' XB 15/10/2013 - Add PauseAlreadySentFlagAttribute + PAUSE_START and PAUSE_END also activate startDoWorker flag - BT #1318
+                                'AG 19/11/2013 - #1396-b Add also BARCODE_ACTION_RECEIVED
+                                If Not endRunAlreadySentFlagAttribute AndAlso Not abortAlreadySentFlagAttribute AndAlso Not PauseAlreadySentFlagAttribute Then
+                                    Dim startDoWorker As Boolean = False
+                                    Select Case AnalyzerCurrentActionAttribute
+                                        Case AnalyzerManagerAx00Actions.TEST_PREPARATION_RECEIVED, AnalyzerManagerAx00Actions.PREDILUTED_TEST_RECEIVED, AnalyzerManagerAx00Actions.ISE_TEST_RECEIVED, _
+                                            AnalyzerManagerAx00Actions.SKIP_START, AnalyzerManagerAx00Actions.WASHING_RUN_START, AnalyzerManagerAx00Actions.START_INSTRUCTION_START, AnalyzerManagerAx00Actions.START_INSTRUCTION_END, _
+                                            AnalyzerManagerAx00Actions.PAUSE_START, AnalyzerManagerAx00Actions.PAUSE_END, AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED
 
-                                        'AG 19/11/2013 - This case is not possible but we add the protection
-                                        If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED AndAlso Not AllowScanInRunning Then
-                                            startDoWorker = False
-                                        End If
-
-                                        'Special cases: ise test and prediluted test appears several cycles (when dummies are performed)
-                                    Case AnalyzerManagerAx00Actions.ISE_TEST_END, AnalyzerManagerAx00Actions.PREDILUTED_TEST_END
-                                        'Activate startDoWorker to process readings only when biochemical Request = 0
-                                        If myRequestValue = 0 Then 'AG 14/09/2012 v052 - If Not AnalyzerIsReadyAttribute Then
                                             startDoWorker = True
-                                        Else
-                                            'When request = 1 the Software the priority is ask the request and send next preparation
-                                            'The readings will treated when preparation will be accepted 
-                                        End If
 
-                                        'AG 07/02/2104 - BT #1484 Process readings also with A:60
-                                        'SOUND_DONE has not to be taken into account Fw answers with status just receive it (exception of running instructions timming)
-                                        'AG 29/01/214 -> The sound done can be added to the actions that extract 1st readings instruction from queue and process it
-                                        '                because in final v100 during running the SOUND instruction is sent after status reception
-                                    Case AnalyzerManagerAx00Actions.SOUND_DONE
+                                            'AG 19/11/2013 - This case is not possible but we add the protection
+                                            If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED AndAlso Not AllowScanInRunning Then
+                                                startDoWorker = False
+                                            End If
+
+                                            'Special cases: ise test and prediluted test appears several cycles (when dummies are performed)
+                                        Case AnalyzerManagerAx00Actions.ISE_TEST_END, AnalyzerManagerAx00Actions.PREDILUTED_TEST_END
+                                            'Activate startDoWorker to process readings only when biochemical Request = 0
+                                            If myRequestValue = 0 Then 'AG 14/09/2012 v052 - If Not AnalyzerIsReadyAttribute Then
+                                                startDoWorker = True
+                                            Else
+                                                'When request = 1 the Software the priority is ask the request and send next preparation
+                                                'The readings will treated when preparation will be accepted 
+                                            End If
+
+                                            'AG 07/02/2104 - BT #1484 Process readings also with A:60
+                                            'SOUND_DONE has not to be taken into account Fw answers with status just receive it (exception of running instructions timming)
+                                            'AG 29/01/214 -> The sound done can be added to the actions that extract 1st readings instruction from queue and process it
+                                            '                because in final v100 during running the SOUND instruction is sent after status reception
+                                        Case AnalyzerManagerAx00Actions.SOUND_DONE
+                                            startDoWorker = True
+                                            'AG 07/02/2014 - BT #1484
+
+                                        Case Else
+                                            'WASHING_RUN_END, TEST_PREPARATION_END, SKIP_END have not to be taken into account (because we receive R:1 with these actions, the request is used for search and send next , not for process readings!!!)
+                                    End Select
+
+                                    'When a instruction is rejected (out of time or repeated in cycle)
+                                    If Not startDoWorker AndAlso (errorValue = 28 OrElse errorValue = 34) Then
                                         startDoWorker = True
-                                        'AG 07/02/2014 - BT #1484
+                                    End If
 
-                                    Case Else
-                                        'WASHING_RUN_END, TEST_PREPARATION_END, SKIP_END have not to be taken into account (because we receive R:1 with these actions, the request is used for search and send next , not for process readings!!!)
-                                End Select
+                                    If startDoWorker Then
+                                        processingLastANSPHRInstructionFlag = True
+                                        wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
+                                    End If
 
-                                'When a instruction is rejected (out of time or repeated in cycle)
-                                If Not startDoWorker AndAlso (errorValue = 28 OrElse errorValue = 34) Then
-                                    startDoWorker = True
-                                End If
-
-                                If startDoWorker Then
+                                Else 'Leaving RUNNING
                                     processingLastANSPHRInstructionFlag = True
                                     wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
                                 End If
 
-                            Else 'Leaving RUNNING
-                                processingLastANSPHRInstructionFlag = True
-                                wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
-                            End If
-                        End If
+                            End If '#1644 - If semaphoreFree Then
+                        End If 'If bufferANSPHRReceived.Count > 0 AndAlso Not processingLastANSPHRInstructionFlag Then
                     End SyncLock
                 End If
 

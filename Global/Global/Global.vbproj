@@ -122,6 +122,7 @@
     <Compile Include="FwAdjustments\FwAdjustmentsDataTO.vb" />
     <Compile Include="FwAdjustments\FwAdjustmentsDelegate.vb" />
     <Compile Include="FwAdjustments\PositionTO.vb" />
+    <Compile Include="GlobalSemaphores.vb" />
     <Compile Include="PCInfoReader.vb" />
     <Compile Include="FwScripts\AnalyzerFwScriptsTO.vb" />
     <Compile Include="FwScripts\InstructionTO.vb" />
