@@ -785,7 +785,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'AG 02/06/2014 - #1644 check if create WS executions semaphore is busy or ready (if busy we cannot process readings)
                             'Sw will evaluate to process last reading next cycle!
-                            Dim semaphoreFree As Boolean = GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_BUSY)
+                            Dim semaphoreFree As Boolean = CBool(IIf(GlobalSemaphores.createWSExecutionsQueue = 0, True, False))
                             If semaphoreFree Then
                                 'AG 02/06/2014 - #1644
 

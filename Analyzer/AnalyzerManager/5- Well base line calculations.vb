@@ -135,6 +135,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myReadingCycleStatus As Boolean = False
 
                 GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS) 'AG 02/06/2014 #1644 - Set the semaphore to busy value (before process ANSPHR)
+                GlobalSemaphores.createWSExecutionsQueue += 1
 
                 '2) Call the biochemical readings treatment
                 'resultData = ProcessBiochemicalReadings(Nothing, pInstructionReceived)
@@ -154,6 +155,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
                 'TR 06/05/2014 BT#1612, #1634 -END
                 GlobalSemaphores.createWSExecutionsSemaphore.Release() 'AG 02/06/2014 #1644 - Set the semaphore to free value (after process ANSPHR)
+                GlobalSemaphores.createWSExecutionsQueue -= 1
 
                 myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
                 StartTime = Now
