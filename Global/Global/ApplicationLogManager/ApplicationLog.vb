@@ -166,6 +166,7 @@ Namespace Biosystems.Ax00.Global
         ''' <remarks>
         ''' Created by:  SA 03/08/2012
         ''' Modified by: XB 28/05/2013 - Correction : Condition must done by Directory instead of File (bugstranking: # 1139)
+        ''' AG 08/05/2014 - #1625 add protections for not return always error when exists files with not std name format (for example "Ax00Log_999.xml")
         ''' </remarks>
         Private Function ManageLogFiles(ByVal pCurrentDate As String, _
                                         ByVal pLogMaxDays As Integer) As GlobalDataTO
@@ -206,7 +207,13 @@ Namespace Biosystems.Ax00.Global
                                       Select b).Max.ToString
 
                     'Get the date part from the name of the last created XML file
-                    Dim fileDate As String = lastCreatedXML.Substring(8, 8)
+                    'AG 08/05/2014 - #1625 new code, when the xml file "Ax00Log_999.xml" is generate once this method always returns error, and Sw overwrites always "Ax00Log_999.xml"
+                    'Dim fileDate As String = lastCreatedXML.Substring(8, 8) 'Old code
+                    Dim fileDate As String = String.Format("{0:yyyyMMdd}", DateTime.Now) 'File date initialization
+                    If lastCreatedXML.Length >= 16 Then
+                        fileDate = lastCreatedXML.Substring(8, 8)
+                    End If
+                    'AG 08/07/2014 - #1625
 
                     If (fileDate <> pCurrentDate) Then
                         'Create the TEMP Folder to move all XMLLog Files to compress
@@ -239,26 +246,48 @@ Namespace Biosystems.Ax00.Global
                             Dim myXmlFile As String                                                  'DL 04/06/2013
 
                             'For Each xmlFile As String In lstXMLFiles                               'DL 04/06/2013
+                            Dim deleteFileFlag As Boolean = False 'AG 08/05/2014 - #1625
                             For Each myTmpFile In myTmpFilesList                                     'DL 04/06/2013
                                 myXmlFile = myTmpFile.ToString
 
-                                eachFileDate = myXmlFile.ToString.Substring(8, 8)
-                                endday = Date.Parse(eachFileDate.Substring(0, 4) & "-" & eachFileDate.Substring(4, 2) & "-" & eachFileDate.Substring(6, 2))
+                                'AG 08/05/2014 - #1625 add protection in case file with not std name(for example Ax00Log_999.xml)
+                                'Old code
+                                'deleteFileFlag = True
+                                'eachFileDate = myXmlFile.ToString.Substring(8, 8)
+                                'endday = Date.Parse(eachFileDate.Substring(0, 4) & "-" & eachFileDate.Substring(4, 2) & "-" & eachFileDate.Substring(6, 2))
 
-                                'DL 01/06/2013. Add only files witch days elapsed are lower than MAX_DAYS_IN_PREVIOUSLOG
-                                If currentday.Subtract(endday).Days <= pLogMaxDays Then
-                                    'AG 04/06/2013 - Do not move nothing, there already are in Temp Folder
-                                    'myGlobalDataTO = myUtils.MoveFiles(myLogPath, myTempFolder & "\", myXmlFile)
+                                ''DL 01/06/2013. Add only files witch days elapsed are lower than MAX_DAYS_IN_PREVIOUSLOG
+                                'If currentday.Subtract(endday).Days <= pLogMaxDays Then
+                                '    'AG 04/06/2013 - Do not move nothing, there already are in Temp Folder
+                                '    'myGlobalDataTO = myUtils.MoveFiles(myLogPath, myTempFolder & "\", myXmlFile)
 
-                                    ''Delete the XML file
-                                    'If (Not myGlobalDataTO.HasError) Then File.Delete(myLogPath & "\" & myXmlFile)
-                                    'If (myGlobalDataTO.HasError) Then Exit For
+                                '    ''Delete the XML file
+                                '    'If (Not myGlobalDataTO.HasError) Then File.Delete(myLogPath & "\" & myXmlFile)
+                                '    'If (myGlobalDataTO.HasError) Then Exit For
 
-                                    'Leave file!!! (it belongs the correct date range)
+                                '    'Leave file!!! (it belongs the correct date range)
+                                '    deleteFileFlag = False
+                                'End If
 
-                                Else
+                                'New code
+                                deleteFileFlag = True
+                                If myXmlFile.Length >= 16 Then
+                                    eachFileDate = myXmlFile.ToString.Substring(8, 8)
+                                    If IsDate("#" & eachFileDate.ToString & "#") OrElse IsNumeric(eachFileDate.ToString) Then
+                                        endday = Date.Parse(eachFileDate.Substring(0, 4) & "-" & eachFileDate.Substring(4, 2) & "-" & eachFileDate.Substring(6, 2))
+
+                                        'DL 01/06/2013. Add only files witch days elapsed are lower than MAX_DAYS_IN_PREVIOUSLOG
+                                        If currentday.Subtract(endday).Days <= pLogMaxDays Then
+                                            'Leave file!!! (it belongs the correct date range)
+                                            deleteFileFlag = False
+                                        End If
+                                    End If
+                                End If
+
+                                If deleteFileFlag Then
                                     File.Delete(myTempFolder & "\" & myXmlFile)
                                 End If
+                                'AG 08/05/2014 - #1625
                             Next
 
                         End If
@@ -275,22 +304,53 @@ Namespace Biosystems.Ax00.Global
                             If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = myUtils.RemoveFolder(myLogPath & TEMP_FOLDER)
                         End If
                     Else
-                        'The if is to avoid ERROR with files generated with the previous implementation (when the last part of the file was HH-mm): if it is the
-                        'case, then generate the 001 file for the current date
-                        If (IsNumeric(lastCreatedXML.Substring(19, 1))) Then
-                            'If its the same date, get the index part from the name of the last created XML and generate the next index incrementing it by one
-                            index = Convert.ToInt32(lastCreatedXML.Substring(17, 3)) + 1
+                        'AG 08/05/2014 - #1625 add protection against user file rename
+
+                        'Old code
+                        ''The if is to avoid ERROR with files generated with the previous implementation (when the last part of the file was HH-mm): if it is the
+                        ''case, then generate the 001 file for the current date
+                        'If (IsNumeric(lastCreatedXML.Substring(19, 1))) Then
+                        '    'If its the same date, get the index part from the name of the last created XML and generate the next index incrementing it by one
+                        '    index = Convert.ToInt32(lastCreatedXML.Substring(17, 3)) + 1
+                        'Else
+                        '    'Search if there are XML files created with the new implementation
+                        '    For Each xmlFile As String In lstXMLFiles
+                        '        If (IsNumeric(xmlFile.Substring(19, 1))) Then
+                        '            If (Convert.ToInt32(xmlFile.Substring(17, 3)) > index) Then index = Convert.ToInt32(xmlFile.Substring(17, 3))
+                        '        End If
+                        '    Next
+                        '    index += 1
+                        'End If
+
+                        'New code
+                        If lastCreatedXML.Length >= 16 Then
+                            'The if is to avoid ERROR with files generated with the previous implementation (when the last part of the file was HH-mm): if it is the
+                            'case, then generate the 001 file for the current date
+                            If (IsNumeric(lastCreatedXML.Substring(17, 3))) Then
+                                'If its the same date, get the index part from the name of the last created XML and generate the next index incrementing it by one
+                                index = Convert.ToInt32(lastCreatedXML.Substring(17, 3)) + 1
+                            Else
+                                'Search if there are XML files created with the new implementation
+                                For Each xmlFile As String In lstXMLFiles
+                                    If (IsNumeric(xmlFile.Substring(17, 3))) Then
+                                        If (Convert.ToInt32(xmlFile.Substring(17, 3)) > index) Then index = Convert.ToInt32(xmlFile.Substring(17, 3))
+                                    End If
+                                Next
+                                index += 1
+                            End If
                         Else
-                            'Search if there are XML files created with the new implementation
-                            For Each xmlFile As String In lstXMLFiles
-                                If (IsNumeric(xmlFile.Substring(19, 1))) Then
-                                    If (Convert.ToInt32(xmlFile.Substring(17, 3)) > index) Then index = Convert.ToInt32(xmlFile.Substring(17, 3))
-                                End If
-                            Next
-                            index += 1
+                            index = 999 'AG 08/05/2014 - #1625 force index value
                         End If
+                        'AG 08/05/2014 - #1625
+
                     End If
                 End If
+
+                'AG 08/05/2014 - #1625 protection in case index 999 is found (some error detected) the index is calculated using list count + 1
+                If index = 999 Then
+                    index = lstXMLFiles.Count + 1
+                End If
+                'AG 08/05/2014 - #1625
 
                 'Finally, set the name of the new XML Log File to create and return it in the GlobalDataTO
                 Dim nextIndex As String = index.ToString
@@ -319,6 +379,7 @@ Namespace Biosystems.Ax00.Global
         ''' <remarks>
         ''' Created by:  SA 03/08/2012 - Based in ExportToLogXML but adding functionality for moving to a ZIP previous XML files
         ''' Modified by: DL 31/05/2013 - Add new parameter pLogMaxDays - Copy into PreviousLog.zin only those xml files in list pxmlList witch days elapsed are lower than MAX_DAYS_IN_PREVIOUSLOG
+        ''' AG 08/05/2014 #1625 fix error in code v300 (do not use "Ax00Log_999.xml" it is not the std name instead of it use "Ax00Log_YYYYMMDD_999.xml"
         ''' </remarks>
         Public Function ExportLogToXml(ByVal pWorkSessionID As String, _
                                        ByVal pLogMaxDays As Integer) As GlobalDataTO
@@ -338,7 +399,9 @@ Namespace Biosystems.Ax00.Global
                 If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
                     myFileName = CType(myGlobalDataTO.SetDatos, String)
                 Else
-                    myFileName = "Ax00Log_999.xml"
+                    'AG 08/05/2014 - #1625 use the std name format
+                    'myFileName = "Ax00Log_999.xml"
+                    myFileName = "Ax00Log_" & wsDatePart & "_999.xml"
                     If File.Exists(myLogPath & myFileName) Then Kill(myLogPath & myFileName)
                 End If
 
