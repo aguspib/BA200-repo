@@ -746,10 +746,11 @@ Partial Public Class IAx00MainMDI
     Private Sub ConfigureLookAndFeel()
 
         DevExpress.UserSkins.BonusSkins.Register()
+        DevExpress.UserSkins.OfficeSkins.Register()
 
         DevExpress.LookAndFeel.UserLookAndFeel.Default.UseWindowsXPTheme = False
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.UseDefaultLookAndFeel = False
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.SkinName = "Seven Classic"
+        'DevExpress.LookAndFeel.UserLookAndFeel.Default.UseDefaultLookAndFeel = True
+        'DevExpress.LookAndFeel.UserLookAndFeel.Default.SkinName = "Seven Classic"
 
         DevExpress.Skins.SkinManager.EnableMdiFormSkins()
         DevExpress.Skins.SkinManager.EnableFormSkins()
