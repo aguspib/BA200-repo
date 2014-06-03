@@ -835,7 +835,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'AG 02/06/2014 - #1644 check if create WS executions semaphore is busy or ready
                                 'If busy we cannot process readings now, so we will evaluate readings next BAx00 cycle
                                 Dim semaphoreFree As Boolean = True
-                                If GlobalConstants.CreateWSExecutionsWithSemaphore Then semaphoreFree = CBool(IIf(GlobalSemaphores.createWSExecutionsQueue = 0, True, False))
+                                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                                    'semaphoreFree = CBool(IIf(GlobalSemaphores.createWSExecutionsQueue = 0, True, False))
+                                End If
                                 If semaphoreFree Then
                                     processingLastANSPHRInstructionFlag = True
                                     wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))

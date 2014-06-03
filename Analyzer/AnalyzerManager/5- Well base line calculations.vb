@@ -136,8 +136,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (before process ANSPHR)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
-                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                    'GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    'GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
                 End If
 
                 '2) Call the biochemical readings treatment
@@ -160,8 +160,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 02/06/2014 #1644 - Set the semaphore to free value (after process ANSPHR)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
-                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                    'GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    'GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
                 End If
 
                 myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012

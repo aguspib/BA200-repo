@@ -6095,8 +6095,8 @@ Namespace Biosystems.Ax00.BL
             Try
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
-                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                    'GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    'GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
                 End If
 
                 'AG 19/03/2014 - #1545 - Do not open transaction, use the parameter as connection
@@ -6942,8 +6942,8 @@ Namespace Biosystems.Ax00.BL
 
                 'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
-                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                    'GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    'GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
                 End If
 
             End Try
@@ -7122,8 +7122,8 @@ Namespace Biosystems.Ax00.BL
 
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
-                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                    'GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    'GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
                 End If
 
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
@@ -7932,8 +7932,8 @@ Namespace Biosystems.Ax00.BL
 
                 'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
-                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                    'GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    'GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
                 End If
 
             End Try
