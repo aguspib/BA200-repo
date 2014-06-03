@@ -19,6 +19,8 @@ Partial Class IResultsAbsCurve
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
+        Dim SideBySideBarSeriesLabel1 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IResultsAbsCurve))
         Me.bsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsGraphToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
@@ -35,7 +37,7 @@ Partial Class IResultsAbsCurve
         Me.bsTestLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsSampleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsTimer1 = New Biosystems.Ax00.Controls.UserControls.BSTimer()
-        Me.ToolTipController1 = New DevExpress.Utils.ToolTipController()
+        Me.ToolTipController1 = New DevExpress.Utils.ToolTipController(Me.components)
         Me.bsCloseButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsLastButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsNextButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -77,6 +79,7 @@ Partial Class IResultsAbsCurve
         CType(Me.ReplicatesGridControl, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ReplicatesGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ResultChartControl, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(SideBySideBarSeriesLabel1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'bsErrorProvider1
@@ -618,14 +621,14 @@ Partial Class IResultsAbsCurve
         '
         'ResultChartControl
         '
-        Me.ResultChartControl.AppearanceNameSerializable = "Light"
-        Me.ResultChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.[False]
+        Me.ResultChartControl.AppearanceName = "Light"
         Me.ResultChartControl.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Empty
         Me.ResultChartControl.Location = New System.Drawing.Point(8, 15)
         Me.ResultChartControl.Name = "ResultChartControl"
         Me.ResultChartControl.PaletteName = "Nature Colors"
-        Me.ResultChartControl.RuntimeHitTesting = True
         Me.ResultChartControl.SeriesSerializable = New DevExpress.XtraCharts.Series(-1) {}
+        SideBySideBarSeriesLabel1.LineVisible = True
+        Me.ResultChartControl.SeriesTemplate.Label = SideBySideBarSeriesLabel1
         Me.ResultChartControl.Size = New System.Drawing.Size(693, 483)
         Me.ResultChartControl.TabIndex = 191
         '
@@ -721,6 +724,7 @@ Partial Class IResultsAbsCurve
         Me.BsGroupBox3.ResumeLayout(False)
         CType(Me.ReplicatesGridControl, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ReplicatesGridView, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(SideBySideBarSeriesLabel1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ResultChartControl, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()

@@ -27,142 +27,145 @@ Partial Class IPositionsAdjustments
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
-        Dim ConstantLine1 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine2 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine3 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine4 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine5 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine6 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine7 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine8 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine9 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine10 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine11 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine12 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine13 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine14 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine15 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine16 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine17 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
-        Dim SplineSeriesView1 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView()
-        Dim Series2 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
-        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
-        Dim SplineSeriesView2 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView()
-        Dim SplineSeriesView3 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView()
-        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Me.components = New System.ComponentModel.Container
+        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
+        Dim ConstantLine1 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine2 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine3 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine4 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine5 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine6 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine7 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine8 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine9 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine10 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine11 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine12 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine13 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine14 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine15 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine16 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine17 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
+        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
+        Dim SplineSeriesView1 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView
+        Dim Series2 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
+        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
+        Dim SplineSeriesView2 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView
+        Dim PointSeriesLabel3 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
+        Dim SplineSeriesView3 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView
+        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IPositionsAdjustments))
-        Dim SwiftPlotDiagram1 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram()
-        Dim ConstantLine18 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine19 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine20 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine21 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine22 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine23 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine24 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine25 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine26 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine27 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine28 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim ConstantLine29 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine()
-        Dim Series3 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
-        Dim SwiftPlotSeriesView1 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
-        Dim SwiftPlotSeriesView2 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView()
-        Dim ChartTitle2 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
-        Me.BsTabPagesControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl()
-        Me.TabOpticCentering = New System.Windows.Forms.TabPage()
-        Me.BsOpticInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsInfoOptXPSViewer = New BsXPSViewer()
-        Me.BsOpticInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsOpticAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsLEDCurrentLabel = New System.Windows.Forms.Label()
-        Me.BsLEDCurrentTrackBar = New System.Windows.Forms.TrackBar()
-        Me.BsMinusLabel = New System.Windows.Forms.Label()
-        Me.BsPlusLabel = New System.Windows.Forms.Label()
-        Me.BsAbsorbancePanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.AbsorbanceChart = New DevExpress.XtraCharts.ChartControl()
-        Me.BsOpticAdjustGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
-        Me.BsOpticAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsOpticStopButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsOpticCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsAdjustOptic = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
-        Me.BsOpticAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BSOpticWSGroupBox = New System.Windows.Forms.GroupBox()
-        Me.BsOpticWSLabel = New System.Windows.Forms.Label()
-        Me.BsButton4 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsUpDownWSButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsEncoderAdjustmentTitle = New System.Windows.Forms.Label()
-        Me.BsEncoderAdjustmentLabel = New System.Windows.Forms.Label()
-        Me.BsOpticAdjustmentTitle = New System.Windows.Forms.Label()
-        Me.BsOpticAdjustmentLabel = New System.Windows.Forms.Label()
-        Me.TabWashingStation = New System.Windows.Forms.TabPage()
-        Me.BsWashingInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsInfoWsXPSViewer = New BsXPSViewer()
-        Me.BsWashingInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsWashingAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsWashingAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BSWSWSGroupBox = New System.Windows.Forms.GroupBox()
-        Me.BsWSWSLabel = New System.Windows.Forms.Label()
-        Me.BsUpDownWSButton2 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsWSAdjustGroupBox = New System.Windows.Forms.GroupBox()
-        Me.BsWSAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsWSCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsAdjustWashing = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
-        Me.BsWashingAdjustmentTitle = New System.Windows.Forms.Label()
-        Me.BsWashingAdjustmentLabel = New System.Windows.Forms.Label()
-        Me.TabArmsPositions = New System.Windows.Forms.TabPage()
-        Me.BsArmsInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsInfoArmsXPSViewer = New BsXPSViewer()
-        Me.BsArmsInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsArmsAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsArmsAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsArmsOkButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsArmsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsArmsWSGroupBox = New System.Windows.Forms.GroupBox()
-        Me.BsArmsWSLabel = New System.Windows.Forms.Label()
-        Me.BsUpDownWSButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsButton6 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsAdjustRotor = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
-        Me.BsAdjustZ = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
-        Me.BsAdjustPolar = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
-        Me.BsTabArmsControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl()
-        Me.TabSample = New System.Windows.Forms.TabPage()
-        Me.BsGridSample = New BSGridControl()
-        Me.TabReagent1 = New System.Windows.Forms.TabPage()
-        Me.BsGridReagent1 = New BSGridControl()
-        Me.TabReagent2 = New System.Windows.Forms.TabPage()
-        Me.BsGridReagent2 = New BSGridControl()
-        Me.TabMixer1 = New System.Windows.Forms.TabPage()
-        Me.BsStirrer1Button = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsGridMixer1 = New BSGridControl()
-        Me.TabMixer2 = New System.Windows.Forms.TabPage()
-        Me.BsStirrer2Button = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsGridMixer2 = New BSGridControl()
-        Me.TabPageTODELETE = New System.Windows.Forms.TabPage()
-        Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.Label3 = New System.Windows.Forms.Label()
-        Me.TrackBar1 = New System.Windows.Forms.TrackBar()
-        Me.Label4 = New System.Windows.Forms.Label()
-        Me.Label5 = New System.Windows.Forms.Label()
-        Me.Label6 = New System.Windows.Forms.Label()
-        Me.BsPanel2 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.ChartControl1 = New DevExpress.XtraCharts.ChartControl()
-        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsAdjustControl1 = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl()
-        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsResponse = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
-        Me.ToolTipController1 = New DevExpress.Utils.ToolTipController()
+        Dim SwiftPlotDiagram1 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram
+        Dim ConstantLine18 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine19 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine20 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine21 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine22 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine23 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine24 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine25 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine26 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine27 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine28 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim ConstantLine29 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
+        Dim Series3 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
+        Dim SwiftPlotSeriesView1 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
+        Dim SwiftPlotSeriesView2 As DevExpress.XtraCharts.SwiftPlotSeriesView = New DevExpress.XtraCharts.SwiftPlotSeriesView
+        Dim ChartTitle2 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
+        Me.BsTabPagesControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl
+        Me.TabOpticCentering = New System.Windows.Forms.TabPage
+        Me.BsOpticInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsInfoOptXPSViewer = New BsXPSViewer
+        Me.BsOpticInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsOpticAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsLEDCurrentLabel = New System.Windows.Forms.Label
+        Me.BsLEDCurrentTrackBar = New System.Windows.Forms.TrackBar
+        Me.BsMinusLabel = New System.Windows.Forms.Label
+        Me.BsPlusLabel = New System.Windows.Forms.Label
+        Me.BsAbsorbancePanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.AbsorbanceChart = New DevExpress.XtraCharts.ChartControl
+        Me.BsOpticAdjustGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
+        Me.BsOpticAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsOpticStopButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsOpticCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsAdjustOptic = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
+        Me.BsOpticAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BSOpticWSGroupBox = New System.Windows.Forms.GroupBox
+        Me.BsOpticWSLabel = New System.Windows.Forms.Label
+        Me.BsButton4 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsUpDownWSButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsEncoderAdjustmentTitle = New System.Windows.Forms.Label
+        Me.BsEncoderAdjustmentLabel = New System.Windows.Forms.Label
+        Me.BsOpticAdjustmentTitle = New System.Windows.Forms.Label
+        Me.BsOpticAdjustmentLabel = New System.Windows.Forms.Label
+        Me.TabWashingStation = New System.Windows.Forms.TabPage
+        Me.BsWashingInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsInfoWsXPSViewer = New BsXPSViewer
+        Me.BsWashingInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsWashingAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsWashingAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BSWSWSGroupBox = New System.Windows.Forms.GroupBox
+        Me.BsWSWSLabel = New System.Windows.Forms.Label
+        Me.BsUpDownWSButton2 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsWSAdjustGroupBox = New System.Windows.Forms.GroupBox
+        Me.BsWSAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsWSCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsAdjustWashing = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
+        Me.BsWashingAdjustmentTitle = New System.Windows.Forms.Label
+        Me.BsWashingAdjustmentLabel = New System.Windows.Forms.Label
+        Me.TabArmsPositions = New System.Windows.Forms.TabPage
+        Me.BsArmsInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsInfoArmsXPSViewer = New BsXPSViewer
+        Me.BsArmsInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsArmsAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsArmsAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsArmsOkButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsArmsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsArmsWSGroupBox = New System.Windows.Forms.GroupBox
+        Me.BsArmsWSLabel = New System.Windows.Forms.Label
+        Me.BsUpDownWSButton3 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsButton6 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsAdjustRotor = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
+        Me.BsAdjustZ = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
+        Me.BsAdjustPolar = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
+        Me.BsTabArmsControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl
+        Me.TabSample = New System.Windows.Forms.TabPage
+        Me.BsGridSample = New BSGridControl
+        Me.TabReagent1 = New System.Windows.Forms.TabPage
+        Me.BsGridReagent1 = New BSGridControl
+        Me.TabReagent2 = New System.Windows.Forms.TabPage
+        Me.BsGridReagent2 = New BSGridControl
+        Me.TabMixer1 = New System.Windows.Forms.TabPage
+        Me.BsStirrer1Button = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsGridMixer1 = New BSGridControl
+        Me.TabMixer2 = New System.Windows.Forms.TabPage
+        Me.BsStirrer2Button = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsGridMixer2 = New BSGridControl
+        Me.TabPageTODELETE = New System.Windows.Forms.TabPage
+        Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.Label1 = New System.Windows.Forms.Label
+        Me.Label2 = New System.Windows.Forms.Label
+        Me.Label3 = New System.Windows.Forms.Label
+        Me.TrackBar1 = New System.Windows.Forms.TrackBar
+        Me.Label4 = New System.Windows.Forms.Label
+        Me.Label5 = New System.Windows.Forms.Label
+        Me.Label6 = New System.Windows.Forms.Label
+        Me.BsPanel2 = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.ChartControl1 = New DevExpress.XtraCharts.ChartControl
+        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsAdjustControl1 = New Biosystems.Ax00.Controls.UserControls.BSAdjustControl
+        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsResponse = New Biosystems.Ax00.Controls.UserControls.BSTextBox
+        Me.ToolTipController1 = New DevExpress.Utils.ToolTipController(Me.components)
         Me.BsTabPagesControl.SuspendLayout()
         Me.TabOpticCentering.SuspendLayout()
         Me.BsOpticInfoPanel.SuspendLayout()
@@ -172,10 +175,12 @@ Partial Class IPositionsAdjustments
         CType(Me.AbsorbanceChart, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(XyDiagram1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Series1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(SplineSeriesView1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Series2, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(PointSeriesLabel2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(SplineSeriesView2, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(PointSeriesLabel3, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(SplineSeriesView3, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsOpticAdjustGroupBox.SuspendLayout()
         Me.BSOpticWSGroupBox.SuspendLayout()
@@ -211,8 +216,8 @@ Partial Class IPositionsAdjustments
         'BsTabPagesControl
         '
         Me.BsTabPagesControl.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsTabPagesControl.Controls.Add(Me.TabOpticCentering)
         Me.BsTabPagesControl.Controls.Add(Me.TabWashingStation)
         Me.BsTabPagesControl.Controls.Add(Me.TabArmsPositions)
@@ -250,8 +255,8 @@ Partial Class IPositionsAdjustments
         Me.BsInfoOptXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoOptXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoOptXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoOptXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoOptXPSViewer.CopyButtonVisible = True
         Me.BsInfoOptXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -260,10 +265,9 @@ Partial Class IPositionsAdjustments
         Me.BsInfoOptXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoOptXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoOptXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoOptXPSViewer.HorizontalPageMargin = 0
+        Me.BsInfoOptXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoOptXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoOptXPSViewer.IncreaseZoomButtonVisible = True
-        Me.BsInfoOptXPSViewer.IsLoaded = False
         Me.BsInfoOptXPSViewer.IsScrollable = False
         Me.BsInfoOptXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoOptXPSViewer.MenuBarVisible = False
@@ -276,14 +280,14 @@ Partial Class IPositionsAdjustments
         Me.BsInfoOptXPSViewer.TabIndex = 34
         Me.BsInfoOptXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoOptXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoOptXPSViewer.VerticalPageMargin = 0
+        Me.BsInfoOptXPSViewer.VerticalPageMargin = 10
         Me.BsInfoOptXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoOptXPSViewer.WholePageButtonVisible = True
         '
         'BsOpticInfoTitle
         '
         Me.BsOpticInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsOpticInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsOpticInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsOpticInfoTitle.ForeColor = System.Drawing.Color.Black
@@ -297,8 +301,8 @@ Partial Class IPositionsAdjustments
         'BsOpticAdjustPanel
         '
         Me.BsOpticAdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsOpticAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsOpticAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsOpticAdjustPanel.Controls.Add(Me.BsLEDCurrentLabel)
@@ -371,8 +375,8 @@ Partial Class IPositionsAdjustments
         'BsAbsorbancePanel
         '
         Me.BsAbsorbancePanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsAbsorbancePanel.Controls.Add(Me.AbsorbanceChart)
         Me.BsAbsorbancePanel.Location = New System.Drawing.Point(7, 68)
         Me.BsAbsorbancePanel.Name = "BsAbsorbancePanel"
@@ -381,10 +385,9 @@ Partial Class IPositionsAdjustments
         '
         'AbsorbanceChart
         '
-        Me.AbsorbanceChart.AppearanceNameSerializable = "Dark Flat"
+        Me.AbsorbanceChart.AppearanceName = "Dark Flat"
         Me.AbsorbanceChart.BackColor = System.Drawing.Color.Gainsboro
         Me.AbsorbanceChart.BorderOptions.Color = System.Drawing.Color.White
-        Me.AbsorbanceChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.[False]
         XyDiagram1.AxisX.Color = System.Drawing.Color.Gray
         ConstantLine1.AxisValueSerializable = "0"
         ConstantLine1.Color = System.Drawing.Color.DimGray
@@ -524,43 +527,35 @@ Partial Class IPositionsAdjustments
         ConstantLine17.ShowInLegend = False
         ConstantLine17.Title.Visible = False
         XyDiagram1.AxisX.ConstantLines.AddRange(New DevExpress.XtraCharts.ConstantLine() {ConstantLine1, ConstantLine2, ConstantLine3, ConstantLine4, ConstantLine5, ConstantLine6, ConstantLine7, ConstantLine8, ConstantLine9, ConstantLine10, ConstantLine11, ConstantLine12, ConstantLine13, ConstantLine14, ConstantLine15, ConstantLine16, ConstantLine17})
-        XyDiagram1.AxisX.DateTimeScaleOptions.AutoGrid = False
-        XyDiagram1.AxisX.DateTimeScaleOptions.GridSpacing = 40.0R
+        XyDiagram1.AxisX.GridSpacing = 40
+        XyDiagram1.AxisX.GridSpacingAuto = False
         XyDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisX.Label.TextColor = System.Drawing.Color.Black
-        XyDiagram1.AxisX.NumericScaleOptions.AutoGrid = False
-        XyDiagram1.AxisX.NumericScaleOptions.GridSpacing = 40.0R
+        XyDiagram1.AxisX.Range.Auto = False
+        XyDiagram1.AxisX.Range.MaxValueSerializable = "400"
+        XyDiagram1.AxisX.Range.MinValueSerializable = "0"
+        XyDiagram1.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
+        XyDiagram1.AxisX.Range.SideMarginsEnabled = True
         XyDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisX.Title.Text = "steps"
         XyDiagram1.AxisX.Title.TextColor = System.Drawing.Color.Black
         XyDiagram1.AxisX.Title.Visible = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisX.VisualRange.Auto = False
-        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
-        XyDiagram1.AxisX.VisualRange.MaxValueSerializable = "400"
-        XyDiagram1.AxisX.VisualRange.MinValueSerializable = "0"
-        XyDiagram1.AxisX.WholeRange.Auto = False
-        XyDiagram1.AxisX.WholeRange.AutoSideMargins = True
-        XyDiagram1.AxisX.WholeRange.MaxValueSerializable = "400"
-        XyDiagram1.AxisX.WholeRange.MinValueSerializable = "0"
         XyDiagram1.AxisY.Color = System.Drawing.Color.Gray
         XyDiagram1.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
-        XyDiagram1.AxisY.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.[True]
+        XyDiagram1.AxisY.Label.Antialiasing = True
         XyDiagram1.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.25!)
         XyDiagram1.AxisY.Label.TextColor = System.Drawing.Color.Black
+        XyDiagram1.AxisY.Range.Auto = False
+        XyDiagram1.AxisY.Range.MaxValueSerializable = "1100000"
+        XyDiagram1.AxisY.Range.MinValueSerializable = "500000"
+        XyDiagram1.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
+        XyDiagram1.AxisY.Range.SideMarginsEnabled = True
         XyDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisY.Title.Text = "counts"
         XyDiagram1.AxisY.Title.TextColor = System.Drawing.Color.Black
         XyDiagram1.AxisY.Title.Visible = True
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisY.VisualRange.Auto = False
-        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
-        XyDiagram1.AxisY.VisualRange.MaxValueSerializable = "1100000"
-        XyDiagram1.AxisY.VisualRange.MinValueSerializable = "500000"
-        XyDiagram1.AxisY.WholeRange.Auto = False
-        XyDiagram1.AxisY.WholeRange.AutoSideMargins = True
-        XyDiagram1.AxisY.WholeRange.MaxValueSerializable = "1100000"
-        XyDiagram1.AxisY.WholeRange.MinValueSerializable = "500000"
         XyDiagram1.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         XyDiagram1.DefaultPane.BorderColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
         Me.AbsorbanceChart.Diagram = XyDiagram1
@@ -581,9 +576,10 @@ Partial Class IPositionsAdjustments
         Me.AbsorbanceChart.Padding.Top = 10
         Me.AbsorbanceChart.PaletteBaseColorNumber = 2
         Me.AbsorbanceChart.PaletteName = "Nature Colors"
-        Me.AbsorbanceChart.RuntimeHitTesting = True
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.[False]
+        PointSeriesLabel1.LineVisible = True
+        PointSeriesLabel1.Visible = False
+        Series1.Label = PointSeriesLabel1
         Series1.LegendText = "Absorbance"
         Series1.Name = "Absorbance"
         SplineSeriesView1.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
@@ -591,12 +587,13 @@ Partial Class IPositionsAdjustments
         SplineSeriesView1.LineStyle.Thickness = 3
         Series1.View = SplineSeriesView1
         Series2.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.BackColor = System.Drawing.Color.SteelBlue
-        PointSeriesLabel1.Border.Color = System.Drawing.Color.SteelBlue
-        PointSeriesLabel1.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Hatch
-        PointSeriesLabel1.LineColor = System.Drawing.Color.White
-        PointSeriesLabel1.TextColor = System.Drawing.Color.White
-        Series2.Label = PointSeriesLabel1
+        PointSeriesLabel2.BackColor = System.Drawing.Color.SteelBlue
+        PointSeriesLabel2.Border.Color = System.Drawing.Color.SteelBlue
+        PointSeriesLabel2.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Hatch
+        PointSeriesLabel2.LineColor = System.Drawing.Color.White
+        PointSeriesLabel2.LineVisible = True
+        PointSeriesLabel2.TextColor = System.Drawing.Color.White
+        Series2.Label = PointSeriesLabel2
         Series2.LegendText = "Encoder"
         Series2.Name = "Encoder"
         SplineSeriesView2.Color = System.Drawing.Color.Silver
@@ -605,6 +602,8 @@ Partial Class IPositionsAdjustments
         SplineSeriesView2.LineStyle.Thickness = 1
         Series2.View = SplineSeriesView2
         Me.AbsorbanceChart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1, Series2}
+        PointSeriesLabel3.LineVisible = True
+        Me.AbsorbanceChart.SeriesTemplate.Label = PointSeriesLabel3
         SplineSeriesView3.LineStyle.Thickness = 1
         Me.AbsorbanceChart.SeriesTemplate.View = SplineSeriesView3
         Me.AbsorbanceChart.Size = New System.Drawing.Size(723, 339)
@@ -826,8 +825,8 @@ Partial Class IPositionsAdjustments
         Me.BsInfoWsXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoWsXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoWsXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoWsXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoWsXPSViewer.CopyButtonVisible = True
         Me.BsInfoWsXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -836,10 +835,9 @@ Partial Class IPositionsAdjustments
         Me.BsInfoWsXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoWsXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoWsXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoWsXPSViewer.HorizontalPageMargin = 0
+        Me.BsInfoWsXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoWsXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoWsXPSViewer.IncreaseZoomButtonVisible = True
-        Me.BsInfoWsXPSViewer.IsLoaded = False
         Me.BsInfoWsXPSViewer.IsScrollable = False
         Me.BsInfoWsXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoWsXPSViewer.MenuBarVisible = False
@@ -852,14 +850,14 @@ Partial Class IPositionsAdjustments
         Me.BsInfoWsXPSViewer.TabIndex = 35
         Me.BsInfoWsXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoWsXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoWsXPSViewer.VerticalPageMargin = 0
+        Me.BsInfoWsXPSViewer.VerticalPageMargin = 10
         Me.BsInfoWsXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoWsXPSViewer.WholePageButtonVisible = True
         '
         'BsWashingInfoTitle
         '
         Me.BsWashingInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWashingInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsWashingInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsWashingInfoTitle.ForeColor = System.Drawing.Color.Black
@@ -873,8 +871,8 @@ Partial Class IPositionsAdjustments
         'BsWashingAdjustPanel
         '
         Me.BsWashingAdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsWashingAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsWashingAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsWashingAdjustPanel.Controls.Add(Me.BsWashingAdjustTitle)
@@ -1057,8 +1055,8 @@ Partial Class IPositionsAdjustments
         Me.BsInfoArmsXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoArmsXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoArmsXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoArmsXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoArmsXPSViewer.CopyButtonVisible = True
         Me.BsInfoArmsXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -1067,10 +1065,9 @@ Partial Class IPositionsAdjustments
         Me.BsInfoArmsXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoArmsXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoArmsXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoArmsXPSViewer.HorizontalPageMargin = 0
+        Me.BsInfoArmsXPSViewer.HorizontalPageMargin = 10
         Me.BsInfoArmsXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoArmsXPSViewer.IncreaseZoomButtonVisible = True
-        Me.BsInfoArmsXPSViewer.IsLoaded = False
         Me.BsInfoArmsXPSViewer.IsScrollable = False
         Me.BsInfoArmsXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoArmsXPSViewer.MenuBarVisible = False
@@ -1083,14 +1080,14 @@ Partial Class IPositionsAdjustments
         Me.BsInfoArmsXPSViewer.TabIndex = 36
         Me.BsInfoArmsXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoArmsXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoArmsXPSViewer.VerticalPageMargin = 0
+        Me.BsInfoArmsXPSViewer.VerticalPageMargin = 10
         Me.BsInfoArmsXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoArmsXPSViewer.WholePageButtonVisible = True
         '
         'BsArmsInfoTitle
         '
         Me.BsArmsInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsArmsInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsArmsInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsArmsInfoTitle.ForeColor = System.Drawing.Color.Black
@@ -1104,8 +1101,8 @@ Partial Class IPositionsAdjustments
         'BsArmsAdjustPanel
         '
         Me.BsArmsAdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsArmsAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsArmsAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsArmsAdjustPanel.Controls.Add(Me.BsArmsAdjustTitle)
@@ -1309,8 +1306,8 @@ Partial Class IPositionsAdjustments
         'BsTabArmsControl
         '
         Me.BsTabArmsControl.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsTabArmsControl.Controls.Add(Me.TabSample)
         Me.BsTabArmsControl.Controls.Add(Me.TabReagent1)
         Me.BsTabArmsControl.Controls.Add(Me.TabReagent2)
@@ -1337,8 +1334,8 @@ Partial Class IPositionsAdjustments
         '
         Me.BsGridSample.AdjustButtonImage = Nothing
         Me.BsGridSample.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsGridSample.BackColor = System.Drawing.Color.Gainsboro
         Me.BsGridSample.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsGridSample.Location = New System.Drawing.Point(3, 3)
@@ -1364,7 +1361,7 @@ Partial Class IPositionsAdjustments
         Me.TabReagent1.Location = New System.Drawing.Point(4, 22)
         Me.TabReagent1.Name = "TabReagent1"
         Me.TabReagent1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabReagent1.Size = New System.Drawing.Size(715, 306)
+        Me.TabReagent1.Size = New System.Drawing.Size(717, 307)
         Me.TabReagent1.TabIndex = 1
         Me.TabReagent1.Text = "REAGENT1"
         '
@@ -1372,8 +1369,8 @@ Partial Class IPositionsAdjustments
         '
         Me.BsGridReagent1.AdjustButtonImage = Nothing
         Me.BsGridReagent1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsGridReagent1.BackColor = System.Drawing.Color.Gainsboro
         Me.BsGridReagent1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsGridReagent1.Location = New System.Drawing.Point(4, 5)
@@ -1387,7 +1384,7 @@ Partial Class IPositionsAdjustments
         Me.BsGridReagent1.OkImage = Nothing
         Me.BsGridReagent1.SelectedRow = 0
         Me.BsGridReagent1.SelectedValue = Nothing
-        Me.BsGridReagent1.Size = New System.Drawing.Size(706, 258)
+        Me.BsGridReagent1.Size = New System.Drawing.Size(708, 259)
         Me.BsGridReagent1.TabIndex = 4
         Me.BsGridReagent1.TestButtonImage = Nothing
         Me.BsGridReagent1.ValidationImage = ""
@@ -1398,7 +1395,7 @@ Partial Class IPositionsAdjustments
         Me.TabReagent2.Controls.Add(Me.BsGridReagent2)
         Me.TabReagent2.Location = New System.Drawing.Point(4, 22)
         Me.TabReagent2.Name = "TabReagent2"
-        Me.TabReagent2.Size = New System.Drawing.Size(715, 306)
+        Me.TabReagent2.Size = New System.Drawing.Size(717, 307)
         Me.TabReagent2.TabIndex = 2
         Me.TabReagent2.Text = "REAGENT2"
         '
@@ -1406,8 +1403,8 @@ Partial Class IPositionsAdjustments
         '
         Me.BsGridReagent2.AdjustButtonImage = Nothing
         Me.BsGridReagent2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsGridReagent2.BackColor = System.Drawing.Color.Gainsboro
         Me.BsGridReagent2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsGridReagent2.Location = New System.Drawing.Point(4, 5)
@@ -1421,7 +1418,7 @@ Partial Class IPositionsAdjustments
         Me.BsGridReagent2.OkImage = Nothing
         Me.BsGridReagent2.SelectedRow = 0
         Me.BsGridReagent2.SelectedValue = Nothing
-        Me.BsGridReagent2.Size = New System.Drawing.Size(706, 258)
+        Me.BsGridReagent2.Size = New System.Drawing.Size(708, 259)
         Me.BsGridReagent2.TabIndex = 4
         Me.BsGridReagent2.TestButtonImage = Nothing
         Me.BsGridReagent2.ValidationImage = ""
@@ -1433,7 +1430,7 @@ Partial Class IPositionsAdjustments
         Me.TabMixer1.Controls.Add(Me.BsGridMixer1)
         Me.TabMixer1.Location = New System.Drawing.Point(4, 22)
         Me.TabMixer1.Name = "TabMixer1"
-        Me.TabMixer1.Size = New System.Drawing.Size(715, 306)
+        Me.TabMixer1.Size = New System.Drawing.Size(717, 307)
         Me.TabMixer1.TabIndex = 3
         Me.TabMixer1.Text = "MIXER1"
         '
@@ -1441,7 +1438,7 @@ Partial Class IPositionsAdjustments
         '
         Me.BsStirrer1Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStirrer1Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsStirrer1Button.Location = New System.Drawing.Point(680, 269)
+        Me.BsStirrer1Button.Location = New System.Drawing.Point(682, 270)
         Me.BsStirrer1Button.Name = "BsStirrer1Button"
         Me.BsStirrer1Button.Size = New System.Drawing.Size(32, 32)
         Me.BsStirrer1Button.TabIndex = 5
@@ -1452,8 +1449,8 @@ Partial Class IPositionsAdjustments
         '
         Me.BsGridMixer1.AdjustButtonImage = Nothing
         Me.BsGridMixer1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsGridMixer1.BackColor = System.Drawing.Color.Gainsboro
         Me.BsGridMixer1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsGridMixer1.Location = New System.Drawing.Point(4, 5)
@@ -1467,7 +1464,7 @@ Partial Class IPositionsAdjustments
         Me.BsGridMixer1.OkImage = Nothing
         Me.BsGridMixer1.SelectedRow = 0
         Me.BsGridMixer1.SelectedValue = Nothing
-        Me.BsGridMixer1.Size = New System.Drawing.Size(706, 258)
+        Me.BsGridMixer1.Size = New System.Drawing.Size(708, 259)
         Me.BsGridMixer1.TabIndex = 4
         Me.BsGridMixer1.TestButtonImage = Nothing
         Me.BsGridMixer1.ValidationImage = ""
@@ -1479,7 +1476,7 @@ Partial Class IPositionsAdjustments
         Me.TabMixer2.Controls.Add(Me.BsGridMixer2)
         Me.TabMixer2.Location = New System.Drawing.Point(4, 22)
         Me.TabMixer2.Name = "TabMixer2"
-        Me.TabMixer2.Size = New System.Drawing.Size(715, 306)
+        Me.TabMixer2.Size = New System.Drawing.Size(717, 307)
         Me.TabMixer2.TabIndex = 4
         Me.TabMixer2.Text = "MIXER2"
         '
@@ -1487,7 +1484,7 @@ Partial Class IPositionsAdjustments
         '
         Me.BsStirrer2Button.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsStirrer2Button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsStirrer2Button.Location = New System.Drawing.Point(680, 269)
+        Me.BsStirrer2Button.Location = New System.Drawing.Point(682, 270)
         Me.BsStirrer2Button.Name = "BsStirrer2Button"
         Me.BsStirrer2Button.Size = New System.Drawing.Size(32, 32)
         Me.BsStirrer2Button.TabIndex = 6
@@ -1498,8 +1495,8 @@ Partial Class IPositionsAdjustments
         '
         Me.BsGridMixer2.AdjustButtonImage = Nothing
         Me.BsGridMixer2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsGridMixer2.BackColor = System.Drawing.Color.Gainsboro
         Me.BsGridMixer2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsGridMixer2.Location = New System.Drawing.Point(4, 5)
@@ -1513,7 +1510,7 @@ Partial Class IPositionsAdjustments
         Me.BsGridMixer2.OkImage = Nothing
         Me.BsGridMixer2.SelectedRow = 0
         Me.BsGridMixer2.SelectedValue = Nothing
-        Me.BsGridMixer2.Size = New System.Drawing.Size(706, 258)
+        Me.BsGridMixer2.Size = New System.Drawing.Size(708, 259)
         Me.BsGridMixer2.TabIndex = 4
         Me.BsGridMixer2.TestButtonImage = Nothing
         Me.BsGridMixer2.ValidationImage = ""
@@ -1532,8 +1529,8 @@ Partial Class IPositionsAdjustments
         'BsPanel1
         '
         Me.BsPanel1.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsPanel1.BackColor = System.Drawing.Color.Gainsboro
         Me.BsPanel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsPanel1.Controls.Add(Me.BsButton1)
@@ -1649,8 +1646,8 @@ Partial Class IPositionsAdjustments
         'BsPanel2
         '
         Me.BsPanel2.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Left) _
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsPanel2.Controls.Add(Me.ChartControl1)
         Me.BsPanel2.Location = New System.Drawing.Point(7, 33)
         Me.BsPanel2.Name = "BsPanel2"
@@ -1659,7 +1656,7 @@ Partial Class IPositionsAdjustments
         '
         'ChartControl1
         '
-        Me.ChartControl1.AppearanceNameSerializable = "Dark Flat"
+        Me.ChartControl1.AppearanceName = "Dark Flat"
         Me.ChartControl1.BackColor = System.Drawing.Color.Gainsboro
         Me.ChartControl1.BorderOptions.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         SwiftPlotDiagram1.AxisX.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
@@ -1749,50 +1746,40 @@ Partial Class IPositionsAdjustments
         ConstantLine29.ShowInLegend = False
         ConstantLine29.Title.Visible = False
         SwiftPlotDiagram1.AxisX.ConstantLines.AddRange(New DevExpress.XtraCharts.ConstantLine() {ConstantLine18, ConstantLine19, ConstantLine20, ConstantLine21, ConstantLine22, ConstantLine23, ConstantLine24, ConstantLine25, ConstantLine26, ConstantLine27, ConstantLine28, ConstantLine29})
-        SwiftPlotDiagram1.AxisX.DateTimeScaleOptions.AutoGrid = False
-        SwiftPlotDiagram1.AxisX.DateTimeScaleOptions.GridSpacing = 80.0R
         SwiftPlotDiagram1.AxisX.GridLines.MinorVisible = True
         SwiftPlotDiagram1.AxisX.GridLines.Visible = True
-        SwiftPlotDiagram1.AxisX.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.[True]
+        SwiftPlotDiagram1.AxisX.GridSpacing = 80
+        SwiftPlotDiagram1.AxisX.GridSpacingAuto = False
+        SwiftPlotDiagram1.AxisX.Label.Antialiasing = True
         SwiftPlotDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisX.Label.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram1.AxisX.NumericScaleOptions.AutoGrid = False
-        SwiftPlotDiagram1.AxisX.NumericScaleOptions.GridSpacing = 80.0R
+        SwiftPlotDiagram1.AxisX.Range.Auto = False
+        SwiftPlotDiagram1.AxisX.Range.MaxValueSerializable = "400"
+        SwiftPlotDiagram1.AxisX.Range.MinValueSerializable = "0"
+        SwiftPlotDiagram1.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
+        SwiftPlotDiagram1.AxisX.Range.SideMarginsEnabled = True
         SwiftPlotDiagram1.AxisX.Title.Alignment = System.Drawing.StringAlignment.Far
         SwiftPlotDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisX.Title.Text = "steps"
         SwiftPlotDiagram1.AxisX.Title.TextColor = System.Drawing.Color.DimGray
         SwiftPlotDiagram1.AxisX.Title.Visible = True
         SwiftPlotDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        SwiftPlotDiagram1.AxisX.VisualRange.Auto = False
-        SwiftPlotDiagram1.AxisX.VisualRange.AutoSideMargins = True
-        SwiftPlotDiagram1.AxisX.VisualRange.MaxValueSerializable = "400"
-        SwiftPlotDiagram1.AxisX.VisualRange.MinValueSerializable = "0"
-        SwiftPlotDiagram1.AxisX.WholeRange.Auto = False
-        SwiftPlotDiagram1.AxisX.WholeRange.AutoSideMargins = True
-        SwiftPlotDiagram1.AxisX.WholeRange.MaxValueSerializable = "400"
-        SwiftPlotDiagram1.AxisX.WholeRange.MinValueSerializable = "0"
         SwiftPlotDiagram1.AxisY.Color = System.Drawing.Color.Black
-        SwiftPlotDiagram1.AxisY.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.[True]
+        SwiftPlotDiagram1.AxisY.Label.Antialiasing = True
         SwiftPlotDiagram1.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        SwiftPlotDiagram1.AxisY.Label.NumericOptions.Precision = 0
         SwiftPlotDiagram1.AxisY.Label.TextColor = System.Drawing.Color.Black
+        SwiftPlotDiagram1.AxisY.NumericOptions.Precision = 0
+        SwiftPlotDiagram1.AxisY.Range.Auto = False
+        SwiftPlotDiagram1.AxisY.Range.MaxValueSerializable = "1100000"
+        SwiftPlotDiagram1.AxisY.Range.MinValueSerializable = "500000"
+        SwiftPlotDiagram1.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
+        SwiftPlotDiagram1.AxisY.Range.SideMarginsEnabled = False
         SwiftPlotDiagram1.AxisY.Title.Alignment = System.Drawing.StringAlignment.Far
         SwiftPlotDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisY.Title.Text = "counts"
         SwiftPlotDiagram1.AxisY.Title.TextColor = System.Drawing.Color.DimGray
         SwiftPlotDiagram1.AxisY.Title.Visible = True
         SwiftPlotDiagram1.AxisY.VisibleInPanesSerializable = "-1"
-        SwiftPlotDiagram1.AxisY.VisualRange.Auto = False
-        SwiftPlotDiagram1.AxisY.VisualRange.AutoSideMargins = False
-        SwiftPlotDiagram1.AxisY.VisualRange.MaxValueSerializable = "1100000"
-        SwiftPlotDiagram1.AxisY.VisualRange.MinValueSerializable = "500000"
-        SwiftPlotDiagram1.AxisY.VisualRange.SideMarginsValue = 0.0R
-        SwiftPlotDiagram1.AxisY.WholeRange.Auto = False
-        SwiftPlotDiagram1.AxisY.WholeRange.AutoSideMargins = False
-        SwiftPlotDiagram1.AxisY.WholeRange.MaxValueSerializable = "1100000"
-        SwiftPlotDiagram1.AxisY.WholeRange.MinValueSerializable = "500000"
-        SwiftPlotDiagram1.AxisY.WholeRange.SideMarginsValue = 0.0R
         SwiftPlotDiagram1.DefaultPane.BorderColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         SwiftPlotDiagram1.ZoomingOptions.UseKeyboard = False
         SwiftPlotDiagram1.ZoomingOptions.UseKeyboardWithMouse = False
@@ -1919,7 +1906,7 @@ Partial Class IPositionsAdjustments
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.ProgressBar1)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageImage)
@@ -1985,7 +1972,6 @@ Partial Class IPositionsAdjustments
         Me.Controls.Add(Me.BsButtonsPanel)
         Me.Controls.Add(Me.BsMessagesPanel)
         Me.Controls.Add(Me.BsTabPagesControl)
-        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "IPositionsAdjustments"
@@ -1998,11 +1984,13 @@ Partial Class IPositionsAdjustments
         CType(Me.BsLEDCurrentTrackBar, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsAbsorbancePanel.ResumeLayout(False)
         CType(XyDiagram1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(SplineSeriesView1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Series1, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(PointSeriesLabel2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(SplineSeriesView2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Series2, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(PointSeriesLabel3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(SplineSeriesView3, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.AbsorbanceChart, System.ComponentModel.ISupportInitialize).EndInit()
         Me.BsOpticAdjustGroupBox.ResumeLayout(False)

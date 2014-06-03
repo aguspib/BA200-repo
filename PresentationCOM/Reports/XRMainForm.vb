@@ -83,7 +83,7 @@ Public Class XRMainForm
             If Not Report Is Nothing Then
                 ' Bind the report's printing system to the print control. 
 
-                DocumentViewer1.PrintingSystem = Report.PrintingSystem
+                PrintControl1.PrintingSystem = Report.PrintingSystem
 
 
                 ' Generate the report's print document. 
@@ -101,7 +101,7 @@ Public Class XRMainForm
 
                 'ShowHideVisibleElements()
 
-                If Report.Landscape Then DocumentViewer1.Zoom = 0.9
+                If Report.Landscape Then PrintControl1.Zoom = 0.9
             End If
 
         Catch ex As Exception
@@ -206,9 +206,8 @@ Public Class XRMainForm
         PrintPreviewBarItem26.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
     End Sub
 
-    Private Sub DocumentViewer1_SelectedPageChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DocumentViewer1.SelectedPageChanged
-        Dim docvw As DevExpress.XtraPrinting.Preview.DocumentViewer = TryCast(sender, DevExpress.XtraPrinting.Preview.DocumentViewer)
-        PrintPreviewStaticItem1.Caption = String.Format("Página {0} de {1}", docvw.SelectedPageIndex + 1, DocumentViewer1.PrintingSystem.Pages.Count)
+    Private Sub PrintControl1_SelectedPageChanged(ByVal sender As System.Object, ByVal e As DevExpress.XtraPrinting.PageEventArgs) Handles PrintControl1.SelectedPageChanged
+        PrintPreviewStaticItem1.Caption = String.Format("Página {0} de {1}", e.Page.Index + 1, PrintControl1.PrintingSystem.Pages.Count)
     End Sub
 
     Private Sub XRForm_FormClosed(ByVal sender As System.Object, ByVal e As FormClosedEventArgs) Handles MyBase.FormClosed
@@ -216,8 +215,8 @@ Public Class XRMainForm
             'JVV 01/10
             'If Report.Pages.Count > pagesPrinted Then MessageBox.Show("Printed: " & pagesPrinted & " / " & Report.Pages.Count)
             'JVV 01/10
-            DocumentViewer1.PrintingSystem.ClearContent()
-            DocumentViewer1.PrintingSystem = Nothing
+            PrintControl1.PrintingSystem.ClearContent()
+            PrintControl1.PrintingSystem = Nothing
             If Not Report Is Nothing Then
                 Report.ClosePreview()
                 Report = Nothing

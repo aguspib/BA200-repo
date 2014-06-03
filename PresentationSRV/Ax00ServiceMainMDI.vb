@@ -6107,19 +6107,6 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-    Private Sub ConfigureLookAndFeel()
-
-        DevExpress.UserSkins.BonusSkins.Register()
-
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.UseWindowsXPTheme = False
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.UseDefaultLookAndFeel = False
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.SkinName = "Seven Classic"
-
-        DevExpress.Skins.SkinManager.EnableMdiFormSkins()
-        DevExpress.Skins.SkinManager.EnableFormSkins()
-
-    End Sub
-
     ''' <summary>
     ''' Screen load event
     ''' </summary>
@@ -6131,8 +6118,6 @@ Public Class Ax00ServiceMainMDI
         Dim myGlobal As New GlobalDataTO
         Dim myGlobalbase As New GlobalBase
         Try
-
-            ConfigureLookAndFeel()
             Me.Text = My.Application.Info.ProductName 'SGM 22/02/2012
 
             Dim XMLScriptFileNamePath As String = Application.StartupPath & myGlobalbase.XmlFwScripts

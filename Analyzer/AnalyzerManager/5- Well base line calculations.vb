@@ -134,6 +134,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myLogAcciones As New ApplicationLogManager()
                 Dim myReadingCycleStatus As Boolean = False
 
+                'AG 02/06/2014 #1644 - Set the semaphore to busy value (before process ANSPHR)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                    'GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    'GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                End If
+
                 '2) Call the biochemical readings treatment
                 'resultData = ProcessBiochemicalReadings(Nothing, pInstructionReceived)
                 resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
@@ -151,6 +157,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
                 'TR 06/05/2014 BT#1612, #1634 -END
+
+                'AG 02/06/2014 #1644 - Set the semaphore to free value (after process ANSPHR)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                    'GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    'GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                End If
 
                 myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
                 StartTime = Now
@@ -542,6 +554,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 executionUpdated = True
 
                                 'AG 28/05/2014 - #1644 - When 1st reading is received remove all previous readings linked with this execution
+
                                 If myReadingNumber = 1 Then
                                     myLogAcciones.CreateLogActivity("Call myReadingsDelegate.Delete ", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                                     myGlobal = myReadingsDelegate.Delete(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionDS)

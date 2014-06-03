@@ -743,18 +743,6 @@ Partial Public Class IAx00MainMDI
         End Try
     End Sub
 
-    Private Sub ConfigureLookAndFeel()
-
-        DevExpress.UserSkins.BonusSkins.Register()
-
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.UseWindowsXPTheme = False
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.UseDefaultLookAndFeel = False
-        DevExpress.LookAndFeel.UserLookAndFeel.Default.SkinName = "Seven Classic"
-
-        DevExpress.Skins.SkinManager.EnableMdiFormSkins()
-        DevExpress.Skins.SkinManager.EnableFormSkins()
-
-    End Sub
     ''' <summary>
     ''' Screen load event
     ''' </summary>
@@ -770,8 +758,6 @@ Partial Public Class IAx00MainMDI
     ''' </remarks>
     Private Sub Ax00MainMDI_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
-
-            ConfigureLookAndFeel()
             'RH
             If (MsgParent Is Nothing) Then MsgParent = Me
 
@@ -812,7 +798,7 @@ Partial Public Class IAx00MainMDI
             'JV + AG - Revision 18/10/2013 task # 1341
             imagePause = Image.FromFile(".\Images\Embedded\MDIVertPause.png")
             imagePlay = Image.FromFile(".\Images\Embedded\MDIVertPlay.png")
-
+            
             showSTARTWSiconFlag = True
             showPAUSEWSiconFlag = False
             ChangeStatusImageMultipleSessionButton()

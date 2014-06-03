@@ -6051,6 +6051,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pPostDilutionType">Type of post Dilution to apply when a Rerun has been requested. Optional parameter</param>
         ''' <param name="pIsISEModuleReady">Flag indicating if the ISE Module is ready to be used. Optional parameter</param>
         ''' <param name="pISEElectrodesList">String list containing ISE Electrodes (ISE_ResultID) with wrong/pending calibration</param>
+        ''' <param name="pPauseMode"></param>
+        ''' <param name="pManualRerunFlag">Always TRUE except when autoreruns are triggered</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 09/02/2011
@@ -6080,15 +6082,23 @@ Namespace Biosystems.Ax00.BL
         '''              AG 19/03/2014 - #1545 (adapt the CreateWSExecutions active until 19/03/2014 and adapt it for use multiples)
         '''                              New method does not open transaction, dbConnection is nothing unless it has been received from parameter
         '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
+        '''              AG 02/06/2014 - #1644 new optional parameter pManualRerunFlag (when FALSE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
         ''' </remarks> 
         Public Function CreateWSExecutionsMultipleTransactions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                            ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
                                            Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False) As GlobalDataTO
+                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
+                                           Optional ByVal pManualRerunFlag As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
+                'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    'GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    'GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                End If
+
                 'AG 19/03/2014 - #1545 - Do not open transaction, use the parameter as connection
                 'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -6929,6 +6939,13 @@ Namespace Biosystems.Ax00.BL
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close() 'AG 19/03/2014 - #1545 - New method does not open transaction, so do not close it
+
+                'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    'GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    'GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                End If
+
             End Try
             Return resultData
         End Function
@@ -7054,6 +7071,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pIsISEModuleReady">Flag indicating if the ISE Module is ready to be used. Optional parameter</param>
         ''' <param name="pISEElectrodesList">String list containing ISE Electrodes (ISE_ResultID) with wrong/pending calibration</param>
         ''' <param name="pPauseMode"></param>
+        ''' <param name="pManualRerunFlag">Always TRUE except when autoreruns are triggered</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 09/02/2011
@@ -7082,11 +7100,13 @@ Namespace Biosystems.Ax00.BL
         '''              AG 19/02/2014 - #1514 improvements memory app/sql
         '''              AG 20/03/2014 - #1545 call create WS executions method with multiple transactions
         '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
+        '''              AG 02/06/2014 - #1644 new optional parameter pManualRerunFlag (when FALSE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
         ''' </remarks> 
         Public Function CreateWSExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                            ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
                                            Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False) As GlobalDataTO
+                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
+                                           Optional ByVal pManualRerunFlag As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -7095,10 +7115,16 @@ Namespace Biosystems.Ax00.BL
                 'AG 20/03/2014 - #1545 - call the new create execution method that uses multiple transactions
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
                     resultData = CreateWSExecutionsMultipleTransactions(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, _
-                                                       pOrderTestID, pPostDilutionType, pIsISEModuleReady, pISEElectrodesList, pPauseMode)
+                                                       pOrderTestID, pPostDilutionType, pIsISEModuleReady, pISEElectrodesList, pPauseMode, pManualRerunFlag)
                     Exit Try 'Exit Try and not execute the old code
                 End If
                 'AG 20/03/2014 - #1545
+
+                'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    'GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    'GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                End If
 
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -7903,6 +7929,13 @@ Namespace Biosystems.Ax00.BL
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+
+                'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    'GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    'GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                End If
+
             End Try
             Return resultData
         End Function
