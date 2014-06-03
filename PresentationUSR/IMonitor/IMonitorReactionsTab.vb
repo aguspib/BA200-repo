@@ -97,6 +97,8 @@ Partial Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshReactionsRotor(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
+            If (IsDisposed) Then Exit Sub
+
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 

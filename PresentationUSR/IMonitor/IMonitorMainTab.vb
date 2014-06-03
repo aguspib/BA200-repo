@@ -30,7 +30,7 @@ Partial Public Class IMonitor
     'RH
     Public Sub ShowActiveAlerts(Optional ByVal CanHide As Boolean = True)
         If ChangingTab Then Return
-        If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+        If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
         If (Not MainMDI Is Nothing) AndAlso (MainMDI.WindowState = FormWindowState.Normal) Then
             'AG 08/01/2014
@@ -298,6 +298,9 @@ Partial Public Class IMonitor
 
         'Real Code
         'Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
+
+        If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
         Dim myAlarms As List(Of GlobalEnumerates.Alarms)
         myAlarms = mdiAnalyzerCopy.Alarms 'Get the current alarms in analyzer
 

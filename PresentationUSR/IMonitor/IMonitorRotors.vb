@@ -2533,8 +2533,11 @@ Partial Public Class IMonitor
     ''' </remarks>
     Private Sub UpdateRotorTreeViewArea(ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, Optional ByVal pRotorType As String = "")
         Try
-            'If isClosingFlag Then Exit Sub ' IT 27/05/2014 - #1496 No refresh if screen is closing
-            If (Me.IsDisposed) Then Exit Sub
+
+            'CreateLogActivity("IsDisposed: " + IsDisposed.ToString(), Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            'CreateLogActivity("Visible: " + Visible.ToString(), Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myGlobalDataTO As GlobalDataTO
             Dim myNotInUseRPDelegate As New WSNotInUseRotorPositionsDelegate()

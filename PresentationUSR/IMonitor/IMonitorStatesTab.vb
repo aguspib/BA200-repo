@@ -134,7 +134,7 @@ Partial Public Class IMonitor
 
             'AG 26/02/2014 - #1521
             If pRefreshDS Is Nothing Then Return
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'Evaluate if grid has to create rows (slow) or only update rows colors (quick)
             Dim PrevExecutionNumber As Integer = 0
@@ -2150,7 +2150,7 @@ Partial Public Class IMonitor
     Private Sub bsWSExecutionsDataGridView_CellMouseClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) _
             Handles bsWSExecutionsDataGridView.CellMouseClick
         Try
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If e.RowIndex < 0 Then Return
             If sender Is Nothing Then Return

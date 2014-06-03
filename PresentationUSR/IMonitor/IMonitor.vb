@@ -141,7 +141,7 @@ Public Class IMonitor
             'Debug.Print("changes in WS :" & pChangesInWS.ToString())
             'Debug.Print("Paused elements :" & pPausedElements.ToString())
 
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'Dim remainingTime As Single = 0
             Dim resultData As New GlobalDataTO
@@ -482,8 +482,7 @@ Public Class IMonitor
     Private Sub RefreshCommonArea(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             'Dim StartTime As DateTime = Now
-            'If isClosingFlag Then Exit Sub ' XB 27/05/2014 - #1496 No refresh if screen is closing
-            If (Me.IsDisposed) Then Exit Sub
+            If (IsDisposed) Then Exit Sub ' XB 27/05/2014 - #1496 No refresh if screen is closing
 
             'LEDs AREA
             UpdateLeds()
@@ -530,9 +529,7 @@ Public Class IMonitor
             WorkSessionChange = False 'TR 14/12/2011 this is the variable
 
             'ContainerLevels information AREA
-            If Not isClosingFlag Then
-                UpdateContainerLevels()
-            End If
+            UpdateContainerLevels()
 
             'Warming Up AREA
             If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) Then
@@ -577,6 +574,8 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshRotors(ByVal pEventType As GlobalEnumerates.UI_RefreshEvents, ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
+            If (IsDisposed) Then Exit Sub
+
             Dim tmpReagentsUpdatePosition As New WSRotorContentByPositionDS
             Dim tmpSamplesUpdatePosition As New WSRotorContentByPositionDS
             Dim RotorContentList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
@@ -852,7 +851,7 @@ Public Class IMonitor
             '    Exit Sub
             'End If
 
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If Not mdiAnalyzerCopy Is Nothing Then
 
@@ -899,11 +898,13 @@ Public Class IMonitor
         Try
             RefreshDoneField = False 'RH 28/03/2012
 
-            'If isClosingFlag Then Return 'AG 03/04/2012
-            If (Me.IsDisposed) Then Exit Sub
+            If (IsDisposed) Then Exit Sub 'AG 03/04/2012
 
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
+
+            myLogAcciones.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS) OrElse _
                 pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED) Then
                 'Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
@@ -1450,7 +1451,7 @@ Public Class IMonitor
             'ISELed.StateIndex = rnd.Next Mod 4
             'A400Led.StateIndex = rnd.Next Mod 4
             'FridgeStateLed.StateIndex = rnd.Next Mod 4
-            If (Me.IsDisposed) Then Exit Sub
+            If (IsDisposed) Then Exit Sub
 
 
             If (Not mdiAnalyzerCopy Is Nothing) Then
@@ -1905,7 +1906,7 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub ExecuteAutoCreateWSLastStep()
         Try
-            If isClosingFlag Then Exit Sub ' XB 13/03/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myEnableButtonsAlreadyLaunch As Boolean = False     ' XB 25/11/2013
             If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
