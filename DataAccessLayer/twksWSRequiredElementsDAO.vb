@@ -1169,10 +1169,12 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 03/05/2012 - Changed subquery for Special Solutions: the description can be also in SubTable DIL_SOLUTIONS in 
         '''                              Preloaded Master Data, not only in SubTable SPECIAL_SOLUTIONS
         '''              TR 21/11/2013 - BT #1388 ==> Changed all sub-queries to return also field ElementID
-        '''              SA 27/05/2014 - BT #1519 ==> Changed the sub-queries used to get the not positioned REAGENTS, the not positioned DILUTION SOLUTIONS 
-        '''                                           and the not positioned WASHING_SOLUTIONS to return only elements still needed in the active Work Session 
-        '''                                           (those needed for NOT CLOSED Order Tests). Created a new sub-query to get the not positioned SPECIAL SOLUTIONS 
-        '''                                           needed for Blanks (previouly they were obtained in the same sub-query than DILUTION SOLUTIONS)  
+        '''              SA 27/05/2014 - BT #1519 ==> Changed the sub-queries used to get the not positioned REAGENTS and the not positioned DILUTION SOLUTIONS 
+        '''                                           to return only elements still needed in the active Work Session (those needed for NOT CLOSED Order Tests). 
+        '''                                           Created a new sub-query to get the not positioned SPECIAL SOLUTIONS needed for Blanks (previouly they were 
+        '''                                           obtained in the same sub-query than DILUTION SOLUTIONS). Removed the getting of not positioned WASHING 
+        '''                                           SOLUTIONS from this function (they are obtained in a different function called from the function with the 
+        '''                                           same name in the Delegate Class) 
         ''' </remarks>
         Public Function GetNotPositionedElements(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1224,21 +1226,21 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS.ToString & "' " & vbCrLf & _
                                    " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
 
-                        '(4) BT #1519 - Subquery to get WASHING SOLUTIONS that are not positioned (or without enough volume) but that are still needed in the active Work Session
-                        '               (to avoid Contaminations between Reagents)
-                        cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 3 AS Position, RE.ElementID " & vbCrLf & _
-                                   " FROM   twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD ON RE.SolutionCode = PMD.ItemID " & vbCrLf & _
-                                                                    " INNER JOIN tfmwMultiLanguageResources MR ON MR.ResourceID = PMD.ResourceID " & vbCrLf & _
-                                                                    " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
-                                                                    " INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                   " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                   " AND    RE.ElementStatus <> 'POS' " & vbCrLf & _
-                                   " AND    RE.ElementFinished = 0 " & vbCrLf & _
-                                   " AND    RE.TubeContent = 'WASH_SOL' " & vbCrLf & _
-                                   " AND    PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                   " AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf & _
-                                   " AND    OT.OrderTestStatus <> 'CLOSED' " & vbCrLf
+                        ''(4) BT #1519 - Subquery to get WASHING SOLUTIONS that are not positioned (or without enough volume) but that are still needed in the active Work Session
+                        ''               (to avoid Contaminations between Reagents)
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 3 AS Position, RE.ElementID " & vbCrLf & _
+                        '           " FROM   twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD ON RE.SolutionCode = PMD.ItemID " & vbCrLf & _
+                        '                                            " INNER JOIN tfmwMultiLanguageResources MR ON MR.ResourceID = PMD.ResourceID " & vbCrLf & _
+                        '                                            " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
+                        '                                            " INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '           " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '           " AND    RE.ElementStatus <> 'POS' " & vbCrLf & _
+                        '           " AND    RE.ElementFinished = 0 " & vbCrLf & _
+                        '           " AND    RE.TubeContent = 'WASH_SOL' " & vbCrLf & _
+                        '           " AND    PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
+                        '           " AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf & _
+                        '           " AND    OT.OrderTestStatus <> 'CLOSED' " & vbCrLf
 
                         '(5) Subquery to get CALIBRATORS that are not positioned (or without enough volume) but that are still needed in the active Work Session
                         cmdText &= " UNION " & vbCrLf & _
