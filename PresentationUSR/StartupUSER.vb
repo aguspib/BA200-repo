@@ -80,6 +80,15 @@ Public NotInheritable Class StartupUSER
 #Else
                 ShowBackground = True
 #End If
+
+                'AG 03/06/2014 - #1644 First time we call the WaitOne of createWSExecutions semaphore spends time, so call it when USR app is started, just before the Login
+                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    GlobalSemaphores.createWSExecutionsQueue = 0
+                End If
+                'AG 03/06/2014 - #1644
+
                 Ax00StartUp = New IAx00StartUp(Nothing) With { _
                             .Title = "Loading...", _
                             .WaitText = "", _

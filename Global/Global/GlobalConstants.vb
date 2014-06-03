@@ -7,7 +7,6 @@ Namespace Biosystems.Ax00.Global
         '**********************
         '**** GLOBAL FLAGs ****
         '**********************
-        Public Shared CreateWSExecutionsWithMultipleTransactions As Boolean = False 'AG 24/03/2014 - #1545 - Create executions using multiple transactions
 
         '*** PROVISIONAL: BT #1545 ==> ONLY WHILE DEVELOPMENT OF NEW ADD WS PROCESS (USING SEVERAL DB TRANSACTIONS) ***'
         Public Shared NEWAddWorkSession As Boolean = False
@@ -22,6 +21,10 @@ Namespace Biosystems.Ax00.Global
         '                                                The analyzer status information is in Communications project that includes Global, so Global can NOT CALL methods or properties in Communications project
 
         Public Shared MaxFileLogSize As Long = -1       'DL 27/01/2012
+
+        Public Shared CreateWSExecutionsWithMultipleTransactions As Boolean = False 'AG 24/03/2014 - #1545 - Create executions using multiple transactions
+        Public Shared CreateWSExecutionsWithSemaphore As Boolean = True 'AG 03/06/2014 - #1644
+
 
 
         '**************************
