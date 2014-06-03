@@ -22,35 +22,35 @@ Partial Class IHistoricalReports
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
-        Me.RepositoryItemRichTextEdit1 = New DevExpress.XtraEditors.Repository.RepositoryItemRichTextEdit()
-        Me.TasksCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
-        Me.TaskLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.ActionsCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
-        Me.ActionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.DateToDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
-        Me.DateToLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.DateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
-        Me.DateFromLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.AnalyzerCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
-        Me.AnalyzerLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.SearchButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.PrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.DeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.components = New System.ComponentModel.Container
+        Me.RepositoryItemRichTextEdit1 = New DevExpress.XtraEditors.Repository.RepositoryItemRichTextEdit
+        Me.TasksCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
+        Me.TaskLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.ActionsCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
+        Me.ActionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.DateToDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
+        Me.DateToLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.DateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
+        Me.DateFromLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.AnalyzerCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
+        Me.AnalyzerLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.SearchButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.PrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.DeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.SRVAdjustmentsDSBindingSource = New System.Windows.Forms.BindingSource(Me.components)
-        Me.SearchGroupBox = New System.Windows.Forms.GroupBox()
-        Me.ActivityGroupBox = New System.Windows.Forms.GroupBox()
-        Me.GridControl1 = New DevExpress.XtraGrid.GridControl()
-        Me.GridView1 = New DevExpress.XtraGrid.Views.Grid.GridView()
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.SearchGroupBox = New System.Windows.Forms.GroupBox
+        Me.ActivityGroupBox = New System.Windows.Forms.GroupBox
+        Me.GridControl1 = New DevExpress.XtraGrid.GridControl
+        Me.GridView1 = New DevExpress.XtraGrid.Views.Grid.GridView
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
+        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
         CType(Me.RepositoryItemRichTextEdit1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SRVAdjustmentsDSBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SearchGroupBox.SuspendLayout()
@@ -74,7 +74,6 @@ Partial Class IHistoricalReports
         Me.RepositoryItemRichTextEdit1.AppearanceReadOnly.Font = New System.Drawing.Font("Consolas", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.RepositoryItemRichTextEdit1.AppearanceReadOnly.Options.UseFont = True
         Me.RepositoryItemRichTextEdit1.Name = "RepositoryItemRichTextEdit1"
-        Me.RepositoryItemRichTextEdit1.ShowCaretInReadOnly = False
         '
         'TasksCombo
         '
@@ -327,8 +326,7 @@ Partial Class IHistoricalReports
         '
         Me.GridControl1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.GridControl1.Location = New System.Drawing.Point(3, 17)
-        Me.GridControl1.LookAndFeel.SkinName = "Seven"
-        Me.GridControl1.LookAndFeel.Style = DevExpress.LookAndFeel.LookAndFeelStyle.Office2003
+        Me.GridControl1.LookAndFeel.UseWindowsXPTheme = True
         Me.GridControl1.MainView = Me.GridView1
         Me.GridControl1.Name = "GridControl1"
         Me.GridControl1.Size = New System.Drawing.Size(959, 442)
@@ -416,18 +414,18 @@ Partial Class IHistoricalReports
         Me.GridView1.Name = "GridView1"
         Me.GridView1.OptionsCustomization.AllowFilter = False
         Me.GridView1.OptionsCustomization.AllowSort = False
-        Me.GridView1.OptionsFind.AllowFindPanel = False
         Me.GridView1.OptionsSelection.EnableAppearanceFocusedCell = False
         Me.GridView1.OptionsSelection.EnableAppearanceFocusedRow = False
         Me.GridView1.OptionsView.EnableAppearanceEvenRow = True
         Me.GridView1.OptionsView.EnableAppearanceOddRow = True
         Me.GridView1.OptionsView.ShowGroupPanel = False
         Me.GridView1.PaintStyleName = "WindowsXP"
+        Me.GridView1.OptionsFind.AllowFindPanel = False
         '
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageImage)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageLabel)
@@ -491,7 +489,6 @@ Partial Class IHistoricalReports
         Me.Controls.Add(Me.ActivityGroupBox)
         Me.Controls.Add(Me.SearchGroupBox)
         Me.Controls.Add(Me.BsTitleLabel)
-        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "IHistoricalReports"

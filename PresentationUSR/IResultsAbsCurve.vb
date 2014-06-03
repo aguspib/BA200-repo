@@ -1461,7 +1461,6 @@ Public Class IResultsAbsCurve
             Dim myView As XtraCharts.LineSeriesView
             myView = TryCast(mySerie.View, XtraCharts.LineSeriesView)
             myView.LineMarkerOptions.Size = SizeMarker
-            myView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateSerie ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
