@@ -1415,7 +1415,6 @@ Partial Public Class IAx00MainMDI
                                 If (Not resultData.HasError) Then myLogMaxDays = CInt(resultData.SetDatos)
 
                                 resultData = myLogAcciones.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
-                                resultData = myLogAcciones.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
                                 If (Not resultData.HasError) Then
                                     'If expor to xml OK then delete all records on Application log Table
                                     resultData = myLogAcciones.DeleteAll()
