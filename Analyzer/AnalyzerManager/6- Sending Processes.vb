@@ -319,6 +319,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim actionAlreadySent As Boolean = False
                 Dim endRunToSend As Boolean = False
                 Dim systemErrorFlag As Boolean = False 'AG 25/01/2012 Indicates if search next has produced a system error. In this case send a END instruction
+                Dim emptyFieldsDetected As Boolean = False 'AG 03/06/2014 - #1519 when Sw cannot send the proper instruction because there are emtpy fields error then send SKIP
+
                 'myGlobal = Me.SearchNextPreparation(Nothing, pNextWell)
                 'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
                 'AG 07/06/2012
@@ -361,6 +363,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
                                         myGlobal.HasError = False
                                         myGlobal.ErrorCode = ""
+                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                     End If
                                     'AG 27/09/2012
                                 End If
@@ -399,6 +402,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 myGlobal.HasError = False
                                                 myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                             End If
                                             'AG 27/09/2012
                                         End If
@@ -449,6 +453,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 myGlobal.HasError = False
                                                 myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                             Else
                                                 myGlobal.HasError = True
                                             End If
@@ -488,6 +493,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 myGlobal.HasError = False
                                                 myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                             End If
                                             'AG 27/09/2012
                                         End If
@@ -526,6 +532,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                         myGlobal.HasError = False
                                                         myGlobal.ErrorCode = ""
+                                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                                     End If
                                                     'AG 27/09/2012
                                                 End If
@@ -564,11 +571,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'End If
 
                 'New Conditions 
+                '- When EMPTY_FIELDS error detected --> Sw sends SKIP
                 '- When NO ise installed: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
                 '- When ise installed but ise switch off: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
                 '- When ise installed and ise switch on: No action sent + AnalyzerIsReady (R:1) + ISEModuleIsReady (I:1) --> Sw sends ENDRUN
                 '- Else if No action sent --> Sw sends SKIP
-                If Not actionAlreadySent Then
+                If emptyFieldsDetected Then
+                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SKIP) 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+
+                ElseIf Not actionAlreadySent Then
                     If Not systemErrorFlag Then
                         endRunToSend = False
                         If Not iseInstalledFlag AndAlso AnalyzerIsReadyAttribute Then
