@@ -561,6 +561,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 16/07/2013 - Added new optional parameter pExcludePatients. When this parameter is TRUE (only when this function is called
         '''                              during process of Automatic WS Creation with LIS), not positioned Patient Samples Tubes are not included in 
         '''                              the total number of not positioned required Elements.
+        '''              AG 04/06/2014 - #1519 - Ignore the WASHING SOLUTIONS that are not positioned (they do not shown warning 
         ''' </remarks>
         Public Function CountNotPositionedElements(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                    Optional ByVal pRotorType As String = "", Optional ByVal pStatusDiffOfPOS As Boolean = False, _
@@ -594,7 +595,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         ElseIf (pRotorType = "REAGENTS") Then
                             'In Reagents Rotor, all not positioned Elements are included in the total
-                            cmdText += " AND TubeContent IN ('SPEC_SOL', 'WASH_SOL','REAGENT') " & vbCrLf
+                            cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT') " & vbCrLf 'AG 04/06/2014 - #1519 - Ignore the WASH SOL that are not positioned (they do not shown warning)
 
                         Else
                             If (Not pExcludePatients) Then
@@ -604,6 +605,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 'Case of Automatic WS Creation with LIS: Washing Solutions and Patient Samples Tubes are excluded from the total
                                 cmdText += " AND TubeContent NOT IN ('TUBE_WASH_SOL', 'PATIENT')"
                             End If
+                        End If
+
+                        'AG 04/06/2014 - #1519 - Ignore the WASHING SOLUTIONS that are not positioned (they do not shown warning
+                        If pRotorType = String.Empty Then
+                            cmdText += " AND TubeContent NOT IN ('WASH_SOL')"
                         End If
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
