@@ -1578,6 +1578,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''              SA 28/05/2014 - BT #1627 ==> Added changes to avoid call functions that are specific for REAGENTS (functions of ReagentsOnBoardManagement)  
         '''                                           when DILUTION and/or WASHING SOLUTIONS are dispensed. Current code just verify the Rotor Type, but not the 
         '''                                           Bottle content. Changes have been made in section labelled (2.2) 
+        '''              AG 04/06/2014 - #1653 Check if WRUN (reagents washings) could not be completed remove the last WRUN for wash reagents sent 
         ''' </remarks>
         Private Function ProcessArmStatusRecived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2074,6 +2075,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                           myBottlePos, myBottleStatus, newElementStatus, 0, 0, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                             'TR 28/09/2012 - END
                             'AG 23/01/2012
+
+                            'AG 04/06/2014 - #1653 Check if WRUN could not be completed and remove the last WRUN (for wash reagents) sent because it was not performed
+                            '(Apply only for ANSBR1 + prepID =0 + status = LD)
+                            If myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBR1.ToString AndAlso myPrepID = 0 AndAlso myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString Then
+                                Dim wrunSentLinq As List(Of AnalyzerManagerDS.sentPreparationsRow) = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+                                                                                                   Where a.ReagentWashFlag = True _
+                                                                                                   Select a).ToList
+                                If wrunSentLinq.Count > 0 Then
+                                    wrunSentLinq(wrunSentLinq.Count - 1).Delete()
+                                    mySentPreparationsDS.sentPreparations.AcceptChanges()
+                                End If
+                                wrunSentLinq = Nothing 'Release memory
+                            End If
+                            'AG 04/06/2014 -
 
                             'AG 04/10/2012 V053 Remove moreVolumeAvailable from condition - when LD is received Sw do not search for more position so variable moreVolumeAvailable has his
                             'initial declaration value (TRUE).
