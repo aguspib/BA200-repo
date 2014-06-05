@@ -905,7 +905,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
         ''' <summary>
-        ''' Get all Standard User Tests
+        ''' Get all Standard Tests by PreloadedTest
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pPreloadedTest">Preloaded Test (1) or User Test (0)</param>
@@ -1538,7 +1538,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Update the sort of the User Tests
+        ''' Update the position of the User Tests
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
