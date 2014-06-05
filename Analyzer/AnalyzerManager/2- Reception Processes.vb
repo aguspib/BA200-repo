@@ -1768,7 +1768,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (myRotorName = "REAGENTS") Then 'For reagents
                         Dim reagOnBoard As New ReagentsOnBoardDelegate
                         myGlobal = reagOnBoard.CalculateBottleVolumeTestLeft(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, myLevelControl, realVolume, testLeft)
-                        
+
                         'BT #1443 - Calculate the new Position Status according the value of the Level Control returned by the Analyzer
                         Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
                                                                                      Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _

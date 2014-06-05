@@ -31,7 +31,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private useRequestFlag As Boolean = False 'Ag 02/11/2010 - Flag for start using request (True when START instruction finish) / Return to False on send ENDRUN or ABORT
         Private waitingTimer As New Timer() ' AG 07/05/2010 - waiting time (watchdog)
         Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        Private Const SYSTEM_TIME_OFFSET As Integer = 5 'Additional time (courtesy)
+        Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
         Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
 
         'Class variables to inform the presentation layer about UI refresh after instruction receptions
