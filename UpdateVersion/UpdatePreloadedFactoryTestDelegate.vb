@@ -92,6 +92,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             End If
                         End If
 
+                        ' XB 04/06/2014 - BT #1646
+                        If Not resultData.HasError Then
+                            resultData = testUpd.DoFinalActions(dbConnection)
+                        End If
+
 
                         ''''''''''''''''''
                         'Update CALC tests
