@@ -2570,6 +2570,109 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' Update the sort of the Tests as alphabetically order by the name of the test (except User tests)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function UpdatePreloadedTestSortByTestName(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError) AndAlso (Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim mytparTestsDAO As New tparTestsDAO
+
+                        myGlobalDataTO = mytparTestsDAO.UpdatePreloadedTestSortByTestName(dbConnection)
+
+                        If (Not myGlobalDataTO.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdatePreloadedTestSortByTestName", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Update the sort of the User Tests depending on Preloaded Tests 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function UpdateUserTestPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError) AndAlso (Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim mytparTestsDAO As New tparTestsDAO
+                        Dim myLastPreloadedTestPosition As Integer
+
+                        myGlobalDataTO = mytparTestsDAO.GetLastPreloadedTestPosition(dbConnection)
+                        If (Not myGlobalDataTO.HasError) Then
+                            If (myGlobalDataTO.SetDatos Is Nothing OrElse myGlobalDataTO.SetDatos Is DBNull.Value) Then
+                                myLastPreloadedTestPosition = 0
+                            Else
+                                myLastPreloadedTestPosition = CType(myGlobalDataTO.SetDatos, Integer)
+                            End If
+
+                            myGlobalDataTO = mytparTestsDAO.UpdateUserTestPosition(dbConnection, myLastPreloadedTestPosition)
+
+                        End If
+
+                        If (Not myGlobalDataTO.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.UpdateUserTestPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 #End Region
     End Class
 End Namespace

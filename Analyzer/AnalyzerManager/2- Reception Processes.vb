@@ -1578,6 +1578,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''              SA 28/05/2014 - BT #1627 ==> Added changes to avoid call functions that are specific for REAGENTS (functions of ReagentsOnBoardManagement)  
         '''                                           when DILUTION and/or WASHING SOLUTIONS are dispensed. Current code just verify the Rotor Type, but not the 
         '''                                           Bottle content. Changes have been made in section labelled (2.2) 
+        '''              AG 04/06/2014 - #1653 Check if WRUN (reagents washings) could not be completed remove the last WRUN for wash reagents sent 
         ''' </remarks>
         Private Function ProcessArmStatusRecived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -1767,7 +1768,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (myRotorName = "REAGENTS") Then 'For reagents
                         Dim reagOnBoard As New ReagentsOnBoardDelegate
                         myGlobal = reagOnBoard.CalculateBottleVolumeTestLeft(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBottlePos, myLevelControl, realVolume, testLeft)
-                        
+
                         'BT #1443 - Calculate the new Position Status according the value of the Level Control returned by the Analyzer
                         Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
                                                                                      Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _
@@ -1958,7 +1959,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim addInfoVolMissingOrClot As String = String.Empty 'Additional info for volume missing or clot detection
 
                 'AG 04/10/2012 - R1 or S or R2 level detection failed but exists additional position, then the Execution Status changes from INPROCESS to PENDING. 
-                Dim executionTurnToPendingAgainFlag As Boolean = False
+                'AG 04/06/2014 - also used when a WRUN (reagents contamination) detects no volume in arm R1 (rename variable to 'reEvaluateNextToSend' instead of 'executionTurnToPendingAgainFlag')
+                Dim reEvaluateNextToSend As Boolean = False
 
                 'If level detection fail has been detected or volume detected but bottle exhausted and no move volume available -> call the  volume missing process
                 If (myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString OrElse myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LP.ToString OrElse _
@@ -2055,7 +2057,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                             myGlobal = exec_delg.ProcessVolumeMissing(dbConnection, myPrepID, myRotorName, myBottlePos, prepPerformedOKFlag, ActiveWorkSession, ActiveAnalyzer, _
-                                                                      executionTurnToPendingAgainFlag, IsBottleLocked, realVolume, testLeft)
+                                                                      reEvaluateNextToSend, IsBottleLocked, realVolume, testLeft)
                             If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                 lockedExecutionsDS = DirectCast(myGlobal.SetDatos, ExecutionsDS) 'Executions locked due to the volume missing alarm 
                             End If
@@ -2074,6 +2076,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                           myBottlePos, myBottleStatus, newElementStatus, 0, 0, "", "", Nothing, Nothing, Nothing, -1, -1, "", "")
                             'TR 28/09/2012 - END
                             'AG 23/01/2012
+
+                            'AG 04/06/2014 - #1653 Check if WRUN could not be completed and remove the last WRUN (for wash reagents) sent because it was not performed
+                            '(Apply only for ANSBR1 + prepID =0 + status = LD)
+                            If myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBR1.ToString AndAlso myPrepID = 0 AndAlso myWellStatus = GlobalEnumerates.Ax00ArmWellStatusValues.LD.ToString Then
+                                Dim wrunSentLinq As List(Of AnalyzerManagerDS.sentPreparationsRow) = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
+                                                                                                   Where a.ReagentWashFlag = True _
+                                                                                                   Select a).ToList
+                                If wrunSentLinq.Count > 0 Then
+                                    wrunSentLinq(wrunSentLinq.Count - 1).Delete()
+                                    mySentPreparationsDS.sentPreparations.AcceptChanges()
+                                    reEvaluateNextToSend = True 'Search for the next instruction to send again
+                                End If
+                                wrunSentLinq = Nothing 'Release memory
+                            End If
+                            'AG 04/06/2014 -
 
                             'AG 04/10/2012 V053 Remove moreVolumeAvailable from condition - when LD is received Sw do not search for more position so variable moreVolumeAvailable has his
                             'initial declaration value (TRUE).
@@ -2109,7 +2126,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             For Each execRow As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions.Rows 'Implements loop for ISE executions
                                                 If Not execRow.IsExecutionIDNull Then
                                                     'Change execution status from INPROCESS -> PENDING
-                                                    executionTurnToPendingAgainFlag = True
+                                                    reEvaluateNextToSend = True
                                                     myGlobal = exec_delg.UpdateStatusByExecutionID(dbConnection, "PENDING", execRow.ExecutionID, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                                     'Prepare UIRefresh Dataset (EXECUTION_STATUS) for refresh screen when needed
                                                     If Not myGlobal.HasError Then
@@ -2485,7 +2502,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'AG 26/07/2012
 
 
-                'AG 08/06/2012 - Finally if Sw has the new WS instruction to be sent to analyzer in Running evaluate if is a test preparation (test, ptest or isetest)
+                'AG 08/06/2012 - Finally if Sw has the new WS instruction to be sent to analyzer in Running. Evaluate if is a test preparation (test, ptest or isetest)
                 'In this case check the execution found continues PENDING, otherwise look for another execution
 
                 If myNextPreparationToSendDS.nextPreparation.Rows.Count > 0 Then
@@ -2494,7 +2511,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'Set to FALSE again when next preparation found belong to a NOT PENDING execution
                     Dim lookForNewInstructionToBeSent As Boolean = False
-                    If executionTurnToPendingAgainFlag Then
+                    If reEvaluateNextToSend Then
                         'AG 04/10/2012 - R1 or S or R2 level detection failed but exists additional position the execution status changes from INPROCESS to PENDING. 
                         '                So remove previous search next estimation a searc again
                         lookForNewInstructionToBeSent = True

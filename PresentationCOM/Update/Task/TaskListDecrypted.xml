@@ -2136,7 +2136,7 @@
       GO
     </StructureScript>
     <UpdateScript>
-      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.1', ServiceSoftware = '1.2.0', FirmwareScripts = '1.1.0', Firmware = '2.06'
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.1', ServiceSoftware = '1.2.1', FirmwareScripts = '1.1.0', Firmware = '2.08'
       GO
       IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'ONLY_ISE_WS_NOT_STARTED2') = 0)
       INSERT INTO [dbo].[tfmwMessages] ([MessageID],[MessageType],[ResourceID])
