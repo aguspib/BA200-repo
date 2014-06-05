@@ -3,7 +3,7 @@ Imports DevExpress.XtraReports.UI
 Public Class SummaryResultsReport
 
     Public Sub SetHeaderLabel(ByVal aText As String)
-        XrHeaderLabel.Text = aText
+        'XrHeaderLabel.Text = aText
     End Sub
 
     Public Sub SetDataSource(ByVal aDataSource As DataTable)
@@ -25,7 +25,7 @@ Public Class SummaryResultsReport
         Dim Margin As Single = 20.0!
         Dim Height As Single = 20.0!
 
-        XrHeaderLabel.SizeF = New System.Drawing.SizeF(Width, Height)
+        ' XrHeaderLabel.SizeF = New System.Drawing.SizeF(Width, Height)
         XrTableHeader.SizeF = New System.Drawing.SizeF(Width - Margin, Height)
         XrTableDetails.SizeF = New System.Drawing.SizeF(Width - Margin, Height)
         XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(Width - Margin, Height)

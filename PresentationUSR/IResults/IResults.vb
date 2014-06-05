@@ -2385,21 +2385,23 @@ Public Class IResults
             For Each myAlarm As ResultsDS.vwksResultsAlarmsRow In myAverageResultList
                 If Not myAlarm.IsAlarmIDNull Then
                     Select Case myAlarm.AlarmID
+                        'EF 03/06/2014 #1650  (usar constantes no texto fijo)
                         Case "CONC_REMARK7"
-                            myResult = "L"
+                            myResult = GlobalConstants.LOW   '"L"
                             Exit Select
                         Case "CONC_REMARK8"
-                            myResult = "H"
+                            myResult = GlobalConstants.HIGH   '"H"
                             Exit Select
                         Case "CONC_REMARK9"
-                            myResult = "PL"
+                            myResult = GlobalConstants.PANIC_LOW  '"PL"
                             Exit Select
                         Case "CONC_REMARK10"
-                            myResult = "PH"
+                            myResult = GlobalConstants.PANIC_HIGH  '"PH"
                             Exit Select
                         Case Else
                             myResult = ""
                             Exit Select
+                            'EF 03/06/2014 #1650  END
                     End Select
                 End If
             Next
@@ -2432,21 +2434,23 @@ Public Class IResults
                 For Each ExecRow As ExecutionsDS.vwksWSExecutionsAlarmsRow In myExecutionsAlarmsList
                     If Not ExecRow.IsAlarmIDNull Then
                         Select Case ExecRow.AlarmID
+                            'EF 03/06/2014 #1650  (usar constantes no texto fijo)
                             Case "CONC_REMARK7"
-                                myResult = "L"
+                                myResult = GlobalConstants.LOW   '"L"
                                 Exit Select
                             Case "CONC_REMARK8"
-                                myResult = "H"
+                                myResult = GlobalConstants.HIGH   '"H"
                                 Exit Select
                             Case "CONC_REMARK9"
-                                myResult = "PL"
+                                myResult = GlobalConstants.PANIC_LOW  '"PL"
                                 Exit Select
                             Case "CONC_REMARK10"
-                                myResult = "PH"
+                                myResult = GlobalConstants.PANIC_HIGH  '"PH"
                                 Exit Select
                             Case Else
                                 myResult = ""
                                 Exit Select
+                                'EF 03/06/2014 #1650  END
                         End Select
                     End If
                 Next
