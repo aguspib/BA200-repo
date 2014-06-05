@@ -5031,7 +5031,7 @@ Namespace Biosystems.Ax00.BL
                             literalPerformedBy = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
 
                             Dim literalComments As String
-                            literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Remarks", CurrentLanguage)
+                            literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)  'EF 03/06/2014 (cargar texto LBL_FLags)
 
                             'RH 15/05/2012 Get Patient data
                             Dim myPatientsDelegate As New PatientDelegate
@@ -5121,16 +5121,25 @@ Namespace Biosystems.Ax00.BL
                                                     patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
                                                 End If
 
-                                                FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport)
+                                                'EF 30/05/2014 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado)
+                                                'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport
+                                                ''FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
+                                                'FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
+                                                ''DL 17/06/2013
+                                                'FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
+                                                'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
+                                                'FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
+                                                'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
+                                                'FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
 
-                                                'FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
-                                                FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
-                                                'DL 17/06/2013
-                                                FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
-                                                FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
-                                                FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
-                                                FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
-                                                FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
+                                                FullID = String.Format("{0}", patIDforReport)
+                                                If (Pat.LastName <> "-" And Pat.LastName <> "") Or (Pat.FirstName <> "-" And Pat.FirstName <> "") Then FullName = String.Format("{0}, {1}", Pat.LastName, Pat.FirstName) Else FullName = ""
+                                                FullGender = String.Format("{0}", Pat.Gender)
+                                                FullBirthDate = String.Format("{0}", Pat.FormatedDateOfBirth)
+                                                FullAge = String.Format("{0}", Pat.AgeWithUnit)
+                                                FullPerformedBy = String.Format("{0}", Pat.PerformedBy)
+                                                FullComments = String.Format("{0}", Pat.Comments)
+                                                'EF 30/05/2014 End
 
                                                 ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
                                                                                                                FullName, FullGender, _
@@ -5152,7 +5161,7 @@ Namespace Biosystems.Ax00.BL
                                     Dim ReferenceRanges As String
                                     Dim Unit As String
                                     Dim ResultDate As String
-                                    Dim Remarks As String
+                                    Dim Flags As String  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
 
                                     Dim tmpOrderTestId As Integer
                                     Dim IsAverageDone As Dictionary(Of String, Boolean)
@@ -5266,113 +5275,124 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                     'END AG 15/09/2010
 
+                                                    'EF 03/06/2014 - Provisional v3.0.1 (PENDIENTE hacer un metodo único que devuelva el valor del FLAG a todos los reports, pantallas, etc y reutilizar!!)
                                                     'RH 16/05/2012
-                                                    Remarks = String.Empty
-
+                                                    Flags = String.Empty
+                                                    '    'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
                                                     If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
                                                         (IsNumeric(CONC_Value))) Then
                                                         If (Not resultRow.IsNormalLowerLimitNull AndAlso Not resultRow.IsNormalUpperLimitNull) Then
-                                                            If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) OrElse _
-                                                                CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit) Then
-                                                                Remarks = "*"
+                                                            If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) Then
+                                                                Flags = GlobalConstants.LOW '"L"
+                                                            ElseIf (CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit)) Then
+                                                                Flags = GlobalConstants.HIGH '"H"
                                                             End If
                                                         End If
                                                     End If
                                                     'RH 16/05/2012 - END
-
-                                                    ResultDate = resultRow.ResultDateTime.ToString(DatePattern) & " " & _
-                                                                 resultRow.ResultDateTime.ToString(TimePattern)
-
-                                                    'AG 03/10/2013 - compact report shows the barcode here because there is not header
-                                                    If pCompact Then
-                                                        If Not resultRow.IsSpecimenIDListNull Then
-                                                            DetailPatientID &= " (" & resultRow.SpecimenIDList & ")"
+                                                    'If there are Panic Ranges informed, then verify if the result is out of the limits of the PANIC RANGE
+                                                    If IsNumeric(CONC_Value) And (Not resultRow.IsPanicLowerLimitNull AndAlso Not resultRow.IsPanicUpperLimitNull) Then
+                                                        If (CSng(CONC_Value) < CSng(resultRow.PanicLowerLimit)) Then
+                                                            Flags = GlobalConstants.PANIC_LOW  'PL
+                                                        ElseIf (CSng(resultRow.PanicUpperLimit) < CSng(CONC_Value)) Then
+                                                            Flags = GlobalConstants.PANIC_HIGH 'PH 
                                                         End If
                                                     End If
-                                                    'AG 03/10/2013
+                                                    'EF 03/06/2014 END
 
-                                                    'Insert Details row
+                                                ResultDate = resultRow.ResultDateTime.ToString(DatePattern) & " " & _
+                                                             resultRow.ResultDateTime.ToString(TimePattern)
+
+                                                'AG 03/10/2013 - compact report shows the barcode here because there is not header
+                                                If pCompact Then
+                                                    If Not resultRow.IsSpecimenIDListNull Then
+                                                        DetailPatientID &= " (" & resultRow.SpecimenIDList & ")"
+                                                    End If
+                                                End If
+                                                'AG 03/10/2013
+
+                                                'Insert Details row
                                                     ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, SampleType, _
                                                                                                                      ReplicateNumber, ABSValue, CONC_Value, _
                                                                                                                      ReferenceRanges, Unit, ResultDate, _
-                                                                                                                     Remarks)
+                                                                                                                     Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
 
-                                                    tmpOrderTestId = resultRow.OrderTestID
-                                                    Dim myRerunNumber As Integer = resultRow.RerunNumber 'AG 04/08/2010
+                                                tmpOrderTestId = resultRow.OrderTestID
+                                                Dim myRerunNumber As Integer = resultRow.RerunNumber 'AG 04/08/2010
 
-                                                    Dim SampleList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                                                                                         Where row.OrderTestID = tmpOrderTestId _
-                                                                                                                       AndAlso row.RerunNumber = myRerunNumber _
-                                                                                                                        Select row).ToList()
+                                                Dim SampleList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                                                                                                     Where row.OrderTestID = tmpOrderTestId _
+                                                                                                                   AndAlso row.RerunNumber = myRerunNumber _
+                                                                                                                    Select row).ToList()
 
-                                                    If (GetReplicates AndAlso (SampleList.Count > 0)) Then
-                                                        Remarks = String.Empty
-                                                        TestName = String.Empty
-                                                        SampleType = String.Empty
-                                                        ReferenceRanges = String.Empty
+                                                If (GetReplicates AndAlso (SampleList.Count > 0)) Then
+                                                        Flags = String.Empty  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+                                                    TestName = String.Empty
+                                                    SampleType = String.Empty
+                                                    ReferenceRanges = String.Empty
 
-                                                        For j As Integer = 0 To SampleList.Count - 1
-                                                            DetailPatientID = SampleList(j).PatientID
-                                                            ReplicateNumber = SampleList(j).ReplicateNumber.ToString()
-                                                            Unit = resultRow.MeasureUnit
+                                                    For j As Integer = 0 To SampleList.Count - 1
+                                                        DetailPatientID = SampleList(j).PatientID
+                                                        ReplicateNumber = SampleList(j).ReplicateNumber.ToString()
+                                                        Unit = resultRow.MeasureUnit
 
-                                                            'AG 02/08/2010
-                                                            Dim hasConcentrationError As Boolean = False
-                                                            If (Not SampleList(j).IsCONC_ErrorNull) Then 'RH 14/09/2010
-                                                                hasConcentrationError = Not String.IsNullOrEmpty(SampleList(j).CONC_Error)
-                                                            End If
+                                                        'AG 02/08/2010
+                                                        Dim hasConcentrationError As Boolean = False
+                                                        If (Not SampleList(j).IsCONC_ErrorNull) Then 'RH 14/09/2010
+                                                            hasConcentrationError = Not String.IsNullOrEmpty(SampleList(j).CONC_Error)
+                                                        End If
 
-                                                            If (Not hasConcentrationError) Then
-                                                                If (Not SampleList(j).IsCONC_ValueNull) Then
-                                                                    CONC_Value = SampleList(j).CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                                                ElseIf (Not resultRow.IsManualResultTextNull) Then
-                                                                    'Take the Manual Result text from the average result
-                                                                    CONC_Value = resultRow.ManualResultText
-                                                                Else
-                                                                    CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                                End If
+                                                        If (Not hasConcentrationError) Then
+                                                            If (Not SampleList(j).IsCONC_ValueNull) Then
+                                                                CONC_Value = SampleList(j).CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                                                            ElseIf (Not resultRow.IsManualResultTextNull) Then
+                                                                'Take the Manual Result text from the average result
+                                                                CONC_Value = resultRow.ManualResultText
                                                             Else
                                                                 CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
                                                             End If
-                                                            'END AG 02/08/2010
+                                                        Else
+                                                            CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                                                        End If
+                                                        'END AG 02/08/2010
 
-                                                            'JV 17/12/2013 #1184 - INI
-                                                            If (Not SampleList(j).IsABS_ValueNull) Then
-                                                                ABSValue = SampleList(j).ABS_Value.ToString(GlobalConstants.ABSORBANCE_FORMAT)
-                                                            Else
-                                                                ABSValue = String.Empty
+                                                        'JV 17/12/2013 #1184 - INI
+                                                        If (Not SampleList(j).IsABS_ValueNull) Then
+                                                            ABSValue = SampleList(j).ABS_Value.ToString(GlobalConstants.ABSORBANCE_FORMAT)
+                                                        Else
+                                                            ABSValue = String.Empty
+                                                        End If
+                                                        'JV 17/12/2013 #1184 - END
+
+                                                        'AG 15/09/2010 - Special case when Absorbance has error
+                                                        If (Not SampleList(j).IsABS_ErrorNull) Then
+                                                            If (Not String.IsNullOrEmpty(SampleList(j).ABS_Error)) Then
+                                                                ABSValue = GlobalConstants.ABSORBANCE_ERROR
+                                                                CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
                                                             End If
-                                                            'JV 17/12/2013 #1184 - END
+                                                        End If
+                                                        'END AG 15/09/2010
 
-                                                            'AG 15/09/2010 - Special case when Absorbance has error
-                                                            If (Not SampleList(j).IsABS_ErrorNull) Then
-                                                                If (Not String.IsNullOrEmpty(SampleList(j).ABS_Error)) Then
-                                                                    ABSValue = GlobalConstants.ABSORBANCE_ERROR
-                                                                    CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
-                                                                End If
+                                                        ResultDate = SampleList(j).ResultDate.ToString(DatePattern) & " " & _
+                                                                     SampleList(j).ResultDate.ToString(TimePattern)
+
+                                                        'AG 03/10/2013 - compact report shows the barcode here because there is not header
+                                                        If pCompact Then
+                                                            If Not SampleList(j).IsSpecimenIDListNull Then
+                                                                DetailPatientID &= " (" & SampleList(j).SpecimenIDList & ")"
                                                             End If
-                                                            'END AG 15/09/2010
+                                                        End If
+                                                        'AG 03/10/2013
 
-                                                            ResultDate = SampleList(j).ResultDate.ToString(DatePattern) & " " & _
-                                                                         SampleList(j).ResultDate.ToString(TimePattern)
-
-                                                            'AG 03/10/2013 - compact report shows the barcode here because there is not header
-                                                            If pCompact Then
-                                                                If Not SampleList(j).IsSpecimenIDListNull Then
-                                                                    DetailPatientID &= " (" & SampleList(j).SpecimenIDList & ")"
-                                                                End If
-                                                            End If
-                                                            'AG 03/10/2013
-
-                                                            'Insert Details row
+                                                        'Insert Details row
                                                             ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, _
                                                                                                                              SampleType, ReplicateNumber, _
                                                                                                                              ABSValue, CONC_Value, _
                                                                                                                              ReferenceRanges, Unit, _
-                                                                                                                             ResultDate, Remarks)
-                                                        Next
-                                                    End If
+                                                                                                                             ResultDate, Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+                                                    Next
                                                 End If
+                            End If
                                             Next
                                         Next
                                     Next
@@ -5544,7 +5564,7 @@ Namespace Biosystems.Ax00.BL
                             literalPerformedBy = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
 
                             Dim literalComments As String
-                            literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Remarks", CurrentLanguage)
+                            literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)  'EF 03/06/2014 (cargar texto LBL_FLags)
 
                             'RH 15/05/2012 Get Patient data
                             Dim myPatientsDelegate As New PatientDelegate
@@ -5651,7 +5671,7 @@ Namespace Biosystems.Ax00.BL
                                     Dim ReferenceRanges As String
                                     Dim Unit As String
                                     Dim ResultDate As String
-                                    Dim Remarks As String
+                                    Dim Flags As String  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
 
                                     Dim tmpOrderTestId As Integer
                                     Dim IsAverageDone As Dictionary(Of String, Boolean)
@@ -5765,19 +5785,30 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                     'END AG 15/09/2010
 
+                                                    'EF 03/06/2014 - Provisional v3.0.1 (PENDIENTE hacer un metodo único que devuelva el valor del FLAG a todos los reports, pantallas, etc y reutilizar!!)
                                                     'RH 16/05/2012
-                                                    Remarks = String.Empty
-
+                                                    Flags = String.Empty
+                                                    '    'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
                                                     If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
                                                         (IsNumeric(CONC_Value))) Then
                                                         If (Not resultRow.IsNormalLowerLimitNull AndAlso Not resultRow.IsNormalUpperLimitNull) Then
-                                                            If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) OrElse _
-                                                                CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit) Then
-                                                                Remarks = "*"
+                                                            If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) Then
+                                                                Flags = GlobalConstants.LOW '"L"
+                                                            ElseIf (CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit)) Then
+                                                                Flags = GlobalConstants.HIGH '"H"
                                                             End If
                                                         End If
                                                     End If
                                                     'RH 16/05/2012 - END
+                                                    'If there are Panic Ranges informed, then verify if the result is out of the limits of the PANIC RANGE
+                                                    If IsNumeric(CONC_Value) And (Not resultRow.IsPanicLowerLimitNull AndAlso Not resultRow.IsPanicUpperLimitNull) Then
+                                                        If (CSng(CONC_Value) < CSng(resultRow.PanicLowerLimit)) Then
+                                                            Flags = GlobalConstants.PANIC_LOW  'PL
+                                                        ElseIf (CSng(resultRow.PanicUpperLimit) < CSng(CONC_Value)) Then
+                                                            Flags = GlobalConstants.PANIC_HIGH 'PH 
+                                                        End If
+                                                    End If
+                                                    'EF 03/06/2014 END
 
                                                     ResultDate = resultRow.ResultDateTime.ToString(DatePattern) & " " & _
                                                                  resultRow.ResultDateTime.ToString(TimePattern)
@@ -5794,7 +5825,7 @@ Namespace Biosystems.Ax00.BL
                                                     ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, SampleType, _
                                                                                                                      ReplicateNumber, ABSValue, CONC_Value, _
                                                                                                                      ReferenceRanges, Unit, ResultDate, _
-                                                                                                                     Remarks)
+                                                                                                                     Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
 
                                                     tmpOrderTestId = resultRow.OrderTestID
                                                     Dim myRerunNumber As Integer = resultRow.RerunNumber 'AG 04/08/2010
@@ -5805,7 +5836,7 @@ Namespace Biosystems.Ax00.BL
                                                                                                                         Select row).ToList()
 
                                                     If (GetReplicates AndAlso (SampleList.Count > 0)) Then
-                                                        Remarks = String.Empty
+                                                        Flags = String.Empty  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
                                                         TestName = String.Empty
                                                         SampleType = String.Empty
                                                         ReferenceRanges = String.Empty
@@ -5860,7 +5891,7 @@ Namespace Biosystems.Ax00.BL
                                                                                                                              SampleType, ReplicateNumber, _
                                                                                                                              ABSValue, CONC_Value, _
                                                                                                                              ReferenceRanges, Unit, _
-                                                                                                                             ResultDate, Remarks)
+                                                                                                                             ResultDate, Flags) 'EF 03/06/2014 (cambio nombre variable 'remarks' a Flags)
                                                         Next
                                                     End If
                                                 End If

@@ -19,19 +19,19 @@ Partial Public Class MASTERTEMPLATE
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim ShapeRectangle1 As DevExpress.XtraPrinting.Shape.ShapeRectangle = New DevExpress.XtraPrinting.Shape.ShapeRectangle
-        Me.Detail = New DevExpress.XtraReports.UI.DetailBand
-        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand
-        Me.XrShape1 = New DevExpress.XtraReports.UI.XRShape
-        Me.XrLabel1 = New DevExpress.XtraReports.UI.XRLabel
-        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand
-        Me.PageHeader = New DevExpress.XtraReports.UI.PageHeaderBand
-        Me.PageFooter = New DevExpress.XtraReports.UI.PageFooterBand
+        Me.Detail = New DevExpress.XtraReports.UI.DetailBand()
+        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand()
+        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
+        Me.PageHeader = New DevExpress.XtraReports.UI.PageHeaderBand()
+        Me.PageFooter = New DevExpress.XtraReports.UI.PageFooterBand()
+        Me.XrPageInfo1 = New DevExpress.XtraReports.UI.XRPageInfo()
+        Me.XrReportDate1 = New DevExpress.XtraReports.UI.XRPageInfo()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
         '
         'Detail
         '
         Me.Detail.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.Detail.HeightF = 103.125!
         Me.Detail.LockedInUserDesigner = True
         Me.Detail.Name = "Detail"
         Me.Detail.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
@@ -39,30 +39,15 @@ Partial Public Class MASTERTEMPLATE
         '
         'TopMargin
         '
-        Me.TopMargin.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrShape1, Me.XrLabel1})
+        Me.TopMargin.HeightF = 59.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.TopMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
-        'XrShape1
-        '
-        Me.XrShape1.LocationFloat = New DevExpress.Utils.PointFloat(545.75!, 44.33336!)
-        Me.XrShape1.Name = "XrShape1"
-        Me.XrShape1.Shape = ShapeRectangle1
-        Me.XrShape1.SizeF = New System.Drawing.SizeF(81.25!, 42.66664!)
-        '
-        'XrLabel1
-        '
-        Me.XrLabel1.LocationFloat = New DevExpress.Utils.PointFloat(562.75!, 57.0!)
-        Me.XrLabel1.Name = "XrLabel1"
-        Me.XrLabel1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabel1.SizeF = New System.Drawing.SizeF(43.75!, 23.0!)
-        Me.XrLabel1.Text = "LOGO"
-        '
         'BottomMargin
         '
         Me.BottomMargin.BackColor = System.Drawing.Color.Gainsboro
-        Me.BottomMargin.LockedInUserDesigner = True
+        Me.BottomMargin.HeightF = 25.0!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.StylePriority.UseBackColor = False
@@ -74,7 +59,35 @@ Partial Public Class MASTERTEMPLATE
         '
         'PageFooter
         '
+        Me.PageFooter.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrReportDate1, Me.XrPageInfo1})
+        Me.PageFooter.HeightF = 99.99998!
         Me.PageFooter.Name = "PageFooter"
+        '
+        'XrPageInfo1
+        '
+        Me.XrPageInfo1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.XrPageInfo1.LocationFloat = New DevExpress.Utils.PointFloat(609.7501!, 84.99998!)
+        Me.XrPageInfo1.Name = "XrPageInfo1"
+        Me.XrPageInfo1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
+        Me.XrPageInfo1.SizeF = New System.Drawing.SizeF(91.24988!, 15.0!)
+        Me.XrPageInfo1.StylePriority.UseFont = False
+        Me.XrPageInfo1.StylePriority.UseTextAlignment = False
+        Me.XrPageInfo1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.BottomRight
+        Me.XrPageInfo1.Visible = False
+        '
+        'XrReportDate1
+        '
+        Me.XrReportDate1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.XrReportDate1.Format = "{0:dd/MM/yyyy HH:mm}"
+        Me.XrReportDate1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 84.99998!)
+        Me.XrReportDate1.Name = "XrReportDate1"
+        Me.XrReportDate1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
+        Me.XrReportDate1.PageInfo = DevExpress.XtraPrinting.PageInfo.DateTime
+        Me.XrReportDate1.SizeF = New System.Drawing.SizeF(227.0833!, 15.0!)
+        Me.XrReportDate1.StylePriority.UseFont = False
+        Me.XrReportDate1.StylePriority.UseTextAlignment = False
+        Me.XrReportDate1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
+        Me.XrReportDate1.Visible = False
         '
         'MASTERTEMPLATE
         '
@@ -82,6 +95,7 @@ Partial Public Class MASTERTEMPLATE
         Me.DesignerOptions.ShowDesignerHints = False
         Me.DesignerOptions.ShowExportWarnings = False
         Me.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 25)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
@@ -95,6 +109,6 @@ Partial Public Class MASTERTEMPLATE
     Friend WithEvents BottomMargin As DevExpress.XtraReports.UI.BottomMarginBand
     Friend WithEvents PageHeader As DevExpress.XtraReports.UI.PageHeaderBand
     Friend WithEvents PageFooter As DevExpress.XtraReports.UI.PageFooterBand
-    Friend WithEvents XrLabel1 As DevExpress.XtraReports.UI.XRLabel
-    Friend WithEvents XrShape1 As DevExpress.XtraReports.UI.XRShape
+    Friend WithEvents XrReportDate1 As DevExpress.XtraReports.UI.XRPageInfo
+    Friend WithEvents XrPageInfo1 As DevExpress.XtraReports.UI.XRPageInfo
 End Class
