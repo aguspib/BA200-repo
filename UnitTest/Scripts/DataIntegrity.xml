@@ -1880,18 +1880,6 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.0</Version>
-    <Label>Data validation in tfmwVersions Table</Label>
-    <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.0'
-      AND ServiceSoftware = '1.2.0'AND FirmwareScripts = '1.1.0'AND Firmware = '2.06')= 1
-      SELECT 'True'
-      ELSE
-      SELECT 'False'
-    </Script>
-    <Result>True</Result>
-  </IntegrityValidation>
-  <IntegrityValidation>
-    <Version>3.0</Version>
     <Label>Settings ID BARCODE_SAMPLEID_FLAG and assigne same value as Sample type flag. </Label>
     <Script>
       IF (SELECT COUNT(*) FROM tcfgUserSettings WHERE SettingID = 'BARCODE_SAMPLEID_FLAG'
@@ -2525,6 +2513,18 @@
     <Label>Message MSG_ONLY_ISE_WS_NOT_STARTED2 exist</Label>
     <Script>
       IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'ONLY_ISE_WS_NOT_STARTED2') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.01</Version>
+    <Label>Data validation in tfmwVersions Table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.1'
+      AND ServiceSoftware = '1.2.1' AND FirmwareScripts = '1.1.0' AND Firmware = '2.08')= 1
       SELECT 'True'
       ELSE
       SELECT 'False'
