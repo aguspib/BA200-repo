@@ -69,7 +69,7 @@ Public Class XRManager
 
 
               
-                    'EF 04/06/2014 (labels for titles)
+                    'EF 04/06/2014 #1649 (labels for titles)
                     Report.XrLabel_PatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage) & ":"
                     Report.XrLabel_PatientName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", CurrentLanguage) & ":"
                     Report.XrLabel_Gender.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", CurrentLanguage) & ":"
@@ -1023,7 +1023,13 @@ Public Class XRManager
                     'Multilanguage. Get texts from DB.
                     Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurrentResults_Patient", CurrentLanguage)
                     Report.SetHeaderLabel(literalHeaderLabel)
-
+                    'EF 05/06/2014 #1649 (labels for titles)
+                    Report.XrLabel_PatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage) & ":"
+                    Report.XrLabel_PatientName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", CurrentLanguage) & ":"
+                    Report.XrLabel_Gender.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", CurrentLanguage) & ":"
+                    Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
+                    Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
+                    'EF 05/06/2014 END
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                     Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)
