@@ -888,6 +888,14 @@ Public Class XRManager
                     Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurrentResults_Patient", CurrentLanguage)     'DL 14/01/2012 '"Current Results by Patient Sample" "*Historic Patient Results" '
                     Report.SetHeaderLabel(literalHeaderLabel)
 
+                    'EF 05/06/2014 #1649 (labels for titles)
+                    Report.XrLabel_PatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage) & ":"
+                    Report.XrLabel_PatientName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", CurrentLanguage) & ":"
+                    Report.XrLabel_Gender.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", CurrentLanguage) & ":"
+                    Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
+                    Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
+                    'EF 05/06/2014 END
+
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                     Report.XrLabelFlags.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Flags", CurrentLanguage) 'EF 03/06/2014 (cambio texto por LBL_Flags)
