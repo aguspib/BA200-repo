@@ -481,8 +481,7 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshCommonArea(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            'Dim StartTime As DateTime = Now
-            If (IsDisposed) Then Exit Sub ' XB 27/05/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'LEDs AREA
             UpdateLeds()
@@ -574,7 +573,7 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshRotors(ByVal pEventType As GlobalEnumerates.UI_RefreshEvents, ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            If (IsDisposed) Then Exit Sub
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim tmpReagentsUpdatePosition As New WSRotorContentByPositionDS
             Dim tmpSamplesUpdatePosition As New WSRotorContentByPositionDS
@@ -851,7 +850,7 @@ Public Class IMonitor
             '    Exit Sub
             'End If
 
-            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If Not mdiAnalyzerCopy Is Nothing Then
 
@@ -898,12 +897,13 @@ Public Class IMonitor
         Try
             RefreshDoneField = False 'RH 28/03/2012
 
-            If (IsDisposed) Then Exit Sub 'AG 03/04/2012
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 
             myLogAcciones.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS) OrElse _
                 pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED) Then
@@ -1006,6 +1006,7 @@ Public Class IMonitor
             End If
 
             myLogAcciones.CreateLogActivity("Refresh monitor screen (complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             ''AG 12/04/2012 - If WS aborted then show message in the app status bar
             'If WorkSessionStatusField = "ABORTED" Then
@@ -1040,7 +1041,7 @@ Public Class IMonitor
     ''' Modified by XB 17/01/2014 - Improve Dispose
     ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
         Try
             'isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
@@ -1451,8 +1452,8 @@ Public Class IMonitor
             'ISELed.StateIndex = rnd.Next Mod 4
             'A400Led.StateIndex = rnd.Next Mod 4
             'FridgeStateLed.StateIndex = rnd.Next Mod 4
-            If (IsDisposed) Then Exit Sub
 
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If (Not mdiAnalyzerCopy Is Nothing) Then
                 Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = mdiAnalyzerCopy.AnalyzerStatus
@@ -2262,6 +2263,9 @@ Public Class IMonitor
 
 
     Public Sub New()
+
+        CreateLogActivity("New Instance", "IMonitor.New ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+
         ' XB 25/11/2013 - Inform to MDI that this screen is building - Task #1303
         LoadingScreen()
 

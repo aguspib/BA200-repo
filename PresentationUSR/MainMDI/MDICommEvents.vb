@@ -1523,8 +1523,10 @@ Partial Public Class IAx00MainMDI
             If Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
                     Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    MonitorTreated = True
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        MonitorTreated = True
+                    End If
                 End If
             End If
 
@@ -1688,88 +1690,95 @@ Partial Public Class IAx00MainMDI
 
                 If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
                     Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    monitorTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        monitorTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                     'AG 16/03/2012 - If no reactions rotor alarm appears while the UI is disabled we must reactivated it
                     'Change rotor
                 ElseIf (TypeOf myCurrentMDIForm Is IChangeRotor AndAlso Not changeRotorTreated) Then
                     Dim CurrentMdiChild As IChangeRotor = CType(myCurrentMDIForm, IChangeRotor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                    changeRotorTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-                    'AG 16/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                        changeRotorTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                        'AG 16/03/2012
+                    End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode button. Else enable it
                     'Sample request
 
-                ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
+                    ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
                     Dim CurrentMdiChild As IConditioning = CType(myCurrentMDIForm, IConditioning)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                    'conditioningTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'DL 05/06/2012
-                    'DL 05/06/2012
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                        'conditioningTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'DL 05/06/2012
+                        'DL 05/06/2012
+                    End If
+                    ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
+                        Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                        If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                            CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
+                            refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                        End If
+                        'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode /Check bottle volume button. Else enable it
+                        'Rotor positions
+                    ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
+                        Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                        If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                            CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
+                            refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                        End If
+                        'AG 28/03/2012 - When cover open and enabled alarms appears it disables ISE command button. Else enable it
+                    ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
+                        Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
+                    End If
 
-                ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                    Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
-                    'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode /Check bottle volume button. Else enable it
-                    'Rotor positions
-                ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
-                    'AG 28/03/2012 - When cover open and enabled alarms appears it disables ISE command button. Else enable it
-                ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                    Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                 End If
 
-            End If
-
-            'AG 17/10/2011
-            If processingBeforeRunning = "0" Then refreshTriggeredFlag = False 'AG 23/01/2012 - special case: enter running process in progress
-            If MdiChildIsDisabled AndAlso refreshTriggeredFlag Then
-                'Activate the current mdi child who is disabled once the refresh method is finished
-                If DisabledMDIChildAttribute.Count > 0 Then
-                    DisabledMDIChildAttribute(0).Enabled = True
-                    If DisabledMDIChildAttribute.Count = 1 Then
-                        DisabledMDIChildAttribute.Clear()
-                    Else
-                        DisabledMDIChildAttribute.Remove(DisabledMDIChildAttribute(0))
+                'AG 17/10/2011
+                If processingBeforeRunning = "0" Then refreshTriggeredFlag = False 'AG 23/01/2012 - special case: enter running process in progress
+                If MdiChildIsDisabled AndAlso refreshTriggeredFlag Then
+                    'Activate the current mdi child who is disabled once the refresh method is finished
+                    If DisabledMDIChildAttribute.Count > 0 Then
+                        DisabledMDIChildAttribute(0).Enabled = True
+                        If DisabledMDIChildAttribute.Count = 1 Then
+                            DisabledMDIChildAttribute.Clear()
+                        Else
+                            DisabledMDIChildAttribute.Remove(DisabledMDIChildAttribute(0))
+                        End If
                     End If
                 End If
-            End If
-            'AG 17/10/2011
+                'AG 17/10/2011
 
-            'DL 31/07/2012. Begin
-            Dim linq As New List(Of UIRefreshDS.ReceivedAlarmsRow)
+                'DL 31/07/2012. Begin
+                Dim linq As New List(Of UIRefreshDS.ReceivedAlarmsRow)
 
-            'DisconnectComms GUI
-            linq = (From a As UIRefreshDS.ReceivedAlarmsRow In copyRefreshDS.ReceivedAlarms _
-                     Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CPU_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_REPOSITORY_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR.ToString) _
-                    OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_MAN_ERR.ToString)) _
-                       And a.AlarmStatus = True _
-                    Select a).ToList
+                'DisconnectComms GUI
+                linq = (From a As UIRefreshDS.ReceivedAlarmsRow In copyRefreshDS.ReceivedAlarms _
+                         Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CPU_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_REPOSITORY_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CHECKSUM_ERR.ToString) _
+                        OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_MAN_ERR.ToString)) _
+                           And a.AlarmStatus = True _
+                        Select a).ToList
 
-            If linq.Count > 0 Then DisconnectComms()
-            'DL 31/07/2012. End
-            linq = Nothing
+                If linq.Count > 0 Then DisconnectComms()
+                'DL 31/07/2012. End
+                linq = Nothing
 
-            'Alarm Messages (Messages do not required ActiveMdiChild)
-            '--------------------------------------------------------
-            '(All screens) Finally show message depending the alarms received and update vertical button bar depending the current alarms
-            ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS)
-            SetActionButtonsEnableProperty(True)
-            'Debug.Print("ShowAlarmsOrSensorsWarningMessages called from ManageReceptionEvent-1")
+                'Alarm Messages (Messages do not required ActiveMdiChild)
+                '--------------------------------------------------------
+                '(All screens) Finally show message depending the alarms received and update vertical button bar depending the current alarms
+                ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS)
+                SetActionButtonsEnableProperty(True)
+                'Debug.Print("ShowAlarmsOrSensorsWarningMessages called from ManageReceptionEvent-1")
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewAlarmsReception ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewAlarmsReception ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2059,15 +2068,17 @@ Partial Public Class IAx00MainMDI
                     If Not myCurrentMDIForm Is Nothing Then
                         If (TypeOf myCurrentMDIForm Is IMonitor) Then
                             Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
-                            CurrentMdiChild.RefreshAlarmsGlobes(Nothing)
+                            If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                                CurrentMdiChild.RefreshAlarmsGlobes(Nothing)
+                            End If
                         End If
                     End If
                     'AG 23/05/2012
 
-                End If
-                'TR 20/09/2012 Commented by TR. 
-                'EnableButtonAndMenus(True)
-                Cursor = Cursors.Default
+                    End If
+                    'TR 20/09/2012 Commented by TR. 
+                    'EnableButtonAndMenus(True)
+                    Cursor = Cursors.Default
             End If
             lnqRes = Nothing
 
@@ -2188,19 +2199,24 @@ Partial Public Class IAx00MainMDI
                 '- Monitor (Reagents or Sample Rotor) screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
                 If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
                     Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    monitorTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
-                    '- Rotor position screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
-                ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        monitorTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
+                End If
+                '- Rotor position screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
+            ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
+                Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                     wsRotorPositionTreated = True
                     refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                End If
 
-                ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                    Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+            ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
+                Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
                     refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                 End If
