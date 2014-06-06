@@ -20,70 +20,70 @@ Partial Public Class QCIndividualResultsByTestControlReport
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(QCIndividualResultsByTestControlReport))
-        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
-        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions
-        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointOptions1 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim PointOptions2 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointOptions3 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Me.Detail = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrTableReport = New DevExpress.XtraReports.UI.XRTable
-        Me.XrTableReportRow = New DevExpress.XtraReports.UI.XRTableRow
-        Me.XrCellIncludedInMean = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellCalcRunNumber = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellResultDateTime = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellVisibleResultValue = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellMeasureUnit = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellABSError = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellRELErrorPercent = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellAlarmsList = New DevExpress.XtraReports.UI.XRTableCell
-        Me.QcResultsDS1 = New Biosystems.Ax00.Types.QCResultsDS
-        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand
-        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand
-        Me.ReportHeader = New DevExpress.XtraReports.UI.ReportHeaderBand
-        Me.XrPanel2 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrLabelABSError = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelMeasureUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelVisibleResultValue = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelAlarmsList = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelRELErrorPercent = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelResultDateTime = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCalcRunNumber = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrPanel4 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrRanges = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelRanges = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCV = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrCV = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrSD = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelSD = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrMean = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLotNumber = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelMean = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelLotNumber = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrControlName = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelControlName = New DevExpress.XtraReports.UI.XRLabel
-        Me.GroupFooter1 = New DevExpress.XtraReports.UI.GroupFooterBand
-        Me.XrPnlLegend = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrPicWarning = New DevExpress.XtraReports.UI.XRPictureBox
-        Me.XrLabelWarning = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelError = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrPicError = New DevExpress.XtraReports.UI.XRPictureBox
-        Me.XrLJGraph = New DevExpress.XtraReports.UI.XRChart
-        Me.XrPanel3 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrGraphHeaderLabel = New DevExpress.XtraReports.UI.XRLabel
-        Me.ControlLotID = New DevExpress.XtraReports.Parameters.Parameter
-        Me.QcIndividualResultsByTestReport1 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport
-        Me.QcIndividualResultsByTestReport2 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport
-        Me.QcIndividualResultsByTestReport3 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport
-        Me.QcIndividualResultsByTestReport4 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport
-        Me.QcIndividualResultsByTestReport5 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport
+        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
+        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions()
+        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim PointOptions1 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions()
+        Dim PointOptions2 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions()
+        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim PointOptions3 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions()
+        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Me.Detail = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrTableReport = New DevExpress.XtraReports.UI.XRTable()
+        Me.XrTableReportRow = New DevExpress.XtraReports.UI.XRTableRow()
+        Me.XrCellIncludedInMean = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellCalcRunNumber = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellResultDateTime = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellVisibleResultValue = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellMeasureUnit = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellABSError = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellRELErrorPercent = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellAlarmsList = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.QcResultsDS1 = New Biosystems.Ax00.Types.QCResultsDS()
+        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand()
+        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
+        Me.ReportHeader = New DevExpress.XtraReports.UI.ReportHeaderBand()
+        Me.XrPanel2 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrLabelABSError = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelMeasureUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelVisibleResultValue = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelAlarmsList = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelRELErrorPercent = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelResultDateTime = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCalcRunNumber = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrPanel4 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrRanges = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelRanges = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCV = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrCV = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrSD = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelSD = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrMean = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLotNumber = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelMean = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelLotNumber = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrControlName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelControlName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.GroupFooter1 = New DevExpress.XtraReports.UI.GroupFooterBand()
+        Me.XrPnlLegend = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrPicWarning = New DevExpress.XtraReports.UI.XRPictureBox()
+        Me.XrLabelWarning = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelError = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrPicError = New DevExpress.XtraReports.UI.XRPictureBox()
+        Me.XrLJGraph = New DevExpress.XtraReports.UI.XRChart()
+        Me.XrPanel3 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrGraphHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
+        Me.ControlLotID = New DevExpress.XtraReports.Parameters.Parameter()
+        Me.QcIndividualResultsByTestReport1 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport()
+        Me.QcIndividualResultsByTestReport2 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport()
+        Me.QcIndividualResultsByTestReport3 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport()
+        Me.QcIndividualResultsByTestReport4 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport()
+        Me.QcIndividualResultsByTestReport5 = New Biosystems.Ax00.PresentationCOM.QCIndividualResultsByTestReport()
         CType(Me.XrTableReport, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.QcResultsDS1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XrLJGraph, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -113,13 +113,13 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrTableReport.LocationFloat = New DevExpress.Utils.PointFloat(10.00023!, 0.0!)
         Me.XrTableReport.Name = "XrTableReport"
         Me.XrTableReport.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableReportRow})
-        Me.XrTableReport.SizeF = New System.Drawing.SizeF(630.0!, 22.0!)
+        Me.XrTableReport.SizeF = New System.Drawing.SizeF(680.9998!, 22.0!)
         '
         'XrTableReportRow
         '
         Me.XrTableReportRow.Cells.AddRange(New DevExpress.XtraReports.UI.XRTableCell() {Me.XrCellIncludedInMean, Me.XrCellCalcRunNumber, Me.XrCellResultDateTime, Me.XrCellVisibleResultValue, Me.XrCellMeasureUnit, Me.XrCellABSError, Me.XrCellRELErrorPercent, Me.XrCellAlarmsList})
         Me.XrTableReportRow.Name = "XrTableReportRow"
-        Me.XrTableReportRow.Weight = 0.88
+        Me.XrTableReportRow.Weight = 0.88R
         '
         'XrCellIncludedInMean
         '
@@ -128,7 +128,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellIncludedInMean.Name = "XrCellIncludedInMean"
         Me.XrCellIncludedInMean.StylePriority.UseFont = False
         Me.XrCellIncludedInMean.Text = "XrCellIncludedInMean"
-        Me.XrCellIncludedInMean.Weight = 0.10476190476190478
+        Me.XrCellIncludedInMean.Weight = 0.10476190476190478R
         '
         'XrCellCalcRunNumber
         '
@@ -139,7 +139,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellCalcRunNumber.StylePriority.UseTextAlignment = False
         Me.XrCellCalcRunNumber.Text = "XrCellCalcRunNumber"
         Me.XrCellCalcRunNumber.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter
-        Me.XrCellCalcRunNumber.Weight = 0.15238095238095242
+        Me.XrCellCalcRunNumber.Weight = 0.15238095238095242R
         '
         'XrCellResultDateTime
         '
@@ -148,7 +148,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellResultDateTime.Name = "XrCellResultDateTime"
         Me.XrCellResultDateTime.StylePriority.UseFont = False
         Me.XrCellResultDateTime.Text = "XrCellGetCurrentColumnValue(""ResultDate"")"
-        Me.XrCellResultDateTime.Weight = 0.62142755417596707
+        Me.XrCellResultDateTime.Weight = 0.61822902179864236R
         '
         'XrCellVisibleResultValue
         '
@@ -158,8 +158,8 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellVisibleResultValue.StylePriority.UseFont = False
         Me.XrCellVisibleResultValue.StylePriority.UseTextAlignment = False
         Me.XrCellVisibleResultValue.Text = "XrCellVisibleResultValue"
-        Me.XrCellVisibleResultValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrCellVisibleResultValue.Weight = 0.36904870896112368
+        Me.XrCellVisibleResultValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
+        Me.XrCellVisibleResultValue.Weight = 0.37224724133844833R
         '
         'XrCellMeasureUnit
         '
@@ -170,7 +170,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellMeasureUnit.StylePriority.UseTextAlignment = False
         Me.XrCellMeasureUnit.Text = "XrCellMeasureUnit"
         Me.XrCellMeasureUnit.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter
-        Me.XrCellMeasureUnit.Weight = 0.25347246442522309
+        Me.XrCellMeasureUnit.Weight = 0.38129582315253657R
         '
         'XrCellABSError
         '
@@ -181,7 +181,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellABSError.StylePriority.UseTextAlignment = False
         Me.XrCellABSError.Text = "XrCellABSError"
         Me.XrCellABSError.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter
-        Me.XrCellABSError.Weight = 0.32961323147728339
+        Me.XrCellABSError.Weight = 0.34600400001862325R
         '
         'XrCellRELErrorPercent
         '
@@ -192,7 +192,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellRELErrorPercent.StylePriority.UseTextAlignment = False
         Me.XrCellRELErrorPercent.Text = "XrCellRELErrorPercent"
         Me.XrCellRELErrorPercent.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopCenter
-        Me.XrCellRELErrorPercent.Weight = 0.42810029983520509
+        Me.XrCellRELErrorPercent.Weight = 0.39464055302812462R
         '
         'XrCellAlarmsList
         '
@@ -205,7 +205,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrCellAlarmsList.StylePriority.UseTextAlignment = False
         Me.XrCellAlarmsList.Text = "XrCellAlarmsList"
         Me.XrCellAlarmsList.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrCellAlarmsList.Weight = 0.74119488398234035
+        Me.XrCellAlarmsList.Weight = 0.63044050352076741R
         '
         'QcResultsDS1
         '
@@ -214,14 +214,14 @@ Partial Public Class QCIndividualResultsByTestControlReport
         '
         'TopMargin
         '
-        Me.TopMargin.HeightF = 37.5!
+        Me.TopMargin.HeightF = 38.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.TopMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
         'BottomMargin
         '
-        Me.BottomMargin.HeightF = 69.91666!
+        Me.BottomMargin.HeightF = 25.0!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -239,7 +239,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelABSError, Me.XrLabelMeasureUnit, Me.XrLabelVisibleResultValue, Me.XrLabelAlarmsList, Me.XrLabelRELErrorPercent, Me.XrLabelResultDateTime, Me.XrLabelCalcRunNumber})
         Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(10.00023!, 66.87498!)
         Me.XrPanel2.Name = "XrPanel2"
-        Me.XrPanel2.SizeF = New System.Drawing.SizeF(630.0!, 23.12501!)
+        Me.XrPanel2.SizeF = New System.Drawing.SizeF(680.9998!, 23.125!)
         Me.XrPanel2.StylePriority.UseBorders = False
         Me.XrPanel2.StylePriority.UseBorderWidth = False
         '
@@ -247,7 +247,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         '
         Me.XrLabelABSError.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelABSError.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelABSError.LocationFloat = New DevExpress.Utils.PointFloat(319.4728!, 0.00003178914!)
+        Me.XrLabelABSError.LocationFloat = New DevExpress.Utils.PointFloat(369.7635!, 0.0!)
         Me.XrLabelABSError.Name = "XrLabelABSError"
         Me.XrLabelABSError.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
         Me.XrLabelABSError.SizeF = New System.Drawing.SizeF(78.22507!, 19.99995!)
@@ -262,7 +262,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         '
         Me.XrLabelMeasureUnit.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelMeasureUnit.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelMeasureUnit.LocationFloat = New DevExpress.Utils.PointFloat(234.6248!, 0.0!)
+        Me.XrLabelMeasureUnit.LocationFloat = New DevExpress.Utils.PointFloat(283.2095!, 0.0!)
         Me.XrLabelMeasureUnit.Name = "XrLabelMeasureUnit"
         Me.XrLabelMeasureUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
         Me.XrLabelMeasureUnit.SizeF = New System.Drawing.SizeF(84.84799!, 20.00001!)
@@ -277,7 +277,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         '
         Me.XrLabelVisibleResultValue.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelVisibleResultValue.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelVisibleResultValue.LocationFloat = New DevExpress.Utils.PointFloat(150.1247!, 0.0!)
+        Me.XrLabelVisibleResultValue.LocationFloat = New DevExpress.Utils.PointFloat(198.7094!, 0.0!)
         Me.XrLabelVisibleResultValue.Name = "XrLabelVisibleResultValue"
         Me.XrLabelVisibleResultValue.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 5, 2, 2, 100.0!)
         Me.XrLabelVisibleResultValue.SizeF = New System.Drawing.SizeF(84.50012!, 20.00002!)
@@ -286,13 +286,13 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrLabelVisibleResultValue.StylePriority.UsePadding = False
         Me.XrLabelVisibleResultValue.StylePriority.UseTextAlignment = False
         Me.XrLabelVisibleResultValue.Text = "Value"
-        Me.XrLabelVisibleResultValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
+        Me.XrLabelVisibleResultValue.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
         'XrLabelAlarmsList
         '
         Me.XrLabelAlarmsList.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelAlarmsList.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelAlarmsList.LocationFloat = New DevExpress.Utils.PointFloat(493.0981!, 0.0!)
+        Me.XrLabelAlarmsList.LocationFloat = New DevExpress.Utils.PointFloat(537.8899!, 0.0!)
         Me.XrLabelAlarmsList.Name = "XrLabelAlarmsList"
         Me.XrLabelAlarmsList.Padding = New DevExpress.XtraPrinting.PaddingInfo(5, 2, 2, 2, 100.0!)
         Me.XrLabelAlarmsList.SizeF = New System.Drawing.SizeF(112.5259!, 20.00001!)
@@ -305,7 +305,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         '
         Me.XrLabelRELErrorPercent.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelRELErrorPercent.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelRELErrorPercent.LocationFloat = New DevExpress.Utils.PointFloat(403.1971!, 0.0!)
+        Me.XrLabelRELErrorPercent.LocationFloat = New DevExpress.Utils.PointFloat(447.9886!, 0.0!)
         Me.XrLabelRELErrorPercent.Name = "XrLabelRELErrorPercent"
         Me.XrLabelRELErrorPercent.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
         Me.XrLabelRELErrorPercent.SizeF = New System.Drawing.SizeF(89.90109!, 20.00001!)
@@ -320,10 +320,10 @@ Partial Public Class QCIndividualResultsByTestControlReport
         '
         Me.XrLabelResultDateTime.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelResultDateTime.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelResultDateTime.LocationFloat = New DevExpress.Utils.PointFloat(52.41661!, 0.000007629395!)
+        Me.XrLabelResultDateTime.LocationFloat = New DevExpress.Utils.PointFloat(52.41661!, 0.0!)
         Me.XrLabelResultDateTime.Name = "XrLabelResultDateTime"
         Me.XrLabelResultDateTime.Padding = New DevExpress.XtraPrinting.PaddingInfo(5, 2, 2, 2, 100.0!)
-        Me.XrLabelResultDateTime.SizeF = New System.Drawing.SizeF(97.7081!, 20.00001!)
+        Me.XrLabelResultDateTime.SizeF = New System.Drawing.SizeF(141.0832!, 20.00001!)
         Me.XrLabelResultDateTime.StylePriority.UseBorders = False
         Me.XrLabelResultDateTime.StylePriority.UseFont = False
         Me.XrLabelResultDateTime.StylePriority.UsePadding = False
@@ -349,12 +349,12 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrPanel4.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPanel4.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel4.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel4.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrRanges, Me.XrLabelRanges, Me.XrLabelCV, Me.XrCV, Me.XrSD, Me.XrLabelSD, Me.XrUnit, Me.XrLabelUnit, Me.XrMean, Me.XrLotNumber, Me.XrLabelMean, Me.XrLabelLotNumber, Me.XrControlName, Me.XrLabelControlName})
         Me.XrPanel4.LocationFloat = New DevExpress.Utils.PointFloat(0.0001907349!, 0.8333365!)
         Me.XrPanel4.Name = "XrPanel4"
-        Me.XrPanel4.SizeF = New System.Drawing.SizeF(649.9998!, 49.79167!)
+        Me.XrPanel4.SizeF = New System.Drawing.SizeF(690.9998!, 49.79167!)
         Me.XrPanel4.StylePriority.UseBackColor = False
         Me.XrPanel4.StylePriority.UseBorderColor = False
         Me.XrPanel4.StylePriority.UseBorders = False
@@ -558,11 +558,11 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrPnlLegend.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPnlLegend.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPnlLegend.Borders = CType(((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPnlLegend.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrPicWarning, Me.XrLabelWarning, Me.XrLabelError, Me.XrPicError})
         Me.XrPnlLegend.LocationFloat = New DevExpress.Utils.PointFloat(10.00023!, 351.6666!)
         Me.XrPnlLegend.Name = "XrPnlLegend"
-        Me.XrPnlLegend.SizeF = New System.Drawing.SizeF(627.4994!, 31.25!)
+        Me.XrPnlLegend.SizeF = New System.Drawing.SizeF(680.9998!, 31.25!)
         Me.XrPnlLegend.StylePriority.UseBackColor = False
         Me.XrPnlLegend.StylePriority.UseBorderColor = False
         Me.XrPnlLegend.StylePriority.UseBorders = False
@@ -616,8 +616,8 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrLJGraph.AppearanceName = "Light"
         Me.XrLJGraph.BorderColor = System.Drawing.Color.DarkGray
         Me.XrLJGraph.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         XyDiagram1.AxisX.GridLines.Visible = True
         XyDiagram1.AxisX.Range.SideMarginsEnabled = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
@@ -635,7 +635,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrLJGraph.Legend.Direction = DevExpress.XtraCharts.LegendDirection.LeftToRight
         Me.XrLJGraph.Legend.EquallySpacedItems = False
         Me.XrLJGraph.Legend.Visible = False
-        Me.XrLJGraph.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 55.20831!)
+        Me.XrLJGraph.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 55.2083!)
         Me.XrLJGraph.Name = "XrLJGraph"
         Me.XrLJGraph.PaletteBaseColorNumber = 4
         Me.XrLJGraph.PaletteName = "Black and White"
@@ -658,7 +658,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrLJGraph.SeriesTemplate.LegendPointOptions = PointOptions3
         Me.XrLJGraph.SeriesTemplate.SynchronizePointOptions = False
         Me.XrLJGraph.SeriesTemplate.View = LineSeriesView2
-        Me.XrLJGraph.SizeF = New System.Drawing.SizeF(627.4996!, 296.4583!)
+        Me.XrLJGraph.SizeF = New System.Drawing.SizeF(681.0!, 296.4583!)
         Me.XrLJGraph.StylePriority.UseBackColor = False
         Me.XrLJGraph.StylePriority.UseBorderColor = False
         Me.XrLJGraph.StylePriority.UseBorders = False
@@ -672,12 +672,12 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrPanel3.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPanel3.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel3.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel3.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrGraphHeaderLabel})
-        Me.XrPanel3.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 10.0!)
+        Me.XrPanel3.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 10.00001!)
         Me.XrPanel3.Name = "XrPanel3"
-        Me.XrPanel3.SizeF = New System.Drawing.SizeF(627.4996!, 29.99999!)
+        Me.XrPanel3.SizeF = New System.Drawing.SizeF(681.0!, 29.99999!)
         Me.XrPanel3.StylePriority.UseBackColor = False
         Me.XrPanel3.StylePriority.UseBorderColor = False
         Me.XrPanel3.StylePriority.UseBorders = False
@@ -707,7 +707,10 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.DataMember = "tqcResults"
         Me.DataSource = Me.QcResultsDS1
         Me.FilterString = "[QCControlLotID] = ?ControlLotID"
-        Me.Margins = New System.Drawing.Printing.Margins(100, 100, 38, 70)
+        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 38, 25)
+        Me.PageHeight = 1169
+        Me.PageWidth = 827
+        Me.PaperKind = System.Drawing.Printing.PaperKind.A4
         Me.Parameters.AddRange(New DevExpress.XtraReports.Parameters.Parameter() {Me.ControlLotID})
         Me.RequestParameters = False
         Me.Version = "10.2"
