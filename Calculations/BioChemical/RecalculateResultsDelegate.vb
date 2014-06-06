@@ -718,6 +718,113 @@ Namespace Biosystems.Ax00.Calculations
             'Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' For the informed ISETest/Sample Type, search if there is a Normality Range defined for it.  The searching is different depending on the SampleClass:
+        ''' ** For PATIENT results, search if there is a GENERIC or DETAILED Reference Range defined for the ISE Test/SampleType. For DETAILED Ranges, check which 
+        '''    of them applies according the Patient Demographics of the specified Order Test
+        ''' ** For CONTROL results, search the theoretical Normality range defined for the ISE Test/Sample Type for the specified Control
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pSampleClass">Sample Class: PATIENT or CTRL</param>
+        ''' <param name="pOrderTestID">Order Test Identifier</param>
+        ''' <param name="pTestID">ISE Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCONC_Value">Calculated concentration value for the ISE Test/Sample Type</param>
+        ''' <param name="pControlID">Control Identifier. Optional parameter that has to be informed when funtion is called for SampleClass CTRL</param>
+        ''' <returns>GlobalDataTO containing a string value with one of the following values:
+        '''          ** Empty String: if there is not a Reference Range defined for the ISETest/SampleType or there is one but the result is not out of the limits
+        '''          ** CONC_REMARK7: the result is lesser than the lower limit
+        '''          ** CONC_REMARK8: the result is greater than the upper limit
+        ''' </returns>
+        ''' <remarks>
+        ''' Created by:  SA 06/06/2014 - BT #1660
+        ''' </remarks>
+        Public Function ValidateISERefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleClass As String, ByVal pOrderTestID As Integer, _
+                                             ByVal pTestID As Integer, ByVal pSampleType As String, ByVal pCONC_Value As Single, _
+                                             Optional ByVal pControlID As Integer = -1) As GlobalDataTO
+
+            Dim resultData As GlobalDataTO = Nothing
+            Dim validationResult As String = String.Empty
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim lowerLimit As Single = -1
+                        Dim upperLimit As Single = -1
+
+                        If (pSampleClass = "PATIENT") Then
+                            'Check if there are Reference Ranges defined for the ISE Test/Sample Type and in this case, get the RangeType: GENERIC or DETAILED
+                            Dim myISETestSampleDelegate As New ISETestSamplesDelegate
+                            resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
+
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                Dim myISETestSampleDS As ISETestSamplesDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
+
+                                If (myISETestSampleDS.tparISETestSamples.Count > 0) Then
+                                    If (Not myISETestSampleDS.tparISETestSamples.First.IsActiveRangeTypeNull) AndAlso _
+                                       (myISETestSampleDS.tparISETestSamples.First.ActiveRangeType <> String.Empty) Then
+                                        'Get the Reference Range Interval defined for the ISE Test/SampleType
+                                        Dim myOrderTestsDelegate As New OrderTestsDelegate
+                                        resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", pTestID, pSampleType, _
+                                                                                                    myISETestSampleDS.tparISETestSamples.First.ActiveRangeType)
+
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+                                            If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+                                                lowerLimit = myTestRefRangesDS.tparTestRefRanges.First.NormalLowerLimit
+                                                upperLimit = myTestRefRangesDS.tparTestRefRanges.First.NormalUpperLimit
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+
+                        ElseIf (pSampleClass = "CTRL") Then
+                            'Get the theoretical range limits for the Control
+                            Dim myTestControlsDelegate As New TestControlsDelegate
+                            resultData = myTestControlsDelegate.GetControlsNEW(dbConnection, "ISE", pTestID, pSampleType, pControlID)
+
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                Dim myTestControlsDS As TestControlsDS = DirectCast(resultData.SetDatos, TestControlsDS)
+
+                                If (myTestControlsDS.tparTestControls.Rows.Count > 0) Then
+                                    lowerLimit = myTestControlsDS.tparTestControls.First.MinConcentration
+                                    upperLimit = myTestControlsDS.tparTestControls.First.MaxConcentration
+                                End If
+                            End If
+                        End If
+
+                        'If a Normality Range was found for the ISE Test/Sample Type, validate the Concentration value
+                        If (lowerLimit <> -1 AndAlso upperLimit <> -1) Then
+                            If (pCONC_Value < lowerLimit) Then
+                                validationResult = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                            ElseIf (pCONC_Value > upperLimit) Then
+                                validationResult = GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                            End If
+                        End If
+                    End If
+                End If
+
+                resultData.SetDatos = validationResult
+                resultData.HasError = False
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ValidateISERefRanges", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "METHODS REPLACED FOR NEW ONES DUE TO PERFORMANCE ISSUES"
