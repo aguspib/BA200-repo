@@ -288,7 +288,7 @@ Public Class XRManager
                 rotorReport.XrLabelExpDate.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ExpDate_Short", CurrentLanguage)
                 rotorReport.XrLabelBottle.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                 rotorReport.XrLabelVolume.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Vol_Short", CurrentLanguage) 'EF 06/06/2014 #1649 (Abreviar textos para mejorar Reports)
-                rotorReport.XrLabelRemainingTests.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
+                rotorReport.XrLabelRemainingTests.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Results_Tests", CurrentLanguage)  'EF 06/06/2014 #1649 (texto abreviado)
                 rotorReport.XrLabelStatus.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MainMDI_Status", CurrentLanguage)
                 rotorReport.XrLabel1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Lot", CurrentLanguage)
 
