@@ -183,10 +183,10 @@ Partial Public Class RotorContentPositionsReport
         '
         Me.XrLabelExpDate.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelExpDate.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelExpDate.LocationFloat = New DevExpress.Utils.PointFloat(401.1248!, 0.00003178914!)
+        Me.XrLabelExpDate.LocationFloat = New DevExpress.Utils.PointFloat(409.6248!, 0.00003178914!)
         Me.XrLabelExpDate.Name = "XrLabelExpDate"
         Me.XrLabelExpDate.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelExpDate.SizeF = New System.Drawing.SizeF(73.5!, 20.00001!)
+        Me.XrLabelExpDate.SizeF = New System.Drawing.SizeF(65.0!, 20.00001!)
         Me.XrLabelExpDate.StylePriority.UseBorders = False
         Me.XrLabelExpDate.StylePriority.UseFont = False
         Me.XrLabelExpDate.StylePriority.UseTextAlignment = False
@@ -258,7 +258,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrLabel1.LocationFloat = New DevExpress.Utils.PointFloat(351.6665!, 0.0!)
         Me.XrLabel1.Name = "XrLabel1"
         Me.XrLabel1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabel1.SizeF = New System.Drawing.SizeF(49.45831!, 20.00001!)
+        Me.XrLabel1.SizeF = New System.Drawing.SizeF(57.95828!, 20.00001!)
         Me.XrLabel1.StylePriority.UseBorders = False
         Me.XrLabel1.StylePriority.UseFont = False
         Me.XrLabel1.StylePriority.UseTextAlignment = False
@@ -392,7 +392,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrTableCell1.StylePriority.UseTextAlignment = False
         Me.XrTableCell1.Text = "XrTableCell1"
         Me.XrTableCell1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
-        Me.XrTableCell1.Weight = 0.0840712816989325R
+        Me.XrTableCell1.Weight = 0.09851990734715188R
         '
         'XrTableCell5
         '
@@ -403,7 +403,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrTableCell5.StylePriority.UseTextAlignment = False
         Me.XrTableCell5.Text = "XrTableCell5"
         Me.XrTableCell5.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
-        Me.XrTableCell5.Weight = 0.12493856262083211R
+        Me.XrTableCell5.Weight = 0.11048993697261274R
         '
         'XrTableCell6
         '
