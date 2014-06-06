@@ -3072,6 +3072,7 @@ Public Class IWSRotorPositions
     '''                            JV - 29/11/2013 - #1419: Order correctly by well and don't show values "Type, Volume and/or Tests" depending the barcode status: error or unknown.
     '''                            JV - 03/12/2013 - #1384: Changes in ElementId when reset the session and mantain status
     '''                            TR - 28/03/2014 - #1562: Show the Expiration Date on te report.
+    '''                            XB - 03/06/2014 - #1648: Change the sort of this report alphabetically by the name of the reagent
     ''' </remarks>
     Private Sub GetInfoAreaForReport(ByVal pAnalyzerID As String, ByVal pRotorType As String)
         Try
@@ -3210,7 +3211,11 @@ Public Class IWSRotorPositions
                             End If
                             myReport.Rows.Add(row)
                         Next
-                        myReport.DefaultView.Sort = myReport.Columns(0).ColumnName & " " & "ASC"
+
+                        ' XB 03/06/2014 - BT #1648
+                        'myReport.DefaultView.Sort = myReport.Columns(0).ColumnName & " " & "ASC"
+                        myReport.DefaultView.Sort = myReport.Columns(1).ColumnName & " " & "ASC"
+
                         myReport = myReport.DefaultView.ToTable()
                     Case Else
                         'Nothing to do

@@ -4537,18 +4537,19 @@ Namespace Biosystems.Ax00.BL
                                     Next
                                 End If
 
-                                '4.3)STD_PREP: Lock all pending executions it the required washing solution is NOPOS
-                                If Not resultData.HasError Then
-                                    'Using Linq search WASH_SOL with status NOPOS
-                                    linqRes = (From a As WSRequiredElementsDS.twksWSRequiredElementsRow In reqElmDS.twksWSRequiredElements _
-                                               Where a.TubeContent = "WASH_SOL" AndAlso a.ElementStatus = "NOPOS" Select a).ToList
+                                'AG 03/06/2014 - #1519 Do not lock any contaminator executions when WASH SOL bottles are over
+                                ''4.3)STD_PREP: Lock all pending executions it the required washing solution is NOPOS
+                                'If Not resultData.HasError Then
+                                '    'Using Linq search WASH_SOL with status NOPOS
+                                '    linqRes = (From a As WSRequiredElementsDS.twksWSRequiredElementsRow In reqElmDS.twksWSRequiredElements _
+                                '               Where a.TubeContent = "WASH_SOL" AndAlso a.ElementStatus = "NOPOS" Select a).ToList
 
-                                    For Each row As WSRequiredElementsDS.twksWSRequiredElementsRow In linqRes
-                                        If Not row.IsSolutionCodeNull Then
-                                            resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", row.SolutionCode, pWorkSessionID, pAnalyzerID)
-                                        End If
-                                    Next
-                                End If
+                                '    For Each row As WSRequiredElementsDS.twksWSRequiredElementsRow In linqRes
+                                '        If Not row.IsSolutionCodeNull Then
+                                '            resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", row.SolutionCode, pWorkSessionID, pAnalyzerID)
+                                '        End If
+                                '    Next
+                                'End If
 
                                 '4.4)ISE_PREP: Lock all pending executions if ise wash solution is NOPOS
                                 If Not resultData.HasError Then
@@ -5529,10 +5530,11 @@ Namespace Biosystems.Ax00.BL
 
                             'WASH solution bottle is empty (OK tested 06/04/2011)
                         ElseIf pTubeContent = "WASH_SOL" Then
-                            'LOCK all executions that uses reagents contaminators that requires the WASH_SOL - pSolutionCode
-                            'See ExecutionsByWashCode.sql
-                            Dim myDAO As New twksWSExecutionsDAO
-                            resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", pSolutionCode, pWorkSessionID, pAnalyzerID)
+                            'AG 03/06/2014 - #1519 Do not lock any contaminator executions when WASH SOL bottles are over
+                            ''LOCK all executions that uses reagents contaminators that requires the WASH_SOL - pSolutionCode
+                            ''See ExecutionsByWashCode.sql
+                            'Dim myDAO As New twksWSExecutionsDAO
+                            'resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", pSolutionCode, pWorkSessionID, pAnalyzerID)
 
                         ElseIf pTubeContent = "TUBE_WASH_SOL" Then
                             'ISE washing solution

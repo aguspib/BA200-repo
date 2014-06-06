@@ -371,6 +371,8 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' Created by:  RH 09/14/2010
         ''' Modified by: SA 25/01/2011 - Changed the way of getting the Reference Range Interval
+        '''              SA 05/06/2014 - BT #1659 ==> When CONC_Value is greater than the Max Range, save CONC_REMARK8 instead of CONC_REMARK7
+        '''                                           Previous result Alarms have to be deleted always, not only when new Alarms have been found
         ''' </remarks>
         Private Sub CreateAlarms(ByVal dbConnection As SqlClient.SqlConnection, ByVal pRelatedStandardTestHasRemark As Boolean, _
                                  ByVal pResultRow As ResultsDS.twksResultsRow, ByVal pActiveRangeType As String, ByVal pCalcTestID As Integer)
@@ -409,10 +411,14 @@ Namespace Biosystems.Ax00.Calculations
 
                 If (minimunValue.HasValue AndAlso maximunValue.HasValue) Then
                     If (minimunValue <> -1 AndAlso maximunValue <> -1) Then
-                        If (pResultRow.CONC_Value < minimunValue.Value OrElse pResultRow.CONC_Value > maximunValue.Value) Then
-                            'Conc out of Normality Range
+                        'BT #1659 - Save CONC_REMARK7 if CONC_Value < Min Range and CONC_REMARK8 if CONC_Value > Max Range
+                        If (pResultRow.CONC_Value < minimunValue.Value) Then
                             AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
                                            GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+
+                        ElseIf (pResultRow.CONC_Value > maximunValue.Value) Then
+                            AddResultAlarm(myResultAlarmsDS, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber, _
+                                           GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
                         End If
                     End If
                 End If
@@ -423,13 +429,12 @@ Namespace Biosystems.Ax00.Calculations
                                    GlobalEnumerates.CalculationRemarks.CONC_REMARK11.ToString)
                 End If
 
-                'Save generated Alarm
-                If (myResultAlarmsDS.twksResultAlarms.Rows.Count > 0) Then
-                    'Delete previous alarms and add the new ones
-                    Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
-                    resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber)
-                    resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
-                End If
+                'BT #1659- Delete all previous Alarms always, not only when new alarms have been found
+                Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
+                resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, pResultRow.OrderTestID, pResultRow.RerunNumber, pResultRow.MultiPointNumber)
+
+                '... and finally save the generated Alarms
+                If (myResultAlarmsDS.twksResultAlarms.Rows.Count > 0) Then resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.CreateAlarms", EventLogEntryType.Error, False)

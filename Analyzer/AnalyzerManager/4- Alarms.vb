@@ -41,6 +41,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                 This flag will be informed once the instruction has been really sent. Current code causes that sometimes the ENDRUN instruction is added to
         '''                 queue but how the flag is informed before send the instruction it wont never be sent!!
         ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
+        ''' AG 05/06/2014 - #1657 Protection (provisional solution)! (do not clear instructions queue when there are only 1 alarm and it is ISE_OFF_ERR)
+        '''               - PENDING FINAL SOLUTION: AlarmID ISE_OFF_ERR must be generated only 1 time when alarm appears, and only 1 time when alarm is fixed (now this alarm with status FALSE is generated with each ANSINF received)
         ''' </remarks>
         Private Function ManageAlarms(ByVal pdbConnection As SqlClient.SqlConnection, _
                                       ByVal pAlarmIDList As List(Of GlobalEnumerates.Alarms), _
@@ -73,7 +75,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 06/03/2012 - Freeze mode treatment
                 If analyzerFREEZEFlagAttribute Then
-                    ClearQueueToSend() 'Clear all instruction in queue to be sent
+                    'AG 05/06/2014 - #1657 - 'AG + XB 08/04/2014 - #1118 (except ISE_OFF_ERR that is always generated with status FALSE)
+                    'ClearQueueToSend() 'Clear all instruction in queue to be sent
+                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
+                        ClearQueueToSend() 'Clear all instruction in queue to be sent
+                    End If
+                    'AG 05/06/2014 - #1657
 
                     If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
                         'INSTRUCTIONS: NOTHING
@@ -802,7 +809,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
                                 'JV 08/01/2014 BT #1118
                             Else
-                                'AG 16/01/2014 - Mark IseOffError as TRUE only when exists the alarm ISE_OFF_ERR in database with status TRUE
+                                'AG 16/01/2014 - Mark IseOffError as FIXED only when exists the alarm ISE_OFF_ERR in database with status TRUE
                                 ' Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
                                 'myISEOffsErrorFixed = True
                                 myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
@@ -810,7 +817,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     Dim temporalDS As New WSAnalyzerAlarmsDS
                                     temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
 
-                                    'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True
+                                    'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED)
                                     'in order to mark it as fixed
                                     Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
                                     auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
@@ -981,74 +988,78 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 14/03/2012
                 If analyzerFREEZEFlagAttribute Then
-                    If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
-                        'BUSINESS: 
-                        'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
-                        'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
+                    'AG 05/06/2014 - #1657 - (except ISE_OFF_ERR that is always generated with status FALSE)
+                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
+                        If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
+                            'BUSINESS: 
+                            'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
+                            'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
 
-                        'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
+                            'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
 
-                        If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
-                            'Analyzer has recovered an operating status automatically by closing covers
-                            analyzerFREEZEFlagAttribute = False
-                            analyzerFREEZEModeAttribute = ""
-                            AnalyzerIsReadyAttribute = True 'Analyzer is ready
-                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
+                            If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
+                                'Analyzer has recovered an operating status automatically by closing covers
+                                analyzerFREEZEFlagAttribute = False
+                                analyzerFREEZEModeAttribute = ""
+                                AnalyzerIsReadyAttribute = True 'Analyzer is ready
+                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
 
-                            'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                            'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                            If methodHasToAddInstructionToQueueFlag = 0 Then
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                                methodHasToAddInstructionToQueueFlag = 1
-                            ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
-                                    myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STATE)
-                                    myParamsQueue.Add("")
+                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
+                                If methodHasToAddInstructionToQueueFlag = 0 Then
+                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
+                                    methodHasToAddInstructionToQueueFlag = 1
+                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
+                                        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STATE)
+                                        myParamsQueue.Add("")
+                                    End If
+                                End If
+                                'AG 14/05/2012
+
+                            Else 'Exists freeze auto
+                                'Reset all processes flags
+                                Dim flags_dlg As New AnalyzerManagerFlagsDelegate
+                                myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
+
+                                'Finally read and update our internal structures
+                                If Not myGlobal.HasError Then
+                                    InitializeAnalyzerFlags(dbConnection)
+                                End If
+
+                                'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
+                                'appears while sensors deactivated there is no other way to auto recover
+                                If Not myGlobal.HasError Then
+                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+                                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+                                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                                        If methodHasToAddInstructionToQueueFlag = 0 Then
+                                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                            methodHasToAddInstructionToQueueFlag = 1
+                                            'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
+                                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+                                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
+                                                myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.INFO)
+                                                'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
+                                                'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
+                                                myParamsQueue.Add(CInt(GlobalEnumerates.Ax00InfoInstructionModes.STR))
+                                            End If
+                                        End If
+                                        'AG 14/05/2012
+                                    End If
                                 End If
                             End If
-                            'AG 14/05/2012
 
-                        Else 'Exists freeze auto
-                            'Reset all processes flags
+                        ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
+                            'Remove all flags ... recover is required
                             Dim flags_dlg As New AnalyzerManagerFlagsDelegate
                             myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
-
-                            'Finally read and update our internal structures
-                            If Not myGlobal.HasError Then
-                                InitializeAnalyzerFlags(dbConnection)
-                            End If
-
-                            'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
-                            'appears while sensors deactivated there is no other way to auto recover
-                            If Not myGlobal.HasError Then
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                    'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
-                                            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.INFO)
-                                            'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
-                                            'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
-                                            myParamsQueue.Add(CInt(GlobalEnumerates.Ax00InfoInstructionModes.STR))
-                                        End If
-                                    End If
-                                    'AG 14/05/2012
-                                End If
-                            End If
                         End If
 
-                    ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
-                        'Remove all flags ... recover is required
-                        Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                        myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
                     End If
                 End If
                 'AG 14/03/2012
@@ -2579,7 +2590,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'newNoProbeTemperatureAlarms = (From a As Boolean In myAlarmStatusList Where a = True Select a).ToList
                     'If newNoProbeTemperatureAlarms.Count > 0 Then
 
-                    If myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
+                    If ((myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse myAlarmList.Count > 1) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
                         'Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 declare at the beginning
                         myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         instrAddedToLogFlag = True

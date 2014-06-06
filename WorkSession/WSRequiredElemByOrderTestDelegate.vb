@@ -223,6 +223,8 @@ Namespace Biosystems.Ax00.BL
         '''                              Order Tests and Washing Solutions required to avoid contaminations
         '''              TR 13/03/2012 - Removed call to InsertRelationsForISEWashingSolutions due to the ISE Washing Solution 
         '''                              is not required for execution of ISE Tests requested for Patients
+        '''              SA 03/06/2014 - BT #1519 ==> Removed call to function InsertRelationsForWashingSolutions due to not positioned Washing 
+        '''                                           Solutions should not block executions 
         ''' </remarks>
         Public Function AddOrderTestElements(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -256,8 +258,9 @@ Namespace Biosystems.Ax00.BL
                         'Insert relations for Patient Samples 
                         If (Not resultData.HasError) Then resultData = requiredElemByOrderTestData.InsertRelationsForPatientSamples(dbConnection, pWorkSessionID)
 
+                        'BT #1519 - Do not create relations between Order Tests of CONTAMINANT Tests and WASHING SOLUTIONS
                         'Insert relations for Washing Solutions 
-                        If (Not resultData.HasError) Then resultData = requiredElemByOrderTestData.InsertRelationsForWashingSolutions(dbConnection, pWorkSessionID)
+                        'If (Not resultData.HasError) Then resultData = requiredElemByOrderTestData.InsertRelationsForWashingSolutions(dbConnection, pWorkSessionID)
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed

@@ -857,6 +857,143 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
 
+        ''' <summary>
+        ''' Get all Standard Preloaded Tests order by TestName
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing all Preloaded Standard Tests sorted by TestName</returns>
+        ''' <remarks>
+        ''' Created by:  XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function ReadPreloadedTestByTestName(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
+                                                " WHERE PreloadedTest = 1 " & vbCrLf & _
+                                                " ORDER BY TestName ASC "
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadPreloadedTestByTestName", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Get all Standard Tests by PreloadedTest
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pPreloadedTest">Preloaded Test (1) or User Test (0)</param>
+        ''' <returns>GlobalDataTO containing all User Standard Tests</returns>
+        ''' <remarks>
+        ''' Created by:  XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function ReadByPreloadedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreloadedTest As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
+                                                " WHERE  PreloadedTest = " & pPreloadedTest
+
+                        Dim myTestDataDS As New TestsDS()
+                        Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(cmd)
+                                da.Fill(myTestDataDS.tparTests)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestDataDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadByPreloadedTest", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Get maximum Test position Standard Preloaded Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing all Standard Tests sorted by position</returns>
+        ''' <remarks>
+        ''' Created by:  XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function GetLastPreloadedTestPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(TestPosition) FROM tparTests " & vbCrLf & _
+                                                " WHERE PreloadedTest = 1 "
+
+
+                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
+                        cmd.CommandText = cmdText
+                        cmd.Connection = dbConnection
+
+                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetLastPreloadedTestPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 
 #End Region
 
@@ -1346,6 +1483,112 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return myGlobalDataTO
         End Function
+
+
+        ''' <summary>
+        ''' Update the sort of the Preloaded Tests as alphabetically order by the name of the test (except User tests)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function UpdatePreloadedTestSortByTestName(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+                    Dim myPosition As Integer = 0
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+
+                    Dim myTestsDS As TestsDS
+                    myGlobalDataTO = ReadPreloadedTestByTestName(pDBConnection)
+                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                        myTestsDS = CType(myGlobalDataTO.SetDatos, TestsDS)
+
+                        For Each tpartestsDR As TestsDS.tparTestsRow In myTestsDS.tparTests
+                            myPosition += 1
+                            cmdText = " UPDATE tparTests SET " & _
+                                      " TestPosition = " & myPosition.ToString() & _
+                                      " WHERE  TestID = " & tpartestsDR.TestID.ToString()
+
+                            cmd.CommandText = cmdText
+                            myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                        Next
+
+                    End If
+
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.UpdatePreloadedTestSortByTestName", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Update the position of the User Tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Function UpdateUserTestPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLastPreloadedTestPosition As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = ""
+
+                    Dim cmd As New SqlCommand
+                    cmd.Connection = pDBConnection
+
+                    Dim myTestsDS As TestsDS
+                    ' Get all User Tests
+                    myGlobalDataTO = ReadByPreloadedTest(pDBConnection, 0)
+                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                        myTestsDS = CType(myGlobalDataTO.SetDatos, TestsDS)
+
+                        For Each tpartestsDR As TestsDS.tparTestsRow In myTestsDS.tparTests
+                            pLastPreloadedTestPosition += 1
+                            cmdText = " UPDATE tparTests SET " & _
+                                      " TestPosition = " & pLastPreloadedTestPosition.ToString() & _
+                                      " WHERE  TestID = " & tpartestsDR.TestID.ToString()
+
+                            cmd.CommandText = cmdText
+                            myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
+                        Next
+
+                    End If
+
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.UpdateUserTestPosition", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 #End Region
     End Class
 End Namespace
