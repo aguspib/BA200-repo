@@ -6532,7 +6532,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub ValidateCheckRotorVolumeButtonEnabled()
         Try
-            If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'If Not mdiAnalyzerCopy Is Nothing Then
             '    'Place the correct condition when implement this functionality
@@ -8348,7 +8348,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub RotorsTabs_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RotorsTabs.SelectedPageChanged
         Try
-            If isClosingFlag Then Exit Sub ' XB 13/03/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If String.Equals(RotorsTabs.SelectedTabPage.Name, "SamplesTab") Then
                 myRotorTypeForm = "SAMPLES"
