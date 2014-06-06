@@ -6889,6 +6889,8 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             If (LISWithFilesMode) Then
                 Dim statusScanningButton As Boolean = False
 
