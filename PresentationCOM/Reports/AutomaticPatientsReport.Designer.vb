@@ -90,6 +90,7 @@ Partial Public Class AutomaticPatientsReport
         Me.GroupHeader1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrPanel2, Me.XrWSStartDateTimeLabel})
         Me.GroupHeader1.HeightF = 68.75001!
         Me.GroupHeader1.Name = "GroupHeader1"
+        Me.GroupHeader1.RepeatEveryPage = True
         '
         'XrPanel2
         '
