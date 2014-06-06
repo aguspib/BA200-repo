@@ -735,6 +735,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              field OrderID for the OrderTestID of the execution  
         '''              SA 14/06/2013 - Changed the query by adding an INNER JOIN with table twksWSOrderTests to get value of field CtrlsSendingGroup
         '''                              (needed to manage automatic reruns for Control Order Tests)
+        '''              SA 06/06/2014 - BT #1660 ==> Changed the SQL Query to get also field ControlID from table twksOrderTests
         ''' </remarks>
         Public Function GetExecutionByPreparationID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, _
                                                     ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
@@ -752,8 +753,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                        " E.AdjustBaseLineID, E.ABS_Value, E.ABS_Error, E.rKinetics, E.KineticsLinear, E.KineticsInitialValue, E.KineticsSlope, " & vbCrLf & _
                                                        " E.SubstrateDepletion, E.ABS_Initial, E.ABS_MainFilter, E.CONC_Value, E.CONC_CurveError, E.CONC_Error, E.InUse, E.ResultDate, " & vbCrLf & _
                                                        " E.PreparationID, E.ClotValue, E.ThermoWarningFlag, E.HasReadings, E.ValidReadings, E.CompleteReadings, " & vbCrLf & _
-                                                       " OT.TestID, OT.SampleType, OT.ReplicatesNumber AS ReplicatesTotalNum, OT.OrderID, T.FirstReadingCycle, T.SecondReadingCycle, " & vbCrLf & _
-                                                       " WOT.CtrlsSendingGroup, IT.ISE_ResultID " & vbCrLf & _
+                                                       " OT.TestID, OT.SampleType, OT.ReplicatesNumber AS ReplicatesTotalNum, OT.OrderID, OT.ControlID, T.FirstReadingCycle, " & vbCrLf & _
+                                                       " T.SecondReadingCycle, WOT.CtrlsSendingGroup, IT.ISE_ResultID " & vbCrLf & _
                                                 " FROM   twksWSExecutions E INNER JOIN twksOrderTests OT ON E.OrderTestID = OT.OrderTestID AND E.AnalyzerID = OT.AnalyzerID " & vbCrLf & _
                                                                           " INNER JOIN twksWSOrderTests WOT ON E.OrderTestID = WOT.OrderTestID AND E.WorkSessionID = WOT.WorkSessionID " & vbCrLf & _
                                                                           " LEFT OUTER JOIN tparTests     T  ON OT.TestType = 'STD' AND OT.TestID = T.TestID " & vbCrLf & _

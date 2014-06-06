@@ -330,6 +330,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "ISE TEST Results"
 
         ''' <summary>
+        ''' IT SHOULD REPLACED FOR NEW FUNCTION ProcessISETESTResults (BT #1660)
         ''' Initializes structures, get the execution, set the results values and finaly save results into database
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
@@ -993,11 +994,467 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISETESTResults", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' Initializes structures, get the execution, set the results values and finaly save results into database
+        ''' NEW VERSION OF FUNCTION ProcessISETESTResults
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pPreparationID">Preparation ID</param>
+        ''' <param name="pISEResult">Received ISE Result</param>
+        ''' <param name="pISEMode">Indicate the ISE module operating mode: SimpleMode / DebugMode1 / DebugMode2
+        ''' </param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS</returns>
+        ''' <remarks>
+        ''' Created by: SA 06/06/2014 - BT #1660 ==> Based on ProcessISETESTResults but when following issues fixed:
+        '''                                          ** Validation of result inside/outside of the Normality Range has to be executed depending on the SampleClass:
+        '''                                             - For CONTROLS, the result is validated using the theorical range defined for Control and ISETest/SampleType
+        '''                                             - For PATIENTS, the result is validated using the Reference Range defined for the ISETest/SampleType (if there is 
+        '''                                               one than exists and applies)
+        '''                                          ** Changed the way of getting Alarms for the Average Result, due to the previous process has several errors
+        '''                                          ** For CONTROLS it is not needed to update field AcceptedResultFlag = FALSE for the previous Rerun results
+        ''' </remarks>
+        Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
+                                                 ByVal pISEMode As String, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
+
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                Dim myReturnValue As New ExecutionsDS
+
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim myDebugModeOn As Boolean
+                        If (pISEMode = "SimpleMode") Then
+                            myDebugModeOn = False
+                        ElseIf (pISEMode = "DebugMode1") OrElse (pISEMode = "DebugMode2") Then
+                            myDebugModeOn = True
+                        End If
+
+                        'Decode the received ISE Result
+                        Dim myISECycle As GlobalEnumerates.ISECycles = GlobalEnumerates.ISECycles.NONE
+                        Dim myISEResultStr As String = pISEResult.ReceivedResults
+
+                        myGlobalDataTO = ConvertISETESTResultToISEResultTO(myISEResultStr, myDebugModeOn)
+                        If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos IsNot Nothing) Then
+                            'Set the result to my ISE result TO 
+                            pISEResult = DirectCast(myGlobalDataTO.SetDatos, ISEResultTO)
+                            pISEResult.ReceivedResults = myISEResultStr
+
+                            If (pISEResult.IsCancelError) Then
+                                myGlobalDataTO = GetCancelError(pISEResult)
+                            Else
+                                myGlobalDataTO = GetResultErrors(pISEResult)
+                            End If
+
+                            If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos IsNot Nothing) Then
+                                Dim myResultErrors As List(Of ISEErrorTO) = CType(myGlobalDataTO.SetDatos, List(Of ISEErrorTO))
+                                pISEResult.Errors = myResultErrors
+
+                                If (pISEResult.IsCancelError) Then
+                                    Select Case myResultErrors(0).CancelErrorCode
+                                        Case ISEErrorTO.ISECancelErrorCodes.A, ISEErrorTO.ISECancelErrorCodes.B, ISEErrorTO.ISECancelErrorCodes.S, ISEErrorTO.ISECancelErrorCodes.F
+                                            MyClass.myISEManager.ISEWSCancelErrorCounter += 1
+                                        Case ISEErrorTO.ISECancelErrorCodes.N
+                                            MyClass.myISEManager.ISEWSCancelErrorCounter = 3
+                                    End Select
+                                Else
+                                    MyClass.myISEManager.ISEWSCancelErrorCounter = 0
+                                End If
+                            End If
+
+                            'Local variables to manage Replicate Results (Executions) and their Alarms
+                            Dim diffExecutionIDList As List(Of Integer)
+                            Dim myExecutionsAlarmsDS As New WSExecutionAlarmsDS
+                            Dim myExecutionAlarmsRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow
+                            Dim myExecutionAlarmsDelegate As New WSExecutionAlarmsDelegate
+
+                            'Local variables to manage Average Results and their Alarms
+                            Dim myResultDS As New ResultsDS
+                            Dim myTemResultDS As New ResultsDS
+                            Dim myResultsRow As ResultsDS.twksResultsRow
+                            Dim myResultDelegate As New ResultsDelegate
+                            Dim qAlarmResult As New List(Of ISEErrorTO)
+                            Dim myResultAlarmsDS As New ResultAlarmsDS
+                            Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
+                            Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
+                            Dim lstResultExecutionsAlarms As List(Of WSExecutionAlarmsDS.twksWSExecutionAlarmsRow)
+
+                            'Other local variables
+                            Dim myAlarmID As Alarms
+                            Dim myAverage As Single = 0
+                            Dim myControlID As Integer = -1
+                            Dim alarmExists As Boolean = False
+                            Dim currentSession As New GlobalBase
+                            Dim mySampleClass As String = String.Empty
+
+                            'Get all ISE Executions for the informed PreparationID
+                            Dim myCalc As New RecalculateResultsDelegate
+                            Dim myExecutionDelegate As New ExecutionsDelegate
+                            Dim myCalculationISEDelegate As New CalculationISEDelegate
+
+                            myGlobalDataTO = myExecutionDelegate.GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID, True)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                Dim myExecutionDS As ExecutionsDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
+
+                                For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                    'Save the SampleClass (PATIENT or CTRL) in a local variable (just once, all Executions have the same SampleClass)
+                                    If (mySampleClass = String.Empty) Then mySampleClass = execRow.SampleClass
+
+                                    If (execRow.ExecutionStatus = "CLOSED") Then
+                                        'Remove the row from the ExecutionsDS
+                                        execRow.Delete()
+                                    Else
+                                        execRow.ExecutionStatus = "CLOSED"
+                                        execRow.ResultDate = DateTime.Now
+                                        execRow.InUse = True
+
+                                        'Set the Concentration value depenting on the ISE_ResultID
+                                        Select Case (execRow.ISE_ResultID)
+                                            Case "Na"
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
+                                                If (myGlobalDataTO.HasError) Then Exit For
+
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                                Exit Select
+
+                                            Case "K"
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
+                                                If (myGlobalDataTO.HasError) Then Exit For
+
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                                Exit Select
+
+                                            Case "Cl"
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
+                                                If (myGlobalDataTO.HasError) Then Exit For
+
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                                Exit Select
+
+                                            Case "Li"
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
+                                                If (myGlobalDataTO.HasError) Then Exit For
+
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                                Exit Select
+
+                                            Case Else
+                                                Exit Select
+                                        End Select
+
+                                        'Get all received ISE Alarms and move them to a typed DataSet WSExecutionAlarmsDS
+                                        qAlarmResult = (From a In pISEResult.Errors _
+                                                       Where ((a.Affected.Contains(execRow.ISE_ResultID)) AndAlso (a.ResultErrorCode <> ISEErrorTO.ISEResultErrorCodes.None)) _
+                                                      OrElse ((a.DigitNumber = 1) AndAlso (a.CancelErrorCode <> ISEErrorTO.ISECancelErrorCodes.None)) _
+                                                      Select a).ToList()
+
+                                        For Each ISEError As ISEErrorTO In qAlarmResult
+                                            myExecutionAlarmsRow = myExecutionsAlarmsDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
+                                            myExecutionAlarmsRow.ExecutionID = execRow.ExecutionID
+                                            myExecutionAlarmsRow.AlarmDateTime = DateTime.Now
+
+                                            If (ISEError.IsCancelError) Then
+                                                Select Case (pISEResult.Errors(0).CancelErrorCode)
+                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A
+                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B
+                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C
+                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D
+                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F
+                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M
+                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N
+                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P
+                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R
+                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S
+                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T
+                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W
+                                                End Select
+                                                myExecutionAlarmsRow.AlarmID = myAlarmID.ToString
+                                            Else
+                                                myExecutionAlarmsRow.AlarmID = ISEError.ErrorDesc
+                                            End If
+
+                                            myExecutionsAlarmsDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(myExecutionAlarmsRow)
+                                        Next
+                                        myExecutionsAlarmsDS.AcceptChanges()
+
+                                        'Load data of the received Result in a row of typed DataSet ResultsDS
+                                        myResultsRow = myResultDS.twksResults.NewtwksResultsRow()
+                                        myResultsRow.OrderTestID = execRow.OrderTestID
+                                        myResultsRow.RerunNumber = execRow.RerunNumber
+                                        myResultsRow.MultiPointNumber = execRow.MultiItemNumber
+                                        myResultsRow.AnalyzerID = pAnalyzerID
+                                        myResultsRow.WorkSessionID = pWorkSessionID
+                                        myResultsRow.ValidationStatus = "OK"
+                                        myResultsRow.AcceptedResultFlag = True
+                                        myResultsRow.ExportStatus = "NOTSENT"
+                                        myResultsRow.Printed = False
+                                        myResultsRow.CONC_Value = execRow.CONC_Value
+                                        myResultsRow.TestID = execRow.TestID
+                                        myResultsRow.SampleType = execRow.SampleType
+                                        myResultsRow.SampleClass = mySampleClass
+                                        If (mySampleClass = "CTRL") Then myResultsRow.ControlID = execRow.ControlID
+                                        myResultsRow.ResultDateTime = execRow.ResultDate
+                                        myResultsRow.TS_User = currentSession.GetSessionInfo.UserName
+                                        myResultsRow.TS_DateTime = DateTime.Now
+                                        myResultsRow.ExecutionID = execRow.ExecutionID
+                                        myResultDS.twksResults.AddtwksResultsRow(myResultsRow)
+                                        myResultDS.AcceptChanges()
+
+                                        'Validate if the result for the Replicate is inside the defined Normality Range 
+                                        myControlID = -1
+                                        If (Not execRow.IsControlIDNull) Then myControlID = execRow.ControlID
+                                        myGlobalDataTO = myCalc.ValidateISERefRanges(dbConnection, execRow.SampleClass, execRow.OrderTestID, execRow.TestID, execRow.SampleType, execRow.CONC_Value, myControlID)
+
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            Dim validationResult As String = myGlobalDataTO.SetDatos.ToString
+
+                                            If (validationResult <> String.Empty) Then
+                                                'Load the Alarm found for the Replicate in the Executions Alarms DataSet (myExecutionsAlarmsDS)
+                                                myExecutionAlarmsRow = myExecutionsAlarmsDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
+                                                myExecutionAlarmsRow.ExecutionID = execRow.ExecutionID
+                                                myExecutionAlarmsRow.AlarmDateTime = DateTime.Now
+                                                myExecutionAlarmsRow.AlarmID = validationResult
+                                                myExecutionsAlarmsDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(myExecutionAlarmsRow)
+                                                myExecutionsAlarmsDS.AcceptChanges()
+                                            End If
+                                        End If
+                                    End If
+                                Next
+                                myExecutionDS.AcceptChanges()
+
+                                'Save the Executions 
+                                myGlobalDataTO = myExecutionDelegate.SaveExecutionsResults(dbConnection, myExecutionDS)
+
+                                'Save the Execution Alarms
+                                If (Not myGlobalDataTO.HasError) Then
+                                    diffExecutionIDList = (From a In myExecutionsAlarmsDS.twksWSExecutionAlarms _
+                                                         Select a.ExecutionID Distinct).ToList()
+
+                                    For Each execID As Integer In diffExecutionIDList
+                                        'Remove all Alarms currently saved for this Execution
+                                        myGlobalDataTO = myExecutionAlarmsDelegate.DeleteAll(dbConnection, execID)
+                                        If (myGlobalDataTO.HasError) Then Exit For
+                                    Next
+
+                                    If (Not myGlobalDataTO.HasError) Then
+                                        'Add all the new Alarms (for all Executions linked to the Preparation)
+                                        myGlobalDataTO = myExecutionAlarmsDelegate.Add(dbConnection, myExecutionsAlarmsDS)
+                                    End If
+                                End If
+
+                                'Re-calculate and save the Average Result 
+                                If (Not myGlobalDataTO.HasError) Then
+                                    myAverage = 0
+                                    For Each resultRow As ResultsDS.twksResultsRow In myResultDS.twksResults.Rows
+                                        myGlobalDataTO = myCalc.GetAverageConcentrationValue(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber)
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            'Get the calculated AVERAGE and update field CONC_VALUE for the Result
+                                            myAverage = CType(myGlobalDataTO.SetDatos, Single)
+                                            resultRow.CONC_Value = myAverage
+                                        Else
+                                            Exit For
+                                        End If
+
+                                        'Copy the Result to a temporary ResultsDS
+                                        myTemResultDS.twksResults.Clear()
+                                        myTemResultDS.twksResults.ImportRow(resultRow)
+
+                                        'Save the Result 
+                                        myGlobalDataTO = myResultDelegate.SaveResults(dbConnection, myTemResultDS)
+                                        If (myGlobalDataTO.HasError) Then Exit For
+
+                                        'If it is a PATIENT Result, set AcceptedResultFlag = False for results of the previous Rerun Numbers
+                                        '(for CONTROLS, several accepted Results are allowed, but not for PATIENT SAMPLES) 
+                                        If (mySampleClass = "PATIENT") Then
+                                            myGlobalDataTO = myResultDelegate.ResetAcceptedResultFlag(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber)
+                                            If (myGlobalDataTO.HasError) Then Exit For
+                                        End If
+
+                                        'Validate if the Average Result is inside the Normality Range define for the ISETest/Sample Type
+                                        myControlID = -1
+                                        If (Not resultRow.IsControlIDNull) Then myControlID = resultRow.ControlID
+                                        myGlobalDataTO = myCalc.ValidateISERefRanges(dbConnection, resultRow.SampleClass, resultRow.OrderTestID, resultRow.TestID, resultRow.SampleType, myAverage, myControlID)
+
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            Dim validationResult As String = myGlobalDataTO.SetDatos.ToString
+
+                                            If (validationResult <> String.Empty) Then
+                                                'Load the Alarm found for the average Result in a row of a typed DataSet ResultAlarmsDS
+                                                myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
+                                                myResultAlarmRow.OrderTestID = resultRow.OrderTestID
+                                                myResultAlarmRow.RerunNumber = resultRow.RerunNumber
+                                                myResultAlarmRow.MultiPointNumber = 1
+                                                myResultAlarmRow.AlarmID = validationResult
+                                                myResultAlarmRow.AlarmDateTime = Now
+                                                myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
+                                                myResultAlarmsDS.AcceptChanges()
+                                            End If
+                                        Else
+                                            Exit For
+                                        End If
+
+                                        'Get all Alarms for the Result Replicate (excepting the alarms for Result Value out of Normality Range)
+                                        lstResultExecutionsAlarms = (From a As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myExecutionsAlarmsDS.twksWSExecutionAlarms _
+                                                                    Where a.ExecutionID = resultRow.ExecutionID _
+                                                                  AndAlso a.AlarmID <> GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString _
+                                                                  AndAlso a.AlarmID <> GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString _
+                                                                   Select a).ToList
+
+                                        For Each executionAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In lstResultExecutionsAlarms
+                                            'Check if the Alarm exists for the Average Result
+                                            alarmExists = (myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = resultRow.OrderTestID _
+                                                                                                       AndAlso a.RerunNumber = resultRow.RerunNumber _
+                                                                                                       AndAlso a.MultiPointNumber = resultRow.MultiPointNumber _
+                                                                                                       AndAlso a.AlarmID = executionAlarmRow.AlarmID).Count > 0)
+
+                                            If (Not alarmExists) Then
+                                                'If the Alarm does not exist for the Average Result, add it to the list of its Alarms
+                                                myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
+                                                myResultAlarmRow.OrderTestID = resultRow.OrderTestID
+                                                myResultAlarmRow.RerunNumber = resultRow.RerunNumber
+                                                myResultAlarmRow.MultiPointNumber = 1
+                                                myResultAlarmRow.AlarmID = executionAlarmRow.AlarmID
+                                                myResultAlarmRow.AlarmDateTime = Now
+                                                myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
+                                            End If
+                                        Next
+                                        myResultAlarmsDS.AcceptChanges()
+
+                                        'Delete all Alarms saved previously for the Average Result
+                                        myGlobalDataTO = myResultAlarmsDelegate.DeleteAll(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
+                                        If (myGlobalDataTO.HasError) Then Exit For
+                                    Next
+                                End If
+
+                                'Save the new Alarms for all calculated Average Result
+                                If (Not myGlobalDataTO.HasError) Then
+                                    myGlobalDataTO = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
+                                End If
+
+                                'Update the OrderTestStatus when needed
+                                Dim myOrderID As String = String.Empty
+                                Dim myOrderTestDelegate As New OrderTestsDelegate
+
+                                If (Not myGlobalDataTO.HasError) Then
+                                    For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                        'Save the OrderID in a local variable (just once, all Executions have the same OrderID)
+                                        If (myOrderID = String.Empty) Then myOrderID = execRow.OrderID
+
+                                        'If it is the last Replicate Number then update the status of the OrderTest to CLOSED
+                                        If (execRow.ReplicatesTotalNum = execRow.ReplicateNumber) Then
+                                            myGlobalDataTO = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, execRow.OrderTestID, "CLOSED")
+                                            If (myGlobalDataTO.HasError) Then Exit For
+                                        End If
+                                    Next
+                                End If
+
+                                'If the DEBUG Mode is ON, then save the Results on the IseDebugModes Result
+                                If (myDebugModeOn AndAlso Not myGlobalDataTO.HasError) Then
+                                    Dim myPatientID As String = String.Empty
+
+                                    If (mySampleClass = "PATIENT") Then
+                                        'Get the Patient Identifier (PatientID or SampleID)
+                                        Dim myOrdersDelegate As New OrdersDelegate
+
+                                        myGlobalDataTO = myOrdersDelegate.ReadOrders(dbConnection, myOrderID)
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            Dim myOrdersDS As OrdersDS = DirectCast(myGlobalDataTO.SetDatos, OrdersDS)
+
+                                            If (myOrdersDS.twksOrders.Rows.Count > 0) Then
+                                                If (Not myOrdersDS.twksOrders.First.IsPatientIDNull) Then
+                                                    myPatientID = myOrdersDS.twksOrders.First.PatientID
+
+                                                ElseIf (Not myOrdersDS.twksOrders.First.IsSampleIDNull) Then
+                                                    myPatientID = myOrdersDS.twksOrders.First.SampleID
+                                                End If
+                                            End If
+                                        End If
+                                    End If
+
+                                    If (Not myGlobalDataTO.HasError) Then
+                                        'Validate the ISE Type to set the ISE Cycle
+                                        Select Case pISEResult.ISEResultType
+                                            Case ISEResultTO.ISEResultTypes.SER
+                                                myISECycle = GlobalEnumerates.ISECycles.SAMPLE
+                                                Exit Select
+                                            Case ISEResultTO.ISEResultTypes.URN
+                                                myISECycle = GlobalEnumerates.ISECycles.URINE1
+                                                Exit Select
+                                            Case ISEResultTO.ISEResultTypes.CAL
+                                                myISECycle = GlobalEnumerates.ISECycles.CALIBRATION
+                                                Exit Select
+                                            Case Else
+                                                Exit Select
+                                        End Select
+
+                                        pISEResult.WorkSessionID = pWorkSessionID
+                                        pISEResult.PatientID = myPatientID
+                                    End If
+                                End If
+
+                                'Release memory
+                                qAlarmResult = Nothing
+                                diffExecutionIDList = Nothing
+                                lstResultExecutionsAlarms = Nothing
+
+                                'The ExecutionsDS will be the function return value
+                                myReturnValue = myExecutionDS
+                            End If
+
+                        ElseIf (myGlobalDataTO.HasError) Then
+                            'Get all ISE Executions for the informed PreparationID
+                            Dim myExecutionDelegate As New ExecutionsDelegate
+                            myGlobalDataTO = myExecutionDelegate.GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID, True)
+
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                Dim myExecutionDS As ExecutionsDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
+
+                                For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                    'Mark the Execution as CLOSEDNOK
+                                    myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
+                                                                                               execRow.ReplicatesTotalNum, False)
+                                    If (myGlobalDataTO.HasError) Then Exit For
+                                Next
+
+                                'The ExecutionsDS will be the function return value
+                                myReturnValue = myExecutionDS
+                            End If
+                        End If
+
+
+                        If (Not myGlobalDataTO.HasError) Then
+                            'Function returns the ExecutionsDS obtained
+                            myGlobalDataTO.SetDatos = myReturnValue
+
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResultsNEW", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
 
 #End Region
 
