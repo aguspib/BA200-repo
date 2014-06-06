@@ -112,7 +112,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrWSStartDateTimeLabel.Multiline = True
         Me.XrWSStartDateTimeLabel.Name = "XrWSStartDateTimeLabel"
         Me.XrWSStartDateTimeLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(10, 2, 4, 2, 100.0!)
-        Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(387.625!, 25.0!)
+        Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(403.6249!, 25.0!)
         Me.XrWSStartDateTimeLabel.StylePriority.UseBackColor = False
         Me.XrWSStartDateTimeLabel.StylePriority.UseBorderColor = False
         Me.XrWSStartDateTimeLabel.StylePriority.UseBorders = False
@@ -129,7 +129,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelRemainingTests, Me.XrLabelBottle, Me.XrLabelVolume, Me.XrLabelExpDate, Me.XrLabelName, Me.XrLabelCell, Me.XrLabelStatus, Me.XrLabelBarcode, Me.XrLabel1})
         Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 45.62499!)
         Me.XrPanel2.Name = "XrPanel2"
-        Me.XrPanel2.SizeF = New System.Drawing.SizeF(734.0001!, 21.5!)
+        Me.XrPanel2.SizeF = New System.Drawing.SizeF(750.0!, 21.5!)
         Me.XrPanel2.StylePriority.UseBorders = False
         Me.XrPanel2.StylePriority.UseBorderWidth = False
         '
@@ -228,7 +228,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrLabelStatus.LocationFloat = New DevExpress.Utils.PointFloat(638.9583!, 0.0!)
         Me.XrLabelStatus.Name = "XrLabelStatus"
         Me.XrLabelStatus.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelStatus.SizeF = New System.Drawing.SizeF(102.0417!, 20.00001!)
+        Me.XrLabelStatus.SizeF = New System.Drawing.SizeF(110.0417!, 20.00001!)
         Me.XrLabelStatus.StylePriority.UseBorders = False
         Me.XrLabelStatus.StylePriority.UseFont = False
         Me.XrLabelStatus.StylePriority.UsePadding = False
@@ -277,7 +277,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrHeaderLabel.Multiline = True
         Me.XrHeaderLabel.Name = "XrHeaderLabel"
         Me.XrHeaderLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(10, 2, 4, 2, 100.0!)
-        Me.XrHeaderLabel.SizeF = New System.Drawing.SizeF(734.0!, 25.0!)
+        Me.XrHeaderLabel.SizeF = New System.Drawing.SizeF(749.0!, 25.0!)
         Me.XrHeaderLabel.StylePriority.UseBackColor = False
         Me.XrHeaderLabel.StylePriority.UseBorderColor = False
         Me.XrHeaderLabel.StylePriority.UseBorders = False
@@ -307,7 +307,7 @@ Partial Public Class RotorContentPositionsReport
         Me.XrTable1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
         Me.XrTable1.Name = "XrTable1"
         Me.XrTable1.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRow1})
-        Me.XrTable1.SizeF = New System.Drawing.SizeF(741.0!, 22.0!)
+        Me.XrTable1.SizeF = New System.Drawing.SizeF(749.0!, 22.0!)
         Me.XrTable1.StylePriority.UseFont = False
         '
         'XrTableRow1
@@ -448,14 +448,14 @@ Partial Public Class RotorContentPositionsReport
         Me.XrTableCell9.StylePriority.UseTextAlignment = False
         Me.XrTableCell9.Text = "XrTableCell9"
         Me.XrTableCell9.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
-        Me.XrTableCell9.Weight = 0.17345526469792369R
+        Me.XrTableCell9.Weight = 0.18705402001402166R
         '
         'RotorContentPositionsReport
         '
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport})
         Me.Font = New System.Drawing.Font("Times New Roman", 9.75!, System.Drawing.FontStyle.Italic)
         Me.FormattingRuleSheet.AddRange(New DevExpress.XtraReports.UI.FormattingRule() {Me.Few, Me.Depleted})
-        Me.Margins = New System.Drawing.Printing.Margins(38, 48, 40, 33)
+        Me.Margins = New System.Drawing.Printing.Margins(38, 40, 40, 33)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4

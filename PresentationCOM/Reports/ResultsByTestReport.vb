@@ -3,7 +3,7 @@ Imports DevExpress.XtraReports.UI
 Public Class ResultsByTestReport
 
     Public Sub SetHeaderLabel(ByVal aText As String)
-        XrHeaderLabel.Text = aText
+        'XrHeaderLabel.Text = aText  'EF 06/06/2014 #1649
     End Sub
 
     Private Sub XrTableDetailsRow_BeforePrint(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles XrTableDetailsRow.BeforePrint
