@@ -357,9 +357,9 @@ Public Class IWSRotorPositions
     ''' Modified by XB 17/01/2014 - Improve Dispose
     ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
         Try
-                       isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+            isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
             ' XB 17/01/2014
             For Each myControl As Control In Me.SamplesTab.Controls
@@ -1672,10 +1672,11 @@ Public Class IWSRotorPositions
     '''              RH 16/06/2011 - Added TUBE_SPEC_SOL and TUBE_WASH_SOL
     '''              SA 18/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed
+    '''              IT 04/06/2014 - BT #1644 ==> Changed call to function UpdateRotorArea: new type of the last parameter
     ''' </remarks>
     Private Sub UpdateRotorTreeViewArea(ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, Optional ByVal pRotorType As String = "")
         Try
-            If isClosingFlag Then Exit Sub ' XB 13/03/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myGlobalDataTO As GlobalDataTO
             Dim myNotInUseRPDelegate As New WSNotInUseRotorPositionsDelegate()
@@ -1697,23 +1698,26 @@ Public Class IWSRotorPositions
                     If (UpdateRotorContentByPositionDSForm(rotorPosition)) Then
                         'Validate if there is a Required Element in the Rotor Position
                         If (Not rotorPosition.IsElementIDNull) Then
-                            'Update the correspondent Node in the Required Elements TreeView and get the information of the updated Node 
-                            Dim myTreeNode As TreeNode = ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, True, rotorPosition, pRotorType)
+                            Dim myTreeNode As TreeNode
+                            If (Not bsElementsTreeView Is Nothing) Then
+                                'Update the correspondent Node in the Required Elements TreeView and get the information of the updated Node 
+                                myTreeNode = ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, True, rotorPosition, pRotorType)
 
-                            'If the Element is a positioned Calibrator (TubeContent=CALIB; ElementStatus=POS) but it does not exist in the 
-                            'Required Elements TreeView (Node.Tag=Nothing), then the Rotor Position corresponds to a point of a multipoint 
-                            'Calibrator() that is not the first in the kit, and the Calibrator Icon has to be searched and placed in the 
-                            'Rotor Position (the Icon Name is stored in the Node Tag, but in this case is informed only for the first point 
-                            'of the Calibrator kit)
-                            If (myTreeNode Is Nothing) Then
-                                'If the Element is not on the TreeView then it has to be a Calibrator or an Special or Washing Solution in Tube 
-                                If (rotorPosition.TubeContent = "CALIB") Then
-                                    'Set the Calibrator Icon in the Rotor Position
-                                    UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab.Controls)
+                                'If the Element is a positioned Calibrator (TubeContent=CALIB; ElementStatus=POS) but it does not exist in the 
+                                'Required Elements TreeView (Node.Tag=Nothing), then the Rotor Position corresponds to a point of a multipoint 
+                                'Calibrator() that is not the first in the kit, and the Calibrator Icon has to be searched and placed in the 
+                                'Rotor Position (the Icon Name is stored in the Node Tag, but in this case is informed only for the first point 
+                                'of the Calibrator kit)
+                                If (myTreeNode Is Nothing) Then
+                                    'If the Element is not on the TreeView then it has to be a Calibrator or an Special or Washing Solution in Tube 
+                                    If (rotorPosition.TubeContent = "CALIB") Then
+                                        'Set the Calibrator Icon in the Rotor Position
+                                        UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab)
 
-                                ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
-                                    'Set the Tube Additional Solution Icon in the Rotor Position
-                                    UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab.Controls)
+                                    ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
+                                        'Set the Tube Additional Solution Icon in the Rotor Position
+                                        UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab)
+                                    End If
                                 End If
                             End If
                         Else
@@ -1759,11 +1763,11 @@ Public Class IWSRotorPositions
                                 End If
 
                                 'Update the rotor area with the new icon path          
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
 
                             Else
                                 'Position is empty...icon is also empty, clean the cell
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
                             End If
                         End If
                     End If
@@ -2472,10 +2476,17 @@ Public Class IWSRotorPositions
     '''              SA 18/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed
     '''              AG 25/11/2013 - #1359 - Inform parameter InProcessElement on call method SetPosControlBackGround
+    '''              IT 04/06/2014 - #1644 - Modified the type of last parameter.
     ''' </remarks>
     Private Sub UpdateRotorArea(ByVal pRotorContenByPosRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
-                                ByVal pIconName As String, ByVal pRotorControlCollection As Control.ControlCollection)
+                                ByVal pIconName As String, ByVal pRotorControl As Control)
         Try
+
+            If (pRotorControl Is Nothing) Then Exit Sub
+
+            Dim pRotorControlCollection As Control.ControlCollection
+            pRotorControlCollection = pRotorControl.Controls
+
             'Change the Icon name for the Reagents and Additional solutions
             Dim myIconName As String = pIconName
             If (myIconName = REAGENTS_IconName OrElse myIconName = ADDSOL_IconName) Then
@@ -2626,7 +2637,7 @@ Public Class IWSRotorPositions
                     Else
                         myRotorPicture = Me.ReagentsTab
                     End If
-                    UpdateRotorArea(pRotorContenByPosRow, myNodeTag.ElementIcon, myRotorPicture.Controls)
+                    UpdateRotorArea(pRotorContenByPosRow, myNodeTag.ElementIcon, myRotorPicture)
 
                     'Validate if the Node corresponds to a Diluted Patient Sample
                     'If (IsDilution(CType(myNode.Tag, WSRequiredElementsTO).ElementID)) Then
@@ -4968,10 +4979,11 @@ Public Class IWSRotorPositions
                                                 OrElse a.ElementStatus = "INCOMPLETE" _
                                                 OrElse a.ElementStatus Is DBNull.Value _
                                                 Select a).ToList()
-
-                            For Each rcpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In qNoposElements
-                                ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, rcpRow, myRotorTypeForm)
-                            Next
+                            If (Not bsElementsTreeView Is Nothing) Then
+                                For Each rcpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In qNoposElements
+                                    ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, rcpRow, myRotorTypeForm)
+                                Next
+                            End If
                             UpdateRotorTreeViewArea(CType(myGlobalDataTo.SetDatos, WSRotorContentByPositionDS))
                         Else
                             'Show error message
@@ -6597,7 +6609,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             If isClosingFlag Then Return 'AG 03/08/2012
@@ -6897,7 +6909,8 @@ Public Class IWSRotorPositions
     ''' <remarks>CREATED BY: TR 14/09/2011</remarks>
     Public Sub RefreshAfterSamplesWithoutRequest(ByVal pWorkSessionStatus As String)
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             ScreenWorkingProcess = False
             WorkSessionStatusAttribute = pWorkSessionStatus
             LoadScreenStatus(WorkSessionStatusAttribute)
@@ -6920,7 +6933,8 @@ Public Class IWSRotorPositions
     ''' <remarks></remarks>
     Public Sub RefreshScreenStatus(ByVal pNewAnalzyerStatus As String, ByVal pWorkSessionStatus As String)
         Try
-            If isClosingFlag Then Return 'AG 03/08/2012
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             WorkSessionStatus(pNewAnalzyerStatus) = pWorkSessionStatus
             LoadScreenStatus(WorkSessionStatusAttribute)
         Catch ex As Exception
@@ -7157,10 +7171,13 @@ Public Class IWSRotorPositions
     End Function
 
     Public Sub RefreshAfterCloseIncompleteSamplesScreen()
-        If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+
+        If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
         ClearSelection() 'DL 17/04/2013
         LoadScreenStatus(WorkSessionStatusAttribute)
         InitializeScreen(False, "")
+
     End Sub
 
     ''' <summary>
@@ -7520,7 +7537,7 @@ Public Class IWSRotorPositions
     ''' <remarks>Created by XB 15/01/2014 - Task #1438</remarks>
     Public Sub RefreshwatchDogTimer_Interval(ByVal pNewIntervalValue As Double)
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             MyClass.watchDogTimer.Interval = pNewIntervalValue
             'Debug.Print("******************************* WATCHDOG INTERVAL CHANGED TO [" & pNewIntervalValue.ToString & "]")
 
@@ -7537,7 +7554,7 @@ Public Class IWSRotorPositions
     ''' <remarks>Created by XB 29/01/2014 - Task #1438</remarks>
     Public Sub RefreshwatchDogTimer_Enable(ByVal pEnableValue As Boolean)
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             If pEnableValue Then mdiAnalyzerCopy.BarcodeStartInstrExpected = True
 
             MyClass.watchDogTimer.Enabled = pEnableValue
@@ -7555,7 +7572,8 @@ Public Class IWSRotorPositions
     ''' <remarks>Created by XB 15/01/2014 - Task #1438</remarks>
     Public Sub RefreshScreenAfterWatchDogInvoke()
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE
             LoadScreenStatus(WorkSessionStatusAttribute)
             Me.Enabled = True 'Enable the screen
@@ -8909,7 +8927,9 @@ Public Class IWSRotorPositions
                                 'and in the opposite case, change the ElementStatus in the TreeView of WS Required Elements 
                                 If (mySelectedElementInfo.twksWSRotorContentByPosition.Count > 0) Then
                                     If (mySelectedElementInfo.twksWSRotorContentByPosition(0).IsElementIDNull AndAlso Not SelectedElement.IsElementIDNull) Then
-                                        ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                        If (Not bsElementsTreeView Is Nothing) Then
+                                            ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                        End If
                                     End If
                                     'AG 20/02/2014 - #1516 - Protection against "This row has been removed from a table and does not have any data.  BeginEdit() will allow creation of new data in this row" ... Move End If
                                     '                        in order to include next line
@@ -8984,7 +9004,9 @@ Public Class IWSRotorPositions
                             'change the ElementStatus in the TreeView of WS Required Elements
                             If (mySelectedElementInfo.twksWSRotorContentByPosition.Count > 0) Then
                                 If (mySelectedElementInfo.twksWSRotorContentByPosition(0).IsElementIDNull AndAlso Not SelectedElement.IsElementIDNull) Then
-                                    ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                    If (Not bsElementsTreeView Is Nothing) Then
+                                        ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                    End If
                                 End If
                                 'AG 20/02/2014 - #1516 - Protection against "This row has been removed from a table and does not have any data.  BeginEdit() will allow creation of new data in this row" ... Move End If
                                 '                        in order to include next line

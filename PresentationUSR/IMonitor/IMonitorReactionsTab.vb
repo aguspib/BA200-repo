@@ -97,7 +97,10 @@ Partial Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshReactionsRotor(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            If (IsDisposed) Then Exit Sub
+            CreateLogActivity("RefreshReactionsRotor (Init): " + IsDisposed.ToString(), Name & ".RefreshReactionsRotor ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshReactionsRotor ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
