@@ -19,21 +19,21 @@ Partial Public Class QCCumulatedResultsByTestReport
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Detail = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrPanel1 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrDateRange = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrSample = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelDateRange = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelSample = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrTestName = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelTestName = New DevExpress.XtraReports.UI.XRLabel
-        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand
-        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand
-        Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand
-        Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel
-        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand
-        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrLabelControls = New DevExpress.XtraReports.UI.XRLabel
+        Me.Detail = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrPanel1 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrDateRange = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrSample = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelDateRange = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelSample = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrTestName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelTestName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand()
+        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
+        Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand()
+        Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
+        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
+        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrLabelControls = New DevExpress.XtraReports.UI.XRLabel()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
         '
         'Detail
@@ -49,8 +49,8 @@ Partial Public Class QCCumulatedResultsByTestReport
         Me.XrPanel1.BackColor = System.Drawing.Color.White
         Me.XrPanel1.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel1.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel1.BorderWidth = 2
         Me.XrPanel1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrDateRange, Me.XrSample, Me.XrLabelDateRange, Me.XrLabelSample, Me.XrTestName, Me.XrLabelTestName})
         Me.XrPanel1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 10.0!)
@@ -139,12 +139,14 @@ Partial Public Class QCCumulatedResultsByTestReport
         '
         'TopMargin
         '
+        Me.TopMargin.HeightF = 59.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.TopMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
         'BottomMargin
         '
+        Me.BottomMargin.HeightF = 25.0!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -160,8 +162,8 @@ Partial Public Class QCCumulatedResultsByTestReport
         Me.XrHeaderLabel.BackColor = System.Drawing.Color.LightGray
         Me.XrHeaderLabel.BorderColor = System.Drawing.Color.DarkGray
         Me.XrHeaderLabel.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrHeaderLabel.Font = New System.Drawing.Font("Verdana", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrHeaderLabel.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 10.00001!)
         Me.XrHeaderLabel.Name = "XrHeaderLabel"
@@ -193,8 +195,8 @@ Partial Public Class QCCumulatedResultsByTestReport
         Me.XrLabelControls.BackColor = System.Drawing.Color.Gainsboro
         Me.XrLabelControls.BorderColor = System.Drawing.Color.DarkGray
         Me.XrLabelControls.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrLabelControls.Font = New System.Drawing.Font("Verdana", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrLabelControls.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
         Me.XrLabelControls.Name = "XrLabelControls"
@@ -212,6 +214,10 @@ Partial Public Class QCCumulatedResultsByTestReport
         'QCCumulatedResultsByTestReport
         '
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport})
+        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 25)
+        Me.PageHeight = 1169
+        Me.PageWidth = 827
+        Me.PaperKind = System.Drawing.Printing.PaperKind.A4
         Me.Version = "10.2"
         CType(Me, System.ComponentModel.ISupportInitialize).EndInit()
 

@@ -112,29 +112,30 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="QcResultsDS1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="QcResultsDS1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>21, 18</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="XrPicWarning.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
         DAAACwwBP0AiyAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAAANUlEQVQ4T2P4
-        //8/AyWYIs0gi6lrQFZW1n9iMLKXUVxAjGaQmlEDRsMAbzogJ1NRNy+Q4wIAd/6yHwo7N+4AAAAASUVO
+        //8/RRirICkYqyApGIWTlZX1nxiMrGfUgFEDQJi6BpCDsQqSgrEKEo//MwAAd/6yH+ttI5YAAAAASUVO
         RK5CYII=
 </value>
   </data>
   <data name="XrPicError.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
-        DAAACwwBP0AiyAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAAAaklEQVQ4T2P4
-        //8/AyWYIs0gi2lrgKSk5H8lJSWgRbi9idMFIM0MQAeCMD5DsBqArJmQIRgGYNOMzxAUA/BpxmUI3AB1
-        dXW4n2GK8dGwgKWeC2AmUhQG+AzBFZW0SQfILiE7JRKbQynOTADGG3UO0yjbcwAAAABJRU5ErkJggg==
+        DAAACwwBP0AiyAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAAAbklEQVQ4T6XR
+        MQ6AMAwDwHwja5f+/4WhHowKdQNVhpOKwRYCi4gSGZ6Q4QkZkrtHa20c9X2QIaBs4zZkIzKcy18jS6DK
+        pEYeF1mZ3iP3ofe+PJxZBqD0BlT6BlT6CzSP7MogQ8JIVgYZnpDhf2EXxht1DhmdtYoAAAAASUVORK5C
+        YII=
 </value>
   </data>
 </root>

@@ -69,7 +69,7 @@ Public Class XRManager
 
 
               
-                    'EF 04/06/2014 (labels for titles)
+                    'EF 04/06/2014 #1649 (labels for titles)
                     Report.XrLabel_PatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage) & ":"
                     Report.XrLabel_PatientName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", CurrentLanguage) & ":"
                     Report.XrLabel_Gender.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", CurrentLanguage) & ":"
@@ -287,8 +287,8 @@ Public Class XRManager
                 rotorReport.XrLabelBarcode.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_BARCODE", CurrentLanguage)
                 rotorReport.XrLabelExpDate.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ExpDate_Short", CurrentLanguage)
                 rotorReport.XrLabelBottle.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
-                rotorReport.XrLabelVolume.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Volumen", CurrentLanguage)
-                rotorReport.XrLabelRemainingTests.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
+                rotorReport.XrLabelVolume.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Vol_Short", CurrentLanguage) 'EF 06/06/2014 #1649 (Abreviar textos para mejorar Reports)
+                rotorReport.XrLabelRemainingTests.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Results_Tests", CurrentLanguage)  'EF 06/06/2014 #1649 (texto abreviado)
                 rotorReport.XrLabelStatus.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MainMDI_Status", CurrentLanguage)
                 rotorReport.XrLabel1.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Lot", CurrentLanguage)
 
@@ -888,6 +888,14 @@ Public Class XRManager
                     Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurrentResults_Patient", CurrentLanguage)     'DL 14/01/2012 '"Current Results by Patient Sample" "*Historic Patient Results" '
                     Report.SetHeaderLabel(literalHeaderLabel)
 
+                    'EF 05/06/2014 #1649 (labels for titles)
+                    Report.XrLabel_PatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage) & ":"
+                    Report.XrLabel_PatientName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", CurrentLanguage) & ":"
+                    Report.XrLabel_Gender.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", CurrentLanguage) & ":"
+                    Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
+                    Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
+                    'EF 05/06/2014 END
+
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                     Report.XrLabelFlags.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Flags", CurrentLanguage) 'EF 03/06/2014 (cambio texto por LBL_Flags)
@@ -1023,7 +1031,13 @@ Public Class XRManager
                     'Multilanguage. Get texts from DB.
                     Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurrentResults_Patient", CurrentLanguage)
                     Report.SetHeaderLabel(literalHeaderLabel)
-
+                    'EF 05/06/2014 #1649 (labels for titles)
+                    Report.XrLabel_PatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage) & ":"
+                    Report.XrLabel_PatientName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", CurrentLanguage) & ":"
+                    Report.XrLabel_Gender.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", CurrentLanguage) & ":"
+                    Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
+                    Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
+                    'EF 05/06/2014 END
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                     Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)

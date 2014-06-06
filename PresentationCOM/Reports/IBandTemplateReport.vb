@@ -694,6 +694,7 @@ Public Class IBandTemplateReport
 
             End If
 
+            DesignForm.Dispose()
             'DesignForm = Nothing
 
         Catch ex As Exception
@@ -759,6 +760,7 @@ Public Class IBandTemplateReport
             panel.SetCommandVisibility(ReportCommand.Redo, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
             panel.SetCommandVisibility(ReportCommand.Exit, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
 
+            RemoveHandler panel.ReportStateChanged, AddressOf DesignPanel_ReportStateChanged
             AddHandler panel.ReportStateChanged, AddressOf DesignPanel_ReportStateChanged
 
             Dim ts As IToolboxService = CType(e.DesignerHost.GetService(GetType(IToolboxService)), IToolboxService)

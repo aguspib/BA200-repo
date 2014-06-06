@@ -277,7 +277,7 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            If isClosingFlag Then Return 'AG 03/08/2012
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             RefreshDoneField = False
 
             If (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ)) Then
@@ -6889,6 +6889,8 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             If (LISWithFilesMode) Then
                 Dim statusScanningButton As Boolean = False
 
