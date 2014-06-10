@@ -128,7 +128,7 @@ Namespace Biosystems.Ax00.Global
 
 
         'AG 02/06/2014 - #1644 constants for global createWSexecutions semaphore
-        Public Const SEMAPHORE_TOUT_CREATE_EXECUTIONS As Integer = 10000 '10 sec
+        Public Const SEMAPHORE_TOUT_CREATE_EXECUTIONS As Integer = 12000 '12 sec
         Public Const SEMAPHORE_BUSY As Integer = 0
 
     End Class
