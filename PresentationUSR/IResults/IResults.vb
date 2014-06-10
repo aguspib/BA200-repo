@@ -5542,7 +5542,7 @@ Public Class IResults
     ''' <remarks>AG 01/08/2012
     ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
         Try
             isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 

@@ -13,7 +13,6 @@ Partial Class IMonitor
             ReleaseElements()
         Finally
             MyBase.Dispose(disposing)
-            isClosingFlag = False
             CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
