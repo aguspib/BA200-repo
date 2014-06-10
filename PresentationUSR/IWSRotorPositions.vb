@@ -6486,6 +6486,8 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             Dim statusScanningButton As Boolean = False
 
             If (Not mdiAnalyzerCopy Is Nothing) Then
