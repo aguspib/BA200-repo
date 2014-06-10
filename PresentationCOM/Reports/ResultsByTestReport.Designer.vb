@@ -98,7 +98,7 @@ Partial Public Class ResultsByTestReport
         Me.XrPanel2.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
         Me.XrPanel2.BorderWidth = 1
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelUnit, Me.XrLabelDate, Me.XrLabelFactor, Me.XrLabelConc, Me.XrLabelAbs, Me.XrLabelNumber, Me.XrLabelType, Me.XrLabelName, Me.XrLabelClass})
-        Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(3.000005!, 45.0!)
+        Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(3.000005!, 40.0!)
         Me.XrPanel2.Name = "XrPanel2"
         Me.XrPanel2.SizeF = New System.Drawing.SizeF(697.9999!, 21.5!)
         Me.XrPanel2.StylePriority.UseBorders = False
@@ -108,16 +108,16 @@ Partial Public Class ResultsByTestReport
         '
         Me.XrLabelUnit.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelUnit.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(441.5832!, 0.0!)
+        Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(440.0!, 0.0!)
         Me.XrLabelUnit.Name = "XrLabelUnit"
-        Me.XrLabelUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(54.99997!, 20.0!)
+        Me.XrLabelUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
+        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(56.58313!, 20.0!)
         Me.XrLabelUnit.StylePriority.UseBorders = False
         Me.XrLabelUnit.StylePriority.UseFont = False
         Me.XrLabelUnit.StylePriority.UsePadding = False
         Me.XrLabelUnit.StylePriority.UseTextAlignment = False
-        Me.XrLabelUnit.Text = "*Unidad"
-        Me.XrLabelUnit.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrLabelUnit.Text = "*Unid"
+        Me.XrLabelUnit.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter
         '
         'XrLabelDate
         '
@@ -156,7 +156,7 @@ Partial Public Class ResultsByTestReport
         Me.XrLabelConc.LocationFloat = New DevExpress.Utils.PointFloat(375.5832!, 0.0!)
         Me.XrLabelConc.Name = "XrLabelConc"
         Me.XrLabelConc.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 3, 0, 0, 100.0!)
-        Me.XrLabelConc.SizeF = New System.Drawing.SizeF(66.0!, 20.0!)
+        Me.XrLabelConc.SizeF = New System.Drawing.SizeF(64.41681!, 20.0!)
         Me.XrLabelConc.StylePriority.UseBorders = False
         Me.XrLabelConc.StylePriority.UseFont = False
         Me.XrLabelConc.StylePriority.UsePadding = False
@@ -190,22 +190,23 @@ Partial Public Class ResultsByTestReport
         Me.XrLabelNumber.StylePriority.UseBorders = False
         Me.XrLabelNumber.StylePriority.UseFont = False
         Me.XrLabelNumber.StylePriority.UseTextAlignment = False
-        Me.XrLabelNumber.Text = "*No."
+        Me.XrLabelNumber.Text = "*N."
         Me.XrLabelNumber.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
         '
         'XrLabelType
         '
         Me.XrLabelType.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelType.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelType.LocationFloat = New DevExpress.Utils.PointFloat(236.0!, 0.0!)
+        Me.XrLabelType.LocationFloat = New DevExpress.Utils.PointFloat(230.0!, 0.0!)
         Me.XrLabelType.Name = "XrLabelType"
-        Me.XrLabelType.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelType.SizeF = New System.Drawing.SizeF(45.58313!, 20.00002!)
+        Me.XrLabelType.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
+        Me.XrLabelType.SizeF = New System.Drawing.SizeF(51.58322!, 20.00002!)
         Me.XrLabelType.StylePriority.UseBorders = False
         Me.XrLabelType.StylePriority.UseFont = False
+        Me.XrLabelType.StylePriority.UsePadding = False
         Me.XrLabelType.StylePriority.UseTextAlignment = False
         Me.XrLabelType.Text = "*Type"
-        Me.XrLabelType.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrLabelType.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter
         '
         'XrLabelName
         '
@@ -214,7 +215,7 @@ Partial Public Class ResultsByTestReport
         Me.XrLabelName.LocationFloat = New DevExpress.Utils.PointFloat(70.00001!, 0.0!)
         Me.XrLabelName.Name = "XrLabelName"
         Me.XrLabelName.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelName.SizeF = New System.Drawing.SizeF(166.0!, 20.0!)
+        Me.XrLabelName.SizeF = New System.Drawing.SizeF(160.0!, 20.0!)
         Me.XrLabelName.StylePriority.UseBorders = False
         Me.XrLabelName.StylePriority.UseFont = False
         Me.XrLabelName.StylePriority.UseTextAlignment = False
