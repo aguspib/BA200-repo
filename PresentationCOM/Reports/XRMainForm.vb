@@ -20,7 +20,8 @@ Public Class XRMainForm
 #Region "Fields"
     Private ReportField As XtraReport
     'JVV 01/10
-    Private pagesPrinted As Integer = 0, reportPages As Integer = 0
+    Private pagesPrinted As Integer = 0
+    Private reportPages As Integer = 0
     'JVV 01/10
 #End Region
 
