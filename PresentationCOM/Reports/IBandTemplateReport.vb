@@ -416,14 +416,14 @@ Public Class IBandTemplateReport
                             'Report has been renamed (rename template name ID in database and also designer files)
                             'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
                             'resultData = templateList.UpdateTemplateNameByOldName(Nothing, bsTemplateTextBox.Text, bsTemplatesListView.SelectedItems(0).Text)
-                            resultData = templateList.UpdateTemplateNameByOldName(Nothing, templateName, bsTemplatesListView.SelectedItems(0).Text)
+                            resultData = templateList.UpdateRenamingTemplate(Nothing, templateName, bsTemplatesListView.SelectedItems(0).Text)
 
 
                         ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text, bsDefaultCheckbox.Checked) Then
                             'Update report
                             'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
                             'resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
-                            resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, templateName, bsDefaultCheckbox.Checked)
+                            resultData = templateList.UpdateByName(Nothing, templateName, bsDefaultCheckbox.Checked)
 
                         ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text, myCurrentOrientation) Then
                             'Create new report (when orientation changes)
@@ -433,7 +433,7 @@ Public Class IBandTemplateReport
 
                             If Not resultData.HasError Then
                                 myTemplateDS = DirectCast(resultData.SetDatos, ReportTemplatesDS)
-                                resultData = templateList.UpdateDefaultTemplateByTempltName(Nothing, myTemplateDS.tcfgReportTemplates(0))
+                                resultData = templateList.UpdateAfterCreation(Nothing, myTemplateDS.tcfgReportTemplates(0))
 
                                 If (Not resultData.HasError) Then bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text = bsOrientationComboBox.Text
                             End If

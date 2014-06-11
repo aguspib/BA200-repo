@@ -502,6 +502,54 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
+
+        ''' <summary>
+        ''' Set DefaultTemplate value as False by the Template Orientation.
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pStatus">TRUE or FALSE</param>
+        ''' <param name="pOnlyMasterTemplateFlag">TRUE means that DefaultTemplate will be updated only for the MasterTemplates / FALSE means that will be updated for ALL</param>
+        ''' <returns>GlobalDataTO</returns>
+        ''' <remarks>AG 11/06/2014 - Create - #1661</remarks>
+        Public Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean) As GlobalDataTO
+
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    'There is not an opened Database Connection
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim myGlobalBase As New GlobalBase
+                    Dim cmdText As String = String.Empty
+
+                    cmdText &= " UPDATE tcfgReportTemplates " & Environment.NewLine
+                    cmdText &= " SET DefaultTemplate =  " & CStr(IIf(pStatus, 1, 0)) & Environment.NewLine
+
+                    If pOnlyMasterTemplateFlag Then
+                        cmdText &= " WHERE MasterTemplate = " & CStr(IIf(pOnlyMasterTemplateFlag, 1, 0))
+                    End If
+
+                    'Execute the SQL sentence 
+                    Dim dbCmd As New SqlClient.SqlCommand
+                    dbCmd.Connection = pDBConnection
+                    dbCmd.CommandText = cmdText
+
+                    myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
+
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetDefaultTemplateStatus", _
+                                                EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
     End Class
 
 End Namespace

@@ -310,6 +310,11 @@ Public Class ISATReportLoad
                                     ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SAT_LOAD_REPORT_OK.ToString)
                                 End If
 
+                                'AG 11/06/2014 #1661 - After load a RSAT (or restore point) remove all report templates not preloaded those designers do not exists on local computer
+                                Dim templateList As New ReportTemplatesDelegate
+                                myGlobal = templateList.DeleteNonExistingReportTemplates(Nothing)
+                                'AG 11/06/2014 #1661
+
                                 IAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
                             End If
                         Else

@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports System.IO 'AG 11/06/2014 #1661
 
 Namespace Biosystems.Ax00.BL
 
@@ -77,14 +78,15 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update the Defaul Template value by the Template Name.
+        ''' Update the template (no rename has done)
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pTemplateName">Template Name</param>
         ''' <param name="pDefaultTemplate">True/False</param>
         ''' <returns>GlobalDataTO</returns>
-        ''' <remarks>CREATED BY: TR 22/11/2011</remarks>
-        Public Function UpdateDefaultTemplateValueByTempltName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' <remarks>CREATED BY: TR 22/11/2011
+        ''' ''' AG 11/06/2014 - Make code easier: Change method name UpdateByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
+        Public Function UpdateByName(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                                ByVal pTemplateName As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -134,7 +136,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateValueByTempltName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateByName", EventLogEntryType.Error, False)
 
             Finally
 
@@ -145,14 +147,15 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update the Defaul Template by the Template Name.
+        ''' Update the template and also rename it and his designer files
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pNewTemplate">Template Name</param>
         ''' <param name="pOldTemplate">Template Name</param>
         ''' <returns>GlobalDataTO</returns>
-        ''' <remarks>CREATED BY: DL 25/11/2011</remarks>
-        Public Function UpdateTemplateNameByOldName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' <remarks>CREATED BY: DL 25/11/2011
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateRenamingTemplate instead of UpdateTemplateNameByOldName</remarks>
+        Public Function UpdateRenamingTemplate(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                     ByVal pNewTemplate As String, _
                                                     ByVal pOldTemplate As String) As GlobalDataTO
 
@@ -188,7 +191,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateTemplateNameByOldName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateRenamingTemplate", EventLogEntryType.Error, False)
 
             Finally
 
@@ -205,8 +208,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection"></param>
         ''' <param name="pTemplateRow">Template Name</param>
         ''' <returns>GlobalDataTO</returns>
-        ''' <remarks>CREATED BY: DL 25/11/2011</remarks>
-        Public Function UpdateDefaultTemplateByTempltName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' <remarks>CREATED BY: DL 25/11/2011
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateAfterCreation instead of UpdateDefaultTemplateByTempltName</remarks>
+        Public Function UpdateAfterCreation(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                           ByVal pTemplateRow As ReportTemplatesDS.tcfgReportTemplatesRow) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -241,7 +245,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateByTempltName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateAfterCreation", EventLogEntryType.Error, False)
 
             Finally
 
@@ -382,7 +386,7 @@ Namespace Biosystems.Ax00.BL
                                                 myNewDefaultTemplate = myReportTemplateDS.tcfgReportTemplates.Where(Function(a) a.TemplateName <> pTemplateName).First().TemplateName
 
                                                 'Select first element and set it as default.
-                                                myGlobalDataTO = UpdateDefaultTemplateValueByTempltName(dbConnection, myNewDefaultTemplate, True)
+                                                myGlobalDataTO = UpdateByName(dbConnection, myNewDefaultTemplate, True)
 
                                             End If
                                         End If
@@ -483,6 +487,144 @@ Namespace Biosystems.Ax00.BL
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 
+            End Try
+
+            Return myGlobalDataTO
+        End Function
+
+#End Region
+
+#Region "Others"
+
+        ''' <summary>
+        ''' Read all report templates defined as MasterTemplate = 0 and check if the designers exits or not on computer
+        ''' Exits -> Leave them
+        ''' No -> Remove from database
+        ''' 
+        ''' This method is called after load RSATs or restore points
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 11/06/2014 Create - #1661</remarks>
+        Public Function DeleteNonExistingReportTemplates(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tcfgReportTemplatesDAO
+
+                        'Get all report templates defined in database just loaded
+                        resultData = myDAO.ReadAll(dbConnection)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            Dim reportsInDB As New ReportTemplatesDS
+                            reportsInDB = CType(resultData.SetDatos, ReportTemplatesDS)
+
+                            'Filter only the user defined templates (those with MasterTemplate as FALSE)
+                            Dim linqResults As List(Of ReportTemplatesDS.tcfgReportTemplatesRow)
+                            linqResults = (From a As ReportTemplatesDS.tcfgReportTemplatesRow In reportsInDB.tcfgReportTemplates _
+                                       Where a.MasterTemplate = False Select a).ToList
+
+
+                            Dim restoreDefaultTemplateValue As Boolean = True 'Set as default the preloaded ones
+
+                            If linqResults.Count > 0 Then
+                                Dim PathTemplates As String = GlobalBase.AppPath & GlobalBase.ReportPath
+                                Dim templateName As String = String.Empty
+                                restoreDefaultTemplateValue = False
+                                For Each row As ReportTemplatesDS.tcfgReportTemplatesRow In linqResults
+                                    templateName = row.TemplateName
+
+                                    'If some designer's files are missing in local computer then remove record from database
+                                    If Not File.Exists(PathTemplates & "\" & templateName & ".REPX") OrElse Not File.Exists(PathTemplates & "\" & templateName & ".GIF") Then
+                                        'If a report saved as DefaultTemplate is deleted ... set as default the preloaded ones
+                                        If row.DefaultTemplate AndAlso Not restoreDefaultTemplateValue Then restoreDefaultTemplateValue = True
+
+                                        'Do not use variable dbConnection, use an unitary transaction!!!
+                                        resultData = Me.Delete(Nothing, templateName)
+                                    End If
+                                Next
+                            End If
+
+                            'Set the MasterTemplates as default
+                            If restoreDefaultTemplateValue Then
+                                resultData = Me.SetDefaultTemplateStatus(Nothing, False, False) 'Reset field DefaultTemplate for all reports
+                                resultData = Me.SetDefaultTemplateStatus(Nothing, True, True) 'Set to TRUE field DefaultTemplate only for MasterTemplate reports
+                            End If
+
+                        End If
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReportTemplatesDelegate.DeleteNonExistingReportTemplates", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Set DefaultTemplate value as False by the Template Orientation.
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pStatus">TRUE or FALSE</param>
+        ''' <param name="pOnlyMasterTemplateFlag">TRUE means that DefaultTemplate will be updated only for the MasterTemplates / FALSE means that will be updated for ALL</param>
+        ''' <returns>GlobalDataTO</returns>
+        ''' <remarks>AG 11/06/2014 - Create - #1661</remarks>
+        Private Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean) As GlobalDataTO
+
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myReportTemplateDAO As New tcfgReportTemplatesDAO
+                        myGlobalDataTO = myReportTemplateDAO.SetDefaultTemplateStatus(dbConnection, pStatus, pOnlyMasterTemplateFlag)
+                    End If
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'When the Database Connection was opened locally, then the Commit is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                    Else
+                        'When the Database Connection was opened locally, then the Rollback is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReportTemplatesDelegate.SetDefaultTemplateStatus", EventLogEntryType.Error, False)
+
+            Finally
+
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
 
             Return myGlobalDataTO
