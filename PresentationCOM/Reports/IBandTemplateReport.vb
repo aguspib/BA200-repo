@@ -329,7 +329,7 @@ Public Class IBandTemplateReport
                 Dim isDuplicated As Boolean = False
 
                 'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
-                Dim templateName As String = templateName
+                Dim templateName As String = bsTemplateTextBox.Text
                 If bsTemplatesListView.SelectedIndices.Count > 0 AndAlso CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
                     templateName = bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(5).Text.ToString
                 End If
