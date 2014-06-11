@@ -609,12 +609,21 @@ Public Class IBandTemplateReport
             copyMasterTemplate.CreateDocument()
 
             'DL 09/11/2012. Begin. When is empty produces a error to export to image
-            For i As Integer = 0 To copyMasterTemplate.Controls.Count - 1
-                If copyMasterTemplate.Controls(i).Controls.Count > 0 Then
-                    ExistObjects = True
-                    Exit For
+            'IT 11/06/2014 #1661 (begin)
+            For Each band As Band In copyMasterTemplate.Controls
+                If TypeOf band Is DevExpress.XtraReports.UI.PageFooterBand Then
+                    If band.Controls.Count > 2 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
+                Else
+                    If band.Controls.Count > 0 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
                 End If
-            Next i
+            Next
+            'IT 11/06/2014 #1661 (end)
 
             If Not ExistObjects Then
                 File.Delete(PathTemplates & "\TEMP.GIF")
@@ -631,12 +640,21 @@ Public Class IBandTemplateReport
             copyMasterTemplateLS.CreateDocument()
 
             'DL 09/11/2012. Begin. When is empty produces a error to export to image
-            For i As Integer = 0 To copyMasterTemplateLS.Controls.Count - 1
-                If copyMasterTemplateLS.Controls(i).Controls.Count > 0 Then
-                    ExistObjects = True
-                    Exit For
+            'IT 11/06/2014 #1661 (begin)
+            For Each band As Band In copyMasterTemplateLS.Controls
+                If TypeOf band Is DevExpress.XtraReports.UI.PageFooterBand Then
+                    If band.Controls.Count > 2 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
+                Else
+                    If band.Controls.Count > 0 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
                 End If
-            Next i
+            Next
+            'IT 11/06/2014 #1661 (end)
 
             If Not ExistObjects Then
                 File.Delete(PathTemplates & "\TEMP.GIF")
@@ -672,6 +690,8 @@ Public Class IBandTemplateReport
         Try
             Cursor = Cursors.WaitCursor
 
+            If (DesignForm.IsDisposed) Then Exit Sub
+
             If newTemplate OrElse ReportChanged Then
 
                 'Save temporal repx
@@ -691,11 +711,7 @@ Public Class IBandTemplateReport
                 Next i
 
                 bsPicturePanel.Controls.Add(tmpPreviewPictureBox)
-
             End If
-
-            DesignForm.Dispose()
-            'DesignForm = Nothing
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -704,6 +720,24 @@ Public Class IBandTemplateReport
         Finally
             Cursor = Cursors.Default
 
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Invoke event when the DesignForm is Closed
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: 'IT 11/06/2014 #1661
+    '''</remarks>
+    Private Sub DesignForm_Closed(ByVal sender As Object, ByVal e As FormClosedEventArgs) Handles DesignForm.FormClosed
+        Try
+            Cursor = Cursors.WaitCursor
+            DesignForm.Dispose()
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".DesignForm_Closed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        Finally
+            Cursor = Cursors.Default
         End Try
     End Sub
 
