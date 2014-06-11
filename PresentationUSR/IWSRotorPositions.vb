@@ -1779,7 +1779,7 @@ Public Class IWSRotorPositions
             CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateRotorTreeViewArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            If (Not isClosingFlag) Then
+            If (Not IsDisposed) Then
                 bsElementsTreeView.Visible = True
             End If
         End Try
