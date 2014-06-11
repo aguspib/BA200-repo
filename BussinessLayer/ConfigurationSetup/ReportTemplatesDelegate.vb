@@ -85,8 +85,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDefaultTemplate">True/False</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>CREATED BY: TR 22/11/2011
-        ''' ''' AG 11/06/2014 - Make code easier: Change method name UpdateByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
-        Public Function UpdateByName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateDefaultTemplateByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
+        Public Function UpdateDefaultTemplateByName(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                                ByVal pTemplateName As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -113,7 +113,7 @@ Namespace Biosystems.Ax00.BL
 
                             End If
 
-                            myGlobalDataTO = myReportTemplateDAO.UpdateDefaultTemplateValueByTempltName(dbConnection, pTemplateName, pDefaultTemplate)
+                            myGlobalDataTO = myReportTemplateDAO.UpdateDefaultTemplateByName(dbConnection, pTemplateName, pDefaultTemplate)
                         End If
 
                         If (Not myGlobalDataTO.HasError) Then
@@ -136,7 +136,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateByName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateByName", EventLogEntryType.Error, False)
 
             Finally
 
@@ -209,8 +209,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pTemplateRow">Template Name</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>CREATED BY: DL 25/11/2011
-        ''' AG 11/06/2014 - Make code easier: Change method name UpdateAfterCreation instead of UpdateDefaultTemplateByTempltName</remarks>
-        Public Function UpdateAfterCreation(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateComplete instead of UpdateDefaultTemplateByTempltName</remarks>
+        Public Function UpdateComplete(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                           ByVal pTemplateRow As ReportTemplatesDS.tcfgReportTemplatesRow) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -223,7 +223,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myReportTemplateDAO As New tcfgReportTemplatesDAO
 
-                        myGlobalDataTO = myReportTemplateDAO.UpdateDefaultTemplateByTempltName(dbConnection, pTemplateRow)
+                        myGlobalDataTO = myReportTemplateDAO.UpdateComplete(dbConnection, pTemplateRow)
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -245,7 +245,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateAfterCreation", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateComplete", EventLogEntryType.Error, False)
 
             Finally
 
@@ -386,7 +386,7 @@ Namespace Biosystems.Ax00.BL
                                                 myNewDefaultTemplate = myReportTemplateDS.tcfgReportTemplates.Where(Function(a) a.TemplateName <> pTemplateName).First().TemplateName
 
                                                 'Select first element and set it as default.
-                                                myGlobalDataTO = UpdateByName(dbConnection, myNewDefaultTemplate, True)
+                                                myGlobalDataTO = UpdateDefaultTemplateByName(dbConnection, myNewDefaultTemplate, True)
 
                                             End If
                                         End If

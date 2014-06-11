@@ -423,7 +423,7 @@ Public Class IBandTemplateReport
                             'Update report
                             'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
                             'resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
-                            resultData = templateList.UpdateByName(Nothing, templateName, bsDefaultCheckbox.Checked)
+                            resultData = templateList.UpdateDefaultTemplateByName(Nothing, templateName, bsDefaultCheckbox.Checked)
 
                         ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text, myCurrentOrientation) Then
                             'Create new report (when orientation changes)
@@ -433,7 +433,7 @@ Public Class IBandTemplateReport
 
                             If Not resultData.HasError Then
                                 myTemplateDS = DirectCast(resultData.SetDatos, ReportTemplatesDS)
-                                resultData = templateList.UpdateAfterCreation(Nothing, myTemplateDS.tcfgReportTemplates(0))
+                                resultData = templateList.UpdateComplete(Nothing, myTemplateDS.tcfgReportTemplates(0))
 
                                 If (Not resultData.HasError) Then bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text = bsOrientationComboBox.Text
                             End If

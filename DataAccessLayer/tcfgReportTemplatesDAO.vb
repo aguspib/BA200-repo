@@ -128,8 +128,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection"></param>
         ''' <param name="pReportTemplateRow">Template name</param>
         ''' <returns>GlobalaDataTO</returns>
-        ''' <remarks>CREATED BY: DL 25/11/2011</remarks>
-        Public Function UpdateDefaultTemplateByTempltName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' <remarks>CREATED BY: DL 25/11/2011
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateComplete instead of UpdateDefaultTemplateByTempltName</remarks>
+        Public Function UpdateComplete(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                           ByVal pReportTemplateRow As ReportTemplatesDS.tcfgReportTemplatesRow) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
@@ -167,7 +168,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateByTempltName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateComplete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -226,8 +227,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pTemplateName">Template name</param>
         ''' <param name="pDefaultTemplate">True/False</param>
         ''' <returns>GlobalaDataTO</returns>
-        ''' <remarks>CREATED BY: TR 23/11/2011</remarks>
-        Public Function UpdateDefaultTemplateValueByTempltName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' <remarks>CREATED BY: TR 23/11/2011
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateDefaultTemplateByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
+        Public Function UpdateDefaultTemplateByName(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                        ByVal pTemplateName As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
@@ -260,7 +262,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultValueByTempltName", _
+                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateByName", _
                                                 EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
