@@ -412,8 +412,8 @@ Public Class IBandTemplateReport
 
                     If Not newTemplate AndAlso bsTemplatesListView.SelectedIndices.Count > 0 Then
 
-                        If Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).Text, templateName) Then
-                            'Report has been renamed
+                        If Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).Text, bsTemplateTextBox.Text) Then 'AG 11/06/2014 Do not replace bsTemplateTextBox.Text for templateName in this IF
+                            'Report has been renamed (rename template name ID in database and also designer files)
                             'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
                             'resultData = templateList.UpdateTemplateNameByOldName(Nothing, bsTemplateTextBox.Text, bsTemplatesListView.SelectedItems(0).Text)
                             resultData = templateList.UpdateTemplateNameByOldName(Nothing, templateName, bsTemplatesListView.SelectedItems(0).Text)
