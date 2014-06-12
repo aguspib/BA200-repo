@@ -78,15 +78,16 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update the template (no rename has done)
+        ''' Update the template (only DefaultTemplate field)
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pTemplateName">Template Name</param>
         ''' <param name="pDefaultTemplate">True/False</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>CREATED BY: TR 22/11/2011
-        ''' AG 11/06/2014 - Make code easier: Change method name UpdateDefaultTemplateByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
-        Public Function UpdateDefaultTemplateByName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateDefaultTemplateFieldByName instead of UpdateDefaultTemplateValueByTempltName
+        ''' AG 11/06/2014 - #1661 always 1 template marked as Default (by orientation)</remarks>
+        Public Function UpdateDefaultTemplateFieldByName(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                                ByVal pTemplateName As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -99,21 +100,67 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         If Not pTemplateName = String.Empty Then
                             Dim myReportTemplateDAO As New tcfgReportTemplatesDAO
+                            Dim orientation As String = "" '#1661
 
-                            If pDefaultTemplate Then
-                                'Get template data to get 
-                                myGlobalDataTO = Read(dbConnection, pTemplateName)
-                                If Not myGlobalDataTO.HasError Then
-                                    Dim myReportTemplateDS As New ReportTemplatesDS
-                                    myReportTemplateDS = DirectCast(myGlobalDataTO.SetDatos, ReportTemplatesDS)
-                                    If myReportTemplateDS.tcfgReportTemplates.Rows.Count = 1 Then
-                                        myGlobalDataTO = SetFalseDefaultTemplateByTempOrientation(dbConnection, myReportTemplateDS.tcfgReportTemplates(0).TemplateOrientation)
-                                    End If
+                            'Get template data to update
+                            myGlobalDataTO = Read(dbConnection, pTemplateName)
+                            If Not myGlobalDataTO.HasError Then
+                                Dim myReportTemplateDS As New ReportTemplatesDS
+                                myReportTemplateDS = DirectCast(myGlobalDataTO.SetDatos, ReportTemplatesDS)
+                                If myReportTemplateDS.tcfgReportTemplates.Rows.Count = 1 Then
+                                    orientation = myReportTemplateDS.tcfgReportTemplates(0).TemplateOrientation '#1661
                                 End If
-
                             End If
 
-                            myGlobalDataTO = myReportTemplateDAO.UpdateDefaultTemplateByName(dbConnection, pTemplateName, pDefaultTemplate)
+                            If pDefaultTemplate Then
+                                'If edited template is selected to be the default ... reset the current default!!
+                                If orientation <> "" Then
+                                    myGlobalDataTO = SetFalseDefaultTemplateByTempOrientation(dbConnection, orientation)
+                                End If
+                            End If
+
+                            'Update the template (only defaultTemplate field)
+                            myGlobalDataTO = myReportTemplateDAO.UpdateDefaultTemplateFieldByName(dbConnection, pTemplateName, pDefaultTemplate)
+
+                            'AG 11/06/2014 - #1661 always 1 template marked as Default (by orientation)
+                            If Not pDefaultTemplate Then
+                                Dim requiredSetDefaultTemplateFlag As Boolean = False
+                                'If orientation = "" mark as default the BOTH mastertemplates, else mark only the mastertemplate of current orientation
+                                If orientation = "" Then
+                                    myGlobalDataTO = Me.SetDefaultTemplateStatus(dbConnection, False, False)
+                                    requiredSetDefaultTemplateFlag = True
+                                Else
+                                    'Read if the current orientation have a default template
+                                    myGlobalDataTO = ReadAll(dbConnection)
+                                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                        Dim reportsInDB As New ReportTemplatesDS
+                                        reportsInDB = CType(myGlobalDataTO.SetDatos, ReportTemplatesDS)
+
+                                        'Search if there is a template programmed as default for the current orientation
+                                        Dim linqResults As List(Of ReportTemplatesDS.tcfgReportTemplatesRow)
+                                        linqResults = (From a As ReportTemplatesDS.tcfgReportTemplatesRow In reportsInDB.tcfgReportTemplates _
+                                                   Where a.DefaultTemplate = True And a.TemplateOrientation = orientation Select a).ToList
+
+                                        If linqResults.Count = 0 Then
+                                            requiredSetDefaultTemplateFlag = True
+                                        End If
+                                        linqResults = Nothing
+
+                                    Else
+                                        'If error mark as default the BOTH mastertemplates, else mark only the mastertemplate of current orientation
+                                        myGlobalDataTO = Me.SetDefaultTemplateStatus(dbConnection, False, False)
+                                        requiredSetDefaultTemplateFlag = True
+                                    End If
+
+                                End If
+
+                                'If not default template programmed set the preloaed mastertemplates by orientation
+                                If requiredSetDefaultTemplateFlag Then
+                                    myGlobalDataTO = SetDefaultTemplateStatus(dbConnection, True, True, orientation)
+                                End If
+                            End If
+                            'AG 11/06/2014 #1661
+
                         End If
 
                         If (Not myGlobalDataTO.HasError) Then
@@ -136,7 +183,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateByName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateFieldByName", EventLogEntryType.Error, False)
 
             Finally
 
@@ -147,17 +194,20 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update the template and also rename it and his designer files
+        ''' Update the template and also rename it and his designer files (also updates the DefaultTemplate field)
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pNewTemplate">Template Name</param>
         ''' <param name="pOldTemplate">Template Name</param>
+        ''' <param name="pOrientation"></param>
+        ''' <param name="pDefaultTemplate"></param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>CREATED BY: DL 25/11/2011
-        ''' AG 11/06/2014 - Make code easier: Change method name UpdateRenamingTemplate instead of UpdateTemplateNameByOldName</remarks>
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateRenamingTemplate instead of UpdateTemplateNameByOldName
+        ''' AG 12/06/2014 #1661 - also update DefaultTemplate and always 1 template marked as Default (by orientation)</remarks>
         Public Function UpdateRenamingTemplate(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                     ByVal pNewTemplate As String, _
-                                                    ByVal pOldTemplate As String) As GlobalDataTO
+                                                    ByVal pOldTemplate As String, ByVal pOrientation As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -169,7 +219,46 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myReportTemplateDAO As New tcfgReportTemplatesDAO
 
-                        myGlobalDataTO = myReportTemplateDAO.UpdateTemplateName(dbConnection, pNewTemplate, pOldTemplate)
+                        'AG 12/06/2014 #1661 if the report to update is marked as default reset current default for the new report orientation
+                        If pDefaultTemplate Then
+                            myGlobalDataTO = SetFalseDefaultTemplateByTempOrientation(dbConnection, pOrientation)
+                        End If
+                        'AG 12/06/2014 #1661
+
+                        myGlobalDataTO = myReportTemplateDAO.UpdateTemplateName(dbConnection, pNewTemplate, pOldTemplate, pDefaultTemplate)
+
+                        'AG 11/06/2014 - #1661 always 1 template marked as Default (by orientation)
+                        If Not pDefaultTemplate Then
+                            Dim requiredSetDefaultTemplateFlag As Boolean = False
+                            'Read if the current orientation have a default template
+                            myGlobalDataTO = ReadAll(dbConnection)
+                            If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                Dim reportsInDB As New ReportTemplatesDS
+                                reportsInDB = CType(myGlobalDataTO.SetDatos, ReportTemplatesDS)
+
+                                'Search if there is a template programmed as default for the current orientation
+                                Dim linqResults As List(Of ReportTemplatesDS.tcfgReportTemplatesRow)
+                                linqResults = (From a As ReportTemplatesDS.tcfgReportTemplatesRow In reportsInDB.tcfgReportTemplates _
+                                           Where a.DefaultTemplate = True And a.TemplateOrientation = pOrientation Select a).ToList
+
+                                If linqResults.Count = 0 Then
+                                    requiredSetDefaultTemplateFlag = True
+                                End If
+                                linqResults = Nothing
+
+                            Else
+                                'If error mark as default the BOTH mastertemplates, else mark only the mastertemplate of current orientation
+                                myGlobalDataTO = Me.SetDefaultTemplateStatus(dbConnection, False, False)
+                                requiredSetDefaultTemplateFlag = True
+                            End If
+
+                            'If not default template programmed set the preloaed mastertemplates by orientation
+                            If requiredSetDefaultTemplateFlag Then
+                                myGlobalDataTO = SetDefaultTemplateStatus(dbConnection, True, True, pOrientation)
+                            End If
+                        End If
+                        'AG 11/06/2014 #1661
+
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -203,13 +292,14 @@ Namespace Biosystems.Ax00.BL
 
 
         ''' <summary>
-        ''' Update the Defaul Template by the Template Name.
+        ''' Update the all fields in database (used when edit changes orientation)
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pTemplateRow">Template Name</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>CREATED BY: DL 25/11/2011
-        ''' AG 11/06/2014 - Make code easier: Change method name UpdateComplete instead of UpdateDefaultTemplateByTempltName</remarks>
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateComplete instead of UpdateDefaultTemplateByTempltName
+        ''' AG 12/06/2014 - #1661 always 1 template marked as Default (by orientation)</remarks>
         Public Function UpdateComplete(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                           ByVal pTemplateRow As ReportTemplatesDS.tcfgReportTemplatesRow) As GlobalDataTO
 
@@ -223,7 +313,59 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myReportTemplateDAO As New tcfgReportTemplatesDAO
 
-                        myGlobalDataTO = myReportTemplateDAO.UpdateComplete(dbConnection, pTemplateRow)
+                        'AG 12/06/2014 #1661 if the report to update is marked as default reset current default for the new report orientation
+                        If pTemplateRow.DefaultTemplate Then
+                            myGlobalDataTO = SetFalseDefaultTemplateByTempOrientation(dbConnection, pTemplateRow.TemplateOrientation)
+                        End If
+                        'AG 12/06/2014 #1661
+
+                        'Update the template (full update)
+                        If Not myGlobalDataTO.HasError Then
+                            myGlobalDataTO = myReportTemplateDAO.UpdateComplete(dbConnection, pTemplateRow)
+                        End If
+
+                        'AG 12/06/2014 - #1661 current orientation OK but check that there is 1 template marked as Default in the old orientation
+                        If Not myGlobalDataTO.HasError Then
+                            'Read if the other orientation have a default template
+                            Dim requiredSetDefaultTemplateFlag As Boolean = False
+                            Dim secondOrientationName As String = ""
+
+                            myGlobalDataTO = ReadAll(dbConnection)
+                            If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                Dim reportsInDB As New ReportTemplatesDS
+                                reportsInDB = CType(myGlobalDataTO.SetDatos, ReportTemplatesDS)
+
+                                'Search if there is a template programmed as default for the current orientation
+                                Dim linqResults As List(Of ReportTemplatesDS.tcfgReportTemplatesRow)
+                                linqResults = (From a As ReportTemplatesDS.tcfgReportTemplatesRow In reportsInDB.tcfgReportTemplates _
+                                           Where a.DefaultTemplate = True And a.TemplateOrientation <> pTemplateRow.TemplateOrientation Select a).ToList
+
+                                If linqResults.Count = 0 Then
+                                    requiredSetDefaultTemplateFlag = True
+
+                                    'Get the other orientation name
+                                    linqResults = (From a As ReportTemplatesDS.tcfgReportTemplatesRow In reportsInDB.tcfgReportTemplates _
+                                                   Where a.TemplateOrientation <> pTemplateRow.TemplateOrientation Select a).ToList
+
+                                    If linqResults.Count > 0 Then
+                                        secondOrientationName = linqResults(0).TemplateOrientation
+                                    End If
+                                End If
+                            Else
+                                'If error mark as default the BOTH mastertemplates, else mark only the mastertemplate of current orientation
+                                myGlobalDataTO = Me.SetDefaultTemplateStatus(dbConnection, False, False)
+                                requiredSetDefaultTemplateFlag = True
+                            End If
+
+                            'If not default template programmed set the preloaed mastertemplates by orientation
+                            If requiredSetDefaultTemplateFlag Then
+                                myGlobalDataTO = SetDefaultTemplateStatus(dbConnection, True, True, secondOrientationName)
+                            End If
+
+                        End If
+                        'AG 12/06/2014 #1661
+
+
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -386,7 +528,7 @@ Namespace Biosystems.Ax00.BL
                                                 myNewDefaultTemplate = myReportTemplateDS.tcfgReportTemplates.Where(Function(a) a.TemplateName <> pTemplateName).First().TemplateName
 
                                                 'Select first element and set it as default.
-                                                myGlobalDataTO = UpdateDefaultTemplateByName(dbConnection, myNewDefaultTemplate, True)
+                                                myGlobalDataTO = UpdateDefaultTemplateFieldByName(dbConnection, myNewDefaultTemplate, True)
 
                                             End If
                                         End If
@@ -549,6 +691,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
                                 Next
                             End If
+                            linqResults = Nothing
 
                             'Set the MasterTemplates as default
                             If restoreDefaultTemplateValue Then
@@ -585,9 +728,11 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection"></param>
         ''' <param name="pStatus">TRUE or FALSE</param>
         ''' <param name="pOnlyMasterTemplateFlag">TRUE means that DefaultTemplate will be updated only for the MasterTemplates / FALSE means that will be updated for ALL</param>
+        ''' <param name="pTemplateOrientation">PORTRAIT or LANDSCAPE</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>AG 11/06/2014 - Create - #1661</remarks>
-        Private Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean) As GlobalDataTO
+        Private Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean, _
+                                                  Optional ByVal pTemplateOrientation As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -598,7 +743,7 @@ Namespace Biosystems.Ax00.BL
 
                     If (Not dbConnection Is Nothing) Then
                         Dim myReportTemplateDAO As New tcfgReportTemplatesDAO
-                        myGlobalDataTO = myReportTemplateDAO.SetDefaultTemplateStatus(dbConnection, pStatus, pOnlyMasterTemplateFlag)
+                        myGlobalDataTO = myReportTemplateDAO.SetDefaultTemplateStatus(dbConnection, pStatus, pOnlyMasterTemplateFlag, pTemplateOrientation)
                     End If
 
                     If (Not myGlobalDataTO.HasError) Then
