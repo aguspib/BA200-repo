@@ -55,6 +55,8 @@ Public Class IBandTemplateReport
         Try
             Cursor = Cursors.WaitCursor
 
+            DeleteResidualFiles() 'IT 12/06/2014 #1661: Delete temporals reports before to edit another
+
             EditionMode = True
             bsEditButton.Enabled = False
             bsSaveButton.Enabled = True
