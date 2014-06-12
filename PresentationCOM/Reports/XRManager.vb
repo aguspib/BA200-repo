@@ -1702,7 +1702,7 @@ Public Class XRManager
             Cell.Weight = 1.0
         End If
 
-        Cell.Padding = New PaddingInfo(1, 3, 1, 1)
+        'Cell.Padding = New PaddingInfo(1, 3, 1, 1)  'EF 06/06/2014 #1649 (evitar usar Padding)
 
         Return Cell
     End Function
@@ -1731,7 +1731,7 @@ Public Class XRManager
             Cell.Weight = 1.0
         End If
 
-        Cell.Padding = New PaddingInfo(1, 3, 1, 1)
+        'Cell.Padding = New PaddingInfo(1, 3, 1, 1)  'EF 06/06/2014 #1649 (evitar usar Padding)
 
         Return Cell
     End Function

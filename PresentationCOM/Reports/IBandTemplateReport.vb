@@ -62,7 +62,7 @@ Public Class IBandTemplateReport
             bsOrientationComboBox.Enabled = False
 
             'If master template then 
-            If CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
+            If bsTemplatesListView.SelectedIndices.Count > 0 AndAlso CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
                 bsTemplateTextBox.Enabled = False
                 bsTemplateTextBox.BackColor = SystemColors.MenuBar
 
@@ -205,6 +205,7 @@ Public Class IBandTemplateReport
     ''' </summary>
     ''' <remarks>
     ''' Created by: DL 23/11/2011
+    ''' AG 12/06/2014 - #1661
     ''' </remarks>
     Private Function AddTemplate(ByVal pFileReport) As GlobalDataTO
 
@@ -229,8 +230,25 @@ Public Class IBandTemplateReport
                 End If
 
                 If myTemplateDS.tcfgReportTemplates.Count > 0 Then
-                    myTemplateDS.tcfgReportTemplates(0).TemplateOrientation = UCase(bsOrientationComboBox.Text.Trim)
+                    'AG 11/06/2014 #1661
+                    'myTemplateDS.tcfgReportTemplates(0).TemplateOrientation = UCase(bsOrientationComboBox.Text.Trim)
+                    myTemplateDS.tcfgReportTemplates(0).BeginEdit()
+                    '1- Update name
+                    If myTemplateDS.tcfgReportTemplates(0).TemplateName <> bsTemplateTextBox.Text Then
+                        myTemplateDS.tcfgReportTemplates(0).TemplateName = bsTemplateTextBox.Text
+                    End If
 
+                    '2- Update orientation
+                    If myTemplateDS.tcfgReportTemplates(0).TemplateOrientation <> myCurrentOrientation Then
+                        myTemplateDS.tcfgReportTemplates(0).TemplateOrientation = myCurrentOrientation
+                    End If
+
+                    '3- Update default template
+                    If myTemplateDS.tcfgReportTemplates(0).DefaultTemplate <> bsDefaultCheckbox.Checked Then
+                        myTemplateDS.tcfgReportTemplates(0).DefaultTemplate = bsDefaultCheckbox.Checked
+                    End If
+                    myTemplateDS.tcfgReportTemplates(0).EndEdit()
+                    'AG 11/06/2014 #1661
                 Else
                     newRow = myTemplateDS.tcfgReportTemplates.NewtcfgReportTemplatesRow
                     newRow.DefaultTemplate = False
@@ -245,6 +263,8 @@ Public Class IBandTemplateReport
                     resultData = templateList.CreateReportTemplate(Nothing, myTemplateDS)
 
                     If (Not resultData.HasError) Then
+                        resultData.SetDatos = myTemplateDS 'AG 12/06/2014 - #1661
+
                         bsTemplatesListView.Items.Add(bsTemplateTextBox.Text)
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(False)
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(myCurrentOrientation) 'UCase(bsOrientationComboBox.Text.Trim))
@@ -310,6 +330,13 @@ Public Class IBandTemplateReport
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' Save (creates or updates) changes in templates
+    ''' </summary>
+    ''' <remarks>
+    ''' AG 11/06/2014 #1661 allow the preloaded mastertemplate become default again (use variable templateName instead of control bsTemplateTextBox.Text)
+    ''' </remarks>
     Private Sub SaveReport()
         Try
             Cursor = Cursors.WaitCursor 'RH 15/12/2011
@@ -320,14 +347,23 @@ Public Class IBandTemplateReport
             If Not String.IsNullOrEmpty(bsTemplateTextBox.Text) AndAlso Not String.IsNullOrEmpty(bsOrientationComboBox.Text) Then
 
                 Dim isDuplicated As Boolean = False
+
+                'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
+                Dim templateName As String = bsTemplateTextBox.Text
+                If bsTemplatesListView.SelectedIndices.Count > 0 AndAlso CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
+                    templateName = bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(5).Text.ToString
+                End If
+                'AG 11/06/2014
+
                 For i As Integer = 0 To bsTemplatesListView.Items.Count - 1
 
+                    'Before save check for the template wont be duplicated!!!
                     If Not newTemplate Then
-                        If Not String.Equals(bsTemplatesListView.SelectedItems(0).Text, bsTemplateTextBox.Text) AndAlso _
-                           String.Equals(bsTemplatesListView.Items(i).Text, bsTemplateTextBox.Text) Then isDuplicated = True
+                        If Not String.Equals(bsTemplatesListView.SelectedItems(0).Text, templateName) AndAlso _
+                           String.Equals(bsTemplatesListView.Items(i).Text, templateName) Then isDuplicated = True
 
                     Else
-                        If String.Equals(bsTemplatesListView.Items(i).Text, bsTemplateTextBox.Text) Then isDuplicated = True
+                        If String.Equals(bsTemplatesListView.Items(i).Text, templateName) Then isDuplicated = True
 
                     End If
 
@@ -335,94 +371,107 @@ Public Class IBandTemplateReport
 
                 Next i
 
+                'Deny permission is duplicated
                 If isDuplicated Then
-                    bsScreenErrorProvider.SetError(bsTemplateTextBox, GetMessageText(GlobalEnumerates.Messages.REPEATED_NAME.ToString))
+                    'bsScreenErrorProvider.SetError(bsTemplateTextBox, GetMessageText(GlobalEnumerates.Messages.REPEATED_NAME.ToString)) 'Duplicated test name
+                    bsScreenErrorProvider.SetError(bsTemplateTextBox, GetMessageText(GlobalEnumerates.Messages.FILE_EXIST.ToString)) 'Duplicated name
                     bsTemplateTextBox.Focus()
+
+                    'If not duplicate save changes (new or update)
                 Else
                     Dim resultData As GlobalDataTO = Nothing
                     Dim templateList As New ReportTemplatesDelegate
                     Dim myFileReport As String
 
-                    If File.Exists(PathTemplates & "\TEMP.REPX") AndAlso File.Exists(PathTemplates & "\" & bsTemplateTextBox.Text & ".REPX") Then
-                        File.Delete(PathTemplates & "\" & bsTemplateTextBox.Text & ".REPX")
-                        File.Delete(PathTemplates & "\" & bsTemplateTextBox.Text & ".GIF")
+                    'Next code applies only for the USER templates, not for the preloaded (whose designer could not be edited)
+                    If bsTemplatesListView.SelectedIndices.Count > 0 AndAlso Not CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
+                        If File.Exists(PathTemplates & "\TEMP.REPX") AndAlso File.Exists(PathTemplates & "\" & templateName & ".REPX") Then
+                            File.Delete(PathTemplates & "\" & templateName & ".REPX")
+                            File.Delete(PathTemplates & "\" & templateName & ".GIF")
 
-                        File.Copy(PathTemplates & "\TEMP.REPX", PathTemplates & "\" & bsTemplateTextBox.Text & ".REPX")
-                        File.Copy(PathTemplates & "\TEMP.GIF", PathTemplates & "\" & bsTemplateTextBox.Text & ".GIF")
-
-                        File.Delete(PathTemplates & "\TEMP.REPX")
-                        File.Delete(PathTemplates & "\TEMP.GIF")
-
-
-                    ElseIf Not newTemplate AndAlso Not String.Equals(bsTemplatesListView.SelectedItems(0).Text, bsTemplateTextBox.Text) Then
-
-                        If File.Exists(PathTemplates & "\TEMP.REPX") AndAlso File.Exists(PathTemplates & "\" & bsTemplatesListView.SelectedItems(0).Text & ".REPX") Then
-                            File.Delete(PathTemplates & bsTemplatesListView.SelectedItems(0).Text & ".REPX")
-                            File.Delete(PathTemplates & bsTemplatesListView.SelectedItems(0).Text & ".GIF")
-
-                            File.Copy(PathTemplates & "\TEMP.REPX", PathTemplates & "\" & bsTemplateTextBox.Text & ".REPX")
-                            File.Copy(PathTemplates & "\TEMP.GIF", PathTemplates & "\" & bsTemplateTextBox.Text & ".GIF")
+                            File.Copy(PathTemplates & "\TEMP.REPX", PathTemplates & "\" & templateName & ".REPX")
+                            File.Copy(PathTemplates & "\TEMP.GIF", PathTemplates & "\" & templateName & ".GIF")
 
                             File.Delete(PathTemplates & "\TEMP.REPX")
                             File.Delete(PathTemplates & "\TEMP.GIF")
 
-                        Else
-                            File.Delete(PathTemplates & bsTemplateTextBox.Text & ".REPX")
-                            File.Delete(PathTemplates & bsTemplateTextBox.Text & ".GIF")
 
-                            File.Copy(PathTemplates & "\" & bsTemplatesListView.SelectedItems(0).Text & ".REPX", _
-                                      PathTemplates & "\" & bsTemplateTextBox.Text & ".REPX")
+                        ElseIf Not newTemplate AndAlso Not String.Equals(bsTemplatesListView.SelectedItems(0).Text, templateName) Then
 
-                            File.Copy(PathTemplates & "\" & bsTemplatesListView.SelectedItems(0).Text & ".GIF", _
-                                      PathTemplates & "\" & bsTemplateTextBox.Text & ".GIF")
+                            If File.Exists(PathTemplates & "\TEMP.REPX") AndAlso File.Exists(PathTemplates & "\" & bsTemplatesListView.SelectedItems(0).Text & ".REPX") Then
+                                File.Delete(PathTemplates & bsTemplatesListView.SelectedItems(0).Text & ".REPX")
+                                File.Delete(PathTemplates & bsTemplatesListView.SelectedItems(0).Text & ".GIF")
+
+                                File.Copy(PathTemplates & "\TEMP.REPX", PathTemplates & "\" & templateName & ".REPX")
+                                File.Copy(PathTemplates & "\TEMP.GIF", PathTemplates & "\" & templateName & ".GIF")
+
+                                File.Delete(PathTemplates & "\TEMP.REPX")
+                                File.Delete(PathTemplates & "\TEMP.GIF")
+
+                            Else
+                                File.Delete(PathTemplates & templateName & ".REPX")
+                                File.Delete(PathTemplates & templateName & ".GIF")
+
+                                File.Copy(PathTemplates & "\" & bsTemplatesListView.SelectedItems(0).Text & ".REPX", _
+                                          PathTemplates & "\" & templateName & ".REPX")
+
+                                File.Copy(PathTemplates & "\" & bsTemplatesListView.SelectedItems(0).Text & ".GIF", _
+                                          PathTemplates & "\" & templateName & ".GIF")
+
+                            End If
 
                         End If
-
                     End If
-
-                    myFileReport = bsTemplateTextBox.Text & ".REPX"
-                    'End If
+                    myFileReport = templateName & ".REPX"
 
                     Dim myCurrentOrientation As String
-
                     If String.Equals(bsOrientationComboBox.Text, labelPortrait) Then
                         myCurrentOrientation = "PORTRAIT"
                     Else
                         myCurrentOrientation = "LANDSCAPE"
                     End If
 
-                    If Not newTemplate Then
-                        If Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).Text, bsTemplateTextBox.Text) Then
-                            'resultData = AddTemplate(myFileReport)
+                    If Not newTemplate AndAlso bsTemplatesListView.SelectedIndices.Count > 0 Then
 
-                            resultData = templateList.UpdateTemplateNameByOldName(Nothing, bsTemplateTextBox.Text, bsTemplatesListView.SelectedItems(0).Text)
-                            'resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
-
-                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text, bsDefaultCheckbox.Checked) Then
-                            resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
-
-                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text, myCurrentOrientation) Then
+                        'AG 12/06/2014 - #1661 (change order of IF's: 1st when change orientation / else 2on when renamed / else 3rd if only change default)
+                        If Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text, myCurrentOrientation) Then
+                            '1) When Orientation changed ---> Create new report (independent if also have been renamed and change default fields)
+                            '
                             resultData = AddTemplate(myFileReport)
 
                             Dim myTemplateDS As ReportTemplatesDS
-
                             If Not resultData.HasError Then
                                 myTemplateDS = DirectCast(resultData.SetDatos, ReportTemplatesDS)
-                                resultData = templateList.UpdateDefaultTemplateByTempltName(Nothing, myTemplateDS.tcfgReportTemplates(0))
+                                resultData = templateList.UpdateComplete(Nothing, myTemplateDS.tcfgReportTemplates(0))
 
                                 If (Not resultData.HasError) Then bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text = bsOrientationComboBox.Text
                             End If
 
+                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).Text, bsTemplateTextBox.Text) Then 'AG 11/06/2014 Do not replace bsTemplateTextBox.Text for templateName in this IF
+                            '2) Report has been renamed (rename template name ID in database and also designer files)
+                            '(independent if also changes default field)
+
+                            'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
+                            'resultData = templateList.UpdateTemplateNameByOldName(Nothing, bsTemplateTextBox.Text, bsTemplatesListView.SelectedItems(0).Text)
+                            resultData = templateList.UpdateRenamingTemplate(Nothing, templateName, bsTemplatesListView.SelectedItems(0).Text, myCurrentOrientation, bsDefaultCheckbox.Checked)
+
+                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text, bsDefaultCheckbox.Checked) Then
+                            '3) Change DefaultTemplate field
+                            'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
+                            'resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
+                            resultData = templateList.UpdateDefaultTemplateFieldByName(Nothing, templateName, bsDefaultCheckbox.Checked)
+
                         End If
 
                     ElseIf newTemplate Then
+                        'Create new report
                         resultData = AddTemplate(myFileReport)
                     End If
 
                     If (resultData Is Nothing) OrElse (Not resultData.HasError) Then 'RH 19/12/2011
                         tmpPreviewPictureBox.Image = Nothing
                         'DL 03/01/2012
-                        Dim sFile As String = PathTemplates & "\" & bsTemplateTextBox.Text
+                        Dim sFile As String = PathTemplates & "\" & templateName
                         If newTemplate And SaveAs Then
 
                             Rename(PathTemplates & "\TEMP.GIF", sFile & ".GIF")
@@ -443,7 +492,7 @@ Public Class IBandTemplateReport
                         End If
 
                         'DL 03/01/2012
-                        Dim auxTemplate As String = bsTemplateTextBox.Text()
+                        Dim auxTemplate As String = templateName
                         LoadTemplatesList()
 
                         For i As Integer = 0 To bsTemplatesListView.Items.Count - 1
@@ -452,24 +501,6 @@ Public Class IBandTemplateReport
                                 Exit For
                             End If
                         Next i
-
-                        'If bsTemplatesListView.Items.Count > 0 AndAlso newTemplate Then
-                        '    SelectIndex = bsTemplatesListView.Items.Count - 1
-
-                        'ElseIf bsTemplatesListView.Items.Count > 0 AndAlso Not newTemplate Then
-                        '    LoadTemplatesList()
-
-                        '    For i As Integer = 0 To bsTemplatesListView.Items.Count - 1
-
-                        '        If bsTemplatesListView.SelectedItems(0).Text <> bsTemplateTextBox.Text AndAlso bsTemplatesListView.Items(i).Text = bsTemplateTextBox.Text Then
-                        '            isDuplicated = True
-                        '            Exit For
-
-                        '        End If
-                        '    Next i
-
-                        '    SelectIndex = bsTemplatesListView.SelectedIndices(0)
-                        'End If
 
                         EditionMode = False
                     End If
@@ -609,12 +640,21 @@ Public Class IBandTemplateReport
             copyMasterTemplate.CreateDocument()
 
             'DL 09/11/2012. Begin. When is empty produces a error to export to image
-            For i As Integer = 0 To copyMasterTemplate.Controls.Count - 1
-                If copyMasterTemplate.Controls(i).Controls.Count > 0 Then
-                    ExistObjects = True
-                    Exit For
+            'IT 11/06/2014 #1661 (begin)
+            For Each band As Band In copyMasterTemplate.Controls
+                If TypeOf band Is DevExpress.XtraReports.UI.PageFooterBand Then
+                    If band.Controls.Count > 2 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
+                Else
+                    If band.Controls.Count > 0 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
                 End If
-            Next i
+            Next
+            'IT 11/06/2014 #1661 (end)
 
             If Not ExistObjects Then
                 File.Delete(PathTemplates & "\TEMP.GIF")
@@ -631,12 +671,21 @@ Public Class IBandTemplateReport
             copyMasterTemplateLS.CreateDocument()
 
             'DL 09/11/2012. Begin. When is empty produces a error to export to image
-            For i As Integer = 0 To copyMasterTemplateLS.Controls.Count - 1
-                If copyMasterTemplateLS.Controls(i).Controls.Count > 0 Then
-                    ExistObjects = True
-                    Exit For
+            'IT 11/06/2014 #1661 (begin)
+            For Each band As Band In copyMasterTemplateLS.Controls
+                If TypeOf band Is DevExpress.XtraReports.UI.PageFooterBand Then
+                    If band.Controls.Count > 2 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
+                Else
+                    If band.Controls.Count > 0 Then
+                        ExistObjects = True
+                        Exit For
+                    End If
                 End If
-            Next i
+            Next
+            'IT 11/06/2014 #1661 (end)
 
             If Not ExistObjects Then
                 File.Delete(PathTemplates & "\TEMP.GIF")
@@ -672,6 +721,8 @@ Public Class IBandTemplateReport
         Try
             Cursor = Cursors.WaitCursor
 
+            If (DesignForm.IsDisposed) Then Exit Sub
+
             If newTemplate OrElse ReportChanged Then
 
                 'Save temporal repx
@@ -691,11 +742,7 @@ Public Class IBandTemplateReport
                 Next i
 
                 bsPicturePanel.Controls.Add(tmpPreviewPictureBox)
-
             End If
-
-            DesignForm.Dispose()
-            'DesignForm = Nothing
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -704,6 +751,24 @@ Public Class IBandTemplateReport
         Finally
             Cursor = Cursors.Default
 
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Invoke event when the DesignForm is Closed
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: 'IT 11/06/2014 #1661
+    '''</remarks>
+    Private Sub DesignForm_Closed(ByVal sender As Object, ByVal e As FormClosedEventArgs) Handles DesignForm.FormClosed
+        Try
+            Cursor = Cursors.WaitCursor
+            DesignForm.Dispose()
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DesignForm_Closed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".DesignForm_Closed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        Finally
+            Cursor = Cursors.Default
         End Try
     End Sub
 
@@ -1102,51 +1167,62 @@ Public Class IBandTemplateReport
     ''' </summary>
     ''' <remarks>
     ''' Created by: DL 23/11/2011
+    ''' AG 12/06/2014 #1661 - Control discard pending changes if clicks NEW button during edition mode
     ''' </remarks>
     Private Sub bsNewButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsNewButton.Click
         Try
+            'AG 12/06/2014 #1661
+            Dim setScreenToCreate As Boolean = True
+            If EditionMode AndAlso (ChangesMade) Then 'Or ReportDesignxUserControl.ReportChanged) Then
 
-            AddImage()
+                If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = Windows.Forms.DialogResult.Yes) Then
+                    setScreenToCreate = True
+                End If
+            End If
+            'AG 12/06/2014 #1661
+            If setScreenToCreate Then
+                AddImage()
 
-            ' Refresh buttons status
-            bsNewButton.Enabled = False
-            bsEditButton.Enabled = False
-            bsDeleteButton.Enabled = False
-            bsSaveButton.Enabled = False
-            bsEditReport.Enabled = False
-            bsCancelButton.Enabled = True
-            bsOrientationComboBox.Enabled = True
-            '
-            bsTemplatesListView.Enabled = False
-            '
-            EditionMode = True 'RH 15/12/2011
-            ChangesMade = True 'RH 15/12/2011
+                ' Refresh buttons status
+                bsNewButton.Enabled = False
+                bsEditButton.Enabled = False
+                bsDeleteButton.Enabled = False
+                bsSaveButton.Enabled = False
+                bsEditReport.Enabled = False
+                bsCancelButton.Enabled = True
+                bsOrientationComboBox.Enabled = True
+                '
+                bsTemplatesListView.Enabled = False
+                '
+                EditionMode = True 'RH 15/12/2011
+                ChangesMade = True 'RH 15/12/2011
 
-            selectedTemplateName = ""
-            newTemplate = True
+                selectedTemplateName = ""
+                newTemplate = True
 
-            RemoveHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
-            RemoveHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
+                RemoveHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
+                RemoveHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
 
-            bsTemplateTextBox.Text = String.Empty
-            bsOrientationComboBox.Text = ""
+                bsTemplateTextBox.Text = String.Empty
+                bsOrientationComboBox.Text = ""
 
-            bsTemplateTextBox.Enabled = True
-            bsTemplateTextBox.BackColor = Color.White
-            bsOrientationComboBox.Enabled = True
-            bsOrientationComboBox.BackColor = Color.White
-            bsDefaultCheckbox.Enabled = True
-            bsDefaultCheckbox.Checked = False
+                bsTemplateTextBox.Enabled = True
+                bsTemplateTextBox.BackColor = Color.White
+                bsOrientationComboBox.Enabled = True
+                bsOrientationComboBox.BackColor = Color.White
+                bsDefaultCheckbox.Enabled = True
+                bsDefaultCheckbox.Checked = False
 
-            bsTemplateTextBox.BackColor = Color.Khaki
+                bsTemplateTextBox.BackColor = Color.Khaki
 
-            AddHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
-            AddHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
+                AddHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
+                AddHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
 
-            '            AuxTemplateName = "" 'DL 09/02/2012
+                '            AuxTemplateName = "" 'DL 09/02/2012
 
-            bsTemplatesListView.SelectedItems.Clear()
-            bsTemplateTextBox.Focus()
+                bsTemplatesListView.SelectedItems.Clear()
+                bsTemplateTextBox.Focus()
+            End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1302,7 +1378,7 @@ Public Class IBandTemplateReport
                 bsTemplatesListView.SelectedItems.Clear()
                 bsScreenErrorProvider.Clear()  'DL 31/07/2012
 
-                SelectTemplate(0) 'SelectTemplate(bsTemplatesListView.SelectedIndices(0))
+                SelectTemplate(0)
 
                 bsNewButton.Enabled = True
                 bsEditButton.Enabled = True
@@ -1545,8 +1621,9 @@ Public Class IBandTemplateReport
                 bsTemplatesListView.Items(0).Selected = True
 
                 DeleteResidualFiles()
-
-                SelectTemplate(bsTemplatesListView.SelectedIndices(0))
+                If bsTemplatesListView.SelectedIndices.Count = 1 Then
+                    SelectTemplate(bsTemplatesListView.SelectedIndices(0))
+                End If
             End If
 
             ResetBorder() 'RH 30/03/2012
@@ -1682,6 +1759,8 @@ Public Class IBandTemplateReport
                 For Each templateRow As ReportTemplatesDS.tcfgReportTemplatesRow In qTemplates
 
                     Select Case templateRow.TemplateName
+
+                        'For the default BioSystems MASTERTEMPLATEs change name for 'ReportTemplate (orientation)'
                         Case "MASTERTEMPLATE"
                             myTestName = myTemplatePlug & " (" & myPortraitPlug & ")"
 
@@ -1697,6 +1776,7 @@ Public Class IBandTemplateReport
                     bsTemplatesListView.Items(i).SubItems.Add(templateRow.TemplateOrientation)
                     bsTemplatesListView.Items(i).SubItems.Add(templateRow.TemplateFileName)
                     bsTemplatesListView.Items(i).SubItems.Add(templateRow.DefaultTemplate.ToString)
+                    bsTemplatesListView.Items(i).SubItems.Add(templateRow.TemplateName) 'AG 11/06/2014 #1661 (the preloaded MasterTemplates change their names in screen, so we need to save the name into database in order to recover them as default is user wants) - subItems(5)
 
                     'If there is a selected template and it is still in the list, its position 
                     'is stored to re-select the same template once the list is loaded
@@ -1830,29 +1910,56 @@ Public Class IBandTemplateReport
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' Delete template
+    ''' </summary>
+    ''' <remarks>
+    ''' ??? - created
+    ''' AG 12/06/2014 #1661 there is always 1 default template for each orientation
+    ''' </remarks>
     Private Sub DeleteTemplate()
         Try
-            If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
-                'Dim resultData As New GlobalDataTO
-                Dim resultData As GlobalDataTO
-                Dim templateList As New ReportTemplatesDelegate
-                Dim iRow As Integer = bsTemplatesListView.SelectedIndices(0)
+            If bsTemplatesListView.SelectedIndices.Count > 0 Then
+                If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
+                    'Dim resultData As New GlobalDataTO
+                    Dim resultData As GlobalDataTO
+                    Dim templateList As New ReportTemplatesDelegate
+                    Dim iRow As Integer = bsTemplatesListView.SelectedIndices(0)
 
-                resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
+                    'AG 12/06/2014 - #1661 check if user wants delete the defaulttemplate .. in this case mark the mastertemplate as new default before delete
+                    'resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
+                    Dim newDefault As Boolean = False
+                    If bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text Then
+                        'Get the current orientation
+                        Dim myOrientation As String = bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text
+                        resultData = templateList.SetDefaultTemplateStatus(Nothing, True, True, myOrientation)
+                        newDefault = True
+                    End If
 
-                If (Not resultData.HasError) Then
-                    Dim fileImage As String = PathTemplates & "\" & bsTemplatesListView.Items(iRow).SubItems(3).Text
+                    resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
 
-                    File.Delete(fileImage.Split(".")(0) & ".REPX")
-                    File.Delete(fileImage.Split(".")(0) & ".GIF")
+                    If (Not resultData.HasError) Then
+                        Dim fileImage As String = PathTemplates & "\" & bsTemplatesListView.Items(iRow).SubItems(3).Text
 
-                    bsTemplatesListView.Items.Remove(bsTemplatesListView.Items(iRow))
+                        File.Delete(fileImage.Split(".")(0) & ".REPX")
+                        File.Delete(fileImage.Split(".")(0) & ".GIF")
 
-                    If bsTemplatesListView.Items.Count > -1 Then
-                        bsTemplatesListView.SelectedItems.Clear()
-                        SelectTemplate(0)
-                        bsTemplatesListView.Items(0).Selected = True
-                        bsNewButton.Select()
+                        bsTemplatesListView.Items.Remove(bsTemplatesListView.Items(iRow))
+
+                        'AG 12/06/2014 - #1661 - If new default has been programmed load the template list
+                        If newDefault Then
+                            LoadTemplatesList()
+                        End If
+                        'AG 12/06/2014 - #1661
+
+                        If bsTemplatesListView.Items.Count > -1 Then
+                            bsTemplatesListView.SelectedItems.Clear()
+                            SelectTemplate(0)
+                            bsTemplatesListView.Items(0).Selected = True
+                            bsNewButton.Select()
+                        End If
+
                     End If
 
                 End If

@@ -836,11 +836,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'If busy we cannot process readings now, so we will evaluate readings next BAx00 cycle
                                 Dim semaphoreFree As Boolean = True
                                 If GlobalConstants.CreateWSExecutionsWithSemaphore Then
-                                    'semaphoreFree = CBool(IIf(GlobalSemaphores.createWSExecutionsQueue = 0, True, False))
+                                    semaphoreFree = CBool(IIf(GlobalSemaphores.createWSExecutionsQueue = 0, True, False))
                                 End If
                                 If semaphoreFree Then
                                     processingLastANSPHRInstructionFlag = True
                                     wellBaseLineWorker.RunWorkerAsync(bufferANSPHRReceived(0))
+                                Else
+                                    Dim myLogAcciones As New ApplicationLogManager()
+                                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore busy. Don't process ANSPHR this cycle!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
                                 End If
                                 'AG 02/06/2014 - #1644
                             End If

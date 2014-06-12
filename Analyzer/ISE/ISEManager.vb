@@ -2595,6 +2595,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''             XB  30/04/2014 - Add protection on CALB operation if FW answers ISE! by error instead of CAL Results or ERC - Task #1614
         '''             XB  20/05/2014 - Add more protections against not expected answers from Firmware - Task #1614
         '''             XB  20/05/2014 - Fix Bug #1629
+        '''             XB  12/06/2014 - Fix Bug caused by Task #1614 - ActivateReagentsPack
         ''' </remarks>
         Private Function ManageISEProcedureFinished(Optional ByVal pForcedResult As ISEProcedureResult = ISEProcedureResult.None) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2885,16 +2886,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         '    MyClass.CheckReagentsPackReady()
                         '    MyClass.CheckReagentsPackVolumeEnough()
                         'End If
-
-                        ' XB 20/05/2014 - Task #1614
-                        If Not isFinished Then
-                            If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
-                                ' This is an error. ISE must answer a DDT01 or an ERC, but no this instruction: <ISE!>
-                                LastISEResult.IsCancelError = True
-                                pForcedResult = ISEProcedureResult.Exception
-                            End If
-                        End If
-                        ' XB 20/05/2014 - Task #1614
 
                     Case ISEProcedures.CheckReagentsPack
                         isFinished = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01))
