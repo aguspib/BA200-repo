@@ -731,7 +731,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pTemplateOrientation">PORTRAIT or LANDSCAPE</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>AG 11/06/2014 - Create - #1661</remarks>
-        Private Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean, _
+        Public Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean, _
                                                   Optional ByVal pTemplateOrientation As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
