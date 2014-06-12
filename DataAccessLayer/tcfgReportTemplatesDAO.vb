@@ -129,7 +129,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pReportTemplateRow">Template name</param>
         ''' <returns>GlobalaDataTO</returns>
         ''' <remarks>CREATED BY: DL 25/11/2011
-        ''' AG 11/06/2014 - Make code easier: Change method name UpdateComplete instead of UpdateDefaultTemplateByTempltName</remarks>
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateComplete instead of UpdateDefaultTemplateByTempltName
+        ''' AG 12/06/2014 - #1661 Update field DefaultTemplate using the proper column in datarow (not the MasterTemplate column as previous versions done)</remarks>
         Public Function UpdateComplete(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                           ByVal pReportTemplateRow As ReportTemplatesDS.tcfgReportTemplatesRow) As GlobalDataTO
 
@@ -148,7 +149,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= "     , MasterTemplate = '" & pReportTemplateRow.MasterTemplate & "'" & Environment.NewLine
                     cmdText &= "     , TemplateOrientation = '" & pReportTemplateRow.TemplateOrientation & "'" & Environment.NewLine
                     cmdText &= "     , TemplateFileName =  N'" & pReportTemplateRow.TemplateFileName.Replace("'", "''") & "'" & Environment.NewLine
-                    cmdText &= "     , DefaultTemplate = '" & pReportTemplateRow.MasterTemplate & "'" & Environment.NewLine
+                    cmdText &= "     , DefaultTemplate = '" & pReportTemplateRow.DefaultTemplate & "'" & Environment.NewLine
                     cmdText &= "     , TS_User = '" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "' " & Environment.NewLine
                     cmdText &= "     , TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & Environment.NewLine
                     cmdText &= " WHERE TemplateName = '" & pReportTemplateRow.TemplateName & "' " & Environment.NewLine
@@ -180,11 +181,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection"></param>
         ''' <param name="pNewName">Template name</param>
         ''' <param name="pOldName">Template name</param>
+        ''' <param name="pDefaultTemplate"></param>
         ''' <returns>GlobalaDataTO</returns>
-        ''' <remarks>CREATED BY: DL 25/11/2011</remarks>
+        ''' <remarks>CREATED BY: DL 25/11/2011
+        ''' AG 12/06/2014 - #1661</remarks>
         Public Function UpdateTemplateName(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pNewName As String, _
-                                           ByVal pOldName As String) As GlobalDataTO
+                                           ByVal pOldName As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
 
             Dim myGlobalDataTO As New GlobalDataTO
@@ -199,6 +202,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= "UPDATE tcfgReportTemplates " & Environment.NewLine
                     cmdText &= "   SET TemplateName = N'" & pNewName.Replace("'", "''") & "'" & Environment.NewLine
                     cmdText &= "     , TemplateFileName = N'" & pNewName.Replace("'", "''") & ".REPX'" & Environment.NewLine
+                    cmdText &= "     , DefaultTemplate = " & CStr(IIf(pDefaultTemplate, 1, 0)) & Environment.NewLine 'AG 12/06/2014 - #1661
                     cmdText &= " WHERE TemplateName = N'" & pOldName.Replace("'", "''") & "'"
 
                     'Execute the SQL sentence 
@@ -228,8 +232,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDefaultTemplate">True/False</param>
         ''' <returns>GlobalaDataTO</returns>
         ''' <remarks>CREATED BY: TR 23/11/2011
-        ''' AG 11/06/2014 - Make code easier: Change method name UpdateDefaultTemplateByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
-        Public Function UpdateDefaultTemplateByName(ByVal pDBConnection As SqlClient.SqlConnection, _
+        ''' AG 11/06/2014 - Make code easier: Change method name UpdateDefaultTemplateFieldByName instead of UpdateDefaultTemplateValueByTempltName</remarks>
+        Public Function UpdateDefaultTemplateFieldByName(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                        ByVal pTemplateName As String, ByVal pDefaultTemplate As Boolean) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
@@ -262,7 +266,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateByName", _
+                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateFieldByName", _
                                                 EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -511,9 +515,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection"></param>
         ''' <param name="pStatus">TRUE or FALSE</param>
         ''' <param name="pOnlyMasterTemplateFlag">TRUE means that DefaultTemplate will be updated only for the MasterTemplates / FALSE means that will be updated for ALL</param>
+        ''' <param name="pTemplateOrientation">PORTRAIT or LANDSCAPE</param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>AG 11/06/2014 - Create - #1661</remarks>
-        Public Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean) As GlobalDataTO
+        Public Function SetDefaultTemplateStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStatus As Boolean, ByVal pOnlyMasterTemplateFlag As Boolean, _
+                                                 Optional ByVal pTemplateOrientation As String = "") As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
             Try
@@ -530,6 +536,10 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If pOnlyMasterTemplateFlag Then
                         cmdText &= " WHERE MasterTemplate = " & CStr(IIf(pOnlyMasterTemplateFlag, 1, 0))
+
+                        If pTemplateOrientation <> "" Then
+                            cmdText &= " AND TemplateOrientation = '" & pTemplateOrientation & "'"
+                        End If
                     End If
 
                     'Execute the SQL sentence 

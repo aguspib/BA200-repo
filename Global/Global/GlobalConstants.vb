@@ -117,6 +117,7 @@ Namespace Biosystems.Ax00.Global
 
         'AG + XB 24/02/20174 - BT #1520
         Public Const MAX_APP_MEMORY_USAGE As String = "For best performance, it's required to close and start the application before continuing."
+        Public Const UNHANDLED_EXCEPTION_ERR As String = "The application has encountered an unexpected error. " & vbNewLine & "Please, try again or contact the technical service."
         Public Const CATCH_APP_MEMORY_ERR As String = "Some images hasn't been properly loaded. For best visualization, change screen and return to the present one."
         Public Const HResult_OutOfMemoryException As String = "-2147024882"
         Public Const HResult_InsufficientMemoryException As String = "-2146233027"

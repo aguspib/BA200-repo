@@ -205,6 +205,7 @@ Public Class IBandTemplateReport
     ''' </summary>
     ''' <remarks>
     ''' Created by: DL 23/11/2011
+    ''' AG 12/06/2014 - #1661
     ''' </remarks>
     Private Function AddTemplate(ByVal pFileReport) As GlobalDataTO
 
@@ -229,8 +230,25 @@ Public Class IBandTemplateReport
                 End If
 
                 If myTemplateDS.tcfgReportTemplates.Count > 0 Then
-                    myTemplateDS.tcfgReportTemplates(0).TemplateOrientation = UCase(bsOrientationComboBox.Text.Trim)
+                    'AG 11/06/2014 #1661
+                    'myTemplateDS.tcfgReportTemplates(0).TemplateOrientation = UCase(bsOrientationComboBox.Text.Trim)
+                    myTemplateDS.tcfgReportTemplates(0).BeginEdit()
+                    '1- Update name
+                    If myTemplateDS.tcfgReportTemplates(0).TemplateName <> bsTemplateTextBox.Text Then
+                        myTemplateDS.tcfgReportTemplates(0).TemplateName = bsTemplateTextBox.Text
+                    End If
 
+                    '2- Update orientation
+                    If myTemplateDS.tcfgReportTemplates(0).TemplateOrientation <> myCurrentOrientation Then
+                        myTemplateDS.tcfgReportTemplates(0).TemplateOrientation = myCurrentOrientation
+                    End If
+
+                    '3- Update default template
+                    If myTemplateDS.tcfgReportTemplates(0).DefaultTemplate <> bsDefaultCheckbox.Checked Then
+                        myTemplateDS.tcfgReportTemplates(0).DefaultTemplate = bsDefaultCheckbox.Checked
+                    End If
+                    myTemplateDS.tcfgReportTemplates(0).EndEdit()
+                    'AG 11/06/2014 #1661
                 Else
                     newRow = myTemplateDS.tcfgReportTemplates.NewtcfgReportTemplatesRow
                     newRow.DefaultTemplate = False
@@ -245,6 +263,8 @@ Public Class IBandTemplateReport
                     resultData = templateList.CreateReportTemplate(Nothing, myTemplateDS)
 
                     If (Not resultData.HasError) Then
+                        resultData.SetDatos = myTemplateDS 'AG 12/06/2014 - #1661
+
                         bsTemplatesListView.Items.Add(bsTemplateTextBox.Text)
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(False)
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(myCurrentOrientation) 'UCase(bsOrientationComboBox.Text.Trim))
@@ -353,7 +373,8 @@ Public Class IBandTemplateReport
 
                 'Deny permission is duplicated
                 If isDuplicated Then
-                    bsScreenErrorProvider.SetError(bsTemplateTextBox, GetMessageText(GlobalEnumerates.Messages.REPEATED_NAME.ToString))
+                    'bsScreenErrorProvider.SetError(bsTemplateTextBox, GetMessageText(GlobalEnumerates.Messages.REPEATED_NAME.ToString)) 'Duplicated test name
+                    bsScreenErrorProvider.SetError(bsTemplateTextBox, GetMessageText(GlobalEnumerates.Messages.FILE_EXIST.ToString)) 'Duplicated name
                     bsTemplateTextBox.Focus()
 
                     'If not duplicate save changes (new or update)
@@ -412,31 +433,33 @@ Public Class IBandTemplateReport
 
                     If Not newTemplate AndAlso bsTemplatesListView.SelectedIndices.Count > 0 Then
 
-                        If Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).Text, bsTemplateTextBox.Text) Then 'AG 11/06/2014 Do not replace bsTemplateTextBox.Text for templateName in this IF
-                            'Report has been renamed (rename template name ID in database and also designer files)
-                            'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
-                            'resultData = templateList.UpdateTemplateNameByOldName(Nothing, bsTemplateTextBox.Text, bsTemplatesListView.SelectedItems(0).Text)
-                            resultData = templateList.UpdateRenamingTemplate(Nothing, templateName, bsTemplatesListView.SelectedItems(0).Text)
-
-
-                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text, bsDefaultCheckbox.Checked) Then
-                            'Update report
-                            'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
-                            'resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
-                            resultData = templateList.UpdateDefaultTemplateByName(Nothing, templateName, bsDefaultCheckbox.Checked)
-
-                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text, myCurrentOrientation) Then
-                            'Create new report (when orientation changes)
+                        'AG 12/06/2014 - #1661 (change order of IF's: 1st when change orientation / else 2on when renamed / else 3rd if only change default)
+                        If Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text, myCurrentOrientation) Then
+                            '1) When Orientation changed ---> Create new report (independent if also have been renamed and change default fields)
+                            '
                             resultData = AddTemplate(myFileReport)
 
                             Dim myTemplateDS As ReportTemplatesDS
-
                             If Not resultData.HasError Then
                                 myTemplateDS = DirectCast(resultData.SetDatos, ReportTemplatesDS)
                                 resultData = templateList.UpdateComplete(Nothing, myTemplateDS.tcfgReportTemplates(0))
 
                                 If (Not resultData.HasError) Then bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text = bsOrientationComboBox.Text
                             End If
+
+                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).Text, bsTemplateTextBox.Text) Then 'AG 11/06/2014 Do not replace bsTemplateTextBox.Text for templateName in this IF
+                            '2) Report has been renamed (rename template name ID in database and also designer files)
+                            '(independent if also changes default field)
+
+                            'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
+                            'resultData = templateList.UpdateTemplateNameByOldName(Nothing, bsTemplateTextBox.Text, bsTemplatesListView.SelectedItems(0).Text)
+                            resultData = templateList.UpdateRenamingTemplate(Nothing, templateName, bsTemplatesListView.SelectedItems(0).Text, myCurrentOrientation, bsDefaultCheckbox.Checked)
+
+                        ElseIf Not String.Equals(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text, bsDefaultCheckbox.Checked) Then
+                            '3) Change DefaultTemplate field
+                            'AG 11/06/2014 #1661 - In case we are editing a preloaded template we can not use the name in screen because is different from name in DB
+                            'resultData = templateList.UpdateDefaultTemplateValueByTempltName(Nothing, bsTemplateTextBox.Text, bsDefaultCheckbox.Checked)
+                            resultData = templateList.UpdateDefaultTemplateFieldByName(Nothing, templateName, bsDefaultCheckbox.Checked)
 
                         End If
 
@@ -1144,51 +1167,62 @@ Public Class IBandTemplateReport
     ''' </summary>
     ''' <remarks>
     ''' Created by: DL 23/11/2011
+    ''' AG 12/06/2014 #1661 - Control discard pending changes if clicks NEW button during edition mode
     ''' </remarks>
     Private Sub bsNewButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsNewButton.Click
         Try
+            'AG 12/06/2014 #1661
+            Dim setScreenToCreate As Boolean = True
+            If EditionMode AndAlso (ChangesMade) Then 'Or ReportDesignxUserControl.ReportChanged) Then
 
-            AddImage()
+                If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = Windows.Forms.DialogResult.Yes) Then
+                    setScreenToCreate = True
+                End If
+            End If
+            'AG 12/06/2014 #1661
+            If setScreenToCreate Then
+                AddImage()
 
-            ' Refresh buttons status
-            bsNewButton.Enabled = False
-            bsEditButton.Enabled = False
-            bsDeleteButton.Enabled = False
-            bsSaveButton.Enabled = False
-            bsEditReport.Enabled = False
-            bsCancelButton.Enabled = True
-            bsOrientationComboBox.Enabled = True
-            '
-            bsTemplatesListView.Enabled = False
-            '
-            EditionMode = True 'RH 15/12/2011
-            ChangesMade = True 'RH 15/12/2011
+                ' Refresh buttons status
+                bsNewButton.Enabled = False
+                bsEditButton.Enabled = False
+                bsDeleteButton.Enabled = False
+                bsSaveButton.Enabled = False
+                bsEditReport.Enabled = False
+                bsCancelButton.Enabled = True
+                bsOrientationComboBox.Enabled = True
+                '
+                bsTemplatesListView.Enabled = False
+                '
+                EditionMode = True 'RH 15/12/2011
+                ChangesMade = True 'RH 15/12/2011
 
-            selectedTemplateName = ""
-            newTemplate = True
+                selectedTemplateName = ""
+                newTemplate = True
 
-            RemoveHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
-            RemoveHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
+                RemoveHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
+                RemoveHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
 
-            bsTemplateTextBox.Text = String.Empty
-            bsOrientationComboBox.Text = ""
+                bsTemplateTextBox.Text = String.Empty
+                bsOrientationComboBox.Text = ""
 
-            bsTemplateTextBox.Enabled = True
-            bsTemplateTextBox.BackColor = Color.White
-            bsOrientationComboBox.Enabled = True
-            bsOrientationComboBox.BackColor = Color.White
-            bsDefaultCheckbox.Enabled = True
-            bsDefaultCheckbox.Checked = False
+                bsTemplateTextBox.Enabled = True
+                bsTemplateTextBox.BackColor = Color.White
+                bsOrientationComboBox.Enabled = True
+                bsOrientationComboBox.BackColor = Color.White
+                bsDefaultCheckbox.Enabled = True
+                bsDefaultCheckbox.Checked = False
 
-            bsTemplateTextBox.BackColor = Color.Khaki
+                bsTemplateTextBox.BackColor = Color.Khaki
 
-            AddHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
-            AddHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
+                AddHandler bsTemplateTextBox.TextChanged, AddressOf bsTemplateTextBox_TextChanged
+                AddHandler bsOrientationComboBox.TextChanged, AddressOf bsOrientationComboBox_TextChanged
 
-            '            AuxTemplateName = "" 'DL 09/02/2012
+                '            AuxTemplateName = "" 'DL 09/02/2012
 
-            bsTemplatesListView.SelectedItems.Clear()
-            bsTemplateTextBox.Focus()
+                bsTemplatesListView.SelectedItems.Clear()
+                bsTemplateTextBox.Focus()
+            End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsNewButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1876,6 +1910,14 @@ Public Class IBandTemplateReport
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' Delete template
+    ''' </summary>
+    ''' <remarks>
+    ''' ??? - created
+    ''' AG 12/06/2014 #1661 there is always 1 default template for each orientation
+    ''' </remarks>
     Private Sub DeleteTemplate()
         Try
             If bsTemplatesListView.SelectedIndices.Count > 0 Then
@@ -1884,6 +1926,16 @@ Public Class IBandTemplateReport
                     Dim resultData As GlobalDataTO
                     Dim templateList As New ReportTemplatesDelegate
                     Dim iRow As Integer = bsTemplatesListView.SelectedIndices(0)
+
+                    'AG 12/06/2014 - #1661 check if user wants delete the defaulttemplate .. in this case mark the mastertemplate as new default before delete
+                    'resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
+                    Dim newDefault As Boolean = False
+                    If bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text Then
+                        'Get the current orientation
+                        Dim myOrientation As String = bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text
+                        resultData = templateList.SetDefaultTemplateStatus(Nothing, True, True, myOrientation)
+                        newDefault = True
+                    End If
 
                     resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
 
@@ -1895,6 +1947,12 @@ Public Class IBandTemplateReport
 
                         bsTemplatesListView.Items.Remove(bsTemplatesListView.Items(iRow))
 
+                        'AG 12/06/2014 - #1661 - If new default has been programmed load the template list
+                        If newDefault Then
+                            LoadTemplatesList()
+                        End If
+                        'AG 12/06/2014 - #1661
+
                         If bsTemplatesListView.Items.Count > -1 Then
                             bsTemplatesListView.SelectedItems.Clear()
                             SelectTemplate(0)
@@ -1903,6 +1961,7 @@ Public Class IBandTemplateReport
                         End If
 
                     End If
+
                 End If
             End If
 
