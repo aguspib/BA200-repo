@@ -4308,13 +4308,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "ISE (Send and Receive Results)"
 
         ''' <summary>
-        ''' Method incharge to process all Recived ISE Results.
+        ''' Method incharge to process all Received ISE Results.
         ''' </summary>
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' CREATE BY: TR 03/01/2010
-        ''' Modified by AG - Open dbConnection (BE CAREFULL, not using the standard methods) and prepare UIRefreshDS
+        ''' Created by:  TR 03/01/2010
+        ''' Modified by: SA 12/06/2014 - BT #1660 ==> Replaced call to function ProcessISETESTResults in ISEReception class, for its new 
+        '''                                           version (ProcessISETESTResultsNEW) 
         ''' </remarks>
         Public Function ProcessRecivedISEResult(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -4489,10 +4490,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ElseIf myPreparationID > 0 Then
                     'ISETEST answer
-
                     MyClass.ISE_Manager.LastISEResult = New ISEResultTO
 
-                    myGlobalDataTO = myISEResultsDelegate.ProcessISETESTResults(dbConnection, myPreparationID, myISEResult, myISEMode, WorkSessionIDAttribute, AnalyzerIDAttribute)
+                    'BT #1660 - Call the new version of function ProcessISETESTResults
+                    myGlobalDataTO = myISEResultsDelegate.ProcessISETESTResultsNEW(dbConnection, myPreparationID, myISEResult, myISEMode, WorkSessionIDAttribute, AnalyzerIDAttribute)
 
                     'UI refresh dataset (new results AND new rotor position status)
                     If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
