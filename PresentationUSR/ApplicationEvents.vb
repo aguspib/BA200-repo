@@ -29,7 +29,8 @@
             Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
             myLogAcciones.CreateLogActivity("An Unhandled Exception has been occurred ", "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
             ' Display message to user and then exit.
-            e.ExitApplication = MessageBox.Show(Biosystems.Ax00.Global.GlobalConstants.MAX_APP_MEMORY_USAGE.ToString, My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Question) = DialogResult.OK
+            MessageBox.Show(Biosystems.Ax00.Global.GlobalConstants.UNHANDLED_EXCEPTION_ERR.ToString, My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Question)
+            e.ExitApplication = False
         End Sub
     End Class
 
