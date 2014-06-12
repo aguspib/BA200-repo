@@ -11,47 +11,41 @@ Namespace Biosystems.Ax00.DAL.DAO
         Inherits DAOBase
 
 #Region "CRUD Methods"
-
         ''' <summary>
-        ''' Get data from the specified result alarm
+        ''' Get all Alarms for the specified Execution 
         ''' </summary>
-        ''' <param name="pDBConnection">Open Database connection</param>
-        ''' <param name="pExecutionID">ExecutionID</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet WSExecutionAlarmsDS with data of the specified
-        '''          Alarm</returns>
-        ''' <remarks>Created by:  SG 07/06/2010</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExecutionID">Execution Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet WSExecutionAlarmsDS with the list of Alarms of the specified Execution</returns>
+        ''' <remarks>
+        ''' Created by:  SG 07/06/2010
+        ''' Modified by: SA 12/06/2014 - Implement USING for SqlCommand and SqlDataAdapter
+        ''' </remarks>
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String
-                        cmdText = " SELECT * " & _
-                                  " FROM   twksWSExecutionAlarms " & _
-                                  " WHERE  ExecutionID = " & pExecutionID
+                        Dim cmdText As String = " SELECT * FROM twksWSExecutionAlarms " & vbCrLf & _
+                                                " WHERE  ExecutionID = " & pExecutionID
 
-                        Dim dbCmd As New SqlClient.SqlCommand
-                        dbCmd.Connection = dbConnection
-                        dbCmd.CommandText = cmdText
-
-                        'Fill the DataSet to return 
                         Dim WSExecutionAlarms As New WSExecutionAlarmsDS
-                        Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        dbDataAdapter.Fill(WSExecutionAlarms.twksWSExecutionAlarms)
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(WSExecutionAlarms.twksWSExecutionAlarms)
+                            End Using
+                        End Using
 
                         resultData.SetDatos = WSExecutionAlarms
                         resultData.HasError = False
                     End If
                 End If
-
             Catch ex As Exception
+                resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
@@ -59,54 +53,54 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Read", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
-
             Return resultData
-
         End Function
 
         ''' <summary>
-        ''' Add a result alarm
+        ''' Add Alarms for an Execution
         ''' </summary>
-        ''' <param name="pDBConnection">Open Database connection</param>
-        ''' <param name="pWSExecutionAlarms">Data Set with only one datarow specifier of the result alarm to add</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet WSExecutionAlarmsDS with data of the specified
-        '''          Alarm</returns>
-        ''' <remarks>Created by:  SG 07/06/2010</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pWSExecutionAlarms">Typed DataSet WSExecutionAlarmsDS containing the list of Alarms to add for an Execution</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SG 07/06/2010
+        ''' Modified by: SA 12/06/2014 - Implement USING for SqlCommand
+        ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSExecutionAlarms As WSExecutionAlarmsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
-                If (IsNothing(pDBConnection)) Then
+                If (pDBConnection Is Nothing) Then
                     'There is not an Opened Database Connection...
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    Dim cmdText As String = String.Empty
                     For Each WSExecutionAlarmsRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In pWSExecutionAlarms.twksWSExecutionAlarms
-
-                        Dim cmdText As String = ""
-
                         cmdText = " INSERT INTO twksWSExecutionAlarms(ExecutionID, AlarmID, AlarmDateTime) " & _
                                   " VALUES(" & WSExecutionAlarmsRow.ExecutionID & ", " & _
                                         " '" & WSExecutionAlarmsRow.AlarmID & "', " & _
                                         " '" & Convert.ToDateTime(WSExecutionAlarmsRow.AlarmDateTime.ToString).ToString("yyyyMMdd HH:mm:ss") & "')"
 
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                            resultData.AffectedRecords += dbCmd.ExecuteNonQuery
+                        End Using
 
                         'Execute the SQL Sentence
-                        Dim dbCmd As New SqlCommand
-                        dbCmd.Connection = pDBConnection
-                        dbCmd.CommandText = cmdText
+                        'Dim dbCmd As New SqlCommand
+                        'dbCmd.Connection = pDBConnection
+                        'dbCmd.CommandText = cmdText
 
-                        resultData.AffectedRecords += dbCmd.ExecuteNonQuery
-                        If (resultData.AffectedRecords > 0) Then
-                            resultData.HasError = False
-                            resultData.SetDatos = pWSExecutionAlarms.Clone
-                        Else
-                            resultData.HasError = True
-                            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                        End If
-
+                        'resultData.AffectedRecords += dbCmd.ExecuteNonQuery
+                        'If (resultData.AffectedRecords > 0) Then
+                        '    resultData.HasError = False
+                        '    resultData.SetDatos = pWSExecutionAlarms.Clone
+                        'Else
+                        '    resultData.HasError = True
+                        '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                        'End If
                     Next
                 End If
 
@@ -118,19 +112,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.Add", EventLogEntryType.Error, False)
             End Try
-
             Return resultData
         End Function
 
-
         ''' <summary>
-        ''' Delete a result alarm
+        ''' Delete the specified Alarms (for all Executions)
         ''' </summary>
-        ''' <param name="pDBConnection">Open Database connection</param>
-        ''' <param name="pWSExecutionAlarms">Data Set with only one datarow specifier of the result alarm to add</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet WSExecutionAlarmsDS with data of the specified
-        '''          Alarm</returns>
-        ''' <remarks>Created by:  SG 07/06/2010</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pWSExecutionAlarms">Typed DataSet WSExecutionAlarmsDS containing the list of Alarms to delete for all Executions</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SG 07/06/2010
+        ''' Modified by: SA 12/06/2014 - Implement USING for SqlCommand
+        ''' </remarks>
         Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSExecutionAlarms As WSExecutionAlarmsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
@@ -140,21 +134,23 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    Dim cmdText As String = String.Empty
                     For Each WSExecutionAlarmsRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In pWSExecutionAlarms.twksWSExecutionAlarms
-                        Dim cmdText As String
                         cmdText = " DELETE FROM twksWSExecutionAlarms " & vbCrLf & _
                                   " WHERE  AlarmID = '" & WSExecutionAlarmsRow.AlarmID & "'"
 
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                            resultData.AffectedRecords += dbCmd.ExecuteNonQuery
+                        End Using
 
-                        Dim dbCmd As New SqlClient.SqlCommand
-                        dbCmd.Connection = pDBConnection
-                        dbCmd.CommandText = cmdText
+                        'Dim dbCmd As New SqlClient.SqlCommand
+                        'dbCmd.Connection = pDBConnection
+                        'dbCmd.CommandText = cmdText
 
-                        resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
-                        resultData.HasError = False
+                        'resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
+                        'resultData.HasError = False
                     Next
                 End If
-
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -167,7 +163,6 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 #End Region
 
-
 #Region "Other Methods"
 
         ''' <summary>
@@ -179,26 +174,31 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 07/06/2010
+        ''' Modified by: SA 12/06/2014 - Implement USING for SqlCommand
         ''' </remarks>
-        Public Function ResetWS(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
-                                ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function ResetWS(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
+
             Try
                 If (pDBConnection Is Nothing) Then
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim cmdText As String
-                    cmdText = " DELETE twksWSExecutionAlarms " & _
-                              " WHERE  ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & _
-                                                     " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
-                                                     " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "')"
+                    Dim cmdText As String = " DELETE twksWSExecutionAlarms " & _
+                                            " WHERE  ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & _
+                                                                   " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                                                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "')"
 
-                    Dim cmd As SqlCommand
-                    cmd = pDBConnection.CreateCommand
-                    cmd.CommandText = cmdText
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords += dbCmd.ExecuteNonQuery
+                        resultData.HasError = False
+                    End Using
 
-                    cmd.ExecuteNonQuery()
+                    'Dim cmd As SqlCommand
+                    'cmd = pDBConnection.CreateCommand
+                    'cmd.CommandText = cmdText
+
+                    'cmd.ExecuteNonQuery()
                 End If
             Catch ex As Exception
                 resultData.HasError = True
@@ -212,13 +212,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Delete all results alarms of an specific executionID
+        ''' Delete all alarms for one specific Execution
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExecutionID">Execution Identifier</param>
+        ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
-        ''' Created by AG 08/06/2010 (tested OK)
+        ''' Created by:  AG 08/06/2010
+        ''' Modified by: SA 12/06/2014 - Implement USING for SqlCommand
         ''' </remarks>
         Public Function DeleteAll(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -229,17 +230,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim cmdText As String = ""
-                    cmdText = " DELETE FROM twksWSExecutionAlarms " & vbCrLf & _
-                              " WHERE  ExecutionID = " & pExecutionID
+                    Dim cmdText As String = " DELETE FROM twksWSExecutionAlarms " & vbCrLf & _
+                                            " WHERE  ExecutionID = " & pExecutionID
 
-                    Dim dbCmd As New SqlClient.SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords += dbCmd.ExecuteNonQuery
+                        resultData.HasError = False
+                    End Using
 
-                    resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
-                    resultData.HasError = False
+                    'Dim dbCmd As New SqlClient.SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
 
+                    'resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
+                    'resultData.HasError = False
                 End If
 
             Catch ex As Exception
@@ -253,6 +257,64 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' For the specified OrderTestID and RerunNumber, search all different Alarms for all the active Executions (excepting the Reference Ranges 
+        ''' Alarms) that will be moved to the Average Result with it is recalculated
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pOrderTestID">Order Test Identifier</param>
+        ''' <param name="pRerunNumber">Rerun Number</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet AlarmsDS with the list of Executions Alarms found</returns>
+        ''' <remarks>
+        ''' Created by:  SA 12/06/2014 - BT #1660
+        ''' </remarks>
+        Public Function ReadAlarmsForAverageResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                   ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT EA.AlarmID " & vbCrLf & _
+                                                " FROM   twksWSExecutionAlarms EA INNER JOIN twksWSExecutions E ON EA.ExecutionID = E.ExecutionID " & vbCrLf & _
+                                                " WHERE  EA.AlarmID NOT IN ('" & GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString & "', " & vbCrLf & _
+                                                                           "'" & GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString & "') " & vbCrLf & _
+                                                " AND    E.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                " AND    E.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                " AND    E.OrderTestID = " & pOrderTestID & vbCrLf & _
+                                                " AND    E.RerunNumber = " & pRerunNumber & vbCrLf & _
+                                                " AND    E.InUse = 1 " & vbCrLf
+
+                        Dim myAlarmsDS As New AlarmsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myAlarmsDS.tfmwAlarms)
+                            End Using
+                        End Using
+
+                        resultData.HasError = False
+                        resultData.SetDatos = myAlarmsDS
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionAlarmsDAO.ReadAlarmsForAverageResult", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
     End Class

@@ -166,174 +166,132 @@ Namespace Biosystems.Ax00.Calculations
 
 #Region "Public Methods"
         ''' <summary>
+        ''' Recalculate the Average Result of an ISE OrderTestID/RerunNumber when one of the Replicates are deactivated or activated in 
+        ''' Current Results Screen.
+        ''' NEW VERSION OF FUNCTION RecalculateAverageValue
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">Work Session Idenfier</param>
+        ''' <param name="pExecutionID">Execution Identifier</param>
+        ''' <returns>GlobalDataTO containing succes/error information</returns>
         ''' <remarks>
-        ''' Created By:AG 13/01/2011
-        ''' Modified By: TR 17/10/2011 -Correct the Exit Try.
-        '''              TR 23/01/2012 -Implement to show alarms on media value.    
-        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
-        ''' AG 25/06/2012 resultsDS inform also AnalyzerID, WorkSessionID
-        ''' AG 03/07/2012 - use the proper template (INSERT / UPDATE / DELETE)
-        '''              TR 19/07/2012 -Inform the sample class in to ResultsDS.
+        ''' Created by:  SA 12/06/2014 - BT #1660
         ''' </remarks>
-        Public Function RecalculateAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
+        Public Function RecalculateISEAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                                   ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'Get the orderTest & rerun number
+                        'Get the OrderTestID And RerunNumber for the informed ExecutionID
                         Dim exec_delg As New ExecutionsDelegate
                         resultData = exec_delg.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
 
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim myDS As New ExecutionsDS
-                            myDS = CType(resultData.SetDatos, ExecutionsDS)
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            Dim myDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
-                            If myDS.twksWSExecutions.Rows.Count > 0 Then
-                                Dim myOT As Integer = myDS.twksWSExecutions(0).OrderTestID
-                                Dim myRerun As Integer = myDS.twksWSExecutions(0).RerunNumber
-                                'TR 19/07/2012 -Declare variable and set the sample class value.
-                                Dim mySampleClass As String = myDS.twksWSExecutions(0).SampleClass
+                            If (myDS.twksWSExecutions.Rows.Count > 0) Then
+                                Dim myOT As Integer = myDS.twksWSExecutions.First.OrderTestID
+                                Dim myRerun As Integer = myDS.twksWSExecutions.First.RerunNumber
+                                Dim mySampleClass As String = myDS.twksWSExecutions.First.SampleClass
 
-                                'Get the current Results row (OrderTestID - RerunNumber
-                                Dim results_del As New ResultsDelegate
+                                'If it is a Control Result, get value of the ControlID from the ExecutionsDS
+                                Dim myControlID As Integer = -1
+                                If (mySampleClass = "CTRL") Then myControlID = myDS.twksWSExecutions.First.ControlID
+
+                                'Get the current Result value for the OrderTestID/RerunNumber
                                 Dim res_DS As New ResultsDS
-                                resultData = results_del.ReadByOrderTestIDandRerunNumber(dbConnection, myOT, myRerun)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    res_DS = CType(resultData.SetDatos, ResultsDS)
-                                    'Else
-                                    '    Exit Try
-                                End If
-                                'TR 17/10/2011 -Implemented to avoid Exit Try
-                                If Not resultData.HasError Then
-                                    'Calculate OrderTestID - Rerun new average
-                                    resultData = GetAverageConcentrationValue(dbConnection, myOT, myRerun)
-                                    Dim myAverage As Single = 0
-                                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                        'Get the concentration value to calculate the the average.
-                                        myAverage = CType(resultData.SetDatos, Single)
-                                        'Else
-                                        '  Exit Try
-                                    End If
-                                    'AG 13/01/2011
+                                Dim myResultsDelegate As New ResultsDelegate
+                                Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
 
-                                    'TR 17/10/2011 -Implemented to avoid Exit Try
-                                    If Not resultData.HasError Then
-                                        'update result into DS
-                                        If res_DS.twksResults.Rows.Count > 0 Then
+                                resultData = myResultsDelegate.ReadByOrderTestIDandRerunNumber(dbConnection, myOT, myRerun)
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    res_DS = DirectCast(resultData.SetDatos, ResultsDS)
+
+                                    If (res_DS.twksResults.Rows.Count > 0) Then
+                                        'Calculate the new Result Average value
+                                        resultData = GetAverageConcentrationValue(dbConnection, myOT, myRerun)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            Dim myAverage As Single = CType(resultData.SetDatos, Single)
+
+                                            'Prepare the DataSet to update the Result Value
                                             res_DS.twksResults(0).BeginEdit()
                                             res_DS.twksResults(0).CONC_Value = myAverage
                                             res_DS.twksResults(0).AnalyzerID = pAnalyzerID
                                             res_DS.twksResults(0).WorkSessionID = pWorkSessionID
-                                            res_DS.twksResults(0).SampleClass = mySampleClass 'TR 19/07/2012 -inform the sampleclass value.
+                                            res_DS.twksResults(0).SampleClass = mySampleClass
                                             res_DS.twksResults(0).AcceptChanges()
 
-                                            'Save results on result table.
-                                            resultData = results_del.SaveResults(dbConnection, res_DS)
-                                            If resultData.HasError Then Exit Try
+                                            'Update the Result Value
+                                            resultData = myResultsDelegate.SaveResults(dbConnection, res_DS)
+                                            If (Not resultData.HasError) Then
+                                                'Delete all Alarms saved previously for the Average Result
+                                                resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, myOT, myRerun, res_DS.twksResults(0).MultiPointNumber)
+                                            End If
 
-                                            'TR 12/12/2011 -Delete all related alarms before entering.
-                                            Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
-                                            resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, res_DS.twksResults(0).OrderTestID, _
-                                                                                          res_DS.twksResults(0).RerunNumber, res_DS.twksResults(0).MultiPointNumber)
+                                            If (Not resultData.HasError) Then
+                                                'Check if there are Reference Ranges Alarms for the new Result
+                                                Dim myResultAlarmsDS As New ResultAlarmsDS
+                                                Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
 
-                                            'Proccess the Ref Ranges Alarm and insert into Ranges alarm.
-                                            resultData = IsValidISERefRanges(dbConnection, res_DS.twksResults(0).OrderTestID, myDS.twksWSExecutions(0).TestID, _
-                                                                             myDS.twksWSExecutions(0).SampleType, myAverage)
+                                                resultData = ValidateISERefRanges(dbConnection, mySampleClass, myOT, myDS.twksWSExecutions.First.TestID, _
+                                                                                  myDS.twksWSExecutions.First.SampleType, myAverage, myControlID)
+                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                    Dim validationResult As String = resultData.SetDatos.ToString
 
-                                            'TR 23/01/2012 -Move here
-                                            Dim myResultAlarmsDS As New ResultAlarmsDS
-                                            Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-                                            'TR 23/01/2012 -END.
-                                            If Not resultData.HasError Then
-                                                If Not CBool(resultData.SetDatos) Then
-                                                    'Dim myResultAlarmsDS As New ResultAlarmsDS
-                                                    'Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
+                                                    If (validationResult <> String.Empty) Then
+                                                        'Load the Alarm found for the average Result in a row of a typed DataSet ResultAlarmsDS
+                                                        myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
+                                                        myResultAlarmRow.OrderTestID = myOT
+                                                        myResultAlarmRow.RerunNumber = myRerun
+                                                        myResultAlarmRow.MultiPointNumber = 1
+                                                        myResultAlarmRow.AlarmID = validationResult
+                                                        myResultAlarmRow.AlarmDateTime = Now
+                                                        myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
+                                                        myResultAlarmsDS.AcceptChanges()
+                                                    End If
 
-                                                    myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                    myResultAlarmRow.OrderTestID = res_DS.twksResults(0).OrderTestID
-                                                    myResultAlarmRow.RerunNumber = res_DS.twksResults(0).RerunNumber
-                                                    myResultAlarmRow.MultiPointNumber = 1
-                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
-                                                    myResultAlarmRow.AlarmDateTime = Now
-                                                    myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-
-                                                End If
-                                                'TR 24/01/2012 -Search if there're any alarm for the current resutl to show.
-                                                If Not resultData.HasError Then
-                                                    Dim myResultExecutionsAlarmsDS As New WSExecutionAlarmsDS 'TR 24/01/2012
-                                                    Dim myTemExecutionDS As New ExecutionsDS
-                                                    Dim myExecutionDelegate As New ExecutionsDelegate
-                                                    'Dim myResultAlarmsDS As New ResultAlarmsDS
+                                                    'Get the list of different Alarms for all active Executions for the OrderTestID/RerunNumber (excepting the Reference Ranges
+                                                    'Alarms: CONC_REMARK7 and CONC_REMARK8)
                                                     Dim myExecutionAlarmsDelegate As New WSExecutionAlarmsDelegate
+                                                    resultData = myExecutionAlarmsDelegate.ReadAlarmsForAverageResult(dbConnection, pAnalyzerID, pWorkSessionID, myOT, myRerun)
 
-                                                    resultData = myExecutionDelegate.GetByOrderTest(dbConnection, pWorkSessionID, pAnalyzerID, _
-                                                                                                    res_DS.twksResults(0).OrderTestID, res_DS.twksResults(0).MultiPointNumber)
-                                                    If Not resultData.HasError Then
-                                                        myTemExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                        Dim myAlarmsDS As AlarmsDS = DirectCast(resultData.SetDatos, AlarmsDS)
 
-                                                        For Each execRow As ExecutionsDS.twksWSExecutionsRow In myTemExecutionDS.twksWSExecutions.Rows
-                                                            'Validate execution is in Use 
-                                                            If Not execRow.IsInUseNull AndAlso execRow.InUse Then
-                                                                'Get the execution alarm by the execution ID 
-                                                                resultData = myExecutionAlarmsDelegate.Read(dbConnection, execRow.ExecutionID)
-                                                                If Not resultData.HasError Then
-                                                                    myResultExecutionsAlarmsDS = DirectCast(resultData.SetDatos, WSExecutionAlarmsDS)
-                                                                    'myResultExecutionsAlarmsDS
-                                                                    For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString Then
-                                                                            'Before adding the row validate if not exist in curren Dataset
-                                                                            If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = res_DS.twksResults(0).OrderTestID _
-                                                                                                                               AndAlso a.RerunNumber = res_DS.twksResults(0).RerunNumber _
-                                                                                                                               AndAlso a.MultiPointNumber = res_DS.twksResults(0).MultiPointNumber _
-                                                                                                                               AndAlso a.AlarmID = ResultExeAlarmRow.AlarmID).Count > 0 Then
-
-                                                                                myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                                                myResultAlarmRow.OrderTestID = myOT
-                                                                                myResultAlarmRow.RerunNumber = myRerun
-                                                                                myResultAlarmRow.MultiPointNumber = 1
-                                                                                myResultAlarmRow.AlarmID = ResultExeAlarmRow.AlarmID
-                                                                                myResultAlarmRow.AlarmDateTime = Now
-                                                                                myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-                                                                            End If
-
-                                                                        End If
-                                                                    Next
-                                                                End If
-                                                            End If
-
+                                                        'Load all Alarms in the typed DataSet ResultAlarmsDS for the Average Result
+                                                        For Each execAlarm As AlarmsDS.tfmwAlarmsRow In myAlarmsDS.tfmwAlarms.Rows
+                                                            myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
+                                                            myResultAlarmRow.OrderTestID = myOT
+                                                            myResultAlarmRow.RerunNumber = myRerun
+                                                            myResultAlarmRow.MultiPointNumber = 1
+                                                            myResultAlarmRow.AlarmID = execAlarm.AlarmID
+                                                            myResultAlarmRow.AlarmDateTime = Now
+                                                            myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
+                                                            myResultAlarmsDS.AcceptChanges()
                                                         Next
                                                     End If
-                                                End If
-                                                'TR 24/01/2012 -END
 
-                                                If Not resultData.HasError Then
-                                                    'Insert. The Result alarms
-                                                    resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
+                                                    'Finally, if there are Alarms for the Average Result, save them
+                                                    If (Not resultData.HasError AndAlso myResultAlarmsDS.twksResultAlarms.Count > 0) Then
+                                                        resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
+                                                    End If
                                                 End If
                                             End If
-                                            'TR 12/12/2011 -END
                                         End If
                                     End If
                                 End If
                             End If
                         End If
 
-
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
@@ -343,379 +301,75 @@ Namespace Biosystems.Ax00.Calculations
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateAverageValue", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateISEAverageValue", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
-
-
-            'Dim resultData As New GlobalDataTO
-            'Dim dbConnection As New SqlClient.SqlConnection
-
-            'Try
-            '    resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-            '    If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-            '        dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-            '        If (Not dbConnection Is Nothing) Then
-            '            'Get the orderTest & rerun number
-            '            Dim exec_delg As New ExecutionsDelegate
-            '            resultData = exec_delg.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
-
-            '            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-            '                Dim myDS As New ExecutionsDS
-            '                myDS = CType(resultData.SetDatos, ExecutionsDS)
-
-            '                If myDS.twksWSExecutions.Rows.Count > 0 Then
-            '                    Dim myOT As Integer = myDS.twksWSExecutions(0).OrderTestID
-            '                    Dim myRerun As Integer = myDS.twksWSExecutions(0).RerunNumber
-
-            '                    'Get the current Results row (OrderTestID - RerunNumber
-            '                    Dim results_del As New ResultsDelegate
-            '                    Dim res_DS As New ResultsDS
-            '                    resultData = results_del.ReadByOrderTestIDandRerunNumber(dbConnection, myOT, myRerun)
-            '                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-            '                        res_DS = CType(resultData.SetDatos, ResultsDS)
-            '                        'Else
-            '                        '    Exit Try
-            '                    End If
-            '                    'TR 17/10/2011 -Implemented to avoid Exit Try
-            '                    If Not resultData.HasError Then
-            '                        'Calculate OrderTestID - Rerun new average
-            '                        resultData = GetAverageConcentrationValue(dbConnection, myOT, myRerun)
-            '                        Dim myAverage As Single = 0
-            '                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-            '                            'Get the concentration value to calculate the the average.
-            '                            myAverage = CType(resultData.SetDatos, Single)
-            '                            'Else
-            '                            '  Exit Try
-            '                        End If
-            '                        'AG 13/01/2011
-
-            '                        'TR 17/10/2011 -Implemented to avoid Exit Try
-            '                        If Not resultData.HasError Then
-            '                            'update result into DS
-            '                            If res_DS.twksResults.Rows.Count > 0 Then
-            '                                res_DS.twksResults(0).BeginEdit()
-            '                                res_DS.twksResults(0).CONC_Value = myAverage
-            '                                res_DS.twksResults(0).AnalyzerID = pAnalyzerID
-            '                                res_DS.twksResults(0).WorkSessionID = pWorkSessionID
-            '                                res_DS.twksResults(0).AcceptChanges()
-
-            '                                'Save results on result table.
-            '                                resultData = results_del.SaveResults(dbConnection, res_DS)
-            '                                If resultData.HasError Then Exit Try
-
-            '                                'TR 12/12/2011 -Delete all related alarms before entering.
-            '                                Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
-            '                                resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, res_DS.twksResults(0).OrderTestID, _
-            '                                                                              res_DS.twksResults(0).RerunNumber, res_DS.twksResults(0).MultiPointNumber)
-
-            '                                'Proccess the Ref Ranges Alarm and insert into Ranges alarm.
-            '                                resultData = IsValidISERefRanges(dbConnection, res_DS.twksResults(0).OrderTestID, myDS.twksWSExecutions(0).TestID, _
-            '                                                                 myDS.twksWSExecutions(0).SampleType, myAverage)
-
-            '                                'TR 23/01/2012 -Move here
-            '                                Dim myResultAlarmsDS As New ResultAlarmsDS
-            '                                Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-            '                                'TR 23/01/2012 -END.
-            '                                If Not resultData.HasError Then
-            '                                    If Not CBool(resultData.SetDatos) Then
-            '                                        'Dim myResultAlarmsDS As New ResultAlarmsDS
-            '                                        'Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-
-            '                                        myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-            '                                        myResultAlarmRow.OrderTestID = res_DS.twksResults(0).OrderTestID
-            '                                        myResultAlarmRow.RerunNumber = res_DS.twksResults(0).RerunNumber
-            '                                        myResultAlarmRow.MultiPointNumber = 1
-            '                                        myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
-            '                                        myResultAlarmRow.AlarmDateTime = Now
-            '                                        myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-
-            '                                    End If
-            '                                    'TR 24/01/2012 -Search if there're any alarm for the current resutl to show.
-            '                                    If Not resultData.HasError Then
-            '                                        Dim myResultExecutionsAlarmsDS As New WSExecutionAlarmsDS 'TR 24/01/2012
-            '                                        Dim myTemExecutionDS As New ExecutionsDS
-            '                                        Dim myExecutionDelegate As New ExecutionsDelegate
-            '                                        'Dim myResultAlarmsDS As New ResultAlarmsDS
-            '                                        Dim myExecutionAlarmsDelegate As New WSExecutionAlarmsDelegate
-
-            '                                        resultData = myExecutionDelegate.GetByOrderTest(dbConnection, pWorkSessionID, pAnalyzerID, _
-            '                                                                                        res_DS.twksResults(0).OrderTestID, res_DS.twksResults(0).MultiPointNumber)
-            '                                        If Not resultData.HasError Then
-            '                                            myTemExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-            '                                            For Each execRow As ExecutionsDS.twksWSExecutionsRow In myTemExecutionDS.twksWSExecutions.Rows
-            '                                                'Validate execution is in Use 
-            '                                                If Not execRow.IsInUseNull AndAlso execRow.InUse Then
-            '                                                    'Get the execution alarm by the execution ID 
-            '                                                    resultData = myExecutionAlarmsDelegate.Read(dbConnection, execRow.ExecutionID)
-            '                                                    If Not resultData.HasError Then
-            '                                                        myResultExecutionsAlarmsDS = DirectCast(resultData.SetDatos, WSExecutionAlarmsDS)
-            '                                                        'myResultExecutionsAlarmsDS
-            '                                                        For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-            '                                                            If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString Then
-            '                                                                'Before adding the row validate if not exist in curren Dataset
-            '                                                                If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = res_DS.twksResults(0).OrderTestID _
-            '                                                                                                                   AndAlso a.RerunNumber = res_DS.twksResults(0).RerunNumber _
-            '                                                                                                                   AndAlso a.MultiPointNumber = res_DS.twksResults(0).MultiPointNumber _
-            '                                                                                                                   AndAlso a.AlarmID = ResultExeAlarmRow.AlarmID).Count > 0 Then
-
-            '                                                                    myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
-            '                                                                    myResultAlarmRow.OrderTestID = myOT
-            '                                                                    myResultAlarmRow.RerunNumber = myRerun
-            '                                                                    myResultAlarmRow.MultiPointNumber = 1
-            '                                                                    myResultAlarmRow.AlarmID = ResultExeAlarmRow.AlarmID
-            '                                                                    myResultAlarmRow.AlarmDateTime = Now
-            '                                                                    myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
-            '                                                                End If
-
-            '                                                            End If
-            '                                                        Next
-            '                                                    End If
-            '                                                End If
-
-            '                                            Next
-            '                                        End If
-            '                                    End If
-            '                                    'TR 24/01/2012 -END
-
-            '                                    If Not resultData.HasError Then
-            '                                        'Insert. The Result alarms
-            '                                        resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
-            '                                    End If
-            '                                End If
-            '                                'TR 12/12/2011 -END
-            '                            End If
-            '                        End If
-            '                    End If
-            '                End If
-            '            End If
-            '        End If
-            '    End If
-
-            'Catch ex As Exception
-            '    resultData.HasError = True
-            '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-            '    resultData.ErrorMessage = ex.Message
-
-            '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateAverageValue", EventLogEntryType.Error, False)
-
-            'Finally
-            '    If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            'End Try
-
-            'Return resultData
         End Function
 
         ''' <summary>
-        ''' Get the accepted concentration values for specific OrderTestID and Rerun Number.
+        ''' Get all accepted concentration values for specific OrderTestID and Rerun Number and calculate the Average 
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pOrderTestID">Order Test ID</param>
-        ''' <returns>The concentration value on the Set Data property on GlobalDataTO (Single)</returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pOrderTestID">Order Test Identifier</param>
+        ''' <returns>GlobalDataTO containing a Single value with the calculate Average CONCENTRATION</returns>
         ''' <remarks>
-        ''' CREATE BY: TR 05/01/2010
-        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
+        ''' Created by:  TR 05/01/2010
         ''' </remarks>
-        Public Function GetAverageConcentrationValue(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                      ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+        Public Function GetAverageConcentrationValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
+                                                     ByVal pRerunNumber As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-
                     If (Not dbConnection Is Nothing) Then
-                        Dim myExecDelegate As New ExecutionsDelegate
                         Dim newAverage As Single = 0
+                        Dim myExecDelegate As New ExecutionsDelegate
 
                         myGlobalDataTO = myExecDelegate.ReadByOrderTestIDandRerunNumber(dbConnection, pOrderTestID, pRerunNumber)
-                        If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
-                            Dim execDS As New ExecutionsDS
-                            execDS = CType(myGlobalDataTO.SetDatos, ExecutionsDS)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            Dim execDS As ExecutionsDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
 
                             Dim itemNumber As Integer = 0
                             For Each row As ExecutionsDS.twksWSExecutionsRow In execDS.twksWSExecutions
-                                If Not row.IsInUseNull Then
-                                    If row.InUse Then
-                                        newAverage += row.CONC_Value
-                                        itemNumber += 1
-                                    End If
+                                If (Not row.IsInUseNull AndAlso row.InUse) Then
+                                    newAverage += row.CONC_Value
+                                    itemNumber += 1
                                 End If
                             Next
-                            If itemNumber > 0 Then
-                                newAverage = newAverage / itemNumber
-                            End If
-                        End If
-                        myGlobalDataTO.SetDatos = newAverage
 
+                            If (itemNumber > 0) Then newAverage = newAverage / itemNumber
+                        End If
+
+                        myGlobalDataTO.SetDatos = newAverage
+                        myGlobalDataTO.HasError = False
                     End If
                 End If
 
             Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return myGlobalDataTO
-
-        End Function
-
-        ''' <summary>
-        ''' Validate if the concentration value is Between the Ref Ranges if APPLY.
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pOrderTestID"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pSampleType"></param>
-        ''' <param name="pCONC_Value"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' CREATED BY: TR 05/12/2011
-        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
-        ''' AG 03/07/2012 - use the proper template (GET)
-        ''' </remarks>
-        Public Function IsValidISERefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
-                                             ByVal pTestID As Integer, ByVal pSampleType As String, ByVal pCONC_Value As Single) As GlobalDataTO
-
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                Dim myResult As Boolean = True
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        'Get the ISE TEST INFO 
-                        Dim myISETestSampleDelegate As New ISETestSamplesDelegate
-                        Dim myISETestSampleDS As New ISETestSamplesDS
-                        resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
-
-                        If Not resultData.HasError Then
-                            myISETestSampleDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
-
-                            If myISETestSampleDS.tparISETestSamples.Count > 0 Then
-                                Dim myOrderTestsDelegate As New OrderTestsDelegate
-                                'Get the Reference Range Interval defined for the Test.
-                                resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
-                                                                                                pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
-
-                                If Not resultData.HasError Then
-                                    'Validate the range
-                                    Dim myTestRefRangesDS As New TestRefRangesDS
-                                    myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                                    If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-                                        If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
-                                           (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
-                                            If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
-                                               (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
-
-                                                myResult = False
-
-                                            End If
-                                        End If
-                                    End If
-                                End If
-                            End If
-                        End If
-                    End If
-                End If
-                resultData.SetDatos = myResult
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
-
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
-            Return resultData
-
-
-            'OLD CODE 03/07/2012
-            'Dim myGlobalDataTO As New GlobalDataTO
-            'Dim dbConnection As New SqlClient.SqlConnection
-            'Try
-            '    Dim myResult As Boolean = True
-            '    myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-            '    If (Not myGlobalDataTO.HasError) Then
-            '        dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-            '        If (Not dbConnection Is Nothing) Then
-            '            'Get the ISE TEST INFO 
-            '            Dim myISETestSampleDelegate As New ISETestSamplesDelegate
-            '            Dim myISETestSampleDS As New ISETestSamplesDS
-            '            myGlobalDataTO = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
-
-            '            If Not myGlobalDataTO.HasError Then
-            '                myISETestSampleDS = DirectCast(myGlobalDataTO.SetDatos, ISETestSamplesDS)
-
-            '                If myISETestSampleDS.tparISETestSamples.Count > 0 Then
-            '                    Dim myOrderTestsDelegate As New OrderTestsDelegate
-            '                    'Get the Reference Range Interval defined for the Test.
-            '                    myGlobalDataTO = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
-            '                                                                                    pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
-
-            '                    If Not myGlobalDataTO.HasError Then
-            '                        'Validate the range
-            '                        Dim myTestRefRangesDS As New TestRefRangesDS
-            '                        myTestRefRangesDS = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
-
-            '                        If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-            '                            If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
-            '                               (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
-            '                                If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
-            '                                   (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
-
-            '                                    myResult = False
-
-            '                                End If
-            '                            End If
-            '                        End If
-            '                    End If
-            '                End If
-            '            End If
-            '        End If
-            '    End If
-            '    myGlobalDataTO.SetDatos = myResult
-
-            'Catch ex As Exception
-            '    myGlobalDataTO.HasError = True
-            '    myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
-            '    myGlobalDataTO.ErrorMessage = ex.Message
-
-            '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
-            'End Try
-            'Return myGlobalDataTO
+            Return myGlobalDataTO
         End Function
 
         ''' <summary>
@@ -1480,7 +1134,6 @@ Namespace Biosystems.Ax00.Calculations
             End Try
             Return resultData
         End Function
-
 #End Region
 
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
@@ -1623,7 +1276,9 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pManualFactorEvent">Optional parameter. When TRUE, it means recalculations are called from ManualFactor functionality</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: SA 09/07/2012 - Based in RecalculateResults
+        ''' Created by:  SA 09/07/2012 - Based in RecalculateResults
+        ''' Modified by: SA 12/06/2014 - BT# 1660 ==> When the Result to recalculate is for an  ISETest/SampleType, new function RecalculateISEAverageValue is
+        '''                                           called instead of the previous version function (RecalculateAverageValue)
         ''' </remarks>
         Public Function RecalculateResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                               ByVal pExecToRecalculateRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pManualRecalculationFlag As Boolean, _
@@ -1727,7 +1382,7 @@ Namespace Biosystems.Ax00.Calculations
                     End If
 
                 ElseIf (myRecalData.ExecutionType = "PREP_ISE" AndAlso myRecalData.ExecutionStatus = "CLOSED") Then
-                    resultData = RecalculateAverageValue(Nothing, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.Execution)
+                    resultData = RecalculateISEAverageValue(Nothing, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.Execution)
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     myLogAcciones.CreateLogActivity("Recalculate selected ISE result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -1872,6 +1527,339 @@ Namespace Biosystems.Ax00.Calculations
         End Function
 #End Region
 
+#Region "NOT USED"
+        ''' <summary>
+        '''  IT IS REPLACED FOR NEW FUNCTION RecalculateISEAverageValue (BT #1660)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pExecutionID"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created By:AG 13/01/2011
+        ''' Modified By: TR 17/10/2011 -Correct the Exit Try.
+        '''              TR 23/01/2012 -Implement to show alarms on media value.    
+        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
+        ''' AG 25/06/2012 resultsDS inform also AnalyzerID, WorkSessionID
+        ''' AG 03/07/2012 - use the proper template (INSERT / UPDATE / DELETE)
+        '''              TR 19/07/2012 -Inform the sample class in to ResultsDS.
+        ''' </remarks>
+        Public Function RecalculateAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                                ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Get the orderTest & rerun number
+                        Dim exec_delg As New ExecutionsDelegate
+                        resultData = exec_delg.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
+
+                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                            Dim myDS As New ExecutionsDS
+                            myDS = CType(resultData.SetDatos, ExecutionsDS)
+
+                            If myDS.twksWSExecutions.Rows.Count > 0 Then
+                                Dim myOT As Integer = myDS.twksWSExecutions(0).OrderTestID
+                                Dim myRerun As Integer = myDS.twksWSExecutions(0).RerunNumber
+                                'TR 19/07/2012 -Declare variable and set the sample class value.
+                                Dim mySampleClass As String = myDS.twksWSExecutions(0).SampleClass
+
+                                'Get the current Results row (OrderTestID - RerunNumber
+                                Dim results_del As New ResultsDelegate
+                                Dim res_DS As New ResultsDS
+                                resultData = results_del.ReadByOrderTestIDandRerunNumber(dbConnection, myOT, myRerun)
+                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                    res_DS = CType(resultData.SetDatos, ResultsDS)
+                                    'Else
+                                    '    Exit Try
+                                End If
+                                'TR 17/10/2011 -Implemented to avoid Exit Try
+                                If Not resultData.HasError Then
+                                    'Calculate OrderTestID - Rerun new average
+                                    resultData = GetAverageConcentrationValue(dbConnection, myOT, myRerun)
+                                    Dim myAverage As Single = 0
+                                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                        'Get the concentration value to calculate the the average.
+                                        myAverage = CType(resultData.SetDatos, Single)
+                                        'Else
+                                        '  Exit Try
+                                    End If
+                                    'AG 13/01/2011
+
+                                    'TR 17/10/2011 -Implemented to avoid Exit Try
+                                    If Not resultData.HasError Then
+                                        'update result into DS
+                                        If res_DS.twksResults.Rows.Count > 0 Then
+                                            res_DS.twksResults(0).BeginEdit()
+                                            res_DS.twksResults(0).CONC_Value = myAverage
+                                            res_DS.twksResults(0).AnalyzerID = pAnalyzerID
+                                            res_DS.twksResults(0).WorkSessionID = pWorkSessionID
+                                            res_DS.twksResults(0).SampleClass = mySampleClass 'TR 19/07/2012 -inform the sampleclass value.
+                                            res_DS.twksResults(0).AcceptChanges()
+
+                                            'Save results on result table.
+                                            resultData = results_del.SaveResults(dbConnection, res_DS)
+                                            If resultData.HasError Then Exit Try
+
+                                            'TR 12/12/2011 -Delete all related alarms before entering.
+                                            Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
+                                            resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, res_DS.twksResults(0).OrderTestID, _
+                                                                                          res_DS.twksResults(0).RerunNumber, res_DS.twksResults(0).MultiPointNumber)
+
+                                            'Proccess the Ref Ranges Alarm and insert into Ranges alarm.
+                                            resultData = IsValidISERefRanges(dbConnection, res_DS.twksResults(0).OrderTestID, myDS.twksWSExecutions(0).TestID, _
+                                                                             myDS.twksWSExecutions(0).SampleType, myAverage)
+
+                                            'TR 23/01/2012 -Move here
+                                            Dim myResultAlarmsDS As New ResultAlarmsDS
+                                            Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
+                                            'TR 23/01/2012 -END.
+                                            If Not resultData.HasError Then
+                                                If Not CBool(resultData.SetDatos) Then
+                                                    'Dim myResultAlarmsDS As New ResultAlarmsDS
+                                                    'Dim myResultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
+
+                                                    myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
+                                                    myResultAlarmRow.OrderTestID = res_DS.twksResults(0).OrderTestID
+                                                    myResultAlarmRow.RerunNumber = res_DS.twksResults(0).RerunNumber
+                                                    myResultAlarmRow.MultiPointNumber = 1
+                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                    myResultAlarmRow.AlarmDateTime = Now
+                                                    myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
+
+                                                End If
+                                                'TR 24/01/2012 -Search if there're any alarm for the current resutl to show.
+                                                If Not resultData.HasError Then
+                                                    Dim myResultExecutionsAlarmsDS As New WSExecutionAlarmsDS 'TR 24/01/2012
+                                                    Dim myTemExecutionDS As New ExecutionsDS
+                                                    Dim myExecutionDelegate As New ExecutionsDelegate
+                                                    'Dim myResultAlarmsDS As New ResultAlarmsDS
+                                                    Dim myExecutionAlarmsDelegate As New WSExecutionAlarmsDelegate
+
+                                                    resultData = myExecutionDelegate.GetByOrderTest(dbConnection, pWorkSessionID, pAnalyzerID, _
+                                                                                                    res_DS.twksResults(0).OrderTestID, res_DS.twksResults(0).MultiPointNumber)
+                                                    If Not resultData.HasError Then
+                                                        myTemExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+                                                        For Each execRow As ExecutionsDS.twksWSExecutionsRow In myTemExecutionDS.twksWSExecutions.Rows
+                                                            'Validate execution is in Use 
+                                                            If Not execRow.IsInUseNull AndAlso execRow.InUse Then
+                                                                'Get the execution alarm by the execution ID 
+                                                                resultData = myExecutionAlarmsDelegate.Read(dbConnection, execRow.ExecutionID)
+                                                                If Not resultData.HasError Then
+                                                                    myResultExecutionsAlarmsDS = DirectCast(resultData.SetDatos, WSExecutionAlarmsDS)
+                                                                    'myResultExecutionsAlarmsDS
+                                                                    For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
+                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString Then
+                                                                            'Before adding the row validate if not exist in curren Dataset
+                                                                            If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = res_DS.twksResults(0).OrderTestID _
+                                                                                                                               AndAlso a.RerunNumber = res_DS.twksResults(0).RerunNumber _
+                                                                                                                               AndAlso a.MultiPointNumber = res_DS.twksResults(0).MultiPointNumber _
+                                                                                                                               AndAlso a.AlarmID = ResultExeAlarmRow.AlarmID).Count > 0 Then
+
+                                                                                myResultAlarmRow = myResultAlarmsDS.twksResultAlarms.NewtwksResultAlarmsRow
+                                                                                myResultAlarmRow.OrderTestID = myOT
+                                                                                myResultAlarmRow.RerunNumber = myRerun
+                                                                                myResultAlarmRow.MultiPointNumber = 1
+                                                                                myResultAlarmRow.AlarmID = ResultExeAlarmRow.AlarmID
+                                                                                myResultAlarmRow.AlarmDateTime = Now
+                                                                                myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
+                                                                            End If
+
+                                                                        End If
+                                                                    Next
+                                                                End If
+                                                            End If
+
+                                                        Next
+                                                    End If
+                                                End If
+                                                'TR 24/01/2012 -END
+
+                                                If Not resultData.HasError Then
+                                                    'Insert. The Result alarms
+                                                    resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
+                                                End If
+                                            End If
+                                            'TR 12/12/2011 -END
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            'resultData.SetDatos = <value to return; if any>
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateAverageValue", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Validate if the concentration value is Between the Ref Ranges if APPLY.
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderTestID"></param>
+        ''' <param name="pTestID"></param>
+        ''' <param name="pSampleType"></param>
+        ''' <param name="pCONC_Value"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' CREATED BY: TR 05/12/2011
+        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
+        ''' AG 03/07/2012 - use the proper template (GET)
+        ''' </remarks>
+        Public Function IsValidISERefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
+                                             ByVal pTestID As Integer, ByVal pSampleType As String, ByVal pCONC_Value As Single) As GlobalDataTO
+
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                Dim myResult As Boolean = True
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Get the ISE TEST INFO 
+                        Dim myISETestSampleDelegate As New ISETestSamplesDelegate
+                        Dim myISETestSampleDS As New ISETestSamplesDS
+                        resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
+
+                        If Not resultData.HasError Then
+                            myISETestSampleDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
+
+                            If myISETestSampleDS.tparISETestSamples.Count > 0 Then
+                                Dim myOrderTestsDelegate As New OrderTestsDelegate
+                                'Get the Reference Range Interval defined for the Test.
+                                resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
+                                                                                                pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
+
+                                If Not resultData.HasError Then
+                                    'Validate the range
+                                    Dim myTestRefRangesDS As New TestRefRangesDS
+                                    myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+                                    If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+                                        If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
+                                           (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
+                                            If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
+                                               (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
+
+                                                myResult = False
+
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+                resultData.SetDatos = myResult
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+
+
+            'OLD CODE 03/07/2012
+            'Dim myGlobalDataTO As New GlobalDataTO
+            'Dim dbConnection As New SqlClient.SqlConnection
+            'Try
+            '    Dim myResult As Boolean = True
+            '    myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+            '    If (Not myGlobalDataTO.HasError) Then
+            '        dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+            '        If (Not dbConnection Is Nothing) Then
+            '            'Get the ISE TEST INFO 
+            '            Dim myISETestSampleDelegate As New ISETestSamplesDelegate
+            '            Dim myISETestSampleDS As New ISETestSamplesDS
+            '            myGlobalDataTO = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
+
+            '            If Not myGlobalDataTO.HasError Then
+            '                myISETestSampleDS = DirectCast(myGlobalDataTO.SetDatos, ISETestSamplesDS)
+
+            '                If myISETestSampleDS.tparISETestSamples.Count > 0 Then
+            '                    Dim myOrderTestsDelegate As New OrderTestsDelegate
+            '                    'Get the Reference Range Interval defined for the Test.
+            '                    myGlobalDataTO = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
+            '                                                                                    pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
+
+            '                    If Not myGlobalDataTO.HasError Then
+            '                        'Validate the range
+            '                        Dim myTestRefRangesDS As New TestRefRangesDS
+            '                        myTestRefRangesDS = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
+
+            '                        If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+            '                            If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
+            '                               (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
+            '                                If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
+            '                                   (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
+
+            '                                    myResult = False
+
+            '                                End If
+            '                            End If
+            '                        End If
+            '                    End If
+            '                End If
+            '            End If
+            '        End If
+            '    End If
+            '    myGlobalDataTO.SetDatos = myResult
+
+            'Catch ex As Exception
+            '    myGlobalDataTO.HasError = True
+            '    myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
+            '    myGlobalDataTO.ErrorMessage = ex.Message
+
+            '    Dim myLogAcciones As New ApplicationLogManager()
+            '    myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
+            'End Try
+            'Return myGlobalDataTO
+        End Function
+
+#End Region
     End Class
 End Namespace
 
