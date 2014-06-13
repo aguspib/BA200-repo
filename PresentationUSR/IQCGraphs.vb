@@ -714,6 +714,8 @@ Public Class IQCGraphs
     '''              DL 31/05/2012 - Set the X-Axis scale to numeric
     '''              SA 02/12/2013 - BT #1392 ==> Changes to draw correctly the Levey-Jennings graph when several Controls have been
     '''                                           selected (X-Axis values in the previous version were wrong and the graph has not sense)
+    '''              SA 13/06/2014 - BT #1665 ==> Property AxisX.Range.Auto has to be initialized to TRUE (it is needed when LJ Graph is
+    '''                                           reloaded after drawn the Youden Graph, which use a not automatic Range) 
     ''' </remarks>
     Private Sub LoadLeveyJenningsGraph()
         Try
@@ -787,6 +789,7 @@ Public Class IQCGraphs
                 myDiagram = CType(bsQCResultChartControl.Diagram, XYDiagram)
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
+                myDiagram.AxisX.Range.Auto = True
                 myDiagram.AxisY.GridLines.Visible = False
                 myDiagram.AxisX.GridLines.Visible = False
                 myDiagram.AxisX.Title.Visible = False
