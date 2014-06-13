@@ -296,7 +296,17 @@ Public Class XRManager
                 rotorReport.DataMember = ""
                 rotorReport.DataSource = pCellPositionsInformation
                 rotorReport.DataMember = "ReportTable"
-                ShowPortrait(rotorReport)
+                'EF 12/06/2014 #1649 - Reports Improvements (Don't use Report Template for Reagent Rotor Report)
+                'ShowPortrait(rotorReport)
+                rotorReport.Landscape = False
+                Using MyXRForm As New XRMainForm
+                    MyXRForm.Report = rotorReport
+                    ' MyXRForm.Report.PaperKind = System.Drawing.Printing.PaperKind.A4
+                    MyXRForm.ShowDialog()
+                End Using
+
+                'EF 12/06/2014 #1649
+
             End Using
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
