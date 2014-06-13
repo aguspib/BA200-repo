@@ -1759,6 +1759,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ElseIf myPrepID = 0 Then
                         'AG Note: I am not sure of this radical protection, so I left commented until more validation (we are in releasing period) and I have added more proteccions marked with same bug-number
                         'For example pending tests using also PTEST, WRUN (cuvettes)
+                        'PENDING validation. Leave commented until validate
+
                         'Return myGlobal
                         'AG 13/06/2014 #1662
                     End If

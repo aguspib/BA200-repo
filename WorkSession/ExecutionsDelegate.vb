@@ -243,7 +243,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         'AG 13/06/2014 #1662 (add also protection against empty position causing method returns a wrong datatype!!!)
-                        If Not TypeOf (resultData.SetDatos) Is ExecutionsDS Then
+                        If Not resultData.HasError AndAlso Not TypeOf (resultData.SetDatos) Is ExecutionsDS Then
                             Dim temp As New ExecutionsDS
                             resultData.SetDatos = temp
                         End If

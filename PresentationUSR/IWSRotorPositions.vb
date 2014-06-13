@@ -6666,7 +6666,8 @@ Public Class IWSRotorPositions
                         If myLinqRes.Count > 0 Then
                             ''updatedRow.Status = "NOT_INUSE" AndAlso
                             'TR 07/09/2011 -Validate if position has a positioned element to change status on treeView 
-                            If myLinqRes(0).ElementStatus = "POS" Then
+                            'AG 13/06/2014 #1661 - add condition Not myLinqRes(0).IsElementIDNull
+                            If myLinqRes(0).ElementStatus = "POS" AndAlso Not myLinqRes(0).IsElementIDNull Then
                                 'Change the tree status 
 
                                 If bsElementsTreeView Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
@@ -7047,15 +7048,16 @@ Public Class IWSRotorPositions
 
                 If (pCreateExecutions) Then
 
-                    'TR 16/04/2014 BT #1597 uncomment on version 3.0.1
-                    'Valiadate if pFromOwnScreen  is enable to set value to IsclosingFlag = true else false
-                    'If pFromOwnScreen Then
-                    '    isClosingFlag = True
-                    'End If
-                    'TR 16/04/2014 BT #1597 -END
+                    'TR 16/04/2014 BT #1597
+                    'Comment or delete this line on version 3.0.1
+                    'isClosingFlag = True 'AG 18/03/2014 - #1545 Investigate avoid DeadLocks
 
-                    'TR 16/04/2014 BT #1597 Comment or delete this line on version 3.0.1
-                    isClosingFlag = True 'AG 18/03/2014 - #1545 Investigate avoid DeadLocks
+                    'Uncomment on version 3.0.1
+                    'Valiadate if pFromOwnScreen  is enable to set value to IsclosingFlag = true else false
+                    If pFromOwnScreen Then
+                        isClosingFlag = True
+                    End If
+                    'TR 16/04/2014 BT #1597 -END
 
                     IAx00MainMDI.EnableButtonAndMenus(False)
                     bsElementsTreeView.BackColor = SystemColors.MenuBar
@@ -7140,7 +7142,7 @@ Public Class IWSRotorPositions
                     Cursor = Cursors.Default
 
                     'TR 16/04/2014 BT #1597-Reload screen status.
-                    'LoadScreenStatus(WorkSessionStatusAttribute)
+                    LoadScreenStatus(WorkSessionStatusAttribute)
                 End If
 
                 'AG 10/02/2014 - If worksession is EMPTY, ABORTED or OPEN and this screen is closed menu and buttons (vertical and screen buttons) disable!
