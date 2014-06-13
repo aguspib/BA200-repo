@@ -1581,7 +1581,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''              SA 28/05/2014 - BT #1627 ==> Added changes to avoid call functions that are specific for REAGENTS (functions of ReagentsOnBoardManagement)  
         '''                                           when DILUTION and/or WASHING SOLUTIONS are dispensed. Current code just verify the Rotor Type, but not the 
         '''                                           Bottle content. Changes have been made in section labelled (2.2) 
-        '''              AG 04/06/2014 - #1653 Check if WRUN (reagents washings) could not be completed remove the last WRUN for wash reagents sent 
+        '''              AG 04/06/2014 - #1653 Check if WRUN (reagents washings) could not be completed remove the last WRUN for wash reagents sent
+        '''              AG 13/06/2014 #1662 - Protection against change positions in pause when S / R2 arm still have not been finished with this position
+        '''                                    If there not information on the position indicated andalso prepID is 0 --> Do nothing
         ''' </remarks>
         Private Function ProcessArmStatusRecived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -1752,8 +1754,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (rcp_DS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                         If (Not rcp_DS.twksWSRotorContentByPosition(0).IsStatusNull) Then initialRotorPositionStatus = rcp_DS.twksWSRotorContentByPosition(0).Status
                         If (Not rcp_DS.twksWSRotorContentByPosition(0).IsTubeContentNull) Then elementTubeContent = rcp_DS.twksWSRotorContentByPosition(0).TubeContent 'AG 30/05/2014 #1627
+
+                        'AG 13/06/2014 #1662 Protection against empty position without prepID (wrun + bug caused by #1644 fixed 12/06/2014)
+                    ElseIf myPrepID = 0 Then
+                        'AG Note: I am not sure of this radical protection, so I left commented until more validation (we are in releasing period) and I have added more proteccions marked with same bug-number
+                        'For example pending tests using also PTEST, WRUN (cuvettes)
+                        'Return myGlobal
+                        'AG 13/06/2014 #1662
                     End If
                 End If
+
 
                 Dim testLeft As Integer = 0
                 Dim realVolume As Single = 0
@@ -1988,7 +1998,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         lockedExecutionsDS.Clear() 'AG 07/02/2012 Clear the DS. The executions that must be informed to be locked are calculated later
 
                         'The volume missing alarms are only generated when each position becomes DEPLETED (initial position status <> 'DEPLETED' but current status = 'DEPLETED')
-                        If (initialRotorPositionStatus <> "DEPLETED") Then
+                        'AG 13/06/2014 #1662 (add also protection against empty position!!!)
+                        If (initialRotorPositionStatus <> "DEPLETED") AndAlso initialRotorPositionStatus <> "" Then
                             'XBC 17/07/2012 - Estimated ISE Consumption by Firmware
                             'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
                             If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) Then

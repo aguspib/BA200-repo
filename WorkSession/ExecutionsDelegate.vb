@@ -45,6 +45,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: TR 28/09/2012 -Add optional parameter IsBottleLocked to indicate if the bottle status is locked, this
         '''                             is for implementation of ReagentsOnBoard Locked bottle.
         ''' Modified by AG 04/10/2012 - add byref parameter pTurnToPendingFlag (used in ProcessArmStatusRecevied, when return TRUE means the Sw has to search next preparation to be sent again)
+        ''' AG 13/06/2014 #1662 (add also protection against empty position causing method returns a wrong datatype!!!)
         ''' </remarks>
         Public Function ProcessVolumeMissing(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, _
                                              ByVal pRotorType As String, ByVal pCellNumber As Integer, _
@@ -240,6 +241,13 @@ Namespace Biosystems.Ax00.BL
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
+
+                        'AG 13/06/2014 #1662 (add also protection against empty position causing method returns a wrong datatype!!!)
+                        If Not TypeOf (resultData.SetDatos) Is ExecutionsDS Then
+                            Dim temp As New ExecutionsDS
+                            resultData.SetDatos = temp
+                        End If
+                        'AG 13/06/2014 #1662
 
                     End If
                 End If
