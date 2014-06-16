@@ -2000,8 +2000,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         lockedExecutionsDS.Clear() 'AG 07/02/2012 Clear the DS. The executions that must be informed to be locked are calculated later
 
                         'The volume missing alarms are only generated when each position becomes DEPLETED (initial position status <> 'DEPLETED' but current status = 'DEPLETED')
-                        'AG 13/06/2014 #1662 (add also protection against empty position!!!)
-                        If (initialRotorPositionStatus <> "DEPLETED") AndAlso initialRotorPositionStatus <> "" Then
+                        'AG 16/06/2014 #1662 (add also protection against empty position (only for WRUN!!! If prepID <> 0 we must call LOCKING executions process)
+                        'If (initialRotorPositionStatus <> "DEPLETED") Then
+                        Dim RunningWashUsingEmptyPositionFlag As Boolean = False
+                        If myPrepID = 0 AndAlso initialRotorPositionStatus = "" Then
+                            RunningWashUsingEmptyPositionFlag = True
+                        End If
+                        If (initialRotorPositionStatus <> "DEPLETED" AndAlso Not RunningWashUsingEmptyPositionFlag) Then
+                            'AG 16/06/2014 #1662
+
                             'XBC 17/07/2012 - Estimated ISE Consumption by Firmware
                             'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
                             If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) Then
