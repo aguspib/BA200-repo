@@ -1754,15 +1754,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (rcp_DS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                         If (Not rcp_DS.twksWSRotorContentByPosition(0).IsStatusNull) Then initialRotorPositionStatus = rcp_DS.twksWSRotorContentByPosition(0).Status
                         If (Not rcp_DS.twksWSRotorContentByPosition(0).IsTubeContentNull) Then elementTubeContent = rcp_DS.twksWSRotorContentByPosition(0).TubeContent 'AG 30/05/2014 #1627
-
-                        'AG 13/06/2014 #1662 Protection against empty position without prepID (wrun + bug caused by #1644 fixed 12/06/2014)
-                    ElseIf myPrepID = 0 Then
-                        'AG Note: I am not sure of this radical protection, so I left commented until more validation (we are in releasing period) and I have added more proteccions marked with same bug-number
-                        'For example pending tests using also PTEST, WRUN (cuvettes)
-                        'PENDING validation. Leave commented until validate
-
-                        'Return myGlobal
-                        'AG 13/06/2014 #1662
                     End If
                 End If
 
@@ -2000,8 +1991,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         lockedExecutionsDS.Clear() 'AG 07/02/2012 Clear the DS. The executions that must be informed to be locked are calculated later
 
                         'The volume missing alarms are only generated when each position becomes DEPLETED (initial position status <> 'DEPLETED' but current status = 'DEPLETED')
-                        'AG 13/06/2014 #1662 (add also protection against empty position!!!)
-                        If (initialRotorPositionStatus <> "DEPLETED") AndAlso initialRotorPositionStatus <> "" Then
+                        'AG 16/06/2014 #1662 (add also protection against empty position (only for WRUN!!! If prepID <> 0 we must call LOCKING executions process)
+                        'If (initialRotorPositionStatus <> "DEPLETED") Then
+                        Dim RunningWashUsingEmptyPositionFlag As Boolean = False
+                        If myPrepID = 0 AndAlso initialRotorPositionStatus = "" Then
+                            RunningWashUsingEmptyPositionFlag = True
+                        End If
+                        If (initialRotorPositionStatus <> "DEPLETED" AndAlso Not RunningWashUsingEmptyPositionFlag) Then
+                            'AG 16/06/2014 #1662
+
                             'XBC 17/07/2012 - Estimated ISE Consumption by Firmware
                             'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
                             If (myInst = GlobalEnumerates.AppLayerInstrucionReception.ANSBM1.ToString) Then

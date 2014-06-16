@@ -46,6 +46,7 @@ Namespace Biosystems.Ax00.BL
         '''                             is for implementation of ReagentsOnBoard Locked bottle.
         ''' Modified by AG 04/10/2012 - add byref parameter pTurnToPendingFlag (used in ProcessArmStatusRecevied, when return TRUE means the Sw has to search next preparation to be sent again)
         ''' AG 13/06/2014 #1662 (add also protection against empty position causing method returns a wrong datatype!!!)
+        '''                     (if not element in position but preparationID value different than zero -- then lock the executions linked with this preparationID)
         ''' </remarks>
         Public Function ProcessVolumeMissing(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, _
                                              ByVal pRotorType As String, ByVal pCellNumber As Integer, _
@@ -230,6 +231,29 @@ Namespace Biosystems.Ax00.BL
 
                                     End If
                                 End If
+
+                                'AG 16/06/2014 #1662 - if user has changed or removed bottle after TEST/PTEST/ISETEST had been sent and there is empty position
+                                'then LOCK executions using this preparationID
+                            ElseIf pPreparationID <> 0 Then
+                                resultData = GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID)
+                                If Not resultData.HasError Then
+                                    Dim myExecutionDS As New ExecutionsDS
+                                    myExecutionDS = CType(resultData.SetDatos, ExecutionsDS)
+
+                                    If Not pPreparationIDPerformedOK Then
+                                        '2c. Update status for the preparation ID (LOCKED or PENDING) depending if more volume is available or not
+                                        myReturnValue = "LOCKED"
+                                        For Each myExecutionRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                            If Not myExecutionRow.IsExecutionIDNull Then
+                                                'Update status for my Execution 
+                                                resultData = UpdateStatusByExecutionID(dbConnection, myReturnValue, myExecutionRow.ExecutionID, pWorkSessionID, pAnalyzerID)
+                                            End If
+                                        Next
+                                    End If
+                                    resultData.SetDatos = myExecutionDS 'Return executions locked!!!
+
+                                End If
+                                'AG 16/06/2014 #1662
 
                             End If
                         End If
