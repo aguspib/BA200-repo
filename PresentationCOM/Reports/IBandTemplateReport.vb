@@ -55,37 +55,41 @@ Public Class IBandTemplateReport
         Try
             Cursor = Cursors.WaitCursor
 
-            DeleteResidualFiles() 'IT 12/06/2014 #1661: Delete temporals reports before to edit another
+            If bsTemplatesListView.SelectedIndices.Count = 1 Then
 
-            EditionMode = True
-            bsEditButton.Enabled = False
-            bsSaveButton.Enabled = True
-            bsCancelButton.Enabled = True
-            bsOrientationComboBox.Enabled = False
+                DeleteResidualFiles() 'IT 12/06/2014 #1661: Delete temporals reports before to edit another
 
-            'If master template then 
-            If bsTemplatesListView.SelectedIndices.Count > 0 AndAlso CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
-                bsTemplateTextBox.Enabled = False
-                bsTemplateTextBox.BackColor = SystemColors.MenuBar
-
+                EditionMode = True
+                bsEditButton.Enabled = False
+                bsSaveButton.Enabled = True
+                bsCancelButton.Enabled = True
                 bsOrientationComboBox.Enabled = False
-                bsOrientationComboBox.BackColor = SystemColors.MenuBar
 
-                bsDefaultCheckbox.Enabled = True
+                'If master template then 
+                If CBool(bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(1).Text) Then
+                    bsTemplateTextBox.Enabled = False
+                    bsTemplateTextBox.BackColor = SystemColors.MenuBar
 
-                bsEditReport.Enabled = False
+                    bsOrientationComboBox.Enabled = False
+                    bsOrientationComboBox.BackColor = SystemColors.MenuBar
 
-            Else
-                bsTemplateTextBox.Enabled = True
-                bsTemplateTextBox.BackColor = Color.White
-                '
-                bsOrientationComboBox.Enabled = True
-                bsOrientationComboBox.BackColor = Color.White  ' 03/01/2012
+                    bsDefaultCheckbox.Enabled = True
 
-                bsDefaultCheckbox.Enabled = True
-                bsEditReport.Enabled = True
+                    bsEditReport.Enabled = False
 
+                Else
+                    bsTemplateTextBox.Enabled = True
+                    bsTemplateTextBox.BackColor = Color.White
+                    '
+                    bsOrientationComboBox.Enabled = True
+                    bsOrientationComboBox.BackColor = Color.White  ' 03/01/2012
+
+                    bsDefaultCheckbox.Enabled = True
+                    bsEditReport.Enabled = True
+
+                End If
             End If
+
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditTemplate", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -106,11 +110,15 @@ Public Class IBandTemplateReport
     Private Sub SelectTemplate(ByVal pRowSelect As Integer)
         Try
             Cursor = Cursors.WaitCursor
+            bsTemplatesListView.SelectedItems.Clear()
 
             Dim propiedadListView As System.Reflection.PropertyInfo
 
             propiedadListView = GetType(Form).GetProperty("DoubleBuffered", System.Reflection.BindingFlags.NonPublic Or System.Reflection.BindingFlags.Instance)
             propiedadListView.SetValue(bsTemplatesListView, True, Nothing)
+
+            bsTemplatesListView.Items(pRowSelect).Selected = True
+            originalSelectedIndex = pRowSelect
 
             Me.Enabled = False 'Disable the screen
 
@@ -478,6 +486,7 @@ Public Class IBandTemplateReport
                     Next i
 
                     EditionMode = False
+                    ReportChanged = False
                 End If
 
                 bsTemplateTextBox.Enabled = False
@@ -510,10 +519,10 @@ Public Class IBandTemplateReport
                         End If
                     End If
                 End If
+
+                DeleteResidualFiles()
+
             End If
-
-            DeleteResidualFiles()
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -573,7 +582,9 @@ Public Class IBandTemplateReport
         'Try
         If e.ReportState = ReportState.Changed Then
             ReportChanged = True
-        Else
+        End If
+
+        If e.ReportState = ReportState.Opened Then
             ReportChanged = False
         End If
 
@@ -1365,7 +1376,7 @@ Public Class IBandTemplateReport
 
                 bsNewButton.Enabled = True
                 bsEditButton.Enabled = True
-                bsDeleteButton.Enabled = True
+                bsDeleteButton.Enabled = False
                 bsTemplatesListView.Enabled = True
 
                 bsCancelButton.Enabled = False
@@ -1373,9 +1384,10 @@ Public Class IBandTemplateReport
                 bsEditReport.Enabled = False
 
                 EditionMode = False
-            End If
 
-            DeleteResidualFiles()
+                DeleteResidualFiles()
+
+            End If
 
             bsNewButton.Select()
 
@@ -1417,7 +1429,7 @@ Public Class IBandTemplateReport
 
             'If bsTemplatesListView.SelectedItems(0).Index <> originalSelectedIndex Then
             If bsTemplatesListView.SelectedItems.Count = 1 Then
-                If EditionMode AndAlso (ChangesMade) Then 'Or ReportDesignxUserControl.ReportChanged) Then
+                If EditionMode AndAlso (ChangesMade Or ReportChanged) Then 'Or ReportDesignxUserControl.ReportChanged) Then
 
                     If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = Windows.Forms.DialogResult.Yes) Then
                         setScreenToQuery = True
@@ -1437,11 +1449,11 @@ Public Class IBandTemplateReport
 
 
             ElseIf bsTemplatesListView.SelectedItems.Count > 1 Then
-                bsTemplatesListView.SelectedItems.Clear()
-
                 'Return focus to the TEMPLATE that has been edited
+                bsTemplatesListView.SelectedItems.Clear()
                 bsTemplatesListView.Items(originalSelectedIndex).Selected = True
                 bsTemplatesListView.Select()
+                setScreenToQuery = True
             End If
 
             If setScreenToQuery Then
@@ -1470,13 +1482,7 @@ Public Class IBandTemplateReport
 
                 End If
 
-                'Else
-
-                '   MsgBox("")
             End If
-            'Else
-            'MsgBox("")
-            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsTemplatesListView_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1621,7 +1627,6 @@ Public Class IBandTemplateReport
         End Try
     End Sub
 
-
     ''' <summary>
     ''' Configure and initialize the ListView of Templates
     ''' </summary>
@@ -1656,8 +1661,6 @@ Public Class IBandTemplateReport
             ShowMessage(Me.Name & ".InitializeTemplateList", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
-
-
 
     ''' <summary>
     ''' Delete all residual file
@@ -1903,7 +1906,7 @@ Public Class IBandTemplateReport
     ''' </remarks>
     Private Sub DeleteTemplate()
         Try
-            If bsTemplatesListView.SelectedIndices.Count > 0 Then
+            If bsTemplatesListView.SelectedIndices.Count = 1 Then
                 If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                     'Dim resultData As New GlobalDataTO
                     Dim resultData As GlobalDataTO
