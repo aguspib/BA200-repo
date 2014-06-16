@@ -753,8 +753,14 @@ Partial Public Class IMonitor
     ''' </summary>
     ''' <param name="dgv"></param>
     ''' <param name="pNewRow"></param>
-    ''' <remarks>AG 28/02/2014 - Creation #1524
-    ''' AG 24/03/2014 - #1550 new business for alarms icon</remarks>
+    ''' <remarks>
+    ''' Created by:  AG 28/02/2014 - BT #1524
+    ''' Modified by: AG 24/03/2014 - BT #1550 ==> New business for Alarms icons
+    '''              SA 16/06/2014 - BT #1667 ==> Changes in the construction of ToolTips with Patient data:
+    '''                                           ** If PatientID = PatientName, only PatientID is shown 
+    '''                                           ** If First Character of PatientName is "-" and Last Character of PatientName is "-", remove both  
+    '''                                           ** If PatientName is empty, only PatientID is shown
+    ''' </remarks>
     Private Sub DrawNewRow(ByVal dgv As BSDataGridView, ByVal pNewRow As ExecutionsDS.vwksWSExecutionsMonitorRow)
         Try
             Dim auxString As String = String.Empty
@@ -846,16 +852,46 @@ Partial Public Class IMonitor
             End If
             dgv("ElementName", MaxRow).Value = auxString
 
-            'ElementName tooltip column
+            'ElementName ToolTip column
             If CurrentRowColor = RowGreen OrElse CurrentRowColor = HeaderGreen Then
                 dgv("ElementName", MaxRow).ToolTipText = labelTitleResult
 
-                If pNewRow.SampleClass = "PATIENT" Then
-                    If Not pNewRow.IsElementNameNull Then auxString = pNewRow.ElementName
-                    If Not pNewRow.IsSpecimenIDListNull Then
-                        dgv("ElementName", MaxRow).ToolTipText = String.Format("{0} ({1}) - {2}", pNewRow.SpecimenIDList, auxString, pNewRow.PatientName)
+                If (pNewRow.SampleClass = "PATIENT") Then
+                    'Get value of the Patient Identifier
+                    auxString = String.Empty
+                    If (Not pNewRow.IsElementNameNull) Then auxString = pNewRow.ElementName
+
+                    'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
+                    '           fields and shown only the PatientID
+                    Dim hyphenIndex As Integer = -1
+                    Dim myPatientName As String = pNewRow.PatientName.Trim
+
+                    If (pNewRow.PatientName.Trim.StartsWith("-") AndAlso pNewRow.PatientName.Trim.EndsWith("-")) Then
+                        hyphenIndex = pNewRow.PatientName.Trim.IndexOf("-")
+                        myPatientName = pNewRow.PatientName.Trim.Remove(hyphenIndex, 1)
+
+                        hyphenIndex = myPatientName.Trim.LastIndexOf("-")
+                        myPatientName = myPatientName.Trim.Remove(hyphenIndex, 1)
+                    End If
+
+                    If (Not pNewRow.IsSpecimenIDListNull) Then
+                        'When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
+                        'code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
+                        '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
+                        If (auxString.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            dgv("ElementName", MaxRow).ToolTipText = String.Format("{0} ({1}) - {2}", pNewRow.SpecimenIDList, auxString, myPatientName)
+                        Else
+                            dgv("ElementName", MaxRow).ToolTipText = String.Format("{0} ({1})", pNewRow.SpecimenIDList, auxString)
+                        End If
                     Else
-                        dgv("ElementName", MaxRow).ToolTipText = String.Format("{0} - {1}", auxString, pNewRow.PatientName)
+                        'When the Barcode is NOT informed, the ToolTip will be "PatientID - FirstName LastName" or, using the variables defined in  
+                        'code: "auxString - PatientName", but with following exceptions (BT #1667):
+                        '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "auxString"
+                        If (auxString.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            dgv("ElementName", MaxRow).ToolTipText = String.Format("{0} - {1}", auxString, myPatientName)
+                        Else
+                            dgv("ElementName", MaxRow).ToolTipText = auxString
+                        End If
                     End If
                 End If
             Else

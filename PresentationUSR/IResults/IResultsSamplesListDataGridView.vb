@@ -144,8 +144,12 @@ Partial Class IResults
     ''' Modified by: RH 24/01/2011 - When verifying if a Patient is already included in the DataGrid, search 
     '''                              by PatientID instead of by Patient Name. Show the PatientID as ToolTip of
     '''                              field PatientName
-    ''' AG 14/06/2013 - if barcode is informed show it as tooltip, else show the patient name
-    ''' AG 29/08/2013 - NEw changes if barcode is informed show it into the list and the patient ID as tooltip
+    '''              AG 14/06/2013 - If Barcode is informed, show it as tooltip, else show the patient name
+    '''              AG 29/08/2013 - If Barcode is informed, show it into the list and the patient ID as tooltip
+    '''              SA 16/06/2014 - BT #1667 ==> Changes in the construction of ToolTips with Patient data:
+    '''                                           ** If PatientID = PatientName, only PatientID is shown 
+    '''                                           ** If First Character of PatientName is "-" and Last Character of PatientName is "-", remove both  
+    '''                                           ** If PatientName is empty, only PatientID is shown
     ''' </remarks>
     Private Sub UpdateSamplesListDataGrid()
         Try
@@ -159,6 +163,9 @@ Partial Class IResults
             Dim existsRow As Boolean = False
 
             ProcessEvent = False
+
+            Dim hyphenIndex As Integer = -1
+            Dim myPatientName As String = String.Empty
 
             Dim addedPatients As New List(Of String) 'AG 21/06/2012 - 
             For i As Integer = 0 To 1
@@ -202,17 +209,57 @@ Partial Class IResults
                         'End If
                         'AG 14/06/2013
 
-                        dgv("PatientID", RowIndex).Tag = sampleRow.PatientID 'Inform the patient in the tag (used for load the results in grid)
-                        If sampleRow.IsSpecimenIDListNull Then
-                            'Case NOT exists BARCODE
-                            dgv("PatientID", RowIndex).Value = sampleRow.PatientID
-                            dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        Else
-                            'Case exists BARCODE
-                            dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
-                            dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
+                        'dgv("PatientID", RowIndex).Tag = sampleRow.PatientID 'Inform the patient in the tag (used for load the results in grid)
+                        'If sampleRow.IsSpecimenIDListNull Then
+                        '    'Case NOT exists BARCODE
+                        '    dgv("PatientID", RowIndex).Value = sampleRow.PatientID
+                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
+                        'Else
+                        '    'Case exists BARCODE
+                        '    dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
+                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
+                        'End If
+                        ''AG 29/08/2013
+
+                        'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
+                        '           fields and shown only the PatientID
+                        myPatientName = sampleRow.PatientName.Trim
+
+                        If (sampleRow.PatientName.Trim.StartsWith("-") AndAlso sampleRow.PatientName.Trim.EndsWith("-")) Then
+                            hyphenIndex = sampleRow.PatientName.Trim.IndexOf("-")
+                            myPatientName = sampleRow.PatientName.Trim.Remove(hyphenIndex, 1)
+
+                            hyphenIndex = myPatientName.Trim.LastIndexOf("-")
+                            myPatientName = myPatientName.Trim.Remove(hyphenIndex, 1)
                         End If
-                        'AG 29/08/2013
+
+                        'Inform the PatientID as Tag value for the row (it is used to load the Patient Results in the grid)
+                        dgv("PatientID", RowIndex).Tag = sampleRow.PatientID
+
+                        'BT #1667 - The TooolTip is built in the same way than in Monitor Screen and in Patients Grid shows in this screen but in Tests View
+                        If (Not sampleRow.IsSpecimenIDListNull) Then
+                            dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
+
+                            'When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
+                            'code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
+                            '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
+                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1}) - {2}", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim, myPatientName.Trim)
+                            Else
+                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1})", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim)
+                            End If
+                        Else
+                            dgv("PatientID", RowIndex).Value = sampleRow.PatientID
+
+                            'When the Barcode is NOT informed, the ToolTip will be "PatientID - FirstName LastName" or, using the variables defined in  
+                            'code: "auxString - PatientName", but with following exceptions (BT #1667):
+                            '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "auxString"
+                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
+                            Else
+                                dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
+                            End If
+                        End If
 
                         dgv("OrderID", RowIndex).Value = sampleRow.OrderID
 

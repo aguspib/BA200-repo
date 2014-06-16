@@ -1235,11 +1235,11 @@ Partial Class IResults
     ''' <summary>
     ''' Processes the mouse over event over XtraGridView
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>
-    ''' Created by: RH 09/11/2011
-    ''' AG 29/08/2013 - group show first the specimen ID if exists and then the patient ID - Rerun
+    ''' Created by:  RH 09/11/2011
+    ''' Modified by: AG 29/08/2013 - Group shows first the SpecimenID (if it is informed) and then the PatientID - RerunNumber
+    '''              SA 16/06/2014 - BT #1667 ==> Changes in the construction of ToolTips with Patient data:
+    '''                                           ** If First Character of PatientName is "-" and Last Character of PatientName is "-", remove both
     ''' </remarks>
     Private Sub ToolTipController1_GetActiveObjectInfo(ByVal sender As System.Object, ByVal e As ToolTipControllerGetActiveObjectInfoEventArgs) Handles ToolTipController1.GetActiveObjectInfo
         Try
@@ -1292,25 +1292,35 @@ Partial Class IResults
                         e.Info = New ToolTipControlInfo(CurrentRow.Remarks, CurrentRow.Remarks)
 
                     Case "PatientID"
-                        'SGM 17/06/2013 - inform specimenIds
-                        'e.Info = New ToolTipControlInfo(CurrentRow.PatientName, CurrentRow.PatientName)
-                        Dim myTooltipText As String = CurrentRow.PatientID
-                        If Not String.IsNullOrEmpty(CurrentRow.SpecimenIDList) Then
-                            'AG 29/08/2013 - Show first the specimen ID if informed
-                            'myTooltipText &= " (" & CurrentRow.SpecimenIDList & ")"
-                            myTooltipText = CurrentRow.SpecimenIDList
-                            myTooltipText &= " (" & CurrentRow.PatientID & ")" 'Between brackets add the patient Identifier
-                            'AG 29/08/2013
+                        Dim myTooltipText As String = CurrentRow.PatientID.Trim
+
+                        'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
+                        '           fields and shown only the PatientID
+                        Dim hyphenIndex As Integer = -1
+                        Dim myPatientName As String = CurrentRow.PatientName.Trim
+
+                        If (CurrentRow.PatientName.Trim.StartsWith("-") AndAlso CurrentRow.PatientName.Trim.EndsWith("-")) Then
+                            hyphenIndex = CurrentRow.PatientName.Trim.IndexOf("-")
+                            myPatientName = CurrentRow.PatientName.Trim.Remove(hyphenIndex, 1)
+
+                            hyphenIndex = myPatientName.Trim.LastIndexOf("-")
+                            myPatientName = myPatientName.Trim.Remove(hyphenIndex, 1)
                         End If
-                        If CurrentRow.PatientID <> CurrentRow.PatientName Then
-                            myTooltipText &= " - " & CurrentRow.PatientName
+
+                        If (Not String.IsNullOrEmpty(CurrentRow.SpecimenIDList)) Then
+                            'When informed, show first the SpecimenID and then the PatientID between brackets
+                            myTooltipText = CurrentRow.SpecimenIDList
+                            myTooltipText &= " (" & CurrentRow.PatientID & ")"
+                        End If
+
+                        'BT #1667 - Do not add the hyphen also when the PatientName is not informed
+                        If (CurrentRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            myTooltipText &= " - " & myPatientName
                         End If
                         e.Info = New ToolTipControlInfo(CurrentRow.PatientName, myTooltipText)
-                        'end SGM 17/06/2013
 
                     Case Else
                         Cursor = Cursors.Default
-
                 End Select
 
                 If CurrentRow.IsSubHeader Then
