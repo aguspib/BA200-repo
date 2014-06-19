@@ -8811,6 +8811,8 @@ Public Class IWSRotorPositions
         Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
+            bsAcceptButton.Enabled = False 'AG 18/06/2014 #1669 - Disable button when this process starts
+
             'AG 28/05/2014 - New trace
             myLogAcciones.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
 
@@ -8857,7 +8859,10 @@ Public Class IWSRotorPositions
                     IAx00MainMDI.ActiveStatus = WorkSessionStatusAttribute
                     IAx00MainMDI.OpenMonitorForm(Me, autoProcessFlag)
                 End If
+            Else
+                bsAcceptButton.Enabled = True 'AG 18/06/2014 #1669 - Enable button again if the screen is not closed!!
             End If
+
             'IAx00MainMDI.EnableButtonAndMenus(True) 'AG 07/11/2012 - Avoid blinking in START WS button when rotor position screen is closed
 
             'BT #1520 - Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters (a warning message is NOT shown 
