@@ -8880,6 +8880,18 @@ Public Class IWSRotorPositions
     End Sub
 
     ''' <summary>
+    ''' Define event but leave business empty
+    ''' Protection for some users with quick clicks
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG + XB 19/06/2014 #1669</remarks>
+    Private Sub bsAcceptButton_DoubleClick(sender As Object, e As EventArgs) Handles bsAcceptButton.DoubleClick
+        'AG + XB 19/06/2014 #1669
+    End Sub
+
+
+    ''' <summary>
     ''' Edits Sample BarCode value
     ''' </summary>
     ''' <remarks>
