@@ -716,6 +716,8 @@ Public Class IQCGraphs
     '''                                           selected (X-Axis values in the previous version were wrong and the graph has not sense)
     '''              SA 13/06/2014 - BT #1665 ==> Property AxisX.Range.Auto has to be initialized to TRUE (it is needed when LJ Graph is
     '''                                           reloaded after drawn the Youden Graph, which use a not automatic Range) 
+    '''              SA 20/06/2014 - BT #1668 ==> When two Controls are drawn, value of property ArgumentScaleType has to be set to Qualitative
+    '''                                           to prevent the values in X-Axis are scaled with decimals (Series are always integer)  
     ''' </remarks>
     Private Sub LoadLeveyJenningsGraph()
         Try
@@ -965,8 +967,8 @@ Public Class IQCGraphs
 
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).DataSource = myDataSourceTable
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
-                    'When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to NUMERICAL
-                    bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+                    'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE 
+                    bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative 'ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 
