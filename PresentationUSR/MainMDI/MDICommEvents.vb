@@ -52,6 +52,7 @@ Partial Public Class IAx00MainMDI
     '''              XB - 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
     '''              XB - 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587
     '''              XB - 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
+    '''              XB - 20/06/2014 - improve the ISE Timeouts control (E:61) - Task #1441
     ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pInstructionReceived As String, _
                                          ByVal pTreated As Boolean, _
@@ -65,6 +66,9 @@ Partial Public Class IAx00MainMDI
         'pRefreshDS.ReadXml(String.Format("UIRefreshDS{0}.xml", DSNumber))
 
         'DSNumber += 1
+
+        ' XB 20/06/2014 - #1441
+        Dim ISENotReady As Boolean = False
 
         Try
             'Dim StartTime As DateTime = Now 'AG 12/06/2012 - time estimation
@@ -267,10 +271,23 @@ Partial Public Class IAx00MainMDI
 
 
                 If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
+
+                    ' XB 20/06/2014 - #1441
+                    If MDIAnalyzerManager.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED Then
+                        Dim sensorValue As Single = 0
+                        sensorValue = MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED)
+                        If sensorValue = 1 Then
+                            ISENotReady = True
+                        End If
+                    End If
+                    ' XB 20/06/2014 - #1441
+
                     PerformNewAlarmsReception(copyRefreshEventList, copyRefreshDS, monitorTreated, changeRotorTreated, conditioningTreated)
                 End If
 
                 If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
+
+
                     PerformNewSensorValueChanged(copyRefreshEventList, copyRefreshDS, monitorTreated, changeRotorTreated, conditioningTreated, wsRotorPositionTreated, configSettingsLISTreated)
                 End If
 
@@ -302,12 +319,15 @@ Partial Public Class IAx00MainMDI
                     PerformNewBarcodeWarnings(barcode_Samples_Warnings)
                 End If
 
+                ' XB 20/06/2014 - #1441
                 'SGM 12/03/2012
                 ' XB 24/10/2013 - Specific ISE commands are allowed in RUNNING (pause mode) - BT #1343
                 'If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED Then
-                If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED Or _
-                   pInstructionReceived.Contains("A400;ANSISE;") Then
+                If (MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED) Or _
+                   (pInstructionReceived.Contains("A400;ANSISE;")) Or _
+                   (ISENotReady AndAlso (ShutDownisPending Or StartSessionisPending)) Then
                     ' XB 24/10/2013
+                    ' XB 20/06/2014 - #1441
                     '
                     ' ISE RECEIVED
                     '
