@@ -3200,23 +3200,29 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Count the number of Patient Samples requested for the WorkSession and corresponding to Tests/SampleTypes 
-        ''' with a programmed automatic dilution that has to be done with the specified Dilution Solution
+        ''' Get the list of Dilution Solutions needed for automatic dilutions programmed for Tests/SampleTypes requested for Patient Samples 
+        ''' in the specified WorkSession
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <param name="pOrderTestsList">List of Order Tests included in a WorkSession</param>
         ''' <param name="pWorkSessionID">Work Session Identifier. Optional parameter</param>
-        ''' <param name="pDiluentSol">Code of the Diluent Solution for the automatic predilution</param>
-        ''' <returns>GlobalDataTO containing an integer value with the number of requested Patient Samples of
-        '''          Tests/SampleTypes with a programmed automatic dilution using the specified Diluent Solution</returns>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestSamplesDS with the list of Dilution Solutions needed for automatic dilutions 
+        '''          programmed for Tests/SampleTypes requested for Patient Samples in the specified WorkSession</returns>
         ''' <remarks>
         ''' Created by:  SA 15/10/2010
         ''' Modified by: SA 26/01/2011 - Add new parameter to specify the Diluent Solution, and change the query to filter
         '''                              for field DiluentSolution in table tparTestSamples
         '''              SA 01/09/2011 - Changed the function template
+        '''              SA 28/05/2014 - BT #1519 ==> Changes to get all Dilution Solutions needed in the specified Work Session instead of 
+        '''                                           verify for an specific Dilution Solution if it is needed for automatic predilutions of 
+        '''                                           one or more Tests requested for Patient Samples in the Work Session:
+        '''                                           * Parameter pDiluentSolution has been removed
+        '''                                           * Return value has been changed from INTEGER to a typed DataSet TestSamplesDS containing the
+        '''                                             list of Dilution Solutions needed in the Work Session
+        '''                                           * Query has been also changed to get the list of needed Dilution Solution
         ''' </remarks>
         Public Function VerifyAutomaticDilutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestsList As String, _
-                                                 ByVal pDiluentSol As String, Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                                 Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -3225,14 +3231,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT COUNT(*) AS NumAutoDilutions " & vbCrLf & _
+                        Dim cmdText As String = " SELECT DISTINCT TS.DiluentSolution " & vbCrLf & _
                                                 " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                                         " INNER JOIN tparTests T ON OT.TestID = T.TestID " & vbCrLf & _
                                                                          " INNER JOIN tparTestSamples TS ON OT.TestID = TS.TestID AND OT.SampleType = TS.SampleType " & vbCrLf & _
                                                 " WHERE  O.SampleClass = 'PATIENT' " & vbCrLf & _
                                                 " AND    OT.TestType = 'STD' " & vbCrLf & _
-                                                " AND    TS.PredilutionMode = 'INST' " & vbCrLf & _
-                                                " AND    TS.DiluentSolution = '" & pDiluentSol & "' " & vbCrLf
+                                                " AND    TS.PredilutionMode = 'INST' " & vbCrLf 
 
                         If (pWorkSessionID <> "") Then
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
@@ -3244,20 +3248,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
 
-                        Dim numAutoDilutions As Integer = 0
+                        Dim myTestSamplesDS As New TestSamplesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Dim dbDataReader As SqlClient.SqlDataReader = dbCmd.ExecuteReader()
-
-                            If (dbDataReader.HasRows) Then
-                                dbDataReader.Read()
-                                If (Not dbDataReader.IsDBNull(0)) Then
-                                    numAutoDilutions = Convert.ToInt32(dbDataReader.Item("NumAutoDilutions"))
-                                End If
-                            End If
-                            dbDataReader.Close()
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myTestSamplesDS.tparTestSamples)
+                            End Using
                         End Using
 
-                        resultData.SetDatos = numAutoDilutions
+                        resultData.SetDatos = myTestSamplesDS
                         resultData.HasError = False
                     End If
                 End If

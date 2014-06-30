@@ -40,6 +40,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 30/11/2012 - Do not inform the attribute endRunAlreadySentFlagAttribute as TRUE when call the ManageAnalyzer with ENDRUN or when you add it to the queue
         '''                 This flag will be informed once the instruction has been really sent. Current code causes that sometimes the ENDRUN instruction is added to
         '''                 queue but how the flag is informed before send the instruction it wont never be sent!!
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
+        ''' AG 05/06/2014 - #1657 Protection (provisional solution)! (do not clear instructions queue when there are only 1 alarm and it is ISE_OFF_ERR)
+        '''               - PENDING FINAL SOLUTION: AlarmID ISE_OFF_ERR must be generated only 1 time when alarm appears, and only 1 time when alarm is fixed (now this alarm with status FALSE is generated with each ANSINF received)
         ''' </remarks>
         Private Function ManageAlarms(ByVal pdbConnection As SqlClient.SqlConnection, _
                                       ByVal pAlarmIDList As List(Of GlobalEnumerates.Alarms), _
@@ -72,7 +75,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 06/03/2012 - Freeze mode treatment
                 If analyzerFREEZEFlagAttribute Then
-                    ClearQueueToSend() 'Clear all instruction in queue to be sent
+                    'AG 05/06/2014 - #1657 - 'AG + XB 08/04/2014 - #1118 (except ISE_OFF_ERR that is always generated with status FALSE)
+                    'ClearQueueToSend() 'Clear all instruction in queue to be sent
+                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
+                        ClearQueueToSend() 'Clear all instruction in queue to be sent
+                    End If
+                    'AG 05/06/2014 - #1657
 
                     If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
                         'INSTRUCTIONS: NOTHING
@@ -801,7 +809,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
                                 'JV 08/01/2014 BT #1118
                             Else
-                                'AG 16/01/2014 - Mark IseOffError as TRUE only when exists the alarm ISE_OFF_ERR in database with status TRUE
+                                'AG 16/01/2014 - Mark IseOffError as FIXED only when exists the alarm ISE_OFF_ERR in database with status TRUE
                                 ' Previous code causes the MONITOR screen refreshs always each 2 seconds because each ANSINF causes new alarm notification ISE_OFF_ERR with status false
                                 'myISEOffsErrorFixed = True
                                 myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_OFF_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
@@ -809,7 +817,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     Dim temporalDS As New WSAnalyzerAlarmsDS
                                     temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
 
-                                    'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True
+                                    'Search if exists alarm ISE_OFF_ERR with status TRUE, in this case set flag myISEOffsErrorFixed = True (FIXED)
                                     'in order to mark it as fixed
                                     Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
                                     auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
@@ -881,7 +889,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim newRowFlag As Boolean = False
                 index = 0
 
-                myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ReceivedAlarms
+                    myUI_RefreshDS.ReceivedAlarms.Clear() 'Clear DS used for update presentation layer (only the proper data table)
+                End SyncLock
 
                 'Get the alarms defined with OKType = False (never are marked as solved)
                 Dim alarmsWithOKTypeFalse As List(Of String) = (From a As AlarmsDS.tfmwAlarmsRow In _
@@ -977,74 +988,78 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 14/03/2012
                 If analyzerFREEZEFlagAttribute Then
-                    If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
-                        'BUSINESS: 
-                        'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
-                        'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
+                    'AG 05/06/2014 - #1657 - (except ISE_OFF_ERR that is always generated with status FALSE)
+                    If ((pAlarmIDList.Count = 1 AndAlso Not pAlarmIDList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse pAlarmIDList.Count > 1) Then
+                        If String.Equals(analyzerFREEZEModeAttribute, "AUTO") Then
+                            'BUSINESS: 
+                            'Special code for FREEZE (AUTO) - once solved the cover alarms error check if there are any other freeze alarm o not
+                            'If not remove the attributes flags (freeze and freeze mode and also update the sensor FREERZE to 0)
 
-                        'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
+                            'NOTE: for call this method here the parameter can not be pAlarmIDList. Instead use the current alarms in analyzer attribute (myAlarmListAttribute)
 
-                        If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
-                            'Analyzer has recovered an operating status automatically by closing covers
-                            analyzerFREEZEFlagAttribute = False
-                            analyzerFREEZEModeAttribute = ""
-                            AnalyzerIsReadyAttribute = True 'Analyzer is ready
-                            UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
+                            If Not ExistFreezeAlarms(dbConnection, myAlarmListAttribute) Then 'Freeze auto solved
+                                'Analyzer has recovered an operating status automatically by closing covers
+                                analyzerFREEZEFlagAttribute = False
+                                analyzerFREEZEModeAttribute = ""
+                                AnalyzerIsReadyAttribute = True 'Analyzer is ready
+                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.FREEZE, 0, True) 'Inform presentation the analyzer is ready
 
-                            'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                            'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                            If methodHasToAddInstructionToQueueFlag = 0 Then
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
-                                methodHasToAddInstructionToQueueFlag = 1
-                            ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
-                                    myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STATE)
-                                    myParamsQueue.Add("")
+                                'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+                                'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
+                                If methodHasToAddInstructionToQueueFlag = 0 Then
+                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'Ask for status
+                                    methodHasToAddInstructionToQueueFlag = 1
+                                ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+                                    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+                                    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.STATE) Then
+                                        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.STATE)
+                                        myParamsQueue.Add("")
+                                    End If
+                                End If
+                                'AG 14/05/2012
+
+                            Else 'Exists freeze auto
+                                'Reset all processes flags
+                                Dim flags_dlg As New AnalyzerManagerFlagsDelegate
+                                myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
+
+                                'Finally read and update our internal structures
+                                If Not myGlobal.HasError Then
+                                    InitializeAnalyzerFlags(dbConnection)
+                                End If
+
+                                'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
+                                'appears while sensors deactivated there is no other way to auto recover
+                                If Not myGlobal.HasError Then
+                                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
+                                        'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+                                        'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                        'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                                        If methodHasToAddInstructionToQueueFlag = 0 Then
+                                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                            methodHasToAddInstructionToQueueFlag = 1
+                                            'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
+                                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                                        ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+                                            ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+                                            If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
+                                                myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.INFO)
+                                                'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
+                                                'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
+                                                myParamsQueue.Add(CInt(GlobalEnumerates.Ax00InfoInstructionModes.STR))
+                                            End If
+                                        End If
+                                        'AG 14/05/2012
+                                    End If
                                 End If
                             End If
-                            'AG 14/05/2012
 
-                        Else 'Exists freeze auto
-                            'Reset all processes flags
+                        ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
+                            'Remove all flags ... recover is required
                             Dim flags_dlg As New AnalyzerManagerFlagsDelegate
                             myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
-
-                            'Finally read and update our internal structures
-                            If Not myGlobal.HasError Then
-                                InitializeAnalyzerFlags(dbConnection)
-                            End If
-
-                            'if standby ... activate ansinf (some processes as shutdown, nrotor, ise utilities deactivate it, if freezes
-                            'appears while sensors deactivated there is no other way to auto recover
-                            If Not myGlobal.HasError Then
-                                If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
-                                    'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                        'AG 04/04/2012 - When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
-                                    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.INFO) Then
-                                            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.INFO)
-                                            'AG 10/12/2012 - Do not use ToString here because Sw will send INFO;Q:STR; instead of INFO;Q:3;
-                                            'myParamsQueue.Add(GlobalEnumerates.Ax00InfoInstructionModes.STR.ToString)
-                                            myParamsQueue.Add(CInt(GlobalEnumerates.Ax00InfoInstructionModes.STR))
-                                        End If
-                                    End If
-                                    'AG 14/05/2012
-                                End If
-                            End If
                         End If
 
-                    ElseIf Not String.Equals(analyzerFREEZEModeAttribute, "PARTIAL") Then
-                        'Remove all flags ... recover is required
-                        Dim flags_dlg As New AnalyzerManagerFlagsDelegate
-                        myGlobal = flags_dlg.ResetFlags(dbConnection, AnalyzerIDAttribute)
                     End If
                 End If
                 'AG 14/03/2012
@@ -2319,7 +2334,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pSensors "></param>
         ''' <returns></returns>
-        ''' <remarks>AG 14/04/2011 - creation - Tested PENDING</remarks>
+        ''' <remarks>
+        ''' Created by  AG 14/04/2011
+        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
+        ''' </remarks>
         Private Function UserSwANSINFTreatment(ByVal pSensors As Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
@@ -2330,7 +2348,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myAlarmStatusList As New List(Of Boolean)
                 Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                 Dim alarmStatus As Boolean = False
-
+                Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 add traces informing when deposit sensors activate/deactivate timers
 
                 'Get General cover (parameter index 3)
                 Dim myIntValue As Integer = 0
@@ -2411,15 +2429,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         alarmStatus = True
                     Else 'Closed
                         alarmStatus = False
+
+                        'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) AndAlso _
+                           (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
+                            alarmStatus = True ' Keep alarm until user clicks confirmation
+                        End If
+                        'AG 29/05/2014 - BT #1630
                     End If
 
                     'Update the class attribute SensorValuesAttribute
                     UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT, pSensors(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT), False)
 
-                    If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
+                    'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
+                    'If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
+                    If alarmStatus AndAlso Not waterDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
+                        myLogAcciones.CreateLogActivity("Water deposit empty!! Enable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
                     ElseIf Not alarmStatus AndAlso waterDepositTimer.Enabled Then
+                        myLogAcciones.CreateLogActivity("Water deposit OK!! Disable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = False  'Deactivate timer
                     End If
                     'AG 01/12/2011
@@ -2442,15 +2471,27 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         alarmStatus = True
                     Else 'Closed
                         alarmStatus = False
+
+                        'AG 29/05/2014 - BT #1630 - Alarm fixed automatically in running but in standby requires user action (click ChangeBottleButton)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) AndAlso _
+                           (AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CHANGE_BOTTLES_Process.ToString) <> "INPROCESS") Then
+                            alarmStatus = True ' Keep alarm until user clicks confirmation
+                        End If
+                        'AG 29/05/2014 - BT #1630
+
                     End If
 
                     'Update the class attribute SensorValuesAttribute
                     UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT, pSensors(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT), False)
 
-                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
+                    'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
+                    'If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
+                    If alarmStatus AndAlso Not wasteDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
+                        myLogAcciones.CreateLogActivity("Waste deposit full!! Enable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
                     ElseIf Not alarmStatus AndAlso wasteDepositTimer.Enabled Then
+                        myLogAcciones.CreateLogActivity("Waste deposit OK!! Disable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = False  'Deactivate timer
                     End If
                     'AG 01/12/2011
@@ -2543,15 +2584,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'NOTE: Here do not place different code for service or user because this method is called only for the user Software
                     myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
 
-                    'AG 18/06/2012 - The ansinf instruction is saved to log only when new alarms are generated or solved
+                    'AG 18/06/2012 - The ANSINF instruction is saved to log only when new alarms are generated or solved
                     '                Previous code only saved it when new alarms were generated
                     'Dim newNoProbeTemperatureAlarms As List(Of Boolean)
                     'newNoProbeTemperatureAlarms = (From a As Boolean In myAlarmStatusList Where a = True Select a).ToList
                     'If newNoProbeTemperatureAlarms.Count > 0 Then
 
-                    If myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
+                    If ((myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse myAlarmList.Count > 1) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
+                        'Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 declare at the beginning
+                        myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         instrAddedToLogFlag = True
                     End If
                     'End If
@@ -3194,7 +3235,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 02/06/2011 - creation </remarks>
+        ''' <remarks>XBC 02/06/2011 - creation
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceFWInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.FW_INFO, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3203,32 +3246,35 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Generate UI_Refresh Firmware values dataset
                 Dim myNewFirmwareValuesRow As UIRefreshDS.FirmwareValueChangedRow
-                myNewFirmwareValuesRow = myUI_RefreshDS.FirmwareValueChanged.NewFirmwareValueChangedRow
-                With myNewFirmwareValuesRow
-                    .BeginEdit()
-                    .ElementID = pElements(GlobalEnumerates.FW_INFO.ID)
-                    .BoardSerialNumber = pElements(GlobalEnumerates.FW_INFO.SMC)
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.FirmwareValueChanged
+                    myNewFirmwareValuesRow = myUI_RefreshDS.FirmwareValueChanged.NewFirmwareValueChangedRow
+                    With myNewFirmwareValuesRow
+                        .BeginEdit()
+                        .ElementID = pElements(GlobalEnumerates.FW_INFO.ID)
+                        .BoardSerialNumber = pElements(GlobalEnumerates.FW_INFO.SMC)
 
-                    .RepositoryVersion = pElements(GlobalEnumerates.FW_INFO.RV)
-                    .RepositoryCRCResult = pElements(GlobalEnumerates.FW_INFO.CRC)
-                    .RepositoryCRCValue = pElements(GlobalEnumerates.FW_INFO.CRCV)
-                    .RepositoryCRCSize = pElements(GlobalEnumerates.FW_INFO.CRCS)
+                        .RepositoryVersion = pElements(GlobalEnumerates.FW_INFO.RV)
+                        .RepositoryCRCResult = pElements(GlobalEnumerates.FW_INFO.CRC)
+                        .RepositoryCRCValue = pElements(GlobalEnumerates.FW_INFO.CRCV)
+                        .RepositoryCRCSize = pElements(GlobalEnumerates.FW_INFO.CRCS)
 
-                    .BoardFirmwareVersion = pElements(GlobalEnumerates.FW_INFO.FWV)
-                    .BoardFirmwareCRCResult = pElements(GlobalEnumerates.FW_INFO.FWCRC)
-                    .BoardFirmwareCRCValue = pElements(GlobalEnumerates.FW_INFO.FWCRCV)
-                    .BoardFirmwareCRCSize = pElements(GlobalEnumerates.FW_INFO.FWCRCS)
+                        .BoardFirmwareVersion = pElements(GlobalEnumerates.FW_INFO.FWV)
+                        .BoardFirmwareCRCResult = pElements(GlobalEnumerates.FW_INFO.FWCRC)
+                        .BoardFirmwareCRCValue = pElements(GlobalEnumerates.FW_INFO.FWCRCV)
+                        .BoardFirmwareCRCSize = pElements(GlobalEnumerates.FW_INFO.FWCRCS)
 
-                    .BoardHardwareVersion = pElements(GlobalEnumerates.FW_INFO.HWV)
+                        .BoardHardwareVersion = pElements(GlobalEnumerates.FW_INFO.HWV)
 
-                    If .ElementID = GlobalEnumerates.POLL_IDs.CPU.ToString Then
-                        .AnalyzerSerialNumber = pElements(GlobalEnumerates.FW_INFO.ASN)
-                    End If
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.FirmwareValueChanged.AddFirmwareValueChangedRow(myNewFirmwareValuesRow)
-
-                myUI_RefreshDS.AcceptChanges()
+                        If .ElementID = GlobalEnumerates.POLL_IDs.CPU.ToString Then
+                            .AnalyzerSerialNumber = pElements(GlobalEnumerates.FW_INFO.ASN)
+                        End If
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.FirmwareValueChanged.AddFirmwareValueChangedRow(myNewFirmwareValuesRow)
+                    myUI_RefreshDS.FirmwareValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -3559,7 +3605,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 31/05/2011 - creation </remarks>
+        ''' <remarks>XBC 31/05/2011 - creation
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceSwArmsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.ARMS_ELEMENTS, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3568,22 +3616,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Generate UI_Refresh Arms values dataset
                 Dim myNewArmsValuesRow As UIRefreshDS.ArmValueChangedRow
-                myNewArmsValuesRow = myUI_RefreshDS.ArmValueChanged.NewArmValueChangedRow
-                With myNewArmsValuesRow
-                    .BeginEdit()
-                    .ArmID = pElements(GlobalEnumerates.ARMS_ELEMENTS.ID)
-                    .BoardTemp = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.TMP), Single)
-                    .MotorHorizontal = pElements(GlobalEnumerates.ARMS_ELEMENTS.MH)
-                    .MotorHorizontalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MHH)
-                    .MotorHorizontalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MHA), Single)
-                    .MotorVertical = pElements(GlobalEnumerates.ARMS_ELEMENTS.MV)
-                    .MotorVerticalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MVH)
-                    .MotorVerticalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MVA), Single)
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.ArmValueChanged.AddArmValueChangedRow(myNewArmsValuesRow)
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ArmValueChanged
+                    myNewArmsValuesRow = myUI_RefreshDS.ArmValueChanged.NewArmValueChangedRow
+                    With myNewArmsValuesRow
+                        .BeginEdit()
+                        .ArmID = pElements(GlobalEnumerates.ARMS_ELEMENTS.ID)
+                        .BoardTemp = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.TMP), Single)
+                        .MotorHorizontal = pElements(GlobalEnumerates.ARMS_ELEMENTS.MH)
+                        .MotorHorizontalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MHH)
+                        .MotorHorizontalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MHA), Single)
+                        .MotorVertical = pElements(GlobalEnumerates.ARMS_ELEMENTS.MV)
+                        .MotorVerticalHome = pElements(GlobalEnumerates.ARMS_ELEMENTS.MVH)
+                        .MotorVerticalPosition = CType(pElements(GlobalEnumerates.ARMS_ELEMENTS.MVA), Single)
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.ArmValueChanged.AddArmValueChangedRow(myNewArmsValuesRow)
 
-                myUI_RefreshDS.AcceptChanges()
+                    'myUI_RefreshDS.AcceptChanges()
+                    myUI_RefreshDS.ArmValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 - AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
 
                 'Generate UI_Refresh event ARMSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.ARMSVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.ARMSVALUE_CHANGED)
@@ -3606,31 +3658,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 01/06/2011 - creation </remarks>
+        ''' <remarks>XBC 01/06/2011 - creation 
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceSwProbesInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.PROBES_ELEMENTS, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 'Generate UI_Refresh Arms Probes dataset
                 Dim myNewprobesValuesRow As UIRefreshDS.ProbeValueChangedRow
-                myNewprobesValuesRow = myUI_RefreshDS.ProbeValueChanged.NewProbeValueChangedRow
-                With myNewprobesValuesRow
-                    .BeginEdit()
-                    .ProbeID = pElements(GlobalEnumerates.PROBES_ELEMENTS.ID)
-                    .BoardTemp = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.TMP), Single)
-                    .DetectionStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.DST)
-                    .DetectionFrequency = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DFQ), Single)
-                    .Detection = pElements(GlobalEnumerates.PROBES_ELEMENTS.D)
-                    .LastInternalRate = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DCV), Single)
-                    .ThermistorValue = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTH), Single)
-                    .ThermistorDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTHD), Single)
-                    .HeaterStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.PH)
-                    .HeaterDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PHD), Single)
-                    .CollisionDetector = pElements(GlobalEnumerates.PROBES_ELEMENTS.CD)
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.ProbeValueChanged.AddProbeValueChangedRow(myNewprobesValuesRow)
 
-                myUI_RefreshDS.AcceptChanges()
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ProbeValueChanged
+                    myNewprobesValuesRow = myUI_RefreshDS.ProbeValueChanged.NewProbeValueChangedRow
+                    With myNewprobesValuesRow
+                        .BeginEdit()
+                        .ProbeID = pElements(GlobalEnumerates.PROBES_ELEMENTS.ID)
+                        .BoardTemp = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.TMP), Single)
+                        .DetectionStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.DST)
+                        .DetectionFrequency = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DFQ), Single)
+                        .Detection = pElements(GlobalEnumerates.PROBES_ELEMENTS.D)
+                        .LastInternalRate = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.DCV), Single)
+                        .ThermistorValue = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTH), Single)
+                        .ThermistorDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PTHD), Single)
+                        .HeaterStatus = pElements(GlobalEnumerates.PROBES_ELEMENTS.PH)
+                        .HeaterDiagnostic = CType(pElements(GlobalEnumerates.PROBES_ELEMENTS.PHD), Single)
+                        .CollisionDetector = pElements(GlobalEnumerates.PROBES_ELEMENTS.CD)
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.ProbeValueChanged.AddProbeValueChangedRow(myNewprobesValuesRow)
+                    myUI_RefreshDS.ProbeValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                 'Generate UI_Refresh event PROBESSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.PROBESVALUE_CHANGED)
@@ -3653,44 +3711,49 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pElements "></param>
         ''' <returns></returns>
-        ''' <remarks>XBC 01/06/2011 - creation </remarks>
+        ''' <remarks>XBC 01/06/2011 - creation
+        ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
+        ''' </remarks>
         Private Function ServiceSwRotorsInfoTreatment(ByVal pElements As Dictionary(Of GlobalEnumerates.ROTORS_ELEMENTS, String)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 'Generate UI_Refresh Rotors values dataset
                 Dim myNewRotorsValuesRow As UIRefreshDS.RotorValueChangedRow
-                myNewRotorsValuesRow = myUI_RefreshDS.RotorValueChanged.NewRotorValueChangedRow
-                With myNewRotorsValuesRow
-                    .BeginEdit()
-                    .RotorID = pElements(GlobalEnumerates.ROTORS_ELEMENTS.ID)
-                    .BoardTemp = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.TMP), Single)
-                    .Motor = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MR)
-                    .MotorHome = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRH)
-                    .MotorPosition = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRA), Single)
-                    .ThermistorFridgeValue = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTH), Single)
-                    .ThermistorFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTHD), Single)
-                    .PeltiersFridgeStatus = pElements(GlobalEnumerates.ROTORS_ELEMENTS.FH)
-                    .PeltiersFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FHD), Single)
-                    .PeltiersFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1), Single)
-                    .PeltiersFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1D), Single)
-                    .PeltiersFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2), Single)
-                    .PeltiersFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2D), Single)
-                    .PeltiersFan3Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3), Single)
-                    .PeltiersFan3Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3D), Single)
-                    .PeltiersFan4Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4), Single)
-                    .PeltiersFan4Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4D), Single)
-                    .FrameFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1), Single)
-                    .FrameFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1D), Single)
-                    .FrameFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2), Single)
-                    .FrameFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2D), Single)
-                    .Cover = pElements(GlobalEnumerates.ROTORS_ELEMENTS.RC)
-                    .BarCodeStatus = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.CB), Single)
-                    .BarcodeError = pElements(GlobalEnumerates.ROTORS_ELEMENTS.CBE)
-                    .EndEdit()
-                End With
-                myUI_RefreshDS.RotorValueChanged.AddRotorValueChangedRow(myNewRotorsValuesRow)
+                SyncLock myUI_RefreshDS.RotorValueChanged
+                    myNewRotorsValuesRow = myUI_RefreshDS.RotorValueChanged.NewRotorValueChangedRow
+                    With myNewRotorsValuesRow
+                        .BeginEdit()
+                        .RotorID = pElements(GlobalEnumerates.ROTORS_ELEMENTS.ID)
+                        .BoardTemp = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.TMP), Single)
+                        .Motor = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MR)
+                        .MotorHome = pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRH)
+                        .MotorPosition = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.MRA), Single)
+                        .ThermistorFridgeValue = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTH), Single)
+                        .ThermistorFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FTHD), Single)
+                        .PeltiersFridgeStatus = pElements(GlobalEnumerates.ROTORS_ELEMENTS.FH)
+                        .PeltiersFridgeDiagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FHD), Single)
+                        .PeltiersFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1), Single)
+                        .PeltiersFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF1D), Single)
+                        .PeltiersFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2), Single)
+                        .PeltiersFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF2D), Single)
+                        .PeltiersFan3Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3), Single)
+                        .PeltiersFan3Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF3D), Single)
+                        .PeltiersFan4Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4), Single)
+                        .PeltiersFan4Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.PF4D), Single)
+                        .FrameFan1Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1), Single)
+                        .FrameFan1Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF1D), Single)
+                        .FrameFan2Speed = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2), Single)
+                        .FrameFan2Diagnostic = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.FF2D), Single)
+                        .Cover = pElements(GlobalEnumerates.ROTORS_ELEMENTS.RC)
+                        .BarCodeStatus = CType(pElements(GlobalEnumerates.ROTORS_ELEMENTS.CB), Single)
+                        .BarcodeError = pElements(GlobalEnumerates.ROTORS_ELEMENTS.CBE)
+                        .EndEdit()
+                    End With
+                    myUI_RefreshDS.RotorValueChanged.AddRotorValueChangedRow(myNewRotorsValuesRow)
+                    myUI_RefreshDS.RotorValueChanged.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
+                End SyncLock
 
-                myUI_RefreshDS.AcceptChanges()
+                'myUI_RefreshDS.AcceptChanges() 'AG 22/05/2014 #1637 AcceptChanges in datatable layer instead of dataset layer
 
                 'Generate UI_Refresh event ROTORSSVALUE_CHANGED
                 If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.ROTORSVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.ROTORSVALUE_CHANGED)
@@ -5261,6 +5324,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
+                    'AG 29/05/2014 - #1630
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("Waste deposit full too much time!! Generate alarm WASTE_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
+
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
@@ -5301,6 +5368,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Manage the new alarm
                 If myAlarmList.Count > 0 Then
+                    'AG 29/05/2014 - #1630
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("Water deposit empty too much time!! Generate alarm WATER_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
+
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then

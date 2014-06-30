@@ -2401,10 +2401,17 @@ Partial Public Class IMonitor
     ''' Modified by: SA 18/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed
     ''' AG 25/11/2013 - #1359 - Inform parameter InProcessElement on call method SetPosControlBackGround
+    ''' IT 04/06/2014 - #1644 - Modified the type of last parameter.
     ''' </remarks>
     Private Sub UpdateRotorArea(ByVal pRotorContenByPosRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
-                                ByVal pIconName As String, ByVal pRotorControlCollection As Control.ControlCollection)
+                                ByVal pIconName As String, ByVal pRotorControl As Control)
         Try
+
+            If (pRotorControl Is Nothing) Then Exit Sub
+
+            Dim rotorControlCollection As Control.ControlCollection
+            rotorControlCollection = pRotorControl.Controls
+
             'ChangeIcon name for the Reagents and Additional solutions
             Dim myIconName As String = pIconName
             If (myIconName = REAGENTS_IconName OrElse myIconName = ADDSOL_IconName) Then
@@ -2416,8 +2423,8 @@ Partial Public Class IMonitor
 
             Dim myControlName As String = String.Empty
             Dim myControls As Control.ControlCollection
-            If (Not pRotorControlCollection Is Nothing) Then
-                myControls = pRotorControlCollection
+            If (Not rotorControlCollection Is Nothing) Then
+                myControls = rotorControlCollection
 
                 If (pRotorContenByPosRow.RotorType = "SAMPLES") Then
                     myControlName = String.Format("Sam{0}{1}", pRotorContenByPosRow.RingNumber, pRotorContenByPosRow.CellNumber)
@@ -2530,9 +2537,12 @@ Partial Public Class IMonitor
     '''                              also Patient Samples with Status NOPOS but positioned in Rotor but in a tube marked as DEPLETED or FEW 
     '''              SA 20/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed 
+    '''              IT 04/06/2014 - BT #1644 ==> Changed call to function UpdateRotorArea: new type of the last parameter
     ''' </remarks>
     Private Sub UpdateRotorTreeViewArea(ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, Optional ByVal pRotorType As String = "")
         Try
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             Dim myGlobalDataTO As GlobalDataTO
             Dim myNotInUseRPDelegate As New WSNotInUseRotorPositionsDelegate()
 
@@ -2559,11 +2569,11 @@ Partial Public Class IMonitor
                         If (Not rotorPosition.IsElementIDNull) Then
                             If (rotorPosition.TubeContent = "CALIB") Then
                                 'Set the Calibrator Icon in the Rotor Position
-                                UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab.Controls)
+                                UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab)
 
                             ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
                                 'Set the Tube Additional Solution Icon in the Rotor Position
-                                UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab.Controls)
+                                UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab)
 
                             ElseIf (rotorPosition.TubeContent = "PATIENT") Then
                                 'Validate if the routine is Urgent
@@ -2589,7 +2599,7 @@ Partial Public Class IMonitor
                                     If (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements.Rows.Count > 0) Then
                                         If (Not DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements(0).IsPredilutionFactorNull) AndAlso _
                                            (DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS).twksWSRequiredElements(0).PredilutionFactor > 0) Then
-                                            UpdateRotorArea(rotorPosition, DILUTIONS_IconName, SamplesTab.Controls)
+                                            UpdateRotorArea(rotorPosition, DILUTIONS_IconName, SamplesTab)
                                         Else
                                             Dim myWSRequiredElementsByOTDelegate As New WSRequiredElemByOrderTestDelegate
                                             myGlobalDataTO = myWSRequiredElementsByOTDelegate.ReadOrderTestByElementIDAndSampleClass(Nothing, rotorPosition.ElementID, rotorPosition.TubeContent)
@@ -2598,9 +2608,9 @@ Partial Public Class IMonitor
                                                 Dim stat As Integer = (From x As WSRequiredElemByOrderTestDS.twksWSRequiredElemByOrderTestRow In myDS.twksWSRequiredElemByOrderTest _
                                                                       Where x.StatFlag = True Select x).Count
                                                 If (stat > 0) Then
-                                                    UpdateRotorArea(rotorPosition, STATS_IconName, SamplesTab.Controls)
+                                                    UpdateRotorArea(rotorPosition, STATS_IconName, SamplesTab)
                                                 Else
-                                                    UpdateRotorArea(rotorPosition, ROUTINES_IconName, SamplesTab.Controls)
+                                                    UpdateRotorArea(rotorPosition, ROUTINES_IconName, SamplesTab)
                                                 End If
                                             End If
                                         End If
@@ -2609,13 +2619,13 @@ Partial Public Class IMonitor
                                 'JV 18/12/2013 #1056 END
                             ElseIf String.Equals(rotorPosition.TubeContent, "CTRL") Then
                                 'Set the Calibrator Icon in the Rotor Position
-                                UpdateRotorArea(rotorPosition, CTRL_IconName, SamplesTab.Controls)
+                                UpdateRotorArea(rotorPosition, CTRL_IconName, SamplesTab)
 
                             ElseIf String.Equals(rotorPosition.TubeContent, "REAGENT") Then
-                                UpdateRotorArea(rotorPosition, REAGENTS_IconName, ReagentsTab.Controls)
+                                UpdateRotorArea(rotorPosition, REAGENTS_IconName, ReagentsTab)
 
                             ElseIf (String.Equals(rotorPosition.TubeContent, "WASH_SOL") OrElse String.Equals(rotorPosition.TubeContent, "SPEC_SOL")) Then
-                                UpdateRotorArea(rotorPosition, ADDSOL_IconName, ReagentsTab.Controls)
+                                UpdateRotorArea(rotorPosition, ADDSOL_IconName, ReagentsTab)
                             End If
 
                             If (rotorPosition.Selected) Then
@@ -2667,10 +2677,10 @@ Partial Public Class IMonitor
                                     End If
 
                                     'Update the rotor area with the new icon path          
-                                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
                                 Else
                                     'Position is empty...icon is also empty, clean the cell
-                                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                    UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
                                 End If
 
                                 If (rotorPosition.Selected) Then
@@ -2749,7 +2759,7 @@ Partial Public Class IMonitor
                                     End Select
                                 End If
 
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
                                 If (rotorPosition.Selected) Then
                                     'Reload the info area with the new information 
                                     mySelectedElementInfo = GetLocalPositionInfo(rotorPosition.RingNumber, rotorPosition.CellNumber, False)

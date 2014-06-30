@@ -277,7 +277,7 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            If isClosingFlag Then Return 'AG 03/08/2012
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             RefreshDoneField = False
 
             If (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ)) Then
@@ -5208,13 +5208,49 @@ Public Class IWSSampleRequest
             myIconNonStatFlag = Nothing
             myFactorTextBox = Nothing
 
-            bsBlkCalibDataGridView = Nothing
-            bsControlOrdersDataGridView = Nothing
-            bsPatientOrdersDataGridView = Nothing
 
             'mdiAnalyzerCopy = Nothing 'not this variable
 
-            GC.Collect()
+            '--- Detach variable defined using WithEvents ---
+            bsOrderDetailsGroupBox = Nothing
+            bsNumOrdersNumericUpDown = Nothing
+            bsNumOrdersLabel = Nothing
+            bsStatCheckbox = Nothing
+            bsSampleClassComboBox = Nothing
+            bsSampleClassLabel = Nothing
+            bsPatientSearchButton = Nothing
+            bsPatientIDTextBox = Nothing
+            bsPatientIDLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsSampleTypeComboBox = Nothing
+            bsSearchTestsButton = Nothing
+            bsOpenRotorButton = Nothing
+            bsSampleClassesTabControl = Nothing
+            PatientsTab = Nothing
+            OtherSamplesTab = Nothing
+            bsSaveWSButton = Nothing
+            bsLoadWSButton = Nothing
+            bsPrepareWSLabel = Nothing
+            bsAcceptButton = Nothing
+            bsDelPatientsButton = Nothing
+            bsDelControlsButton = Nothing
+            bsDelCalibratorsButton = Nothing
+            bsLIMSImportButton = Nothing
+            bsLIMSErrorsButton = Nothing
+            bsScreenToolTips = Nothing
+            bsAllPatientsCheckBox = Nothing
+            bsAllBlkCalCheckBox = Nothing
+            bsAllCtrlsCheckBox = Nothing
+            bsBlkCalibDataGridView = Nothing
+            bsControlOrdersDataGridView = Nothing
+            bsPatientOrdersDataGridView = Nothing
+            bsOffSystemResultsButton = Nothing
+            bsScanningButton = Nothing
+            bsBarcodeWarningButton = Nothing
+            bsErrorProvider1 = Nothing
+            '------------------------------------------------
+
+            'GC.Collect()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -5624,7 +5660,7 @@ Public Class IWSSampleRequest
                             'Open the WS Monitor form and close this one
                             IAx00MainMDI.OpenMonitorForm(Me)
                         End If
-                        GC.Collect()
+                        'GC.Collect()
                     Else
                         'In case of Error, set Enabled=True for all controls that can be activated
                         ChangeControlsStatusByProgressBar(True)
@@ -6102,8 +6138,9 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Modified by: RH 19/10/2010 - Introduced the Using statement
-    '''              TR 28/04/2014 - BT #1494 Validate when the auxiliari Test selection screen is close if there are any incomplete programming test
-    '''                              from selection and show message.
+    '''              TR 28/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
+    '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
+    '''                                           incomplete) and in this case shows a warning message
     ''' </remarks>
     Private Sub SearchTestsForCalibrators()
         Try
@@ -6142,11 +6179,9 @@ Public Class IWSSampleRequest
                 If (myForm.DialogResult = DialogResult.OK) Then
                     Cursor = Cursors.WaitCursor
 
-                    ' TR 28/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                    If myForm.IncompleteTest Then
-                        ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                    End If
-                    ' TR 28/04/2014 BT#1494 -END.
+                    'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                    '          that notify the User they was removed from the list of Selected Tests
+                    If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForCalibrators", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
 
                     If (Not myForm.ListOfSelectedTests Is Nothing) Then
                         Dim myGlobalDataTO As GlobalDataTO
@@ -6194,6 +6229,9 @@ Public Class IWSSampleRequest
     '''              TR 11/03/2013 - Inform LISRequest in SelectedTestsDS with the same value it has for the
     '''                              corresponding Order Test.
     '''              TR 17/05/2013 - Inform optional parameters when calling function AddControlOrderTests
+    '''              TR 28/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
+    '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
+    '''                                           incomplete) and in this case shows a warning message
     ''' </remarks>
     Private Sub SearchTestsForControls()
         Try
@@ -6257,11 +6295,10 @@ Public Class IWSSampleRequest
                 If (myForm.DialogResult = DialogResult.OK) Then
                     Cursor = Cursors.WaitCursor
 
-                    ' TR 28/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                    If myForm.IncompleteTest Then
-                        ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                    End If
-                    ' TR 28/04/2014 BT#1494 -END.
+                    'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                    '          that notify the User they was removed from the list of Selected Tests
+                    If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForControls", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
+
 
                     If (Not myForm.ListOfSelectedTests Is Nothing) Then
                         Dim myGlobalDataTO As GlobalDataTO
@@ -6303,8 +6340,11 @@ Public Class IWSSampleRequest
     ''' Modified by: RH 19/10/2010 - Introduced the Using statement
     '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     '''              XB 06/03/2013 - Implement again ToUpper because is not redundant but using invariant mode
-    '''              TR 29/04/2014 - BT #1494 Validate when the auxiliari Test selection screen is close if there are any incomplete programming test
-    '''                              from selection.
+    '''              TR 29/04/2014 - BT #1494 ==> When the auxiliary screen that allow select/unselect Tests is closed by clicking in OK Button, validates if Screen Property 
+    '''                                           IncompleteTest has been set to TRUE (which means that at least one of the selected STD Tests has the Calibration programming 
+    '''                                           incomplete) and in this case shows a warning message
+    '''              SA 20/05/2014 - BT #1633 ==> Added validation of Screen Property IncompleteTest for patientCase = 3 (n rows selected in Patient Samples grid having 
+    '''                                           different Tests and belonging to different Patients). This change should have been included in BT #1494
     ''' </remarks>
     Private Sub SearchTestsForPatientSamples()
         Try
@@ -6385,11 +6425,9 @@ Public Class IWSSampleRequest
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
 
-                                ' TR 28/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                                If myForm.IncompleteTest Then
-                                    ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                                End If
-                                ' TR 28/04/2014 BT#1494 -END.
+                                'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '          that notify the User they was removed from the list of Selected Tests
+                                If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
 
                                 'Calculate the maximun AutoNumeric PatientSample currently in the grid when the Order(s) to add 
                                 'are for unknown Patients
@@ -6444,11 +6482,11 @@ Public Class IWSSampleRequest
                             If (myForm.DialogResult = Windows.Forms.DialogResult.OK) Then
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
-                                ' TR 29/04/2014 BT#1494 -Validate if there was incomplete programming test to show message
-                                If myForm.IncompleteTest Then
-                                    ShowMessage("Error", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
-                                End If
-                                ' TR 29/04/2014 BT#1494 -END.
+
+                                'BT#1494 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '          that notify the User they was removed from the list of Selected Tests
+                                If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
+
                                 If (Not myForm.ListOfSelectedTests Is Nothing) Then
                                     'Delete all Open Patient Order Tests that are not in the list of selected Tests for the active StatFlag, Sample Type, SampleID
                                     Dim myOrderTestsDelegate As New OrderTestsDelegate
@@ -6512,8 +6550,12 @@ Public Class IWSSampleRequest
                             If (myForm.DialogResult = Windows.Forms.DialogResult.OK) Then
                                 Cursor = Cursors.WaitCursor
                                 actionCancelled = False
-                                Dim myOrderTestsDelegate As New OrderTestsDelegate
 
+                                'BT #1633 - Validate if there was selected STD Tests with incomplete Calibration programming to show the warning message
+                                '           that notify the User they was removed from the list of Selected Tests
+                                If (myForm.IncompleteTest) Then ShowMessage(Name & ".SearchTestsForPatientSamples", GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString)
+
+                                Dim myOrderTestsDelegate As New OrderTestsDelegate
                                 If (Not myForm.ListOfSelectedTests Is Nothing) Then
                                     Dim currentSampleID As String = ""
                                     Dim currentStatFlag As Boolean = False
@@ -6847,6 +6889,8 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             If (LISWithFilesMode) Then
                 Dim statusScanningButton As Boolean = False
 
@@ -7973,14 +8017,15 @@ Public Class IWSSampleRequest
     '******************************************
     '* SCREEN EVENTS                          *
     '******************************************
-    Private Sub WS_Preparation_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
-        Try
-            ReleaseElements()
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".WS_Preparation_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
+
+    'Private Sub WS_Preparation_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+    '    Try
+    '        ReleaseElements()
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WS_Preparation_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".WS_Preparation_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+    '    End Try
+    'End Sub
 
     Private Sub WS_Preparation_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
@@ -8338,7 +8383,5 @@ Public Class IWSSampleRequest
     'End Sub
 #End Region
 
-    Private Sub bsPatientIDLabel_Click(sender As Object, e As EventArgs) Handles bsPatientIDLabel.Click
 
-    End Sub
 End Class

@@ -538,8 +538,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pWorkSessionID">WorkSession Identifier</param>
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
-        ''' Created by:  AG 21/06/2011 (based on InsertRelationsForSpecialSolutions)
+        ''' Created by:  AG 21/06/2011 - Based on InsertRelationsForSpecialSolutions
         ''' Modified by: SA 22/06/2011 - Removed filter tparTests.InUse=True
+        '''              SA 28/05/2014 - BT #1519 ==> Changed the query to create a relation between Order Tests and required Elements for Washing Solutions when 
+        '''                                           the Order Test is for the Contaminated Test (the previous query create the relation only for Order Tests that 
+        '''                                           are for the Contaminant Test). This change is to allow show the Washing Solution in the Warning of Not Positioned
+        '''                                           Elements when whatever of the two Tests (the Contaminant and the Contaminated) are not finished (CLOSED)
+        '''              SA 03/06/2014 - Undo last change. THIS FUNCTION IS NOT USED ANY MORE.
         ''' </remarks>
         Public Function InsertRelationsForWashingSolutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -550,18 +555,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " INSERT INTO twksWSRequiredElemByOrderTest (OrderTestID, ElementID, StatFlag) " & vbCrLf & _
-                                            " SELECT DISTINCT WSOT.OrderTestID, RE.ElementID,  WSOT.StatFlag " & vbCrLf & _
+                                            " SELECT DISTINCT OT.OrderTestID, RE.ElementID,  O.StatFlag " & vbCrLf & _
                                             " FROM   twksWSRequiredElements RE INNER JOIN tparContaminations CT " & vbCrLf & _
                                                                                      " ON (RE.SolutionCode = CT.WashingSolutionR1 OR RE.SolutionCode = CT.WashingSolutionR2) " & vbCrLf & _
-                                                                             " INNER JOIN tparTestReagents  TR ON CT.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
-                                                                             " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
-                                                                             " INNER JOIN vwksWSOrderTests WSOT ON T.TestID = WSOT.TestID " & vbCrLf & _
+                                                                             " INNER JOIN tparTestReagents TR ON CT.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
+                                                                             " INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & vbCrLf & _
+                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                                             " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
                                             " WHERE  RE.TubeContent       = 'WASH_SOL' " & vbCrLf & _
+                                            " AND    OT.OrderTestStatus   = 'OPEN' " & vbCrLf & _
+                                            " AND    OT.TestType          = 'STD' " & vbCrLf & _
                                             " AND    WSOT.WorkSessionID   = '" & pWorkSessionID & "' " & vbCrLf & _
-                                            " AND    WSOT.OrderTestStatus = 'OPEN' " & vbCrLf & _
                                             " AND    WSOT.ToSendFlag      = 1 " & vbCrLf & _
-                                            " AND    WSOT.OpenOTFlag      = 0 " & vbCrLf & _
-                                            " AND    WSOT.TestType        = 'STD' " & vbCrLf
+                                            " AND    WSOT.OpenOTFlag      = 0 " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

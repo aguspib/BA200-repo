@@ -9,7 +9,7 @@
 Public Class HistoricResultsByPatientSampleReport
 
     Public Sub SetHeaderLabel(ByVal aText As String)
-        XrHeaderLabel.Text = aText
+        'XrHeaderLabel.Text = aText             ' EF 03/06/2014 (se anula titulo en cabecero)
     End Sub
 
     '    Private Sub XrTableDetailsRow_BeforePrint(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles XrTableDetailsRow.BeforePrint

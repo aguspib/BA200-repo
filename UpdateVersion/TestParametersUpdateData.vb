@@ -37,6 +37,28 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #Region "PUBLIC METHODS"
 
+        ''' <summary>
+        ''' Execute required final actions
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Public Overrides Function DoFinalActions(pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                myGlobalDataTO = UpdateTestSortByTestName(pDBConnection)
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoFinalActions", EventLogEntryType.Error, False)
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 #End Region
 
 
@@ -1111,6 +1133,35 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetOtherDataInfoFromLocal", EventLogEntryType.Error, False)
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+            End Try
+
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Update the sort of the Tests as alphabetically order by the name of the test (except User tests)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by XB 04/06/2014 - BT #1646
+        ''' </remarks>
+        Private Function UpdateTestSortByTestName(pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                Dim myTestDelegate As New TestsDelegate
+
+                myGlobalDataTO = myTestDelegate.UpdatePreloadedTestSortByTestName(pDBConnection)
+                If Not myGlobalDataTO.HasError Then
+                    myGlobalDataTO = myTestDelegate.UpdateUserTestPosition(pDBConnection)
+                End If
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateTestSortByTestName", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message

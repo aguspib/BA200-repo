@@ -141,7 +141,7 @@ Public Class IMonitor
             'Debug.Print("changes in WS :" & pChangesInWS.ToString())
             'Debug.Print("Paused elements :" & pPausedElements.ToString())
 
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'Dim remainingTime As Single = 0
             Dim resultData As New GlobalDataTO
@@ -481,7 +481,7 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshCommonArea(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            'Dim StartTime As DateTime = Now
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'LEDs AREA
             UpdateLeds()
@@ -528,9 +528,7 @@ Public Class IMonitor
             WorkSessionChange = False 'TR 14/12/2011 this is the variable
 
             'ContainerLevels information AREA
-            If Not isClosingFlag Then
-                UpdateContainerLevels()
-            End If
+            UpdateContainerLevels()
 
             'Warming Up AREA
             If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) Then
@@ -575,6 +573,8 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub RefreshRotors(ByVal pEventType As GlobalEnumerates.UI_RefreshEvents, ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             Dim tmpReagentsUpdatePosition As New WSRotorContentByPositionDS
             Dim tmpSamplesUpdatePosition As New WSRotorContentByPositionDS
             Dim RotorContentList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
@@ -850,7 +850,7 @@ Public Class IMonitor
             '    Exit Sub
             'End If
 
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If Not mdiAnalyzerCopy Is Nothing Then
 
@@ -897,10 +897,14 @@ Public Class IMonitor
         Try
             RefreshDoneField = False 'RH 28/03/2012
 
-            If isClosingFlag Then Return 'AG 03/04/2012
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
+
+            myLogAcciones.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS) OrElse _
                 pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED) Then
                 'Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
@@ -984,6 +988,7 @@ Public Class IMonitor
                     mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
                     Me.BsIseMonitor.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
                     BsISELongTermDeactivated.Visible = (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEModuleInstalled AndAlso MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation)
+
                     Me.ISETab.Refresh()
 
                     'Debug.Print("iMonitor.BsIseMonitor.RefreshFieldsData: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 05/06/2012 - time estimation
@@ -1001,6 +1006,7 @@ Public Class IMonitor
             End If
 
             myLogAcciones.CreateLogActivity("Refresh monitor screen (complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             ''AG 12/04/2012 - If WS aborted then show message in the app status bar
             'If WorkSessionStatusField = "ABORTED" Then
@@ -1035,11 +1041,10 @@ Public Class IMonitor
     ''' Modified by XB 17/01/2014 - Improve Dispose
     ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
         Try
-            isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+            'isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
-            SampleIconList.Images.Clear()
             NoImage = Nothing
             SatImage = Nothing
             NoSatImage = Nothing
@@ -1061,50 +1066,16 @@ Public Class IMonitor
             CalibratorIcon = Nothing
             ControlIcon = Nothing
 
-            bsWSExecutionsDataGridView = Nothing
-            AlarmsXtraGrid = Nothing
-            bsDepletedPictureBox = Nothing
-            SelectedPictureBox = Nothing
-            NoInUsePictureBox = Nothing
-            AdditionalSolPictureBox = Nothing
-            ReagentPictureBox = Nothing
-            LowVolPictureBox = Nothing
-            LegendBarCodeErrorRGImage = Nothing
-            LegendUnknownImage = Nothing
-
             LegendSelectedImage.Image = Nothing
-            LegendSelectedImage = Nothing
             LegendNotInUseImage.Image = Nothing
-            LegendNotInUseImage = Nothing
             LegendDepletedImage.Image = Nothing
-            LegendDepletedImage = Nothing
             LegendPendingImage.Image = Nothing
-            LegendPendingImage = Nothing
             LegendInProgressImage.Image = Nothing
-            LegendInProgressImage = Nothing
             LegendFinishedImage.Image = Nothing
-            LegendFinishedImage = Nothing
             LegendPendingImage0.Image = Nothing
-            LegendPendingImage0 = Nothing
             LegendInProgressImage0.Image = Nothing
-            LegendInProgressImage0 = Nothing
             LegendFinishedImage0.ImageLocation = Nothing
-            LegendFinishedImage0 = Nothing
-
             LegendBarCodeErrorImage.Image = Nothing
-            LegendBarCodeErrorImage = Nothing
-
-            bsWashingPictureBox = Nothing
-            bsNotInUsePictureBox = Nothing
-            bsR1PictureBox = Nothing
-            bsR1SamplePictureBox = Nothing
-            bsR1SampleR2PictureBox = Nothing
-            bsDilutionPictureBox = Nothing
-            bsFinishPictureBox = Nothing
-            bsContaminatedPictureBox = Nothing
-            bsOpticalPictureBox = Nothing
-
-            MonitorTabs = Nothing
 
             ERRORImage = Nothing
             WARNINGImage = Nothing
@@ -1174,9 +1145,6 @@ Public Class IMonitor
             myExecutions.Clear()
             'AG 03/03/2014 - #1524
 
-            AlarmsXtraGridView = Nothing
-            bsWSExecutionsDataGridView = Nothing
-
             'mdiAnalyzerCopy = Nothing 'not this variable
             'MainMDI = Nothing 'not this variable
 
@@ -1203,8 +1171,6 @@ Public Class IMonitor
             CurrentRowColor = Nothing
             CurrentHeaderColor = Nothing
 
-            TotalTestsChart = Nothing
-
             ResultsReadyImage.Image = Nothing
             ResultsWarningImage.Image = Nothing
             ResultsAbsImage.Image = Nothing
@@ -1219,7 +1185,245 @@ Public Class IMonitor
             autoWSCreationTimer = Nothing
             'AG 31/01/2014 - BT #1486
 
-            GC.Collect()
+            '--- Detach variable defined using WithEvents ---
+            MonitorTabs = Nothing
+            MainTab = Nothing
+            StatesTab = Nothing
+            SamplesTab = Nothing
+            ReagentsTab = Nothing
+            ReactionsTab = Nothing
+            ISETab = Nothing
+            WasteLabel = Nothing
+            WashingLabel = Nothing
+            BsGroupBox9 = Nothing
+            TotalTestsChart = Nothing
+            bsTestStatusLabel = Nothing
+            bsWSExecutionsDataGridView = Nothing
+            ElapsedTimeLabel = Nothing
+            TaskListProgressBar = Nothing
+            PanelControl2 = Nothing
+            BsGroupBox3 = Nothing
+            bsTimeLabel = Nothing
+            bsFridgeStatusLed = Nothing
+            BsGroupBox10 = Nothing
+            StateCfgLabel = Nothing
+            bsConnectedLed = Nothing
+            bsISEStatusLed = Nothing
+            bsSamplesLegendGroupBox = Nothing
+            bsSensorsLabel = Nothing
+            bsReactionsTemperatureLed = Nothing
+            bsFridgeTemperatureLed = Nothing
+            bsSampleNumberTextBox = Nothing
+            bsSampleContentTextBox = Nothing
+            bsSampleDiskNameTextBox = Nothing
+            bsSampleCellTextBox = Nothing
+            bsSamplesNumberLabel = Nothing
+            bsSamplesContentLabel = Nothing
+            bsSamplesDiskNameLabel = Nothing
+            bsSamplesCellLabel = Nothing
+            bsSamplesBarcodeTextBox = Nothing
+            bsDiluteStatusTextBox = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsSampleIDTextBox = Nothing
+            bsSamplesBarcodeLabel = Nothing
+            bsDiluteStatusLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsSampleIDLabel = Nothing
+            bsSamplesMoveLastPositionButton = Nothing
+            bsSamplesIncreaseButton = Nothing
+            bsSamplesDecreaseButton = Nothing
+            bsSamplesMoveFirstPositionButton = Nothing
+            bsTubeSizeComboBox = Nothing
+            bsTubeSizeLabel = Nothing
+            bsReagentsPositionInfoGroupBox = Nothing
+            bsReagentsCellTextBox = Nothing
+            bsReagentsCellLabel = Nothing
+            bsTeststLeftTextBox = Nothing
+            bsCurrentVolTextBox = Nothing
+            bsTestsLeftLabel = Nothing
+            bsCurrentVolLabel = Nothing
+            bsBottleSizeComboBox = Nothing
+            bsBottleSizeLabel = Nothing
+            bsExpirationDateTextBox = Nothing
+            bsReagentsPositionInfoLabel = Nothing
+            bsReagentsMoveLastPositionButton = Nothing
+            bsReagentsIncreaseButton = Nothing
+            bsReagentsDecreaseButton = Nothing
+            bsReagentsMoveFirstPositionButton = Nothing
+            bsReagentsBarCodeTextBox = Nothing
+            bsTestNameTextBox = Nothing
+            bsReagentsNumberTextBox = Nothing
+            bsReagentNameTextBox = Nothing
+            bsReagentsContentTextBox = Nothing
+            bsReagentsDiskNameTextBox = Nothing
+            bsExpirationDateLabel = Nothing
+            bsReagentsBarCodeLabel = Nothing
+            bsTestNameLabel = Nothing
+            bsReagentsNumberLabel = Nothing
+            bsReagentNameLabel = Nothing
+            bsReagentsContentLabel = Nothing
+            bsReagentsDiskNameLabel = Nothing
+            PanelControl3 = Nothing
+            LegendReagentsGroupBox = Nothing
+            LegReagAdditionalSol = Nothing
+            LegReagNoInUseLabel = Nothing
+            LegReagentSelLabel = Nothing
+            LegReagDepleteLabel = Nothing
+            AdditionalSolPictureBox = Nothing
+            NoInUsePictureBox = Nothing
+            SelectedPictureBox = Nothing
+            bsDepletedPictureBox = Nothing
+            bsReagentsLegendLabel = Nothing
+            PanelControl4 = Nothing
+            bsReagentsStatusTextBox = Nothing
+            bsReagentsStatusLabel = Nothing
+            PanelControl6 = Nothing
+            PanelControl7 = Nothing
+            BsGroupBox11 = Nothing
+            bsSampleStatusTextBox = Nothing
+            bsSamplesStatusLabel = Nothing
+            bsSamplesPositionInfoLabel = Nothing
+            LegendDepletedImage = Nothing
+            bsSamplesLegendLabel = Nothing
+            LegendFinishedImage = Nothing
+            LegendInProgressImage = Nothing
+            LegendNotInUseImage = Nothing
+            LegendBarCodeErrorImage = Nothing
+            BarcodeErrorLabel = Nothing
+            InProgressLabel = Nothing
+            FinishedLabel = Nothing
+            DepletedLabel = Nothing
+            NotInUseLabel = Nothing
+            SelectedLabel = Nothing
+            PendingLabel = Nothing
+            LegendPendingImage = Nothing
+            RemainingTimeLabel = Nothing
+            AccessRRTimeLabel = Nothing
+            AccessRMTimeLabel = Nothing
+            LegReagentLabel = Nothing
+            LegReagLowVolLabel = Nothing
+            LowVolPictureBox = Nothing
+            ReagentPictureBox = Nothing
+            LegendSelectedImage = Nothing
+            TestRefresh = Nothing
+            LegendSamplesGroupBox = Nothing
+            OverallTimeTitleLabel = Nothing
+            OverallTimeTextEdit = Nothing
+            ElapsedTimeTextEdit = Nothing
+            RemainingTimeTextEdit = Nothing
+            AccessRRTimeTextEdit = Nothing
+            AccessRMTimeTextEdit = Nothing
+            PanelControl11 = Nothing
+            PanelControl14 = Nothing
+            PanelControl15 = Nothing
+            LegendReactionsGroupBox = Nothing
+            bsFinishLabel = Nothing
+            bsR1SampleLabel = Nothing
+            bsR1SampleR2 = Nothing
+            bsReactionsLegendLabel = Nothing
+            bsDilutionLabel = Nothing
+            bsR1SamplePictureBox = Nothing
+            bsFinishPictureBox = Nothing
+            bsDilutionPictureBox = Nothing
+            bsR1PictureBox = Nothing
+            bsR1SampleR2PictureBox = Nothing
+            bsWashingPictureBox = Nothing
+            bsNotInUsePictureBox = Nothing
+            bsR1Label = Nothing
+            bsWashingLabel = Nothing
+            bsNotInUseLabel = Nothing
+            BsGroupBox13 = Nothing
+            bsReacStatusTextBox = Nothing
+            bsReacStatusLabel = Nothing
+            bsReactionsMoveFirstPositionButton = Nothing
+            bsReactionsPositionInfoLabel = Nothing
+            bsWellNumberLabel = Nothing
+            bsSampleClassLabel = Nothing
+            bsReactionsDecreaseButton = Nothing
+            bsCalibNumLabel = Nothing
+            bsReactionsIncreaseButton = Nothing
+            bsReactionsMoveLastPositionButton = Nothing
+            bsWellNrTextBox = Nothing
+            bsSampleClassTextBox = Nothing
+            bsCalibNrTextBox = Nothing
+            bsReacSampleIDLabel = Nothing
+            bsDilutionTextBox = Nothing
+            bsReacSampleTypeLabel = Nothing
+            bsReacSampleTypeTextBox = Nothing
+            bsReacDilutionLabel = Nothing
+            bsPatientIDTextBox = Nothing
+            bsRerunTextBox = Nothing
+            bsReplicateTextBox = Nothing
+            bsRerunLabel = Nothing
+            bsReplicateLabel = Nothing
+            bsOpticalLabel = Nothing
+            bsContaminatedLabel = Nothing
+            bsOpticalPictureBox = Nothing
+            bsContaminatedPictureBox = Nothing
+            BsGroupBox14 = Nothing
+            bsTimeAvailableLabel = Nothing
+            bsReacTestTextBox = Nothing
+            bsReacTestNameLabel = Nothing
+            bsReactionsOpenGraph = Nothing
+            BsExecutionIDTextBox = Nothing
+            bsOrderTestIDTextBox = Nothing
+            BsTimer1 = Nothing
+            PanelControl10 = Nothing
+            LegendBarCodeErrorRGImage = Nothing
+            BarcodeErrorRGLabel = Nothing
+            LegendUnknownImage = Nothing
+            UnknownLabel = Nothing
+            bsWamUpGroupBox = Nothing
+            bsEndWarmUp = Nothing
+            TimeWarmUpProgressBar = Nothing
+            bsTimeWUpLabel = Nothing
+            PanelControl9 = Nothing
+            LegendWSGroupBox = Nothing
+            ResultsStatusLabel = Nothing
+            PausedTestImage = Nothing
+            PausedTestLabel = Nothing
+            LockedTestImage = Nothing
+            ResultsAbsImage = Nothing
+            LockedTestLabel = Nothing
+            ResultsAbsLabel = Nothing
+            FinalReportLabel = Nothing
+            ResultsWarningLabel = Nothing
+            ResultsReadyLabel = Nothing
+            TestStatusLabel = Nothing
+            FinalReportImage = Nothing
+            ResultsWarningImage = Nothing
+            ResultsReadyImage = Nothing
+            bsWorksessionLegendLabel = Nothing
+            ExportLISLabel = Nothing
+            ExportLISImage = Nothing
+            PendingLabel0 = Nothing
+            InProgressLabel0 = Nothing
+            FinishedLabel0 = Nothing
+            LegendPendingImage0 = Nothing
+            LegendFinishedImage0 = Nothing
+            LegendInProgressImage0 = Nothing
+            SampleStatusLabel = Nothing
+            AlarmsTab = Nothing
+            BsGroupBox4 = Nothing
+            bsTitleLabel = Nothing
+            BsGroupBox1 = Nothing
+            BsLabel1 = Nothing
+            BsDataGridView1 = Nothing
+            AlarmsXtraGrid = Nothing
+            AlarmsXtraGridView = Nothing
+            BsIseMonitor = Nothing
+            BsISELongTermDeactivated = Nothing
+            bsErrorProvider1 = Nothing
+            CoverOffPicture = Nothing
+            chart2 = Nothing
+            CoverOnPicture = Nothing
+            CoverReagentsPicture = Nothing
+            CoverSamplesPicture = Nothing
+            CoverReactionsPicture = Nothing
+            ToolTipController1 = Nothing
+            '------------------------------------------------
+
+            'GC.Collect()
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
@@ -1248,6 +1452,8 @@ Public Class IMonitor
             'ISELed.StateIndex = rnd.Next Mod 4
             'A400Led.StateIndex = rnd.Next Mod 4
             'FridgeStateLed.StateIndex = rnd.Next Mod 4
+
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If (Not mdiAnalyzerCopy Is Nothing) Then
                 Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = mdiAnalyzerCopy.AnalyzerStatus
@@ -1701,7 +1907,7 @@ Public Class IMonitor
     ''' </remarks>
     Private Sub ExecuteAutoCreateWSLastStep()
         Try
-            If isClosingFlag Then Exit Sub ' XB 13/03/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myEnableButtonsAlreadyLaunch As Boolean = False     ' XB 25/11/2013
             If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
@@ -1870,9 +2076,9 @@ Public Class IMonitor
             End If
         Next
 
-        'Application.DoEvents() 'AG 21/02/2014 - #1516 Comment because sometimes cause internal exceptions
+        CreateLogActivity("IMonitor CLOSED (Complete)", "IMonitor.Monitor_FormClosed", EventLogEntryType.Information, False) 'AG 28/05/2014 - New trace
 
-        ReleaseElement()
+        'Application.DoEvents() 'AG 21/02/2014 - #1516 Comment because sometimes cause internal exceptions
     End Sub
 
     Private Sub bsEndWarmUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsEndWarmUp.Click
@@ -2057,6 +2263,9 @@ Public Class IMonitor
 
 
     Public Sub New()
+
+        CreateLogActivity("New Instance", "IMonitor.New ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+
         ' XB 25/11/2013 - Inform to MDI that this screen is building - Task #1303
         LoadingScreen()
 

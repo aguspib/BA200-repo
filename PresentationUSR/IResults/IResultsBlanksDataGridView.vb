@@ -29,6 +29,8 @@ Imports DevExpress.Utils
 
 Partial Class IResults
 
+    Dim CollapseColumnBlanks As New bsDataGridViewCollapseColumn
+
 #Region "BlanksDataGridView Methods"
     ''' <summary>
     ''' 
@@ -45,12 +47,12 @@ Partial Class IResults
 
             bsBlanksDataGridView.Columns.Clear()
 
-            Dim CollapseColumn As New bsDataGridViewCollapseColumn
-            With CollapseColumn
+            'Dim CollapseColumn As New bsDataGridViewCollapseColumn
+            With CollapseColumnBlanks
                 .Name = CollapseColName
                 AddHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
             End With
-            bsBlanksDataGridView.Columns.Add(CollapseColumn)
+            bsBlanksDataGridView.Columns.Add(CollapseColumnBlanks)
 
             'dl 23/09/2011
             Dim OkColumn As New DataGridViewImageColumn

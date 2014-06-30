@@ -2130,4 +2130,18 @@
       GO
     </UpdateScript>
   </AppVersion >
+  <AppVersion>
+    <Version>3.01</Version>
+    <StructureScript>
+      GO
+    </StructureScript>
+    <UpdateScript>
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.1', ServiceSoftware = '1.2.1', FirmwareScripts = '1.1.0', Firmware = '2.08'
+      GO
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'ONLY_ISE_WS_NOT_STARTED2') = 0)
+      INSERT INTO [dbo].[tfmwMessages] ([MessageID],[MessageType],[ResourceID])
+      VALUES ('ONLY_ISE_WS_NOT_STARTED2','Information','MSG_ONLY_ISE_WS_NOT_STARTED2')
+      GO
+    </UpdateScript>
+  </AppVersion >
 </TaskListDS>

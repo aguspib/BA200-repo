@@ -95,7 +95,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Raise event for UI refrsh
                     'If Not resultData.HasError Then
                     'Now do not use the secondary refresh (mySecondaryUI_RefreshDS, mySecondaryUI_RefreshEvent) use always the primary (myUI_RefreshDS, myUI_RefreshEvent)
-                    If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+
+                    'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                    ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
+
                     RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
                     'eventDataPendingToTriggerFlag = False 'AG 07/10/2011 - inform not exists information in UI_RefreshDS to be send to the event
                     'End If
@@ -131,9 +134,39 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myLogAcciones As New ApplicationLogManager()
                 Dim myReadingCycleStatus As Boolean = False
 
+                'AG 02/06/2014 #1644 - Set the semaphore to busy value (before process ANSPHR)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                End If
+
                 '2) Call the biochemical readings treatment
                 'resultData = ProcessBiochemicalReadings(Nothing, pInstructionReceived)
                 resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
+
+                'AG 21/05/2014 activate code: TR 06/05/2014 BT#1612, #1634 -**UNCOMMENT Version 3.0.1**-
+                If resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString() Then
+                    myLogAcciones.CreateLogActivity("Try saving the reading again... ", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    'Try to save the reading one more time 
+                    resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
+
+                    If resultData.HasError Then
+                        myLogAcciones.CreateLogActivity("2º attempt saving readings FAILED!!!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    Else
+                        myLogAcciones.CreateLogActivity("2º attempt saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    End If
+                End If
+                'TR 06/05/2014 BT#1612, #1634 -END
+
+                'AG 02/06/2014 #1644 - Set the semaphore to free value (after process ANSPHR)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                End If
+
                 myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
                 StartTime = Now
 
@@ -365,12 +398,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              new ByRef parameter, and inform the Pause status when saving the received Readings
         '''              AG 22/11/2013 - #1397 During 'Recovery Results' in pause mode call method SaveReadings instead of SaverReadingsNEW (it checks if exists before call 
         '''                              the insert in DAO)
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
         ''' </remarks>
         Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                        ByVal pInstructionReceived As List(Of InstructionParameterTO), _
                                                        ByRef pReadingCycleStatus As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim instructionSavedFlag As Boolean = False 'AG 21/05/2014 BT#1612, #1634 (update TR initial design)
 
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -405,8 +440,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If (limitList.Count > 0) Then totalReadingsNumber = CInt(limitList.First.MaxValue) - internalReadingsOffset
                 'limitList = Nothing 'AG 24/10/2013
 
-                'Clear DS used for update of presentation layer (only the proper data table)
-                myUI_RefreshDS.ReceivedReadings.Clear()
+                'AG 22/05/2014 #1637 - Use exclusive lock over myUI_RefreshDS variables
+                SyncLock myUI_RefreshDS.ReceivedReadings
+                    myUI_RefreshDS.ReceivedReadings.Clear() 'Clear DS used for update of presentation layer (only the proper data table)
+                End SyncLock
 
                 'Process all Readings received
                 Dim myUtility As New Utilities()
@@ -505,7 +542,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 localBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
                                 'Get the BaseLineID for the base lines with adjust (from table twksWSBLines)
-                                myGlobal = Me.GetCurrentBaseLineID(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True)
+                                myGlobal = Me.GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 myAdjustBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
@@ -518,6 +555,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myExecutionDS.twksWSExecutions(0).EndEdit()
 
                                 executionUpdated = True
+
+                                'AG 28/05/2014 - #1644 - When 1st reading is received remove all previous readings linked with this execution
+
+                                If myReadingNumber = 1 Then
+                                    myLogAcciones.CreateLogActivity("Call myReadingsDelegate.Delete ", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                                    myGlobal = myReadingsDelegate.Delete(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionDS)
+                                End If
+                                'AG 28/05/2014
+
                             End If
 
                             'Verify if it is needed to activate ThermoWarningFlag for the Execution
@@ -584,15 +630,33 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 completeReadingsFlag = (CType(myGlobal.SetDatos, twksWSReadingsDS).twksWSReadings.Count > 0)
                             End If
 
-                            If (Not validReadingFlag OrElse myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
-                                'Update fields ValidReadings and CompleteReadings for the Execution
+                            'AG 22/05/2014 - #1634 - If CompleteReadings is FALSE do not update it to TRUE (the error flag cannot be removed or calculations will call and exception could appear)
+                            ' EXCEPTION: when the 1st reading is received the flag must be set to TRUE
+                            'Make it in two IFs, do not mixed because condition is wrong
+                            'If (Not validReadingFlag OrElse myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
+                            '    myExecutionDS.twksWSExecutions(0).BeginEdit()
+                            '    myExecutionDS.twksWSExecutions(0).ValidReadings = validReadingFlag
+                            '    myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
+                            '    myExecutionDS.twksWSExecutions(0).EndEdit()
+                            '    executionUpdated = True
+                            'End If
+
+                            '1- Update ValidRedingFlag (1st reading initiate value, else evaluate it but if current value is FALSE do not change it!!!)
+                            If ((myReadingNumber - internalReadingsOffset) = 1) OrElse (Not validReadingFlag AndAlso myExecutionDS.twksWSExecutions(0).ValidReadings <> validReadingFlag) Then
                                 myExecutionDS.twksWSExecutions(0).BeginEdit()
                                 myExecutionDS.twksWSExecutions(0).ValidReadings = validReadingFlag
-                                myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
                                 myExecutionDS.twksWSExecutions(0).EndEdit()
-
                                 executionUpdated = True
                             End If
+
+                            '2- Update CompleteReadings (1st reading set to TRUE, else evaluate it but if current value is FALSE do not change it!!!)
+                            If ((myReadingNumber - internalReadingsOffset) = 1) OrElse (Not completeReadingsFlag AndAlso myExecutionDS.twksWSExecutions(0).CompleteReadings <> completeReadingsFlag) Then
+                                myExecutionDS.twksWSExecutions(0).BeginEdit()
+                                myExecutionDS.twksWSExecutions(0).CompleteReadings = completeReadingsFlag
+                                myExecutionDS.twksWSExecutions(0).EndEdit()
+                                executionUpdated = True
+                            End If
+                            'AG 22/05/2014 - #1634
 
                             'Move the Execution to the DS containing all processed Executions
                             allExecutionsDS.twksWSExecutions.ImportRow(myExecutionDS.twksWSExecutions(0))
@@ -602,7 +666,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'Finally, prepare the UI Refresh for the Execution
                             myGlobal = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.READINGS_RECEIVED, myReadingRow.ExecutionID, myReadingRow.ReadingNumber, Nothing, False)
-                            If (myGlobal.HasError) Then Exit For
+                            'AG 21/05/2014 BT#1612, #1634 (comment next line applies only for #1634 - If this method (used only for real time presentation refresh) returns error do not stop saving process. Skip the error!!)
+                            'If (myGlobal.HasError) Then Exit For
+                            If (myGlobal.HasError) Then myGlobal.HasError = False 'skip error in function PrepareUIRefreshEvent
                         End If
                     End If
                 Next i
@@ -624,6 +690,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'Recovery results during pause mode scenario
                                 If (Not myGlobal.HasError) Then myGlobal = myReadingsDelegate.SaveReadings(dbConnection, myReadingDS)
                             Else
+                                myLogAcciones.CreateLogActivity("Call myReadingsDelegate.SaveReadingsNEW", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+
                                 'Normal scenario
                                 If (Not myGlobal.HasError) Then myGlobal = myReadingsDelegate.SaveReadingsNEW(dbConnection, myReadingDS)
                             End If
@@ -632,6 +700,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Rollback or Commit the DB Transaction depending if an error was raised or not
                             If (Not myGlobal.HasError) Then
                                 If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                                instructionSavedFlag = True 'AG 21/05/2014 BT#1612, #1634 (flag indicates instruction saved OK)
                             Else
                                 If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                             End If
@@ -931,9 +1000,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadings", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+
+                'AG 21/05/2014 BT#1612, #1634 (change TR initial design) Indicate there was an error and instruction has not been saved -**UNCOMMENT Version 3.0.1**-
+                If Not instructionSavedFlag Then
+                    myGlobal.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString()
+                    myGlobal.HasError = True
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("There was an error and the ANSPHR instruction had not been saved. Set error code = READING_NOT_SAVED! ", _
+                                "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                End If
+                'TR 06/05/2014 BT#1612 -END
+
             End Try
             Return myGlobal
         End Function

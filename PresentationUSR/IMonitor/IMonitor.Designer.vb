@@ -6,11 +6,14 @@ Partial Class IMonitor
     <System.Diagnostics.DebuggerNonUserCode()> _
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
+            CreateLogActivity("Initial - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
             If disposing AndAlso components IsNot Nothing Then
                 components.Dispose()
             End If
+            ReleaseElements()
         Finally
             MyBase.Dispose(disposing)
+            CreateLogActivity("Final - Dispose", Me.Name & ".Dispose", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 

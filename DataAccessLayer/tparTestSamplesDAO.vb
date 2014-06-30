@@ -735,6 +735,48 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
+        ''' Update the Enable Status of all Sample Types defined for the informed Test and using as Alternative Calibrator the one defined 
+        ''' for the informed Sample Type
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type of the ALTERNATIVE Calibrator</param>
+        ''' <param name="pEnableStatus">New value for field EnableStatus</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 21/05/2014 - BT #1633
+        ''' </remarks>
+        Public Function UpdateEnableStatusForALTERNATIVECalib(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                              ByVal pSampleType As String, ByVal pEnableStatus As Boolean) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    myGlobalDataTO.HasError = True
+                    myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = " UPDATE tparTestSamples SET EnableStatus = " & IIf(pEnableStatus, 1, 0).ToString & vbCrLf & _
+                                            " WHERE  TestID = " & pTestID.ToString & vbCrLf & _
+                                            " AND    CalibratorType = 'ALTERNATIV' " & vbCrLf & _
+                                            " AND    SampleTypeAlternative = '" & pSampleType.Trim & "' " & vbCrLf
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
+                        myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        myGlobalDataTO.HasError = False
+                    End Using
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateEnableStatusForALTERNATIVECalib", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
         ''' Update the Factory Calibrator by TestID and SampleType
         ''' </summary>
         ''' <param name="pDBConnection"></param>

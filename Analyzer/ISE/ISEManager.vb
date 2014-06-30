@@ -2593,6 +2593,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by  SGM 08/03/2012
         ''' Modified by SGM 16/01/2013 - Bug #1108
         '''             XB  30/04/2014 - Add protection on CALB operation if FW answers ISE! by error instead of CAL Results or ERC - Task #1614
+        '''             XB  20/05/2014 - Add more protections against not expected answers from Firmware - Task #1614
+        '''             XB  20/05/2014 - Fix Bug #1629
+        '''             XB  12/06/2014 - Fix Bug caused by Task #1614 - ActivateReagentsPack
         ''' </remarks>
         Private Function ManageISEProcedureFinished(Optional ByVal pForcedResult As ISEProcedureResult = ISEProcedureResult.None) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2659,11 +2662,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                                   LastElectrodesCalibrationErrorAttr)
                                     End If
 
+                                    ' XB 30/04/2014 - Task #1629
+                                    MyClass.IsCalibrationNeeded = True
+
                                     ' XB 30/04/2014 - Task #1614
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
                                     LastISEResult.IsCancelError = True
                                     pForcedResult = ISEProcedureResult.Exception
+                                    MyClass.IsCalibrationNeeded = True
                                     ' XB 30/04/2014 - Task #1614
                                 End If
 
@@ -2690,6 +2697,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                              LastPumpsCalibrationDateAttr, _
                                                                              LastPumpsCalibrationResultAttr, LastPumpsCalibrationErrorAttr)
                                     End If
+
+                                    ' XB 30/04/2014 - Task #1629
+                                    MyClass.IsPumpCalibrationNeeded = True
+
+                                    ' XB 20/05/2014 - Task #1614
+                                ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                    ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                                    LastISEResult.IsCancelError = True
+                                    pForcedResult = ISEProcedureResult.Exception
+                                    MyClass.IsPumpCalibrationNeeded = True
+                                    ' XB 20/05/2014 - Task #1614
                                 End If
                             Case ISECommands.SHOW_PUMP_CAL
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
@@ -2714,16 +2732,56 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                                LastBubbleCalibrationDateAttr, _
                                                                                LastBubbleCalibrationResultAttr, LastBubbleCalibrationErrorAttr)
                                     End If
+
+                                    ' XB 30/04/2014 - Task #1629
+                                    MyClass.IsBubbleCalibrationNeeded = True
+
+                                    ' XB 20/05/2014 - Task #1614
+                                ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                    ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                                    LastISEResult.IsCancelError = True
+                                    pForcedResult = ISEProcedureResult.Exception
+                                    ' XB 20/05/2014 - Task #1614
                                 End If
 
                             Case ISECommands.READ_mV
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.AMV) Or (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BMV)
 
+                                ' XB 20/05/2014 - Task #1614
+                                If Not isFinished Then
+                                    If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                        ' This is an error. ISE must answer AMV or BMV or an ERC, but no this instruction: <ISE!>
+                                        LastISEResult.IsCancelError = True
+                                        pForcedResult = ISEProcedureResult.Exception
+                                    End If
+                                End If
+                                ' XB 20/05/2014 - Task #1614
+
                             Case ISECommands.READ_PAGE_0_DALLAS
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT00)
 
+                                ' XB 20/05/2014 - Task #1614
+                                If Not isFinished Then
+                                    If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                        ' This is an error. ISE must answer DDT00 but no this instruction: <ISE!>
+                                        LastISEResult.IsCancelError = True
+                                        pForcedResult = ISEProcedureResult.Exception
+                                    End If
+                                End If
+                                ' XB 20/05/2014 - Task #1614
+
                             Case ISECommands.READ_PAGE_1_DALLAS
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.DDT01)
+
+                                ' XB 20/05/2014 - Task #1614
+                                If Not isFinished Then
+                                    If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                        ' This is an error. ISE must answer DDT01 but no this instruction: <ISE!>
+                                        LastISEResult.IsCancelError = True
+                                        pForcedResult = ISEProcedureResult.Exception
+                                    End If
+                                End If
+                                ' XB 20/05/2014 - Task #1614
 
                             Case ISECommands.VERSION_CHECKSUM
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ISV)
@@ -2785,6 +2843,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             MyClass.IsISEInitializationDoneAttr = True
                             MyClass.IsISEInitiatedOKAttr = False
                             RaiseEvent ISEConnectionFinished(False)
+
+                            ' XB 20/05/2014 - Task #1614
+                        ElseIf MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV AndAlso LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                            ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
+                            LastISEResult.IsCancelError = True
+                            pForcedResult = ISEProcedureResult.Exception
+                            MyClass.IsISEInitializationDoneAttr = True
+                            MyClass.IsISEInitiatedOKAttr = False
+                            RaiseEvent ISEConnectionFinished(False)
+                            ' XB 20/05/2014 - Task #1614
                         End If
 
                     Case ISEProcedures.ActivateModule
@@ -2843,6 +2911,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'end SGM 21/09/2012
                         End If
 
+                        ' XB 20/05/2014 - Task #1614
+                        If Not isFinished Then
+                            If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                                ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
+                                LastISEResult.IsCancelError = True
+                                pForcedResult = ISEProcedureResult.Exception
+                            End If
+                        End If
+                        ' XB 20/05/2014 - Task #1614
 
                     Case ISEProcedures.CalibrateElectrodes
                         isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
@@ -2867,11 +2944,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
                             'JB 28/08/2012 - End
 
+                            ' XB 30/04/2014 - Task #1629
+                            MyClass.IsCalibrationNeeded = True
+
                             ' XB 30/04/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
                             LastISEResult.IsCancelError = True
                             pForcedResult = ISEProcedureResult.Exception
+                            MyClass.IsCalibrationNeeded = True
                             ' XB 30/04/2014 - Task #1614
                         End If
 
@@ -2892,6 +2973,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                      LastPumpsCalibrationResultAttr, LastPumpsCalibrationErrorAttr)
                             End If
 
+                            ' XB 30/04/2014 - Task #1629
+                            MyClass.IsPumpCalibrationNeeded = True
+
+                            ' XB 20/05/2014 - Task #1614
+                        ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                            ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                            LastISEResult.IsCancelError = True
+                            pForcedResult = ISEProcedureResult.Exception
+                            MyClass.IsPumpCalibrationNeeded = True
+                            ' XB 20/05/2014 - Task #1614
                         End If
 
                         ' XBC 27/09/2012
@@ -2911,6 +3002,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             End If
 
+                            ' XB 30/04/2014 - Task #1629
+                            MyClass.IsBubbleCalibrationNeeded = True
+
+                            ' XB 20/05/2014 - Task #1614
+                        ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
+                            ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
+                            LastISEResult.IsCancelError = True
+                            pForcedResult = ISEProcedureResult.Exception
+                            ' XB 20/05/2014 - Task #1614
                         End If
 
                     Case ISEProcedures.Clean
@@ -3354,7 +3454,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Refreshes the current Monitor Data
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by XB 23/05/2014 - BT #1639 - Display Calibrations Expired Data times
+        ''' </remarks>
         Public Function RefreshMonitorDataTO() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3495,6 +3597,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
 
+                ' XB 26/05/2014 - BT #1639
+                Dim myCalElectrodesExpiredTime As Integer = 4
+                myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CALB_HOURS_NEEDED)
+                If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
+                    myCalElectrodesExpiredTime = CInt(myGlobal.SetDatos)
+                End If
 
                 Dim myCalPumpsdate As DateTime = MyClass.LastPumpsCalibrationDate
                 Dim myCalPumpsString As String = MyClass.LastPumpsCalibrationResult
@@ -3508,6 +3616,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else
                         isError = True
                     End If
+                End If
+
+                ' XB 26/05/2014 - BT #1639
+                Dim myCalPumpsExpiredTime As Integer = 24
+                myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_PUMPCAL_HOURS_NEEDED)
+                If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
+                    myCalPumpsExpiredTime = CInt(myGlobal.SetDatos)
                 End If
 
                 'SGM 25/07/2012 Bubble detector
@@ -3537,7 +3652,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                           myCalElectroDate, myCalElectroString1, myCalElectroString2, myCalElectroResult1OK, myCalElectroResult2OK, myCalElectroRecomm, _
                                                           myCalPumpsdate, myCalPumpsString, myCalPumpsResultOK, myCalPumpsRecomm, _
                                                           myCalBubbledate, myCalBubbleString, myCalBubbleResultOK, myCalBubbleRecomm, _
-                                                          myCleanDate, myCleanRecomm, IsISEInitiatedOK, IsLongTermDeactivation)
+                                                          myCleanDate, myCleanRecomm, IsISEInitiatedOK, IsLongTermDeactivation, myCalElectrodesExpiredTime, myCalPumpsExpiredTime)
 
                     MyClass.MonitorDataTOAttr = myMonitorData
 
@@ -4640,7 +4755,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Checks if a new Electrodes calibration is needed
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 12/03/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 12/03/2012
+        ''' Modified by XB 23/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+        ''' </remarks>
         Public Function CheckElectrodesCalibrationIsNeeded() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -4673,6 +4791,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'End If
 
                 MyClass.IsCalibrationNeeded = IsNeeded
+
+                If IsNeeded Then RaiseEvent ISEMonitorDataChanged() ' XB 23/05/2014 - BT #1639
 
                 myGlobal.SetDatos = IsNeeded
 
@@ -7969,7 +8089,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Warning, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
             End Try
         End Sub
 

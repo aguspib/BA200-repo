@@ -3,7 +3,10 @@ Option Strict On
 
 Namespace Biosystems.Ax00.Global
     Public Class GlobalConstants
-        Public Shared CreateWSExecutionsWithMultipleTransactions As Boolean = False 'AG 24/03/2014 - #1545 - Create executions using multiple transactions
+
+        '**********************
+        '**** GLOBAL FLAGs ****
+        '**********************
 
         '*** PROVISIONAL: BT #1545 ==> ONLY WHILE DEVELOPMENT OF NEW ADD WS PROCESS (USING SEVERAL DB TRANSACTIONS) ***'
         Public Shared NEWAddWorkSession As Boolean = False
@@ -19,7 +22,14 @@ Namespace Biosystems.Ax00.Global
 
         Public Shared MaxFileLogSize As Long = -1       'DL 27/01/2012
 
+        Public Shared CreateWSExecutionsWithMultipleTransactions As Boolean = False 'AG 24/03/2014 - #1545 - Create executions using multiple transactions
+        Public Shared CreateWSExecutionsWithSemaphore As Boolean = True 'AG 03/06/2014 - #1644
 
+
+
+        '**************************
+        '**** GLOBAL CONSTANTs ****
+        '**************************
         'AG 21/04/2010 - There arent preparation pending to sent the analyzer
         Public Const NO_PENDING_PREPARATION_FOUND As Integer = -1
         Public Const ADDITIONALINFO_ALARM_SEPARATOR As String = "|" 'Field twksWSAnalyzerAlarms.AdditionalInfo has several fields informed separated using this character
@@ -107,6 +117,7 @@ Namespace Biosystems.Ax00.Global
 
         'AG + XB 24/02/20174 - BT #1520
         Public Const MAX_APP_MEMORY_USAGE As String = "For best performance, it's required to close and start the application before continuing."
+        Public Const UNHANDLED_EXCEPTION_ERR As String = "The application has encountered an unexpected error. " & vbNewLine & "Please, try again or contact the technical service."
         Public Const CATCH_APP_MEMORY_ERR As String = "Some images hasn't been properly loaded. For best visualization, change screen and return to the present one."
         Public Const HResult_OutOfMemoryException As String = "-2147024882"
         Public Const HResult_InsufficientMemoryException As String = "-2146233027"
@@ -115,5 +126,11 @@ Namespace Biosystems.Ax00.Global
         Public Const SQLDeadLockException As String = "-2146232060" ' XB 20/03/2014 - #1548
         Public Const ObjRefException As String = "-2147467261" ' XB 26/03/2014 - #1548
         Public Const NullReferenceException As String = "-2146233069" ' XB 26/03/2014 - #1548
+
+
+        'AG 02/06/2014 - #1644 constants for global createWSexecutions semaphore
+        Public Const SEMAPHORE_TOUT_CREATE_EXECUTIONS As Integer = 12000 '12 sec
+        Public Const SEMAPHORE_BUSY As Integer = 0
+
     End Class
 End Namespace

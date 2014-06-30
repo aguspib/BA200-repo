@@ -11,6 +11,48 @@ Namespace Biosystems.Ax00.BL
 
 #Region "Public Methods"
         ''' <summary>
+        ''' Get the list of Washing Solutions needed in the active WorkSession (to add them as required Work Session Elements). Only Washing Solutions that fulfill
+        ''' one or more of the following conditions are returned:
+        ''' ** The Washing Solution is needed to avoid Contaminations between Reagents that are both needed in the active Work Session
+        ''' ** The Washing Solution is needed to avoid Well Contamination caused by a Test requested in the active Work Session
+        ''' ** The Washing Solution is needed to remove remaining Well Contaminations from the previous Work Session 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with the list of Washing Solutions needed in the active WS</returns>
+        ''' <remarks>
+        ''' Created by:  SA 27/05/2014 - BT #1519
+        ''' </remarks>
+        Public Function GetWSContaminationsWithWASH(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myContaminationsDAO As New tparContaminationsDAO
+                        resultData = myContaminationsDAO.GetWSContaminationsWithWASH(dbConnection, pWorkSessionID, pAnalyzerID)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
         ''' According the informed Contamination Type, delete all Contaminations defined (CUVETTES case) or all Contaminations
         ''' in which the specified ReagentID acts as Contaminator.  After that, create all new defined Contaminations
         ''' </summary>
@@ -32,7 +74,7 @@ Namespace Biosystems.Ax00.BL
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myContaminationsDAO As New tparContaminationsDAO
                         Select Case (pContaminationType)
@@ -64,7 +106,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -73,7 +115,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.SaveContaminations", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -86,7 +128,8 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  TR
-        ''' MODIFIED BY: TR 10/12/2013 -BT #1415 Remove the implementation of ContaminationWashing delegate is use no more. Table has been delete.
+        ''' Modified by: TR 10/12/2013 - BT #1415 ==> Remove the implementation of ContaminationWashingDelegate; it is not used anymore due to the 
+        '''                                           table has been deleted
         ''' </remarks>
         Public Function DeleteCascadeContaminationByReagentID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentID As Integer) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -94,16 +137,14 @@ Namespace Biosystems.Ax00.BL
 
             Try
                 myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myContaminationsDAO As New tparContaminationsDAO
-                        'load the contaminations
+
                         myGlobalDataTO = myContaminationsDAO.ReadAllContaminationsByReagentID(dbConnection, pReagentID)
                         If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            Dim myContaminationsDS As New ContaminationsDS
-                            myContaminationsDS = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
-
+                            Dim myContaminationsDS As ContaminationsDS = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
 
                             If (Not myGlobalDataTO.HasError) Then
                                 'Delete all contaminations in which the specified Reagent acts as contaminator or contaminated
@@ -131,7 +172,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteCascadeContaminationByReagentID", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
@@ -166,78 +207,6 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByType", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get all Contaminations currently defined (both types R1 and CUVETTES)
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all Contaminations (R1 and CUVETTES)
-        '''          currently defined</returns>
-        ''' <remarks>
-        ''' Created by:  TR 30/03/2011
-        ''' </remarks>
-        Public Function GetAllContaminations(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim contaminationsDataDAO As New tparContaminationsDAO
-                        resultData = contaminationsDataDAO.ReadAll(dbConnection)
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetAllContaminations", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Search if there is an R1 Contaminamination between the Reagents informed as Contaminator and Contaminated
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pReagentContaminatorID">Identifier of the Contaminator Reagent</param>
-        ''' <param name="pReagentContaminatedID">Identifier of the Contaminated Reagent</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with the Contamination between the informed Reagents</returns>
-        ''' <remarks>
-        ''' Created by:  TR 30/03/2011
-        ''' </remarks>
-        Public Function GetContaminationByContaminatorIDContaminatedID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, _
-                                                                       ByVal pReagentContaminatedID As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim contaminationsDataDAO As New tparContaminationsDAO
-                        resultData = contaminationsDataDAO.ReadByContaminatorIDContaminatedID(dbConnection, pReagentContaminatorID, pReagentContaminatedID)
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationByContaminatorIDContaminatedID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -372,42 +341,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Get all Standard Tests that contaminate the specified Standard Test
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestID">Test Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all found Contaminations</returns>
-        ''' <remarks>
-        ''' Created by:  SA 29/11/2010
-        ''' </remarks>
-        Public Function GetTestRNAsContaminated(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim contaminationsDataDAO As New tparContaminationsDAO
-                        resultData = contaminationsDataDAO.ReadTestRNAsContaminated(dbConnection, pTestID)
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestRNAsContaminated", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
         ''' Delete all Contaminations defined for the specified Test
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
@@ -415,7 +348,8 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 01/12/2010
-        ''' MODIFIED BY: TR 10/12/2013 -BT #1415 Remove the implementation of ContaminationWashing delegate is use no more. Table has been delete.
+        ''' Modified by: TR 10/12/2013 - BT #1415 ==> Remove the implementation of ContaminationWashingDelegate; it is not used anymore due to the 
+        '''                                           table has been deleted
         ''' </remarks>
         Public Function DeleteAllByTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -423,10 +357,10 @@ Namespace Biosystems.Ax00.BL
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'Delete all R1, R2 and/or Contaminations defined for the selected Test
+                        'Delete all R1 and/or Well Contaminations defined for the selected Test
                         If (Not resultData.HasError) Then
                             Dim myContaminationsDAO As New tparContaminationsDAO
                             resultData = myContaminationsDAO.DeleteAllByTest(dbConnection, pTestID)
@@ -504,27 +438,27 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
-        ''' Get Contaminations By the testid
+        ''' Get all Contaminations (of all types) defined for an specific Standard Tests 
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID"></param>
-        ''' <returns></returns>
-        ''' <remarks>CREATED BY: TR 13/12/2011</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all the Contaminations (all types) defined
+        '''          for the specified Standard Test</returns>
+        ''' <remarks>
+        ''' Created by:  TR 13/12/2011
+        ''' </remarks>
         Public Function ReadByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         Dim myContaminationsDAO As New tparContaminationsDAO
                         resultData = myContaminationsDAO.ReadByTestID(dbConnection, pTestID)
-
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -537,7 +471,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -546,11 +480,10 @@ Namespace Biosystems.Ax00.BL
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByTestID", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Returns Contaminations info to show in a Report
@@ -559,7 +492,6 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="AppLang">Application Language</param>
         ''' <remarks>
         ''' Created by: RH 21/12/2011
-        '''        
         ''' </remarks>
         Public Function GetContaminationsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal AppLang As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -567,10 +499,8 @@ Namespace Biosystems.Ax00.BL
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
                     If (Not dbConnection Is Nothing) Then
                         Dim myContaminationsDAO As New tparContaminationsDAO
                         resultData = myContaminationsDAO.GetContaminationsForReport(dbConnection, AppLang)
@@ -584,38 +514,37 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsForReport", EventLogEntryType.Error, False)
-
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Get the info by the contaminator Reagent Name and the contaminated reagent name.
+        ''' Get Contaminantions between Reagents searching by the Contaminator Reagent Name and the Contaminated Reagent Name
+        ''' NOTE: this function is used ONLY for the process of update preloaded data
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pContaminatorReagtName"></param>
-        '''  ''' <param name="pContaminatedReagName"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pContaminatorReagtName">Contaminator Reagent Name</param>
+        ''' <param name="pContaminatedReagName">Contaminated Reagent Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with data of all Contaminations between Reagents defined for the 
+        '''          specified Reagents (Contaminator and Contaminated)</returns>
         ''' <remarks>
-        ''' CREATED BY: TR 11/02/2013
+        ''' Created by:  TR 11/02/2013
         ''' </remarks>
         Public Function ReadByReagentsName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminatorReagtName As String, _
-                                          pContaminatedReagName As String) As GlobalDataTO
+                                           ByVal pContaminatedReagName As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         Dim myContaminationsDAO As New tparContaminationsDAO
                         resultData = myContaminationsDAO.ReadByReagentsName(dbConnection, pContaminatorReagtName, pContaminatedReagName)
+
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
@@ -627,7 +556,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -636,19 +565,21 @@ Namespace Biosystems.Ax00.BL
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByReagentsName", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Get the info by the TestName (TestContaminaCuvette).
+        ''' Get Well Contaminations searching by the TestName 
+        ''' NOTE: this function is used ONLY for the process of update preloaded data
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestName"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestName">Test Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with data of the Well Contamination defined for the 
+        '''          specified Test</returns>
         ''' <remarks>
-        ''' CREATED BY: TR 12/02/2013
+        ''' Created by:  TR 11/02/2013
         ''' </remarks>
         Public Function ReadByTestName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestName As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -656,13 +587,11 @@ Namespace Biosystems.Ax00.BL
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         Dim myContaminationsDAO As New tparContaminationsDAO
                         resultData = myContaminationsDAO.ReadByTestName(dbConnection, pTestName)
-
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -675,7 +604,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -684,26 +613,30 @@ Namespace Biosystems.Ax00.BL
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByTestID", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Returns the number of contaminations for a given pWashingSolution in a WS
+        ''' Returns the number of Well Contaminations that can happens in the active WorkSession and in which the informed Washing Solution is used 
+        ''' in the second Step
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pWashingSolution"></param>
-        ''' <returns></returns>
-        ''' <remarks>JV #1358 08/11/2013</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pWashingSolution">Code of the Washing Solution used in the second step of Well Contaminations</param>
+        ''' <returns>GlobalDataTO containing an Integer value with the number of Well Contaminations that can happens in the active WorkSession and
+        '''          in which the informed Washing Solution is used in the second Step</returns>
+        ''' <remarks>
+        ''' Created by:  JV 08/11/2013 - BT #1358
+        ''' </remarks>
         Public Function VerifyWashingSolutionR2(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pWashingSolution As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim contaminationsDataDAO As New tparContaminationsDAO
@@ -718,26 +651,23 @@ Namespace Biosystems.Ax00.BL
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
-
 #End Region
 
-
 #Region "Private Method"
-
         ''' <summary>
-        ''' Get the resource id by the item id
+        ''' For the informed Washing Solution Code, get the ResourceID needed to get the multilanguage description
         ''' </summary>
-        ''' <param name="pCode"></param>
-        ''' <returns></returns>
+        ''' <param name="pCode">Washing Solution Code</param>
+        ''' <returns>String value containing the Multilanguage Resource Identifier</returns>
         ''' <remarks>
-        ''' CREATED BY: TR 14/12/2011
+        ''' Created by: TR 14/12/2011
         ''' </remarks>
         Private Function GetResourceID(ByVal pCode As String) As String
-            Dim myResourceId As String = ""
+            Dim myResourceId As String = String.Empty
             Try
                 Select Case pCode
                     Case "WASHSOL1"
@@ -760,105 +690,105 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "TO REVIEW - DELETE - USED FOR THE PREVIOUS FORM OR NOT USED"
-        ''' <summary>
-        ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM
-        ''' According the informed Contamination Type, delete all Contaminations defined (CUVETTES case) or all Contaminations
-        ''' in which the specified ReagentID acts as Contaminator.  After that, create all new defined Contaminations
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pContaminationType">Type of Contamination</param>
-        ''' <param name="pContaminationsDS">Typed DataSet ContaminationsDS containing the Contaminations to save</param>
-        ''' <param name="pReagentContaminatorID">Optional parameter, needed when the Contamination Type is R1 or R2</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' Created by:  SA 22/07/2010
-        ''' </remarks>
-        Public Function DeleteContaminations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationType As String, _
-                                             ByVal pContaminationsDS As ContaminationsDS, Optional ByVal pReagentContaminatorID As Integer = -1) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+        ' ''' <summary>
+        ' ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM
+        ' ''' According the informed Contamination Type, delete all Contaminations defined (CUVETTES case) or all Contaminations
+        ' ''' in which the specified ReagentID acts as Contaminator.  After that, create all new defined Contaminations
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pContaminationType">Type of Contamination</param>
+        ' ''' <param name="pContaminationsDS">Typed DataSet ContaminationsDS containing the Contaminations to save</param>
+        ' ''' <param name="pReagentContaminatorID">Optional parameter, needed when the Contamination Type is R1 or R2</param>
+        ' ''' <returns>GlobalDataTO containing success/error information</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  SA 22/07/2010
+        ' ''' </remarks>
+        'Public Function DeleteContaminations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationType As String, _
+        '                                     ByVal pContaminationsDS As ContaminationsDS, Optional ByVal pReagentContaminatorID As Integer = -1) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
 
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myContaminationsDAO As New tparContaminationsDAO
-                        Select Case (pContaminationType)
-                            Case "R1", "R2"
-                                'Delete all  Contaminations defined for the informed Contaminator Reagent
-                                resultData = myContaminationsDAO.Delete(dbConnection, pReagentContaminatorID, pContaminationType)
+        '    Try
+        '        resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim myContaminationsDAO As New tparContaminationsDAO
+        '                Select Case (pContaminationType)
+        '                    Case "R1", "R2"
+        '                        'Delete all  Contaminations defined for the informed Contaminator Reagent
+        '                        resultData = myContaminationsDAO.Delete(dbConnection, pReagentContaminatorID, pContaminationType)
 
-                            Case "CUVETTES"
-                                'Delete all Cuvettes Contaminations
-                                resultData = myContaminationsDAO.DeleteByContaminationType(dbConnection, pContaminationType)
-                        End Select
+        '                    Case "CUVETTES"
+        '                        'Delete all Cuvettes Contaminations
+        '                        resultData = myContaminationsDAO.DeleteByContaminationType(dbConnection, pContaminationType)
+        '                End Select
 
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                If (Not resultData.HasError) Then
+        '                    'When the Database Connection was opened locally, then the Commit is executed
+        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                Else
+        '                    'When the Database Connection was opened locally, then the Rollback is executed
+        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        'When the Database Connection was opened locally, then the Rollback is executed
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteContaminations", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteContaminations", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
 
-        ''' <summary>
-        ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM
-        ''' Search all the Contaminations of the informed type in which the specified Reagent acts as contaminator
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pReagentContaminatorID"></param>
-        ''' <param name="pContaminationType">Type of Contaminations</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all the Contaminations of the informed type 
-        '''          in which the specified Reagent acts as contaminator</returns>
-        ''' <remarks>
-        ''' Created by:  DL 10/02/2010
-        ''' Modified by: SA 22/02/2010 - Parameter ContaminationType was changed from Integer to String
-        ''' </remarks>
-        Public Function GetContaminationsByReagentID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, _
-                                                     ByVal pContaminationType As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+        ' ''' <summary>
+        ' ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM
+        ' ''' Search all the Contaminations of the informed type in which the specified Reagent acts as contaminator
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pReagentContaminatorID"></param>
+        ' ''' <param name="pContaminationType">Type of Contaminations</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all the Contaminations of the informed type 
+        ' '''          in which the specified Reagent acts as contaminator</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  DL 10/02/2010
+        ' ''' Modified by: SA 22/02/2010 - Parameter ContaminationType was changed from Integer to String
+        ' ''' </remarks>
+        'Public Function GetContaminationsByReagentID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, _
+        '                                             ByVal pContaminationType As String) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim contaminationsDataDAO As New tparContaminationsDAO
-                        resultData = contaminationsDataDAO.ReadByContaminatorIDAndType(dbConnection, pReagentContaminatorID, pContaminationType)
-                    End If
-                End If
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim contaminationsDataDAO As New tparContaminationsDAO
+        '                resultData = contaminationsDataDAO.ReadByContaminatorIDAndType(dbConnection, pReagentContaminatorID, pContaminationType)
+        '            End If
+        '        End If
 
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByReagentID", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByReagentID", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
 
         '''' <summary>
         '''' 
@@ -950,6 +880,115 @@ Namespace Biosystems.Ax00.BL
         '    End Try
         '    Return resultData
         'End Function
+
+        ' ''' <summary>
+        ' ''' Get all Contaminations currently defined (both types R1 and CUVETTES)
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all Contaminations (R1 and CUVETTES)
+        ' '''          currently defined</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  TR 30/03/2011
+        ' ''' </remarks>
+        'Public Function GetAllContaminations(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim contaminationsDataDAO As New tparContaminationsDAO
+        '                resultData = contaminationsDataDAO.ReadAll(dbConnection)
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetAllContaminations", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+
+        ' ''' <summary>
+        ' ''' Search if there is an R1 Contaminamination between the Reagents informed as Contaminator and Contaminated
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pReagentContaminatorID">Identifier of the Contaminator Reagent</param>
+        ' ''' <param name="pReagentContaminatedID">Identifier of the Contaminated Reagent</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with the Contamination between the informed Reagents</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  TR 30/03/2011
+        ' ''' </remarks>
+        'Public Function GetContaminationByContaminatorIDContaminatedID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, _
+        '                                                               ByVal pReagentContaminatedID As Integer) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim contaminationsDataDAO As New tparContaminationsDAO
+        '                resultData = contaminationsDataDAO.ReadByContaminatorIDContaminatedID(dbConnection, pReagentContaminatorID, pReagentContaminatedID)
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationByContaminatorIDContaminatedID", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+
+        ' ''' <summary>
+        ' ''' Get all Standard Tests that contaminate the specified Standard Test
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pTestID">Test Identifier</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ContaminationsDS with all found Contaminations</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  SA 29/11/2010
+        ' ''' </remarks>
+        'Public Function GetTestRNAsContaminated(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim contaminationsDataDAO As New tparContaminationsDAO
+        '                resultData = contaminationsDataDAO.ReadTestRNAsContaminated(dbConnection, pTestID)
+        '            End If
+        '        End If
+
+        '    Catch ex As Exception
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestRNAsContaminated", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+
 #End Region
     End Class
 End Namespace

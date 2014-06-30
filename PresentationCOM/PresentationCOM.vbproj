@@ -522,6 +522,9 @@
     <EmbeddedResource Include="Reports\QCIndividualResultsByTestReport.resx">
       <DependentUpon>QCIndividualResultsByTestReport.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reports\RotorContentPositionsReport.resx">
+      <DependentUpon>RotorContentPositionsReport.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Update\DetectorForm.resx">
       <DependentUpon>DetectorForm.vb</DependentUpon>
     </EmbeddedResource>

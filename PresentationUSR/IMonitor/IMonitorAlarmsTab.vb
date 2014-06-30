@@ -79,7 +79,7 @@ Partial Public Class IMonitor
     ''' </remarks>
     Public Sub UpdateAlarmsTab(ByVal pRefreshDS As UIRefreshDS)
         Try
-            If isClosingFlag Then Return 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myGloblaData As GlobalDataTO = Nothing
             Dim myWSAlarmsDelegate As New WSAnalyzerAlarmsDelegate

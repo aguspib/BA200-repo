@@ -313,38 +313,6 @@ Public Class BSBaseForm
                 'Get multilanguage text to be used as Window Title
                 Dim windowTitleText As String = String.Empty
 
-                ''SG 05/01/11
-                'Dim windowTitleMessageID As String = String.Empty
-
-                ''XBC 03/11/2011
-                ''Select Case My.Application.Info.ProductName.ToUpper()
-                ''    Case "BAX00"
-                ''        windowTitleMessageID = GlobalEnumerates.Messages.SHOW_MESSAGE_TITLE_TEXT.ToString()
-                ''    Case "AX00 SERVICE"
-                ''        windowTitleMessageID = GlobalEnumerates.Messages.SHOW_MESSAGE_TITLE_TEXT_SRV.ToString()
-                ''End Select
-
-                ''SGM 01/02/2012 - Set that is Service Assembly - Bug #1112
-                ''If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                'If GlobalBase.IsServiceAssembly Then
-                '    windowTitleMessageID = GlobalEnumerates.Messages.SHOW_MESSAGE_TITLE_TEXT_SRV.ToString()
-                'Else
-                '    windowTitleMessageID = GlobalEnumerates.Messages.SHOW_MESSAGE_TITLE_TEXT.ToString()
-                'End If
-                ''XBC 03/11/2011
-
-                'myGlobalDataTO = Messages.GetMessageDescription(Nothing, windowTitleMessageID)
-
-                ''END SG 05/01/11
-
-                'If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                '    myMessagesDS = DirectCast(myGlobalDataTO.SetDatos, MessagesDS)
-                '    If (myMessagesDS.tfmwMessages.Rows.Count > 0) Then windowTitleText = myMessagesDS.tfmwMessages(0).MessageText
-                'Else
-                '    'If there is an error getting the title message text, use the one received as parameter
-                '    windowTitleText = pWindowTitle
-                'End If
-
                 'SGM 26/06/2013 - set the Title from Product Name (Not to be translated!!!)
                 windowTitleText = My.Application.Info.Title
                 'end SGM 26/06/2013
@@ -364,10 +332,6 @@ Public Class BSBaseForm
                         If Not String.IsNullOrEmpty(pSystemMessageText) Then msgText = msgText & " - " & pSystemMessageText
 
                         'Window Owner...if it has not been informed, then the owner is the Main MDI Form
-                        'AG 28/07/2010
-                        'If (pOwnerWindow Is Nothing) Then pOwnerWindow = New Ax00MainMDI
-                        'If (pOwnerWindow Is Nothing) Then pOwnerWindow = MyClass.myParentMDI
-
                         'RH 12/04/2012 The previous version does not work properly because MyClass.myParentMDI is Nothing
                         If (pOwnerWindow Is Nothing) Then
                             If Me.MdiParent Is Nothing Then
@@ -401,7 +365,6 @@ Public Class BSBaseForm
 
                         'SGM 18/1/2012
                         If pAditionalText.Length > 0 Then msgText = msgText & vbCrLf & vbCrLf & pAditionalText
-                        'end SGM 18/1/2012
 
                         'DL 12/07/2013
                         Dim myMessageType As String = ""
@@ -472,6 +435,9 @@ Public Class BSBaseForm
                         'Show message with the proper icon according the Message Type
                         'If (myMessagesDS.tfmwMessages(0).MessageType = "Error") Then
                         If (myMessageType = "Error") Then
+                            ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
+                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+
                             'Error Message 
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Error)
 
@@ -492,6 +458,9 @@ Public Class BSBaseForm
 
                             'ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "FailureAudit") Then
                         ElseIf (myMessageType = "FailureAudit") Then
+                            ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
+                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+
                             'System Error Message - FailureAudit
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Stop)
 

@@ -186,6 +186,15 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         End Sub
 
+        Protected Overrides Sub Dispose(ByVal disposing As Boolean)
+            Try
+                If disposing Then
+                    headerPictureBox = Nothing
+                End If
+            Finally
+                MyBase.Dispose(disposing)
+            End Try
+        End Sub
 #End Region
 
 #Region "Private Methods"

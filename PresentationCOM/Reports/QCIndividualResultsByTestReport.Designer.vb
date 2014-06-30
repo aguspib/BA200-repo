@@ -20,41 +20,41 @@ Partial Public Class QCIndividualResultsByTestReport
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(QCIndividualResultsByTestReport))
-        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
-        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions
-        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointOptions1 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim PointOptions2 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointOptions3 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Me.Detail = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrPanel1 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrLabelCalcultationMode = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrDateRange = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrSample = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelDateRange = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelSample = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrTestName = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelTestName = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrMode = New DevExpress.XtraReports.UI.XRLabel
-        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand
-        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand
-        Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel
-        Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand
-        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand
-        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrLabelControls = New DevExpress.XtraReports.UI.XRLabel
-        Me.GroupFooter1 = New DevExpress.XtraReports.UI.GroupFooterBand
-        Me.XrPnlLegend = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrPicLast = New DevExpress.XtraReports.UI.XRPictureBox
-        Me.XrLabelLast = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrPanel3 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrGraphHeaderLabel = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrYoudenGraph = New DevExpress.XtraReports.UI.XRChart
+        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
+        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions()
+        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim PointOptions1 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions()
+        Dim PointOptions2 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions()
+        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim PointOptions3 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions()
+        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Me.Detail = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrPanel1 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrLabelCalcultationMode = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrDateRange = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrSample = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelDateRange = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelSample = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrTestName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelTestName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrMode = New DevExpress.XtraReports.UI.XRLabel()
+        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand()
+        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
+        Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
+        Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand()
+        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
+        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrLabelControls = New DevExpress.XtraReports.UI.XRLabel()
+        Me.GroupFooter1 = New DevExpress.XtraReports.UI.GroupFooterBand()
+        Me.XrPnlLegend = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrPicLast = New DevExpress.XtraReports.UI.XRPictureBox()
+        Me.XrLabelLast = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrPanel3 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrGraphHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrYoudenGraph = New DevExpress.XtraReports.UI.XRChart()
         CType(Me.XrYoudenGraph, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(XyDiagram1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Series1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -77,13 +77,13 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrPanel1.BackColor = System.Drawing.Color.White
         Me.XrPanel1.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel1.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel1.BorderWidth = 2
         Me.XrPanel1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelCalcultationMode, Me.XrDateRange, Me.XrSample, Me.XrLabelDateRange, Me.XrLabelSample, Me.XrTestName, Me.XrLabelTestName, Me.XrMode})
         Me.XrPanel1.LocationFloat = New DevExpress.Utils.PointFloat(0.0001907349!, 10.00001!)
         Me.XrPanel1.Name = "XrPanel1"
-        Me.XrPanel1.SizeF = New System.Drawing.SizeF(649.9998!, 49.79167!)
+        Me.XrPanel1.SizeF = New System.Drawing.SizeF(690.9998!, 49.79167!)
         Me.XrPanel1.StylePriority.UseBackColor = False
         Me.XrPanel1.StylePriority.UseBorderColor = False
         Me.XrPanel1.StylePriority.UseBorders = False
@@ -189,12 +189,14 @@ Partial Public Class QCIndividualResultsByTestReport
         '
         'TopMargin
         '
+        Me.TopMargin.HeightF = 59.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.TopMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
         'BottomMargin
         '
+        Me.BottomMargin.HeightF = 25.0!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -204,13 +206,13 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrHeaderLabel.BackColor = System.Drawing.Color.LightGray
         Me.XrHeaderLabel.BorderColor = System.Drawing.Color.DarkGray
         Me.XrHeaderLabel.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrHeaderLabel.Font = New System.Drawing.Font("Verdana", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrHeaderLabel.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 10.00001!)
         Me.XrHeaderLabel.Name = "XrHeaderLabel"
         Me.XrHeaderLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(10, 2, 3, 3, 100.0!)
-        Me.XrHeaderLabel.SizeF = New System.Drawing.SizeF(650.0!, 25.0!)
+        Me.XrHeaderLabel.SizeF = New System.Drawing.SizeF(691.0!, 25.0!)
         Me.XrHeaderLabel.StylePriority.UseBackColor = False
         Me.XrHeaderLabel.StylePriority.UseBorderColor = False
         Me.XrHeaderLabel.StylePriority.UseBorders = False
@@ -243,13 +245,13 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrLabelControls.BackColor = System.Drawing.Color.Gainsboro
         Me.XrLabelControls.BorderColor = System.Drawing.Color.DarkGray
         Me.XrLabelControls.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrLabelControls.Font = New System.Drawing.Font("Verdana", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrLabelControls.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
         Me.XrLabelControls.Name = "XrLabelControls"
         Me.XrLabelControls.Padding = New DevExpress.XtraPrinting.PaddingInfo(10, 2, 3, 3, 100.0!)
-        Me.XrLabelControls.SizeF = New System.Drawing.SizeF(650.0!, 25.0!)
+        Me.XrLabelControls.SizeF = New System.Drawing.SizeF(691.0!, 25.0!)
         Me.XrLabelControls.StylePriority.UseBackColor = False
         Me.XrLabelControls.StylePriority.UseBorderColor = False
         Me.XrLabelControls.StylePriority.UseBorders = False
@@ -270,11 +272,11 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrPnlLegend.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPnlLegend.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPnlLegend.Borders = CType(((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPnlLegend.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrPicLast, Me.XrLabelLast})
         Me.XrPnlLegend.LocationFloat = New DevExpress.Utils.PointFloat(10.00023!, 426.8333!)
         Me.XrPnlLegend.Name = "XrPnlLegend"
-        Me.XrPnlLegend.SizeF = New System.Drawing.SizeF(627.4994!, 31.25!)
+        Me.XrPnlLegend.SizeF = New System.Drawing.SizeF(680.9998!, 31.25!)
         Me.XrPnlLegend.StylePriority.UseBackColor = False
         Me.XrPnlLegend.StylePriority.UseBorderColor = False
         Me.XrPnlLegend.StylePriority.UseBorders = False
@@ -306,12 +308,12 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrPanel3.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPanel3.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel3.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel3.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrGraphHeaderLabel})
-        Me.XrPanel3.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 5.0!)
+        Me.XrPanel3.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 4.999987!)
         Me.XrPanel3.Name = "XrPanel3"
-        Me.XrPanel3.SizeF = New System.Drawing.SizeF(627.4996!, 32.08329!)
+        Me.XrPanel3.SizeF = New System.Drawing.SizeF(681.0!, 32.08329!)
         Me.XrPanel3.StylePriority.UseBackColor = False
         Me.XrPanel3.StylePriority.UseBorderColor = False
         Me.XrPanel3.StylePriority.UseBorders = False
@@ -333,8 +335,8 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrYoudenGraph.AppearanceName = "Light"
         Me.XrYoudenGraph.BorderColor = System.Drawing.Color.DarkGray
         Me.XrYoudenGraph.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         XyDiagram1.AxisX.GridLines.Visible = True
         XyDiagram1.AxisX.Range.SideMarginsEnabled = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
@@ -372,7 +374,7 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrYoudenGraph.SeriesTemplate.LegendPointOptions = PointOptions3
         Me.XrYoudenGraph.SeriesTemplate.SynchronizePointOptions = False
         Me.XrYoudenGraph.SeriesTemplate.View = LineSeriesView2
-        Me.XrYoudenGraph.SizeF = New System.Drawing.SizeF(627.4996!, 384.7917!)
+        Me.XrYoudenGraph.SizeF = New System.Drawing.SizeF(681.0!, 384.7917!)
         Me.XrYoudenGraph.StylePriority.UseBackColor = False
         Me.XrYoudenGraph.StylePriority.UseBorderColor = False
         Me.XrYoudenGraph.StylePriority.UseBorders = False
@@ -384,6 +386,10 @@ Partial Public Class QCIndividualResultsByTestReport
         'QCIndividualResultsByTestReport
         '
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport, Me.GroupFooter1})
+        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 25)
+        Me.PageHeight = 1169
+        Me.PageWidth = 827
+        Me.PaperKind = System.Drawing.Printing.PaperKind.A4
         Me.ScriptsSource = "" & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10)
         Me.Version = "10.2"
         CType(XyDiagram1, System.ComponentModel.ISupportInitialize).EndInit()

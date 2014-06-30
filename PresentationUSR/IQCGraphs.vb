@@ -566,6 +566,60 @@ Public Class IQCGraphs
         End Try
         Return myResult
     End Function
+
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsGraphicalResultsGroupBox = Nothing
+            bsGraphicalResultLabel = Nothing
+            bsSDLabel = Nothing
+            bsRejectionLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsTestLabel = Nothing
+            bsGraphicalAreaGroupBox = Nothing
+            bsYoudenRB = Nothing
+            bsLeveyJenningsRB = Nothing
+            bsResultByControlLabel = Nothing
+            bsResultControlLotGridView = Nothing
+            bsExitButton = Nothing
+            bsPrintButton = Nothing
+            bsQCResultChartControl = Nothing
+            bsLegendGroupBox = Nothing
+            bsToolTipController = Nothing
+            bsTestNameTextBox = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsRejectionTextBox = Nothing
+            bsEventLog = Nothing
+            bsSecondCtrlLotPictureBox = Nothing
+            bsFirstCtrlLotLabel = Nothing
+            bsSecondCtrlLotLabel = Nothing
+            bsFirstCtrlLotPictureBox = Nothing
+            bsThirdCtrlLotLabel = Nothing
+            bsThirdCtrlLotPictureBox = Nothing
+            bsWarningPictureBox = Nothing
+            bsWarningLabel = Nothing
+            bsErrorLabel = Nothing
+            bsErrorPictureBox = Nothing
+            bsGraphTypeLabel = Nothing
+            bsLegendYoudenGB = Nothing
+            bsLastPointLabel = Nothing
+            bsLastRunPintImage = Nothing
+            bsControlLotResultsLabel = Nothing
+            bs3SDLabel = Nothing
+            bs3SDPictureBox = Nothing
+            bs2SDLabel = Nothing
+            bs2SDPictureBox = Nothing
+            bs1SDLabel = Nothing
+            bs1SDPictureBox = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Methods for LEVEY-JENNINGS Graph"
@@ -660,6 +714,10 @@ Public Class IQCGraphs
     '''              DL 31/05/2012 - Set the X-Axis scale to numeric
     '''              SA 02/12/2013 - BT #1392 ==> Changes to draw correctly the Levey-Jennings graph when several Controls have been
     '''                                           selected (X-Axis values in the previous version were wrong and the graph has not sense)
+    '''              SA 13/06/2014 - BT #1665 ==> Property AxisX.Range.Auto has to be initialized to TRUE (it is needed when LJ Graph is
+    '''                                           reloaded after drawn the Youden Graph, which use a not automatic Range) 
+    '''              SA 20/06/2014 - BT #1668 ==> When two Controls are drawn, value of property ArgumentScaleType has to be set to Qualitative
+    '''                                           to prevent the values in X-Axis are scaled with decimals (Series are always integer)  
     ''' </remarks>
     Private Sub LoadLeveyJenningsGraph()
         Try
@@ -733,6 +791,7 @@ Public Class IQCGraphs
                 myDiagram = CType(bsQCResultChartControl.Diagram, XYDiagram)
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
+                myDiagram.AxisX.Range.Auto = True
                 myDiagram.AxisY.GridLines.Visible = False
                 myDiagram.AxisX.GridLines.Visible = False
                 myDiagram.AxisX.Title.Visible = False
@@ -908,8 +967,8 @@ Public Class IQCGraphs
 
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).DataSource = myDataSourceTable
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
-                    'When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to NUMERICAL
-                    bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+                    'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE 
+                    bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative 'ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 

@@ -561,6 +561,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 16/07/2013 - Added new optional parameter pExcludePatients. When this parameter is TRUE (only when this function is called
         '''                              during process of Automatic WS Creation with LIS), not positioned Patient Samples Tubes are not included in 
         '''                              the total number of not positioned required Elements.
+        '''              AG 04/06/2014 - #1519 - Ignore the WASHING SOLUTIONS that are not positioned (they do not shown warning 
         ''' </remarks>
         Public Function CountNotPositionedElements(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                    Optional ByVal pRotorType As String = "", Optional ByVal pStatusDiffOfPOS As Boolean = False, _
@@ -594,7 +595,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         ElseIf (pRotorType = "REAGENTS") Then
                             'In Reagents Rotor, all not positioned Elements are included in the total
-                            cmdText += " AND TubeContent IN ('SPEC_SOL', 'WASH_SOL','REAGENT') " & vbCrLf
+                            cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT') " & vbCrLf 'AG 04/06/2014 - #1519 - Ignore the WASH SOL that are not positioned (they do not shown warning)
 
                         Else
                             If (Not pExcludePatients) Then
@@ -604,6 +605,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 'Case of Automatic WS Creation with LIS: Washing Solutions and Patient Samples Tubes are excluded from the total
                                 cmdText += " AND TubeContent NOT IN ('TUBE_WASH_SOL', 'PATIENT')"
                             End If
+                        End If
+
+                        'AG 04/06/2014 - #1519 - Ignore the WASHING SOLUTIONS that are not positioned (they do not shown warning
+                        If pRotorType = String.Empty Then
+                            cmdText += " AND TubeContent NOT IN ('WASH_SOL')"
                         End If
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -710,7 +716,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT * FROM twksWSRequiredElements " & vbCrLf & _
                                                 " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND    TubeContent = '" & pTubeContent & "' " & vbCrLf & _
-                                                " AND    SolutionCode = '" & pSolutionCode & "' " & vbCrLf
+                                                " AND    SolutionCode = '" & pSolutionCode.Trim & "' " & vbCrLf
 
                         Dim resultData As New WSRequiredElementsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1168,7 +1174,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              Washing Solution (code WASHSOL3)
         '''              SA 03/05/2012 - Changed subquery for Special Solutions: the description can be also in SubTable DIL_SOLUTIONS in 
         '''                              Preloaded Master Data, not only in SubTable SPECIAL_SOLUTIONS
-        '''              TR 21/11/2013 - BT # 1388 Add the ElementID into the diferents selects .
+        '''              TR 21/11/2013 - BT #1388 ==> Changed all sub-queries to return also field ElementID
+        '''              SA 27/05/2014 - BT #1519 ==> Changed the sub-queries used to get the not positioned REAGENTS and the not positioned DILUTION SOLUTIONS 
+        '''                                           to return only elements still needed in the active Work Session (those needed for NOT CLOSED Order Tests). 
+        '''                                           Created a new sub-query to get the not positioned SPECIAL SOLUTIONS needed for Blanks (previouly they were 
+        '''                                           obtained in the same sub-query than DILUTION SOLUTIONS). Removed the getting of not positioned WASHING 
+        '''                                           SOLUTIONS from this function (they are obtained in a different function called from the function with the 
+        '''                                           same name in the Delegate Class) 
         ''' </remarks>
         Public Function GetNotPositionedElements(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1180,36 +1192,63 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim var As New GlobalBase
+
+                        '(1) BT #1519 - Subquery to get REAGENTS that are not positioned (or without enough volume) but that are still needed in the active Work Session
                         Dim cmdText As String = " SELECT RE.TubeContent AS SampleClass, R.ReagentName AS SampleName, NULL AS SampleType, 1 AS Position, RE.ElementID " & vbCrLf & _
                                                 " FROM   twksWSRequiredElements RE INNER JOIN tparReagents R ON RE.ReagentID = R.ReagentID " & vbCrLf & _
-                                                " WHERE  RE.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                                                 " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
+                                                                                 " INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND    RE.ElementStatus <> 'POS'" & vbCrLf & _
-                                                " AND    RE.TubeContent = 'REAGENT' " & vbCrLf
+                                                " AND    RE.TubeContent = 'REAGENT' " & vbCrLf & _
+                                                " AND    OT.OrderTestStatus <> 'CLOSED' " & vbCrLf
 
+                        '(2) BT #1519 - Subquery to get DILUTION SOLUTIONS that are not positioned (or without enough volume) but that are still needed in the active 
+                        '               Work Session (for automatic predilutions)
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 2 AS Position, RE.ElementID " & vbCrLf & _
+                                   " SELECT DISTINCT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 2 AS Position, RE.ElementID " & vbCrLf & _
                                    " FROM   twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD ON RE.SolutionCode = PMD.ItemID " & vbCrLf & _
                                                                     " INNER JOIN tfmwMultiLanguageResources MR ON MR.ResourceID = PMD.ResourceID " & vbCrLf & _
-                                   " WHERE RE.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                                    " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
+                                                                    " INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                   " WHERE RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                    " AND   RE.ElementStatus <> 'POS' " & vbCrLf & _
                                    " AND   RE.ElementFinished = 0 " & vbCrLf & _
-                                   " AND  (RE.TubeContent = 'SPEC_SOL' OR RE.TubeContent = 'TUBE_SPEC_SOL') " & vbCrLf & _
-                                   " AND  (PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                   "  OR   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.DIL_SOLUTIONS.ToString & "') " & vbCrLf & _
-                                   " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf
+                                   " AND   RE.TubeContent = 'SPEC_SOL' " & vbCrLf & _
+                                   " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.DIL_SOLUTIONS.ToString & "' " & vbCrLf & _
+                                   " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
+                                   " AND   OT.OrderTestStatus <> 'CLOSED' " & vbCrLf
 
+                        '(3) BT #1519 - Subquery to get SPECIAL SOLUTIONS (needed for Blanks) that are not positioned (or without enough volume) but that are still needed 
+                        '               in the active Work Session
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 3 AS Position, RE.ElementID " & vbCrLf & _
-                                   " FROM   twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD ON RE.SolutionCode = PMD.ItemID " & vbCrLf & _
+                                   " SELECT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 2 AS Position, RE.ElementID " & vbCrLf & _
+                                   " FROM   twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD ON RE.SolutionCode = PMD.ItemID  " & vbCrLf & _
                                                                     " INNER JOIN tfmwMultiLanguageResources MR ON MR.ResourceID = PMD.ResourceID " & vbCrLf & _
-                                   " WHERE  RE.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                   " AND    RE.ElementStatus <> 'POS' " & vbCrLf & _
-                                   " AND    RE.ElementFinished = 0 " & vbCrLf & _
-                                   " AND   (RE.TubeContent = 'WASH_SOL' " & vbCrLf & _
-                                   " OR     (RE.TubeContent = 'TUBE_WASH_SOL' AND RE.SolutionCode <> 'WASHSOL3')) " & vbCrLf & _
-                                   " AND    PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                   " AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf
+                                   " WHERE RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                   " AND   RE.ElementStatus <> 'POS' " & vbCrLf & _
+                                   " AND   RE.ElementFinished = 0 " & vbCrLf & _
+                                   " AND   RE.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf & _
+                                   " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.SPECIAL_SOLUTIONS.ToString & "' " & vbCrLf & _
+                                   " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
 
+                        ''(4) BT #1519 - Subquery to get WASHING SOLUTIONS that are not positioned (or without enough volume) but that are still needed in the active Work Session
+                        ''               (to avoid Contaminations between Reagents)
+                        'cmdText &= " UNION " & vbCrLf & _
+                        '           " SELECT DISTINCT RE.TubeContent AS SampleClass, MR.ResourceText AS SampleName, NULL AS SampleType, 3 AS Position, RE.ElementID " & vbCrLf & _
+                        '           " FROM   twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD ON RE.SolutionCode = PMD.ItemID " & vbCrLf & _
+                        '                                            " INNER JOIN tfmwMultiLanguageResources MR ON MR.ResourceID = PMD.ResourceID " & vbCrLf & _
+                        '                                            " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
+                        '                                            " INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '           " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '           " AND    RE.ElementStatus <> 'POS' " & vbCrLf & _
+                        '           " AND    RE.ElementFinished = 0 " & vbCrLf & _
+                        '           " AND    RE.TubeContent = 'WASH_SOL' " & vbCrLf & _
+                        '           " AND    PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
+                        '           " AND    MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "'" & vbCrLf & _
+                        '           " AND    OT.OrderTestStatus <> 'CLOSED' " & vbCrLf
+
+                        '(5) Subquery to get CALIBRATORS that are not positioned (or without enough volume) but that are still needed in the active Work Session
                         cmdText &= " UNION " & vbCrLf & _
                                    " SELECT DISTINCT RE.TubeContent AS SampleClass, C.CalibratorName + ' (' + CONVERT(NVARCHAR(1), C.NumberOfCalibrators) + ')' AS SampleName, " & vbCrLf & _
                                                    " NULL AS SampleType, 4 AS Position, NULL As ElementID " & vbCrLf & _
@@ -1220,6 +1259,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND    RE.TubeContent = 'CALIB' " & vbCrLf & _
                                    " AND    RE.ElementFinished = 0 " & vbCrLf
 
+                        '(5) Subquery to get CONTROLS that are not positioned (or without enough volume) but that are still needed in the active Work Session
                         cmdText &= " UNION " & vbCrLf & _
                                    " SELECT DISTINCT RE.TubeContent AS SampleClass, C.ControlName AS SampleName, NULL AS SampleType, 5 AS Position, NULL As ElementID " & vbCrLf & _
                                    " FROM   twksWSRequiredElements RE INNER JOIN tparControls C ON RE.ControlID = C.ControlID " & vbCrLf & _

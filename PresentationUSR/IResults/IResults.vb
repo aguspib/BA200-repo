@@ -325,7 +325,7 @@ Public Class IResults
         If OpenForms > 0 Then
             OpenForms -= 1
         End If
-        ReleaseElement()
+        'ReleaseElement()
     End Sub
 
     ''' <summary>
@@ -1044,6 +1044,7 @@ Public Class IResults
             Dim tb As TextBox = CType(e.Control, TextBox)
 
             If Not tb Is Nothing Then
+                RemoveHandler tb.KeyPress, AddressOf dgvTextBox_KeyPress
                 AddHandler tb.KeyPress, AddressOf dgvTextBox_KeyPress
             End If
 
@@ -1338,7 +1339,8 @@ Public Class IResults
 
     Private Sub ExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExitButton.Click
         Try
-            'Me.Close()
+            'AG 28/05/2014 - New trace
+            CreateLogActivity("Start Closing IResults", "IResults.bsExitButton_Click", EventLogEntryType.Information, False)
 
             'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not show message here!!!) ' XB 18/02/2014 BT #1499
             Dim PCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
@@ -2383,21 +2385,23 @@ Public Class IResults
             For Each myAlarm As ResultsDS.vwksResultsAlarmsRow In myAverageResultList
                 If Not myAlarm.IsAlarmIDNull Then
                     Select Case myAlarm.AlarmID
+                        'EF 03/06/2014 #1650  (usar constantes no texto fijo)
                         Case "CONC_REMARK7"
-                            myResult = "L"
+                            myResult = GlobalConstants.LOW   '"L"
                             Exit Select
                         Case "CONC_REMARK8"
-                            myResult = "H"
+                            myResult = GlobalConstants.HIGH   '"H"
                             Exit Select
                         Case "CONC_REMARK9"
-                            myResult = "PL"
+                            myResult = GlobalConstants.PANIC_LOW  '"PL"
                             Exit Select
                         Case "CONC_REMARK10"
-                            myResult = "PH"
+                            myResult = GlobalConstants.PANIC_HIGH  '"PH"
                             Exit Select
                         Case Else
                             myResult = ""
                             Exit Select
+                            'EF 03/06/2014 #1650  END
                     End Select
                 End If
             Next
@@ -2430,21 +2434,23 @@ Public Class IResults
                 For Each ExecRow As ExecutionsDS.vwksWSExecutionsAlarmsRow In myExecutionsAlarmsList
                     If Not ExecRow.IsAlarmIDNull Then
                         Select Case ExecRow.AlarmID
+                            'EF 03/06/2014 #1650  (usar constantes no texto fijo)
                             Case "CONC_REMARK7"
-                                myResult = "L"
+                                myResult = GlobalConstants.LOW   '"L"
                                 Exit Select
                             Case "CONC_REMARK8"
-                                myResult = "H"
+                                myResult = GlobalConstants.HIGH   '"H"
                                 Exit Select
                             Case "CONC_REMARK9"
-                                myResult = "PL"
+                                myResult = GlobalConstants.PANIC_LOW  '"PL"
                                 Exit Select
                             Case "CONC_REMARK10"
-                                myResult = "PH"
+                                myResult = GlobalConstants.PANIC_HIGH  '"PH"
                                 Exit Select
                             Case Else
                                 myResult = ""
                                 Exit Select
+                                'EF 03/06/2014 #1650  END
                         End Select
                     End If
                 Next
@@ -5536,7 +5542,7 @@ Public Class IResults
     ''' <remarks>AG 01/08/2012
     ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
         Try
             isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
 
@@ -5595,14 +5601,7 @@ Public Class IResults
             'mdiAnalyzerCopy = Nothing 'not this variable
             copyRefreshDS = Nothing
 
-            'Controls (grids & buttons with images)
-            bsBlanksDataGridView = Nothing
-            bsCalibratorsDataGridView = Nothing
-            bsControlsDataGridView = Nothing
-            bsExperimentalsDataGridView = Nothing
-            SamplesXtraGridView = Nothing
-            bsSamplesListDataGridView = Nothing
-            bsTestsListDataGridView = Nothing
+            'Buttons with images
 
             PrintReportButton.Image = Nothing
             PrintCompactReportButton.Image = Nothing
@@ -5628,7 +5627,77 @@ Public Class IResults
             HISPictureBox.Image = Nothing
             'TR 25/09/2013 #memory
 
-            GC.Collect()
+            With CollapseColumnControls
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            With CollapseColumnExperimentals
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            With CollapseColumnCalibrators
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            With CollapseColumnBlanks
+                .Name = CollapseColName
+                RemoveHandler .HeaderClickEventHandler, AddressOf GenericDataGridView_CellMouseClick
+            End With
+
+            '--- Detach variable defined using WithEvents ---
+            bsErrorProvider1 = Nothing
+            bsProgTestToolTips = Nothing
+            bsPanel2 = Nothing
+            bsPanel4 = Nothing
+            Cycle = Nothing
+            Abs1 = Nothing
+            Abs2 = Nothing
+            Diff = Nothing
+            OrderToExportCheckBox = Nothing
+            OrderToPrintCheckBox = Nothing
+            STATImage = Nothing
+            ExitButton = Nothing
+            bsXlsresults = Nothing
+            ExportButton = Nothing
+            OffSystemResultsButton = Nothing
+            SendManRepButton = Nothing
+            bsResultFormGroupBox = Nothing
+            bsSamplesResultsTabControl = Nothing
+            bsExperimentalsTabPage = Nothing
+            bsExperimentalsDataGridView = Nothing
+            bsResultsTabControl = Nothing
+            bsBlanksTabPage = Nothing
+            bsBlanksDataGridView = Nothing
+            bsCalibratorsTabPage = Nothing
+            bsCalibratorsDataGridView = Nothing
+            bsControlsTabPage = Nothing
+            bsControlsDataGridView = Nothing
+            bsTestDetailsTabControl = Nothing
+            bsSamplesTab = Nothing
+            bsSamplesListDataGridView = Nothing
+            bsTestsTabTage = Nothing
+            bsTestsListDataGridView = Nothing
+            bsResultsFormLabel = Nothing
+            bsTestPanel = Nothing
+            PrintTestButton = Nothing
+            bsSamplesPanel = Nothing
+            PrintReportButton = Nothing
+            SummaryButton = Nothing
+            PrintSampleButton = Nothing
+            XtraSamplesTabPage = Nothing
+            SamplesXtraGrid = Nothing
+            SamplesXtraGridView = Nothing
+            ToolTipController1 = Nothing
+            AlarmsDS1 = Nothing
+            PrintCompactReportButton = Nothing
+            PrintTestBlankButton = Nothing
+            PrintTestCtrlButton = Nothing
+            '------------------------------------------------
+
+            'GC.Collect() 
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()

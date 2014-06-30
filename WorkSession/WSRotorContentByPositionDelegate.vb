@@ -4702,6 +4702,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentByPositionDS</returns>
         ''' <remarks>
         ''' Created by:  AG 30/03/2011 - Based on ExistOtherPosition
+        ''' AG 13/06/2014 #1662 - Protection against change positions in pause when S / R2 arm still have not been finished with this position
         ''' </remarks>
         Public Function SearchOtherPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
                                             ByVal pRotorType As String, ByVal pCellNumber As Integer) As GlobalDataTO
@@ -4720,7 +4721,9 @@ Namespace Biosystems.Ax00.BL
 
                             'Search if the Element is placed in another position...
                             Dim myElementID As Integer = 0
-                            If (Not myWSRotorContentByPositionDS.twksWSRotorContentByPosition.First.IsElementIDNull) Then
+                            'AG 13/06/2014 - #1662
+                            'If (Not myWSRotorContentByPositionDS.twksWSRotorContentByPosition.First.IsElementIDNull) Then
+                            If (myWSRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0 AndAlso Not myWSRotorContentByPositionDS.twksWSRotorContentByPosition.First.IsElementIDNull) Then
                                 myElementID = myWSRotorContentByPositionDS.twksWSRotorContentByPosition.First.ElementID
                             End If
                             resultData = ExistOtherPosition(dbConnection, myElementID, pWorkSessionID, pAnalyzerID)

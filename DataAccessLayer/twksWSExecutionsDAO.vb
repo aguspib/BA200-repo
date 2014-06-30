@@ -735,6 +735,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              field OrderID for the OrderTestID of the execution  
         '''              SA 14/06/2013 - Changed the query by adding an INNER JOIN with table twksWSOrderTests to get value of field CtrlsSendingGroup
         '''                              (needed to manage automatic reruns for Control Order Tests)
+        '''              SA 06/06/2014 - BT #1660 ==> Changed the SQL Query to get also field ControlID from table twksOrderTests
         ''' </remarks>
         Public Function GetExecutionByPreparationID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, _
                                                     ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
@@ -752,8 +753,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                        " E.AdjustBaseLineID, E.ABS_Value, E.ABS_Error, E.rKinetics, E.KineticsLinear, E.KineticsInitialValue, E.KineticsSlope, " & vbCrLf & _
                                                        " E.SubstrateDepletion, E.ABS_Initial, E.ABS_MainFilter, E.CONC_Value, E.CONC_CurveError, E.CONC_Error, E.InUse, E.ResultDate, " & vbCrLf & _
                                                        " E.PreparationID, E.ClotValue, E.ThermoWarningFlag, E.HasReadings, E.ValidReadings, E.CompleteReadings, " & vbCrLf & _
-                                                       " OT.TestID, OT.SampleType, OT.ReplicatesNumber AS ReplicatesTotalNum, OT.OrderID, T.FirstReadingCycle, T.SecondReadingCycle, " & vbCrLf & _
-                                                       " WOT.CtrlsSendingGroup, IT.ISE_ResultID " & vbCrLf & _
+                                                       " OT.TestID, OT.SampleType, OT.ReplicatesNumber AS ReplicatesTotalNum, OT.OrderID, OT.ControlID, T.FirstReadingCycle, " & vbCrLf & _
+                                                       " T.SecondReadingCycle, WOT.CtrlsSendingGroup, IT.ISE_ResultID " & vbCrLf & _
                                                 " FROM   twksWSExecutions E INNER JOIN twksOrderTests OT ON E.OrderTestID = OT.OrderTestID AND E.AnalyzerID = OT.AnalyzerID " & vbCrLf & _
                                                                           " INNER JOIN twksWSOrderTests WOT ON E.OrderTestID = WOT.OrderTestID AND E.WorkSessionID = WOT.WorkSessionID " & vbCrLf & _
                                                                           " LEFT OUTER JOIN tparTests     T  ON OT.TestType = 'STD' AND OT.TestID = T.TestID " & vbCrLf & _
@@ -5233,8 +5234,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status PENDING or LOCKED in the specified Analyzer Work Session (when not Running)
-        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status LOCKED in the specified Analyzer Work Session (when Running)
+        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status PENDING or LOCKED in the specified Analyzer Work Session (when StandBy or pause mode)
+        ''' Get all distinct SampleClass / OrderTestID / RerunNumber having Executions with status LOCKED in the specified Analyzer Work Session (when Running normal)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -5245,9 +5246,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  SA 05/07/2012
         ''' AG 25/03/2013 - return also LockedByLIS
+        ''' AG 30/05/2014 - #1644 add parameter pPauseMode
         ''' </remarks>
         Public Function GetPendingAndLockedGroupedExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                             ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean) As GlobalDataTO
+                                                             ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean, ByVal pPauseMode As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -5268,9 +5270,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
 
-                        If Not pWorkInRunningMode Then
+                        If Not pWorkInRunningMode OrElse pPauseMode Then 'AG 30/05/2014 - #1644 in standBy or in pause mode
                             cmdText += " AND   (ExecutionStatus = 'PENDING' OR ExecutionStatus = 'LOCKED') " & vbCrLf
-                        Else
+                        Else 'In normal running
                             cmdText += " AND   (ExecutionStatus = 'LOCKED') " & vbCrLf
                         End If
                         cmdText += " ORDER BY SampleClass, OrderTestID, RerunNumber " & vbCrLf

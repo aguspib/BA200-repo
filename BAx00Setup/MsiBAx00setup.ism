@@ -58,7 +58,7 @@
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
-		<revnumber>{09AAF77F-52FC-402A-84DF-388830A14FAE}</revnumber>
+		<revnumber>{35724961-22EF-4E22-84CA-C408A7AA8098}</revnumber>
 		<lastprinted/>
 		<createdtm>06/21/1999 14:00</createdtm>
 		<lastsavedtm>07/14/2000 17:50</lastsavedtm>
@@ -351,7 +351,7 @@
 		<row><td>Analyzer.dll</td><td>{F89913B4-4680-4B5A-A58F-BD74AD49C0C4}</td><td>SERVICE_SW</td><td>8</td><td/><td>analyzer.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Analyzer.dll1</td><td>{F5B6AAA6-4C81-43C8-BFC3-DDCFA6B913C1}</td><td>USER_SW</td><td>8</td><td/><td>analyzer.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Ax00Service.exe</td><td>{EC6971B2-7CC1-42C6-897B-79FE573B37B0}</td><td>SERVICE_SW</td><td>8</td><td/><td>ax00service.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>AxInterop.AcroPDFLib.dll</td><td>{EC006550-AF24-44DE-A0F0-25CB08BCB9B1}</td><td>USER_SW</td><td>8</td><td/><td>axinterop.acropdflib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AxInterop.AcroPDFLib.dll</td><td>{EC006550-AF24-44DE-A0F0-25CB08BCB9B1}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>AxInterop.WMPLib.dll</td><td>{24794DBB-501D-4623-A3DD-F1462327DA9F}</td><td>SERVICE_SW</td><td>8</td><td/><td>axinterop.wmplib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BA400User.exe</td><td>{B87DABA1-AB59-4931-BD6D-C824AA839E74}</td><td>USER_SW</td><td>8</td><td/><td>ba400user.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSCSharpControl_Library.dll</td><td>{2F619DCF-6C0F-4BE9-9CC5-ACAA57A32EFC}</td><td>SERVICE_SW</td><td>8</td><td/><td>bscsharpcontrol_library.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -415,10 +415,11 @@
 		<row><td>DevExpress.XtraVerticalGrid.v10.2.dll</td><td>{0ACEB562-8ACA-41B9-AC87-5836CBF03241}</td><td>SERVICE_SW</td><td>8</td><td/><td>devexpress.xtraverticalgrid.</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>DevExpress.XtraVerticalGrid.v10.2.dll1</td><td>{6663F91A-0695-4C56-BFA0-60A3FF44D81A}</td><td>USER_SW</td><td>8</td><td/><td>devexpress.xtraverticalgrid.1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Digiface.ttf1</td><td>{5B36ABEE-6DEB-462A-BA52-9C44A8E34D2E}</td><td>FontsFolder</td><td>8</td><td/><td>digiface.ttf</td><td>17</td><td>This component consists of font files to be registered on the target system.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Firmware</td><td>{E2032768-722F-4162-943C-2C870D2367E4}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of files not belonging to other components (Firmwares of previous versions to be deleted)</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>FirmwareLast</td><td>{DD4A46C0-900C-4412-87D8-FE542DF46310}</td><td>FIRMWARE</td><td>8</td><td/><td/><td>17</td><td>This component consists of files not belonging to other components (Firmware distributed with new version)</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Firmware</td><td>{E2032768-722F-4162-943C-2C870D2367E4}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>Removes old Firmware files distributed using this component 'Firmware' only fw 1.00, 1.20, 1.26 and 1.30)- NOTE: From June2014 we decide create 1 component for each Fw version instead of 1 component for N Fw versions</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FirmwareLast</td><td>{DD4A46C0-900C-4412-87D8-FE542DF46310}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>Removes old Firmware files distributed using this component 'Firmware' only fw 1.34, 2.0.6) - NOTE: From June2014 we decide create 1 component for each Fw version instead of 1 component for N Fw versions</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Framework.dll</td><td>{FC3C30A4-898A-4C3A-B35A-043DAB5A32EA}</td><td>SERVICE_SW</td><td>8</td><td/><td>framework.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Framework.dll1</td><td>{938A4083-9422-45C8-BE30-BED795B9A802}</td><td>USER_SW</td><td>8</td><td/><td>framework.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FwBA400v208</td><td>{2521F542-6414-4D7F-83FA-D2515C5C8000}</td><td>FIRMWARE</td><td>8</td><td/><td>ba400v208.ba4</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwScriptsManagement.dll</td><td>{0B7D8845-CE9B-4AF0-B87F-8DE1A9222F67}</td><td>SERVICE_SW</td><td>8</td><td/><td>fwscriptsmanagement.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwScriptsManagement.dll1</td><td>{24F5D650-0CA0-457D-8935-FE184D4E5AF9}</td><td>USER_SW</td><td>8</td><td/><td>fwscriptsmanagement.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>History.dll</td><td>{1514F067-2E39-4AC3-9096-DED3ABC18E25}</td><td>SERVICE_SW</td><td>8</td><td/><td>history.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -427,13 +428,13 @@
 		<row><td>ICSharpCode.SharpZipLib.dll1</td><td>{D6E06460-E3C6-474A-9DF5-B5E7C065815E}</td><td>USER_SW</td><td>8</td><td/><td>icsharpcode.sharpziplib.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>InfoAnalyzer.dll</td><td>{0540D35B-3BD4-43DF-8906-CE303032B624}</td><td>SERVICE_SW</td><td>8</td><td/><td>infoanalyzer.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>InfoAnalyzer.dll1</td><td>{5333B2BE-0272-49D8-BE6F-B66608E42289}</td><td>USER_SW</td><td>8</td><td/><td>infoanalyzer.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Interop.AcroPDFLib.dll</td><td>{FFF53C61-5DC8-4F93-AAA1-33EC2457C4F4}</td><td>USER_SW</td><td>8</td><td/><td>interop.acropdflib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Interop.AcroPDFLib.dll</td><td>{FFF53C61-5DC8-4F93-AAA1-33EC2457C4F4}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.CommunicationsAx00.dll</td><td>{BD49C3F6-6A54-4992-ADB8-640A4D3A84CA}</td><td>SERVICE_SW</td><td>8</td><td/><td>interop.communicationsax00.d</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.CommunicationsAx00.dll1</td><td>{1FB7E654-EEC7-40C9-AC39-9014F4DAA998}</td><td>USER_SW</td><td>8</td><td/><td>interop.communicationsax00.d1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.WMPLib.dll</td><td>{B2268157-E114-4C2D-9D10-A92B77FC4625}</td><td>SERVICE_SW</td><td>8</td><td/><td>interop.wmplib.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>LIS.dll</td><td>{0D8E4C70-D1C4-46C3-8A06-7C3BA252391C}</td><td>USER_SW</td><td>8</td><td/><td>lis.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>{064CDBFD-2612-4406-9AFA-41F9B34CFC49}</td><td>SERVICE_SW</td><td>8</td><td/><td>microsoft.visualbasic.powerp1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
-		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td>{0987E3DC-687C-414E-96CF-831DFB54564E}</td><td>USER_SW</td><td>8</td><td/><td>microsoft.visualbasic.powerp</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>{064CDBFD-2612-4406-9AFA-41F9B34CFC49}</td><td>SERVICE_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td>{0987E3DC-687C-414E-96CF-831DFB54564E}</td><td>USER_SW</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ParameterPrograming.dll</td><td>{304D80C8-07D6-49BE-ABF5-FBB0C0ED4B48}</td><td>SERVICE_SW</td><td>8</td><td/><td>parameterprograming.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>ParameterPrograming.dll1</td><td>{F39E696D-4322-4D29-87F5-694FFD75DE9A}</td><td>USER_SW</td><td>8</td><td/><td>parameterprograming.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>PerpetuumSoft.Framework.Export.dll</td><td>{75C5F6BE-F654-4588-B483-E2295802DEB0}</td><td>SERVICE_SW</td><td>8</td><td/><td>perpetuumsoft.framework.expo</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -2048,8 +2049,9 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>BA400</td><td>FirmwareLast</td></row>
 		<row><td>Firmware</td><td>Firmware</td></row>
+		<row><td>Firmware</td><td>FirmwareLast</td></row>
+		<row><td>Firmware</td><td>FwBA400v208</td></row>
 		<row><td>Service_Sw</td><td>AX00Global.dll</td></row>
 		<row><td>Service_Sw</td><td>AX00Types.dll</td></row>
 		<row><td>Service_Sw</td><td>Analyzer.dll</td></row>
@@ -2249,7 +2251,7 @@
 		<row><td>ax00tem.bak1</td><td>UserSw_Update_bak</td><td>Ax00TEM.bak</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;bak&gt;\Ax00TEM.bak</td><td>1</td><td/></row>
 		<row><td>ax00types.dll</td><td>AX00Types.dll</td><td>AX00TY~1.DLL|AX00Types.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\AX00Types.dll</td><td>1</td><td/></row>
 		<row><td>ax00types.dll1</td><td>AX00Types.dll1</td><td>AX00TY~1.DLL|AX00Types.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\AX00Types.dll</td><td>1</td><td/></row>
-		<row><td>axinterop.acropdflib.dll</td><td>AxInterop.AcroPDFLib.dll</td><td>AXINTE~1.DLL|AxInterop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\AxInterop.AcroPDFLib.dll</td><td>1</td><td/></row>
+		<row><td>axinterop.acropdflib.dll</td><td>AxInterop.AcroPDFLib.dll</td><td>AXINTE~1.DLL|AxInterop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\AxInterop.AcroPDFLib.dll</td><td>1</td><td/></row>
 		<row><td>axinterop.wmplib.dll</td><td>AxInterop.WMPLib.dll</td><td>AXINTE~1.DLL|AxInterop.WMPLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\AxInterop.WMPLib.dll</td><td>1</td><td/></row>
 		<row><td>ba400srv.ico</td><td>ServiceSw_Images_Embedded</td><td>BA400SRV.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA400SRV.ico</td><td>1</td><td/></row>
 		<row><td>ba400srv.ico1</td><td>UserSw_Images_Embedded</td><td>BA400SRV.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA400SRV.ico</td><td>1</td><td/></row>
@@ -2258,8 +2260,10 @@
 		<row><td>ba400user.ico1</td><td>UserSw_Images_Embedded</td><td>BA400U~1.ICO|BA400USER.ico</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA400USER.ico</td><td>1</td><td/></row>
 		<row><td>ba400v120.ba4</td><td>Firmware</td><td>BA400V~1.BA4|BA400v120.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v120.ba4</td><td>1</td><td/></row>
 		<row><td>ba400v126.ba4</td><td>Firmware</td><td>BA400V~1.BA4|BA400v126.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v126.ba4</td><td>1</td><td/></row>
-		<row><td>ba400v130.ba4</td><td>Firmware</td><td>BA400V~1.BA4|BA400v130.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v130.ba4</td><td>1</td><td/></row>
-		<row><td>ba400v206.ba4</td><td>FirmwareLast</td><td>BA400V~1.BA4|BA400v206.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA400v206.ba4</td><td>1</td><td/></row>
+		<row><td>ba400v130.ba4</td><td>Firmware</td><td>BA400V~1.BA4|BA400v130.ba4</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v130.ba4</td><td>1</td><td/></row>
+		<row><td>ba400v134.ba4</td><td>FirmwareLast</td><td>BA400V~1.BA4|BA400v134.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v134.ba4</td><td>1</td><td/></row>
+		<row><td>ba400v206.ba4</td><td>FirmwareLast</td><td>BA400V~1.BA4|BA400v206.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v206.ba4</td><td>1</td><td/></row>
+		<row><td>ba400v208.ba4</td><td>FwBA400v208</td><td>BA400V~1.BA4|BA400v208.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA400v208.ba4</td><td>1</td><td/></row>
 		<row><td>ba4svr_login.png</td><td>ServiceSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
 		<row><td>ba4svr_login.png1</td><td>UserSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
 		<row><td>ba4usr_login.png</td><td>ServiceSw_Images_Embedded</td><td>BA4USR~1.PNG|BA4USR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA4USR_Login.png</td><td>1</td><td/></row>
@@ -2656,7 +2660,7 @@
 		<row><td>info.png1</td><td>UserSw_Images</td><td>Info.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Info.png</td><td>1</td><td/></row>
 		<row><td>infoanalyzer.dll</td><td>InfoAnalyzer.dll</td><td>INFOAN~1.DLL|InfoAnalyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\InfoAnalyzer.dll</td><td>1</td><td/></row>
 		<row><td>infoanalyzer.dll1</td><td>InfoAnalyzer.dll1</td><td>INFOAN~1.DLL|InfoAnalyzer.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\InfoAnalyzer.dll</td><td>1</td><td/></row>
-		<row><td>interop.acropdflib.dll</td><td>Interop.AcroPDFLib.dll</td><td>INTERO~1.DLL|Interop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Interop.AcroPDFLib.dll</td><td>1</td><td/></row>
+		<row><td>interop.acropdflib.dll</td><td>Interop.AcroPDFLib.dll</td><td>INTERO~1.DLL|Interop.AcroPDFLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\Interop.AcroPDFLib.dll</td><td>1</td><td/></row>
 		<row><td>interop.communicationsax00.d</td><td>Interop.CommunicationsAx00.dll</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
 		<row><td>interop.communicationsax00.d1</td><td>Interop.CommunicationsAx00.dll1</td><td>INTERO~1.DLL|Interop.CommunicationsAx00.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Interop.CommunicationsAx00.dll</td><td>1</td><td/></row>
 		<row><td>interop.wmplib.dll</td><td>Interop.WMPLib.dll</td><td>INTERO~1.DLL|Interop.WMPLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Interop.WMPLib.dll</td><td>1</td><td/></row>
@@ -2779,8 +2783,8 @@
 		<row><td>mdivertstop.png1</td><td>UserSw_Images_Embedded</td><td>MDIVER~1.PNG|MDIVertStop.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\MDIVertStop.png</td><td>1</td><td/></row>
 		<row><td>metrology_eng.xps</td><td>ServiceSw_InfoDocs</td><td>METROL~1.XPS|Metrology_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Metrology_ENG.xps</td><td>1</td><td/></row>
 		<row><td>metrology_spa.xps</td><td>ServiceSw_InfoDocs</td><td>METROL~1.XPS|Metrology_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\Metrology_SPA.xps</td><td>1</td><td/></row>
-		<row><td>microsoft.visualbasic.powerp</td><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td>MICROS~1.DLL|Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>1</td><td/></row>
-		<row><td>microsoft.visualbasic.powerp1</td><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>MICROS~1.DLL|Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>1</td><td/></row>
+		<row><td>microsoft.visualbasic.powerp</td><td>Microsoft.VisualBasic.PowerPacks.Vs.dll1</td><td>MICROS~1.DLL|Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\USR\Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>1</td><td/></row>
+		<row><td>microsoft.visualbasic.powerp1</td><td>Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>MICROS~1.DLL|Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\DLLs\SRV\Microsoft.VisualBasic.PowerPacks.Vs.dll</td><td>1</td><td/></row>
 		<row><td>mon_leg_bcerr.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_BCERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_BCERR.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_bcerr.png1</td><td>UserSw_Images</td><td>MON_LE~1.PNG|MON_LEG_BCERR.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\MON_LEG_BCERR.png</td><td>1</td><td/></row>
 		<row><td>mon_leg_deplet.png</td><td>ServiceSw_Images</td><td>MON_LE~1.PNG|MON_LEG_DEPLET.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\MON_LEG_DEPLET.png</td><td>1</td><td/></row>
@@ -3366,6 +3370,7 @@
 		<row><td>FirmwareLast</td><td/><td/><td>_D0B9E387_D5C7_40FD_9FF4_553EE2514007_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Framework.dll</td><td/><td/><td>_9970581E_5041_4E7D_B2B7_C509EE09927D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Framework.dll1</td><td/><td/><td>_4C0AFB0B_AF76_41F7_A93B_0F121C6FBF1D_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>FwBA400v208</td><td/><td/><td>_8D041E32_1247_434C_A73B_98BEC33497F5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwScriptsManagement.dll</td><td/><td/><td>_1B0991FB_8116_43AC_B249_F54AC0AEABAB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwScriptsManagement.dll1</td><td/><td/><td>_CA61D457_E380_4058_89A8_0A5919602B49_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>History.dll</td><td/><td/><td>_9A2FC4E6_C727_4A3C_A5DA_463F19D659EE_FILTER</td><td/><td/><td/><td/></row>
@@ -3770,47 +3775,47 @@
 		<col def="S255">Value</col>
 		<col def="S255">TestValue</col>
 		<col def="i4">Type</col>
-		<row><td>Ax00 v1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300</td><td/><td>2</td></row>
+		<row><td>Ax00 v1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00</td><td/><td>2</td></row>
 		<row><td>C Drive</td><td>C:</td><td/><td>2</td></row>
 		<row><td>CommonFilesFolder</td><td/><td/><td>1</td></row>
-		<row><td>Data</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Data</td><td/><td>2</td></row>
-		<row><td>Embedded</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Images\Embedded</td><td/><td>2</td></row>
-		<row><td>Embedded1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Images\Embedded</td><td/><td>2</td></row>
-		<row><td>HelpFiles</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\HelpFiles</td><td/><td>2</td></row>
+		<row><td>Data</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Data</td><td/><td>2</td></row>
+		<row><td>Embedded</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Images\Embedded</td><td/><td>2</td></row>
+		<row><td>Embedded1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Images\Embedded</td><td/><td>2</td></row>
+		<row><td>HelpFiles</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\HelpFiles</td><td/><td>2</td></row>
 		<row><td>ISPROJECTDIR</td><td/><td/><td>1</td></row>
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectDataFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
-		<row><td>Images</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Images</td><td/><td>2</td></row>
-		<row><td>Images1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Images</td><td/><td>2</td></row>
-		<row><td>Import</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Import</td><td/><td>2</td></row>
-		<row><td>Import1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Import</td><td/><td>2</td></row>
-		<row><td>InfoDocs</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\InfoDocs</td><td/><td>2</td></row>
+		<row><td>Images</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Images</td><td/><td>2</td></row>
+		<row><td>Images1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Images</td><td/><td>2</td></row>
+		<row><td>Import</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Import</td><td/><td>2</td></row>
+		<row><td>Import1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Import</td><td/><td>2</td></row>
+		<row><td>InfoDocs</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\InfoDocs</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INSTALLSHIELD 2_FILES</td><td>C:\InstallShield 2012 Spring Projects</td><td/><td>2</td></row>
-		<row><td>PATH_TO_RELEASE_FILES</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release</td><td/><td>2</td></row>
-		<row><td>PATH_TO_RELEASE_FILES1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release</td><td/><td>2</td></row>
+		<row><td>PATH_TO_RELEASE_FILES</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release</td><td/><td>2</td></row>
+		<row><td>PATH_TO_RELEASE_FILES1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release</td><td/><td>2</td></row>
 		<row><td>PATH_TO_TEMP_FILES</td><td>C:\TEMP</td><td/><td>2</td></row>
-		<row><td>PresentationSRV</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV</td><td/><td>2</td></row>
-		<row><td>PresentationUSR</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR</td><td/><td>2</td></row>
+		<row><td>PresentationSRV</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV</td><td/><td>2</td></row>
+		<row><td>PresentationUSR</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
-		<row><td>Release</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release</td><td/><td>2</td></row>
-		<row><td>Release1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release</td><td/><td>2</td></row>
-		<row><td>Reports</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Reports</td><td/><td>2</td></row>
-		<row><td>Reports1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Reports</td><td/><td>2</td></row>
+		<row><td>Release</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release</td><td/><td>2</td></row>
+		<row><td>Release1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release</td><td/><td>2</td></row>
+		<row><td>Reports</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Reports</td><td/><td>2</td></row>
+		<row><td>Reports1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Reports</td><td/><td>2</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
-		<row><td>Task</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Update\Task</td><td/><td>2</td></row>
-		<row><td>Task1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Update\Task</td><td/><td>2</td></row>
-		<row><td>Templates</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Reports\Templates</td><td/><td>2</td></row>
-		<row><td>Templates1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Reports\Templates</td><td/><td>2</td></row>
-		<row><td>Test</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Reports\Test</td><td/><td>2</td></row>
-		<row><td>Test1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Reports\Test</td><td/><td>2</td></row>
-		<row><td>Update</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Update</td><td/><td>2</td></row>
-		<row><td>Update1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Update</td><td/><td>2</td></row>
+		<row><td>Task</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Update\Task</td><td/><td>2</td></row>
+		<row><td>Task1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Update\Task</td><td/><td>2</td></row>
+		<row><td>Templates</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Reports\Templates</td><td/><td>2</td></row>
+		<row><td>Templates1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Reports\Templates</td><td/><td>2</td></row>
+		<row><td>Test</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Reports\Test</td><td/><td>2</td></row>
+		<row><td>Test1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Reports\Test</td><td/><td>2</td></row>
+		<row><td>Update</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Update</td><td/><td>2</td></row>
+		<row><td>Update1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Update</td><td/><td>2</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
-		<row><td>XmlFiles</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\XmlFiles</td><td/><td>2</td></row>
-		<row><td>XmlFiles1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\XmlFiles</td><td/><td>2</td></row>
-		<row><td>bak</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationUSR\bin\x86\Release\Update\bak</td><td/><td>2</td></row>
-		<row><td>bak1</td><td>C:\Users\Albert Guillen\Documents\Ax00v300\PresentationSRV\bin\x86\Release\Update\bak</td><td/><td>2</td></row>
+		<row><td>XmlFiles</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\XmlFiles</td><td/><td>2</td></row>
+		<row><td>XmlFiles1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\XmlFiles</td><td/><td>2</td></row>
+		<row><td>bak</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationUSR\bin\x86\Release\Update\bak</td><td/><td>2</td></row>
+		<row><td>bak1</td><td>C:\Users\Albert Guillen\Documents\Projects\Repositories\BAx00\PresentationSRV\bin\x86\Release\Update\bak</td><td/><td>2</td></row>
 		<row><td>isrt.obl</td><td>\\isrt.obl</td><td/><td>2</td></row>
 		<row><td>iswi.obl</td><td>\\iswi.obl</td><td/><td>2</td></row>
 	</table>
@@ -5242,6 +5247,10 @@
 		<row><td>ID_STRING12</td><td>1034</td><td>BA400 Service</td><td>0</td><td/><td>-308265840</td></row>
 		<row><td>ID_STRING13</td><td>1033</td><td>BA400 User</td><td>0</td><td/><td>-308261744</td></row>
 		<row><td>ID_STRING13</td><td>1034</td><td>BA400 User</td><td>0</td><td/><td>-308261744</td></row>
+		<row><td>ID_STRING14</td><td>1033</td><td>BA400v134.ba4</td><td>0</td><td/><td>857922636</td></row>
+		<row><td>ID_STRING14</td><td>1034</td><td>Ba400v134.ba4</td><td>0</td><td/><td>857873835</td></row>
+		<row><td>ID_STRING15</td><td>1033</td><td/><td>0</td><td/><td>857919564</td></row>
+		<row><td>ID_STRING15</td><td>1034</td><td/><td>0</td><td/><td>857919564</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>BioSystems SA</td><td>0</td><td/><td>-576692656</td></row>
 		<row><td>ID_STRING2</td><td>1034</td><td>BioSystems SA</td><td>0</td><td/><td>-576692656</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Firmware</td><td>0</td><td/><td>-576700303</td></row>
@@ -5884,7 +5893,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>ProductID</td><td>none</td><td/></row>
 		<row><td>ProductLanguage</td><td>1033</td><td/></row>
 		<row><td>ProductName</td><td>BA400</td><td/></row>
-		<row><td>ProductVersion</td><td>3.0.0</td><td/></row>
+		<row><td>ProductVersion</td><td>3.0.1</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>

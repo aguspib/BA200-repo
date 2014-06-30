@@ -357,11 +357,9 @@ Public Class IWSRotorPositions
     ''' Modified by XB 17/01/2014 - Improve Dispose
     ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
     ''' </remarks>
-    Private Sub ReleaseElement()
+    Private Sub ReleaseElements()
         Try
             isClosingFlag = True 'AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
-            sourceNode = Nothing
-            RotorsTabs = Nothing
 
             ' XB 17/01/2014
             For Each myControl As Control In Me.SamplesTab.Controls
@@ -405,66 +403,43 @@ Public Class IWSRotorPositions
             End If
 
             'AG 01/08/2012 - add more controls
+
             listReqElements = Nothing
             AllTubeSizeList = Nothing
             myRotorContentByPositionDSForm = Nothing
             mySelectedElementInfo = Nothing
             myPosControlList = Nothing
             sourceNode = Nothing
+            RotorsTabs = Nothing
             'mdiAnalyzerCopy = Nothing 'not this variable
-            bsElementsTreeView = Nothing
+
             ReagentPictureBox.Image = Nothing
-            ReagentPictureBox = Nothing
             ReagentsTab.Appearance.PageClient.Image = Nothing
             SamplesTab.Appearance.PageClient.Image = Nothing
-            RotorsTabs = Nothing
             bsCalibratorPictureBox.Image = Nothing
-            bsCalibratorPictureBox = Nothing
             bsControlPictureBox.Image = Nothing
-            bsControlPictureBox = Nothing
             bsStatPictureBox.Image = Nothing
-            bsStatPictureBox = Nothing
             bsRoutinePictureBox.Image = Nothing
-            bsRoutinePictureBox = Nothing
             bsDilutedPictureBox.Image = Nothing
-            bsDilutedPictureBox = Nothing
             bsTubeAddSolPictureBox.Image = Nothing
-            bsTubeAddSolPictureBox = Nothing
             AdditionalSolPictureBox.Image = Nothing
-            AdditionalSolPictureBox = Nothing
             bsDepletedPictureBox.Image = Nothing
-            bsDepletedPictureBox = Nothing
             LowVolPictureBox.Image = Nothing
-            LowVolPictureBox = Nothing
             NoInUsePictureBox.Image = Nothing
-            NoInUsePictureBox = Nothing
             LegendBarCodeErrorRGImage.Image = Nothing
-            LegendBarCodeErrorRGImage = Nothing
             LegendUnknownImage.Image = Nothing
-            LegendUnknownImage = Nothing
             SelectedPictureBox.Image = Nothing
-            SelectedPictureBox = Nothing
             bsReagentsMoveFirstPositionButton.Image = Nothing
-            bsReagentsMoveFirstPositionButton = Nothing
             bsReagentsDecreaseButton.Image = Nothing
-            bsReagentsDecreaseButton = Nothing
             bsReagentsIncreaseButton.Image = Nothing
             bsReagentsMoveLastPositionButton.Image = Nothing
-            bsReagentsMoveLastPositionButton = Nothing
             bsReagentsRefillPosButton.Image = Nothing
-            bsReagentsRefillPosButton = Nothing
             bsReagentsCheckVolumePosButton.Image = Nothing
-            bsReagentsCheckVolumePosButton = Nothing
             bsReagentsDeletePosButton.Image = Nothing
-            bsReagentsDeletePosButton = Nothing
             bsSamplesMoveFirstPositionButton.Image = Nothing
-            bsSamplesMoveFirstPositionButton = Nothing
             bsSamplesDecreaseButton.Image = Nothing
-            bsSamplesDecreaseButton = Nothing
             bsSamplesIncreaseButton.Image = Nothing
-            bsSamplesIncreaseButton = Nothing
             bsSamplesMoveLastPositionButton.Image = Nothing
-            bsSamplesMoveLastPositionButton = Nothing
 
             'AG 10/09/2013 - Do not release the buttons in the bottom bar (causes a ugly visual effect)
             'So comment these lines
@@ -506,7 +481,141 @@ Public Class IWSRotorPositions
             autoWSCreationTimer = Nothing
             'AG 02/01/2014 - BT #1433
 
-            GC.Collect()
+            '--- Detach variable defined using WithEvents ---
+            bsScreenTimer = Nothing
+            bsScreenToolTips = Nothing
+            bsErrorProvider1 = Nothing
+            FunctionalityArea = Nothing
+            BarcodeWarningButton = Nothing
+            bsAcceptButton = Nothing
+            bsScanningButton = Nothing
+            bsCheckRotorVolumeButton = Nothing
+            bsWarningsButton = Nothing
+            bsPrintButton = Nothing
+            bsSaveVRotorButton = Nothing
+            bsLoadVRotorButton = Nothing
+            bsResetRotorButton = Nothing
+            bsReagentAutoPosButton = Nothing
+            bsSamplesAutoPosButton = Nothing
+            RotorsTabs = Nothing
+            SamplesTab = Nothing
+            PanelControl1 = Nothing
+            PanelControl2 = Nothing
+            bsSamplesLegendGroupBox = Nothing
+            bsTubeAddSolLabel = Nothing
+            bsTubeAddSolPictureBox = Nothing
+            bsLegendDilutedLabel = Nothing
+            bsDilutedPictureBox = Nothing
+            bsLegendRoutineLabel = Nothing
+            bsLegendStatLabel = Nothing
+            bsLegendControlsLabel = Nothing
+            bsLegendCalibratorsLabel = Nothing
+            bsRoutinePictureBox = Nothing
+            bsStatPictureBox = Nothing
+            bsControlPictureBox = Nothing
+            bsCalibratorPictureBox = Nothing
+            bsSamplesLegendLabel = Nothing
+            bsSamplesPositionInfoGroupBox = Nothing
+            SamplesStatusTextBox = Nothing
+            bsSamplesStatusLabel = Nothing
+            bsSamplesPositionInfoLabel = Nothing
+            bsSamplesDeletePosButton = Nothing
+            bsSamplesMoveLastPositionButton = Nothing
+            bsSamplesRefillPosButton = Nothing
+            bsSamplesIncreaseButton = Nothing
+            bsTubeSizeComboBox = Nothing
+            bsSamplesBarcodeTextBox = Nothing
+            bsSamplesDecreaseButton = Nothing
+            bsDiluteStatusTextBox = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsSamplesMoveFirstPositionButton = Nothing
+            bsSampleNumberTextBox = Nothing
+            bsSampleIDTextBox = Nothing
+            bsSampleContentTextBox = Nothing
+            bsSampleRingNumTextBox = Nothing
+            bsSampleCellTextBox = Nothing
+            bsTubeSizeLabel = Nothing
+            bsSamplesBarcodeLabel = Nothing
+            bsDiluteStatusLabel = Nothing
+            bsSampleTypeLabel = Nothing
+            bsSamplesNumberLabel = Nothing
+            bsSampleIDLabel = Nothing
+            bsSamplesContentLabel = Nothing
+            bsSamplesRingNumLabel = Nothing
+            bsSamplesCellLabel = Nothing
+            ReagentsTab = Nothing
+            PanelControl6 = Nothing
+            PanelControl7 = Nothing
+            bsReagentsLegendGroupBox = Nothing
+            LegReagentSelLabel = Nothing
+            SelectedPictureBox = Nothing
+            LegendUnknownImage = Nothing
+            bsUnknownLabel = Nothing
+            LegendBarCodeErrorRGImage = Nothing
+            bsBarcodeErrorRGLabel = Nothing
+            LowVolPictureBox = Nothing
+            ReagentPictureBox = Nothing
+            bsLegReagLowVolLabel = Nothing
+            bsLegReagentLabel = Nothing
+            bsLegReagAdditionalSol = Nothing
+            bsLegReagNoInUseLabel = Nothing
+            bsLegReagDepleteLabel = Nothing
+            AdditionalSolPictureBox = Nothing
+            NoInUsePictureBox = Nothing
+            bsDepletedPictureBox = Nothing
+            bsReagentsLegendLabel = Nothing
+            bsReagentsPositionInfoGroupBox = Nothing
+            bsReagStatusLabel = Nothing
+            ReagStatusTextBox = Nothing
+            bsReagentsCellTextBox = Nothing
+            bsReagentsCellLabel = Nothing
+            bsReagentsDeletePosButton = Nothing
+            bsTeststLeftTextBox = Nothing
+            bsReagentsRefillPosButton = Nothing
+            bsCurrentVolTextBox = Nothing
+            bsReagentsCheckVolumePosButton = Nothing
+            bsTestsLeftLabel = Nothing
+            bsCurrentVolLabel = Nothing
+            bsBottleSizeComboBox = Nothing
+            bsBottleSizeLabel = Nothing
+            bsExpirationDateTextBox = Nothing
+            bsReagentsPositionInfoLabel = Nothing
+            bsReagentsMoveLastPositionButton = Nothing
+            bsReagentsBarCodeTextBox = Nothing
+            bsTestNameTextBox = Nothing
+            bsReagentsIncreaseButton = Nothing
+            bsReagentsNumberTextBox = Nothing
+            bsReagentsDecreaseButton = Nothing
+            bsReagentNameTextBox = Nothing
+            bsReagentsMoveFirstPositionButton = Nothing
+            bsReagentsContentTextBox = Nothing
+            bsReagentsRingNumTextBox = Nothing
+            bsExpirationDateLabel = Nothing
+            bsReagentsBarCodeLabel = Nothing
+            bsTestNameLabel = Nothing
+            bsReagentsNumberLabel = Nothing
+            bsReagentNameLabel = Nothing
+            bsReagentsContentLabel = Nothing
+            bsReagentsRingNumLabel = Nothing
+            BsGroupBox1 = Nothing
+            BsRefresh = Nothing
+            BsLabel3 = Nothing
+            BsLabel2 = Nothing
+            BsLabel1 = Nothing
+            BsRotationAngle = Nothing
+            BsLeft = Nothing
+            BsRotate2 = Nothing
+            BsTop1 = Nothing
+            BsRotate1 = Nothing
+            BsLeft2 = Nothing
+            BsTop2 = Nothing
+            BsLeft1 = Nothing
+            BsTop = Nothing
+            bsElementsTreeView = Nothing
+            bsRequiredElementsLabel = Nothing
+            '------------------------------------------------
+
+            'GC.Collect()
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
@@ -1563,10 +1672,11 @@ Public Class IWSRotorPositions
     '''              RH 16/06/2011 - Added TUBE_SPEC_SOL and TUBE_WASH_SOL
     '''              SA 18/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed
+    '''              IT 04/06/2014 - BT #1644 ==> Changed call to function UpdateRotorArea: new type of the last parameter
     ''' </remarks>
     Private Sub UpdateRotorTreeViewArea(ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, Optional ByVal pRotorType As String = "")
         Try
-            If isClosingFlag Then Exit Sub ' XB 13/03/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myGlobalDataTO As GlobalDataTO
             Dim myNotInUseRPDelegate As New WSNotInUseRotorPositionsDelegate()
@@ -1588,23 +1698,26 @@ Public Class IWSRotorPositions
                     If (UpdateRotorContentByPositionDSForm(rotorPosition)) Then
                         'Validate if there is a Required Element in the Rotor Position
                         If (Not rotorPosition.IsElementIDNull) Then
-                            'Update the correspondent Node in the Required Elements TreeView and get the information of the updated Node 
-                            Dim myTreeNode As TreeNode = ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, True, rotorPosition, pRotorType)
+                            Dim myTreeNode As TreeNode
+                            If (Not bsElementsTreeView Is Nothing) Then
+                                'Update the correspondent Node in the Required Elements TreeView and get the information of the updated Node 
+                                myTreeNode = ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, True, rotorPosition, pRotorType)
 
-                            'If the Element is a positioned Calibrator (TubeContent=CALIB; ElementStatus=POS) but it does not exist in the 
-                            'Required Elements TreeView (Node.Tag=Nothing), then the Rotor Position corresponds to a point of a multipoint 
-                            'Calibrator() that is not the first in the kit, and the Calibrator Icon has to be searched and placed in the 
-                            'Rotor Position (the Icon Name is stored in the Node Tag, but in this case is informed only for the first point 
-                            'of the Calibrator kit)
-                            If (myTreeNode Is Nothing) Then
-                                'If the Element is not on the TreeView then it has to be a Calibrator or an Special or Washing Solution in Tube 
-                                If (rotorPosition.TubeContent = "CALIB") Then
-                                    'Set the Calibrator Icon in the Rotor Position
-                                    UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab.Controls)
+                                'If the Element is a positioned Calibrator (TubeContent=CALIB; ElementStatus=POS) but it does not exist in the 
+                                'Required Elements TreeView (Node.Tag=Nothing), then the Rotor Position corresponds to a point of a multipoint 
+                                'Calibrator() that is not the first in the kit, and the Calibrator Icon has to be searched and placed in the 
+                                'Rotor Position (the Icon Name is stored in the Node Tag, but in this case is informed only for the first point 
+                                'of the Calibrator kit)
+                                If (myTreeNode Is Nothing) Then
+                                    'If the Element is not on the TreeView then it has to be a Calibrator or an Special or Washing Solution in Tube 
+                                    If (rotorPosition.TubeContent = "CALIB") Then
+                                        'Set the Calibrator Icon in the Rotor Position
+                                        UpdateRotorArea(rotorPosition, CALIB_IconName, SamplesTab)
 
-                                ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
-                                    'Set the Tube Additional Solution Icon in the Rotor Position
-                                    UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab.Controls)
+                                    ElseIf (rotorPosition.TubeContent = "TUBE_SPEC_SOL" OrElse rotorPosition.TubeContent = "TUBE_WASH_SOL") Then
+                                        'Set the Tube Additional Solution Icon in the Rotor Position
+                                        UpdateRotorArea(rotorPosition, ADDSAMPLESOL_IconName, SamplesTab)
+                                    End If
                                 End If
                             End If
                         Else
@@ -1650,11 +1763,11 @@ Public Class IWSRotorPositions
                                 End If
 
                                 'Update the rotor area with the new icon path          
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
 
                             Else
                                 'Position is empty...icon is also empty, clean the cell
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture.Controls)
+                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
                             End If
                         End If
                     End If
@@ -1666,7 +1779,9 @@ Public Class IWSRotorPositions
             CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".UpdateRotorTreeViewArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateRotorTreeViewArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            bsElementsTreeView.Visible = True
+            If (Not IsDisposed) Then
+                bsElementsTreeView.Visible = True
+            End If
         End Try
     End Sub
 
@@ -2361,10 +2476,17 @@ Public Class IWSRotorPositions
     '''              SA 18/11/2013 - BT #1359 ==> Changed call to function GetIconNameByTubeContent: new parameter InProcessElement (obtained from the current
     '''                                           row in WSRotorContentByPositionDS) is informed
     '''              AG 25/11/2013 - #1359 - Inform parameter InProcessElement on call method SetPosControlBackGround
+    '''              IT 04/06/2014 - #1644 - Modified the type of last parameter.
     ''' </remarks>
     Private Sub UpdateRotorArea(ByVal pRotorContenByPosRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
-                                ByVal pIconName As String, ByVal pRotorControlCollection As Control.ControlCollection)
+                                ByVal pIconName As String, ByVal pRotorControl As Control)
         Try
+
+            If (pRotorControl Is Nothing) Then Exit Sub
+
+            Dim pRotorControlCollection As Control.ControlCollection
+            pRotorControlCollection = pRotorControl.Controls
+
             'Change the Icon name for the Reagents and Additional solutions
             Dim myIconName As String = pIconName
             If (myIconName = REAGENTS_IconName OrElse myIconName = ADDSOL_IconName) Then
@@ -2515,7 +2637,7 @@ Public Class IWSRotorPositions
                     Else
                         myRotorPicture = Me.ReagentsTab
                     End If
-                    UpdateRotorArea(pRotorContenByPosRow, myNodeTag.ElementIcon, myRotorPicture.Controls)
+                    UpdateRotorArea(pRotorContenByPosRow, myNodeTag.ElementIcon, myRotorPicture)
 
                     'Validate if the Node corresponds to a Diluted Patient Sample
                     'If (IsDilution(CType(myNode.Tag, WSRequiredElementsTO).ElementID)) Then
@@ -2950,6 +3072,7 @@ Public Class IWSRotorPositions
     '''                            JV - 29/11/2013 - #1419: Order correctly by well and don't show values "Type, Volume and/or Tests" depending the barcode status: error or unknown.
     '''                            JV - 03/12/2013 - #1384: Changes in ElementId when reset the session and mantain status
     '''                            TR - 28/03/2014 - #1562: Show the Expiration Date on te report.
+    '''                            XB - 03/06/2014 - #1648: Change the sort of this report alphabetically by the name of the reagent
     ''' </remarks>
     Private Sub GetInfoAreaForReport(ByVal pAnalyzerID As String, ByVal pRotorType As String)
         Try
@@ -3088,7 +3211,11 @@ Public Class IWSRotorPositions
                             End If
                             myReport.Rows.Add(row)
                         Next
-                        myReport.DefaultView.Sort = myReport.Columns(0).ColumnName & " " & "ASC"
+
+                        ' XB 03/06/2014 - BT #1648
+                        'myReport.DefaultView.Sort = myReport.Columns(0).ColumnName & " " & "ASC"
+                        myReport.DefaultView.Sort = myReport.Columns(1).ColumnName & " " & "ASC"
+
                         myReport = myReport.DefaultView.ToTable()
                     Case Else
                         'Nothing to do
@@ -4852,10 +4979,11 @@ Public Class IWSRotorPositions
                                                 OrElse a.ElementStatus = "INCOMPLETE" _
                                                 OrElse a.ElementStatus Is DBNull.Value _
                                                 Select a).ToList()
-
-                            For Each rcpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In qNoposElements
-                                ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, rcpRow, myRotorTypeForm)
-                            Next
+                            If (Not bsElementsTreeView Is Nothing) Then
+                                For Each rcpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In qNoposElements
+                                    ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, rcpRow, myRotorTypeForm)
+                                Next
+                            End If
                             UpdateRotorTreeViewArea(CType(myGlobalDataTo.SetDatos, WSRotorContentByPositionDS))
                         Else
                             'Show error message
@@ -6156,6 +6284,8 @@ Public Class IWSRotorPositions
     '''              SA 10/04/2014 - BT #1584 ==> When the Analyzer is in PAUSE mode, flag createWSInRunning has to be set to FALSE although the Analyzer 
     '''                                           Status is Running. This is to allow block/unblock Executions when elements have been unpositioned/positioned 
     '''                                           during the Pause
+    '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
+    '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6166,10 +6296,17 @@ Public Class IWSRotorPositions
             Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
+            'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks
             'Verify is the current Analyzer Status is RUNNING ==> BT #1584: ...and it is not in PAUSE
             Dim createWSInRunning As Boolean = False
-            If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-                                                                          Not mdiAnalyzerCopy.AllowScanInRunning)
+            'If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+            '                                                              Not mdiAnalyzerCopy.AllowScanInRunning)
+            Dim pauseMode As Boolean = False
+            If (Not mdiAnalyzerCopy Is Nothing) Then
+                createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+            End If
+            'AG 30/05/2014 #1644
 
             'SGM 07/09/2012 - Check if there is any pending ISE Calibration
             Dim iseModuleReady As Boolean = True
@@ -6191,7 +6328,13 @@ Public Class IWSRotorPositions
                                 If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                                     Dim isNeeded As Boolean = CBool(resultData.SetDatos)
                                     If isNeeded Then
-                                        iseModuleReady = False
+
+                                        ' XB 23/05/2014 - BT #1639
+                                        If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                                           (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                            iseModuleReady = False
+                                        End If
+                                        ' XB 23/05/2014 - BT #1639
 
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
@@ -6228,8 +6371,8 @@ Public Class IWSRotorPositions
             'Generate the WS Executions
             'Dim resultData As GlobalDataTO
             Dim myExecutionDelegate As New ExecutionsDelegate
-            'resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady)
-            resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes) 'SGM 07/09/2012 - inform affected electrodes for locking them
+            'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (add parameter pauseMode)
+            resultData = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, createWSInRunning, -1, String.Empty, iseModuleReady, AffectedISEElectrodes, pauseMode) 'SGM 07/09/2012 - inform affected electrodes for locking them
 
             If (resultData.HasError) Then
                 ErrorOnCreateWSExecutions = String.Format("{0}|{1}", resultData.ErrorCode, resultData.ErrorMessage)
@@ -6242,7 +6385,9 @@ Public Class IWSRotorPositions
 
                         ' XB 22/11/2013 - Task #1394
                         'Me.UIThread(Function() ShowMessage(Me.Name, "ISE_NEW_TEST_LOCKED"))
-                        Me.UIThread(Sub() IAx00MainMDI.SetDisplayISELockedPreparationsWarning(True))
+
+                        ' XB 27/05/2014 - BT #1638
+                        'Me.UIThread(Sub() IAx00MainMDI.SetDisplayISELockedPreparationsWarning(True))
 
                         'DL 15/05/2013
                         'ISE preparations locked'. 
@@ -6341,6 +6486,8 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             Dim statusScanningButton As Boolean = False
 
             If (Not mdiAnalyzerCopy Is Nothing) Then
@@ -6387,7 +6534,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub ValidateCheckRotorVolumeButtonEnabled()
         Try
-            If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             'If Not mdiAnalyzerCopy Is Nothing Then
             '    'Place the correct condition when implement this functionality
@@ -6464,7 +6611,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             If isClosingFlag Then Return 'AG 03/08/2012
@@ -6519,7 +6666,8 @@ Public Class IWSRotorPositions
                         If myLinqRes.Count > 0 Then
                             ''updatedRow.Status = "NOT_INUSE" AndAlso
                             'TR 07/09/2011 -Validate if position has a positioned element to change status on treeView 
-                            If myLinqRes(0).ElementStatus = "POS" Then
+                            'AG 13/06/2014 #1661 - add condition Not myLinqRes(0).IsElementIDNull
+                            If myLinqRes(0).ElementStatus = "POS" AndAlso Not myLinqRes(0).IsElementIDNull Then
                                 'Change the tree status 
 
                                 If bsElementsTreeView Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
@@ -6764,7 +6912,8 @@ Public Class IWSRotorPositions
     ''' <remarks>CREATED BY: TR 14/09/2011</remarks>
     Public Sub RefreshAfterSamplesWithoutRequest(ByVal pWorkSessionStatus As String)
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             ScreenWorkingProcess = False
             WorkSessionStatusAttribute = pWorkSessionStatus
             LoadScreenStatus(WorkSessionStatusAttribute)
@@ -6787,7 +6936,8 @@ Public Class IWSRotorPositions
     ''' <remarks></remarks>
     Public Sub RefreshScreenStatus(ByVal pNewAnalzyerStatus As String, ByVal pWorkSessionStatus As String)
         Try
-            If isClosingFlag Then Return 'AG 03/08/2012
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             WorkSessionStatus(pNewAnalzyerStatus) = pWorkSessionStatus
             LoadScreenStatus(WorkSessionStatusAttribute)
         Catch ex As Exception
@@ -6898,15 +7048,16 @@ Public Class IWSRotorPositions
 
                 If (pCreateExecutions) Then
 
-                    'TR 16/04/2014 BT #1597 uncomment on version 3.0.1
-                    'Valiadate if pFromOwnScreen  is enable to set value to IsclosingFlag = true else false
-                    'If pFromOwnScreen Then
-                    '    isClosingFlag = True
-                    'End If
-                    'TR 16/04/2014 BT #1597 -END
+                    'TR 16/04/2014 BT #1597
+                    'Comment or delete this line on version 3.0.1
+                    'isClosingFlag = True 'AG 18/03/2014 - #1545 Investigate avoid DeadLocks
 
-                    'TR 16/04/2014 BT #1597 Comment or delete this line on version 3.0.1
-                    isClosingFlag = True 'AG 18/03/2014 - #1545 Investigate avoid DeadLocks
+                    'Uncomment on version 3.0.1
+                    'Valiadate if pFromOwnScreen  is enable to set value to IsclosingFlag = true else false
+                    If pFromOwnScreen Then
+                        isClosingFlag = True
+                    End If
+                    'TR 16/04/2014 BT #1597 -END
 
                     IAx00MainMDI.EnableButtonAndMenus(False)
                     bsElementsTreeView.BackColor = SystemColors.MenuBar
@@ -6991,7 +7142,7 @@ Public Class IWSRotorPositions
                     Cursor = Cursors.Default
 
                     'TR 16/04/2014 BT #1597-Reload screen status.
-                    'LoadScreenStatus(WorkSessionStatusAttribute)
+                    LoadScreenStatus(WorkSessionStatusAttribute)
                 End If
 
                 'AG 10/02/2014 - If worksession is EMPTY, ABORTED or OPEN and this screen is closed menu and buttons (vertical and screen buttons) disable!
@@ -7024,10 +7175,13 @@ Public Class IWSRotorPositions
     End Function
 
     Public Sub RefreshAfterCloseIncompleteSamplesScreen()
-        If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+
+        If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
         ClearSelection() 'DL 17/04/2013
         LoadScreenStatus(WorkSessionStatusAttribute)
         InitializeScreen(False, "")
+
     End Sub
 
     ''' <summary>
@@ -7387,7 +7541,7 @@ Public Class IWSRotorPositions
     ''' <remarks>Created by XB 15/01/2014 - Task #1438</remarks>
     Public Sub RefreshwatchDogTimer_Interval(ByVal pNewIntervalValue As Double)
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             MyClass.watchDogTimer.Interval = pNewIntervalValue
             'Debug.Print("******************************* WATCHDOG INTERVAL CHANGED TO [" & pNewIntervalValue.ToString & "]")
 
@@ -7404,7 +7558,7 @@ Public Class IWSRotorPositions
     ''' <remarks>Created by XB 29/01/2014 - Task #1438</remarks>
     Public Sub RefreshwatchDogTimer_Enable(ByVal pEnableValue As Boolean)
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
             If pEnableValue Then mdiAnalyzerCopy.BarcodeStartInstrExpected = True
 
             MyClass.watchDogTimer.Enabled = pEnableValue
@@ -7422,7 +7576,8 @@ Public Class IWSRotorPositions
     ''' <remarks>Created by XB 15/01/2014 - Task #1438</remarks>
     Public Sub RefreshScreenAfterWatchDogInvoke()
         Try
-            If isClosingFlag Then Exit Sub 'AG 10/02/2014 - #1496 No refresh is screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+
             mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE
             LoadScreenStatus(WorkSessionStatusAttribute)
             Me.Enabled = True 'Enable the screen
@@ -8197,7 +8352,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub RotorsTabs_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RotorsTabs.SelectedPageChanged
         Try
-            If isClosingFlag Then Exit Sub ' XB 13/03/2014 - #1496 No refresh if screen is closing
+            If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
             If String.Equals(RotorsTabs.SelectedTabPage.Name, "SamplesTab") Then
                 myRotorTypeForm = "SAMPLES"
@@ -8656,6 +8811,11 @@ Public Class IWSRotorPositions
         Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
+            bsAcceptButton.Enabled = False 'AG 18/06/2014 #1669 - Disable button when this process starts
+
+            'AG 28/05/2014 - New trace
+            myLogAcciones.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
+
             'BT #1520 - Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters (a warning message is NOT shown 
             '           if at least one of them has been exceeded)
             Dim pCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
@@ -8666,8 +8826,8 @@ Public Class IWSRotorPositions
             myGlobal = CreateExecutionsProcess(True, createExecutionsFlag)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!! IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            'AG 28/05/2014 - change text  'AG 18/02/2014 - #1505 - Change text!!!
+            myLogAcciones.CreateLogActivity("IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -8682,7 +8842,7 @@ Public Class IWSRotorPositions
                 isClosingFlag = True
                 IAx00MainMDI.StopMarqueeProgressBar()
 
-                ReleaseElement() 'AG 09/07/2013
+                'ReleaseElement() 'AG 09/07/2013
                 'RH 09/02/2011
                 If (Not Me.Tag Is Nothing) Then
                     'A PerformClick() method was executed
@@ -8699,7 +8859,10 @@ Public Class IWSRotorPositions
                     IAx00MainMDI.ActiveStatus = WorkSessionStatusAttribute
                     IAx00MainMDI.OpenMonitorForm(Me, autoProcessFlag)
                 End If
+            Else
+                bsAcceptButton.Enabled = True 'AG 18/06/2014 #1669 - Enable button again if the screen is not closed!!
             End If
+
             'IAx00MainMDI.EnableButtonAndMenus(True) 'AG 07/11/2012 - Avoid blinking in START WS button when rotor position screen is closed
 
             'BT #1520 - Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters (a warning message is NOT shown 
@@ -8709,12 +8872,24 @@ Public Class IWSRotorPositions
             pCounters = Nothing
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("FINAL! High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!! IWSROTORPositions CLOSED (Complete2): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            'AG 28/05/2014 - change text 'AG 18/02/2014 - #1505 - Change text!!!
+            myLogAcciones.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Define event but leave business empty
+    ''' Protection for some users with quick clicks
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG + XB 19/06/2014 #1669</remarks>
+    Private Sub bsAcceptButton_DoubleClick(sender As Object, e As EventArgs) Handles bsAcceptButton.DoubleClick
+        'AG + XB 19/06/2014 #1669
+    End Sub
+
 
     ''' <summary>
     ''' Edits Sample BarCode value
@@ -8773,7 +8948,9 @@ Public Class IWSRotorPositions
                                 'and in the opposite case, change the ElementStatus in the TreeView of WS Required Elements 
                                 If (mySelectedElementInfo.twksWSRotorContentByPosition.Count > 0) Then
                                     If (mySelectedElementInfo.twksWSRotorContentByPosition(0).IsElementIDNull AndAlso Not SelectedElement.IsElementIDNull) Then
-                                        ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                        If (Not bsElementsTreeView Is Nothing) Then
+                                            ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                        End If
                                     End If
                                     'AG 20/02/2014 - #1516 - Protection against "This row has been removed from a table and does not have any data.  BeginEdit() will allow creation of new data in this row" ... Move End If
                                     '                        in order to include next line
@@ -8848,7 +9025,9 @@ Public Class IWSRotorPositions
                             'change the ElementStatus in the TreeView of WS Required Elements
                             If (mySelectedElementInfo.twksWSRotorContentByPosition.Count > 0) Then
                                 If (mySelectedElementInfo.twksWSRotorContentByPosition(0).IsElementIDNull AndAlso Not SelectedElement.IsElementIDNull) Then
-                                    ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                    If (Not bsElementsTreeView Is Nothing) Then
+                                        ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, SelectedElement, myRotorTypeForm)
+                                    End If
                                 End If
                                 'AG 20/02/2014 - #1516 - Protection against "This row has been removed from a table and does not have any data.  BeginEdit() will allow creation of new data in this row" ... Move End If
                                 '                        in order to include next line

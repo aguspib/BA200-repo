@@ -34,12 +34,13 @@ Namespace Biosystems.Ax00.Global.DAL
                     dbCmd.Connection = myDBConnection
                     For Each myApplicationLog As ApplicationLogTO In pApplicationLogTOList
                         cmdText.Append("INSERT INTO tfmwApplicationLog ")
-                        cmdText.Append("(LogDateTime, Message, LogType, Module)")
-                        cmdText.AppendFormat(" VALUES('{0}', N'{1}', '{2}', '{3}')", _
+                        cmdText.Append("(LogDateTime, Message, LogType, Module, ThreadId)")
+                        cmdText.AppendFormat(" VALUES('{0}', N'{1}', '{2}', '{3}', {4})", _
                                              myApplicationLog.LogDate.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture), _
                                              myApplicationLog.LogMessage.Replace("'", "''"), _
                                              myApplicationLog.LogType, _
-                                             myApplicationLog.LogModule)
+                                             myApplicationLog.LogModule, _
+                                             myApplicationLog.LogThreadId)
 
                         'myApplicationLog.LogDate.ToString("yyyy-MM-dd HH:mm:ss:fff"), _
 
@@ -115,6 +116,7 @@ Namespace Biosystems.Ax00.Global.DAL
                         dbCmd.Parameters.AddWithValue("@Message", myApplicationLog.LogMessage)
                         dbCmd.Parameters.AddWithValue("@LogType", myApplicationLog.LogType)
                         dbCmd.Parameters.AddWithValue("@Module", myApplicationLog.LogModule)
+                        dbCmd.Parameters.AddWithValue("@ThreadId", myApplicationLog.LogThreadId)
 
                         'Execute procedure
                         dbCmd.ExecuteNonQuery()
@@ -151,7 +153,7 @@ Namespace Biosystems.Ax00.Global.DAL
                     myDBConnection.Open()
                     dbCmd.Connection = myDBConnection
 
-                    cmdText.Append("SELECT LogDateTime, Message, LogType, Module")
+                    cmdText.Append("SELECT LogDateTime, Message, LogType, Module, ThreadId")
                     cmdText.Append(" FROM tfmwApplicationLog ")
                     cmdText.Append(" ORDER BY LogDateTime ASC")
 

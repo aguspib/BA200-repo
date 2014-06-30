@@ -111,6 +111,9 @@ Namespace Biosystems.Ax00.DAL
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
         Public Shared Sub BeginTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+
+            Dim myLogAcciones As New ApplicationLogManager()
+
             Try
                 'Dim cmdText As String = ""
                 'cmdText = " SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED "
@@ -125,6 +128,8 @@ Namespace Biosystems.Ax00.DAL
                 'dbCmd.CommandText = cmdText
                 'dbCmd.ExecuteNonQuery()
 
+                myLogAcciones.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
+
                 Using dbCmd As New SqlClient.SqlCommand()
                     dbCmd.Connection = pDBConnection
                     dbCmd.CommandText = " SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED "
@@ -135,7 +140,6 @@ Namespace Biosystems.Ax00.DAL
                 End Using
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -149,9 +153,11 @@ Namespace Biosystems.Ax00.DAL
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
         Public Shared Sub CommitTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+
+            Dim myLogAcciones As New ApplicationLogManager()
+
             Try
                 Dim cmdText As String = " COMMIT TRANSACTION "
-
                 'Dim dbCmd As New SqlClient.SqlCommand
                 'dbCmd.Connection = pDBConnection
                 'dbCmd.CommandText = cmdText
@@ -161,8 +167,9 @@ Namespace Biosystems.Ax00.DAL
                     dbCmd.ExecuteNonQuery()
                 End Using
 
+                myLogAcciones.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
+
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.CommitTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -176,6 +183,8 @@ Namespace Biosystems.Ax00.DAL
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
         Public Shared Sub RollbackTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+            Dim myLogAcciones As New ApplicationLogManager()
+
             Try
                 Dim cmdText As String = " ROLLBACK TRANSACTION "
 
@@ -188,10 +197,10 @@ Namespace Biosystems.Ax00.DAL
                     dbCmd.ExecuteNonQuery()
                 End Using
 
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity("", System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
+            Catch ex As Exception
+                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -252,6 +261,7 @@ Namespace Biosystems.Ax00.DAL
             Dim openTransaction As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 If (pDBConnection Is Nothing) Then
@@ -280,7 +290,6 @@ Namespace Biosystems.Ax00.DAL
                     dbConnection.Close()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBTransaction", EventLogEntryType.Error, False)
             End Try
             Return openTransaction

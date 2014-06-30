@@ -610,31 +610,63 @@ Namespace Biosystems.Ax00.Global
         ''' <summary>
         ''' Get the EXE version (adapted from iPRO Utils.GetVersionSw)
         ''' </summary>
-        ''' <returns>GlobalDataTO with data as String</returns>
+        ''' <param name="pIgnoreRevision">Optional parameter. When its value is TRUE (default value), it means field Revision will not be 
+        '''                               returned although its value is greater than zero. Function will be called with pIgnoreRevision = FALSE
+        '''                               only when the function is called to write the Version.txt file (the file is written from IAx00Login if
+        '''                               it is the first time the application is loaded and the file does not exist yet, and also from ISATReport
+        '''                               when a RSAT is generated)
+        ''' </param>
+        ''' <param name="pForRSATFromServiceSW">Optional parameter. When TRUE, it indicates the RSAT was requested from Service SW. Default value
+        '''                                     is FALSE</param>
+        ''' <returns>GlobalDataTO containing an String value with the SW version (Major.Minor.Build). If field Revision is informed (greater than
+        '''          zero) then it is also returned in the String value (Major.Minor.Build.Revision), but only when value of optional parameter
+        '''          pIgnoreRevision is FALSE</returns>
         ''' <remarks>
-        ''' Created by AG 22/04/2010 (Tested pending)
+        ''' Created by:  AG 22/04/2010 
         ''' Modified by: RH 12/11/2010
-        '''              TR 07/02/2012 -New implementation, get the information from the assembly info and if 
-        '''                             revision value is Cero don't show it.
+        '''              TR 07/02/2012 - New implementation. Get the information from the AssemblyInfo and show Revision field only when its value
+        '''                              is greater than zero 
+        '''              SA 15/05/2014 - BT #1617 ==> ** Added optional parameter pIgnoreRevision. When value of this parameter is TRUE, field Revision
+        '''                                              will not be returned although it has a value greater than zero.
+        '''                                           ** Added new optional parameter pForRSATFromServiceSW. When its value is TRUE, it means the function
+        '''                                              has to return the ApplicationVersion of the User SW instead of the ApplicationVersion of the 
+        '''                                              Service SW.
+        '''                                           ** Function has been re-written
         ''' </remarks>
-        Public Function GetSoftwareVersion() As GlobalDataTO
+        Public Function GetSoftwareVersion(Optional ByVal pIgnoreRevision As Boolean = True, _
+                                           Optional ByVal pForRSATFromServiceSW As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
 
             Try
-                'Validate if the revision value on the version info.
-                If My.Application.Info.Version.Revision = 0 Then
-                    'Cero value remove from text
-                    myGlobal.SetDatos = String.Format("{0}.{1}.{2}", My.Application.Info.Version.Major, My.Application.Info.Version.Minor, _
-                                                          My.Application.Info.Version.Build)
+                If (Not pForRSATFromServiceSW) Then
+                    'Normal function use --> get the Application Version of the program being executed (UserSW or ServiceSW)
+                    If (My.Application.Info.Version.Revision = 0 OrElse pIgnoreRevision) Then
+                        'REVISION field is not returned when its value is zero or it has to be ignored (pIgnoreRevision = TRUE)
+                        myGlobal.SetDatos = String.Format("{0}.{1}.{2}", My.Application.Info.Version.Major, My.Application.Info.Version.Minor, _
+                                                              My.Application.Info.Version.Build)
+                    Else
+                        'REVISION field is returned when its value is greater than zero and it has not to be ignored (pIgnoreRevision = FALSE)
+                        myGlobal.SetDatos = String.Format("{0}.{1}.{2}.{3}", My.Application.Info.Version.Major, My.Application.Info.Version.Minor, _
+                                                              My.Application.Info.Version.Build, My.Application.Info.Version.Revision)
+                    End If
                 Else
-                    'Show complete version value including the Revision.
-                    myGlobal.SetDatos = String.Format("{0}.{1}.{2}.{3}", My.Application.Info.Version.Major, My.Application.Info.Version.Minor, _
-                                                          My.Application.Info.Version.Build, My.Application.Info.Version.Revision)
-                End If
+                    'Special case --> function has been called for the RSAT generation process launched from ServiceSW. In this case, the value
+                    '                 to return has to be the Application Version of the UserSW (different code is needed to get it)
+                    Dim myGlobalBase As New GlobalBase
+                    Dim userSwExeFullPath As String = myGlobalBase.UserSwExeFullPath()
+                    Dim fvi As FileVersionInfo = FileVersionInfo.GetVersionInfo(userSwExeFullPath)
 
+                    If (fvi.FilePrivatePart = 0 OrElse pIgnoreRevision) Then
+                        'REVISION field is not returned when its value is zero or it has to be ignored (pIgnoreRevision = TRUE)
+                        myGlobal.SetDatos = String.Format("{0}.{1}.{2}", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart)
+                    Else
+                        'REVISION field is returned when its value is greater than zero and it has not to be ignored (pIgnoreRevision = FALSE)
+                        myGlobal.SetDatos = String.Format("{0}.{1}.{2}.{3}", fvi.FileMajorPart, fvi.FileMinorPart, fvi.FileBuildPart, fvi.FilePrivatePart)
+                    End If
+                End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -677,58 +709,67 @@ Namespace Biosystems.Ax00.Global
         End Function
 
         ''' <summary>
-        ''' Creates version text file in the specified directory
+        ''' Create the Version.txt file in the specified directory
         ''' </summary>
-        ''' <param name="pFilePath">Indicate the file path where the version file is create</param>
-        ''' <param name="pActionProcess">Indicate if the process that made the call, in case the 
-        ''' process is and SAT_UPDATE the user must inform the parameter pPreviousAppVesion</param>
-        ''' <param name="pAppVersion">Indicate the previous application version</param>
-        ''' <returns></returns>
+        ''' <param name="pFilePath">Name of the Version.txt file that has to be created</param>
+        ''' <param name="pActionProcess">Optional parameter to indicate in which type of process this function has been called: SAT Report generation 
+        '''                              (SAT_REPORT, which is the parameter default value) or Application Update (SAT_UPDATE)</param>
+        ''' <param name="pAppVersion">Optional parameter to indicate the previous Application version (the version installed before an Update Application
+        '''                           process). When value of optional parameter pActionProcess is SAT_UPDATE, it is mandatory to inform this parameter</param>
+        ''' <param name="pForRSATFromServiceSW">Optional parameter. When TRUE, it indicates the RSAT was requested from Service SW.
+        '''                                     Default value is FALSE</param>
+        ''' <returns>GlobalDataTO containing a Boolean value that indicates when the Version.txt file was succesfully created</returns>
         ''' <remarks>
-        ''' Created by SG 13/10/10
-        ''' Modified by: TR 12/06/2013 -Add the parameters pActionProcess and pAppVersion, this parameter are uses to indicate 
-        '''                             The process that call this metohod, in case is a SAT_UPDATE means it's and update process 
-        '''                             is calling, so the AppVersion will be database version berofe it's updated.
+        ''' Created by:  SG 13/10/10
+        ''' Modified by: TR 12/06/2013 - Added new optional parameter pActionProcess to indicate in which type of process this function has been 
+        '''                              called: SAT Report generation (SAT_REPORT, which is the parameter default value) or Application Update
+        '''                              (SAT_UPDATE). When value of the parameter is SAT_UPDATE, it means a Restore Point of the previous Application 
+        '''                              version is beign created, and then, the User Sw Version to save in the Version.txt file have to be the one
+        '''                              of the previous Application version (new optional parameter pAppVersion has been also added to inform that 
+        '''                              previous version)
+        '''              SA 13/05/2014 - BT #1617 ==> ** Changed the call to function GetSoftwareVersion to inform optional parameter pIgnoreRevision = FALSE, 
+        '''                                              which mean that field Revision will be also written in the Version.txt file when its value is greater 
+        '''                                              than zero  
+        '''                                           ** Added new optional parameter pForRSATFromServiceSW, that will be informed in the call to function 
+        '''                                              GetSoftwareVersion 
         ''' </remarks>
-        Public Function CreateVersionFile(ByVal pFilePath As String, _
-                                          Optional pActionProcess As GlobalEnumerates.SATReportActions = GlobalEnumerates.SATReportActions.SAT_REPORT, _
-                                          Optional pAppVersion As String = "") As GlobalDataTO
-
+        Public Function CreateVersionFile(ByVal pFilePath As String, Optional pActionProcess As GlobalEnumerates.SATReportActions = GlobalEnumerates.SATReportActions.SAT_REPORT, _
+                                          Optional pAppVersion As String = "", Optional ByVal pForRSATFromServiceSW As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
-                Dim myAppVersion As String
-
-                'TR 12/06/2013 -Validate the action executed to indicate the previous application version if is an update process.
-                If pActionProcess = GlobalEnumerates.SATReportActions.SAT_UPDATE Then
+                'Verify in which type of process this function has been called: SAT Report Generation or Application Update
+                If (pActionProcess = GlobalEnumerates.SATReportActions.SAT_UPDATE) Then
+                    'Function has been called for Application Update ==> The SW Version is the one informed in pAppVersion parameter
                     myGlobal.SetDatos = pAppVersion
                 Else
-                    'Get the version from DB.
-                    myGlobal = myUtil.GetSoftwareVersion()
+                    'Function has been called for SAT Report Generation ==> The SW Version is obtained from the DLL
+                    Dim myUtil As New Utilities
+                    myGlobal = myUtil.GetSoftwareVersion(False, pForRSATFromServiceSW)
                 End If
 
-                If Not myGlobal.HasError And Not myGlobal Is Nothing Then
-                    myAppVersion = CStr(myGlobal.SetDatos)
+                'Write the SW Version in the Version.txt file
+                If (Not myGlobal.HasError AndAlso Not myGlobal Is Nothing) Then
+                    Dim myAppVersion As String = CStr(myGlobal.SetDatos)
                     Dim VersionFileName As String = pFilePath
+
                     Dim myStreamWriter As StreamWriter = File.CreateText(VersionFileName)
                     myStreamWriter.Write(myAppVersion)
                     myStreamWriter.Close()
+
                     myGlobal.SetDatos = True
                 End If
             Catch ex As Exception
-                If File.Exists(pFilePath) Then File.Delete(pFilePath)
+                If (File.Exists(pFilePath)) Then File.Delete(pFilePath)
 
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CreateVersionFile", EventLogEntryType.Error, False)
             End Try
-
             Return myGlobal
-
         End Function
 
         ''' <summary>

@@ -221,6 +221,38 @@ Public Class IQCResultsEditionAux
             ShowMessage(Me.Name & ".SetControlsBackGround ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsResultEditionGroupBox = Nothing
+            bsExitButton = Nothing
+            bsAcceptButton = Nothing
+            bsLotNumberLabel = Nothing
+            bsLotNumberTextBox = Nothing
+            bsTestSampleTypeTextBox = Nothing
+            bsTestSampleTypeLabel = Nothing
+            bsResultEditionLabel = Nothing
+            bsMeasureUnitLabel = Nothing
+            bsResultValueTextBox = Nothing
+            bsResultLabel = Nothing
+            bsRunNumberTextBox = Nothing
+            bsControlNameTextBox = Nothing
+            bsControlLabel = Nothing
+            bsRemarkTextBox = Nothing
+            bsExcludeResultCheckBox = Nothing
+            bsRemarksLabel = Nothing
+            myToolTipsControl = Nothing
+            myErrorProvider = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"

@@ -83,6 +83,8 @@ Namespace Biosystems.Ax00.BL
         '''                                 "INCOMPLETE" as ElementStatus
         '''              SA 02/03/2012    - Undo the previous change; when the total positioned volume of the informed Element is zero, then return "NOPOS"
         '''                                 as ElementStatus
+        '''              SA 29/05/2014    - BT #1627 ==> The final validation comparing the required volume against the total positioned volume must be done
+        '''                                              only for Reagents; for Dilution and Washing Solutions the required volume is unknown
         ''' </remarks>
         Public Function CalculateReagentStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                                                ByVal pElementID As Integer, ByVal pNotForClear As Boolean) As GlobalDataTO
@@ -113,14 +115,18 @@ Namespace Biosystems.Ax00.BL
                                     If (Not pNotForClear) Then
                                         reagentStatus = "NOPOS"
                                     ElseIf (myTotalVolume = 0) Then
-                                        reagentStatus = "NOPOS"   '"INCOMPLETE"
+                                        reagentStatus = "NOPOS"
                                     End If
 
-                                    'Validate the required volume and the total volume to know if the Element is incomplete
-                                    If (myTotalVolume > 0 AndAlso myRequiredVolume.twksWSRequiredElements(0).RequiredVolume > myTotalVolume) Then
-                                        reagentStatus = "INCOMPLETE"
-                                    ElseIf (myTotalVolume > 0 AndAlso myRequiredVolume.twksWSRequiredElements(0).RequiredVolume <= myTotalVolume) Then
-                                        reagentStatus = "POS"
+                                    'BT #1627 - The validation comparing the required volume against the total positioned volume must be done
+                                    '           only for Reagents; for Dilution and Washing Solutions the required volume is unknown
+                                    If (myRequiredVolume.twksWSRequiredElements.First.TubeContent = "REAGENT") Then
+                                        'Validate the required volume and the total volume to know if the Element is incomplete
+                                        If (myTotalVolume > 0 AndAlso myRequiredVolume.twksWSRequiredElements(0).RequiredVolume > myTotalVolume) Then
+                                            reagentStatus = "INCOMPLETE"
+                                        ElseIf (myTotalVolume > 0 AndAlso myRequiredVolume.twksWSRequiredElements(0).RequiredVolume <= myTotalVolume) Then
+                                            reagentStatus = "POS"
+                                        End If
                                     End If
 
                                     resultData.SetDatos = reagentStatus
@@ -432,7 +438,6 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Get the number of Elements belonging to the specified Work Session that have been still non positioned in an Analyzer Rotor
@@ -1219,8 +1224,12 @@ Namespace Biosystems.Ax00.BL
         '''              SA 29/08/2013 - When filling the WSNoPosRequiredElementsDS  to return with data of the not positioned Patient Samples, if the 
         '''                              required element is not a manual predilution and field SpecimenIDList is informed, set value of field SampleName 
         '''                              as SpecimenIDList plus the PatientID/SampleID between brackets; otherwise, set field SampleName = PatientID/SampleID
-        '''              TR 13/11/2013 - BT #1380 On method GetRequiredPatientSamplesElements set the parameter pOnlyNotFinished to true, to get only the not positioned patients.
-        '''              TR 21/11/2013 - BT #1380 Unload the reagents that are nor in use any more validating the OrderTest.
+        '''              TR 13/11/2013 - BT #1380 ==> When call function GetRequiredPatientSamplesElements, parameter pOnlyNotFinished is set to TRUE, to get 
+        '''                                           only Not Positioned and NOT FINISHED Patient Samples.
+        '''              TR 21/11/2013 - BT #1380 ==> After calling function GetNotPositionedElements, unload Not Positioned Reagents that are not needed  
+        '''                                           anymore in the active WorkSession
+        '''              SA 27/05/2014 - BT #1519 ==> Undo the last change. Now not positioned Reagents that are not needed anymore in the active WorkSession 
+        '''                                           are not returned by function GetNotPositionedElements
         ''' </remarks>
         Public Function GetNotPositionedElements(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1237,33 +1246,33 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim myWSNoPosElementsDS As WSNoPosRequiredElementsDS = DirectCast(resultData.SetDatos, WSNoPosRequiredElementsDS)
 
-                            'TR 21/11/2013 -BT #1380
-                            Dim myOrderTestsDS As New OrderTestsDS
-                            Dim NoPosElementsToRemove As New List(Of WSNoPosRequiredElementsDS.twksWSRequiredElementsRow)
-                            For Each noposElementRow As WSNoPosRequiredElementsDS.twksWSRequiredElementsRow In _
-                                                                    myWSNoPosElementsDS.twksWSRequiredElements.Rows
-                                If noposElementRow.SampleClass = "REAGENT" AndAlso _
-                                                Not noposElementRow.IsElementIDNull Then
+                            ''TR 21/11/2013 -BT #1380
+                            'Dim myOrderTestsDS As New OrderTestsDS
+                            'Dim NoPosElementsToRemove As New List(Of WSNoPosRequiredElementsDS.twksWSRequiredElementsRow)
+                            'For Each noposElementRow As WSNoPosRequiredElementsDS.twksWSRequiredElementsRow In _
+                            '                                        myWSNoPosElementsDS.twksWSRequiredElements.Rows
+                            '    If noposElementRow.SampleClass = "REAGENT" AndAlso _
+                            '                    Not noposElementRow.IsElementIDNull Then
 
-                                    'TR 21/11/2013 -Validate reagent rotor elemens if not requiered any more.
-                                    resultData = ValidateReagentRotorElementIsRequired(dbConnection, noposElementRow.ElementID)
-                                    If Not resultData.HasError Then
-                                        myOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsDS)
-                                        If myOrderTestsDS.twksOrderTests.Count = 0 Then
-                                            'MarkElement To be remove for dataset
-                                            NoPosElementsToRemove.Add(noposElementRow)
-                                        End If
-                                    Else
-                                        Exit Try
-                                    End If
-                                End If
-                            Next
+                            '        'TR 21/11/2013 -Validate reagent rotor elemens if not requiered any more.
+                            '        resultData = ValidateReagentRotorElementIsRequired(dbConnection, noposElementRow.ElementID)
+                            '        If Not resultData.HasError Then
+                            '            myOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsDS)
+                            '            If myOrderTestsDS.twksOrderTests.Count = 0 Then
+                            '                'MarkElement To be remove for dataset
+                            '                NoPosElementsToRemove.Add(noposElementRow)
+                            '            End If
+                            '        Else
+                            '            Exit Try
+                            '        End If
+                            '    End If
+                            'Next
 
-                            For Each ElemetToRemove In NoPosElementsToRemove
-                                ElemetToRemove.Delete()
-                            Next
-                            myWSNoPosElementsDS.AcceptChanges()
-                            'TR 21/11/2013 -BT #1380 END    
+                            'For Each ElemetToRemove In NoPosElementsToRemove
+                            '    ElemetToRemove.Delete()
+                            'Next
+                            'myWSNoPosElementsDS.AcceptChanges()
+                            ''TR 21/11/2013 -BT #1380 END    
 
                             If (myWSNoPosElementsDS.twksWSRequiredElements.Rows.Count > 0) Then
                                 Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -2909,41 +2918,6 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
-
-        ''' <summary>
-        ''' Validate if there are open Order Tests for the specified Element Identifier
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pElementID">Element Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet OrderTestsDS with data of all OPEN Order Tests related with the specified Element</returns>
-        ''' <remarks>
-        ''' Created by:  TR 21/11/2013 - BT #1380
-        ''' </remarks>
-        Public Function ValidateReagentRotorElementIsRequired(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pElementID As Integer) As GlobalDataTO
-            Dim myGlobalDataTO As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Try
-                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myOrderTestDelegate As New OrderTestsDelegate
-                        myGlobalDataTO = myOrderTestDelegate.GetNotClosedOrderTestByElementID(dbConnection, pElementID)
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO = New GlobalDataTO()
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRequiredElementsDelegate.ValidateReagentRotorElementIsRequired", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return myGlobalDataTO
-        End Function
 #End Region
 
 #Region "Private Methods"
@@ -4094,6 +4068,41 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "TO REVIEW - DELETE?"
+        ' ''' <summary>
+        ' ''' Validate if there are open Order Tests for the specified Element Identifier
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pElementID">Element Identifier</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet OrderTestsDS with data of all OPEN Order Tests related with the specified Element</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  TR 21/11/2013 - BT #1380
+        ' ''' </remarks>
+        'Public Function ValidateReagentRotorElementIsRequired(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pElementID As Integer) As GlobalDataTO
+        '    Dim myGlobalDataTO As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+        '    Try
+        '        myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim myOrderTestDelegate As New OrderTestsDelegate
+        '                myGlobalDataTO = myOrderTestDelegate.GetNotClosedOrderTestByElementID(dbConnection, pElementID)
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        myGlobalDataTO = New GlobalDataTO()
+        '        myGlobalDataTO.HasError = True
+        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSRequiredElementsDelegate.ValidateReagentRotorElementIsRequired", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return myGlobalDataTO
+        'End Function
+
         '''' <summary>
         '''' Get the list of Required Elements for an Order Test belonging to a Control Order according its TestID/SampleType
         '''' </summary>

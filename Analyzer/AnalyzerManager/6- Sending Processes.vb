@@ -54,10 +54,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_ERR) Then
                     myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_ERR)
                 End If
-                myUI_RefreshEvent.Clear()
-                myUI_RefreshDS.Clear()
-                mySecondaryUI_RefreshEvent.Clear()
-                mySecondaryUI_RefreshDS.Clear()
+                'myUI_RefreshEvent.Clear()
+                'myUI_RefreshDS.Clear()
+                ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
+
+                'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                'mySecondaryUI_RefreshEvent.Clear()
+                'mySecondaryUI_RefreshDS.Clear()
 
                 'AG 29/03/2012 - clear freeze alarms
                 If analyzerFREEZEFlagAttribute AndAlso Not pFromRecoveryResults Then
@@ -316,6 +319,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim actionAlreadySent As Boolean = False
                 Dim endRunToSend As Boolean = False
                 Dim systemErrorFlag As Boolean = False 'AG 25/01/2012 Indicates if search next has produced a system error. In this case send a END instruction
+                Dim emptyFieldsDetected As Boolean = False 'AG 03/06/2014 - #1519 when Sw cannot send the proper instruction because there are emtpy fields error then send SKIP
+
                 'myGlobal = Me.SearchNextPreparation(Nothing, pNextWell)
                 'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
                 'AG 07/06/2012
@@ -358,6 +363,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     If myGlobal.ErrorCode = "EMPTY_FIELDS" Then
                                         myGlobal.HasError = False
                                         myGlobal.ErrorCode = ""
+                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                     End If
                                     'AG 27/09/2012
                                 End If
@@ -396,6 +402,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 myGlobal.HasError = False
                                                 myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                             End If
                                             'AG 27/09/2012
                                         End If
@@ -446,6 +453,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 myGlobal.HasError = False
                                                 myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                             Else
                                                 myGlobal.HasError = True
                                             End If
@@ -485,6 +493,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 myGlobal.HasError = False
                                                 myGlobal.ErrorCode = ""
+                                                emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                             End If
                                             'AG 27/09/2012
                                         End If
@@ -523,6 +532,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                         myGlobal.HasError = False
                                                         myGlobal.ErrorCode = ""
+                                                        emptyFieldsDetected = True 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
                                                     End If
                                                     'AG 27/09/2012
                                                 End If
@@ -561,11 +571,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'End If
 
                 'New Conditions 
+                '- When EMPTY_FIELDS error detected --> Sw sends SKIP
                 '- When NO ise installed: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
                 '- When ise installed but ise switch off: No action sent + AnalyzerIsReady (R:1) --> Sw sends ENDRUN
                 '- When ise installed and ise switch on: No action sent + AnalyzerIsReady (R:1) + ISEModuleIsReady (I:1) --> Sw sends ENDRUN
                 '- Else if No action sent --> Sw sends SKIP
-                If Not actionAlreadySent Then
+                If emptyFieldsDetected Then
+                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SKIP) 'AG 03/06/2014 - #1519 if the proper instruction could not be sent because EMPTY_FIELDS error send a SKIP
+
+                ElseIf Not actionAlreadySent Then
                     If Not systemErrorFlag Then
                         endRunToSend = False
                         If Not iseInstalledFlag AndAlso AnalyzerIsReadyAttribute Then
@@ -1457,30 +1471,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'AG 10/01/2014 - BT #1432 (sometimes Software does not send the reagent contamination wash)
                                 'CHANGE RULE: When a new TEST is sent remove all previous Wash sent (reagents or cuvettes)
                                 'The old was wrong and also the index used where wrong!!! - (Now, I think it has no sense)
-
-                                ''2on: After reagent or cuvette wash delete all PREP_STD executions sent before
-                                'resLinq = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
-                                '           Where a.ReagentWashFlag = True Or a.CuvetteWashFlag = True _
-                                '           Select a).ToList
-
-                                'If resLinq.Count > 0 Then '(6.2) 
-                                '    Dim firstSTDPrepRow As Integer = -1
-                                '    For i As Integer = 0 To mySentPreparationsDS.sentPreparations.Rows.Count - 1
-                                '        If Not mySentPreparationsDS.sentPreparations(i).IsExecutionTypeNull Then
-                                '            If String.Equals(mySentPreparationsDS.sentPreparations(i).ExecutionType, "PREP_STD") Then
-                                '                firstSTDPrepRow = i
-                                '                Exit For
-                                '            End If
-                                '        End If
-                                '    Next
-
-                                '    If firstSTDPrepRow > 0 Then
-                                '        For i As Integer = 0 To firstSTDPrepRow - 1
-                                '            mySentPreparationsDS.sentPreparations(i).Delete()
-                                '        Next
-                                '        mySentPreparationsDS.sentPreparations.AcceptChanges()
-                                '    End If
-                                'End If '(6.2)
 
                                 '2on NEW RULE: When send a new PREP_STD clear all previous wash
                                 resLinq = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _

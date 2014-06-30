@@ -45,6 +45,8 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: TR 28/09/2012 -Add optional parameter IsBottleLocked to indicate if the bottle status is locked, this
         '''                             is for implementation of ReagentsOnBoard Locked bottle.
         ''' Modified by AG 04/10/2012 - add byref parameter pTurnToPendingFlag (used in ProcessArmStatusRecevied, when return TRUE means the Sw has to search next preparation to be sent again)
+        ''' AG 13/06/2014 #1662 (add also protection against empty position causing method returns a wrong datatype!!!)
+        '''                     (if not element in position but preparationID value different than zero -- then lock the executions linked with this preparationID)
         ''' </remarks>
         Public Function ProcessVolumeMissing(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, _
                                              ByVal pRotorType As String, ByVal pCellNumber As Integer, _
@@ -230,6 +232,29 @@ Namespace Biosystems.Ax00.BL
                                     End If
                                 End If
 
+                                'AG 16/06/2014 #1662 - if user has changed or removed bottle after TEST/PTEST/ISETEST had been sent and there is empty position
+                                'then LOCK executions using this preparationID
+                            ElseIf pPreparationID <> 0 Then
+                                resultData = GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID)
+                                If Not resultData.HasError Then
+                                    Dim myExecutionDS As New ExecutionsDS
+                                    myExecutionDS = CType(resultData.SetDatos, ExecutionsDS)
+
+                                    If Not pPreparationIDPerformedOK Then
+                                        '2c. Update status for the preparation ID (LOCKED or PENDING) depending if more volume is available or not
+                                        myReturnValue = "LOCKED"
+                                        For Each myExecutionRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                            If Not myExecutionRow.IsExecutionIDNull Then
+                                                'Update status for my Execution 
+                                                resultData = UpdateStatusByExecutionID(dbConnection, myReturnValue, myExecutionRow.ExecutionID, pWorkSessionID, pAnalyzerID)
+                                            End If
+                                        Next
+                                    End If
+                                    resultData.SetDatos = myExecutionDS 'Return executions locked!!!
+
+                                End If
+                                'AG 16/06/2014 #1662
+
                             End If
                         End If
 
@@ -240,6 +265,13 @@ Namespace Biosystems.Ax00.BL
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
+
+                        'AG 13/06/2014 #1662 (add also protection against empty position causing method returns a wrong datatype!!!)
+                        If Not resultData.HasError AndAlso Not TypeOf (resultData.SetDatos) Is ExecutionsDS Then
+                            Dim temp As New ExecutionsDS
+                            resultData.SetDatos = temp
+                        End If
+                        'AG 13/06/2014 #1662
 
                     End If
                 End If
@@ -4537,18 +4569,19 @@ Namespace Biosystems.Ax00.BL
                                     Next
                                 End If
 
-                                '4.3)STD_PREP: Lock all pending executions it the required washing solution is NOPOS
-                                If Not resultData.HasError Then
-                                    'Using Linq search WASH_SOL with status NOPOS
-                                    linqRes = (From a As WSRequiredElementsDS.twksWSRequiredElementsRow In reqElmDS.twksWSRequiredElements _
-                                               Where a.TubeContent = "WASH_SOL" AndAlso a.ElementStatus = "NOPOS" Select a).ToList
+                                'AG 03/06/2014 - #1519 Do not lock any contaminator executions when WASH SOL bottles are over
+                                ''4.3)STD_PREP: Lock all pending executions it the required washing solution is NOPOS
+                                'If Not resultData.HasError Then
+                                '    'Using Linq search WASH_SOL with status NOPOS
+                                '    linqRes = (From a As WSRequiredElementsDS.twksWSRequiredElementsRow In reqElmDS.twksWSRequiredElements _
+                                '               Where a.TubeContent = "WASH_SOL" AndAlso a.ElementStatus = "NOPOS" Select a).ToList
 
-                                    For Each row As WSRequiredElementsDS.twksWSRequiredElementsRow In linqRes
-                                        If Not row.IsSolutionCodeNull Then
-                                            resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", row.SolutionCode, pWorkSessionID, pAnalyzerID)
-                                        End If
-                                    Next
-                                End If
+                                '    For Each row As WSRequiredElementsDS.twksWSRequiredElementsRow In linqRes
+                                '        If Not row.IsSolutionCodeNull Then
+                                '            resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", row.SolutionCode, pWorkSessionID, pAnalyzerID)
+                                '        End If
+                                '    Next
+                                'End If
 
                                 '4.4)ISE_PREP: Lock all pending executions if ise wash solution is NOPOS
                                 If Not resultData.HasError Then
@@ -5529,10 +5562,11 @@ Namespace Biosystems.Ax00.BL
 
                             'WASH solution bottle is empty (OK tested 06/04/2011)
                         ElseIf pTubeContent = "WASH_SOL" Then
-                            'LOCK all executions that uses reagents contaminators that requires the WASH_SOL - pSolutionCode
-                            'See ExecutionsByWashCode.sql
-                            Dim myDAO As New twksWSExecutionsDAO
-                            resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", pSolutionCode, pWorkSessionID, pAnalyzerID)
+                            'AG 03/06/2014 - #1519 Do not lock any contaminator executions when WASH SOL bottles are over
+                            ''LOCK all executions that uses reagents contaminators that requires the WASH_SOL - pSolutionCode
+                            ''See ExecutionsByWashCode.sql
+                            'Dim myDAO As New twksWSExecutionsDAO
+                            'resultData = myDAO.UpdateStatusByContamination(dbConnection, "LOCKED", "PENDING", pSolutionCode, pWorkSessionID, pAnalyzerID)
 
                         ElseIf pTubeContent = "TUBE_WASH_SOL" Then
                             'ISE washing solution
@@ -6051,6 +6085,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pPostDilutionType">Type of post Dilution to apply when a Rerun has been requested. Optional parameter</param>
         ''' <param name="pIsISEModuleReady">Flag indicating if the ISE Module is ready to be used. Optional parameter</param>
         ''' <param name="pISEElectrodesList">String list containing ISE Electrodes (ISE_ResultID) with wrong/pending calibration</param>
+        ''' <param name="pPauseMode"></param>
+        ''' <param name="pManualRerunFlag">Always TRUE except when autoreruns are triggered</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 09/02/2011
@@ -6079,15 +6115,31 @@ Namespace Biosystems.Ax00.BL
         '''              AG 19/02/2014 - #1514 improvements memory app/sql
         '''              AG 19/03/2014 - #1545 (adapt the CreateWSExecutions active until 19/03/2014 and adapt it for use multiples)
         '''                              New method does not open transaction, dbConnection is nothing unless it has been received from parameter
+        '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
+        '''              AG 02/06/2014 - #1644 new optional parameter pManualRerunFlag (when FALSE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
         ''' </remarks> 
         Public Function CreateWSExecutionsMultipleTransactions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                            ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
                                            Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing) As GlobalDataTO
+                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
+                                           Optional ByVal pManualRerunFlag As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                Dim StartTime As DateTime = Now
+                Dim myLogAcciones As New ApplicationLogManager()
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+                'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                End If
+
                 'AG 19/03/2014 - #1545 - Do not open transaction, use the parameter as connection
                 'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -6097,11 +6149,7 @@ Namespace Biosystems.Ax00.BL
                 'AG 19/03/2014 - #1545
 
                 Dim calledForRerun As Boolean = (pOrderTestID <> -1)
-
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                StartTime = Now '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 'Delete all Executions with status PENDING or LOCKED belonging OrderTests not started!!!
                 'If an OrderTestID is not informed, only Pending and Locked Executions for Rerun=1 are deleted
@@ -6152,12 +6200,14 @@ Namespace Biosystems.Ax00.BL
                 'pWorkInRuuningMode = TRUE ->  Recalculate status for all existing executions with status PENDING or LOCKED
                 'Table twksWSExecutions is updated at this point
                 If (Not calledForRerun) Then
-                    'In RUNNING Mode, delete all Readings of all LOCKED Executions 
-                    Dim myReadingsDelegate As New WSReadingsDelegate
-                    resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
 
-                    'resultData = RecalculateStatusForNotDeletedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
-                    resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
+                    'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
+                    ''In RUNNING Mode, delete all Readings of all LOCKED Executions 
+                    'Dim myReadingsDelegate As New WSReadingsDelegate
+                    'resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
+
+                    'AG 30/05/2014 - #1644 new parameter pPauseMode required
+                    resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     myLogAcciones.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -6926,6 +6976,15 @@ Namespace Biosystems.Ax00.BL
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close() 'AG 19/03/2014 - #1545 - New method does not open transaction, so do not close it
+
+                'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                End If
+
             End Try
             Return resultData
         End Function
@@ -7050,6 +7109,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pPostDilutionType">Type of post Dilution to apply when a Rerun has been requested. Optional parameter</param>
         ''' <param name="pIsISEModuleReady">Flag indicating if the ISE Module is ready to be used. Optional parameter</param>
         ''' <param name="pISEElectrodesList">String list containing ISE Electrodes (ISE_ResultID) with wrong/pending calibration</param>
+        ''' <param name="pPauseMode"></param>
+        ''' <param name="pManualRerunFlag">Always TRUE except when autoreruns are triggered</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 09/02/2011
@@ -7077,11 +7138,14 @@ Namespace Biosystems.Ax00.BL
         '''                              After generate the new executions set ExecutionStatus = LOCKED and LockedByLIS = True for the executions of these ordertests
         '''              AG 19/02/2014 - #1514 improvements memory app/sql
         '''              AG 20/03/2014 - #1545 call create WS executions method with multiple transactions
+        '''              AG 30/05/2014 - #1584 new parameter pPauseMode (for recalculate status for executions LOCKED and also PENDING)!!! (in normal running only the LOCKED are recalculated)
+        '''              AG 02/06/2014 - #1644 new optional parameter pManualRerunFlag (when FALSE Software cannot use the semaphore because it has been set to busy when ANSPHR started to be processed)
         ''' </remarks> 
         Public Function CreateWSExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                            ByVal pWorkInRunningMode As Boolean, Optional ByVal pOrderTestID As Integer = -1, _
                                            Optional ByVal pPostDilutionType As String = "", Optional ByVal pIsISEModuleReady As Boolean = False, _
-                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing) As GlobalDataTO
+                                           Optional ByVal pISEElectrodesList As List(Of String) = Nothing, Optional ByVal pPauseMode As Boolean = False, _
+                                           Optional ByVal pManualRerunFlag As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -7090,10 +7154,23 @@ Namespace Biosystems.Ax00.BL
                 'AG 20/03/2014 - #1545 - call the new create execution method that uses multiple transactions
                 If (GlobalConstants.CreateWSExecutionsWithMultipleTransactions) Then
                     resultData = CreateWSExecutionsMultipleTransactions(pDBConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, _
-                                                       pOrderTestID, pPostDilutionType, pIsISEModuleReady, pISEElectrodesList)
+                                                       pOrderTestID, pPostDilutionType, pIsISEModuleReady, pISEElectrodesList, pPauseMode, pManualRerunFlag)
                     Exit Try 'Exit Try and not execute the old code
                 End If
                 'AG 20/03/2014 - #1545
+
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                Dim StartTime As DateTime = Now
+                Dim myLogAcciones As New ApplicationLogManager()
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+                'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
+                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                    GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
+                End If
 
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -7101,10 +7178,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim calledForRerun As Boolean = (pOrderTestID <> -1)
 
-                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        Dim StartTime As DateTime = Now
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                        StartTime = Now '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                         'Delete all Executions with status PENDING or LOCKED belonging OrderTests not started!!!
                         'If an OrderTestID is not informed, only Pending and Locked Executions for Rerun=1 are deleted
@@ -7152,12 +7226,14 @@ Namespace Biosystems.Ax00.BL
                         'pWorkInRuuningMode = TRUE ->  Recalculate status for all existing executions with status PENDING or LOCKED
                         'Table twksWSExecutions is updated at this point
                         If (Not calledForRerun) Then
-                            'In RUNNING Mode, delete all Readings of all LOCKED Executions 
-                            Dim myReadingsDelegate As New WSReadingsDelegate
-                            resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
 
-                            'resultData = RecalculateStatusForNotDeletedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
-                            resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
+                            'AG 28/05/2014 - #1644 - Do not delete readings here!! They will be removed when the new preparation receives his 1st reading
+                            ''In RUNNING Mode, delete all Readings of all LOCKED Executions 
+                            'Dim myReadingsDelegate As New WSReadingsDelegate
+                            'resultData = myReadingsDelegate.DeleteReadingsForNotInCourseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, Nothing)
+
+                            'AG 30/05/2014 - #1644 new parameter pPauseMode required
+                            resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                             myLogAcciones.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -7896,6 +7972,15 @@ Namespace Biosystems.Ax00.BL
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+
+                'AG 02/06/2014 #1644 - Set the semaphore to free value (EXCEPT when called from auto rerun business)
+                If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
+                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                    GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
+                    Dim myLogAcciones As New ApplicationLogManager()
+                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
+                End If
+
             End Try
             Return resultData
         End Function
@@ -10169,8 +10254,8 @@ Namespace Biosystems.Ax00.BL
 
 
         ''' <summary>
-        ''' Recalculate status for all not deleted existing executions with status PENDING or LOCKED
-        ''' AG 12/07/2012 - In running mode: Do not evaluate the possible status change PENDING to LOCKED because in running remove rotor position is not allowed
+        ''' Recalculate status for all not deleted existing executions with status PENDING or LOCKED (standBy or pause mode)
+        ''' In running normal mode: Do not evaluate the possible status change PENDING to LOCKED because in running remove rotor position is not allowed
         ''' Summary
         ''' PENDING to LOCKED: Only when pWorkInRunningMode = FALSE
         ''' LOCKED to PENDING: Always
@@ -10185,9 +10270,10 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 03/07/2012 - Based in RecalculateStatusForNotDeletedExecutions; changes to improve the function perfomance
         ''' Modified by AG 25/03/2013 - When the ordertest has been locked by lis assign LOCKED value instead of PENDING, otherwise although 
         '''                             the final result is OK the sort by contaminations can be affected
+        ''' AG 30/05/2014 - #1644 add parameter pPauseMode
         ''' </remarks>
         Public Function RecalculateStatusForNotDeletedExecutionsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                                    ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean) As GlobalDataTO
+                                                                    ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean, ByVal pPauseMode As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -10199,7 +10285,7 @@ Namespace Biosystems.Ax00.BL
                         Dim myExecutionsDAO As New twksWSExecutionsDAO
 
                         'Get all Pending and Locked Executions in the Analyzer WorkSession
-                        resultData = myExecutionsDAO.GetPendingAndLockedGroupedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
+                        resultData = myExecutionsDAO.GetPendingAndLockedGroupedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim myExecutionsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 

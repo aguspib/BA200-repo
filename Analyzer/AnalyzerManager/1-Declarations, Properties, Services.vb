@@ -31,7 +31,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private useRequestFlag As Boolean = False 'Ag 02/11/2010 - Flag for start using request (True when START instruction finish) / Return to False on send ENDRUN or ABORT
         Private waitingTimer As New Timer() ' AG 07/05/2010 - waiting time (watchdog)
         Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        Private Const SYSTEM_TIME_OFFSET As Integer = 5 'Additional time (courtesy)
+        Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
         Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
 
         'Class variables to inform the presentation layer about UI refresh after instruction receptions
@@ -40,13 +40,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '    (so use variables myUI_RefreshEvent, myUI_RefreshDS and eventDataPendingToTriggerFlag)
         ' 2) But some instructions (ANSPHR) are treated using 2 threads (main thread for chemical reactions and secondary for well base line). Both generates differents event refresh when finish
         '    (so use variables myUI_RefreshEvent, myUI_RefreshDS and eventDataPendingToTriggerFlag for the main thread)
-        '    (and use mySecondaryUI_RefreshEvent, mySecondaryUI_RefreshDS and secondaryEventDataPendingToTriggerFlag for the secondary thread)
+        '    (and use mySecondaryUI_RefreshEvent, mySecondaryUI_RefreshDS and secondaryEventDataPendingToTriggerFlag for the secondary thread) --> REJECTED!!!! In running refreshs are added in 1 DSet and event is triggered 1 time each machine cycle
         Private myUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
         Private myUI_RefreshDS As New UIRefreshDS
         Private eventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
-        Private mySecondaryUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
-        Private mySecondaryUI_RefreshDS As New UIRefreshDS
-        Private secondaryEventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
+
+        'AG 22/05/2014 - #1637 Clear code, comment non used variables that could make read code difficult
+        'Private mySecondaryUI_RefreshEvent As New List(Of GlobalEnumerates.UI_RefreshEvents)
+        'Private mySecondaryUI_RefreshDS As New UIRefreshDS
+        'Private secondaryEventDataPendingToTriggerFlag As Boolean = False 'This flag tell us if exits information in myUI_RefreshDS pending to be informed (True) or not exists information to be informed (False) (event ReceptionEvent)
         'AG 07/10/2011
 
 
@@ -1692,8 +1694,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'AG 09/03/2012 - when load a reportsat and no connection remove all previous refresh information
                             If Not ConnectedAttribute Then
-                                myUI_RefreshEvent.Clear()
-                                myUI_RefreshDS.Clear()
+                                'myUI_RefreshEvent.Clear()
+                                'myUI_RefreshDS.Clear()
+                                ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
                             End If
 
                             If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
@@ -2108,7 +2111,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pMainThread Then
                     eventDataPendingToTriggerFlag = False
                 Else
-                    secondaryEventDataPendingToTriggerFlag = False
+                    'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                    'secondaryEventDataPendingToTriggerFlag = False
                 End If
 
             Catch ex As Exception
@@ -2195,14 +2199,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             InstructionSentAttribute = ""
 
                             If Not eventDataPendingToTriggerFlag Then
-                                myUI_RefreshEvent.Clear()
-                                myUI_RefreshDS.Clear()
+                                'myUI_RefreshEvent.Clear()
+                                'myUI_RefreshDS.Clear()
+                                ClearRefreshDataSets(True, True) 'AG 22/05/2014 - #1637
                             End If
 
-                            If Not secondaryEventDataPendingToTriggerFlag Then
-                                mySecondaryUI_RefreshEvent.Clear()
-                                mySecondaryUI_RefreshDS.Clear()
-                            End If
+                            'AG 22/05/2014 - #1637 Clear code. Comment dead code
+                            'If Not secondaryEventDataPendingToTriggerFlag Then
+                            '    mySecondaryUI_RefreshEvent.Clear()
+                            '    mySecondaryUI_RefreshDS.Clear()
+                            'End If
 
                             InitializeTimerControl(WAITING_TIME_OFF) 'AG 13/02/2012 - disable waiting time control if active
 
@@ -3458,7 +3464,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Some SENDinstructions also generate refresh ... for instance CONNECT instruction
                             'or when no connection is detected
                             If myUI_RefreshEvent.Count = 0 Then
-                                myUI_RefreshDS.Clear()
+                                'myUI_RefreshDS.Clear()
+                                ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
                             Else
                                 'AG 14/10/2011
                                 'Select Case pAction
@@ -3508,7 +3515,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If RefreshPresentation Then
                                 ' XB 21/10/2013
 
-                                If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                                'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                                ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
                                 RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
 
                                 'AG 12/06/2012 - comment this part. Now the running refresh event is unique and called from wellBaseLineWorker_DoWork
@@ -3523,7 +3531,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                               OrElse String.Equals(analyzerFREEZEModeAttribute, "RESET")) _
                               AndAlso AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
 
-                                If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                                'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                                ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
+
                                 RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
 
 
@@ -3534,7 +3544,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                    AndAlso AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING _
                                    AndAlso (InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED OrElse InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSPSN_RECEIVED) Then
 
-                                If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                                'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
+                                ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
                                 RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
 
                             End If
@@ -4383,14 +4394,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                     Dim myLogAcciones As New ApplicationLogManager()
                                                     myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageBarCodeRequestBeforeRUNNING", EventLogEntryType.Information, False)
 
+                                                    'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (runningMode + new parameter AllowScanInRunning)
                                                     'Verify is the current Analyzer Status is RUNNING ==> BT #1584: ...and it is not in PAUSE
-                                                    Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-                                                                                  Not AllowScanInRunning)
+                                                    'Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+                                                    '                              Not AllowScanInRunning)
+                                                    ''Create the Executions
+                                                    'resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
+                                                    '                                                String.Empty, iseModuleReady)
+                                                    Dim runningFlag As Boolean = (AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
 
                                                     'Create the Executions
                                                     resultData = myExecutionsDlg.CreateWSExecutions(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, runningFlag, -1, _
-                                                                                                    String.Empty, iseModuleReady)
-                                                    'AG 31/04/2014 - #1565
+                                                                                                    String.Empty, iseModuleReady, Nothing, AllowScanInRunning)
+                                                    'AG 30/05/2014 #1644
+
 
                                                 End If 'AG 01/04/2014 - #1565
 

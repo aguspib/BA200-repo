@@ -32,7 +32,7 @@ Public Class IWSTestSelectionAuxScreen
     Private UNSELECTED_BACK_COLOR As Color = Color.IndianRed
     Private UNSELECTED_FORE_COLOR As Color = Color.Black
 
-    'SGM 13/03/2013
+    'SG 13/03/2013
     Private LIS_REQUESTED_BACK_COLOR As Color = Color.MediumPurple
     Private LIS_REQUESTED_FORE_COLOR As Color = Color.White
 
@@ -104,31 +104,25 @@ Public Class IWSTestSelectionAuxScreen
     Private SelectedTestsInDifPriorityAttribute As New SelectedTestsDS
     Private PatientIDAttribute As String
     Private MaxValuesAttribute As New MaxOrderTestsValuesDS()
-
     Private WorkingModelAttribute As String = GlbSourceScreen.STANDARD.ToString
     Private ControlIDAttribute As Integer = -1
-    ' TR 28/04/2014 BT#1494 -Use to indicate if there are any test with incomplete programming.
+
+    'BT #1494 - Used to indicate if at least one of the selected STANDARD Tests have incomplete programming
     Private IncompleteTestAttribute As Boolean = False
 #End Region
 
 #Region "Properties"
-
     ''' <summary>
-    ''' ' TR 28/04/2014 BT#1494 -Use to indicate if there are any test with incomplete programming
+    ''' Screen property to indicate if at least one of the selected STANDARD Tests have incomplete programming
     ''' </summary>
-    ''' <value></value>
-    ''' <returns></returns>
-    ''' <remarks>CREATED BY TR 28/04/2014</remarks>
-    Public Property IncompleteTest() As Boolean
-        Set(ByVal value As Boolean)
-            IncompleteTestAttribute = value
-        End Set
+    ''' <remarks>
+    ''' Created by: TR 28/04/2014 - BT #1494
+    ''' </remarks>
+    Public ReadOnly Property IncompleteTest() As Boolean
         Get
             Return IncompleteTestAttribute
         End Get
     End Property
-
-
 
     ''' <summary>
     ''' Code of the SampleClass (sent from the previous screen).  Needed to filter the Tests to shown
@@ -246,40 +240,63 @@ Public Class IWSTestSelectionAuxScreen
 
 #Region "Methods for Standard Screen Model"
     ''' <summary>
-    ''' Search Icons for screen buttons
+    ''' When a Test (whatever TestType) included in a selected Test Profile is clicked to unselect it, besides unselect the Test Profile in the TreeView,
+    ''' the Profile information (ID and Name) has to be removed for the rest of Tests in the affected Profile (these Tests remain selected, but they are not 
+    ''' linked to the unselected Test Profile anymore)
     ''' </summary>
+    ''' <param name="pTestType">TestType Code</param>
+    ''' <param name="pTestID">Test Identifier</param>
+    ''' <param name="pTestProfileID">Identifier of the unselected Test Profile</param>
     ''' <remarks>
-    ''' Created by:  SA 12/05/2010 
-    ''' Modified by: SA 03/11/2010 - Set value of Image Property instead of BackgroundImage Property
-    '''              DL 23/03/2012 - Changed the Icon used for the Warning Area
+    ''' Created by: SA 21/05/2014 - BT #1633
     ''' </remarks>
-    Private Sub PrepareButtons()
+    Private Sub DeleteProfileInformation(ByVal pTestType As String, pTestID As Integer, ByVal pTestProfileID As Integer)
         Try
-            Dim auxIconName As String = ""
-            Dim iconPath As String = MyBase.IconsPath
+            Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
 
-            'ACCEPT Button
-            auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            'Search the Test in the proper SelectedTestsDS according its type
+            Select Case (pTestType)
+                Case "STD"
+                    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In standardTestList.SelectedTestTable _
+                                    Where a.TestID = pTestID AndAlso Not a.IsTestProfileIDNull AndAlso a.TestProfileID = pTestProfileID _
+                                   Select a).ToList()
+                Case "ISE"
+                    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
+                                    Where a.TestID = pTestID AndAlso Not a.IsTestProfileIDNull AndAlso a.TestProfileID = pTestProfileID _
+                                   Select a).ToList()
+                Case "CALC"
+                    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In calculatedTestList.SelectedTestTable _
+                                    Where a.TestID = pTestID AndAlso Not a.IsTestProfileIDNull AndAlso a.TestProfileID = pTestProfileID _
+                                   Select a).ToList()
+                Case "OFFS"
+                    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
+                                    Where a.TestID = pTestID AndAlso Not a.IsTestProfileIDNull AndAlso a.TestProfileID = pTestProfileID _
+                                   Select a).ToList()
+            End Select
+
+            If (qSelectedTest.Count > 0) Then
+                'If the Test is included in another selected Test Profile, inform in the SelectedTestsDS the ID and Name of this Profile;
+                'otherwise, set both fields to Null
+                Dim myTreeNode As New TreeNode()
+                myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+
+                If (myTreeNode.Name <> String.Empty) Then
+                    If (myTreeNode.Parent Is Nothing) Then
+                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                        qSelectedTest.First.TestProfileName = myTreeNode.Text
+                    Else
+                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                        qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                    End If
+                Else
+                    qSelectedTest.First.SetTestProfileIDNull()
+                    qSelectedTest.First.SetTestProfileNameNull()
+                End If
             End If
 
-            'CANCEL Button
-            auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
-            End If
-
-            'Warning Icon in Warnings area
-            auxIconName = GetIconName("STUS_WITHERRS")
-            If (auxIconName <> "") Then
-                bsWarningIconPictureBox.ImageLocation = iconPath & auxIconName
-                bsWarningIconPictureBox.SizeMode = PictureBoxSizeMode.StretchImage
-            End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-            Me.Close()
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".DeleteProfileInformation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".DeleteProfileInformation", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -529,6 +546,44 @@ Public Class IWSTestSelectionAuxScreen
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            Me.Close()
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Search Icons for screen buttons
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 12/05/2010 
+    ''' Modified by: SA 03/11/2010 - Set value of Image Property instead of BackgroundImage Property
+    '''              DL 23/03/2012 - Changed the Icon used for the Warning Area
+    ''' </remarks>
+    Private Sub PrepareButtons()
+        Try
+            Dim auxIconName As String = ""
+            Dim iconPath As String = MyBase.IconsPath
+
+            'ACCEPT Button
+            auxIconName = GetIconName("ACCEPT1")
+            If (auxIconName <> "") Then
+                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            End If
+
+            'CANCEL Button
+            auxIconName = GetIconName("CANCEL")
+            If (auxIconName <> "") Then
+                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            End If
+
+            'Warning Icon in Warnings area
+            auxIconName = GetIconName("STUS_WITHERRS")
+            If (auxIconName <> "") Then
+                bsWarningIconPictureBox.ImageLocation = iconPath & auxIconName
+                bsWarningIconPictureBox.SizeMode = PictureBoxSizeMode.StretchImage
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
             Me.Close()
         End Try
     End Sub
@@ -873,6 +928,11 @@ Public Class IWSTestSelectionAuxScreen
     '''                              informed), check if the rest of Calculated Tests to which the STD is linked remain selected, removing
     '''                              from fields CalcTestIDs and CalcTestNames those that are currently unselected
     '''              SG 13/03/2013 - Do not allow unselect Tests that have been requested by LIS
+    '''              SA 21/05/2014 - BT #1633 ==> When a Test is clicked to unselect it, if it is included in a selected TestProfile, the TestProfile
+    '''                                           is unselected, and fields TestProfileID and TestProfileName have to be cleared also for the rest of 
+    '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
+    '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
+    '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
     ''' </remarks>
     Private Function MarkUnMarkSelectedCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, Optional ByVal pCalcTestID As Integer = 0, _
                                             Optional ByVal pCalcTestName As String = "") As Boolean
@@ -918,20 +978,33 @@ Public Class IWSTestSelectionAuxScreen
                             'but this process is executed only when the Test is unselected by clicking in it, not when it is unselected
                             'by unselect the Calculated Test in which Formula the Test is included 
                             If (pCalcTestID = 0) Then
+                                'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                                Dim myTestID As Integer = -1
+                                Dim myTestType As String = String.Empty
+                                Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
+
                                 'Search the Profile on the TreeView to unchecked it
-                                If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
-                                    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                                If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
                                     myTreeNode.Checked = False
 
                                     'Unselect also all the Tests in the Profile
                                     For Each myNode As TreeNode In myTreeNode.Nodes
                                         myNode.Checked = myTreeNode.Checked
+
+                                        'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                        '           the TestType and TestID
+                                        If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                            myTestType = myNode.Name.Split(CChar("|"))(0)
+                                            myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+
+                                            DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                        End If
                                     Next
 
                                     'Search if the Test is also in another Test Profile 
-                                    'myTreeNode = SearchNode(qSelectedTest.First.TestID.ToString(), bsProfilesTreeView.Nodes)
                                     myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                    If (Not myTreeNode.Name = "") Then
+                                    If (myTreeNode.Name <> String.Empty) Then
                                         If (myTreeNode.Parent Is Nothing) Then
                                             qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
                                             qSelectedTest.First.TestProfileName = myTreeNode.Text
@@ -946,6 +1019,33 @@ Public Class IWSTestSelectionAuxScreen
                                         canBeUnselected = True
                                     End If
                                 End If
+
+                                'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
+                                '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                                '    myTreeNode.Checked = False
+
+                                '    'Unselect also all the Tests in the Profile
+                                '    For Each myNode As TreeNode In myTreeNode.Nodes
+                                '        myNode.Checked = myTreeNode.Checked
+                                '    Next
+
+                                '    'Search if the Test is also in another Test Profile 
+                                '    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                                '    If (Not myTreeNode.Name = "") Then
+                                '        If (myTreeNode.Parent Is Nothing) Then
+                                '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                                '            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                '        Else
+                                '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                                '            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                                '        End If
+                                '    Else
+                                '        qSelectedTest.First.TestProfileID = 0
+                                '        qSelectedTest.First.TestProfileName = ""
+
+                                '        canBeUnselected = True
+                                '    End If
+                                'End If
                             Else
                                 'Nothing to do, the Test remains selected because is linked to a selected Test Profile...
                                 'Search the Calculated Test ID in field CalcTestIDs to remove it
@@ -1127,6 +1227,11 @@ Public Class IWSTestSelectionAuxScreen
     '''                              change is shown in an auxiliary screen instead of a MsgBox
     '''              RH 24/05/2012 - New parameter pTestToValidate
     '''              SG 13/03/2013 - Do not allow unselect Tests that have been requested by LIS
+    '''              SA 21/05/2014 - BT #1633 ==> When a Test is clicked to unselect it, if it is included in a selected TestProfile, the TestProfile
+    '''                                           is unselected, and fields TestProfileID and TestProfileName have to be cleared also for the rest of 
+    '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
+    '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
+    '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
     ''' </remarks>
     Private Function MarkUnMarkCalculatedTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, _
                                                   Optional ByVal pVerifyComponents As Boolean = True, _
@@ -1175,21 +1280,35 @@ Public Class IWSTestSelectionAuxScreen
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
+                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                            Dim myTestID As Integer = -1
+                            Dim myTestType As String = String.Empty
+                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
+
                             'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
                             'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString(), True).First, TreeNode)
                                 myTreeNode.Checked = False
 
                                 'Unselect also all the Tests in the Profile
                                 For Each myNode As TreeNode In myTreeNode.Nodes
                                     myNode.Checked = myTreeNode.Checked
+
+                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                    '           the TestType and TestID
+                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                        myTestType = myNode.Name.Split(CChar("|"))(0)
+                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+
+                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                    End If
                                 Next
 
                                 'Search if the Test is also in another Test Profile 
                                 'myTreeNode = SearchNode(qSelectedTest.First.TestID.ToString(), bsProfilesTreeView.Nodes)
                                 myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (Not myTreeNode.Name = "") Then
+                                If (myTreeNode.Name <> String.Empty) Then
                                     If (myTreeNode.Parent Is Nothing) Then
                                         qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
                                         qSelectedTest.First.TestProfileName = myTreeNode.Text
@@ -1204,6 +1323,34 @@ Public Class IWSTestSelectionAuxScreen
                                     continueProcess = True
                                 End If
                             End If
+
+                            'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
+                            '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                            '    myTreeNode.Checked = False
+
+                            '    'Unselect also all the Tests in the Profile
+                            '    For Each myNode As TreeNode In myTreeNode.Nodes
+                            '        myNode.Checked = myTreeNode.Checked
+                            '    Next
+
+                            '    'Search if the Test is also in another Test Profile 
+                            '    'myTreeNode = SearchNode(qSelectedTest.First.TestID.ToString(), bsProfilesTreeView.Nodes)
+                            '    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                            '    If (Not myTreeNode.Name = "") Then
+                            '        If (myTreeNode.Parent Is Nothing) Then
+                            '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                            '            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                            '        Else
+                            '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                            '            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                            '        End If
+                            '    Else
+                            '        qSelectedTest.First.TestProfileID = 0
+                            '        qSelectedTest.First.TestProfileName = ""
+
+                            '        continueProcess = True
+                            '    End If
+                            'End If
                         Else
                             continueProcess = True
                         End If
@@ -1422,6 +1569,11 @@ Public Class IWSTestSelectionAuxScreen
     '''                              in another Profile 
     '''              SA 19/06/2012 - Added management of Controls partially selected in the same way it is done for Standard Tests
     '''              SG 13/03/2013 - Do not allow unselect Tests that have been requested by LIS
+    '''              SA 21/05/2014 - BT #1633 ==> When a Test is clicked to unselect it, if it is included in a selected TestProfile, the TestProfile
+    '''                                           is unselected, and fields TestProfileID and TestProfileName have to be cleared also for the rest of 
+    '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
+    '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
+    '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
     ''' </remarks>
     Private Function MarkUnMarkISETestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) As Boolean
         Dim selectedTest As Boolean = False
@@ -1449,20 +1601,34 @@ Public Class IWSTestSelectionAuxScreen
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
+                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                            Dim myTestID As Integer = -1
+                            Dim myTestType As String = String.Empty
+                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
+
                             'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
                             'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
                                 myTreeNode.Checked = False
 
                                 'Unselect also all the Tests in the Profile
                                 For Each myNode As TreeNode In myTreeNode.Nodes
                                     myNode.Checked = myTreeNode.Checked
+
+                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                    '           the TestType and TestID
+                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                        myTestType = myNode.Name.Split(CChar("|"))(0)
+                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+
+                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                    End If
                                 Next
 
                                 'Search if the Test is also in another Test Profile 
                                 myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (Not myTreeNode.Name = "") Then
+                                If (myTreeNode.Name <> String.Empty) Then
                                     If (myTreeNode.Parent Is Nothing) Then
                                         qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
                                         qSelectedTest.First.TestProfileName = myTreeNode.Text
@@ -1477,6 +1643,33 @@ Public Class IWSTestSelectionAuxScreen
                                     canBeUnselected = True
                                 End If
                             End If
+
+                            'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
+                            '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                            '    myTreeNode.Checked = False
+
+                            '    'Unselect also all the Tests in the Profile
+                            '    For Each myNode As TreeNode In myTreeNode.Nodes
+                            '        myNode.Checked = myTreeNode.Checked
+                            '    Next
+
+                            '    'Search if the Test is also in another Test Profile 
+                            '    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                            '    If (Not myTreeNode.Name = "") Then
+                            '        If (myTreeNode.Parent Is Nothing) Then
+                            '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                            '            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                            '        Else
+                            '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                            '            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                            '        End If
+                            '    Else
+                            '        qSelectedTest.First.TestProfileID = 0
+                            '        qSelectedTest.First.TestProfileName = ""
+
+                            '        canBeUnselected = True
+                            '    End If
+                            'End If
                         Else
                             canBeUnselected = True
                         End If
@@ -1581,6 +1774,11 @@ Public Class IWSTestSelectionAuxScreen
     ''' <remarks>
     ''' Created by:  DL 29/11/2010
     ''' Modified by: SG 13/03/2013 - Do not allow unselect Tests that have been requested by LIS
+    '''              SA 21/05/2014 - BT #1633 ==> When a Test is clicked to unselect it, if it is included in a selected TestProfile, the TestProfile
+    '''                                           is unselected, and fields TestProfileID and TestProfileName have to be cleared also for the rest of 
+    '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
+    '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
+    '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
     ''' </remarks>
     Private Function MarkUnMarkOffSystemTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) As Boolean
         Dim selectedTest As Boolean = False
@@ -1608,20 +1806,34 @@ Public Class IWSTestSelectionAuxScreen
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
+                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                            Dim myTestID As Integer = -1
+                            Dim myTestType As String = String.Empty
+                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
+
                             'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
                             'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
                                 myTreeNode.Checked = False
 
                                 'Unselect also all the Tests in the Profile
                                 For Each myNode As TreeNode In myTreeNode.Nodes
                                     myNode.Checked = myTreeNode.Checked
+
+                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                    '           the TestType and TestID
+                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                        myTestType = myNode.Name.Split(CChar("|"))(0)
+                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+
+                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                    End If
                                 Next
 
                                 'Search if the Test is also in another Test Profile 
                                 myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (Not myTreeNode.Name = "") Then
+                                If (myTreeNode.Name <> String.Empty) Then
                                     If (myTreeNode.Parent Is Nothing) Then
                                         qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
                                         qSelectedTest.First.TestProfileName = myTreeNode.Text
@@ -1636,6 +1848,33 @@ Public Class IWSTestSelectionAuxScreen
                                     canBeUnselected = True
                                 End If
                             End If
+
+                            'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
+                            '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
+                            '    myTreeNode.Checked = False
+
+                            '    'Unselect also all the Tests in the Profile
+                            '    For Each myNode As TreeNode In myTreeNode.Nodes
+                            '        myNode.Checked = myTreeNode.Checked
+                            '    Next
+
+                            '    'Search if the Test is also in another Test Profile 
+                            '    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                            '    If (Not myTreeNode.Name = "") Then
+                            '        If (myTreeNode.Parent Is Nothing) Then
+                            '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                            '            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                            '        Else
+                            '            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                            '            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                            '        End If
+                            '    Else
+                            '        qSelectedTest.First.TestProfileID = 0
+                            '        qSelectedTest.First.TestProfileName = ""
+
+                            '        canBeUnselected = True
+                            '    End If
+                            'End If
                         Else
                             canBeUnselected = True
                         End If
@@ -1810,7 +2049,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' Modified by: SA 02/11/2010 - Removed call to MarkSelectedProfilesOnTreeView
     '''              TR 10/03/2011 - Inform also field FactoryCalib in the DS of STD Tests
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested 
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkTestListGridView(ByVal pTestsDS As TestsDS)
         Try
@@ -1854,7 +2093,8 @@ Public Class IWSTestSelectionAuxScreen
                             newTestRow.FactoryCalib = qStandardTests(standarPos).FactoryCalib
                         End If
 
-                        newTestRow.EnableStatus = qStandardTests(standarPos).EnableStatus 'TR 28/04/2014 BT1494 assing the value that indicate if the test is complete programming.
+                        'BT1494 - Inform the field that indicates if the Calibration Programming is completed for the Test/SampleType
+                        newTestRow.EnableStatus = qStandardTests(standarPos).EnableStatus
 
                         'Only for Controls: needed to verify Controls partially selected
                         If (Not qStandardTests(standarPos).IsNumberOfControlsNull) Then
@@ -1899,15 +2139,13 @@ Public Class IWSTestSelectionAuxScreen
 
                         If (qSearchTest.Count = 1) Then
                             qSearchTest.First.Selected = True
-                            'SGM 13/03/2013
-                            'qSearchTest.First.OTStatus = selTestRow.OTStatus
-                            If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+
+                            'SG 13/03/2013
+                            If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                 qSearchTest.First.OTStatus = "LISLOCK"
                             Else
                                 qSearchTest.First.OTStatus = selTestRow.OTStatus
                             End If
-                            'end SGM 13/03/2013
-
 
                             'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
                             If (SampleClassAttribute = "PATIENT") Then
@@ -1983,7 +2221,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' Modified by: SA 02/11/2010 - Inform TestProfileID and TestProfileName when the previously selected Calculated
     '''                              Tests have these fields informed
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkCalcTestListGridView(ByVal pCalcTestsDS As CalculatedTestsDS)
         Try
@@ -2078,14 +2316,12 @@ Public Class IWSTestSelectionAuxScreen
                                 If (calcTestROW.TestID = selTestRow.TestID) Then
                                     calcTestROW.Selected = True
 
-                                    'SGM 13/03/2013
-                                    'calcTestROW.OTStatus = selTestRow.OTStatus
-                                    If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+                                    'SG 13/03/2013
+                                    If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                         calcTestROW.OTStatus = "LISLOCK"
                                     Else
                                         calcTestROW.OTStatus = selTestRow.OTStatus
                                     End If
-                                    'end SGM 13/03/2013
 
                                     If (Not selTestRow.IsTestProfileIDNull) Then
                                         calcTestROW.TestProfileID = selTestRow.TestProfileID
@@ -2145,7 +2381,7 @@ Public Class IWSTestSelectionAuxScreen
     '''              SA 19/06/2012 - When informed, save value of field NumberOfControls in the DS containing all ISE Tests
     '''                              (needed to verify ISE Controls partially selected)
     '''              XB 27/07/2012 - ISE Tests Disabled by volume not enough functionallity is canceled
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkISETestListGridView(ByVal pISETestsDS As ISETestsDS)
         Try
@@ -2219,14 +2455,12 @@ Public Class IWSTestSelectionAuxScreen
                             If (iseTestROW.TestID = selTestRow.TestID) Then
                                 iseTestROW.Selected = True
 
-                                'SGM 13/03/2013
-                                'iseTestROW.OTStatus = selTestRow.OTStatus
-                                If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+                                'SG 13/03/2013
+                                If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                     iseTestROW.OTStatus = "LISLOCK"
                                 Else
                                     iseTestROW.OTStatus = selTestRow.OTStatus
                                 End If
-                                'end SGM 13/03/2013
 
                                 If (Not selTestRow.IsTestProfileIDNull) Then
                                     iseTestROW.TestProfileID = selTestRow.TestProfileID
@@ -2318,7 +2552,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' <remarks>
     ''' Created by:  DL 29/11/2010
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
-    '''              SGM 13/03/2013 - Set OTStatus = "LISLOCK" if LIS Requested
+    '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
     ''' </remarks>
     Private Sub FillAndMarkOffSystemTestListGridView(ByVal pOffSystemTestsDS As OffSystemTestsDS)
         Try
@@ -2388,14 +2622,12 @@ Public Class IWSTestSelectionAuxScreen
                             If (offsystemTestROW.TestID = selTestRow.TestID) Then
                                 offsystemTestROW.Selected = True
 
-                                'SGM 13/03/2013
-                                'offsystemTestROW.OTStatus = selTestRow.OTStatus
-                                If Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest Then
+                                'SG 13/03/2013
+                                If (Not selTestRow.IsLISRequestNull AndAlso selTestRow.LISRequest) Then
                                     offsystemTestROW.OTStatus = "LISLOCK"
                                 Else
                                     offsystemTestROW.OTStatus = selTestRow.OTStatus
                                 End If
-                                'end SGM 13/03/2013
 
                                 If (Not selTestRow.IsTestProfileIDNull) Then
                                     offsystemTestROW.TestProfileID = selTestRow.TestProfileID
@@ -2498,7 +2730,10 @@ Public Class IWSTestSelectionAuxScreen
     '''              SA 08/05/2013 - If fields SampleID and SampleIDType are informed in the entry SelectedTestsDS, save them also 
     '''                              in the returned SelectedTestsDS (this functionality is required when this screen is used from 
     '''                              HQBarcode screen; in any other case, those fields are not informed)
-    '''              TR 28/04/2014 - BT #1494 Validate if selecte test is completed (programming complete) before including to list.
+    '''              TR 28/04/2014 - BT #1494 ==> For each STANDARD Test marked as selected, validate if it has a completed Calibration programming 
+    '''                                           before add it to the final list of selected Tests. Besides, set value of screen attribute 
+    '''                                           IncompleteTestAttribute to TRUE to notify the User that some of the selected Tests were removed 
+    '''                                           due to they have an incomplete Calibration programming 
     ''' </remarks>
     Private Sub AcceptTestSelection()
         Try
@@ -2520,62 +2755,59 @@ Public Class IWSTestSelectionAuxScreen
             Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
             ListOfSelectedTestsAttribute = New SelectedTestsDS
 
-            
-            'TR 28/04/2014  BT #1494 -Get the list of Standard Tests that have been selected and incompleted programming to unselected
+
+            'BT #1494 - Get the list of Standard Tests that have been selected but have an incomplete Calibration programming to unselect them
             Dim qSelStdTests As List(Of SelectedTestsDS.SelectedTestTableRow)
             Dim qTestInFormula As List(Of FormulasDS.tparFormulasRow)
             Dim qSelCalcTests As List(Of SelectedTestsDS.SelectedTestTableRow)
             Dim lstCalculatedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
             Dim myCalTestName As String = String.Empty
-            Dim BelongCalcTest As Boolean = False 'Indicate the test belong to a calculated test
+            Dim belongCalcTest As Boolean = False 'Indicate the Test is included in the Formula of one or more Calculated Tests
 
-            'Get the list of elements with enable status = false (incomplete programming)
+            'Get the list of selected STD Tests having EnableStatus = False (those marked with incomplete Calibration programming)
             qSelStdTests = (From a As SelectedTestsDS.SelectedTestTableRow In standardTestList.SelectedTestTable _
                            Where a.Selected = True AndAlso a.EnableStatus = False _
                           Select a).ToList()
-            If qSelStdTests.Count > 0 Then
-                'Go throught each incomplet element and unmark from the list.
-                For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelStdTests
-                    BelongCalcTest = False 'initialize as false 
 
-                    If Not selectedRow.IsCalcTestIDsNull Then
+            If (qSelStdTests.Count > 0) Then
+                For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelStdTests
+                    belongCalcTest = False
+
+                    If (Not selectedRow.IsCalcTestIDsNull) Then
+                        'The STD Test is included in the Formula of one or more selected Calculated Tests
                         myCalTestName = selectedRow.CalcTestNames
-                        BelongCalcTest = True ' belong to a calcualted test
+                        belongCalcTest = True
                     End If
 
-                    'Validate if the test is belong to calculated test unmark the afected calculated test from the list
-                    If myCalTestName <> "" Then
-                        'For each calculate test do the unselect process.
+                    If (myCalTestName <> String.Empty) Then
+                        'Unmark all Calculated Tests in which Formula the STD Test is included
                         For Each calcTestName As String In myCalTestName.Split(CChar(","))
-
                             lstCalculatedTest = (From b In calculatedTestList.SelectedTestTable _
-                                Where b.TestType = "CALC" AndAlso b.TestName = calcTestName Select b).ToList
+                                                Where b.TestType = "CALC" AndAlso b.TestName = calcTestName _
+                                               Select b).ToList
 
-                            If lstCalculatedTest.Count > 0 Then
+                            If (lstCalculatedTest.Count > 0) Then
                                 MarkUnMarkCalculatedTestCell(lstCalculatedTest.First().Row, lstCalculatedTest.First().Col, True, lstCalculatedTest)
                             End If
                         Next
                     End If
 
-                    If BelongCalcTest Then
-                        ' set the selected value to true bechaus on previous actios 
-                        ' value change to false and whe need to remove the STD test
-                        selectedRow.Selected = True
-                    End If
+                    'Set Selected = TRUE to allow unmark the STD Tests (needed because in the previous action it is possible than the Selected 
+                    'value of this Test was set to FALSE)
+                    If (belongCalcTest) Then selectedRow.Selected = True
 
-                    'Unselect from list the incomplete programming test.
+                    'Finally, unmark the STD Test to remove it from the list of selected Tests
                     MarkUnMarkSelectedCell(selectedRow.Row, selectedRow.Col)
                 Next
 
+                'At least an STD Test with incomplete Calibration programming was selected and removed. Set to TRUE the property that allow the WS Samples 
+                'Requests Screen to notify the final User that some of the chosen Tests cannot be selected 
                 IncompleteTestAttribute = True
-
             Else
                 IncompleteTestAttribute = False
             End If
-            'TR 28/04/2014 BT #1494 -END
 
             'Get the list of Standard Tests that have been selected...
-            'Dim qSelStdTests As List(Of SelectedTestsDS.SelectedTestTableRow)
             qSelStdTests = (From a As SelectedTestsDS.SelectedTestTableRow In standardTestList.SelectedTestTable _
                            Where a.Selected = True OrElse a.PartiallySelected = True _
                           Select a).ToList()
@@ -3398,6 +3630,87 @@ Public Class IWSTestSelectionAuxScreen
         End Try
         Return myResult.ToString()
     End Function
+
+    Private Sub ReleaseElements()
+
+        Try
+            '--- Detach variable defined using WithEvents ---
+            bsAcceptButton = Nothing
+            bsAdviceGroupBox = Nothing
+            bsWarningMessageLabel = Nothing
+            bsWarningIconPictureBox = Nothing
+            bsTestSelectionLabel = Nothing
+            bsSampleTypeTextBox = Nothing
+            bsSampleTypeLabel = Nothing
+            bsTestProfilesLabel = Nothing
+            bsCalcTestsLabel = Nothing
+            bsStandardTestsLabel = Nothing
+            bsTestListDataGridView = Nothing
+            bsCalcTestDataGridView = Nothing
+            bsProfilesTreeView = Nothing
+            bsPatientTextBox = Nothing
+            bsPatientLabel = Nothing
+            bsTestSelectionAreaGroupBox = Nothing
+            bsLegendGroupBox = Nothing
+            bsPartialSelectedLabel = Nothing
+            bsDifPriorityLabel = Nothing
+            bsInProcessLabel = Nothing
+            bsDeletedLabel = Nothing
+            bsUnselectedLabel = Nothing
+            bsSelectedLabel = Nothing
+            bsDifPriorityButton = Nothing
+            bsSelectButton = Nothing
+            bsPartialSelectedButton = Nothing
+            bsUnselectedButton = Nothing
+            bsDeletedButton = Nothing
+            bsInProcessButton = Nothing
+            bsScreenToolTips = Nothing
+            bsCancelButton = Nothing
+            bsISETestDataGridView = Nothing
+            bsISETestsLabel = Nothing
+            bsOffSystemTestDataGridView = Nothing
+            bsOffSystemTestsLabel = Nothing
+            bsLegendLabel = Nothing
+            bsLegendModel2GroupBox = Nothing
+            bsLegendModel2Label = Nothing
+            bsUnselectedModel2Label = Nothing
+            bsSelectedInUseModel2Label = Nothing
+            bsDeletedModel2Label = Nothing
+            bsSelectedModel2Label = Nothing
+            bsSelectModel2Button = Nothing
+            bsUnselectedModel2Button = Nothing
+            bsDeletedModel2Button = Nothing
+            bsSelectedInUseModel2Button = Nothing
+            bsSampleTypeComboBox = Nothing
+            Column1 = Nothing
+            Column2 = Nothing
+            Column3 = Nothing
+            Column4 = Nothing
+            Column5 = Nothing
+            DataGridViewButtonColumn9 = Nothing
+            DataGridViewButtonColumn10 = Nothing
+            DataGridViewButtonColumn11 = Nothing
+            DataGridViewButtonColumn12 = Nothing
+            DataGridViewButtonColumn13 = Nothing
+            DataGridViewButtonColumn1 = Nothing
+            DataGridViewButtonColumn2 = Nothing
+            DataGridViewButtonColumn3 = Nothing
+            DataGridViewButtonColumn4 = Nothing
+            DataGridViewButtonColumn14 = Nothing
+            DataGridViewButtonColumn5 = Nothing
+            DataGridViewButtonColumn6 = Nothing
+            DataGridViewButtonColumn7 = Nothing
+            DataGridViewButtonColumn8 = Nothing
+            DataGridViewButtonColumn15 = Nothing
+            bsLISRequestedLabel = Nothing
+            bsLISRequestedButton = Nothing
+            '-----------------------------------------------
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
 
 #End Region
 
@@ -4783,6 +5096,9 @@ Public Class IWSTestSelectionAuxScreen
     '''              SA 02/12/2010 - Added management of OffSystem Tests included in the selected Profile
     '''              TR 10/03/2011 - Added changes to validate if the selected Test Profile is composed for Standard
     '''                              Tests that are still using Factory Calibration values
+    '''              SA 21/05/2014 - BT #1633 ==> Fixed an old error in the code that validates if a Test Node of an unselected Profile belongs to another Profile:
+    '''                                           result of function SearchNode is assigned to variable tmpNode, but the checkings are executed using variable 
+    '''                                           myTreeNode; this is wrong, checkings have to be executed using tmpNode
     ''' </remarks>
     Private Sub bsProfilesTreeView_NodeMouseClick(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles bsProfilesTreeView.NodeMouseClick
         Try
@@ -4916,14 +5232,16 @@ Public Class IWSTestSelectionAuxScreen
                         If (qSelectedTest.Count > 0) Then
                             'Validate if the Node belong to another Profile
                             tmpNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                            If (Not tmpNode.Name = "") Then
+
+                            'BT #1633 - Execute the checking using tmpNode instead of myTreeNode
+                            If (tmpNode.Name <> String.Empty) Then
                                 'The Test belong to another selected Test Profile: it is re-linked to it
-                                If (myTreeNode.Parent Is Nothing) Then
-                                    qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
-                                    qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                If (tmpNode.Parent Is Nothing) Then
+                                    qSelectedTest.First.TestProfileID = CType(tmpNode.Name, Integer)
+                                    qSelectedTest.First.TestProfileName = tmpNode.Text
                                 Else
-                                    qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
-                                    qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                                    qSelectedTest.First.TestProfileID = CType(tmpNode.Parent.Name, Integer)
+                                    qSelectedTest.First.TestProfileName = tmpNode.Parent.Text
                                 End If
                             Else
                                 'Remove the link to the unselected Test Profile

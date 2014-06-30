@@ -51,6 +51,8 @@ Partial Public Class IAx00MainMDI
     '''              AG - 07/01/2014 - refactoring code in CommEvents partial class inherits form
     '''              XB - 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
     '''              XB - 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587
+    '''              XB - 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
+    '''              XB - 20/06/2014 - improve the ISE Timeouts control (E:61) - Task #1441
     ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pInstructionReceived As String, _
                                          ByVal pTreated As Boolean, _
@@ -64,6 +66,9 @@ Partial Public Class IAx00MainMDI
         'pRefreshDS.ReadXml(String.Format("UIRefreshDS{0}.xml", DSNumber))
 
         'DSNumber += 1
+
+        ' XB 20/06/2014 - #1441
+        Dim ISENotReady As Boolean = False
 
         Try
             'Dim StartTime As DateTime = Now 'AG 12/06/2012 - time estimation
@@ -266,10 +271,23 @@ Partial Public Class IAx00MainMDI
 
 
                 If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
+
+                    ' XB 20/06/2014 - #1441
+                    If MDIAnalyzerManager.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED Then
+                        Dim sensorValue As Single = 0
+                        sensorValue = MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED)
+                        If sensorValue = 1 Then
+                            ISENotReady = True
+                        End If
+                    End If
+                    ' XB 20/06/2014 - #1441
+
                     PerformNewAlarmsReception(copyRefreshEventList, copyRefreshDS, monitorTreated, changeRotorTreated, conditioningTreated)
                 End If
 
                 If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
+
+
                     PerformNewSensorValueChanged(copyRefreshEventList, copyRefreshDS, monitorTreated, changeRotorTreated, conditioningTreated, wsRotorPositionTreated, configSettingsLISTreated)
                 End If
 
@@ -301,12 +319,15 @@ Partial Public Class IAx00MainMDI
                     PerformNewBarcodeWarnings(barcode_Samples_Warnings)
                 End If
 
+                ' XB 20/06/2014 - #1441
                 'SGM 12/03/2012
                 ' XB 24/10/2013 - Specific ISE commands are allowed in RUNNING (pause mode) - BT #1343
                 'If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED Then
-                If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED Or _
-                   pInstructionReceived.Contains("A400;ANSISE;") Then
+                If (MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED) Or _
+                   (pInstructionReceived.Contains("A400;ANSISE;")) Or _
+                   (ISENotReady AndAlso (ShutDownisPending Or StartSessionisPending)) Then
                     ' XB 24/10/2013
+                    ' XB 20/06/2014 - #1441
                     '
                     ' ISE RECEIVED
                     '
@@ -491,54 +512,79 @@ Partial Public Class IAx00MainMDI
                                         myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
                                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
 
-                                            ' XB 23/07/2013 - Activate buzzer
-                                            If Not MDIAnalyzerManager Is Nothing Then
-                                                MDIAnalyzerManager.StartAnalyzerRinging()
-                                                System.Threading.Thread.Sleep(500)
-                                            End If
-                                            ' XB 23/07/2013
-
+                                            '  XB 23/05/2014 - #1638
+                                            Dim TestsByTypeIntoWS As String = ""
                                             If (CType(myGlobal.SetDatos, Boolean)) Then
-                                                'ISE Calibrations are wrong so Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
-                                                'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
-                                                Dim userAnswer As DialogResult
-
-                                                ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
-                                                'userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                                If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
-                                                    userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                                Else
-                                                    userAnswer = Windows.Forms.DialogResult.Yes
+                                                TestsByTypeIntoWS = "STD"
+                                                myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
+                                                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                                    If (CType(myGlobal.SetDatos, Boolean)) Then
+                                                        TestsByTypeIntoWS = "ALL"
+                                                    End If
                                                 End If
-                                                ' XB 20/11/2013
-
-                                                Application.DoEvents()
-                                                If (userAnswer = DialogResult.Yes) Then
-                                                    'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
-                                                    executeSTD = True
-                                                    LockISE = True
-                                                    EnableButtonAndMenus(False)
-                                                    Me.SkipPMCL = True ' XB 22/10/2013
-                                                Else
-                                                    EnableButtonAndMenus(True, True)   ' XB 07/11/2013
-                                                    Application.DoEvents()
-                                                End If
-
                                             Else
-                                                'ISE Calibrations are wrong so Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
-                                                'the WS can not be started
-                                                ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
-                                                Application.DoEvents()
-                                                'All ISE Pending Tests will be blocked
-                                                LockISE = True
+                                                TestsByTypeIntoWS = "ISE"
                                             End If
 
-                                            ' XB 23/07/2013 - Close buzzer
-                                            If Not MDIAnalyzerManager Is Nothing Then
-                                                MDIAnalyzerManager.StopAnalyzerRinging()
-                                                System.Threading.Thread.Sleep(500)
-                                            End If
-                                            ' XB 22/07/2013
+                                            If TestsByTypeIntoWS = "STD" Then
+                                                ' Only STD
+                                                executeSTD = True
+                                                EnableButtonAndMenus(False)
+                                                Me.SkipPMCL = True
+                                            Else
+                                                '  XB 23/05/2014 - #1638
+
+                                                ' XB 23/07/2013 - Activate buzzer
+                                                If Not MDIAnalyzerManager Is Nothing Then
+                                                    MDIAnalyzerManager.StartAnalyzerRinging()
+                                                    System.Threading.Thread.Sleep(500)
+                                                End If
+                                                ' XB 23/07/2013
+
+                                                If TestsByTypeIntoWS = "ALL" Then
+                                                    'ISE Calibrations are wrong so Module is not ready to be used but there are STD Tests pending of execution; a question Message is shown, and the User 
+                                                    'can choose between stop the WS Start/Continue process to solve the problem or to continue with the execution despite of the problem
+                                                    Dim userAnswer As DialogResult
+
+                                                    ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
+                                                    'userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
+                                                    If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                                        userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
+                                                    Else
+                                                        userAnswer = Windows.Forms.DialogResult.Yes
+                                                    End If
+                                                    ' XB 20/11/2013
+
+                                                    Application.DoEvents()
+                                                    If (userAnswer = DialogResult.Yes) Then
+                                                        'User has selected continue WS without ISE Tests; all pending ISE Tests will be blocked
+                                                        executeSTD = True
+                                                        LockISE = True
+                                                        EnableButtonAndMenus(False)
+                                                        Me.SkipPMCL = True ' XB 22/10/2013
+                                                    Else
+                                                        LockISE = True '  XB 23/05/2014 - Lock ISE preparations always #1638
+                                                        EnableButtonAndMenus(True, True)   ' XB 07/11/2013
+                                                        Application.DoEvents()
+                                                    End If
+
+                                                Else
+                                                    'ISE Calibrations are wrong so Module is not ready and there are not STD Tests pending of execution; an error Message is shown due to 
+                                                    'the WS can not be started
+                                                    ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ONLY_ISE_WS_NOT_STARTED.ToString)
+                                                    Application.DoEvents()
+                                                    'All ISE Pending Tests will be blocked
+                                                    LockISE = True
+                                                End If
+
+                                                ' XB 23/07/2013 - Close buzzer
+                                                If Not MDIAnalyzerManager Is Nothing Then
+                                                    MDIAnalyzerManager.StopAnalyzerRinging()
+                                                    System.Threading.Thread.Sleep(500)
+                                                End If
+                                                ' XB 22/07/2013
+
+                                            End If    '  XB 23/05/2014 - #1638
 
                                         End If
 
@@ -1497,8 +1543,10 @@ Partial Public Class IAx00MainMDI
             If Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
                     Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    MonitorTreated = True
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        MonitorTreated = True
+                    End If
                 End If
             End If
 
@@ -1662,51 +1710,58 @@ Partial Public Class IAx00MainMDI
 
                 If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
                     Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    monitorTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        monitorTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                     'AG 16/03/2012 - If no reactions rotor alarm appears while the UI is disabled we must reactivated it
                     'Change rotor
                 ElseIf (TypeOf myCurrentMDIForm Is IChangeRotor AndAlso Not changeRotorTreated) Then
                     Dim CurrentMdiChild As IChangeRotor = CType(myCurrentMDIForm, IChangeRotor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                    changeRotorTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-                    'AG 16/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                        changeRotorTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                        'AG 16/03/2012
+                    End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode button. Else enable it
                     'Sample request
 
                 ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
                     Dim CurrentMdiChild As IConditioning = CType(myCurrentMDIForm, IConditioning)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                    'conditioningTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'DL 05/06/2012
-                    'DL 05/06/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                        'conditioningTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'DL 05/06/2012
+                        'DL 05/06/2012
+                    End If
                 ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
                     Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode /Check bottle volume button. Else enable it
                     'Rotor positions
                 ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
                     Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables ISE command button. Else enable it
                 ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
                     Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                 End If
 
             End If
 
-            'AG 17/10/2011
+                'AG 17/10/2011
             If processingBeforeRunning = "0" Then refreshTriggeredFlag = False 'AG 23/01/2012 - special case: enter running process in progress
             If MdiChildIsDisabled AndAlso refreshTriggeredFlag Then
                 'Activate the current mdi child who is disabled once the refresh method is finished
@@ -1719,12 +1774,12 @@ Partial Public Class IAx00MainMDI
                     End If
                 End If
             End If
-            'AG 17/10/2011
+                'AG 17/10/2011
 
-            'DL 31/07/2012. Begin
+            'DL 31/07/2012. Begin 
             Dim linq As New List(Of UIRefreshDS.ReceivedAlarmsRow)
 
-            'DisconnectComms GUI
+            'DisconnectComms GUI 
             linq = (From a As UIRefreshDS.ReceivedAlarmsRow In copyRefreshDS.ReceivedAlarms _
                      Where (String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_CPU_ERR.ToString) _
                     OrElse String.Equals(a.AlarmID, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR.ToString) _
@@ -1735,15 +1790,15 @@ Partial Public Class IAx00MainMDI
                     Select a).ToList
 
             If linq.Count > 0 Then DisconnectComms()
-            'DL 31/07/2012. End
+            'DL 31/07/2012. End 
             linq = Nothing
 
-            'Alarm Messages (Messages do not required ActiveMdiChild)
-            '--------------------------------------------------------
+            'Alarm Messages (Messages do not required ActiveMdiChild) 
+                '--------------------------------------------------------
             '(All screens) Finally show message depending the alarms received and update vertical button bar depending the current alarms
-            ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS)
+            ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS) 
             SetActionButtonsEnableProperty(True)
-            'Debug.Print("ShowAlarmsOrSensorsWarningMessages called from ManageReceptionEvent-1")
+            'Debug.Print("ShowAlarmsOrSensorsWarningMessages called from ManageReceptionEvent-1") 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewAlarmsReception ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewAlarmsReception ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2033,15 +2088,17 @@ Partial Public Class IAx00MainMDI
                     If Not myCurrentMDIForm Is Nothing Then
                         If (TypeOf myCurrentMDIForm Is IMonitor) Then
                             Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
-                            CurrentMdiChild.RefreshAlarmsGlobes(Nothing)
+                            If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                                CurrentMdiChild.RefreshAlarmsGlobes(Nothing)
+                            End If
                         End If
                     End If
                     'AG 23/05/2012
 
-                End If
-                'TR 20/09/2012 Commented by TR. 
-                'EnableButtonAndMenus(True)
-                Cursor = Cursors.Default
+                    End If
+                    'TR 20/09/2012 Commented by TR. 
+                    'EnableButtonAndMenus(True)
+                    Cursor = Cursors.Default
             End If
             lnqRes = Nothing
 
@@ -2162,21 +2219,26 @@ Partial Public Class IAx00MainMDI
                 '- Monitor (Reagents or Sample Rotor) screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
                 If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
                     Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    monitorTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        monitorTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                     '- Rotor position screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
                 ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
                     Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
-                    wsRotorPositionTreated = True
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
+                        wsRotorPositionTreated = True
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
 
                 ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
                     Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
-                    CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
-                    refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
+                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
+                        refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
+                    End If
                 End If
             End If
 
