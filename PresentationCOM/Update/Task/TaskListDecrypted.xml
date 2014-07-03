@@ -2144,4 +2144,14 @@
       GO
     </UpdateScript>
   </AppVersion >
+  <AppVersion>
+    <Version>3.02</Version>
+    <StructureScript>
+      GO
+    </StructureScript>
+    <UpdateScript>
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.2', ServiceSoftware = '1.2.2', FirmwareScripts = '1.1.0', Firmware = '2.10'
+      GO
+    </UpdateScript>
+  </AppVersion >
 </TaskListDS>
