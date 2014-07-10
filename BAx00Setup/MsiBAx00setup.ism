@@ -5321,7 +5321,7 @@
 		<col key="yes" def="s13">Name</col>
 		<col def="s0">MsiPath</col>
 		<col def="s8">Family</col>
-		<row><td>Patch1</td><td>&lt;ISLatestRelease&gt;</td><td>Family1</td></row>
+		<row><td>Patch1</td><td>&lt;PATH_TO_TEMP_FILES&gt;\Setup 2014-07-10\Patch1\BA400.msi</td><td>Family1</td></row>
 	</table>
 
 	<table name="ISVirtualDirectory">
