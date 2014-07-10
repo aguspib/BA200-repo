@@ -236,10 +236,17 @@ Public Class XRManager
             band = axTraReport.Bands.GetBandByType(GetType(PageHeaderBand))
             If Not (band Is Nothing) Then axTraReport.Bands.Remove(band)
 
+            ' XB 25/06/2014 - BT #1673
+            band = axTraReport.Bands.GetBandByType(GetType(PageFooterBand))
+            If Not (band Is Nothing) Then axTraReport.Bands.Remove(band)
+
             axTraReport.Landscape = False
 
             axTraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(TopMarginBand)).Band)
-            axTraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(TopMarginBand)).Band)
+
+            ' XB 25/06/2014 - BT 1673
+            axTraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(PageHeaderBand)).Band)
+            axTraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(PageFooterBand)).Band)
 
             Dim reportPrintTool As ReportPrintTool = New ReportPrintTool(axTraReport)
             Try
