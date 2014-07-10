@@ -58,7 +58,7 @@
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
-		<revnumber>{AAC61AD5-5DB4-4195-A733-363C0316BA7D}</revnumber>
+		<revnumber>{5CAA8791-CF7F-4F4F-A346-47516DBD9FF8}</revnumber>
 		<lastprinted/>
 		<createdtm>06/21/1999 14:00</createdtm>
 		<lastsavedtm>07/14/2000 17:50</lastsavedtm>
@@ -3735,6 +3735,7 @@
 	<table name="ISPatchConfigImage">
 		<col key="yes" def="S72">PatchConfiguration_</col>
 		<col key="yes" def="s72">UpgradedImage_</col>
+		<row><td>Patch1</td><td>Patch1</td></row>
 	</table>
 
 	<table name="ISPatchConfiguration">
@@ -3753,12 +3754,31 @@
 		<col def="s0">OutputPath</col>
 		<col def="i2">MinMsiVersion</col>
 		<col def="I4">Attributes</col>
+		<row><td>Patch1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td><td>-1</td><td>&lt;PATH_TO_TEMP_FILES&gt;</td><td>2338</td><td/><td>*</td><td>{CA4E0750-8B33-4109-8980-5FDC08FB52B4}</td><td>&lt;PATH_TO_TEMP_FILES&gt;</td><td>200</td><td/></row>
 	</table>
 
 	<table name="ISPatchConfigurationProperty">
 		<col key="yes" def="S72">ISPatchConfiguration_</col>
 		<col key="yes" def="S50">Property</col>
 		<col def="S50">Value</col>
+		<row><td>Patch1</td><td>CommandLine</td><td>REINSTALLMODE=emus REINSTALL=ALL</td></row>
+		<row><td>Patch1</td><td>CreateSetupExe</td><td>1</td></row>
+		<row><td>Patch1</td><td>DotNetRedistLocation</td><td>http://www.installengine.com/cert05/dotnetfx</td></row>
+		<row><td>Patch1</td><td>DotNetRedistLocationOption</td><td>3</td></row>
+		<row><td>Patch1</td><td>GenerateMsiPatchOldAssembly</td><td>1</td></row>
+		<row><td>Patch1</td><td>GeneratePatchGuid</td><td>1</td></row>
+		<row><td>Patch1</td><td>Install9xEngine</td><td>0</td></row>
+		<row><td>Patch1</td><td>InstallNTEngine</td><td>0</td></row>
+		<row><td>Patch1</td><td>MsiEngineVersion</td><td>12</td></row>
+		<row><td>Patch1</td><td>MsiLocation30</td><td>http://www.installengine.com/Msiengine30</td></row>
+		<row><td>Patch1</td><td>MsiLocation9x</td><td>http://www.installengine.com/Msiengine20</td></row>
+		<row><td>Patch1</td><td>MsiLocationNT</td><td>http://www.installengine.com/Msiengine20</td></row>
+		<row><td>Patch1</td><td>MsiLocationOption</td><td>2</td></row>
+		<row><td>Patch1</td><td>OptimizePatchSizeForLargeFiles</td><td>1</td></row>
+		<row><td>Patch1</td><td>SEQUENCE_DATA_GENERATION_DISABLED</td><td>0</td></row>
+		<row><td>Patch1</td><td>SetupLauncherIcon</td><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\setupicon.ico,0</td></row>
+		<row><td>Patch1</td><td>SetupLauncherManifest</td><td>2</td></row>
+		<row><td>Patch1</td><td>ValidateAtBuild</td><td>1</td></row>
 	</table>
 
 	<table name="ISPatchExternalFile">
@@ -5242,7 +5262,7 @@
 		<row><td>IDS__TargetReq_DESC_PROCESSOR</td><td>1033</td><td>The processor is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
-		<row><td>ID_STRING1</td><td>1033</td><td>http://www.BioSystemsSA.com</td><td>0</td><td/><td>-1792956948</td></row>
+		<row><td>ID_STRING1</td><td>1033</td><td>http://www.BioSystems-sa.com</td><td>0</td><td/><td>1403144682</td></row>
 		<row><td>ID_STRING10</td><td>1033</td><td>0</td><td>0</td><td/><td>-442498197</td></row>
 		<row><td>ID_STRING10</td><td>1034</td><td>0</td><td>0</td><td/><td>-442498197</td></row>
 		<row><td>ID_STRING11</td><td>1033</td><td>0</td><td>0</td><td/><td>-442498197</td></row>
@@ -5287,6 +5307,7 @@
 		<col def="i2">Order</col>
 		<col def="I4">Flags</col>
 		<col def="i2">IgnoreMissingFiles</col>
+		<row><td>Patch1</td><td>Release302</td><td>&lt;PATH_TO_TEMP_FILES&gt;\BA400 v302\Release302\BA400.msi</td><td>1</td><td>2338</td><td>0</td></row>
 	</table>
 
 	<table name="ISUpgradeMsiItem">
@@ -5300,6 +5321,7 @@
 		<col key="yes" def="s13">Name</col>
 		<col def="s0">MsiPath</col>
 		<col def="s8">Family</col>
+		<row><td>Patch1</td><td>&lt;ISLatestRelease&gt;</td><td>Family1</td></row>
 	</table>
 
 	<table name="ISVirtualDirectory">
@@ -5708,6 +5730,13 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<col key="yes" def="S72">Company</col>
 		<col key="yes" def="s72">Property</col>
 		<col def="S0">Value</col>
+		<row><td>Patch1</td><td></td><td>AllowRemoval</td><td>0</td></row>
+		<row><td>Patch1</td><td></td><td>Classification</td><td> Update</td></row>
+		<row><td>Patch1</td><td></td><td>Description</td><td>3.0.2.1</td></row>
+		<row><td>Patch1</td><td></td><td>DisplayName</td><td>BA400</td></row>
+		<row><td>Patch1</td><td></td><td>ManufacturerName</td><td>BioSystems SA</td></row>
+		<row><td>Patch1</td><td></td><td>MoreInfoURL</td><td>www.biosystems.es</td></row>
+		<row><td>Patch1</td><td></td><td>TargetProductName</td><td>BA400</td></row>
 	</table>
 
 	<table name="MsiPatchOldAssemblyFile">
