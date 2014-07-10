@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
+Imports System.Globalization
 
 Public Class IWSRotorPositions
     'RH 14/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
@@ -1388,6 +1389,7 @@ Public Class IWSRotorPositions
     ''' <remarks>
     ''' CREATED BY: TR 28/03/2014
     '''             TR 10/04/2014 -Initialize the ExpirationDate variable to min Date value.
+    '''             XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
     ''' </remarks>
     Private Function GetReagentExpDateFromBarCode(pReagentBarcode As String) As Date
         Dim ExpirationDate As Date = Date.MinValue
@@ -1404,7 +1406,9 @@ Public Class IWSRotorPositions
 
                 'Set the result value.
                 If myMonth <> "" OrElse myYear <> "" Then
-                    Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
+                    ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
+                    'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
+                    ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
                 End If
             End If
         Catch ex As Exception
