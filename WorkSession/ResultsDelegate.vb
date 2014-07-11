@@ -5640,16 +5640,26 @@ Namespace Biosystems.Ax00.BL
                                                     patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
                                                 End If
 
-                                                FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport)
+                                                ' XB 10/07/2014 - kill repeated lables - #1673
+                                                'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport)
 
-                                                'FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
-                                                FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
-                                                'DL 17/06/2013
-                                                FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
-                                                FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
-                                                FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
-                                                FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
-                                                FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
+                                                ''FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
+                                                'FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
+                                                ''DL 17/06/2013
+                                                'FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
+                                                'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
+                                                'FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
+                                                'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
+                                                'FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
+
+                                                FullID = String.Format("{0}", patIDforReport)
+                                                If (Pat.LastName <> "-" And Pat.LastName <> "") Or (Pat.FirstName <> "-" And Pat.FirstName <> "") Then FullName = String.Format("{0}, {1}", Pat.LastName, Pat.FirstName) Else FullName = ""
+                                                FullGender = String.Format("{0}", Pat.Gender)
+                                                FullBirthDate = String.Format("{0}", Pat.FormatedDateOfBirth)
+                                                FullAge = String.Format("{0}", Pat.AgeWithUnit)
+                                                FullPerformedBy = String.Format("{0}", Pat.PerformedBy)
+                                                FullComments = String.Format("{0}", Pat.Comments)
+                                                ' XB 10/07/2014 - #1673
 
                                                 ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
                                                                                                                FullName, FullGender, _

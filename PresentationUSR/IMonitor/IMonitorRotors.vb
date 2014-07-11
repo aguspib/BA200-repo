@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
+Imports System.Globalization
 
 'Put here your common business code for the Rotors tabs inside Monitor Form
 Partial Public Class IMonitor
@@ -2130,6 +2131,7 @@ Partial Public Class IMonitor
     ''' <remarks>
     ''' CREATED BY: TR 28/03/2014
     '''             TR 10/04/2014 bt #1583-Initialize the ExpirationDate variable to min Date value.
+    '''             XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
     ''' </remarks>
     Private Function GetReagentExpDateFromBarCode(pReagentBarcode As String) As Date
         Dim ExpirationDate As Date = Date.MinValue
@@ -2146,7 +2148,9 @@ Partial Public Class IMonitor
 
                 'Set the result value.
                 If myMonth <> "" OrElse myYear <> "" Then
-                    Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
+                    ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
+                    'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
+                    ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
                 End If
             End If
         Catch ex As Exception
