@@ -58,7 +58,7 @@
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
-		<revnumber>{AAC61AD5-5DB4-4195-A733-363C0316BA7D}</revnumber>
+		<revnumber>{ACA98E8C-D609-408D-B1BF-751D42B2C005}</revnumber>
 		<lastprinted/>
 		<createdtm>06/21/1999 14:00</createdtm>
 		<lastsavedtm>07/14/2000 17:50</lastsavedtm>
@@ -5897,7 +5897,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>ProductID</td><td>none</td><td/></row>
 		<row><td>ProductLanguage</td><td>1033</td><td/></row>
 		<row><td>ProductName</td><td>BA400</td><td/></row>
-		<row><td>ProductVersion</td><td>3.0.2</td><td/></row>
+		<row><td>ProductVersion</td><td>3.1.0</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
