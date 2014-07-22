@@ -3557,7 +3557,6 @@
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">ISSetupPrerequisites_</col>
 		<row><td>BA400</td><td>_31B7D0E6_6756_40C3_9491_A3FA05E4C02E_</td></row>
-		<row><td>BA400</td><td>_92E7FB7E_ECE8_4CAE_AA7D_B89FC0685C89_</td></row>
 		<row><td>BA400</td><td>_C55F9715_458F_4657_BCCA_4A7EFC17EBFD_</td></row>
 		<row><td>BA400</td><td>_EC572159_AACD_4995_ACBC_FDC2D1029EC8_</td></row>
 	</table>
@@ -4131,7 +4130,7 @@
 		<col def="I2">ISSetupLocation</col>
 		<col def="S255">ISReleaseFlags</col>
 		<row><td>_31B7D0E6_6756_40C3_9491_A3FA05E4C02E_</td><td>ES Driver Provider - BAx00.prq</td><td>4</td><td/><td/></row>
-		<row><td>_92E7FB7E_ECE8_4CAE_AA7D_B89FC0685C89_</td><td>Microsoft SQL Server 2008 R2 Express RTM (x86 &amp; x64Wow) - BAx00.prq</td><td>1</td><td/><td/></row>
+		<row><td>_464C3D72_C9C5_45E8_8645_EF8E4BA855DC_</td><td>Microsoft SQL Server 2008 R2 Express SP2  (x86 &amp; x64Wow) - BAx00.prq</td><td>1</td><td/><td/></row>
 		<row><td>_AE0C8732_D25A_4120_BE2C_8BF9C270F619_</td><td>Microsoft .NET Framework 4.5 Full - BAx00.prq</td><td>0</td><td/><td/></row>
 		<row><td>_C55F9715_458F_4657_BCCA_4A7EFC17EBFD_</td><td>ES Engine - BAx00.prq</td><td>3</td><td/><td/></row>
 		<row><td>_EC572159_AACD_4995_ACBC_FDC2D1029EC8_</td><td>ES xml Parser - BAx00.prq</td><td>2</td><td/><td/></row>
@@ -4149,7 +4148,7 @@
 		<col def="I2">Encoded</col>
 		<col def="S0">Comment</col>
 		<col def="I4">TimeStamp</col>
-		<row><td>COMPANY_NAME</td><td>1033</td><td>BioSystems SA</td><td>0</td><td/><td>-1792956948</td></row>
+		<row><td>COMPANY_NAME</td><td>1033</td><td>BioSystems SA</td><td>0</td><td/><td>-1818047864</td></row>
 		<row><td>DN_AlwaysInstall</td><td>1033</td><td>Always Install</td><td>0</td><td/><td>-576676464</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>1033</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_OS</td><td>1033</td><td>The operating system is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
@@ -5242,7 +5241,7 @@
 		<row><td>IDS__TargetReq_DESC_PROCESSOR</td><td>1033</td><td>The processor is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
 		<row><td>IDS__TargetReq_DESC_RAM</td><td>1033</td><td>The amount of RAM is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
 		<row><td>IDS__TargetReq_DESC_RESOLUTION</td><td>1033</td><td>The screen resolution is not adequate for running [ProductName].</td><td>0</td><td/><td>-576676464</td></row>
-		<row><td>ID_STRING1</td><td>1033</td><td>http://www.BioSystemsSA.com</td><td>0</td><td/><td>-1792956948</td></row>
+		<row><td>ID_STRING1</td><td>1033</td><td>http://www.BioSystemsSA.com</td><td>0</td><td/><td>-1818047864</td></row>
 		<row><td>ID_STRING10</td><td>1033</td><td>0</td><td>0</td><td/><td>-442498197</td></row>
 		<row><td>ID_STRING10</td><td>1034</td><td>0</td><td>0</td><td/><td>-442498197</td></row>
 		<row><td>ID_STRING11</td><td>1033</td><td>0</td><td>0</td><td/><td>-442498197</td></row>
@@ -5575,7 +5574,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 	<table name="LaunchCondition">
 		<col key="yes" def="s255">Condition</col>
 		<col def="l255">Description</col>
-		<row><td>(Not Version9X) And (Not VersionNT=400) And (Not VersionNT=500) And (Not VersionNT=501) And (Not VersionNT=502) And (Not VersionNT=600) And (Not (VersionNT=601 And Not (MsiNTProductType=1))) And (Not VersionNT=602)</td><td>##IDPROP_EXPRESS_LAUNCH_CONDITION_OS##</td></row>
+		<row><td>(Not Version9X) And (Not VersionNT=400) And (Not VersionNT=500) And (Not VersionNT=501) And (Not VersionNT=502) And (Not VersionNT=600) And (Not (VersionNT=601 And Not (MsiNTProductType=1))) And (Not (VersionNT=602 And Not (MsiNTProductType=1)))</td><td>##IDPROP_EXPRESS_LAUNCH_CONDITION_OS##</td></row>
 	</table>
 
 	<table name="ListBox">
