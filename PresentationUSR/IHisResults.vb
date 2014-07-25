@@ -1170,16 +1170,18 @@ Public Class IHisResults
                 Dim myExportedExecutionsDS As ExecutionsDS = TryCast(myGlobalDataTO.SetDatos, ExecutionsDS)
                 Dim myHisWSResultsDS As HisWSResultsDS = New HisWSResultsDS
 
+                'AG 24/07/2014 - RQ00086 v310 Export all selected results again (not only those not SENT)
                 'AG 14/02/2014 - #1505 do not create DS using selectedRows, add only those results to export!!!
                 'Create a new HisWSResultsDS (data table vhisWSResults) using the list of selected rows
-                'For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In selectedRows
-                '    myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
-                'Next
-                For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In (From A In selectedRows Where A.ExportStatus <> "SENT" AndAlso A.ExportStatus <> "SENDING" Select A).ToList
-                    If Not HisWSResultsRow.IsHistOrderTestIDNull AndAlso histOrderTestIDList.Contains(HisWSResultsRow.HistOrderTestID) Then
-                        myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
-                    End If
+                For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In selectedRows
+                    myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
                 Next
+                'For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In (From A In selectedRows Where A.ExportStatus <> "SENT" AndAlso A.ExportStatus <> "SENDING" Select A).ToList
+                '    If Not HisWSResultsRow.IsHistOrderTestIDNull AndAlso histOrderTestIDList.Contains(HisWSResultsRow.HistOrderTestID) Then
+                '        myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
+                '    End If
+                'Next
+                'AG 24/07/2014 - RQ00086 v310
                 myHisWSResultsDS.AcceptChanges()
 
                 'AG 13/02/2014 - #1505
