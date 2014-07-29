@@ -4307,7 +4307,7 @@ Namespace Biosystems.Ax00.BL
         '''                              HistPatientID and SampleID were saved as NULL
         '''              AG 24/04/2013 - Fill new fields to be added in new history records: LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, 
         '''                              ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
-        '''              AG 24/07/2014 - RQ00086 v3.1.0 Historic patient results can be re-sent (all fields required has to be save although the result is already sent)
+        '''              AG 24/07/2014 - #1886 - RQ00086 v3.1.0 Historic patient results can be re-sent (all fields required has to be save although the result is already sent)
         ''' </remarks>
         Private Function MoveWSOrderTestsToHISTModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
                                                       ByVal pHistSTDTestsDS As HisTestSamplesDS, ByVal pHistISETestsDS As HisISETestSamplesDS, _
@@ -4493,12 +4493,12 @@ Namespace Biosystems.Ax00.BL
                                     myHistOrderTestsRow.SetHistPatientIDNull()
                                 End If
 
-                                'AG 24/07/2014 - RQ00086 v3.1.0 Historic patient results can be re-sent. Change condition and always save next fields
+                                'AG 24/07/2014 - #1886 - RQ00086 v3.1.0 Historic patient results can be re-sent. Change condition and always save next fields
                                 'AG 24/04/2013 - new fields to be able upload results to LIS from history (only if ExportStatus <> "SENT")
                                 'LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
                                 'If (myResultsRow.SampleClass = "PATIENT") AndAlso ((Not myResultsRow.IsExportStatusNull AndAlso myResultsRow.ExportStatus <> "SENT") OrElse (myResultsRow.IsExportStatusNull)) Then
                                 If (myResultsRow.SampleClass = "PATIENT") Then
-                                    'AG 24/07/2014 - RQ00086
+                                    'AG 24/07/2014
 
                                     'Fields get from OrderTests
                                     If Not myResultsRow.IsLISRequestNull Then myHistOrderTestsRow.LISRequest = myResultsRow.LISRequest Else myHistOrderTestsRow.SetLISRequestNull()

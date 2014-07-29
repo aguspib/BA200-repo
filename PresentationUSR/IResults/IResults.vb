@@ -1555,7 +1555,7 @@ Public Class IResults
 
             Dim myExport As New ExportDelegate
 
-            'AG 29/07/2014 - RQ00086
+            'AG 29/07/2014 - #1887 - RQ00086
             'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
             If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
                 'PATIENTs view re-send process

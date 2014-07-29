@@ -577,7 +577,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += ")"
                     End With
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -598,7 +598,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                             resultData.HasError = True
                         End If
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
             Catch ex As Exception
@@ -1164,7 +1164,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "  AND MultiPointNumber = " & .MultiPointNumber
                     End With
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -1174,7 +1174,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
             Catch ex As Exception
@@ -2800,7 +2800,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += " AND MultiPointNumber = " & pMultiItemNumber
                     End If
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -2810,7 +2810,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -2929,7 +2929,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText += " Printed = " & CStr(IIf(pNewValue, 1, 0))
                     cmdText += " WHERE OrderTestID = " & pOrderTestID
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -2939,7 +2939,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -2993,7 +2993,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "   AND MultiPointNumber = " & pRow.MultiPointNumber
                     End With
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -3003,7 +3003,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
 
                 End If
@@ -3097,7 +3097,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     Next
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -3107,7 +3107,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
@@ -3163,7 +3163,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " WHERE LISMessageID = '" & pLISMessageID & "' "
                     cmdText &= " AND ExportStatus = 'SENDING' "
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -3173,7 +3173,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception

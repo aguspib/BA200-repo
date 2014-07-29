@@ -934,7 +934,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " WHERE HistOrderTestID = " & HistResultRow.HistOrderTestID
                         'cmdText &= " AND ExportStatus = 'SENDING'" 'AG 24/03/2014 - AG 17/02/2014 this line must be COMMENTED when implement #1505 point 7 '(AG 14/02/2014 - #1505 comment this line)
 
-                        'AG 25/07/2014 RQ00086 - improve memory usage
+                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                             resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
                             If resultData.AffectedRecords > 0 Then
@@ -945,7 +945,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 resultData.AffectedRecords = 0
                             End If
                         End Using
-                        'AG 25/07/2014 RQ00086
+                        'AG 25/07/2014
                     Next
 
                 End If
@@ -993,7 +993,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " WHERE LISMessageID = '" & pLISMessageID & "'"
                     cmdText &= " AND ExportStatus = 'SENDING' "
 
-                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                     'Dim dbCmd As New SqlCommand
                     'dbCmd.Connection = pDBConnection
                     'dbCmd.CommandText = cmdText
@@ -1003,7 +1003,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014 RQ00086
+                    'AG 25/07/2014
 
                 End If
 
