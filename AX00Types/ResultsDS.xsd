@@ -232,6 +232,7 @@
               <xs:element name="AgeWithUnit" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AgeWithUnit" msprop:Generator_ColumnVarNameInTable="columnAgeWithUnit" msprop:Generator_ColumnPropNameInTable="AgeWithUnitColumn" msprop:Generator_UserColumnName="AgeWithUnit" type="xs:string" default="" minOccurs="0" />
               <xs:element name="PerformedBy" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PerformedBy" msprop:Generator_ColumnVarNameInTable="columnPerformedBy" msprop:Generator_ColumnPropNameInTable="PerformedByColumn" msprop:Generator_UserColumnName="PerformedBy" type="xs:string" minOccurs="0" />
               <xs:element name="Comments" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Comments" msprop:Generator_ColumnVarNameInTable="columnComments" msprop:Generator_ColumnPropNameInTable="CommentsColumn" msprop:Generator_UserColumnName="Comments" type="xs:string" minOccurs="0" />
+              <xs:element name="ReportDate" msprop:Generator_ColumnVarNameInTable="columnReportDate" msprop:Generator_ColumnPropNameInRow="ReportDate" msprop:Generator_ColumnPropNameInTable="ReportDateColumn" msprop:Generator_UserColumnName="ReportDate" type="xs:dateTime" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -303,8 +304,8 @@
   </xs:element>
   <xs:annotation>
     <xs:appinfo>
-      <msdata:Relationship name="ReportTestMaster_ReportTestDetails" msdata:parent="ReportTestMaster" msdata:child="ReportTestDetails" msdata:parentkey="TestTypeTestID" msdata:childkey="TestTypeTestID" msprop:Generator_UserChildTable="ReportTestDetails" msprop:Generator_ChildPropName="GetReportTestDetailsRows" msprop:Generator_UserRelationName="ReportTestMaster_ReportTestDetails" msprop:Generator_RelationVarName="relationReportTestMaster_ReportTestDetails" msprop:Generator_UserParentTable="ReportTestMaster" msprop:Generator_ParentPropName="ReportTestMasterRow" />
-      <msdata:Relationship name="ReportSampleMaster_ReportSampleDetails" msdata:parent="ReportSampleMaster" msdata:child="ReportSampleDetails" msdata:parentkey="PatientID" msdata:childkey="PatientID" msprop:Generator_UserChildTable="ReportSampleDetails" msprop:Generator_ChildPropName="GetReportSampleDetailsRows" msprop:Generator_UserRelationName="ReportSampleMaster_ReportSampleDetails" msprop:Generator_RelationVarName="relationReportSampleMaster_ReportSampleDetails" msprop:Generator_UserParentTable="ReportSampleMaster" msprop:Generator_ParentPropName="ReportSampleMasterRow" />
+      <msdata:Relationship name="ReportTestMaster_ReportTestDetails" msdata:parent="ReportTestMaster" msdata:child="ReportTestDetails" msdata:parentkey="TestTypeTestID" msdata:childkey="TestTypeTestID" msprop:Generator_UserChildTable="ReportTestDetails" msprop:Generator_ChildPropName="GetReportTestDetailsRows" msprop:Generator_UserRelationName="ReportTestMaster_ReportTestDetails" msprop:Generator_ParentPropName="ReportTestMasterRow" msprop:Generator_RelationVarName="relationReportTestMaster_ReportTestDetails" msprop:Generator_UserParentTable="ReportTestMaster" />
+      <msdata:Relationship name="ReportSampleMaster_ReportSampleDetails" msdata:parent="ReportSampleMaster" msdata:child="ReportSampleDetails" msdata:parentkey="PatientID" msdata:childkey="PatientID" msprop:Generator_UserChildTable="ReportSampleDetails" msprop:Generator_ChildPropName="GetReportSampleDetailsRows" msprop:Generator_UserRelationName="ReportSampleMaster_ReportSampleDetails" msprop:Generator_ParentPropName="ReportSampleMasterRow" msprop:Generator_RelationVarName="relationReportSampleMaster_ReportSampleDetails" msprop:Generator_UserParentTable="ReportSampleMaster" />
     </xs:appinfo>
   </xs:annotation>
 </xs:schema>

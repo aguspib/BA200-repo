@@ -5144,7 +5144,7 @@ Namespace Biosystems.Ax00.BL
                                                 ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
                                                                                                                FullName, FullGender, _
                                                                                                                FullBirthDate, FullAge, _
-                                                                                                               FullPerformedBy, FullComments)
+                                                                                                               FullPerformedBy, FullComments, DateTime.Now) 'IT 30/07/2014 #BA-1893
                                             End If
                                         Next sampleRow
 
@@ -5664,7 +5664,7 @@ Namespace Biosystems.Ax00.BL
                                                 ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
                                                                                                                FullName, FullGender, _
                                                                                                                FullBirthDate, FullAge, _
-                                                                                                               FullPerformedBy, FullComments)
+                                                                                                               FullPerformedBy, FullComments, DateTime.Now) 'IT 30/07/2014 #BA-1893
                                             End If
                                         Next sampleRow
 

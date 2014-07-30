@@ -748,6 +748,7 @@ Namespace Biosystems.Ax00.BL
                                 Dim FullAge As String
                                 Dim FullPerformedBy As String
                                 Dim FullComments As String
+                                Dim ReportDate As DateTime = DateTime.Now 'IT 30/07/2014 #BA-1893
                                 Dim LinqPat As HisPatientDS.thisPatientsRow
 
                                 Dim ABSValue As String
@@ -824,9 +825,19 @@ Namespace Biosystems.Ax00.BL
                                             ' FullComments = String.Format("{0}", LinqPat.Comments)
                                             'EF 03/06/2014 #1650  END
 
+                                            'IT 30/07/2014 #BA-1893 INI
+                                            Dim resultsRow As HisWSResultsDS.vhisWSResultsRow
+                                            resultsRow = (From detail In pHisWSResults _
+                                                   Where String.Compare(detail.SampleClass, "PATIENT", False) = 0 _
+                                                   AndAlso String.Compare(detail.PatientID, myPatientID, False) = 0 _
+                                                   Order By detail.ResultDateTime Descending).First
+
+                                            ReportDate = resultsRow.ResultDateTime
 
                                             ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow _
-                                                    (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments)
+                                                    (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments, ReportDate)
+                                            'IT 30/07/2014 #BA-1893 END
+
                                         End If
                                     Next sampleRow
                                 Next i
@@ -871,9 +882,11 @@ Namespace Biosystems.Ax00.BL
                                         ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
                                                                                                          ReferenceRanges, Unit, ResultDate, Remarks)
                                     Next detail
+
                                 Next SampleID
 
                                 resultData.SetDatos = ResultsForReportDS
+
                             End If
                         End If
                     End If
