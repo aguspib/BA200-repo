@@ -969,6 +969,93 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Updates the column OrderToExport to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management</remarks>
+        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As String, pNewValue As Boolean) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As String = " UPDATE twksOrders " & vbCrLf & _
+                                           " SET    OrderToExport = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf & _
+                                           " WHERE  ( SampleClass   = 'PATIENT' OR  SampleClass = 'CTRL' )" & vbCrLf & _
+                                           " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+
+                    Using dbCmd As New SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdateOrderToExport", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Read data of the Order to which the specified LISMessageID belongs 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pLISMessageID">LIS message Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified LIS message identifier belongs</returns>
+        ''' <remarks>
+        ''' Created by:  AG 30/07/2014 #1887 OrderToExport management
+        ''' </remarks>
+        Public Function ReadByLISMessageID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISMessageID As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT O.* FROM twksOrders O INNER JOIN twksOrderTests OT ON O.OrderID = OT.OrderID " & vbCrLf & _
+                                                " INNER JOIN twksResults R ON OT.OrderTestID = R.OrderTestID " & vbCrLf & _
+                                                " WHERE  R.LISMessageID = N'" & pLISMessageID.Trim.Replace("'", "''") & "' "
+
+                        Dim resultData As New OrdersDS
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(dbCmd)
+                                da.Fill(resultData.twksOrders)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = resultData
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadByLISMessageID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
 #End Region
     End Class
 End Namespace

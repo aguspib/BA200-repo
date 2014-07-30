@@ -4690,6 +4690,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  TR 12/07/2012
         ''' Modified by: SA 01/08/2012 - Added parameters for OrderTestID and RerunNumber
+        ''' Modified by AG 30/07/2014 - #1887 be sure all CALC/OFFS tests appear in data to export
         ''' </remarks>
         Public Function GetExportedExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                               ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer) As GlobalDataTO
@@ -4703,6 +4704,18 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSExecutionsDAO
                         resultData = myDAO.GetExportedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pRerunNumber)
+
+                        'AG 30/07/20014 #1887 
+                        'previous query sometime fails for calculated tests that are form by another calc test (uses the view in monitor WS in v1.0.0)
+                        'when NOTHING found use the new view developed v300 for CALC/OFF tests
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            If DirectCast(resultData.SetDatos, ExecutionsDS).twksWSExecutions.Rows.Count = 0 Then
+                                resultData = myDAO.GetExportedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pRerunNumber, True)
+                            End If
+                        End If
+                        'AG 30/07/2014
+
+
                     End If
                 End If
             Catch ex As Exception

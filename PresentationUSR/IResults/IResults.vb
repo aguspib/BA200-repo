@@ -1555,22 +1555,45 @@ Public Class IResults
 
             Dim myExport As New ExportDelegate
 
-            'AG 29/07/2014 - #1887 - RQ00086
+            'AG 29/07/2014 - #1887 - Re-send results
+            'Export by Patient view uses the OrderToExport field
+            'Export by Test view uses ??? - PENDING CONFIRM
             'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
             If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
                 'PATIENTs view re-send process
-                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'Include the already exported results
             Else
                 'TESTs view re-send process
                 resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'PENDING to get data in a special way for TESTs view re-send process
             End If
-
-
+            'AG 29/07/2014
 
             'AG 18/03/2013 - upload results to LIS
             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 Dim exportResults As New ExecutionsDS
                 exportResults = CType(resultData.SetDatos, ExecutionsDS)
+
+                'AG 29/07/2014 #1887 Max number of results to export each time 100
+                Dim maxResultsToExport As Integer = 100 'Default value
+                Dim swParamDlg As New SwParametersDelegate
+                resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
+                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    Dim myDS As New ParametersDS
+                    myDS = DirectCast(resultData.SetDatos, ParametersDS)
+                    If myDS.tfmwSwParameters.Rows.Count > 0 Then
+                        If Not myDS.tfmwSwParameters(0).IsValueNumericNull Then
+                            maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
+                        End If
+                    End If
+                End If
+
+                If exportResults.twksWSExecutions.Rows.Count > maxResultsToExport Then
+                    'Show message and leave method - MESSAGE NOT IN DATABASE (same as in historical results!!!)
+                    MessageBox.Show(Me, "Please, export to LIS in groups of " & maxResultsToExport & " results (maximum)", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Return
+                End If
+                'AG 29/07/2014
+
                 If exportResults.twksWSExecutions.Rows.Count > 0 Then 'AG 17/02/2014 - #1505
                     'Inform the new results to be updated into MDI property
                     IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)

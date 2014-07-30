@@ -73,6 +73,7 @@ Namespace Biosystems.Ax00.Calculations
         '''                              (along with the corresponding Result Alarms) and call the function recursively to delete also results
         '''                              of all Order Tests of another Calculated Tests in which Formula the Calculated Test in process is included
         '''              AG 25/02/2014 - BT #1521 ==> Set all Linqs to Nothing
+        '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
         ''' </remarks> 
         Public Function ExecuteCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                               ByVal pManualRecalculation As Boolean) As GlobalDataTO
@@ -225,6 +226,10 @@ Namespace Biosystems.Ax00.Calculations
                                                             resultData = resultsDelegate.RecalculateExportStatusValue(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber)
                                                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                                 resultRow.ExportStatus = CType(resultData.SetDatos, String)
+
+                                                                'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
+                                                                Dim orders_dlg As New OrdersDelegate
+                                                                resultData = orders_dlg.UpdateOrderToExport(pDBConnection, False, , resultRow.OrderTestID)
                                                             Else
                                                                 'Error recalculating the Export Status
                                                                 Exit For

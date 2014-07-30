@@ -4152,6 +4152,7 @@ Namespace Biosystems.Ax00.Calculations
         '''                              accepted and validated in order to sent them to QC Module when the active WS is reset 
         '''              AG 25/06/2012 - ResultsDS also informs AnalyzerID and WorkSessionID
         '''              TR 19/07/2012 - Inform field SampleClass for the result
+        '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
         ''' </remarks>
         Private Sub SaveAverageResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pItem As Integer, ByRef curveResultID As Integer)
             Try
@@ -4216,15 +4217,19 @@ Namespace Biosystems.Ax00.Calculations
                         res_row.SetManualResultTextNull()
                         'END AG 10/11/2010
 
-                        'AG 10/09/2010 - new rules for ExportStatus
-                        If common(0).RecalculationFlag And myManualRecalculationsFlag And preparation(0).SampleClass = "PATIENT" Then
+                        'AG 30/07/2014 add also sampleclass CTRL 'AG 10/09/2010 - new rules for ExportStatus
+                        If common(0).RecalculationFlag AndAlso myManualRecalculationsFlag AndAlso (preparation(0).SampleClass = "PATIENT" OrElse preparation(0).SampleClass = "CTRL") Then
                             myGlobal = res_delegate.RecalculateExportStatusValue(pDBConnection, myOrderTestID, myRerunNumber)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 res_row.ExportStatus = CType(myGlobal.SetDatos, String)
+
+                                'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
+                                Dim orders_dlg As New OrdersDelegate
+                                myGlobal = orders_dlg.UpdateOrderToExport(pDBConnection, False, , myOrderTestID)
+
                             End If
                         End If
                         'END AG 10/09/2010 - new rules
-
 
                         res_row.SetCurveSlopeNull()
                         res_row.SetCurveOffsetNull()
@@ -4249,7 +4254,6 @@ Namespace Biosystems.Ax00.Calculations
                                     Case "BRDIF"
                                         res_row.Abs_WorkReagent = .WorkingReagentAbs
                                         'END AG 12/0/2010
-
                                 End Select
 
                             Case "CALIB"

@@ -3842,9 +3842,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              instead of from table twksWSExecutions to allow get also Calculated and OffSystem "fake" Executions.
         '''                              Get only the Execution for the first Replicate of the informed OrderTest/RerunNumber
         ''' Modified by: SG 06/03/2013 - Add Inner Join with twksOrderTests
+        ''' Modified by AG 30/07/2014 - #1887 be sure all CALC/OFFS tests appear in data to export
         ''' </remarks>
         Public Function GetExportedExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                              ByVal pOrderTestID As Integer, ByVal pReRunNumber As Integer) As GlobalDataTO
+                                              ByVal pOrderTestID As Integer, ByVal pReRunNumber As Integer, Optional ByVal pUseCALCOFFviewFlag As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -3854,21 +3855,28 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
-                        'SGM 06/03/2013 - inner join with order test table
-                        Dim cmdText As String = " SELECT * FROM vwksWSExecutionsMonitor VEM " & vbCrLf & _
-                                                " INNER JOIN twksOrderTests TOT ON VEM.OrderTestID = TOT.OrderTestID " & vbCrLf & _
-                                                " WHERE  VEM.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                " AND    VEM.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                " AND    VEM.OrderTestID = " & pOrderTestID.ToString & vbCrLf & _
-                                                " AND    VEM.RerunNumber = " & pReRunNumber.ToString & vbCrLf & _
-                                                " AND    VEM.ReplicateNumber = 1 " & vbCrLf
+                        'AG 30/07/2014 - #1887 - Classical view
+                        Dim cmdText As String = String.Empty
+                        If Not pUseCALCOFFviewFlag Then
+                            'SGM 06/03/2013 - inner join with order test table
+                            cmdText = " SELECT * FROM vwksWSExecutionsMonitor VEM " & vbCrLf & _
+                                                    " INNER JOIN twksOrderTests TOT ON VEM.OrderTestID = TOT.OrderTestID " & vbCrLf & _
+                                                    " WHERE  VEM.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                    " AND    VEM.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                    " AND    VEM.OrderTestID = " & pOrderTestID.ToString & vbCrLf & _
+                                                    " AND    VEM.RerunNumber = " & pReRunNumber.ToString & vbCrLf & _
+                                                    " AND    VEM.ReplicateNumber = 1 " & vbCrLf
 
-                        'Dim cmdText As String = " SELECT * FROM vwksWSExecutionsMonitor " & vbCrLf & _
-                        '                        " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                        '                        " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                        '                        " AND    OrderTestID = " & pOrderTestID.ToString & vbCrLf & _
-                        '                        " AND    RerunNumber = " & pReRunNumber.ToString & vbCrLf & _
-                        '                        " AND    ReplicateNumber = 1 " & vbCrLf
+                            'OrderTest not found in classical view, use the new developed in v300
+                        Else
+                            cmdText = "SELECT 1 As RerunNumber, VOC.*, OT.*, O.SampleID, O.PatientID FROM vwksMonitorWSTabOFFSCALC VOC" & vbCrLf & _
+                                      " INNER JOIN twksOrderTests OT ON VOC.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                      " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                      " WHERE VOC.OrderTestID = " & pOrderTestID.ToString & vbCrLf & _
+                                      " AND VOC.AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                        End If
+                        'AG 30/07/2014 - #1887
 
                         Dim myExecutionsDS As New ExecutionsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
