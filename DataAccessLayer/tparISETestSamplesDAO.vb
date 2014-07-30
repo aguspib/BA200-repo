@@ -100,11 +100,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Add a new ISETestSample
+        ''' Update an existing ISETestSample
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pISETestSamplesRow">Typed DataSet ISETestSamplesDS containing the data of the ISETestSample to add</param>
-        ''' <returns>GlobalDataTO containing the added record and/or error information</returns>
+        ''' <param name="pISETestSamplesRow">Typed DataSet ISETestSamplesDS containing the data of the ISETestSample to update</param>
+        ''' <returns>GlobalDataTO containing the updated record and/or error information</returns>
         ''' <remarks>Created by: XBC 15/10/2010
         ''' AG 21/10/2010 - remove RangeLower and RangeUpper fields
         ''' AG 27/10/2010 - parameter is row not DS</remarks>
