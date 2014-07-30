@@ -1554,11 +1554,18 @@ Public Class IResults
             'TR 04/08/2011 -END.
 
             Dim myExport As New ExportDelegate
-            'resultData = myExport.ExportToLISManual(AnalyzerIDField, WorkSessionIDField)
 
-            'TR 12/07/2012 -NEW IMPLEMENTATION TO EXPORT MANUAL. 
-            'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'SG 10/04/2013 - pIncludeSent = TRUE
-            resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+            'AG 29/07/2014 - #1887 - RQ00086
+            'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+            If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
+                'PATIENTs view re-send process
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+            Else
+                'TESTs view re-send process
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'PENDING to get data in a special way for TESTs view re-send process
+            End If
+
+
 
             'AG 18/03/2013 - upload results to LIS
             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then

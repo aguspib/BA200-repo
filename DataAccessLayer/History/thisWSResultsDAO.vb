@@ -933,20 +933,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "      ,LISMessageID = '" & HistResultRow.LISMessageID & "' " & vbCrLf
                         cmdText &= " WHERE HistOrderTestID = " & HistResultRow.HistOrderTestID
                         'cmdText &= " AND ExportStatus = 'SENDING'" 'AG 24/03/2014 - AG 17/02/2014 this line must be COMMENTED when implement #1505 point 7 '(AG 14/02/2014 - #1505 comment this line)
-                        Dim dbCmd As New SqlCommand
-                        dbCmd.Connection = pDBConnection
-                        dbCmd.CommandText = cmdText
 
-                        resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
-
-                        If resultData.AffectedRecords > 0 Then
-                            resultData.HasError = False
-                            resultData.SetDatos = pHistWSResultsDS
-                        Else
-                            resultData.HasError = True
-                            resultData.AffectedRecords = 0
-                        End If
-
+                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                            resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
+                            If resultData.AffectedRecords > 0 Then
+                                resultData.HasError = False
+                                resultData.SetDatos = pHistWSResultsDS
+                            Else
+                                resultData.HasError = True
+                                resultData.AffectedRecords = 0
+                            End If
+                        End Using
+                        'AG 25/07/2014
                     Next
 
                 End If
@@ -994,11 +993,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " WHERE LISMessageID = '" & pLISMessageID & "'"
                     cmdText &= " AND ExportStatus = 'SENDING' "
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
 
                 End If
 

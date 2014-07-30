@@ -20,6 +20,7 @@
               <xs:element name="CalcTestID" msprop:Generator_ColumnVarNameInTable="columnCalcTestID" msprop:Generator_ColumnPropNameInRow="CalcTestID" msprop:Generator_ColumnPropNameInTable="CalcTestIDColumn" msprop:Generator_UserColumnName="CalcTestID" type="xs:int" minOccurs="0" />
               <xs:element name="CalcTestLongName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="CalcTestLongName" msprop:Generator_ColumnVarNameInTable="columnCalcTestLongName" msprop:Generator_ColumnPropNameInTable="CalcTestLongNameColumn" msprop:Generator_UserColumnName="CalcTestLongName" type="xs:string" minOccurs="0" />
               <xs:element name="SpecimenID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SpecimenID" msprop:Generator_ColumnVarNameInTable="columnSpecimenID" msprop:Generator_ColumnPropNameInTable="SpecimenIDColumn" msprop:Generator_UserColumnName="SpecimenID" type="xs:string" minOccurs="0" />
+              <xs:element name="PrintExpTests" msprop:Generator_ColumnVarNameInTable="columnPrintExpTests" msprop:Generator_ColumnPropNameInRow="PrintExpTests" msprop:Generator_ColumnPropNameInTable="PrintExpTestsColumn" msprop:Generator_UserColumnName="PrintExpTests" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

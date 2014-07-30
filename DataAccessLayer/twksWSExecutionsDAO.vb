@@ -317,18 +317,12 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     cmdText &= ") " 'AG 31/01/2012
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                    'If (resultData.AffectedRecords = 1) Then
-                    resultData.HasError = False
-                    '                    Else
-                    'resultData.HasError = True
-                    'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    'End If
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception
@@ -373,18 +367,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " AND WorkSessionID = '" & pWorkSessionID.ToString & "' "
                     cmdText &= " AND AnalyzerID = '" & pAnalyzerID.ToString & "' "
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                    If (resultData.AffectedRecords = 1) Then
-                        resultData.HasError = False
-                    Else
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    End If
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        If (resultData.AffectedRecords = 1) Then
+                            resultData.HasError = False
+                        Else
+                            resultData.HasError = True
+                            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                        End If
+                    End Using
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception
@@ -1285,11 +1278,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                                             " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "'" & vbCrLf & _
                                             " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "'"
 
-                    Dim cmd As SqlCommand
-                    cmd = pDBConnection.CreateCommand
-                    cmd.CommandText = cmdText
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    'Dim cmd As SqlCommand
+                    'cmd = pDBConnection.CreateCommand
+                    'cmd.CommandText = cmdText
+                    'cmd.ExecuteNonQuery()
 
-                    cmd.ExecuteNonQuery()
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
+
                 End If
             Catch ex As Exception
                 resultData.HasError = True
@@ -1820,12 +1820,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText += " ThermoWarningFlag = " & CStr(IIf(pNewValue, 1, 0))
                     cmdText += " WHERE ExecutionID = " & pExecutionID
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception
@@ -1873,11 +1873,13 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     cmdText += " WHERE ExecutionID = " & pExecutionID
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
                 End If
 
@@ -1931,11 +1933,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= String.Format("{0}", vbNewLine) 'insert line break
                     Next
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
 
                 End If
 
@@ -2518,12 +2521,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText = cmdText & " OR CT.WashingSolutionR2 = '" & pWashSolutionCode & "')) " & vbCrLf
 
                     'Execute the SQL sentence 
-                    Dim dbCmd As New SqlClient.SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                    resultData.HasError = False
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception
@@ -2742,11 +2745,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText += " AND AnalyzerID = '" & pAnalyzerID & "' "
                     cmdText += " AND WorkSessionID = '" & pWorkSessionID & "' )" & vbCrLf
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
 
                 End If
 
@@ -3140,13 +3144,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText = cmdText & " AND E.AnalyzerID = '" & pAnalyzerID & "' ) " & vbCrLf
 
                     'Execute the SQL sentence 
-                    Dim dbCmd As New SqlClient.SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                    resultData.HasError = False
-
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception
@@ -3596,19 +3599,17 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                             cmdText += "Where ExecutionID = " & pExecutionsDS.twksWSExecutions(i).ExecutionID
 
-                            Dim dbCmd As New SqlCommand
-                            dbCmd.Connection = pDBConnection
-                            dbCmd.CommandText = cmdText
-
-                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                            If (resultData.AffectedRecords = 1) Then
-                                resultData.HasError = False
-
-                            Else
-                                resultData.HasError = True
-                                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                            End If
+                            'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                            Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                                resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                                If resultData.AffectedRecords = 1 Then
+                                    resultData.HasError = False
+                                Else
+                                    resultData.HasError = True
+                                    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                                End If
+                            End Using
+                            'AG 25/07/2014
 
                             'AG 11/08/2010
                             If resultData.HasError Then Exit For
@@ -4758,18 +4759,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += " And AnalyzerID = '" & pExecutionsDS.twksWSExecutions(0).AnalyzerID & "' "
                         cmdText += " And WorkSessionID = '" & pExecutionsDS.twksWSExecutions(0).WorkSessionID & "' "
 
-                        Dim dbCmd As New SqlCommand
-                        dbCmd.Connection = pDBConnection
-                        dbCmd.CommandText = cmdText
-
-                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                        If (resultData.AffectedRecords = 1) Then
-                            resultData.HasError = False
-                        Else
-                            resultData.HasError = True
-                            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                        End If
+                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                            If resultData.AffectedRecords = 1 Then
+                                resultData.HasError = False
+                            Else
+                                resultData.HasError = True
+                                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                            End If
+                        End Using
+                        'AG 25/07/2014
 
                     End If
                 End If
@@ -4826,12 +4826,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " WHERE ExecutionID = " & pExecutionsDS.twksWSExecutions(0).ExecutionID
 
                         'Execute the SQL sentence 
-                        Dim dbCmd As New SqlClient.SqlCommand
-                        dbCmd.Connection = pDBConnection
-                        dbCmd.CommandText = cmdText
-
-                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                        resultData.HasError = False
+                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                            resultData.HasError = False
+                        End Using
+                        'AG 25/07/2014
 
                     Else
                         resultData.HasError = True
@@ -5726,11 +5726,12 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     Next
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014
                 End If
 
             Catch ex As Exception

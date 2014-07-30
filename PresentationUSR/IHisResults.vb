@@ -1069,7 +1069,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by: JB 18/10/2012
     ''' Modified by: DL 25/04/2013. New condition for activate export status when any result NOT EXPORTED
-    ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
+    ''' Modified AG 24/07/2014 - #1886 - RQ00086 v3.1.0 (allow re-sent patient results from history)
     ''' </remarks>
     Private Sub UpdateFormBehavior(ByVal pStatus As Boolean)
         Try
@@ -1080,12 +1080,12 @@ Public Class IHisResults
 
             historyDeleteButton.Enabled = pStatus AndAlso selectedRows.Count > 0
 
-            'AG 24/07/2014 - RQ00086
+            'AG 24/07/2014 - #1886 - RQ00086
             ''DL 25/04/2013
             'Dim selectedNotExport As Integer = (From row In selectedRows Where row.ExportStatus = "NOTSENT").Count
             'exportButton.Enabled = pStatus AndAlso selectedRows.Count > 0 AndAlso selectedNotExport > 0
             exportButton.Enabled = pStatus AndAlso selectedRows.Count > 0
-            'AG 24/07/2014 - RQ00086
+            'AG 24/07/2014
 
             PrintButton.Enabled = pStatus AndAlso selectedRows.Count > 0
             searchGroup.Enabled = pStatus AndAlso analyzerIDComboBox.Items.Count > 0
@@ -1107,7 +1107,7 @@ Public Class IHisResults
     ''' Modified by: SA 17/12/2012 - If an error has happened when expoting, shown it 
     '''              DL 24/04/2013 - 
     '''              AG 13/02/2014 - BT #1505
-    ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
+    ''' Modified AG 24/07/2014 - #1886 - RQ00086 v3.1.0 (allow re-sent patient results from history)
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1138,7 +1138,7 @@ Public Class IHisResults
             'Show export confirmation message ??
             'If (ShowMessage(Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) <> Windows.Forms.DialogResult.Yes) Then Exit Sub
 
-            'AG 24/07/2014 - RQ00086
+            'AG 24/07/2014 - #1886 - RQ00086
             ''BEGIN DL 24/04/2013 - The results SENT or SENDING could not be uploaded again from Historical results screen 
             'Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows
             '                                              Where row.ExportStatus <> "SENT" AndAlso row.ExportStatus <> "SENDING" _
@@ -1146,7 +1146,7 @@ Public Class IHisResults
 
             'Convert dataset to LIST of historic order test integers
             Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows Select row.HistOrderTestID Distinct).ToList
-            'AG 24/07/2014 - RQ00086
+            'AG 24/07/2014
 
             'AG 14/02/2014 - #1505 If number of results to export > limit --> show warning!! No export
             If histOrderTestIDList.Count > maxHistResultsToExport Then
@@ -1170,16 +1170,18 @@ Public Class IHisResults
                 Dim myExportedExecutionsDS As ExecutionsDS = TryCast(myGlobalDataTO.SetDatos, ExecutionsDS)
                 Dim myHisWSResultsDS As HisWSResultsDS = New HisWSResultsDS
 
+                'AG 24/07/2014 - #1886 - RQ00086 v310 Export all selected results again (not only those not SENT)
                 'AG 14/02/2014 - #1505 do not create DS using selectedRows, add only those results to export!!!
                 'Create a new HisWSResultsDS (data table vhisWSResults) using the list of selected rows
-                'For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In selectedRows
-                '    myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
-                'Next
-                For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In (From A In selectedRows Where A.ExportStatus <> "SENT" AndAlso A.ExportStatus <> "SENDING" Select A).ToList
-                    If Not HisWSResultsRow.IsHistOrderTestIDNull AndAlso histOrderTestIDList.Contains(HisWSResultsRow.HistOrderTestID) Then
-                        myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
-                    End If
+                For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In selectedRows
+                    myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
                 Next
+                'For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In (From A In selectedRows Where A.ExportStatus <> "SENT" AndAlso A.ExportStatus <> "SENDING" Select A).ToList
+                '    If Not HisWSResultsRow.IsHistOrderTestIDNull AndAlso histOrderTestIDList.Contains(HisWSResultsRow.HistOrderTestID) Then
+                '        myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
+                '    End If
+                'Next
+                'AG 24/07/2014
                 myHisWSResultsDS.AcceptChanges()
 
                 'AG 13/02/2014 - #1505

@@ -328,6 +328,120 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get all ordertests that form part of a CALCULATED TEST and has to be excluded from in the final patients / and compact patients reports
+        ''' (apply only in current WS results)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo as list of integer with the OrderTestID that have to be excluded from patients final reports</returns>
+        ''' <remarks>
+        ''' AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ''' </remarks>
+        Public Function GetOrderTestsToExcludeInPatientsReport(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksOrderCalculatedTestsDAO
+
+                        'Get all order tests in worksession that form part of a calculated test (and also with PrintExpTests value programmed in calc tests)
+                        resultData = myDAO.GetOrderTestsFormPartOfCalculatedTest(dbConnection)
+
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            Dim myAuxDS As New OrderCalculatedTestsDS
+                            myAuxDS = DirectCast(resultData.SetDatos, OrderCalculatedTestsDS)
+
+                            Dim FinalToExcludeList As New List(Of Integer)
+                            'Get ordertests that form part of a calculated test that exclude print their experimental tests
+                            FinalToExcludeList = (From a As OrderCalculatedTestsDS.twksOrderCalculatedTestsRow In myAuxDS.twksOrderCalculatedTests _
+                                       Where a.PrintExpTests = False Select a.OrderTestID Distinct).ToList
+
+                            'From FinalToExclude list remove those OrderTests that belongs to another calc test that prints their experimental tests
+                            Dim toPrint As List(Of Integer)
+                            toPrint = (From a As OrderCalculatedTestsDS.twksOrderCalculatedTestsRow In myAuxDS.twksOrderCalculatedTests _
+                                       Where a.PrintExpTests = True Select a.OrderTestID Distinct).ToList
+
+                            'If the same ordertestID exists in toExclude and toPrint list we have to remove it from toExclude list
+                            If toPrint.Count > 0 Then
+                                Dim positionToDelete As Integer = 0
+                                For Each item As Integer In toPrint
+                                    If FinalToExcludeList.Contains(item) Then
+                                        positionToDelete = FinalToExcludeList.IndexOf(item)
+                                        FinalToExcludeList.RemoveAt(positionToDelete)
+                                    End If
+                                Next
+                            End If
+
+                            resultData.SetDatos = FinalToExcludeList
+
+                            'Release memory
+                            toPrint.Clear()
+                            'FinalToExcludeList.Clear()
+                            toPrint = Nothing
+                            FinalToExcludeList = Nothing
+                        End If
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrderCalculatedTestsDelegate.GetOrderTestsToExcludeInPatientsReport", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Get all ordertests in worksession that form part of a calculated test
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ''' </remarks>
+        Public Function GetOrderTestsFormPartOfCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksOrderCalculatedTestsDAO
+                        resultData = myDAO.GetOrderTestsFormPartOfCalculatedTest(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrderCalculatedTestsDelegate.GetOrderTestsFormPartOfCalculatedTest", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
     End Class
