@@ -281,6 +281,14 @@
     <Compile Include="GraphDS.vb">
       <DependentUpon>GraphDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="GridColsConfigDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="GridColsConfigDS.vb">
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </Compile>
     <Compile Include="HelpFilesSettingDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1547,6 +1555,17 @@
     </None>
     <None Include="GraphDS.xss">
       <DependentUpon>GraphDS.xsd</DependentUpon>
+    </None>
+    <None Include="GridColsConfigDS.xsc">
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
+    </None>
+    <None Include="GridColsConfigDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>GridColsConfigDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="GridColsConfigDS.xss">
+      <DependentUpon>GridColsConfigDS.xsd</DependentUpon>
     </None>
     <None Include="HelpFilesSettingDS.xsc">
       <DependentUpon>HelpFilesSettingDS.xsd</DependentUpon>

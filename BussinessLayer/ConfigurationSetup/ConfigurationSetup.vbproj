@@ -114,6 +114,7 @@
     <Compile Include="BarCodeConfigDelegate.vb" />
     <Compile Include="BarCodeSampleTypesMappingDelegate.vb" />
     <Compile Include="CustomDemographicsDelegate.vb" />
+    <Compile Include="GridColsConfigurationDelegate.vb" />
     <Compile Include="LISMappingsDelegate.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

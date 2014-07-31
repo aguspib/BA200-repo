@@ -155,6 +155,7 @@
     <Compile Include="History\thisWSReadingsDAO.vb" />
     <Compile Include="History\thisWSResultsDAO.vb" />
     <Compile Include="Integrity\IntegrityDAO.vb" />
+    <Compile Include="tcfgGridColsConfigurationDAO.vb" />
     <Compile Include="tcfgReportsTestsSortingDAO.vb" />
     <Compile Include="tcfgReportTemplatesDAO.vb" />
     <Compile Include="tfmwHelpFilesSettingDAO.vb" />
