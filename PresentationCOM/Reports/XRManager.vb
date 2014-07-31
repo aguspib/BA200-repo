@@ -1640,6 +1640,218 @@ Public Class XRManager
     End Sub
 
 
+    ''' <summary>
+    ''' Calibration curve report
+    ''' </summary>
+    ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+    ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+    ''' <param name="pHistOrderTestID">Historic order test identifier</param>
+    ''' <remarks> 
+    ''' Created by XB 30/07/2014 - BT #1863
+    ''' </remarks>
+    Public Shared Sub ShowHISTResultsCalibCurveReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pHistOrderTestID As Integer, Optional ByVal pTestReportName As String = "")
+        Try
+            Dim resultData As GlobalDataTO
+            Dim myResultsDelegate As New HisWSResultsDelegate
+
+            Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+            Dim myDecimalsAllowed As String = "0"
+            Dim myTestLongName As String = ""
+
+            ' Obtains HisTestSamples data information searching the DecimalsAllowed value for the test selected
+            Dim myHisWSOTDelegate As New HisWSOrderTestsDelegate
+            resultData = myHisWSOTDelegate.ReadByOrderTestID(Nothing, pHistOrderTestID)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                Dim myHisTestSamplesDS As HisTestSamplesDS = DirectCast(resultData.SetDatos, HisTestSamplesDS)
+
+                If myHisTestSamplesDS.thisTestSamples.Rows.Count > 0 Then
+                    Dim LinqTestSample As HisTestSamplesDS.thisTestSamplesRow
+                    LinqTestSample = (From row As HisTestSamplesDS.thisTestSamplesRow In myHisTestSamplesDS.thisTestSamples _
+                                        Select row).First()
+
+                    myDecimalsAllowed = LinqTestSample.DecimalsAllowed.ToString
+                    myTestLongName = LinqTestSample.TestLongName
+                End If
+            End If
+
+            resultData = myResultsDelegate.GetResultsCalibCurveForReport(Nothing, pAnalyzerID, pWorkSessionID, pHistOrderTestID, myDecimalsAllowed)
+
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                Dim ResultsData As ResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
+
+                If ResultsData.ReportCalibCurve.Rows.Count = 0 Then Return
+
+                Dim Report As New ResultsCalibCurveReport
+
+                'Multilanguage. Get texts from DB.
+                Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_CurveResultsScreen", CurrentLanguage)
+                Report.SetHeaderLabel(literalHeaderLabel)
+
+                Dim myTestReportName As String = myTestLongName
+                If myTestReportName = "" Then myTestReportName = pTestReportName
+                Report.XrLabelTestName.Text = myTestReportName
+
+                Report.XrLabelXAxis.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AxisX", CurrentLanguage)
+                Report.XrLabelYAxis.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AxisY", CurrentLanguage)
+                Report.XrLabelCurveType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveType", CurrentLanguage)
+                Report.XrLabelCurveGrowth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveGrowth", CurrentLanguage)
+                Report.XrLabelUnit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", CurrentLanguage)
+
+                Report.XrLabelCalibNo.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveCalibratorNumber", CurrentLanguage)
+                Report.XrLabelAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", CurrentLanguage)
+                Report.XrLabelTheorConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TheoricalConc_Short", CurrentLanguage)
+                Report.XrLabelCalcConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalcConc", CurrentLanguage)
+                Report.XrLabelError.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_%Error", CurrentLanguage)
+
+                Dim WSStartDateTime As String = String.Empty
+
+                'Get WSStartDateTime from DB
+                Dim myHistAnalyzerWSDelegate As New HisAnalyzerWorkSessionsDelegate
+
+                resultData = myHistAnalyzerWSDelegate.Read(Nothing, pAnalyzerID, pWorkSessionID)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    Dim myWSDataDS As WorkSessionsDS = DirectCast(resultData.SetDatos, WorkSessionsDS)
+                    If myWSDataDS.twksWorkSessions.Count > 0 AndAlso Not (myWSDataDS.twksWorkSessions.First.IsStartDateTimeNull) Then
+                        WSStartDateTime = myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(DatePattern) & " " & _
+                                            myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(TimePattern)
+                    End If
+                End If
+
+                Report.XrWSStartDateTimeLabel.Text = WSStartDateTime
+
+                Dim CurveResultsID As Integer = 0
+                Dim CurveGrowthType As String = String.Empty
+                Dim CurveType As String = String.Empty
+                Dim CurveAxisXType As String = String.Empty
+                Dim CurveAxisYType As String = String.Empty
+                Dim MonotonousCurve As Boolean = True
+
+                With ResultsData.ReportCalibCurve(0)
+                    CurveGrowthType = .CurveGrowthType
+                    CurveType = .CurveType
+                    CurveAxisXType = .CurveAxisXType
+                    CurveAxisYType = .CurveAxisYType
+                    MonotonousCurve = String.IsNullOrEmpty(.CalibrationError)
+
+                    Report.XrLabelXAxisField.Text = _
+                            myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_CURVE_AXIS_TYPES_" & .CurveAxisXType, CurrentLanguage)
+
+                    Report.XrLabelYAxisField.Text = _
+                            myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_CURVE_AXIS_TYPES_" & .CurveAxisYType, CurrentLanguage)
+
+                    Report.XrLabelCurveTypeField.Text = _
+                            myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_CURVE_TYPES_" & .CurveType, CurrentLanguage)
+
+                    Report.XrLabelUnitField.Text = .MeasureUnit
+
+                    If String.Compare(.CurveGrowthType, "DEC", False) = 0 Then
+                        Report.XrLabelCurveGrowthField.Text = _
+                                myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decreasing", CurrentLanguage)
+                    Else
+                        Report.XrLabelCurveGrowthField.Text = _
+                                myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Increasing", CurrentLanguage)
+                    End If
+                End With
+
+                Report.XrChart1.Titles(0).Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", CurrentLanguage)
+                Report.XrChart1.Titles(1).Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Concentration_Long", CurrentLanguage)
+
+                Dim myHistCurve As New HisWSCurveResultsDelegate
+                resultData = myHistCurve.GetResults(Nothing, pHistOrderTestID, pAnalyzerID, pWorkSessionID)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    If (MonotonousCurve) Then
+                        Dim curveDS As CurveResultsDS
+                        curveDS = DirectCast(resultData.SetDatos, CurveResultsDS)
+
+                        'Plot curve points
+                        For i As Integer = 0 To curveDS.twksCurveResults.Rows.Count - 1
+                            With curveDS.twksCurveResults(i)
+                                Report.XrChart1.Series(0).Points.Add(New DevExpress.XtraCharts.SeriesPoint(.CONCValue, .ABSValue))
+                            End With
+                        Next i
+
+                        Dim PointAbsorbance As Single
+                        Dim PointConcentration As Single
+
+                        PointAbsorbance = ResultsData.ReportCalibCurve(0).CalibratorBlankAbsUsed
+                        PointConcentration = 0
+
+                        'Plot CalibratorBlankAbsUsed
+                        Report.XrChart1.Series(1).Points.Add(New DevExpress.XtraCharts.SeriesPoint(PointConcentration, PointAbsorbance))
+                        Report.XrChart1.Series(1).Points(0).Tag = _
+                                myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_BLANK", CurrentLanguage)
+
+                        'Plot Result Points
+                        For i As Integer = 0 To ResultsData.ReportCalibCurve.Rows.Count - 1
+                            PointAbsorbance = Single.Parse(ResultsData.ReportCalibCurve(i).ABSValue)
+                            PointConcentration = Single.Parse(ResultsData.ReportCalibCurve(i).TheoricalConcentration)
+
+                            Report.XrChart1.Series(1).Points.Add(New DevExpress.XtraCharts.SeriesPoint(PointConcentration, PointAbsorbance))
+                            Report.XrChart1.Series(1).Points(i + 1).Tag = (i + 1).ToString()
+                        Next i
+
+                        If curveDS.twksCurveResults.Rows.Count > 0 Then
+
+                            If String.Compare(CurveType, "LINEAR", False) = 0 Then
+
+                                Dim AverageList As List(Of ResultsDS.ReportCalibCurveRow) = _
+                                                    (From row In ResultsData.ReportCalibCurve _
+                                                     Where row.CurveOffset <> Single.MinValue _
+                                                     AndAlso row.CurveSlope <> Single.MinValue _
+                                                     AndAlso row.CurveCorrelation <> Single.MinValue _
+                                                     Order By row.CurveSlope Descending _
+                                                     Select row).ToList()
+
+                                If AverageList.Count > 0 Then
+                                    Dim CurveSlope As String
+                                    Dim CurveOffset As String
+                                    Dim r As String
+                                    Dim r2 As String
+
+                                    CurveSlope = String.Format("Abs = {0}*Conc", ResultsData.ReportCalibCurve(0).CurveSlope.ToStringWithDecimals(4))
+
+                                    If ResultsData.ReportCalibCurve(0).CurveOffset < 0 Then
+                                        CurveOffset = " - " & ((-1) * ResultsData.ReportCalibCurve(0).CurveOffset).ToStringWithDecimals(4)
+                                    Else
+                                        CurveOffset = " + " & ResultsData.ReportCalibCurve(0).CurveOffset.ToStringWithDecimals(4)
+                                    End If
+
+                                    r = ResultsData.ReportCalibCurve(0).CurveCorrelation.ToStringWithDecimals(4)
+                                    r2 = Math.Pow(ResultsData.ReportCalibCurve(0).CurveCorrelation, 2).ToStringWithDecimals(4)
+
+                                    Report.XrChart1.Titles(2).Text = String.Format("{0}{1}   r = {2}   r² = {3}", CurveSlope, CurveOffset, r, r2)
+                                    Report.XrChart1.Titles(2).Visible = True
+                                End If
+                            End If
+
+                        Else
+                            Report.XrLabelNoData.Visible = True
+                            Report.XrLabelNoData.Text = _
+                                    myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_CALIBCURVE_NOT_CALCULATED", CurrentLanguage)
+                        End If
+
+                    Else
+                        Report.XrLabelNoData.Visible = True
+                        Report.XrLabelNoData.Text = _
+                                myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_CALIBCURVE_NOT_CALCULATED", CurrentLanguage)
+                    End If
+                End If
+
+                Report.DataSource = ResultsData
+                ShowPortrait(Report)
+            End If
+
+        Catch ex As Exception
+            Dim myLogAcciones As New ApplicationLogManager()
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowHISTResultsCalibCurveReport", EventLogEntryType.Error, False)
+
+        End Try
+    End Sub
+
 #End Region
 
 

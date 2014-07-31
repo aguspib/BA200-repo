@@ -1309,7 +1309,10 @@ Public Class IHisBlankCalibResults
     ''' Opens the auxliary screen (IResultsCalibCurve)
     ''' </summary>
     ''' <param name="pRow"></param>
-    ''' <remarks>AG 23/10/2012</remarks>
+    ''' <remarks>
+    ''' Created by:  AG 23/10/2012
+    ''' Modified by: XB 30/07/2014 - Remove call to function HisWSExecutionsDelegate.GetExecutionResultsForCalibCurve. Instead, add required rows to the local ExecutionsDS - BT #1863
+    ''' </remarks>
     Private Sub OpenCalibCurveScreen(ByVal pRow As HisWSResultsDS.vhisWSResultsRow)
         Try
             If pRow.IsAnalyzerIDNull OrElse pRow.IsWorkSessionIDNull OrElse pRow.IsHistOrderTestIDNull _
@@ -1318,7 +1321,7 @@ Public Class IHisBlankCalibResults
                 'Some required column is missing. The aux screen can not be opened
                 'Do nothing
 
-            Else 'All required columns are informed. The aux screen can be opened
+            Else 'All required columns are informed. The aux screen can be opened 
 
                 Dim analyzerID As String = pRow.AnalyzerID
                 Dim worksessionID As String = pRow.WorkSessionID
@@ -1343,13 +1346,41 @@ Public Class IHisBlankCalibResults
                 'Get Replic Results
                 Dim exeResults As New ExecutionsDS
                 If Not resultData.HasError Then
-                    Dim dlgate2 As New HisWSExecutionsDelegate
-                    resultData = dlgate2.GetExecutionResultsForCalibCurve(Nothing, histOrderTestID, analyzerID, worksessionID)
-                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                        exeResults = CType(resultData.SetDatos, ExecutionsDS)
-                    Else
-                        ShowMessage(Me.Name & ".OpenCalibCurveScreen", resultData.ErrorCode, resultData.ErrorMessage, Me)
-                    End If
+
+                    ' XB 30/07/2014 - BT #1863
+                    'Dim dlgate2 As New HisWSExecutionsDelegate
+                    'resultData = dlgate2.GetExecutionResultsForCalibCurve(Nothing, histOrderTestID, analyzerID, worksessionID)
+
+                    'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    '    exeResults = CType(resultData.SetDatos, ExecutionsDS)
+                    'Else
+                    '    ShowMessage(Me.Name & ".OpenCalibCurveScreen", resultData.ErrorCode, resultData.ErrorMessage, Me)
+                    'End If
+
+                    Dim myExecutionRow As ExecutionsDS.vwksWSExecutionsResultsRow
+                    myExecutionRow = exeResults.vwksWSExecutionsResults.NewvwksWSExecutionsResultsRow()
+                    myExecutionRow.OrderTestID = avgResults.vwksResults.First.OrderTestID
+                    myExecutionRow.AnalyzerID = avgResults.vwksResults.First.AnalyzerID
+                    myExecutionRow.WorkSessionID = avgResults.vwksResults.First.WorkSessionID
+                    myExecutionRow.SampleClass = avgResults.vwksResults.First.SampleClass
+                    myExecutionRow.MultiItemNumber = avgResults.vwksResults.First.MultiPointNumber
+                    myExecutionRow.RerunNumber = 1
+                    myExecutionRow.ReplicateNumber = 1
+                    myExecutionRow.ExecutionType = "CALIB"
+                    myExecutionRow.ABS_Value = avgResults.vwksResults.First.ABSValue
+                    If (Not avgResults.vwksResults.First.IsABS_InitialNull) Then myExecutionRow.ABS_Initial = avgResults.vwksResults.First.ABS_Initial
+                    If (Not avgResults.vwksResults.First.IsABS_MainFilterNull) Then myExecutionRow.ABS_MainFilter = avgResults.vwksResults.First.ABS_MainFilter
+                    If (Not avgResults.vwksResults.First.IsAbs_WorkReagentNull) Then myExecutionRow.Abs_WorkReagent = avgResults.vwksResults.First.Abs_WorkReagent
+                    myExecutionRow.CONC_Value = avgResults.vwksResults.First.TheoricalConcentration
+                    myExecutionRow.ResultDate = avgResults.vwksResults.First.ResultDateTime
+                    myExecutionRow.SampleType = avgResults.vwksResults.First.SampleType
+                    myExecutionRow.TestName = avgResults.vwksResults.First.TestName
+                    If (Not avgResults.vwksResults.First.IsKineticBlankLimitNull) Then myExecutionRow.KineticBlankLimit = avgResults.vwksResults.First.KineticBlankLimit
+                    myExecutionRow.TestType = "STD"
+                    myExecutionRow.AlarmList = avgResults.vwksResults.First.AlarmList
+                    myExecutionRow.InUse = True
+                    exeResults.vwksWSExecutionsResults.AddvwksWSExecutionsResultsRow(myExecutionRow)
+                    ' XB 30/07/2014 - BT #1863
                 End If
 
                 'Open the calib curve screen
@@ -1383,6 +1414,7 @@ Public Class IHisBlankCalibResults
                                 .SelectedTestName = TestList(0).TestName
                                 .SelectedSampleType = TestList(0).SampleType
                                 .SelectedFullTestName = TestList(0).TestName
+                                .SelectedOrderTestID = TestList(0).OrderTestID  ' XB 30/07/2014 - BT #1863 
 
                                 'Add the analyzsis mode
                                 Dim analysisMode As String = String.Empty

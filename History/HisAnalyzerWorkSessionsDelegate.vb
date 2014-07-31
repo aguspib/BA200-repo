@@ -105,6 +105,43 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get data of the specified WorkSession 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DS WorkSessionsDS with all WorkSession definition data</returns>
+        ''' <remarks>
+        ''' Created by XB 30/07/2014 - BT #1863
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New thisAnalyzerWorkSessionsDAO
+                        resultData = myDAO.Read(dbConnection, pAnalyzerID, pWorkSessionID)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "HisAnalyzerWorkSessionsDelegate.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "NOT USED"

@@ -1211,6 +1211,48 @@ Namespace Biosystems.Ax00.BL
             '' EF 03/06/2014 (comentada completa)
         End Function
 
+        ''' <summary>
+        ''' Get the historic curve average results to generate a report
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pHistOrderTestID">Historic order test identifier</param>
+        ''' <param name="pDecimalsAllowed">Test decimals allowed configuration</param>
+        ''' <returns>GlobalDataTo with dataset as ResultsDS.ReportCalibCurve</returns>
+        ''' <remarks>
+        ''' Created by XB 30/07/2014 - BT #1863
+        ''' </remarks>
+        Public Function GetResultsCalibCurveForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
+                                                      ByVal pAnalyzerID As String, _
+                                                      ByVal pWorkSessionID As String, _
+                                                      ByVal pHistOrderTestID As Integer, _
+                                                      ByVal pDecimalsAllowed As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New thisWSResultsDAO
+                        resultData = myDAO.GetResultsCalibCurveForReport(dbConnection, pAnalyzerID, pWorkSessionID, pHistOrderTestID, pDecimalsAllowed)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsCalibCurveForReport", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "METHODS FOR EXPORT RESULTS TO LIMS"
