@@ -1058,6 +1058,7 @@ Public Class XRManager
                     Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
                     Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
                     'EF 05/06/2014 END
+                    Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Patients_PerformedBy", CurrentLanguage) & ":"   'EF 29/07/2014 #1893 (labels for titles)
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                     Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)
