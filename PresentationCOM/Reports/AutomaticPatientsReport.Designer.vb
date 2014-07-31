@@ -139,10 +139,10 @@ Partial Public Class AutomaticPatientsReport
         Me.XrLabelUnit.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelUnit.CanGrow = False
         Me.XrLabelUnit.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(405.2083!, 0.0!)
+        Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(398.0833!, 0.0!)
         Me.XrLabelUnit.Name = "XrLabelUnit"
         Me.XrLabelUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(59.91663!, 20.00001!)
+        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(67.04175!, 20.00001!)
         Me.XrLabelUnit.StylePriority.UseBorders = False
         Me.XrLabelUnit.StylePriority.UseFont = False
         Me.XrLabelUnit.StylePriority.UseTextAlignment = False
@@ -173,7 +173,7 @@ Partial Public Class AutomaticPatientsReport
         Me.XrLabelConc.LocationFloat = New DevExpress.Utils.PointFloat(328.0833!, 0.0!)
         Me.XrLabelConc.Name = "XrLabelConc"
         Me.XrLabelConc.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelConc.SizeF = New System.Drawing.SizeF(77.12491!, 20.00001!)
+        Me.XrLabelConc.SizeF = New System.Drawing.SizeF(70.0!, 20.00001!)
         Me.XrLabelConc.StylePriority.UseBorders = False
         Me.XrLabelConc.StylePriority.UseFont = False
         Me.XrLabelConc.StylePriority.UseTextAlignment = False
@@ -295,7 +295,7 @@ Partial Public Class AutomaticPatientsReport
         Me.XrTableCell6.StylePriority.UseTextAlignment = False
         Me.XrTableCell6.Text = "XrTableCell6"
         Me.XrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell6.Weight = 0.1018489640527412R
+        Me.XrTableCell6.Weight = 0.11396042416901166R
         '
         'XrTableCell5
         '
@@ -309,7 +309,7 @@ Partial Public Class AutomaticPatientsReport
         Me.XrTableCell5.StylePriority.UseTextAlignment = False
         Me.XrTableCell5.Text = "XrTableCell5"
         Me.XrTableCell5.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell5.Weight = 0.13110026984895171R
+        Me.XrTableCell5.Weight = 0.11898880973268125R
         '
         'XrTableCell4
         '
