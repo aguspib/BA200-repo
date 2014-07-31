@@ -5328,8 +5328,8 @@
 		<col def="I4">Flags</col>
 		<col def="i2">IgnoreMissingFiles</col>
 		<row><td>Patch1</td><td>Release302</td><td>&lt;PATH_TO_TEMP_FILES&gt;\BA400 v302\Release302\BA400.msi</td><td>1</td><td>2338</td><td>0</td></row>
-		<row><td>Patch2</td><td>Patch1</td><td>NoMsiPath</td><td>1</td><td>2210</td><td>0</td></row>
-		<row><td>Patch2</td><td>Release302</td><td>&lt;PATH_TO_TEMP_FILES&gt;\Release302\Release302\BA400.msi</td><td>2</td><td>2210</td><td>0</td></row>
+		<row><td>Patch2</td><td>Release302</td><td>&lt;PATH_TO_TEMP_FILES&gt;\Release302\Release302\BA400.msi</td><td>1</td><td>2338</td><td>0</td></row>
+		<row><td>Patch2</td><td>v302Patch1</td><td>&lt;PATH_TO_TEMP_FILES&gt;\Patch1-302\v302Patch1\BA400.msi</td><td>2</td><td>2338</td><td>0</td></row>
 	</table>
 
 	<table name="ISUpgradeMsiItem">
@@ -5344,7 +5344,7 @@
 		<col def="s0">MsiPath</col>
 		<col def="s8">Family</col>
 		<row><td>Patch1</td><td>&lt;PATH_TO_TEMP_FILES&gt;\Setup 2014-07-10\Patch1\BA400.msi</td><td>Family1</td></row>
-		<row><td>Patch2</td><td>&lt;ISLatestRelease&gt;</td><td>Family2</td></row>
+		<row><td>Patch2</td><td>&lt;PATH_TO_TEMP_FILES&gt;\Patch2-302\Patch2\BA400.msi</td><td>Family2</td></row>
 	</table>
 
 	<table name="ISVirtualDirectory">
@@ -5762,7 +5762,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>Patch1</td><td></td><td>TargetProductName</td><td>BA400</td></row>
 		<row><td>Patch2</td><td></td><td>AllowRemoval</td><td>0</td></row>
 		<row><td>Patch2</td><td></td><td>Classification</td><td> Update</td></row>
-		<row><td>Patch2</td><td></td><td>Description</td><td> 3.0.2.2</td></row>
+		<row><td>Patch2</td><td></td><td>Description</td><td>Contact:  Your local administrator</td></row>
 		<row><td>Patch2</td><td></td><td>DisplayName</td><td>BA400</td></row>
 		<row><td>Patch2</td><td></td><td>ManufacturerName</td><td>BioSystems SA</td></row>
 		<row><td>Patch2</td><td></td><td>MoreInfoURL</td><td>www.biosystems.es</td></row>
