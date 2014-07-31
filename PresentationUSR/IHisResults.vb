@@ -1068,7 +1068,8 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by: JB 18/10/2012
-    ''' Modified by: DL 25/04/2013. New condition for activate export status when any result NOT EXPORTED  
+    ''' Modified by: DL 25/04/2013. New condition for activate export status when any result NOT EXPORTED
+    ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
     ''' </remarks>
     Private Sub UpdateFormBehavior(ByVal pStatus As Boolean)
         Try
@@ -1079,10 +1080,12 @@ Public Class IHisResults
 
             historyDeleteButton.Enabled = pStatus AndAlso selectedRows.Count > 0
 
-            'DL 25/04/2013
-            Dim selectedNotExport As Integer = (From row In selectedRows Where row.ExportStatus = "NOTSENT").Count
-            exportButton.Enabled = pStatus AndAlso selectedRows.Count > 0 AndAlso selectedNotExport > 0
-            'DL 25/04/2013
+            'AG 24/07/2014 - RQ00086
+            ''DL 25/04/2013
+            'Dim selectedNotExport As Integer = (From row In selectedRows Where row.ExportStatus = "NOTSENT").Count
+            'exportButton.Enabled = pStatus AndAlso selectedRows.Count > 0 AndAlso selectedNotExport > 0
+            exportButton.Enabled = pStatus AndAlso selectedRows.Count > 0
+            'AG 24/07/2014 - RQ00086
 
             PrintButton.Enabled = pStatus AndAlso selectedRows.Count > 0
             searchGroup.Enabled = pStatus AndAlso analyzerIDComboBox.Items.Count > 0
@@ -1104,6 +1107,7 @@ Public Class IHisResults
     ''' Modified by: SA 17/12/2012 - If an error has happened when expoting, shown it 
     '''              DL 24/04/2013 - 
     '''              AG 13/02/2014 - BT #1505
+    ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1134,10 +1138,15 @@ Public Class IHisResults
             'Show export confirmation message ??
             'If (ShowMessage(Name & ".DeleteSelectedRowsFromGrid ", GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) <> Windows.Forms.DialogResult.Yes) Then Exit Sub
 
-            'BEGIN DL 24/04/2013 - The results SENT or SENDING could not be uploaded again from Historical results screen 
-            Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows
-                                                          Where row.ExportStatus <> "SENT" AndAlso row.ExportStatus <> "SENDING" _
-                                                         Select row.HistOrderTestID Distinct).ToList
+            'AG 24/07/2014 - RQ00086
+            ''BEGIN DL 24/04/2013 - The results SENT or SENDING could not be uploaded again from Historical results screen 
+            'Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows
+            '                                              Where row.ExportStatus <> "SENT" AndAlso row.ExportStatus <> "SENDING" _
+            '                                             Select row.HistOrderTestID Distinct).ToList
+
+            'Convert dataset to LIST of historic order test integers
+            Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows Select row.HistOrderTestID Distinct).ToList
+            'AG 24/07/2014 - RQ00086
 
             'AG 14/02/2014 - #1505 If number of results to export > limit --> show warning!! No export
             If histOrderTestIDList.Count > maxHistResultsToExport Then
