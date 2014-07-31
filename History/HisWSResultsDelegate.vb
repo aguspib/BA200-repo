@@ -817,7 +817,7 @@ Namespace Biosystems.Ax00.BL
                                             'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, LinqPat.FormatedDateOfBirth)
                                             'FullAge = String.Format("{0}: {1}", literalAge, LinqPat.AgeWithUnit)
                                             'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, String.Empty) ' LinqPat.PerformedBy. NO IN V1
-                                            'FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)
+                                            FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)   'EF 31/07/2014 #1893 (Comments info)
 
                                             FullID = String.Format("{0}", myPatientID)
                                             If (LinqPat.FirstName <> "-" And LinqPat.FirstName <> "") Or (LinqPat.LastName <> "-" And LinqPat.LastName <> "") Then FullName = String.Format("{0}, {1}", LinqPat.LastName, LinqPat.FirstName) Else FullName = ""
@@ -825,7 +825,7 @@ Namespace Biosystems.Ax00.BL
                                             FullBirthDate = String.Format("{0}", LinqPat.FormatedDateOfBirth)
                                             FullAge = String.Format("{0}", LinqPat.AgeWithUnit)
                                             ' FullPerformedBy = String.Format("{0}", String.Empty)
-                                            ' FullComments = String.Format("{0}", LinqPat.Comments)
+                                            FullComments = String.Format("{0}", LinqPat.Comments)  'EF 31/07/2014 #1893 (Comments info)
                                             'EF 03/06/2014 #1650  END
 
                                             'IT 30/07/2014 #BA-1893 INI

@@ -92,7 +92,7 @@ Partial Public Class PatientsFinalReport
         'XrLabel1
         '
         Me.XrLabel1.Borders = DevExpress.XtraPrinting.BorderSide.None
-        Me.XrLabel1.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportSampleMaster.PerformedBy")})
+        Me.XrLabel1.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportSampleMaster.Comments")})
         Me.XrLabel1.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrLabel1.LocationFloat = New DevExpress.Utils.PointFloat(213.75!, 140.8333!)
         Me.XrLabel1.Name = "XrLabel1"
@@ -114,7 +114,7 @@ Partial Public Class PatientsFinalReport
         Me.XrLabel_PerformedBy.StylePriority.UseBorders = False
         Me.XrLabel_PerformedBy.StylePriority.UseFont = False
         Me.XrLabel_PerformedBy.StylePriority.UseTextAlignment = False
-        Me.XrLabel_PerformedBy.Text = "*Performed By:"
+        Me.XrLabel_PerformedBy.Text = "*Comments:"
         Me.XrLabel_PerformedBy.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
         '
         'XrLabel_Gender
@@ -366,7 +366,7 @@ Partial Public Class PatientsFinalReport
         'BottomMargin
         '
         Me.BottomMargin.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrPageInfo_DateTime, Me.XrPageInfo_TotalPages, Me.XrLabel_ReportDate})
-        Me.BottomMargin.HeightF = 25.0!
+        Me.BottomMargin.HeightF = 21.5833!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.StylePriority.UseTextAlignment = False
@@ -470,7 +470,7 @@ Partial Public Class PatientsFinalReport
         '
         Me.Detail1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTableDetails})
         Me.Detail1.Font = New System.Drawing.Font("Verdana", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Detail1.HeightF = 22.0!
+        Me.Detail1.HeightF = 19.0417!
         Me.Detail1.Name = "Detail1"
         Me.Detail1.StylePriority.UseFont = False
         '
@@ -565,7 +565,7 @@ Partial Public Class PatientsFinalReport
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport})
         Me.DataMember = "ReportSampleMaster"
         Me.DataSource = Me.ResultsDS1
-        Me.Margins = New System.Drawing.Printing.Margins(63, 77, 96, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(63, 77, 96, 22)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
