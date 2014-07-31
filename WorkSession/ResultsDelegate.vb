@@ -1584,6 +1584,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         '''Created by:  TR 14/05/2010
         '''Modified by: SG 10/04/2013 - new parameter "pAlternativeStatus"
+        ''' AG 30/07/2014 - #1887 OrderToExport management - NOT REQUIRED in current scenarios
         ''' </remarks>
         Public Function UpdateExportStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, ByVal pAlternativeStatus As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -1595,6 +1596,13 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim mytwksResultDAO As New twksResultsDAO()
                         myGlobalDataTO = mytwksResultDAO.UpdateExportStatus(dbConnection, pResultsDS, pAlternativeStatus)
+
+                        'AG 30/07/2014 #1887 NOT required because this method is used:
+                        '     isLISWithFilesMode (ExportStatus = TRUE) - out of date!!
+                        '     not isLISWithFilesMode (ExportStatus = FALSE because not msg to LIS can be sent, so OrderToExport is already TRUE)
+                        'If Not myGlobalDataTO.HasError Then
+                        '    myGlobalDataTO = Me.UpdateOrderToExportAfterChangesInExportStatus(Nothing, pResultsDS, pAlternativeStatus)
+                        'End If
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -1632,6 +1640,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing success/errorinformation</returns>
         ''' <remarks>
         ''' Created by:  SA 12/02/2014 - BT #1497
+        ''' AG 30/07/2014 - #1887 OrderToExport management - NOT REQUIRED in current scenarios
         ''' </remarks>
         Public Function UpdateExportStatusMASIVE(ByVal pResultsDS As ResultsDS, ByVal pAlternativeStatus As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -1639,6 +1648,12 @@ Namespace Biosystems.Ax00.BL
             Try
                 Dim mytwksResultDAO As New twksResultsDAO()
                 myGlobalDataTO = mytwksResultDAO.UpdateExportStatusMASIVE(pResultsDS, pAlternativeStatus)
+
+                'AG 30/07/2014 #1887 NOT required because this method is NEVER used:
+                'If Not myGlobalDataTO.HasError Then
+                '    myGlobalDataTO = Me.UpdateOrderToExportAfterChangesInExportStatus(Nothing, pResultsDS, pAlternativeStatus)
+                'End If
+
             Catch ex As Exception
                 myGlobalDataTO = New GlobalDataTO()
                 myGlobalDataTO.HasError = True
@@ -8053,6 +8068,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  SG 10/04/2012
         ''' AG 02/04/2014 - #1564 add parameter pSetDateTime (when TRUE the DAO has to inform ExportDateTime, else leave as NULL)
+        ''' AG 30/07/2014 - #1887 OrderToExport management
         ''' </remarks>
         Public Function UpdateExportStatusByMessageID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pLISMessageID As String, _
@@ -8073,6 +8089,15 @@ Namespace Biosystems.Ax00.BL
                         'AG 02/04/2014 - #1564
                         'resultData = myDAO.UpdateExportStatusByMessageID(dbConnection, pLISMessageID, pNewExportStatus)
                         resultData = myDAO.UpdateExportStatusByMessageID(dbConnection, pLISMessageID, pNewExportStatus, pSetDateTime)
+
+                        'AG 30/07/2014 #1887 - OrderToExport management
+                        Dim myOrder As New OrdersDelegate
+                        If pNewExportStatus = "SENT" Then
+                            resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
+                        Else
+                            resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
+                        End If
+                        'AG 30/07/2014
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -8107,17 +8132,15 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
         ''' <summary>
-        ''' Get all OrderTests - Rerun - optionally Execution#1 which results was uploaded using the messageID in parameter
-        ''' The returned data will be used for screen refreshment improvements
+        ''' Get all validated and accepted results ExportStatus by OrderID
         ''' </summary>
         ''' <param name="pDBConnection"></param>
-        ''' <param name="pLISMessageID"></param>
+        ''' <param name="pOrderID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 14/03/2014 - #1533 creation</remarks>
-        Public Function GetResultsByMessageID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISMessageID As String) As GlobalDataTO
+        ''' <remarks>AG 30/07/2014 Creation - #1887 OrderToExport management</remarks>
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
-
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
@@ -8125,11 +8148,9 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksResultsDAO
-                        resultData = myDAO.GetResultsByMessageID(dbConnection, pLISMessageID)
-
+                        resultData = myDAO.GetAcceptedResultsByOrder(dbConnection, pOrderID)
                     End If
                 End If
-
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -8137,7 +8158,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByMessageID", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetAcceptedResultsByOrder", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -8147,6 +8168,96 @@ Namespace Biosystems.Ax00.BL
             Return resultData
 
         End Function
+
+
+        ''' <summary>
+        ''' After call methods UpdateExportStatus / UpdateExportStatusMASSIVE the field OrderToExport must be re-evaluated
+        '''
+        ''' DESIGN NOTES:
+        ''' Method UpdateExportStatus is used:
+        '''     isLISWithFilesMode (ExportStatus = TRUE) - out of date!!
+        '''     not isLISWithFilesMode (ExportStatus = FALSE because not msg to LIS can be sent, so OrderToExport is already TRUE)
+        '''
+        ''' Method UpdateExportStatusMASSIVE is never used
+        ''' 
+        ''' CONCLUSION: OrderToExport management NOT REQUIRED after current use of methods UpdateExportStatus / UpdateExportStatusMASSIVE
+        ''' 
+        ''' Define the method but I dont develop the code! It is not required by now
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pResultsDS"></param>
+        ''' <param name="pAlternativeStatus"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 creation #1887 - OrderToExport management</remarks>
+        Private Function UpdateOrderToExportAfterChangesInExportStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, ByVal pAlternativeStatus As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim OrderToExportToEvaluate_OrderList As New List(Of String)
+                        Dim OrderToExportFALSE_OrderList As New List(Of String)
+
+                        Dim myOrder As New OrdersDelegate
+                        If pAlternativeStatus = "SENT" Then '-> See notes in summary! Only possible working with files. Out of date!!!
+                            'Get all different orderID in DS as fill OrderToExportToEvaluate_OrderList
+
+                        ElseIf pAlternativeStatus.Length > 0 Then
+                            'Get all different orderID in DS as fill OrderToExportFALSE_OrderList
+
+                        Else '-> See notes in summary! Case not possible
+                            'Get by linq OrderTests with ExportStatus <> SENT, get their orderID and fill OrderToExportFALSE_OrderList
+
+                            'Get by linq OrderTests with ExportStatus = SENT, get their orderID and if not exists in OrderToExportFALSE_OrderList add to OrderToExportToEvaluate_OrderList
+
+                        End If
+
+                        'Finally update the OrderToExport value
+                        'Orders to evaluate OrderToExport new value
+                        For Each tmpOrder As String In OrderToExportToEvaluate_OrderList
+                            myGlobalDataTO = myOrder.SetNewOrderToExportValue(dbConnection, tmpOrder)
+                        Next
+
+                        'Orders to set OrderToExport = FALSE
+                        For Each tmpOrder As String In OrderToExportFALSE_OrderList
+                            myGlobalDataTO = myOrder.UpdateOrderToExport(dbConnection, False, tmpOrder)
+                        Next
+
+                        'Release memory
+                        OrderToExportToEvaluate_OrderList.Clear()
+                        OrderToExportToEvaluate_OrderList = Nothing
+                        OrderToExportFALSE_OrderList.Clear()
+                        OrderToExportFALSE_OrderList = Nothing
+
+                        If (Not myGlobalDataTO.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.UpdateOrderToExportAfterChangesInExportStatus", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 
     End Class
 End Namespace

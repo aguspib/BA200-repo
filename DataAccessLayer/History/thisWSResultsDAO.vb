@@ -465,6 +465,81 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get the historic curve average results to generate a report
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pHistOrderTestID">Historic order test identifier</param>
+        ''' <param name="pDecimalsAllowed">Test decimals allowed configuration</param>
+        ''' <returns>GlobalDataTo with dataset as ResultsDS.ReportCalibCurve</returns>
+        ''' <remarks>
+        ''' Created by XB 30/07/2014 - BT #1863
+        ''' </remarks>
+        Public Function GetResultsCalibCurveForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
+                                                      ByVal pAnalyzerID As String, _
+                                                      ByVal pWorkSessionID As String, _
+                                                      ByVal pHistOrderTestID As Integer, _
+                                                      ByVal pDecimalsAllowed As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        cmdText = "SELECT HOT.HistOrderTestID, HOT.SampleType,HR.MultipointNumber, " & _
+                                  "       CAST(HR.ABSValue AS DECIMAL(20,4)) AS ABSValue, " & _
+                                  "       CAST(HR.CONCValue AS DECIMAL(20," & pDecimalsAllowed & ")) AS CONC_Value, " & _
+                                  "       CAST(HR.RelativeErrorCurve AS DECIMAL(20,4)) AS RelativeErrorCurve, " & _
+                                  "       HR.CalibratorBlankAbsUsed, HTS.CurveGrowthType, HTS.CurveType, HTS.CurveAxisXType, " & _
+                                  "       HTS.CurveAxisYType, HTS.TestLongName, HTCV.TheoreticalConcentration As TheoricalConcentration, " & _
+                                  "       MD.FixedItemDesc As MeasureUnit " & _
+                                  " FROM thisWSResults HR INNER JOIN thisWSOrderTests HOT ON HR.HistOrderTestID = HOT.HistOrderTestID " & _
+                                  "                       INNER JOIN thisTestSamples HTS ON HOT.HistTestID = HTS.HistTestID AND HOT.SampleType = HTS.SampleType " & _
+                                  "                                                     AND HOT.TestVersionNumber = HTS.TestVersionNumber " & _
+                                  "                       INNER JOIN thisTestCalibratorsValues HTCV ON HOT.HistTestID = HTCV.HistTestID " & _
+                                  "                                                                AND HOT.SampleType = HTCV.SampleType " & _
+                                  "                                                                AND HOT.TestVersionNumber = HTCV.TestVersionNumber " & _
+                                  "                                                                AND HOT.HistCalibratorID = HTCV.HistCalibratorID " & _
+                                  "                                                                AND HR.MultiPointNumber = HTCV.CalibratorNum " & _
+                                  "                       INNER JOIN tcfgMasterData MD ON HTS.MeasureUnit = MD.ItemID AND MD.SubTableID = 'TEST_UNITS' " & _
+                                  " WHERE HOT.HistOrderTestID = " & pHistOrderTestID & _
+                                  " AND HOT.SampleClass = 'CALIB' " & _
+                                  " AND HOT.TestType = 'STD' " & _
+                                  " AND HR.AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                                  " AND HR.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
+
+                        Dim myDataSet As New ResultsDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.ReportCalibCurve)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "thisWSResultsDAO.GetResultsCalibCurveForReport", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "View to reuse IResultsCalibCurve screen in history"

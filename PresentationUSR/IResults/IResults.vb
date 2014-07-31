@@ -1555,22 +1555,45 @@ Public Class IResults
 
             Dim myExport As New ExportDelegate
 
-            'AG 29/07/2014 - #1887 - RQ00086
+            'AG 29/07/2014 - #1887 - Re-send results
+            'Export by Patient view uses the OrderToExport field
+            'Export by Test view uses ??? - PENDING CONFIRM
             'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
             If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
                 'PATIENTs view re-send process
-                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'Include the already exported results
             Else
                 'TESTs view re-send process
                 resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'PENDING to get data in a special way for TESTs view re-send process
             End If
-
-
+            'AG 29/07/2014
 
             'AG 18/03/2013 - upload results to LIS
             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 Dim exportResults As New ExecutionsDS
                 exportResults = CType(resultData.SetDatos, ExecutionsDS)
+
+                'AG 29/07/2014 #1887 Max number of results to export each time 100
+                Dim maxResultsToExport As Integer = 100 'Default value
+                Dim swParamDlg As New SwParametersDelegate
+                resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
+                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    Dim myDS As New ParametersDS
+                    myDS = DirectCast(resultData.SetDatos, ParametersDS)
+                    If myDS.tfmwSwParameters.Rows.Count > 0 Then
+                        If Not myDS.tfmwSwParameters(0).IsValueNumericNull Then
+                            maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
+                        End If
+                    End If
+                End If
+
+                If exportResults.twksWSExecutions.Rows.Count > maxResultsToExport Then
+                    'Show message and leave method - MESSAGE NOT IN DATABASE (same as in historical results!!!)
+                    MessageBox.Show(Me, "Please, export to LIS in groups of " & maxResultsToExport & " results (maximum)", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information)
+                    Return
+                End If
+                'AG 29/07/2014
+
                 If exportResults.twksWSExecutions.Rows.Count > 0 Then 'AG 17/02/2014 - #1505
                     'Inform the new results to be updated into MDI property
                     IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
@@ -5304,45 +5327,142 @@ Public Class IResults
 
 #Region "Other methods"
 
+
+    ''' <summary>
+    ''' Click on the patient list (header or item)
+    ''' - Click on item (name) select item and load results
+    ''' - Click on item (columns OrderToExport /OrderToPrint) change current field value (screen and database)
+    ''' 
+    ''' - Click on header (name) sort alphabetical
+    ''' - Click on header (columns OrderToExport /OrderToPrint) select all (if any not selected) or deselect all (if all selected) -> New 31/07/2014 #1187
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by RH 04/06/2012
+    ''' Modify by AG 31/07/2014 - #1887 click on header select all / deselect all
+    ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsSamplesListDataGridView.CellMouseClick
         Try
-            'RH 04/06/2012
-            If e.RowIndex < 0 Then Return
+            'AG 31/07/2014 - #1887
+            Dim updateDSRequired As Boolean = False
 
-            If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 OrElse _
-               String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+            'Define variables common used for click on item and also on header
+            Dim updateColumnOrderToExport As Boolean = False
+
+            Dim myPatientID As String = "" 'Patient to refresh, "" all
+            Dim myOrdersDelegate As New OrdersDelegate
+            Dim myOrderToExportValue As Boolean = False
+            Dim myOrderToPrintValue As Boolean = False
+            Dim resultData As GlobalDataTO
+            Dim linqRes As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+
+            If e.RowIndex >= 0 Then
+                'Click on item
+
+                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 OrElse _
+                   String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+
+                    Cursor = Cursors.WaitCursor
+
+                    updateDSRequired = True
+                    updateColumnOrderToExport = (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0)
+
+                    Dim dgv As BSDataGridView = bsSamplesListDataGridView
+                    Dim myField As String = dgv.Columns(e.ColumnIndex).Name
+                    dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) 'Assign new value = Not current
 
 
-                Cursor = Cursors.WaitCursor
+                    'TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
+                    myPatientID = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
 
-                Dim dgv As BSDataGridView = bsSamplesListDataGridView
-                Dim myField As String = dgv.Columns(e.ColumnIndex).Name
+                    myOrderToExportValue = Convert.ToBoolean(dgv("OrderToExport", e.RowIndex).Value)
+                    myOrderToPrintValue = Convert.ToBoolean(dgv("OrderToPrint", e.RowIndex).Value)
+                    resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrintValue, myOrderToExportValue)
+                End If
 
-                dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value)
+            Else
+                'Click on header
+                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 Then
+                    'Order To Export
+                    'Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
 
-                'TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
-                Dim myPatientID As String = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
+                    Cursor = Cursors.WaitCursor
 
-                Dim myOrderToExport As Boolean = Convert.ToBoolean(dgv("OrderToExport", e.RowIndex).Value)
-                Dim myOrderToPrint As Boolean = Convert.ToBoolean(dgv("OrderToPrint", e.RowIndex).Value)
+                    updateDSRequired = True
+                    updateColumnOrderToExport = True
+                    linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                               Where a.SampleClass = "PATIENT" AndAlso a.OrderToExport = False Select a).ToList
+                    If linqRes.Count > 0 Then
+                        'Some no selected
+                        myOrderToExportValue = True
+                    Else
+                        myOrderToExportValue = False
+                    End If
+                    resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue)
 
-                Dim myOrdersDelegate As New OrdersDelegate
-                Dim resultData As GlobalDataTO
+                    'Refresh list
+                    If Not resultData.HasError Then
+                        For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+                            bsSamplesListDataGridView("OrderToExport", i).Value = myOrderToExportValue
+                        Next
+                    End If
 
-                resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrint, myOrderToExport)
+                ElseIf String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+                    'Order To Print
+                    'Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
 
-                ' Update Data Set
-                If Not resultData.HasError Then
-                    For Each Row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-                        If Row.PatientID = myPatientID AndAlso Row.SampleClass = "PATIENT" Then
-                            Row.OrderToPrint = myOrderToPrint
-                            Row.OrderToExport = myOrderToExport
+                    Cursor = Cursors.WaitCursor
+
+                    updateDSRequired = True
+                    updateColumnOrderToExport = False
+                    linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                               Where a.SampleClass = "PATIENT" AndAlso a.OrderToPrint = False Select a).ToList
+                    If linqRes.Count > 0 Then
+                        'Some no selected
+                        myOrderToPrintValue = True
+                    Else
+                        myOrderToPrintValue = False
+                    End If
+
+                    resultData = myOrdersDelegate.UpdateOrderToPrint(Nothing, myOrderToPrintValue)
+
+                    'Refresh list
+                    If Not resultData.HasError Then
+                        For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+                            bsSamplesListDataGridView("OrderToPrint", i).Value = myOrderToPrintValue
+                        Next
+                    End If
+
+                End If
+            End If
+
+            'Finally update DS if required
+            If updateDSRequired Then
+                If Not resultData Is Nothing AndAlso Not resultData.HasError Then
+                    If myPatientID <> "" Then 'Click on item
+                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                   Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a).ToList
+
+                    Else 'Click on header
+                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                   Where a.SampleClass = "PATIENT" Select a).ToList
+                    End If
+
+                    For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
+                        row.BeginEdit()
+                        If Not updateColumnOrderToExport Then
+                            row.OrderToPrint = myOrderToPrintValue
+                        Else
+                            row.OrderToExport = myOrderToExportValue
                         End If
-                    Next Row
+                        row.EndEdit()
+                    Next
 
                     ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
                 End If
             End If
+            linqRes = Nothing 'Release memory
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
