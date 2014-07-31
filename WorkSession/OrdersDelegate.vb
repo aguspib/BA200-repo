@@ -1146,14 +1146,21 @@ Namespace Biosystems.Ax00.BL
                                 resultData = myDAO.ReadByLISMessageID(dbConnection, pLISMessageID)
                             End If
 
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
-                                    affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                            If Not (pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "") Then
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
+                                        affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                    End If
                                 End If
                             End If
                         End If
+
                         If affectedOrderID <> "" Then
                             resultData = myDAO.UpdateOrderToExport(dbConnection, affectedOrderID, pNewValue)
+
+                            'If affected orderID not found because no parameter informed ... update all by sampleclass = PATIENT
+                        ElseIf pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "" Then
+                            resultData = myDAO.UpdateOrderToExport(dbConnection, "", pNewValue)
                         End If
 
                         If (Not resultData.HasError) Then
@@ -1313,6 +1320,82 @@ Namespace Biosystems.Ax00.BL
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Updates the column OrderToPrint to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToPrint management</remarks>
+        Public Function UpdateOrderToPrint(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewValue As Boolean, Optional ByVal pOrderID As String = "", _
+                                            Optional ByVal pOrderTestID As Integer = -1, Optional ByVal pLISMessageID As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New TwksOrdersDAO
+
+                        'Search the orderID (if not informed)
+                        Dim affectedOrderID As String = pOrderID
+                        If affectedOrderID = "" Then
+                            If pOrderTestID <> -1 Then
+                                resultData = myDAO.ReadByOrderTestID(dbConnection, pOrderTestID)
+                            ElseIf pLISMessageID <> "" Then
+                                resultData = myDAO.ReadByLISMessageID(dbConnection, pLISMessageID)
+                            End If
+
+                            If Not (pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "") Then
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
+                                        affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If affectedOrderID <> "" Then
+                            resultData = myDAO.UpdateOrderToPrint(dbConnection, affectedOrderID, pNewValue)
+
+                            'If affected orderID not found because no parameter informed ... update all by sampleclass = PATIENT
+                        ElseIf pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "" Then
+                            resultData = myDAO.UpdateOrderToPrint(dbConnection, "", pNewValue)
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrdersDelegate.UpdateOrderToPrint", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
         End Function
 
 

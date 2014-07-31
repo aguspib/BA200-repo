@@ -4225,7 +4225,7 @@ Namespace Biosystems.Ax00.Calculations
 
                                 'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
                                 Dim orders_dlg As New OrdersDelegate
-                                myGlobal = orders_dlg.UpdateOrderToExport(pDBConnection, False, , myOrderTestID)
+                                myGlobal = orders_dlg.UpdateOrderToExport(pDBConnection, True, , myOrderTestID)
 
                             End If
                         End If

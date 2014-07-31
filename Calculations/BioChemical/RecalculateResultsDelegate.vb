@@ -233,7 +233,7 @@ Namespace Biosystems.Ax00.Calculations
                                                 res_DS.twksResults(0).ExportStatus = CType(resultData.SetDatos, String)
 
                                                 Dim orders_dlg As New OrdersDelegate
-                                                resultData = orders_dlg.UpdateOrderToExport(dbConnection, False, , myOT)
+                                                resultData = orders_dlg.UpdateOrderToExport(dbConnection, True, , myOT)
                                             End If
                                             'AG 30/07/2014 #1887
 

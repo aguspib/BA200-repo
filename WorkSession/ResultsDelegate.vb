@@ -8094,7 +8094,7 @@ Namespace Biosystems.Ax00.BL
                         If pNewExportStatus = "SENT" Then
                             resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
                         Else
-                            resultData = myOrder.UpdateOrderToExport(dbConnection, False, , , pLISMessageID)
+                            resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
                         End If
                         'AG 30/07/2014
 

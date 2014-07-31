@@ -989,13 +989,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = " UPDATE twksOrders " & vbCrLf & _
                                            " SET    OrderToExport = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf & _
-                                           " WHERE  ( SampleClass   = 'PATIENT' OR  SampleClass = 'CTRL' )" & vbCrLf & _
-                                           " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                                           " WHERE  ( SampleClass   = 'PATIENT' )" & vbCrLf
+
+                    If pOrderID <> "" Then
+                        cmdText &= " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                    End If
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                     End Using
-                End If
+                    End If
 
             Catch ex As Exception
                 resultData.HasError = True
@@ -1053,6 +1056,47 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Updates the column OrderToPrint to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToPrint management</remarks>
+        Public Function UpdateOrderToPrint(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As String, pNewValue As Boolean) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As String = " UPDATE twksOrders " & vbCrLf & _
+                                           " SET    OrderToPrint = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf & _
+                                           " WHERE  ( SampleClass   = 'PATIENT' )" & vbCrLf
+
+                    If pOrderID <> "" Then
+                        cmdText &= " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                    End If
+
+                    Using dbCmd As New SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.UpdateOrderToPrint", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
         End Function
 
 

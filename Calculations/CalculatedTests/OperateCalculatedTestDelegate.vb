@@ -229,7 +229,7 @@ Namespace Biosystems.Ax00.Calculations
 
                                                                 'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
                                                                 Dim orders_dlg As New OrdersDelegate
-                                                                resultData = orders_dlg.UpdateOrderToExport(pDBConnection, False, , resultRow.OrderTestID)
+                                                                resultData = orders_dlg.UpdateOrderToExport(pDBConnection, True, , resultRow.OrderTestID)
                                                             Else
                                                                 'Error recalculating the Export Status
                                                                 Exit For
