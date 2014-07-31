@@ -1114,6 +1114,291 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
+
+        ''' <summary>
+        ''' Updates the column OrderToExport to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management</remarks>
+        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewValue As Boolean, Optional ByVal pOrderID As String = "", _
+                                            Optional ByVal pOrderTestID As Integer = -1, Optional ByVal pLISMessageID As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New TwksOrdersDAO
+
+                        'Search the orderID (if not informed)
+                        Dim affectedOrderID As String = pOrderID
+                        If affectedOrderID = "" Then
+                            If pOrderTestID <> -1 Then
+                                resultData = myDAO.ReadByOrderTestID(dbConnection, pOrderTestID)
+                            ElseIf pLISMessageID <> "" Then
+                                resultData = myDAO.ReadByLISMessageID(dbConnection, pLISMessageID)
+                            End If
+
+                            If Not (pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "") Then
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
+                                        affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If affectedOrderID <> "" Then
+                            resultData = myDAO.UpdateOrderToExport(dbConnection, affectedOrderID, pNewValue)
+
+                            'If affected orderID not found because no parameter informed ... update all by sampleclass = PATIENT
+                        ElseIf pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "" Then
+                            resultData = myDAO.UpdateOrderToExport(dbConnection, "", pNewValue)
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrdersDelegate.UpdateOrderToExport", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Get all ExportStatus for the current order and calculates new OrderToExport value by the informed filter (Filter1: by orderTest // Filter2: by LISMEssageID)
+        ''' - All results SENT: New OrderToExport = FALSE
+        ''' - Some result NOTSENT: New OrderToExport = TRUE
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pF1OrderTestID"></param>
+        ''' <param name="pF2LISMessageID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management</remarks>
+        Public Function SetNewOrderToExportValue(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pOrderID As String = "", _
+                                                 Optional ByVal pF1OrderTestID As Integer = -1, Optional ByVal pF2LISMessageID As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        '(1) Get the affected orderID by filter1 or filter2
+                        Dim myDAO As New TwksOrdersDAO
+                        Dim affectedOrderID As String = pOrderID
+                        If affectedOrderID = "" Then
+                            If pF1OrderTestID <> -1 Then
+                                resultData = myDAO.ReadByOrderTestID(dbConnection, pF1OrderTestID)
+                            ElseIf pF2LISMessageID <> "" Then
+                                resultData = myDAO.ReadByLISMessageID(dbConnection, pF2LISMessageID)
+                            End If
+
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
+                                    affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                End If
+                            End If
+                        End If
+
+                        '(2) Get all results belongs the current orderID
+                        If affectedOrderID <> "" Then
+                            Dim resultsDlg As New ResultsDelegate
+                            resultData = resultsDlg.GetAcceptedResultsByOrder(dbConnection, affectedOrderID)
+
+                            '(3) Calculate the new OrderToExport value
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim myResDS As New ResultsDS
+                                myResDS = DirectCast(resultData.SetDatos, ResultsDS)
+
+                                Dim newOrderToExportValue As Boolean = False 'All results with ExportStatus = 'SENT'
+                                If myResDS.vwksResults.Rows.Count > 0 Then
+                                    If (From a As ResultsDS.vwksResultsRow In myResDS.vwksResults Where a.ExportStatus <> "SENT").ToList.Count > 0 Then
+                                        'Some result with ExportStatus <> 'SENT'
+                                        newOrderToExportValue = True
+                                    End If
+
+                                    '(4) Finally update the new value
+                                    If Not resultData.HasError AndAlso Not myResDS.vwksResults(0).IsOrderIDNull Then
+                                        resultData = myDAO.UpdateOrderToExport(dbConnection, myResDS.vwksResults(0).OrderID, newOrderToExportValue)
+                                    End If
+
+                                End If
+                            End If
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            'resultData.SetDatos = <value to return; if any>
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrdersDelegate.SetNewOrderToExportValue", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+
+        End Function
+
+
+        ''' <summary>
+        ''' Read data of the Order to which the specified LISMessageID belongs 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pLISMessageID">LIS message Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified LIS message identifier belongs</returns>
+        ''' <remarks>
+        ''' Created by:  AG 30/07/2014 - #1887 OrderToExport management
+        ''' </remarks>
+        Public Function ReadByLISMessageID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISMessageID As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myOrdersDAO As New TwksOrdersDAO
+                        myGlobalDataTO = myOrdersDAO.ReadByLISMessageID(dbConnection, pLISMessageID)
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "OrdersDelegate.ReadByLISMessageID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Updates the column OrderToPrint to pNewValue by the informed filter parameters
+        ''' Filter1: by orderTest + Rerun
+        ''' Filter2: by LISMEssageID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pNewValue"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToPrint management</remarks>
+        Public Function UpdateOrderToPrint(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewValue As Boolean, Optional ByVal pOrderID As String = "", _
+                                            Optional ByVal pOrderTestID As Integer = -1, Optional ByVal pLISMessageID As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New TwksOrdersDAO
+
+                        'Search the orderID (if not informed)
+                        Dim affectedOrderID As String = pOrderID
+                        If affectedOrderID = "" Then
+                            If pOrderTestID <> -1 Then
+                                resultData = myDAO.ReadByOrderTestID(dbConnection, pOrderTestID)
+                            ElseIf pLISMessageID <> "" Then
+                                resultData = myDAO.ReadByLISMessageID(dbConnection, pLISMessageID)
+                            End If
+
+                            If Not (pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "") Then
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
+                                        affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        If affectedOrderID <> "" Then
+                            resultData = myDAO.UpdateOrderToPrint(dbConnection, affectedOrderID, pNewValue)
+
+                            'If affected orderID not found because no parameter informed ... update all by sampleclass = PATIENT
+                        ElseIf pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "" Then
+                            resultData = myDAO.UpdateOrderToPrint(dbConnection, "", pNewValue)
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrdersDelegate.UpdateOrderToPrint", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
 #End Region
 
 #Region "LIS WITH FILES"

@@ -177,6 +177,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <returns>GlobalDataTO containing succes/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 12/06/2014 - BT #1660
+        ''' Modified by: AG 30/07/2014 #1887 (recalculate the ExportStatus after manual recalculations)
         ''' </remarks>
         Public Function RecalculateISEAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                    ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
@@ -225,6 +226,17 @@ Namespace Biosystems.Ax00.Calculations
                                             res_DS.twksResults(0).AnalyzerID = pAnalyzerID
                                             res_DS.twksResults(0).WorkSessionID = pWorkSessionID
                                             res_DS.twksResults(0).SampleClass = mySampleClass
+
+                                            'AG 30/07/2014 #1887 - Update ExportStatus after recalculations and set OrderToExport = TRUE after manual recalculations
+                                            resultData = myResultsDelegate.RecalculateExportStatusValue(dbConnection, myOT, myRerun)
+                                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                                res_DS.twksResults(0).ExportStatus = CType(resultData.SetDatos, String)
+
+                                                Dim orders_dlg As New OrdersDelegate
+                                                resultData = orders_dlg.UpdateOrderToExport(dbConnection, True, , myOT)
+                                            End If
+                                            'AG 30/07/2014 #1887
+
                                             res_DS.twksResults(0).AcceptChanges()
 
                                             'Update the Result Value

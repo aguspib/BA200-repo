@@ -388,6 +388,11 @@ Public Class IProgISETest
             'Area of ISE Test List
             bsEditButton.Enabled = False
 
+            ' WE 29/07/2014 - #1865 
+            bsFullNameTextbox.Enabled = True
+            bsFullNameTextbox.BackColor = Color.White
+            ' WE 29/07/2014 - #1865 - End
+
             bsShortNameTextbox.Enabled = True
             bsShortNameTextbox.BackColor = Color.White
 
@@ -1128,11 +1133,14 @@ Public Class IProgISETest
                     End If
 
                     'In Edit Mode, loading values are compared against current values
+                    ' WE 29/07/2014 - #1865 - Added <Name> field.
                     If (bsISETestListView.SelectedIndices(0) = OriginalSelectedIndex) Then
-                        pendingToSaveChanges = (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.SelectedItems(0).SubItems(3).Text, False) <> 0) Or _
+                        pendingToSaveChanges = (String.Compare(bsFullNameTextbox.Text.Trim, bsISETestListView.SelectedItems(0).SubItems(2).Text, False) <> 0) Or _
+                                               (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.SelectedItems(0).SubItems(3).Text, False) <> 0) Or _
                                                (String.Compare(bsAvailableISETestCheckBox.Checked.ToString, bsISETestListView.SelectedItems(0).SubItems(6).Text, False) <> 0)
                     Else
-                        pendingToSaveChanges = (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.Items(OriginalSelectedIndex).SubItems(3).Text, False) <> 0) Or _
+                        pendingToSaveChanges = (String.Compare(bsFullNameTextbox.Text.Trim, bsISETestListView.Items(OriginalSelectedIndex).SubItems(2).Text, False) <> 0) Or _
+                                               (String.Compare(bsShortNameTextbox.Text.Trim, bsISETestListView.Items(OriginalSelectedIndex).SubItems(3).Text, False) <> 0) Or _
                                                (bsAvailableISETestCheckBox.Checked.ToString <> bsISETestListView.Items(OriginalSelectedIndex).SubItems(6).Text)
                     End If
                 End If
@@ -1753,11 +1761,13 @@ Public Class IProgISETest
             Dim setFocusTo As Integer = -1
 
             BsErrorProvider1.Clear()
-            'If (bsFullNameTextbox.TextLength = 0) Then
-            '    'Validate the Long Name is not empty otherwise inform the missing data
-            '    bsScreenErrorProvider.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-            '    setFocusTo = 0
-            'End If
+            ' WE 29/07/2014 - #1865
+            If (bsFullNameTextbox.TextLength = 0) Then
+                'Validate the Long Name is not empty otherwise inform the missing data
+                BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                setFocusTo = 0
+            End If
+            ' WE 29/07/2014 - #1865 - End.
 
             If (bsShortNameTextbox.TextLength = 0) Then
                 'Validate the Short Name is not empty otherwise inform the missing data
@@ -1798,6 +1808,25 @@ Public Class IProgISETest
                         bsISETestTabControl.SelectedTab = QCTabPage
                 End Select
             Else
+                'All mandatory fields have been completed, verify that the Full Name is unique.
+                ' WE 29/07/2014 - #1865
+                Dim resultDataName As GlobalDataTO
+                Dim myISETestDelegateName As New ISETestsDelegate
+
+                resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "FNAME")
+                If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
+                    Dim myISETestsDSname As ISETestsDS
+                    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
+
+                    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
+                        fieldsOK = False
+
+                        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
+                        bsFullNameTextbox.Focus()
+                    End If
+                End If
+                ' WE 29/07/2014 - #1865 - End.
+
                 'All mandatory fields are informed, verify the informed ShortName is unique
                 Dim resultData As GlobalDataTO
                 Dim myISETestDelegate As New ISETestsDelegate

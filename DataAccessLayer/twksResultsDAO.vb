@@ -3191,13 +3191,13 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
         ''' <summary>
-        ''' Get all OrderTests - Rerun - optionally Execution#1 which results was uploaded using the messageID in parameter
+        ''' Get all validated and accepted results by OrderID
         ''' </summary>
         ''' <param name="pDBConnection"></param>
-        ''' <param name="pLISMessageID"></param>
+        ''' <param name="pOrderID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 14/03/2014 - #1533 creation</remarks>
-        Public Function GetResultsByMessageID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISMessageID As String) As GlobalDataTO
+        ''' <remarks>AG 30/07/2014 - #1887 creation OrderToExport management</remarks>
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -3208,15 +3208,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT r.OrderTestID, r.RerunNumber, ex.ExecutionID FROM twksResults r LEFT OUTER JOIN "
-                        cmdText &= " twksWSExecutions ex ON r.OrderTestID = ex.OrderTestID AND r.RerunNumber = ex.RerunNumber AND ex.ReplicateNumber = 1 "
-                        cmdText &= " WHERE r.LISMessageID = '" & pLISMessageID.Replace("'", "''") & "'"
+                        'By now get only ExportStatus, and OrderID
+                        Dim cmdText As String = " SELECT R.ExportStatus , O.OrderID, R.OrderTestID, R.RerunNumber   FROM twksResults R INNER JOIN twksOrderTests OT ON "
+                        cmdText &= " R.OrderTestID = OT.OrderTestID INNER JOIN twksOrders O ON "
+                        cmdText &= " O.OrderID = OT.OrderID "
+                        cmdText &= " WHERE R.ValidationStatus = 'OK' AND R.AcceptedResultFlag = 1  "
+                        cmdText &= " AND (O.SampleClass = 'PATIENT' OR O.SampleClass = 'CTRL') "
+                        cmdText &= " AND O.OrderID = N'" & pOrderID.Replace("'", "''") & "'"
+                        cmdText &= " AND OT.OrderTestStatus = 'CLOSED' "
 
-                        Dim myDataSet As New ExecutionsDS
+                        Dim myDataSet As New ResultsDS
 
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dBConnection)
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myDataSet.twksWSExecutions)
+                                dbDataAdapter.Fill(myDataSet.vwksResults)
                             End Using
                         End Using
 
@@ -3232,7 +3237,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetResultsByMessageID", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.GetAcceptedResultsByOrder", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
