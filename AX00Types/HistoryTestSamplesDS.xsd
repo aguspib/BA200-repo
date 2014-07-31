@@ -62,7 +62,7 @@
               <xs:element name="NumberOfSeries" msprop:Generator_ColumnVarNameInTable="columnNumberOfSeries" msprop:Generator_ColumnPropNameInRow="NumberOfSeries" msprop:Generator_ColumnPropNameInTable="NumberOfSeriesColumn" msprop:Generator_UserColumnName="NumberOfSeries" type="xs:int" minOccurs="0" />
               <xs:element name="DeletedTest" msprop:Generator_ColumnVarNameInTable="columnDeletedTest" msprop:Generator_ColumnPropNameInRow="DeletedTest" msprop:Generator_ColumnPropNameInTable="DeletedTestColumn" msprop:Generator_UserColumnName="DeletedTest" type="xs:boolean" minOccurs="0" />
               <xs:element name="DeletedSampleType" msprop:Generator_ColumnVarNameInTable="columnDeletedSampleType" msprop:Generator_ColumnPropNameInRow="DeletedSampleType" msprop:Generator_ColumnPropNameInTable="DeletedSampleTypeColumn" msprop:Generator_UserColumnName="DeletedSampleType" type="xs:boolean" minOccurs="0" />
-              <xs:element name="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
+              <xs:element name="TestLongName" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

@@ -36,7 +36,7 @@
               <xs:element name="CalculationMode" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="CalculationMode" msprop:Generator_ColumnVarNameInTable="columnCalculationMode" msprop:Generator_ColumnPropNameInTable="CalculationModeColumn" msprop:Generator_UserColumnName="CalculationMode" type="xs:string" minOccurs="0" />
               <xs:element name="NumberOfSeries" msprop:Generator_ColumnVarNameInTable="columnNumberOfSeries" msprop:Generator_ColumnPropNameInRow="NumberOfSeries" msprop:Generator_ColumnPropNameInTable="NumberOfSeriesColumn" msprop:Generator_UserColumnName="NumberOfSeries" type="xs:int" minOccurs="0" />
               <xs:element name="TotalAllowedError" msprop:Generator_ColumnVarNameInTable="columnTotalAllowedError" msprop:Generator_ColumnPropNameInRow="TotalAllowedError" msprop:Generator_ColumnPropNameInTable="TotalAllowedErrorColumn" msprop:Generator_UserColumnName="TotalAllowedError" type="xs:float" minOccurs="0" />
-              <xs:element name="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
+              <xs:element name="TestLongName" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

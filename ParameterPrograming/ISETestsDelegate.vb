@@ -587,6 +587,7 @@ Namespace Biosystems.Ax00.BL
                             myHistoryTestSamplesRow.PreloadedTest = False
                             myHistoryTestSamplesRow.MeasureUnit = pUpdatedISETestSamples.tparISETestSamples(0).MeasureUnit
                             myHistoryTestSamplesRow.DecimalsAllowed = pUpdatedISETestSamples.tparISETestSamples(0).Decimals
+                            myHistoryTestSamplesRow.TestLongName = pUpdatedISETestSamples.tparISETestSamples(0).TestLongName    ' WE 31/07/2014 - #1865
                             myHistoryTestSamplesDS.tqcHistoryTestSamples.AddtqcHistoryTestSamplesRow(myHistoryTestSamplesRow)
 
                             resultData = myHistoryTestSamplesDelegate.UpdateByTestIDNEW(dbConnection, myHistoryTestSamplesDS)

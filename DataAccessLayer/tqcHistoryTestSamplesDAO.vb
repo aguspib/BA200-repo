@@ -25,6 +25,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR 13/05/2011
         ''' Modified by: SA 03/06/2011 - Removed the For/Next loop
         '''              SA 21/05/2012 - Insert also TestType field (required)
+        '''              WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name (NULL allowed) in IProgISETest.
         ''' </remarks>
         Public Function CreateNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistoryTestSamplesDS As HistoryTestSamplesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -38,7 +39,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 ElseIf (Not pHistoryTestSamplesDS Is Nothing) Then
                     Dim cmdText As String = " INSERT INTO tqcHistoryTestSamples(TestType, TestID, SampleType, CreationDate, TestName, TestShortName, " & vbCrLf & _
                                                                               " PreloadedTest, MeasureUnit, DecimalsAllowed, RejectionCriteria, CalculationMode, " & vbCrLf & _
-                                                                              " NumberOfSeries, DeletedTest, DeletedSampleType) " & vbCrLf & _
+                                                                              " NumberOfSeries, DeletedTest, DeletedSampleType, TestLongName) " & vbCrLf & _
                                              " VALUES ('" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType & "', " & vbCrLf & _
                                                             pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID & ", " & vbCrLf & _
                                                      " '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).SampleType & "', " & vbCrLf & _
@@ -52,7 +53,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                       "'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode & "', " & vbCrLf & _
                                                             pHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries.ToString & ", " & vbCrLf & _
                                                             Convert.ToInt32(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).DeletedTest, 1, 0)) & ", " & vbCrLf & _
-                                                            Convert.ToInt32(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).DeletedSampleType, 1, 0)) & ") " & vbCrLf & _
+                                                            Convert.ToInt32(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).DeletedSampleType, 1, 0)) & ", " & vbCrLf & _
+                                                            Convert.ToString(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull)) & ") " & vbCrLf & _
                                              " SELECT SCOPE_IDENTITY() "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -263,10 +265,12 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pHistoryTestSamplesDS">Typed DataSet HistoryTestSamplesDS containing the data of the Test
         '''                                     to update</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' Pre: TestType = ISE or STD
         ''' <remarks>
         ''' Created by:  TR 10/05/2011
         ''' Modified by: SA 03/06/2011 - Removed the For/Next loop
         '''              SA 05/06/2012 - Filter the query also for field TestType
+        '''              WE 31/07/2014 - Update DecimalsAllowed if TestType = STD (#1865).
         ''' </remarks>
         Public Function UpdateByTestIDNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistoryTestSamplesDS As HistoryTestSamplesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -278,21 +282,34 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 ElseIf (Not pHistoryTestSamplesDS Is Nothing) Then
-                    Dim cmdText As String = " UPDATE tqcHistoryTestSamples " & vbCrLf & _
-                                            " SET TestName        = N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestName.Replace("'", "''") & "', " & vbCrLf & _
-                                                " TestShortName   = N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestShortName.Replace("'", "''") & "', " & vbCrLf & _
-                                                " MeasureUnit     = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).MeasureUnit & "', " & vbCrLf & _
-                                                " DecimalsAllowed = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).DecimalsAllowed & "' " & vbCrLf & _
-                                            " WHERE TestType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType.Trim & "' " & vbCrLf & _
-                                            " AND   TestID = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID.ToString & vbCrLf & _
-                                            " AND   DeletedTest = 0 " & vbCrLf & _
-                                            " AND   DeletedSampleType = 0 "
+                    Dim cmdText As String = ""
+
+                    If pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType = "STD" Then
+                        cmdText = " UPDATE tqcHistoryTestSamples " & vbCrLf & _
+                                    " SET TestName        = N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestName.Replace("'", "''") & "', " & vbCrLf & _
+                                    " TestShortName   = N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestShortName.Replace("'", "''") & "', " & vbCrLf & _
+                                    " MeasureUnit     = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).MeasureUnit & "', " & vbCrLf & _
+                                    " DecimalsAllowed = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).DecimalsAllowed & "' " & vbCrLf & _
+                                    " WHERE TestType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType.Trim & "' " & vbCrLf & _
+                                    " AND   TestID = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID.ToString & vbCrLf & _
+                                    " AND   DeletedTest = 0 " & vbCrLf & _
+                                    " AND   DeletedSampleType = 0 "
+                    ElseIf pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType = "ISE" Then
+                        cmdText = " UPDATE tqcHistoryTestSamples " & vbCrLf & _
+                                  " SET TestName        = N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestName.Replace("'", "''") & "', " & vbCrLf & _
+                                  " TestShortName   = N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestShortName.Replace("'", "''") & "', " & vbCrLf & _
+                                  " MeasureUnit     = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).MeasureUnit & "' " & vbCrLf & _
+                                  " WHERE TestType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType.Trim & "' " & vbCrLf & _
+                                  " AND   TestID = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID.ToString & vbCrLf & _
+                                  " AND   DeletedTest = 0 " & vbCrLf & _
+                                  " AND   DeletedSampleType = 0 "
+                    End If
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
                         myGlobalDataTO.HasError = False
                     End Using
-                End If
+                    End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -312,10 +329,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pHistoryTestSamplesDS">Typed DataSet HistoryTestSamplesDS containing the data of the Test/SampleType
         '''                                     to update</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' Pre: TestType = ISE or STD
         ''' <remarks>
         ''' Created by:  TR 10/05/2011
         ''' Modified by: SA 03/06/2011 - Removed the For/Next loop
         '''              SA 15/06/2012 - Filter the query also for field TestType
+        '''              WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name (NULL allowed) in IProgISETest.
+        '''                            - Update DecimalsAllowed if TestType = ISE (#1865).
         ''' </remarks>
         Public Function UpdateByTestIDAndSampleTypeNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistoryTestSamplesDS As HistoryTestSamplesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -327,14 +347,31 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 ElseIf (Not pHistoryTestSamplesDS Is Nothing) Then
-                    Dim cmdText As String = " UPDATE tqcHistoryTestSamples " & vbCrLf & _
-                                            " SET    RejectionCriteria = " & ReplaceNumericString(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).RejectionCriteria) & ", " & vbCrLf & _
-                                                   " CalculationMode   = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode & "', " & vbCrLf & _
-                                                   " NumberOfSeries    = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries & " " & vbCrLf & _
-                                            " WHERE TestType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType & "' " & vbCrLf & _
-                                            " AND   TestID = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID & vbCrLf & _
-                                            " AND   SampleType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).SampleType & "' " & vbCrLf & _
-                                            " AND   DeletedSampleType = 0 "
+                    Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName))
+                    Dim cmdText As String = ""
+
+                    If pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType = "ISE" Then
+                        cmdText = " UPDATE tqcHistoryTestSamples " & vbCrLf & _
+                                  " SET    RejectionCriteria = " & ReplaceNumericString(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).RejectionCriteria) & ", " & vbCrLf & _
+                                         " CalculationMode   = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode & "', " & vbCrLf & _
+                                         " NumberOfSeries    = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries & ", " & vbCrLf & _
+                                         " DecimalsAllowed   = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).DecimalsAllowed & ", " & vbCrLf & _
+                                         " TestLongName      = " & tstLongName & " " & vbCrLf & _
+                                         " WHERE TestType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType & "' " & vbCrLf & _
+                                         " AND   TestID = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID & vbCrLf & _
+                                         " AND   SampleType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).SampleType & "' " & vbCrLf & _
+                                         " AND   DeletedSampleType = 0 "
+                    ElseIf pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType = "STD" Then
+                        cmdText = " UPDATE tqcHistoryTestSamples " & vbCrLf & _
+                                  " SET    RejectionCriteria = " & ReplaceNumericString(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).RejectionCriteria) & ", " & vbCrLf & _
+                                         " CalculationMode   = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode & "', " & vbCrLf & _
+                                         " NumberOfSeries    = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries & ", " & vbCrLf & _
+                                         " TestLongName      = " & tstLongName & " " & vbCrLf & _
+                                         " WHERE TestType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType & "' " & vbCrLf & _
+                                         " AND   TestID = " & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestID & vbCrLf & _
+                                         " AND   SampleType = '" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).SampleType & "' " & vbCrLf & _
+                                         " AND   DeletedSampleType = 0 "
+                    End If
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()

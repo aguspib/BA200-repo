@@ -2738,6 +2738,7 @@ Namespace Biosystems.Ax00.BL
                                     myHistoryTestSampleRow.NumberOfSeries = myHistTestSamplesDS.tqcHistoryTestSamples.First.NumberOfSeries
                                     myHistoryTestSampleRow.DeletedTest = False
                                     myHistoryTestSampleRow.DeletedSampleType = False
+                                    myHistoryTestSampleRow.TestLongName = myHistTestSamplesDS.tqcHistoryTestSamples.First.TestLongName  ' WE 31/07/2014 - #1865
                                     myHistTestSamplesToAddDS.tqcHistoryTestSamples.AddtqcHistoryTestSamplesRow(myHistoryTestSampleRow)
                                     myHistTestSamplesToAddDS.AcceptChanges()
 

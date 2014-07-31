@@ -186,10 +186,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                     End If
 
                     If (pISETestSamplesRow.IsTotalAllowedErrorNull) Then
-                        cmdText &= " TotalAllowedError = NULL "
+                        cmdText &= " TotalAllowedError = NULL, "
                     Else
-                        cmdText &= " TotalAllowedError = " & pISETestSamplesRow.TotalAllowedError.ToSQLString() & " "
+                        cmdText &= " TotalAllowedError = " & pISETestSamplesRow.TotalAllowedError.ToSQLString() & ", "
                     End If
+
+                    ' WE 30/07/2014 - #1865
+                    If (pISETestSamplesRow.IsTestLongNameNull) Then
+                        cmdText &= " TestLongName = NULL "
+                    Else
+                        cmdText &= " TestLongName = N'" & pISETestSamplesRow.TestLongName & "' "
+                    End If
+                    ' WE 30/07/2014 - #1865 - End
 
                     cmdText &= " WHERE ISETestID = " & pISETestSamplesRow.ISETestID & " " & _
                                " AND   SampleType = '" & pISETestSamplesRow.SampleType & "' "
@@ -437,6 +445,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet HistoryQCTestSamples with all data needed to export the ISE Test/SampleType to QC Module</returns>
         ''' <remarks>
         ''' Created by:  SA 21/05/2012
+        ''' Modified by: WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name in IProgISETest.
         ''' </remarks>
         Public Function GetDefinitionForQCModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -449,7 +458,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT IT.ISETestID AS TestID, IT.Name AS TestName, IT.ShortName AS TestShortName, 1 AS PreloadedTest, " & vbCrLf & _
                                                        " IT.Units AS MeasureUnit, ITS.SampleType, ITS.Decimals AS DecimalsAllowed, ITS.RejectionCriteria, " & vbCrLf & _
-                                                       " ITS.CalculationMode, ITS.NumberOfSeries " & vbCrLf & _
+                                                       " ITS.CalculationMode, ITS.NumberOfSeries, ITS.TestLongName " & vbCrLf & _
                                                 " FROM   tparISETests IT INNER JOIN tparISETestSamples ITS ON IT.ISETestID = ITS.ISETestID " & vbCrLf & _
                                                 " WHERE  ITS.ISETestID  = " & pISETestID.ToString & vbCrLf & _
                                                 " AND    ITS.SampleType = '" & pSampleType & "' " & vbCrLf

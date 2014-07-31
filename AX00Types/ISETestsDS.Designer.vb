@@ -1071,7 +1071,7 @@ Partial Public Class ISETestsDS
         Public Property TestLongName() As String
             Get
                 If Me.IsTestLongNameNull Then
-                    Return String.Empty
+                    Return Nothing
                 Else
                     Return CType(Me(Me.tabletparISETests.TestLongNameColumn), String)
                 End If

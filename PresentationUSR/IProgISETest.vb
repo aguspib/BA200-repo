@@ -144,15 +144,11 @@ Public Class IProgISETest
     Private Sub BindISETestSamplesData(ByVal pTestID As Integer, ByVal pSampleType As String)
 
         Try
-            Dim myGlobalDataTO As GlobalDataTO
-            'Dim myTestSampleMultiDS As TestSamplesMultirulesDS
-            Dim myTestSampleMultiDelegate As New TestSamplesMultirulesDelegate
+ 
+            '        EditionMode = False
 
-            EditionMode = False
-
-            'For the selected ISE TestID/SampleType, get data of fields ControlReplicates, RejectionCriteria,
-            'CalculationMode, NumberOfSeries and TotalAllowedError from global DataSet SelectedISETestSamplesDS
-            '(loaded in function LoadSampleTypesList)
+            'For the selected ISE TestID/SampleType get data of field TestLongName, Decimals, SlopeFactorA2 and SlopeFactorB2
+            'from global DataSet SelectedISETestSamplesDS (loaded in function LoadSampleTypesList).
             Dim qTestSamples As List(Of ISETestSamplesDS.tparISETestSamplesRow)
 
             qTestSamples = (From a In SelectedISETestSamplesDS.tparISETestSamples _
@@ -160,41 +156,25 @@ Public Class IProgISETest
                             AndAlso a.ISETestID = pTestID _
                             Select a).ToList()
 
-            bsReportNameTextBox.Text = qTestSamples.First().TestLongName
-            '=========================
-
-            If Not qTestSamples.First().IsControlReplicatesNull Then
-                QCReplicNumberNumeric.Text = qTestSamples.First().ControlReplicates.ToString()
+            If Not qTestSamples.First().IsTestLongNameNull Then
+                bsReportNameTextBox.Text = qTestSamples.First().TestLongName
             Else
-                QCReplicNumberNumeric.ResetText()
+                bsReportNameTextBox.ResetText()
             End If
 
-            If Not qTestSamples.First().IsRejectionCriteriaNull Then
-                QCRejectionCriteria.Value = CDec(qTestSamples.First().RejectionCriteria)
-            Else
-                QCRejectionCriteria.ResetText()
-            End If
+            bsDecimalsUpDown.Text = qTestSamples.First().Decimals.ToString()
+            
+            ' ToDo:
+            ' SlopeFactorA2 and SlopeFactorB2
 
- 
-            myGlobalDataTO = myTestControlDelegate.GetControlsNEW(Nothing, "ISE", pTestID, pSampleType)
 
-            If Not myGlobalDataTO.HasError Then
-                SelectedTestControlDS = DirectCast(myGlobalDataTO.SetDatos, TestControlsDS)
-                ''Order by Active control so the check ones get the first positions
-                'SelectedTestControlDS.tparTestControls.DefaultView.Sort = "ActiveControl DESC"
-                PrepareISETestControlsGrid()
-                UsedControlsGridView.DataSource = SelectedTestControlDS.tparTestControls
-                UsedControlsGridView.ClearSelection()
-            End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestQCData " & Name, EventLogEntryType.Error, _
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestSamplesData " & Name, EventLogEntryType.Error, _
                                                             GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
-
-
     End Sub
 
 
@@ -243,7 +223,7 @@ Public Class IProgISETest
                     'Load screen fields with all data of the selected ISE Test 
                     Dim inUseISETest As Boolean = BindISETestData()
 
-                    BindISETestSamplesData()    ' WE 30/07/2014 - #1865
+                    BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
 
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
@@ -422,7 +402,7 @@ Public Class IProgISETest
                         SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                     End If
 
-                    BindISETestSamplesData()    ' WE 30/07/2014 - #1865
+                    BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
 
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
@@ -471,6 +451,9 @@ Public Class IProgISETest
             ' WE 30/07/2014 - #1865 
             bsReportNameTextBox.Enabled = True
             bsReportNameTextBox.BackColor = Color.White
+
+            bsDecimalsUpDown.Enabled = True
+            bsDecimalsUpDown.BackColor = Color.White
             ' WE 30/07/2014 - #1865 - End
 
             bsSaveButton.Enabled = True
@@ -898,14 +881,16 @@ Public Class IProgISETest
             bsAvailableISETestCheckBox.CheckState = CheckState.Unchecked
             bsAvailableISETestCheckBox.Enabled = False
 
-            ' WE 30/07/2014 - #1865
+            ' WE 31/07/2014 - #1865
             bsReportNameTextBox.Text = ""
             bsReportNameTextBox.Enabled = False
             bsReportNameTextBox.BackColor = SystemColors.MenuBar
 
             bsDecimalsUpDown.Enabled = False
             bsDecimalsUpDown.BackColor = SystemColors.MenuBar
-            ' WE 30/07/2014 - #1865 - End
+
+            SetISETestControlsLimits()
+            ' WE 31/07/2014 - #1865 - End
 
             'Area of Reference Ranges
             InitializeReferenceRangesControl()
@@ -1643,6 +1628,31 @@ Public Class IProgISETest
                             'RH 11/06/2012
                             .QCActive = QCActiveCheckBox.Checked
 
+                            ' WE 31/07/2014 - #1865
+                            .TestLongName = bsReportNameTextBox.Text.Trim
+
+                            .Decimals = CByte(bsDecimalsUpDown.Value)
+
+                            'TR 29/03/2010 Add the slope factor to save.
+                            'If SlopeAUpDown.Text <> "" Then
+                            '    qTestSampleRow.First().SlopeFactorA = CType(SlopeAUpDown.Value, Single)
+                            'Else
+                            '    'TR 21/06/2010
+                            '    qTestSampleRow.First().SetSlopeFactorANull()
+                            'End If
+
+                            'If SlopeBUpDown.Text <> "" Then
+                            '    qTestSampleRow.First().SlopeFactorB = CType(SlopeBUpDown.Value, Single)
+                            'Else
+                            '    'TR 21/06/2010
+                            '    qTestSampleRow.First().SetSlopeFactorBNull()
+                            'End If
+
+                            ' WE 31/07/2014 - #1865 - End
+
+
+
+
                             If Not String.IsNullOrEmpty(QCReplicNumberNumeric.Text) Then
                                 .ControlReplicates = CInt(QCReplicNumberNumeric.Value)
                             Else
@@ -1909,18 +1919,18 @@ Public Class IProgISETest
                 Dim resultDataName As GlobalDataTO
                 Dim myISETestDelegateName As New ISETestsDelegate
 
-                resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "FNAME")
-                If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
-                    Dim myISETestsDSname As ISETestsDS
-                    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
+                'resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "FNAME")
+                'If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
+                '    Dim myISETestsDSname As ISETestsDS
+                '    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
 
-                    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
-                        fieldsOK = False
+                '    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
+                '        fieldsOK = False
 
-                        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
-                        bsFullNameTextbox.Focus()
-                    End If
-                End If
+                '        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
+                '        bsFullNameTextbox.Focus()
+                '    End If
+                'End If
                 ' WE 29/07/2014 - #1865 - End.
 
                 'All mandatory fields are informed, verify the informed ShortName is unique
@@ -3067,6 +3077,37 @@ Public Class IProgISETest
 
         Return decimalsNumber
     End Function
+
+
+
+    ''' <summary>
+    ''' Set the limits and step increments for all Numeric UpDown controls on the main part of the form.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 31/07/2014 - #1865
+    ''' </remarks>
+    Private Sub SetISETestControlsLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            '** FIELDS IN MAIN PART OF SCREEN (ABOVE TAB CONTROL PART) ** '
+            'Decimals
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.CTEST_NUM_DECIMALS)
+            If (myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0) Then
+                bsDecimalsUpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsDecimalsUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsDecimalsUpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If (Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull) Then
+                    bsDecimalsUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetISETestControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
 
 #End Region
 

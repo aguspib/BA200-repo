@@ -1478,7 +1478,7 @@ Partial Public Class HisTestSamplesDS
         Public Property TestLongName() As String
             Get
                 If Me.IsTestLongNameNull Then
-                    Return String.Empty
+                    Return Nothing
                 Else
                     Return CType(Me(Me.tablethisTestSamples.TestLongNameColumn),String)
                 End If

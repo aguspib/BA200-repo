@@ -994,7 +994,7 @@ Partial Public Class HistoryTestSamplesDS
         Public Property TestLongName() As String
             Get
                 If Me.IsTestLongNameNull Then
-                    Return String.Empty
+                    Return Nothing
                 Else
                     Return CType(Me(Me.tabletqcHistoryTestSamples.TestLongNameColumn), String)
                 End If
