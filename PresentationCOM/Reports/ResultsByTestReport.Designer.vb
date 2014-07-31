@@ -111,13 +111,13 @@ Partial Public Class ResultsByTestReport
         Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(440.0!, 0.00002670288!)
         Me.XrLabelUnit.Name = "XrLabelUnit"
         Me.XrLabelUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
-        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(64.58331!, 20.0!)
+        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(66.99994!, 20.0!)
         Me.XrLabelUnit.StylePriority.UseBorders = False
         Me.XrLabelUnit.StylePriority.UseFont = False
         Me.XrLabelUnit.StylePriority.UsePadding = False
         Me.XrLabelUnit.StylePriority.UseTextAlignment = False
         Me.XrLabelUnit.Text = "*Unit"
-        Me.XrLabelUnit.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleCenter
+        Me.XrLabelUnit.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
         '
         'XrLabelDate
         '
@@ -138,10 +138,10 @@ Partial Public Class ResultsByTestReport
         '
         Me.XrLabelFactor.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelFactor.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelFactor.LocationFloat = New DevExpress.Utils.PointFloat(504.5834!, 0.0!)
+        Me.XrLabelFactor.LocationFloat = New DevExpress.Utils.PointFloat(507.0!, 0.0!)
         Me.XrLabelFactor.Name = "XrLabelFactor"
         Me.XrLabelFactor.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 3, 0, 0, 100.0!)
-        Me.XrLabelFactor.SizeF = New System.Drawing.SizeF(78.41663!, 20.0!)
+        Me.XrLabelFactor.SizeF = New System.Drawing.SizeF(76.0!, 20.0!)
         Me.XrLabelFactor.StylePriority.UseBorders = False
         Me.XrLabelFactor.StylePriority.UseFont = False
         Me.XrLabelFactor.StylePriority.UsePadding = False
@@ -247,7 +247,7 @@ Partial Public Class ResultsByTestReport
         '
         'BottomMargin
         '
-        Me.BottomMargin.HeightF = 25.0!
+        Me.BottomMargin.HeightF = 26.95834!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -382,9 +382,11 @@ Partial Public Class ResultsByTestReport
         '
         Me.XrTableCell1.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportTestMaster.ReportTestMaster_ReportTestDetails.MeasureUnit")})
         Me.XrTableCell1.Name = "XrTableCell1"
+        Me.XrTableCell1.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
+        Me.XrTableCell1.StylePriority.UsePadding = False
         Me.XrTableCell1.StylePriority.UseTextAlignment = False
         Me.XrTableCell1.Text = "XrTableCell1"
-        Me.XrTableCell1.Weight = 0.3075394380660284R
+        Me.XrTableCell1.Weight = 0.31904732613336467R
         '
         'XrTableCell7
         '
@@ -393,7 +395,7 @@ Partial Public Class ResultsByTestReport
         Me.XrTableCell7.StylePriority.UseTextAlignment = False
         Me.XrTableCell7.Text = "XrTableCell7"
         Me.XrTableCell7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell7.Weight = 0.37341279302324559R
+        Me.XrTableCell7.Weight = 0.36190490495590932R
         '
         'XrTableCell8
         '
@@ -415,7 +417,7 @@ Partial Public Class ResultsByTestReport
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport})
         Me.DataMember = "ReportTestMaster"
         Me.DataSource = Me.ResultsDS1
-        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 27)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
