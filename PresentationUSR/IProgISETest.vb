@@ -133,72 +133,6 @@ Public Class IProgISETest
         Return inUse
     End Function
 
-
-
-    ''' <summary>
-    ''' Binds ISE Test Samples data to the corresponding screen fields.
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: WE 30/07/2014 - #1865
-    ''' </remarks>
-    Private Sub BindISETestSamplesData(ByVal pTestID As Integer, ByVal pSampleType As String)
-
-        Try
-            Dim myGlobalDataTO As GlobalDataTO
-            'Dim myTestSampleMultiDS As TestSamplesMultirulesDS
-            Dim myTestSampleMultiDelegate As New TestSamplesMultirulesDelegate
-
-            EditionMode = False
-
-            'For the selected ISE TestID/SampleType, get data of fields ControlReplicates, RejectionCriteria,
-            'CalculationMode, NumberOfSeries and TotalAllowedError from global DataSet SelectedISETestSamplesDS
-            '(loaded in function LoadSampleTypesList)
-            Dim qTestSamples As List(Of ISETestSamplesDS.tparISETestSamplesRow)
-
-            qTestSamples = (From a In SelectedISETestSamplesDS.tparISETestSamples _
-                            Where String.Compare(a.SampleType, pSampleType, False) = 0 _
-                            AndAlso a.ISETestID = pTestID _
-                            Select a).ToList()
-
-            bsReportNameTextBox.Text = qTestSamples.First().TestLongName
-            '=========================
-
-            If Not qTestSamples.First().IsControlReplicatesNull Then
-                QCReplicNumberNumeric.Text = qTestSamples.First().ControlReplicates.ToString()
-            Else
-                QCReplicNumberNumeric.ResetText()
-            End If
-
-            If Not qTestSamples.First().IsRejectionCriteriaNull Then
-                QCRejectionCriteria.Value = CDec(qTestSamples.First().RejectionCriteria)
-            Else
-                QCRejectionCriteria.ResetText()
-            End If
-
- 
-            myGlobalDataTO = myTestControlDelegate.GetControlsNEW(Nothing, "ISE", pTestID, pSampleType)
-
-            If Not myGlobalDataTO.HasError Then
-                SelectedTestControlDS = DirectCast(myGlobalDataTO.SetDatos, TestControlsDS)
-                ''Order by Active control so the check ones get the first positions
-                'SelectedTestControlDS.tparTestControls.DefaultView.Sort = "ActiveControl DESC"
-                PrepareISETestControlsGrid()
-                UsedControlsGridView.DataSource = SelectedTestControlDS.tparTestControls
-                UsedControlsGridView.ClearSelection()
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestQCData " & Name, EventLogEntryType.Error, _
-                                                            GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        End Try
-
-
-    End Sub
-
-
-
     ''' <summary>
     ''' Execute the cancelling of a ISE Test edition
     ''' </summary>
@@ -242,8 +176,6 @@ Public Class IProgISETest
                 If (bsISETestListView.SelectedItems.Count > 0) Then
                     'Load screen fields with all data of the selected ISE Test 
                     Dim inUseISETest As Boolean = BindISETestData()
-
-                    BindISETestSamplesData()    ' WE 30/07/2014 - #1865
 
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
@@ -422,8 +354,6 @@ Public Class IProgISETest
                         SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                     End If
 
-                    BindISETestSamplesData()    ' WE 30/07/2014 - #1865
-
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                     'Get the Reference Ranges defined for the ISE Test and the selected SampleType and shown them
@@ -467,11 +397,6 @@ Public Class IProgISETest
             bsShortNameTextbox.BackColor = Color.White
 
             bsAvailableISETestCheckBox.Enabled = False
-
-            ' WE 30/07/2014 - #1865 
-            bsReportNameTextBox.Enabled = True
-            bsReportNameTextBox.BackColor = Color.White
-            ' WE 30/07/2014 - #1865 - End
 
             bsSaveButton.Enabled = True
             bsCancelButton.Enabled = True
@@ -739,8 +664,6 @@ Public Class IProgISETest
             bsUnitLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", currentLanguage) + ":"
             bsSampleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", currentLanguage) + ":" 'AG 21/10/2010
             bsAvailableISETestCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AvailableISETest", currentLanguage)  'AG 21/10/2010
-            bsReportNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_ReportName", currentLanguage) + ":"   ' WE 30/07/2014 - #1865
-            bsDecimalsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decimals", currentLanguage) + ":"     ' WE 30/07/2014 - #1865
 
             DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage)
 
@@ -897,15 +820,6 @@ Public Class IProgISETest
 
             bsAvailableISETestCheckBox.CheckState = CheckState.Unchecked
             bsAvailableISETestCheckBox.Enabled = False
-
-            ' WE 30/07/2014 - #1865
-            bsReportNameTextBox.Text = ""
-            bsReportNameTextBox.Enabled = False
-            bsReportNameTextBox.BackColor = SystemColors.MenuBar
-
-            bsDecimalsUpDown.Enabled = False
-            bsDecimalsUpDown.BackColor = SystemColors.MenuBar
-            ' WE 30/07/2014 - #1865 - End
 
             'Area of Reference Ranges
             InitializeReferenceRangesControl()
@@ -1351,8 +1265,6 @@ Public Class IProgISETest
                     SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 End If
 
-                BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
-
                 BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                 'Get the Reference Ranges defined for the ISE Test and the selected SampleType and shown them
@@ -1428,14 +1340,6 @@ Public Class IProgISETest
             bsUnitComboBox.BackColor = SystemColors.MenuBar
 
             bsAvailableISETestCheckBox.Enabled = False
-
-            ' WE 30/07/2014 - #1865
-            bsReportNameTextBox.Enabled = False
-            bsReportNameTextBox.BackColor = SystemColors.MenuBar
-
-            bsDecimalsUpDown.Enabled = False
-            bsDecimalsUpDown.BackColor = SystemColors.MenuBar
-            ' WE 30/07/2014 - #1865 - End
 
             bsVolumeUpDown.Enabled = False
             bsVolumeUpDown.BackColor = SystemColors.MenuBar
@@ -2564,7 +2468,6 @@ Public Class IProgISETest
             QCReplicNumberNumeric.Enabled = pEnable
             QCRejectionCriteria.Enabled = pEnable
 
-            ' Six-Sigma Values Group Box is not used at this moment. Therefore its Visibility property is set to True at design-time.
             'SixSigmaValuesGroupBox.Enabled = pEnable
             QCErrorAllowable.Enabled = pEnable
             BsButton1.Enabled = pEnable
@@ -4019,8 +3922,7 @@ Public Class IProgISETest
     ''' Modified by: SA SA 12/01/2011 - Changes due to new implementation of Reference Ranges Control 
     ''' </remarks>
     Private Sub bsTextbox_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsFullNameTextbox.TextChanged, _
-                                                                                                   bsShortNameTextbox.TextChanged, ReportsNameTextBox.TextChanged
-        ' WE 30/07/2014 - #1865 - Added ReportsNameTextBox.
+                                                                                                   bsShortNameTextbox.TextChanged
         Try
             Dim myTextBox As New TextBox
             myTextBox = CType(sender, TextBox)
