@@ -171,6 +171,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: DL 24/04/2013
         ''' AG 25/04/2013 before call clear in my DAO call clear method in historic order tests delegate
+        ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
         ''' </remarks>
         Public Function ClearIdentifiersForLIS(ByVal pDBConnection As SqlClient.SqlConnection,
                                                ByVal pLISMessageID As String) As GlobalDataTO
@@ -183,8 +184,10 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myHistOTDlg As New HisWSOrderTestsDelegate
-                        resultData = myHistOTDlg.ClearIdentifiersForLIS(Nothing, pLISMessageID)
+                        'AG 24/07/2014 - RQ00086
+                        'Dim myHistOTDlg As New HisWSOrderTestsDelegate
+                        'resultData = myHistOTDlg.ClearIdentifiersForLIS(Nothing, pLISMessageID)
+                        'AG 24/07/2014 - RQ00086
 
                         If Not resultData.HasError Then
                             Dim myDao As New thisWSResultsDAO
