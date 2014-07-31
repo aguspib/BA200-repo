@@ -7367,6 +7367,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 01/09/2011 - Changed the function template
         '''              AG 22/05/2012 - when new executions are added, if the WSStatus is closed it becomes PENDING
         '''              TR 28/06/2013 - Add parameter POFFSOrderTest Validate if ordertest belong to and off system test to avoid the ToSendFlag and openOTFlag Filter.
+        '''              AG 31/07/2014 #1887 - Set OrderToExport = TRUE after 1 order test status is set to CLOSED
         ''' </remarks>
         Public Function UpdateStatusByOrderTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                                   ByVal pNewStatusValue As String, Optional pOFFSOrderTest As Boolean = False) As GlobalDataTO
@@ -7398,6 +7399,11 @@ Namespace Biosystems.Ax00.BL
                                 If Not myOrderTestWSAnalyzerDS.twksOrderTestWSAnalyzer(0).IsWSStatusNull Then myWSStatus = myOrderTestWSAnalyzerDS.twksOrderTestWSAnalyzer(0).WSStatus()
                                 'AG 22/05/2012
                                 If (pNewStatusValue = "CLOSED") Then
+                                    'AG 31/07/2014 #1887 - Set OrderToExport = TRUE after 1 order test status is set to CLOSED
+                                    Dim myOrdersDelegate As New OrdersDelegate
+                                    dataToReturn = myOrdersDelegate.UpdateOrderToExport(pDBConnection, True, , pOrderTestID)
+                                    'AG 31/07/2014 #1887
+
                                     'Verify if all the Order Tests of the same Order are already CLOSED to set also to CLOSED the Status of the Order 
 
                                     dataToReturn = myWSOrderTestsDelegate.CountClosedOTsByOrder(dbConnection, myWorkSessionID, myAnalyzerID, myOrderID, pOFFSOrderTest)
@@ -7405,7 +7411,6 @@ Namespace Biosystems.Ax00.BL
                                         Dim numNotClosedByOrderID As Integer = CType(dataToReturn.SetDatos, Integer)
                                         If (numNotClosedByOrderID = 0) Then
                                             'Change Order Status to CLOSED
-                                            Dim myOrdersDelegate As New OrdersDelegate
                                             dataToReturn = myOrdersDelegate.UpdateOrderStatus(dbConnection, myOrderID, "CLOSED")
                                             If (Not dataToReturn.HasError) Then
                                                 'Verify if all the Order Tests included in the active WorkSession are already CLOSED  
