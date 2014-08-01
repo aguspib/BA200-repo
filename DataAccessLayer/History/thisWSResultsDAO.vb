@@ -604,103 +604,110 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 #Region " Get Historical Results "
         ''' <summary>
-        ''' Gets all Historical Patient Results that fulfill the specified filters
+        ''' Get all Historic Patient Results that fulfill the specified filters
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pSamplePatientId"></param>
-        ''' <param name="pSampleClasses"></param>
-        ''' <param name="pSampleTypes"></param>
-        ''' <param name="pStatFlag"></param>
-        ''' <param name="pTestTypes"></param>
-        ''' <param name="pTestStartName"></param>
-        ''' <returns>GlobalDataTo with dataset as HisWSResultsDS.vhisWSResults</returns>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pPatientData">Part of the Patient ID, LastName or FirstName</param>
+        ''' <param name="pSampleTypes">List of Sample Types</param>
+        ''' <param name="pStatFlag">Priority Flag</param>
+        ''' <param name="pTestTypes">List of Test Types</param>
+        ''' <param name="pTestName">Part of the Test Name</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pSpecimenID">Part of the SpecimenID (Barcode)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Patient results that fulfill the
+        '''          specified search criteria</returns>
         ''' <remarks>
         ''' Created by:  JB 19/10/2012
-        ''' Modified by: AG 29/10/2012 (AG + EF MEETING) DEFAULT ORDER BY PATIENTID, RESULTDATE DESC
-        '''              JB 07/11/2012 Fixed search query
+        ''' Modified by: AG 29/10/2012 - Sort returned records by PatientID and ResultDateTime (DESC) 
+        '''              JB 07/11/2012 - Fixed search query
+        '''              SA 01/08/2014 - BT #1861 ==> - Added new optional parameter pSpecimenID and the corresponding filter in the SQL when it is informed
+        '''                                           - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
+        '''                                           - Changed the use of parameter pPatientData: when it is informed, the query searches if it is part of 
+        '''                                             fields PatientID, LastName or FirstName
+        '''                                           - Changed the ORDER BY: sort returned data by PatientID, SpecimenID and ResultDateTime
         ''' </remarks>
         Public Function GetHistoricalResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                      Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pSamplePatientId As String = "", Optional ByVal pSampleClasses As List(Of String) = Nothing, _
-                                                     Optional ByVal pSampleTypes As List(Of String) = Nothing, Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
-                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestStartName As String = "", _
-                                                     Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
+                                                     Optional ByVal pPatientData As String = "", Optional ByVal pSampleTypes As List(Of String) = Nothing, _
+                                                     Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
+                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestName As String = "", _
+                                                     Optional ByVal pWorkSessionID As String = "", Optional ByVal pSpecimenID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        Dim cmdInFilter As String = ""
-                        cmdText = "  SELECT * FROM vhisWSResults WHERE "
+                        Dim cmdInFilter As String = String.Empty
+                        Dim cmdText As String = " SELECT * FROM vhisWSResults " & vbCrLf & _
+                                                " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " AND    SampleClass = 'PATIENT' " & vbCrLf
 
-                        cmdText &= " AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+                        '******************************************************************************
+                        '* Add additional filters when the different optional parameters are informed *
+                        '******************************************************************************
 
-                        'DL 23/10/2012
-                        If String.Compare(pWorkSessionID, "", False) <> 0 Then cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
-                        'DL 23/10/2012
+                        '(1) Range of dates
+                        If (pDateFrom <> Nothing) Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
+                        If (pDateTo <> Nothing) Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
 
-                        'JB 07/11/2012 - Fixed search filter
-                        'If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & pDateFrom.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & pDateTo.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If Not String.IsNullOrEmpty(pSamplePatientId) Then cmdText &= " AND PatientID LIKE '%" & pSamplePatientId & "%' "
-
-                        If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
-                        If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
-                        If Not String.IsNullOrEmpty(pSamplePatientId) Then cmdText &= " AND UPPER(PatientID) LIKE UPPER(N'%" & pSamplePatientId.Trim.Replace("'", "''") & "%') "
-                        'JB 07/11/2012
-
-                        If pSampleClasses IsNot Nothing Then
-                            cmdInFilter = ""
-                            For Each elem As String In pSampleClasses
-                                If Not String.IsNullOrEmpty(cmdInFilter) Then cmdInFilter &= ", "
-                                cmdInFilter &= " '" & elem & "' "
-                            Next
-                            If Not String.IsNullOrEmpty(cmdInFilter) Then
-                                cmdText &= " AND SampleClass IN (" & cmdInFilter & ") "
-                            End If
+                        '(2) Patient data
+                        If (Not String.IsNullOrEmpty(pPatientData)) Then
+                            cmdText &= " AND (UPPER(PatientID) LIKE UPPER(N'%" & pPatientData.Trim.Replace("'", "''") & "%') " & vbCrLf & _
+                                       " OR   UPPER(LastName) LIKE UPPER(N'%" & pPatientData.Trim.Replace("'", "''") & "%') " & vbCrLf & _
+                                       " OR   UPPER(FirstName) LIKE UPPER(N'%" & pPatientData.Trim.Replace("'", "''") & "%')) " & vbCrLf
                         End If
 
-                        If pSampleTypes IsNot Nothing Then
-                            cmdInFilter = ""
-                            For Each elem As String In pSampleTypes
-                                If Not String.IsNullOrEmpty(cmdInFilter) Then cmdInFilter &= ", "
-                                cmdInFilter &= " '" & elem & "' "
-                            Next
-                            If Not String.IsNullOrEmpty(cmdInFilter) Then
+                        '(3) SpecimenID (Barcode)
+                        If (Not String.IsNullOrEmpty(pSpecimenID)) Then cmdText &= " AND SpecimenID LIKE UPPER(N'%" & pSpecimenID.Trim.Replace("'", "''") & "%') " & vbCrLf
+
+                        '(4) Priority
+                        If (pStatFlag <> TriState.UseDefault) Then cmdText &= " AND StatFlag = " & IIf(pStatFlag = TriState.False, 0, 1).ToString
+
+                        '(5) List of Sample Types
+                        If (Not pSampleTypes Is Nothing AndAlso pSampleTypes.Count > 0) Then
+                            If (pSampleTypes.Count = 1) Then
+                                cmdText &= " AND SampleType = '" & pSampleTypes.First & "' "
+                            Else
+                                For Each elem As String In pSampleTypes
+                                    If (Not String.IsNullOrEmpty(cmdInFilter)) Then cmdInFilter &= ", "
+                                    cmdInFilter &= " '" & elem & "' "
+                                Next
                                 cmdText &= " AND SampleType IN (" & cmdInFilter & ") "
                             End If
                         End If
 
-                        If pStatFlag = TriState.False Then cmdText &= " AND StatFlag = 0 "
-                        If pStatFlag = TriState.True Then cmdText &= "  AND StatFlag = 1 "
-
-                        If pTestTypes IsNot Nothing Then
-                            cmdInFilter = ""
-                            For Each elem As String In pTestTypes
-                                If Not String.IsNullOrEmpty(cmdInFilter) Then cmdInFilter &= ", "
-                                cmdInFilter &= " '" & elem & "' "
-                            Next
-                            If Not String.IsNullOrEmpty(cmdInFilter) Then
+                        '(6) List of Test Types
+                        If (Not pTestTypes Is Nothing AndAlso pTestTypes.Count > 0) Then
+                            If (pTestTypes.Count = 1) Then
+                                cmdText &= " AND TestType = '" & pTestTypes.First & "' "
+                            Else
+                                cmdInFilter = String.Empty
+                                For Each elem As String In pTestTypes
+                                    If (Not String.IsNullOrEmpty(cmdInFilter)) Then cmdInFilter &= ", "
+                                    cmdInFilter &= " '" & elem & "' "
+                                Next
                                 cmdText &= " AND TestType IN (" & cmdInFilter & ") "
                             End If
                         End If
 
-                        If Not String.IsNullOrEmpty(pTestStartName) Then cmdText &= " AND TestName LIKE '%" & pTestStartName.Trim & "%' "
+                        '(7) Test Name
+                        If (Not String.IsNullOrEmpty(pTestName)) Then cmdText &= " AND TestName LIKE N'%" & pTestName.Trim.replace("'", "''") & "%' "
 
-                        'cmdText &= " ORDER BY ResultDateTime DESC "
-                        cmdText &= "ORDER BY PatientID, ResultDateTime DESC "
+                        '(8) Work Session Identifier
+                        If (pWorkSessionID.Trim <> String.Empty) Then cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
+
+                        '******************************************************************
+                        '* Sort returned data by PatientID, SpecimenID and ResultDateTime *
+                        '******************************************************************
+                        cmdText &= " ORDER BY PatientID, SpecimenID, ResultDateTime DESC "
 
                         Dim myDataSet As New HisWSResultsDS
-
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
                                 dbDataAdapter.Fill(myDataSet.vhisWSResults)
@@ -722,60 +729,50 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
 
         ''' <summary>
-        ''' Get the historical blank and calibrator results with the selected filter in screen
+        ''' Get the Historic Blank and Calibrator Results that fulfill the specified filters
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pTestNameContains"></param>
-        ''' <returns>GlobalDataTo (data as HisWSResultsDS.vhisWSResults</returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pTestNameContains">Part of the Test Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Blank and Calibrator results that 
+        '''          fulfill the specified search criteria</returns>
         ''' <remarks>
         ''' Created by:  AG 22/10/2012
-        ''' Modified by: AG 29/10/2012 order by TestName, ResultDateTime DESC (AG + EF meeting)
-        '''              JB 07/11/2012 fixed search filter 
+        ''' Modified by: AG 29/10/2012 - Order by TestName, ResultDateTime DESC (AG + EF meeting)
+        '''              JB 07/11/2012 - Fixed search filter 
         ''' </remarks>
         Public Function GetHistoricalBlankCalibResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                     Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pTestNameContains As String = "") As GlobalDataTO
+                                                               Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
+                                                               Optional ByVal pTestNameContains As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        'Const cmdInFilter As String = ""
-                        cmdText = "  SELECT * FROM vhisWSBlankCalibResults WHERE "
+                        Dim cmdText As String = " SELECT * FROM vhisWSBlankCalibResults " & vbCrLf & _
+                                                " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
 
-                        cmdText &= " AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+                        'Range of dates
+                        If (pDateFrom <> Nothing) Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
+                        If (pDateTo <> Nothing) Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
 
-                        'JB 07/11/2012 - Fixed search filter
-                        'If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & pDateFrom.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & pDateTo.ToString("yyyyMMdd 00:00:00") & "' "
-                        'If Not String.IsNullOrEmpty(pTestNameContains) Then cmdText &= " AND TestName LIKE '%" & pTestNameContains.Trim & "%' "
+                        'Test Name
+                        If (Not String.IsNullOrEmpty(pTestNameContains)) Then cmdText &= " AND UPPER(TestName) LIKE UPPER(N'%" & pTestNameContains.Trim.Replace("'", "''") & "%') "
 
-                        If pDateFrom <> Nothing Then cmdText &= " AND ResultDateTime >= '" & Format(pDateFrom, "yyyyMMdd") & "' "
-                        If pDateTo <> Nothing Then cmdText &= " AND ResultDateTime <= '" & Format(pDateTo, "yyyyMMdd") & "' "
-                        If Not String.IsNullOrEmpty(pTestNameContains) Then cmdText &= " AND UPPER(TestName) LIKE UPPER(N'%" & pTestNameContains.Trim.Replace("'", "''") & "%') "
-                        'JB 07/11/2012
-
-                        'cmdText &= " ORDER BY ResultDateTime DESC "
+                        'Sort records by TestName and ResultDateTime (DESC)
                         cmdText &= " ORDER BY TestName, ResultDateTime DESC "
 
                         Dim myDataSet As New HisWSResultsDS
-
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
                                 dbDataAdapter.Fill(myDataSet.vhisWSResults)
@@ -797,9 +794,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
 #End Region

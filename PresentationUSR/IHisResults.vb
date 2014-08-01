@@ -19,23 +19,20 @@ Public Class IHisResults
 
 #End Region
 
-#Region " Structures "
+#Region "Structures"
+    'SA 01/08/2014
+    'BT #1861 ==> Added new field specimenID. Removed field sampleClasses, it is not needed.
     Public Structure SearchFilter
         Public analyzerId As String
         Public dateFrom As Date
         Public dateTo As Date
-        Public samplePatientID As String
-        Public sampleClasses As List(Of String)
+        Public patientData As String
+        Public specimenID As String
         Public statFlag As TriState
         Public sampleTypes As List(Of String)
         Public testTypes As List(Of String)
-        Public testStartName As String
+        Public testName As String
     End Structure
-#End Region
-
-#Region "Attributes"
-    Private AnalyzerIDAttribute As String = String.Empty
-    Private WorkSessionIDAttribute As String = String.Empty
 #End Region
 
 #Region "Declarations"
@@ -61,20 +58,9 @@ Public Class IHisResults
 
     Private DeletingHistOrderTests As Boolean = False 'SGM 02/07/2013
 
-#End Region
-
-#Region "Properties"
-    Public WriteOnly Property AnalyzerID() As String
-        Set(ByVal value As String)
-            AnalyzerIDAttribute = value
-        End Set
-    End Property
-
-    Public WriteOnly Property WorkSessionID() As String
-        Set(ByVal value As String)
-            WorkSessionIDAttribute = value
-        End Set
-    End Property
+    'SA 01/08/2014
+    'BT #1861 ==> Global DS to get/save the configuration for width of all visible grid columns
+    Private gridColWidthConfigDS As GridColsConfigDS
 #End Region
 
 #Region "Constructor"
@@ -202,7 +188,9 @@ Public Class IHisResults
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012
+    ''' Created by:  JB 18/10/2012
+    ''' Modified by: SA 01/08/2014 - Get the multilanguage label for filter field SpecimenID (Barcode)
+    '''                            - Changed the multilanguage label used for field PatientData
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -211,7 +199,8 @@ Public Class IHisResults
             dateFromLabel.Text = GetText("LBL_Date_From") & ":"
             dateToLabel.Text = GetText("LBL_Date_To") & ":"
 
-            sampleIdLabel.Text = GetText("LBL_PatientSample") & ":"
+            bsPatientDataLabel.Text = GetText("LBL_Patient") & ":"
+            bsSpecimenIDLabel.Text = GetText("MENU_BARCODE") & ":"
             analyzerIDLabel.Text = GetText("LBL_SCRIPT_EDIT_Analyzer") & ":"
 
             statFlagLabel.Text = GetText("LBL_Stat") & ":"
@@ -337,15 +326,33 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by: JB 18/10/2012
+    ''' Modified by: SA 01/08/2014 - Load the ComboBox of Test Types from DB
     ''' </remarks>
     Private Sub GetTestTypes()
-        With mTestTypes
-            .Clear()
-            .Add("STD", GetText("PMD_TEST_TYPES_STD"))
-            .Add("CALC", GetText("PMD_TEST_TYPES_CALC"))
-            .Add("ISE", GetText("PMD_TEST_TYPES_ISE"))
-            .Add("OFFS", GetText("PMD_TEST_TYPES_OFFS"))
-        End With
+        Dim myGlobalDataTO As New GlobalDataTO()
+        Dim myMasterDataDelegate As New PreloadedMasterDataDelegate()
+
+        myGlobalDataTO = myMasterDataDelegate.GetList(Nothing, PreloadedMasterDataEnum.TEST_TYPES)
+        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+            Dim myMasteDataDS As PreloadedMasterDataDS = DirectCast(myGlobalDataTO.SetDatos, PreloadedMasterDataDS)
+
+            'Sort the returned data 
+            Dim qTestTypes As List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow) = (From a As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In myMasteDataDS.tfmwPreloadedMasterData _
+                                                                                       Order By a.Position Select a).ToList()
+            mTestTypes.Clear()
+            For Each testTypeRow As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In qTestTypes
+                mTestTypes.Add(testTypeRow.ItemID.ToString(), "-" & testTypeRow.FixedItemDesc)
+            Next
+            qTestTypes = Nothing
+        End If
+
+        'With mTestTypes
+        '    .Clear()
+        '    .Add("STD", GetText("PMD_TEST_TYPES_STD"))
+        '    .Add("CALC", GetText("PMD_TEST_TYPES_CALC"))
+        '    .Add("ISE", GetText("PMD_TEST_TYPES_ISE"))
+        '    .Add("OFFS", GetText("PMD_TEST_TYPES_OFFS"))
+        'End With
     End Sub
 
     ''' <summary>
@@ -372,7 +379,7 @@ Public Class IHisResults
 
         With testTypeChkComboBox.Properties.Items
             For Each kvp As KeyValuePair(Of String, String) In mTestTypes
-                .Add(kvp.Key, kvp.Value)
+                .Add(kvp.Key, kvp.Key + kvp.Value)
             Next
         End With
 
@@ -434,17 +441,25 @@ Public Class IHisResults
     '''             AG 14/02/2014 - BT #1505 ==> User can sort also by column ExportStatus
     '''             SA 29/04/2014 - BT #1608 ==> Added a hidden column for field TestLongName (this field has to be shown as Test Name in reports
     '''                                          when it is informed)
+    '''             SA 01/08/2014 - BT #1861 ==> Added new grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name
+    '''                                          Call new function to get the saved width of all visible grid columns and assign the value
     ''' </remarks>
     Private Sub InitializeResultHistoryGrid()
         Try
-            historyGridView.Columns.Clear()
+            '/**********************************************************************************************************************************/
+            '/*                                          READ BEFORE CHANGE THIS FUNCTION!!                                                    */
+            '/*                                                                                                                                */
+            '/* Each time a Column is ADDED/DELETED from this Grid, table tcfgGridColsConfiguration for ScreenID = HIS001 have to be updated   */
+            '/* to ADD/DELETE the row for the Column. When  property Name of a Column is changed, it is also needed to update ColumnName field */
+            '/* in that table                                                                                                                  */
+            '/**********************************************************************************************************************************/
 
+            historyGridView.Columns.Clear()
             InitializeGridNavigator()
 
             Dim column As DevExpress.XtraGrid.Columns.GridColumn
-
             With historyGridView
-                .OptionsView.AllowCellMerge = True
+                .OptionsView.AllowCellMerge = False
                 .OptionsView.GroupDrawMode = DevExpress.XtraGrid.Views.Grid.GroupDrawMode.Default
                 .OptionsView.ShowGroupedColumns = False
                 .OptionsView.ColumnAutoWidth = False
@@ -452,16 +467,12 @@ Public Class IHisResults
                 .OptionsView.ShowIndicator = False
 
                 .Appearance.Row.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center
-                '.Appearance.FocusedRow.ForeColor = Color.White
-                '.Appearance.FocusedRow.BackColor = Color.LightSlateGray
 
                 .OptionsHint.ShowColumnHeaderHints = False
-
                 .OptionsBehavior.Editable = False
                 .OptionsBehavior.ReadOnly = True
                 .OptionsCustomization.AllowFilter = False
                 .OptionsCustomization.AllowSort = True
-
                 .OptionsSelection.EnableAppearanceFocusedRow = True
                 .OptionsSelection.MultiSelect = True
 
@@ -482,7 +493,6 @@ Public Class IHisResults
             Dim largeTextEdit As DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit
             largeTextEdit = TryCast(historyGrid.RepositoryItems.Add("MemoEdit"),  _
                                     DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit)
-
 
             'Select Column
             column = historyGridView.Columns.Add()
@@ -515,10 +525,24 @@ Public Class IHisResults
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
-            'SamplePatient Column
+            'SpecimenID (Barcode) Column
             column = historyGridView.Columns.Add()
             With column
-                .Caption = GetText("LBL_PatientSample")
+                .Caption = GetText("MENU_BARCODE")
+                .FieldName = "SpecimenID"
+                .Name = "SpecimenID"
+                .Visible = True
+                .Width = 95
+                .OptionsColumn.AllowSize = True
+                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.True
+                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+            End With
+
+            'PatientID / SampleID Column
+            column = historyGridView.Columns.Add()
+            With column
+                .Caption = GetText("LBL_PatientID")
                 .FieldName = "PatientID"
                 .Name = "PatientID"
                 .Visible = True
@@ -526,7 +550,35 @@ Public Class IHisResults
                 .OptionsColumn.AllowSize = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.True
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near 'AG 26/10/2012
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+            End With
+
+            'Patient Family Name Column
+            column = historyGridView.Columns.Add()
+            With column
+                .Caption = GetText("LBL_LastName")
+                .FieldName = "LastName"
+                .Name = "FamilyName"
+                .Visible = True
+                .Width = 95
+                .OptionsColumn.AllowSize = True
+                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.True
+                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+            End With
+
+            'Patient Given Name Column
+            column = historyGridView.Columns.Add()
+            With column
+                .Caption = GetText("LBL_FirstName")
+                .FieldName = "FirstName"
+                .Name = "GivenName"
+                .Visible = True
+                .Width = 95
+                .OptionsColumn.AllowSize = True
+                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.True
+                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
             'StatFlagImage column
@@ -666,21 +718,21 @@ Public Class IHisResults
                 .ColumnEdit = pictureEdit
             End With
 
-            'Graph column
-            column = historyGridView.Columns.Add()
-            With column
-                .Caption = ""
-                .FieldName = "GraphImage"
-                .Name = "GraphImage"
-                .Visible = False 'No V1
-                .Width = 16
-                .OptionsColumn.AllowSize = False
-                .OptionsColumn.ShowCaption = False
-                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
-                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
-                .ColumnEdit = pictureEdit
-            End With
+            ''Graph column
+            'column = historyGridView.Columns.Add()
+            'With column
+            '    .Caption = ""
+            '    .FieldName = "GraphImage"
+            '    .Name = "GraphImage"
+            '    .Visible = False 'No V1
+            '    .Width = 16
+            '    .OptionsColumn.AllowSize = False
+            '    .OptionsColumn.ShowCaption = False
+            '    .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
+            '    .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
+            '    .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
+            '    .ColumnEdit = pictureEdit
+            'End With
 
             'Remarks column
             column = historyGridView.Columns.Add()
@@ -730,7 +782,7 @@ Public Class IHisResults
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
-            ' XB 03/10/2013
+            'XB 03/10/2013
             'TestPosition Column
             column = historyGridView.Columns.Add()
             With column
@@ -745,6 +797,19 @@ Public Class IHisResults
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
+
+            'Get the saved width of all visible grid columns and assign the value
+            Dim resultData As New GlobalDataTO
+            Dim myColWidthConfigDelegate As New GridColsConfigurationDelegate
+
+            resultData = myColWidthConfigDelegate.Read(Nothing, "HIS001", "historyGridView")
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                gridColWidthConfigDS = DirectCast(resultData.SetDatos, GridColsConfigDS)
+
+                For Each row As GridColsConfigDS.tcfgGridColsConfigurationRow In gridColWidthConfigDS.tcfgGridColsConfiguration
+                    historyGridView.Columns(row.ColumnName).Width = row.SavedWidth
+                Next
+            End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeResultHistoryGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -820,10 +885,13 @@ Public Class IHisResults
 
 #Region "Search"
     ''' <summary>
-    ''' Returns the selected search filter
+    ''' Fill a SearchFilter structure with filters selected in Search Area
     ''' </summary>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <returns>SearchFilter structure filled with filters selected in Search Area</returns>
+    ''' <remarks>
+    ''' Created by:  JB
+    ''' Modified by: SA 01/08/2014 - BT #1861 ==> Inform SpecimenID in the structure with value of the corresponding filter
+    ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
@@ -841,10 +909,8 @@ Public Class IHisResults
                 .dateTo = Nothing
             End If
 
-            .samplePatientID = sampleIdTextBox.Text
-
-            .sampleClasses = New List(Of String)
-            .sampleClasses.Add("PATIENT")
+            .patientData = bsPatientDataTextBox.Text
+            .specimenID = bsSpecimenIDTextBox.Text
 
             .statFlag = (From kvp As KeyValuePair(Of TriState, String) In mStatFlags _
                         Where kvp.Value = statFlagComboBox.SelectedItem.ToString _
@@ -860,7 +926,7 @@ Public Class IHisResults
                 If (elem.CheckState = CheckState.Checked) Then .testTypes.Add(elem.Value.ToString)
             Next
 
-            .testStartName = testNameTextBox.Text
+            .testName = testNameTextBox.Text
         End With
         Return filter
     End Function
@@ -870,19 +936,22 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 18/10/2012
-    ''' Modified by: AG 13/02/2014 - BT #1505
+    ''' Modified by: AG 13/02/2014 - BT #1505 ==> Added traces in the LOG 
+    '''              SA 01/08/2014 - BT #1861 ==> Changed the call to function GetHistoricalResultsByFilter due to its parameters have been changed
     ''' </remarks>
     Private Sub FindHistoricalResults()
         Dim myGlobalDataTO As New GlobalDataTO
         Dim myHisWSResultsDS As HisWSResultsDS
 
         historyGrid.DataSource = Nothing
-        If analyzerIDComboBox.Items.Count = 0 Then Exit Sub
+        If (analyzerIDComboBox.Items.Count = 0) Then Exit Sub
         Try
             UpdateFormBehavior(False)
 
             Me.Cursor = Cursors.WaitCursor
             Dim StartTime As DateTime = Now 'AG 13/02/2014 - #1505
+
+            'Get all informed filters
             Dim filter As SearchFilter = GetSearchFilter()
             With filter
                 'AG 14/02/2014 - #1505
@@ -891,21 +960,21 @@ Public Class IHisResults
                 CreateLogActivity("Days number to find: " & diffDays.Days.ToString, Me.Name & ".FindHistoricalResults", EventLogEntryType.Information, False)
                 'AG 14/02/2014 - #1505
 
-                myGlobalDataTO = myHisWSResultsDelegate.GetHistoricalResultsByFilter(Nothing, .analyzerId, .dateFrom, .dateTo, .samplePatientID, .sampleClasses, _
-                                                                                     .sampleTypes, .statFlag, .testTypes, .testStartName)
+                myGlobalDataTO = myHisWSResultsDelegate.GetHistoricalResultsByFilter(Nothing, .analyzerId, .dateFrom, .dateTo, .patientData, .sampleTypes, _
+                                                                                     .statFlag, .testTypes, .testName, String.Empty, .specimenID)
             End With
-            CreateLogActivity("GetHistoricalResultsByFilter: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".FindHistoricalResults", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
+
+            CreateLogActivity("GetHistoricalResultsByFilter: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".FindHistoricalResults", _
+                              EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
 
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 myHisWSResultsDS = DirectCast(myGlobalDataTO.SetDatos, HisWSResultsDS)
+
                 PrepareAndSetDataToGrid(myHisWSResultsDS.vhisWSResults)
                 'AG 13/02/2014 - #1505 NOTE: Do not add trace, it has already been added into method PrepareAndSetDataToGrid
-
-            ElseIf myGlobalDataTO.HasError Then
+            ElseIf (myGlobalDataTO.HasError) Then
                 ShowMessage(Me.Name & ".FindHistoricalResults", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
-
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FindHistoricalResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FindHistoricalResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -918,24 +987,25 @@ Public Class IHisResults
     ''' <summary>
     ''' Decodes the images of the row
     ''' </summary>
-    ''' <param name="pRow"></param>
     ''' <remarks>
-    ''' Created by: JB 19/10/2012 
+    ''' Created by:  JB 19/10/2012 
+    ''' Modified by: SA 01/08/2014 - Do not load the Icon for the ABS/Time Graph: the column is not visible
     ''' </remarks>
     Private Sub DecodeRowImages(ByRef pRow As HisWSResultsDS.vhisWSResultsRow)
         Try
             With pRow
-                If .StatFlag Then
+                If (.StatFlag) Then
                     .StatFlagImage = GetImageGrid("STATS")
                 Else
                     .StatFlagImage = GetImageGrid("ROUTINES")
                 End If
-                If .ExportStatus = "SENT" Then
+                If (.ExportStatus = "SENT") Then
                     .ExportImage = GetImageGrid("EXPORTHEAD")
                 End If
-                If .TestType = "STD" Then
-                    .GraphImage = GetImageGrid("AVG_ABS_GRAPH")
-                End If
+
+                'If .TestType = "STD" Then
+                '    .GraphImage = GetImageGrid("AVG_ABS_GRAPH")
+                'End If
             End With
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DecodeRowImages ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -946,7 +1016,6 @@ Public Class IHisResults
     ''' <summary>
     ''' Decodes the row texts
     ''' </summary>
-    ''' <param name="pRow"></param>
     ''' <remarks>
     ''' Created by: JB 19/10/2012
     ''' </remarks>
@@ -1007,8 +1076,8 @@ Public Class IHisResults
 
         Try
             UpdateFormBehavior(False)
-
             Dim StartTime As DateTime = Now 'AG 13/02/2014 - #1505
+
             For Each row As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable
                 'Mark the row as "not selected"
                 row.Selected = False
@@ -1043,9 +1112,11 @@ Public Class IHisResults
 #End Region
 
 #Region "Behavior"
-    ''' <summary></summary>
+    ''' <summary>
+    ''' Apply rights by User Level
+    ''' </summary>
     ''' <remarks>
-    ''' created by SG 31/05/2013
+    ''' Created by: SG 31/05/2013
     ''' </remarks>
     Private Sub ScreenStatusByUserLevel()
         Try
@@ -1068,8 +1139,8 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by: JB 18/10/2012
-    ''' Modified by: DL 25/04/2013. New condition for activate export status when any result NOT EXPORTED
-    ''' Modified AG 24/07/2014 - #1886 - RQ00086 v3.1.0 (allow re-sent patient results from history)
+    ''' Modified by: DL 25/04/2013 - New condition for activate export status when any result NOT EXPORTED
+    '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Allow re-sent patient results from history
     ''' </remarks>
     Private Sub UpdateFormBehavior(ByVal pStatus As Boolean)
         Try
@@ -1077,8 +1148,7 @@ Public Class IHisResults
             exitButton.Enabled = pStatus
 
             Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
-
-            historyDeleteButton.Enabled = pStatus AndAlso selectedRows.Count > 0
+            historyDeleteButton.Enabled = (pStatus AndAlso selectedRows.Count > 0)
 
             'AG 24/07/2014 - #1886 - RQ00086
             ''DL 25/04/2013
@@ -1107,7 +1177,7 @@ Public Class IHisResults
     ''' Modified by: SA 17/12/2012 - If an error has happened when expoting, shown it 
     '''              DL 24/04/2013 - 
     '''              AG 13/02/2014 - BT #1505
-    ''' Modified AG 24/07/2014 - #1886 - RQ00086 v3.1.0 (allow re-sent patient results from history)
+    '''              AG 24/07/2014 - #1886 - RQ00086 v3.1.0 (allow re-sent patient results from history)
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1300,9 +1370,8 @@ Public Class IHisResults
     End Sub
 
     ''' <summary>
-    ''' Enables/Disables the screen
+    ''' Enables/Disables screen buttons
     ''' </summary>
-    ''' <param name="pEnable"></param>
     ''' <remarks>
     ''' Created by:  SG 02/07/2013
     ''' </remarks>
@@ -1332,7 +1401,6 @@ Public Class IHisResults
     Private Sub OpenGraphScreen(ByVal pRow As HisWSResultsDS.vhisWSResultsRow)
         Try
             'TODO: Show the History Result Graph Screen 
-
         Catch ex As Exception
             Cursor = Cursors.Default
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenGraphScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

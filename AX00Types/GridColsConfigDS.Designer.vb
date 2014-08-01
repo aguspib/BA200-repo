@@ -405,7 +405,7 @@ Partial Public Class GridColsConfigDS
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtcfgGridColsConfigurationRow(ByVal ScreenID As String, ByVal GridName As String, ByVal ColumnName As String, ByVal DefaultWidth As Long, ByVal SavedWidth As Long) As tcfgGridColsConfigurationRow
+        Public Overloads Function AddtcfgGridColsConfigurationRow(ByVal ScreenID As String, ByVal GridName As String, ByVal ColumnName As String, ByVal DefaultWidth As Long, ByVal SavedWidth As Integer) As tcfgGridColsConfigurationRow
             Dim rowtcfgGridColsConfigurationRow As tcfgGridColsConfigurationRow = CType(Me.NewRow, tcfgGridColsConfigurationRow)
             Dim columnValuesArray() As Object = New Object() {ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth}
             rowtcfgGridColsConfigurationRow.ItemArray = columnValuesArray
@@ -448,7 +448,7 @@ Partial Public Class GridColsConfigDS
             MyBase.Columns.Add(Me.columnColumnName)
             Me.columnDefaultWidth = New Global.System.Data.DataColumn("DefaultWidth", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnDefaultWidth)
-            Me.columnSavedWidth = New Global.System.Data.DataColumn("SavedWidth", GetType(Long), Nothing, Global.System.Data.MappingType.Element)
+            Me.columnSavedWidth = New Global.System.Data.DataColumn("SavedWidth", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnSavedWidth)
         End Sub
 
@@ -657,16 +657,16 @@ Partial Public Class GridColsConfigDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property SavedWidth() As Long
+        Public Property SavedWidth() As Integer
             Get
                 Try
-                    Return CType(Me(Me.tabletcfgGridColsConfiguration.SavedWidthColumn), Long)
+                    Return CType(Me(Me.tabletcfgGridColsConfiguration.SavedWidthColumn), Integer)
                 Catch e As Global.System.InvalidCastException
                     Throw New Global.System.Data.StrongTypingException("The value for column 'SavedWidth' in table 'tcfgGridColsConfiguration' is DBNull." & _
                             "", e)
                 End Try
             End Get
-            Set(value As Long)
+            Set(value As Integer)
                 Me(Me.tabletcfgGridColsConfiguration.SavedWidthColumn) = value
             End Set
         End Property

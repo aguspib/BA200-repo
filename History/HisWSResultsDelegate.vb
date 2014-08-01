@@ -403,45 +403,46 @@ Namespace Biosystems.Ax00.BL
 
 #Region " Get Historical Results "
         ''' <summary>
-        ''' 
+        ''' Get all Historic Patient Results that fulfill the specified filters
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pSamplePatientId"></param>
-        ''' <param name="pSampleClasses"></param>
-        ''' <param name="pSampleTypes"></param>
-        ''' <param name="pStatFlag"></param>
-        ''' <param name="pTestTypes"></param>
-        ''' <param name="pTestStartName"></param>
-        ''' <returns></returns>
-        ''' <remarks>Modified by DL 23/10/2012 Add optional Worksession ID filter</remarks>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pPatientData">Part of the Patient ID, LastName or FirstName</param>
+        ''' <param name="pSampleTypes">List of Sample Types</param>
+        ''' <param name="pStatFlag">Priority Flag</param>
+        ''' <param name="pTestTypes">List of Test Types</param>
+        ''' <param name="pTestName">Part of the Test Name</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pSpecimenID">Part of the SpecimenID (Barcode)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Patient results that fulfill the
+        '''          specified search criteria</returns>
+        ''' <remarks>
+        ''' Created by:  JB 19/10/2012
+        ''' Modified by: DL 23/10/2012 - Added new optional parameter pWorkSessionID
+        '''              SA 01/08/2014 - BT #1861 ==> - Added new optional parameter pSpecimenID
+        '''                                           - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
+        ''' </remarks>
         Public Function GetHistoricalResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                      Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pSamplePatientId As String = "", Optional ByVal pSampleClasses As List(Of String) = Nothing, _
-                                                     Optional ByVal pSampleTypes As List(Of String) = Nothing, Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
-                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestStartName As String = "", _
-                                                     Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
-
+                                                     Optional ByVal pPatientData As String = "", Optional ByVal pSampleTypes As List(Of String) = Nothing, _
+                                                     Optional ByVal pStatFlag As TriState = TriState.UseDefault, _
+                                                     Optional ByVal pTestTypes As List(Of String) = Nothing, Optional ByVal pTestName As String = "", _
+                                                     Optional ByVal pWorkSessionID As String = "", Optional ByVal pSpecimenID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New thisWSResultsDAO
-                        resultData = myDAO.GetHistoricalResultsByFilter(dbConnection, pAnalyzerID, _
-                                                                        pDateFrom, pDateTo, _
-                                                                        pSamplePatientId, pSampleClasses, pSampleTypes, pStatFlag, _
-                                                                        pTestTypes, pTestStartName, pWorkSessionID)
-
+                        resultData = myDAO.GetHistoricalResultsByFilter(dbConnection, pAnalyzerID, pDateFrom, pDateTo, pPatientData, pSampleTypes, pStatFlag, _
+                                                                        pTestTypes, pTestName, pWorkSessionID, pSpecimenID)
                     End If
                 End If
-
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -453,12 +454,53 @@ Namespace Biosystems.Ax00.BL
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Get the Historic Blank and Calibrator Results that fulfill the specified filters
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pDateFrom">Initial Results Date</param>
+        ''' <param name="pDateTo">Final Result Date</param>
+        ''' <param name="pTestNameContains">Part of the Test Name</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSResultsDS.vhisWSResults with all the Blank and Calibrator results that 
+        '''          fulfill the specified search criteria</returns>
+        ''' <remarks>
+        ''' Created by:  AG 22/10/2012
+        ''' </remarks>
+        Public Function GetHistoricalBlankCalibResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                                               Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
+                                                               Optional ByVal pTestNameContains As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New thisWSResultsDAO
+                        resultData = myDAO.GetHistoricalBlankCalibResultsByFilter(dbConnection, pAnalyzerID, pDateFrom, pDateTo, pTestNameContains)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 
         ''' <summary>
         ''' Transform the historic AlarmList into a HisWSResultsDS.vhisWSResultsRow.Remarks (description of alarms in alarmList)
@@ -471,7 +513,8 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTo with error or not. pRow.Remark and RemarkAlert updated</returns>
         ''' <remarks>AG 22/10/2012 Creation
         ''' AG 13/02/2014 - #1505 Historic improvments - Not open connection, it is not used and method is called inside a wide loop</remarks>
-        Public Function GetAvgAlarmsForScreen(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pAlarmsDefinition As AlarmsDS, ByRef pRow As HisWSResultsDS.vhisWSResultsRow) As GlobalDataTO
+        Public Function GetAvgAlarmsForScreen(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pAlarmsDefinition As AlarmsDS, _
+                                              ByRef pRow As HisWSResultsDS.vhisWSResultsRow) As GlobalDataTO
             Dim resultData As New GlobalDataTO  'AG 13/02/2014 - #1505 'Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -530,54 +573,6 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForScreens", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-            End Try
-
-            Return resultData
-        End Function
-
-
-        ''' <summary>
-        ''' Get the historical blank and calibrator results with the selected filter in screen
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pDateFrom"></param>
-        ''' <param name="pDateTo"></param>
-        ''' <param name="pTestNameContains"></param>
-        ''' <returns>GlobalDataTo (data as HisWSResultsDS.vhisWSResults</returns>
-        ''' <remarks>AG 22/10/2012</remarks>
-        Public Function GetHistoricalBlankCalibResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                     Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _
-                                                     Optional ByVal pTestNameContains As String = "") As GlobalDataTO
-
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New thisWSResultsDAO
-                        resultData = myDAO.GetHistoricalBlankCalibResultsByFilter(dbConnection, pAnalyzerID, _
-                                                                        pDateFrom, pDateTo, pTestNameContains)
-
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
