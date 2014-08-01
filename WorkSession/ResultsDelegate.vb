@@ -4904,6 +4904,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: RH 19/03/2012 Label PatientID in Multilanguage
         '''              AG 27/05/2013 - Add new samples types LIQ and SER
         '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
+        '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
         ''' </remarks>
         Public Function GetResultsByPatientSampleForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                            ByVal pWorkSessionID As String, Optional ByVal GetReplicates As Boolean = True, _
@@ -4928,6 +4929,26 @@ Namespace Biosystems.Ax00.BL
                                                                  Order By row.TestPosition _
                                                                    Select row.OrderTestID Distinct).ToList()
 
+                            'AG 29/07/2014 - #1894 Get all orderTests that form part of a calculated test that has to be excluded from patients final report
+                            Dim orderCalcDelg As New OrderCalculatedTestsDelegate
+                            Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
+                            resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
+
+                                'Remove these orderTest from OrderTestList of STD tests
+                                If toExcludeFromReport.Count > 0 Then
+                                    Dim positionToDelete As Integer = 0
+                                    For Each item As Integer In toExcludeFromReport
+                                        If OrderTestList.Contains(item) Then
+                                            positionToDelete = OrderTestList.IndexOf(item)
+                                            OrderTestList.RemoveAt(positionToDelete)
+                                        End If
+                                    Next
+                                End If
+                            End If
+                            'AG 29/07/2014
+
                             'Get the Patient Results for the list of OrderTestIDs
                             Dim AverageResultsDS As New ResultsDS
                             Dim myResultsDelegate As New ResultsDelegate
@@ -4941,7 +4962,12 @@ Namespace Biosystems.Ax00.BL
                             resultData = myResultsDelegate.GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                                    'AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    End If
+                                    'AG 29/07/2014
                                 Next
                             End If
 
@@ -4949,7 +4975,12 @@ Namespace Biosystems.Ax00.BL
                             resultData = myResultsDelegate.GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                                    'AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    End If
+                                    'AG 29/07/2014
                                 Next resultRow
                             End If
 
@@ -5437,6 +5468,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 27/05/2013 - Add new samples types LIQ and SER
         '''              CF 25/09/2013 - Copied the GetResultsByPatientSampleForReport function and added the orderList param. 
         '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
+        '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
         ''' </remarks>
         Public Function GetResultsByPatientSampleForReportByOrderList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                            ByVal pWorkSessionID As String, ByVal pOrderList As List(Of String), _
@@ -5461,6 +5493,26 @@ Namespace Biosystems.Ax00.BL
                                                                  Order By row.TestPosition _
                                                                    Select row.OrderTestID Distinct).ToList()
 
+                            'AG 29/07/2014 - #1894 Get all orderTests that form part of a calculated test that has to be excluded from patients final report
+                            Dim orderCalcDelg As New OrderCalculatedTestsDelegate
+                            Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
+                            resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
+
+                                'Remove these orderTest from OrderTestList of STD tests
+                                If toExcludeFromReport.Count > 0 Then
+                                    Dim positionToDelete As Integer = 0
+                                    For Each item As Integer In toExcludeFromReport
+                                        If OrderTestList.Contains(item) Then
+                                            positionToDelete = OrderTestList.IndexOf(item)
+                                            OrderTestList.RemoveAt(positionToDelete)
+                                        End If
+                                    Next
+                                End If
+                            End If
+                            'AG 29/07/2014
+
                             'Get the Patient Results for the list of OrderTestIDs
                             Dim AverageResultsDS As New ResultsDS
                             Dim myResultsDelegate As New ResultsDelegate
@@ -5474,7 +5526,12 @@ Namespace Biosystems.Ax00.BL
                             resultData = myResultsDelegate.GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                                    'AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    End If
+                                    'AG 29/07/2014
                                 Next
                             End If
 
@@ -5482,7 +5539,12 @@ Namespace Biosystems.Ax00.BL
                             resultData = myResultsDelegate.GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                                    'AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    End If
+                                    'AG 29/07/2014
                                 Next resultRow
                             End If
 
