@@ -362,6 +362,63 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get all ordertests in worksession that form part of a calculated test
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ''' </remarks>
+        Public Function GetOrderTestsFormPartOfCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+
+                        cmdText = " SELECT OCT.OrderTestID ,CT.CalcTestID , ct.PrintExpTests  " & vbCrLf
+                        cmdText &= " FROM   twksOrderTests OT INNER JOIN tparCalculatedTests CT ON OT.TestID = CT.CalcTestID " & vbCrLf
+                        cmdText &= " INNER JOIN twksOrderCalculatedTests OCT ON OT.OrderTestID = OCT.CalcOrderTestID  " & vbCrLf
+                        cmdText &= " WHERE  OT.TestType = 'CALC'  " & vbCrLf
+
+                        Dim myDataSet As New OrderCalculatedTestsDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.twksOrderCalculatedTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksOrderCalculatedTestsDAO.GetOrderTestsFormPartOfCalculatedTest", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
 #End Region
 
     End Class
