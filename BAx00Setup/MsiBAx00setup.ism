@@ -5762,7 +5762,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>Patch1</td><td></td><td>TargetProductName</td><td>BA400</td></row>
 		<row><td>Patch2</td><td></td><td>AllowRemoval</td><td>0</td></row>
 		<row><td>Patch2</td><td></td><td>Classification</td><td> Update</td></row>
-		<row><td>Patch2</td><td></td><td>Description</td><td>Contact:  Your local administrator</td></row>
+		<row><td>Patch2</td><td></td><td>Description</td><td>3.0.2.2</td></row>
 		<row><td>Patch2</td><td></td><td>DisplayName</td><td>BA400</td></row>
 		<row><td>Patch2</td><td></td><td>ManufacturerName</td><td>BioSystems SA</td></row>
 		<row><td>Patch2</td><td></td><td>MoreInfoURL</td><td>www.biosystems.es</td></row>
