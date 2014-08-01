@@ -24,12 +24,14 @@ Partial Class IHisResults
     Private Sub InitializeComponent()
         Me.exitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.searchGroup = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsSpecimenIDTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsSpecimenIDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.subtitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.testTypeChkComboBox = New DevExpress.XtraEditors.CheckedComboBoxEdit()
         Me.sampleTypeChkComboBox = New DevExpress.XtraEditors.CheckedComboBoxEdit()
         Me.sampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.testNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
-        Me.sampleIdTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsPatientDataTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.analyzerIDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.testTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.statFlagLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -37,7 +39,7 @@ Partial Class IHisResults
         Me.statFlagComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
         Me.testNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.dateToDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
-        Me.sampleIdLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsPatientDataLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.dateToLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.dateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
         Me.dateFromLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -63,17 +65,19 @@ Partial Class IHisResults
         Me.exitButton.Location = New System.Drawing.Point(923, 614)
         Me.exitButton.Name = "exitButton"
         Me.exitButton.Size = New System.Drawing.Size(32, 32)
-        Me.exitButton.TabIndex = 0
+        Me.exitButton.TabIndex = 16
         Me.exitButton.UseVisualStyleBackColor = True
         '
         'searchGroup
         '
+        Me.searchGroup.Controls.Add(Me.bsSpecimenIDTextBox)
+        Me.searchGroup.Controls.Add(Me.bsSpecimenIDLabel)
         Me.searchGroup.Controls.Add(Me.subtitleLabel)
         Me.searchGroup.Controls.Add(Me.testTypeChkComboBox)
         Me.searchGroup.Controls.Add(Me.sampleTypeChkComboBox)
         Me.searchGroup.Controls.Add(Me.sampleTypeLabel)
         Me.searchGroup.Controls.Add(Me.testNameTextBox)
-        Me.searchGroup.Controls.Add(Me.sampleIdTextBox)
+        Me.searchGroup.Controls.Add(Me.bsPatientDataTextBox)
         Me.searchGroup.Controls.Add(Me.analyzerIDLabel)
         Me.searchGroup.Controls.Add(Me.testTypeLabel)
         Me.searchGroup.Controls.Add(Me.statFlagLabel)
@@ -81,17 +85,43 @@ Partial Class IHisResults
         Me.searchGroup.Controls.Add(Me.statFlagComboBox)
         Me.searchGroup.Controls.Add(Me.testNameLabel)
         Me.searchGroup.Controls.Add(Me.dateToDateTimePick)
-        Me.searchGroup.Controls.Add(Me.sampleIdLabel)
+        Me.searchGroup.Controls.Add(Me.bsPatientDataLabel)
         Me.searchGroup.Controls.Add(Me.dateToLabel)
         Me.searchGroup.Controls.Add(Me.dateFromDateTimePick)
         Me.searchGroup.Controls.Add(Me.dateFromLabel)
         Me.searchGroup.Controls.Add(Me.searchButton)
         Me.searchGroup.ForeColor = System.Drawing.Color.Black
-        Me.searchGroup.Location = New System.Drawing.Point(11, 10)
+        Me.searchGroup.Location = New System.Drawing.Point(10, 10)
         Me.searchGroup.Name = "searchGroup"
-        Me.searchGroup.Size = New System.Drawing.Size(957, 136)
+        Me.searchGroup.Size = New System.Drawing.Size(958, 130)
         Me.searchGroup.TabIndex = 26
         Me.searchGroup.TabStop = False
+        '
+        'bsSpecimenIDTextBox
+        '
+        Me.bsSpecimenIDTextBox.BackColor = System.Drawing.Color.White
+        Me.bsSpecimenIDTextBox.DecimalsValues = False
+        Me.bsSpecimenIDTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsSpecimenIDTextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsSpecimenIDTextBox.IsNumeric = False
+        Me.bsSpecimenIDTextBox.Location = New System.Drawing.Point(289, 101)
+        Me.bsSpecimenIDTextBox.Mandatory = False
+        Me.bsSpecimenIDTextBox.MaxLength = 30
+        Me.bsSpecimenIDTextBox.Name = "bsSpecimenIDTextBox"
+        Me.bsSpecimenIDTextBox.Size = New System.Drawing.Size(170, 21)
+        Me.bsSpecimenIDTextBox.TabIndex = 7
+        '
+        'bsSpecimenIDLabel
+        '
+        Me.bsSpecimenIDLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsSpecimenIDLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsSpecimenIDLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsSpecimenIDLabel.Location = New System.Drawing.Point(289, 83)
+        Me.bsSpecimenIDLabel.Name = "bsSpecimenIDLabel"
+        Me.bsSpecimenIDLabel.Size = New System.Drawing.Size(170, 13)
+        Me.bsSpecimenIDLabel.TabIndex = 86
+        Me.bsSpecimenIDLabel.Text = "* Barcode:"
+        Me.bsSpecimenIDLabel.Title = False
         '
         'subtitleLabel
         '
@@ -100,7 +130,7 @@ Partial Class IHisResults
         Me.subtitleLabel.ForeColor = System.Drawing.Color.Black
         Me.subtitleLabel.Location = New System.Drawing.Point(10, 15)
         Me.subtitleLabel.Name = "subtitleLabel"
-        Me.subtitleLabel.Size = New System.Drawing.Size(934, 20)
+        Me.subtitleLabel.Size = New System.Drawing.Size(938, 20)
         Me.subtitleLabel.TabIndex = 26
         Me.subtitleLabel.Text = "*Historical Results patient"
         Me.subtitleLabel.Title = True
@@ -108,8 +138,12 @@ Partial Class IHisResults
         'testTypeChkComboBox
         '
         Me.testTypeChkComboBox.EditValue = ""
-        Me.testTypeChkComboBox.Location = New System.Drawing.Point(701, 62)
+        Me.testTypeChkComboBox.Location = New System.Drawing.Point(707, 57)
         Me.testTypeChkComboBox.Name = "testTypeChkComboBox"
+        Me.testTypeChkComboBox.Properties.Appearance.BackColor = System.Drawing.Color.White
+        Me.testTypeChkComboBox.Properties.Appearance.ForeColor = System.Drawing.Color.Black
+        Me.testTypeChkComboBox.Properties.Appearance.Options.UseBackColor = True
+        Me.testTypeChkComboBox.Properties.Appearance.Options.UseForeColor = True
         Me.testTypeChkComboBox.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
         Me.testTypeChkComboBox.Properties.HideSelection = False
         Me.testTypeChkComboBox.Properties.LookAndFeel.UseDefaultLookAndFeel = False
@@ -120,13 +154,17 @@ Partial Class IHisResults
         Me.testTypeChkComboBox.Properties.ShowButtons = False
         Me.testTypeChkComboBox.Properties.ShowPopupCloseButton = False
         Me.testTypeChkComboBox.Size = New System.Drawing.Size(170, 20)
-        Me.testTypeChkComboBox.TabIndex = 85
+        Me.testTypeChkComboBox.TabIndex = 5
         '
         'sampleTypeChkComboBox
         '
         Me.sampleTypeChkComboBox.EditValue = ""
-        Me.sampleTypeChkComboBox.Location = New System.Drawing.Point(512, 106)
+        Me.sampleTypeChkComboBox.Location = New System.Drawing.Point(498, 101)
         Me.sampleTypeChkComboBox.Name = "sampleTypeChkComboBox"
+        Me.sampleTypeChkComboBox.Properties.Appearance.BackColor = System.Drawing.Color.White
+        Me.sampleTypeChkComboBox.Properties.Appearance.ForeColor = System.Drawing.Color.Black
+        Me.sampleTypeChkComboBox.Properties.Appearance.Options.UseBackColor = True
+        Me.sampleTypeChkComboBox.Properties.Appearance.Options.UseForeColor = True
         Me.sampleTypeChkComboBox.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
         Me.sampleTypeChkComboBox.Properties.DropDownRows = 15
         Me.sampleTypeChkComboBox.Properties.HideSelection = False
@@ -137,17 +175,17 @@ Partial Class IHisResults
         Me.sampleTypeChkComboBox.Properties.SelectAllItemCaption = "All"
         Me.sampleTypeChkComboBox.Properties.ShowButtons = False
         Me.sampleTypeChkComboBox.Properties.ShowPopupCloseButton = False
-        Me.sampleTypeChkComboBox.Size = New System.Drawing.Size(157, 20)
-        Me.sampleTypeChkComboBox.TabIndex = 84
+        Me.sampleTypeChkComboBox.Size = New System.Drawing.Size(170, 20)
+        Me.sampleTypeChkComboBox.TabIndex = 8
         '
         'sampleTypeLabel
         '
         Me.sampleTypeLabel.BackColor = System.Drawing.Color.Transparent
         Me.sampleTypeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.sampleTypeLabel.ForeColor = System.Drawing.Color.Black
-        Me.sampleTypeLabel.Location = New System.Drawing.Point(512, 91)
+        Me.sampleTypeLabel.Location = New System.Drawing.Point(498, 83)
         Me.sampleTypeLabel.Name = "sampleTypeLabel"
-        Me.sampleTypeLabel.Size = New System.Drawing.Size(157, 13)
+        Me.sampleTypeLabel.Size = New System.Drawing.Size(170, 13)
         Me.sampleTypeLabel.TabIndex = 83
         Me.sampleTypeLabel.Text = "* Sample Type:"
         Me.sampleTypeLabel.Title = False
@@ -157,31 +195,35 @@ Partial Class IHisResults
         Me.testNameTextBox.BackColor = System.Drawing.Color.White
         Me.testNameTextBox.DecimalsValues = False
         Me.testNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.testNameTextBox.ForeColor = System.Drawing.Color.Black
         Me.testNameTextBox.IsNumeric = False
-        Me.testNameTextBox.Location = New System.Drawing.Point(701, 106)
+        Me.testNameTextBox.Location = New System.Drawing.Point(707, 101)
         Me.testNameTextBox.Mandatory = False
+        Me.testNameTextBox.MaxLength = 16
         Me.testNameTextBox.Name = "testNameTextBox"
         Me.testNameTextBox.Size = New System.Drawing.Size(170, 21)
-        Me.testNameTextBox.TabIndex = 79
+        Me.testNameTextBox.TabIndex = 9
         '
-        'sampleIdTextBox
+        'bsPatientDataTextBox
         '
-        Me.sampleIdTextBox.BackColor = System.Drawing.Color.White
-        Me.sampleIdTextBox.DecimalsValues = False
-        Me.sampleIdTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.sampleIdTextBox.IsNumeric = False
-        Me.sampleIdTextBox.Location = New System.Drawing.Point(309, 62)
-        Me.sampleIdTextBox.Mandatory = False
-        Me.sampleIdTextBox.Name = "sampleIdTextBox"
-        Me.sampleIdTextBox.Size = New System.Drawing.Size(170, 21)
-        Me.sampleIdTextBox.TabIndex = 79
+        Me.bsPatientDataTextBox.BackColor = System.Drawing.Color.White
+        Me.bsPatientDataTextBox.DecimalsValues = False
+        Me.bsPatientDataTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsPatientDataTextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsPatientDataTextBox.IsNumeric = False
+        Me.bsPatientDataTextBox.Location = New System.Drawing.Point(289, 57)
+        Me.bsPatientDataTextBox.Mandatory = False
+        Me.bsPatientDataTextBox.MaxLength = 30
+        Me.bsPatientDataTextBox.Name = "bsPatientDataTextBox"
+        Me.bsPatientDataTextBox.Size = New System.Drawing.Size(170, 21)
+        Me.bsPatientDataTextBox.TabIndex = 3
         '
         'analyzerIDLabel
         '
         Me.analyzerIDLabel.BackColor = System.Drawing.Color.Transparent
         Me.analyzerIDLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.analyzerIDLabel.ForeColor = System.Drawing.Color.Black
-        Me.analyzerIDLabel.Location = New System.Drawing.Point(306, 91)
+        Me.analyzerIDLabel.Location = New System.Drawing.Point(10, 83)
         Me.analyzerIDLabel.Name = "analyzerIDLabel"
         Me.analyzerIDLabel.Size = New System.Drawing.Size(173, 13)
         Me.analyzerIDLabel.TabIndex = 77
@@ -193,9 +235,9 @@ Partial Class IHisResults
         Me.testTypeLabel.BackColor = System.Drawing.Color.Transparent
         Me.testTypeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.testTypeLabel.ForeColor = System.Drawing.Color.Black
-        Me.testTypeLabel.Location = New System.Drawing.Point(698, 47)
+        Me.testTypeLabel.Location = New System.Drawing.Point(707, 39)
         Me.testTypeLabel.Name = "testTypeLabel"
-        Me.testTypeLabel.Size = New System.Drawing.Size(173, 13)
+        Me.testTypeLabel.Size = New System.Drawing.Size(170, 13)
         Me.testTypeLabel.TabIndex = 78
         Me.testTypeLabel.Text = "* Test Type:"
         Me.testTypeLabel.Title = False
@@ -205,41 +247,43 @@ Partial Class IHisResults
         Me.statFlagLabel.BackColor = System.Drawing.Color.Transparent
         Me.statFlagLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.statFlagLabel.ForeColor = System.Drawing.Color.Black
-        Me.statFlagLabel.Location = New System.Drawing.Point(509, 47)
+        Me.statFlagLabel.Location = New System.Drawing.Point(498, 39)
         Me.statFlagLabel.Name = "statFlagLabel"
-        Me.statFlagLabel.Size = New System.Drawing.Size(160, 13)
+        Me.statFlagLabel.Size = New System.Drawing.Size(170, 13)
         Me.statFlagLabel.TabIndex = 78
         Me.statFlagLabel.Text = "* Stat Flag:"
         Me.statFlagLabel.Title = False
         '
         'analyzerIDComboBox
         '
+        Me.analyzerIDComboBox.BackColor = System.Drawing.Color.White
         Me.analyzerIDComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.analyzerIDComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.analyzerIDComboBox.ForeColor = System.Drawing.Color.Black
         Me.analyzerIDComboBox.FormattingEnabled = True
-        Me.analyzerIDComboBox.Location = New System.Drawing.Point(309, 106)
+        Me.analyzerIDComboBox.Location = New System.Drawing.Point(10, 101)
         Me.analyzerIDComboBox.Name = "analyzerIDComboBox"
-        Me.analyzerIDComboBox.Size = New System.Drawing.Size(170, 21)
-        Me.analyzerIDComboBox.TabIndex = 75
+        Me.analyzerIDComboBox.Size = New System.Drawing.Size(240, 21)
+        Me.analyzerIDComboBox.TabIndex = 6
         '
         'statFlagComboBox
         '
+        Me.statFlagComboBox.BackColor = System.Drawing.Color.White
         Me.statFlagComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.statFlagComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.statFlagComboBox.ForeColor = System.Drawing.Color.Black
         Me.statFlagComboBox.FormattingEnabled = True
-        Me.statFlagComboBox.Location = New System.Drawing.Point(512, 62)
+        Me.statFlagComboBox.Location = New System.Drawing.Point(498, 57)
         Me.statFlagComboBox.Name = "statFlagComboBox"
-        Me.statFlagComboBox.Size = New System.Drawing.Size(157, 21)
-        Me.statFlagComboBox.TabIndex = 76
+        Me.statFlagComboBox.Size = New System.Drawing.Size(170, 21)
+        Me.statFlagComboBox.TabIndex = 4
         '
         'testNameLabel
         '
         Me.testNameLabel.BackColor = System.Drawing.Color.Transparent
         Me.testNameLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.testNameLabel.ForeColor = System.Drawing.Color.Black
-        Me.testNameLabel.Location = New System.Drawing.Point(701, 91)
+        Me.testNameLabel.Location = New System.Drawing.Point(707, 83)
         Me.testNameLabel.Name = "testNameLabel"
         Me.testNameLabel.Size = New System.Drawing.Size(170, 13)
         Me.testNameLabel.TabIndex = 66
@@ -256,31 +300,31 @@ Partial Class IHisResults
         Me.dateToDateTimePick.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.dateToDateTimePick.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.dateToDateTimePick.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dateToDateTimePick.Location = New System.Drawing.Point(162, 62)
+        Me.dateToDateTimePick.Location = New System.Drawing.Point(142, 57)
         Me.dateToDateTimePick.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.dateToDateTimePick.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.dateToDateTimePick.Name = "dateToDateTimePick"
         Me.dateToDateTimePick.Size = New System.Drawing.Size(108, 21)
-        Me.dateToDateTimePick.TabIndex = 64
+        Me.dateToDateTimePick.TabIndex = 2
         '
-        'sampleIdLabel
+        'bsPatientDataLabel
         '
-        Me.sampleIdLabel.BackColor = System.Drawing.Color.Transparent
-        Me.sampleIdLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.sampleIdLabel.ForeColor = System.Drawing.Color.Black
-        Me.sampleIdLabel.Location = New System.Drawing.Point(309, 47)
-        Me.sampleIdLabel.Name = "sampleIdLabel"
-        Me.sampleIdLabel.Size = New System.Drawing.Size(170, 13)
-        Me.sampleIdLabel.TabIndex = 66
-        Me.sampleIdLabel.Text = "* Patient ID\Sample ID:"
-        Me.sampleIdLabel.Title = False
+        Me.bsPatientDataLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsPatientDataLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsPatientDataLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsPatientDataLabel.Location = New System.Drawing.Point(289, 39)
+        Me.bsPatientDataLabel.Name = "bsPatientDataLabel"
+        Me.bsPatientDataLabel.Size = New System.Drawing.Size(170, 13)
+        Me.bsPatientDataLabel.TabIndex = 66
+        Me.bsPatientDataLabel.Text = "* Patient data:"
+        Me.bsPatientDataLabel.Title = False
         '
         'dateToLabel
         '
         Me.dateToLabel.BackColor = System.Drawing.Color.Transparent
         Me.dateToLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.dateToLabel.ForeColor = System.Drawing.Color.Black
-        Me.dateToLabel.Location = New System.Drawing.Point(162, 47)
+        Me.dateToLabel.Location = New System.Drawing.Point(142, 39)
         Me.dateToLabel.Name = "dateToLabel"
         Me.dateToLabel.Size = New System.Drawing.Size(108, 13)
         Me.dateToLabel.TabIndex = 66
@@ -297,19 +341,19 @@ Partial Class IHisResults
         Me.dateFromDateTimePick.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.dateFromDateTimePick.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.dateFromDateTimePick.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dateFromDateTimePick.Location = New System.Drawing.Point(33, 62)
+        Me.dateFromDateTimePick.Location = New System.Drawing.Point(10, 57)
         Me.dateFromDateTimePick.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.dateFromDateTimePick.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.dateFromDateTimePick.Name = "dateFromDateTimePick"
         Me.dateFromDateTimePick.Size = New System.Drawing.Size(108, 21)
-        Me.dateFromDateTimePick.TabIndex = 63
+        Me.dateFromDateTimePick.TabIndex = 1
         '
         'dateFromLabel
         '
         Me.dateFromLabel.BackColor = System.Drawing.Color.Transparent
         Me.dateFromLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.dateFromLabel.ForeColor = System.Drawing.Color.Black
-        Me.dateFromLabel.Location = New System.Drawing.Point(33, 47)
+        Me.dateFromLabel.Location = New System.Drawing.Point(10, 39)
         Me.dateFromLabel.Name = "dateFromLabel"
         Me.dateFromLabel.Size = New System.Drawing.Size(108, 13)
         Me.dateFromLabel.TabIndex = 65
@@ -319,10 +363,10 @@ Partial Class IHisResults
         'searchButton
         '
         Me.searchButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.searchButton.Location = New System.Drawing.Point(912, 50)
+        Me.searchButton.Location = New System.Drawing.Point(916, 49)
         Me.searchButton.Name = "searchButton"
         Me.searchButton.Size = New System.Drawing.Size(32, 32)
-        Me.searchButton.TabIndex = 4
+        Me.searchButton.TabIndex = 10
         Me.searchButton.UseVisualStyleBackColor = True
         '
         'historyGroup
@@ -333,28 +377,28 @@ Partial Class IHisResults
         Me.historyGroup.Controls.Add(Me.exportButton)
         Me.historyGroup.Controls.Add(Me.historyDeleteButton)
         Me.historyGroup.ForeColor = System.Drawing.Color.Black
-        Me.historyGroup.Location = New System.Drawing.Point(11, 144)
+        Me.historyGroup.Location = New System.Drawing.Point(10, 140)
         Me.historyGroup.Name = "historyGroup"
-        Me.historyGroup.Size = New System.Drawing.Size(957, 465)
+        Me.historyGroup.Size = New System.Drawing.Size(958, 465)
         Me.historyGroup.TabIndex = 27
         Me.historyGroup.TabStop = False
         '
         'CompactPrintButton
         '
         Me.CompactPrintButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CompactPrintButton.Location = New System.Drawing.Point(912, 134)
+        Me.CompactPrintButton.Location = New System.Drawing.Point(916, 129)
         Me.CompactPrintButton.Name = "CompactPrintButton"
         Me.CompactPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.CompactPrintButton.TabIndex = 29
+        Me.CompactPrintButton.TabIndex = 15
         Me.CompactPrintButton.UseVisualStyleBackColor = True
         '
         'PrintButton
         '
         Me.PrintButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.PrintButton.Location = New System.Drawing.Point(912, 96)
+        Me.PrintButton.Location = New System.Drawing.Point(916, 91)
         Me.PrintButton.Name = "PrintButton"
         Me.PrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.PrintButton.TabIndex = 28
+        Me.PrintButton.TabIndex = 14
         Me.PrintButton.UseVisualStyleBackColor = True
         '
         'historyGrid
@@ -370,12 +414,12 @@ Partial Class IHisResults
         Me.historyGrid.EmbeddedNavigator.Buttons.Prev.Visible = False
         Me.historyGrid.EmbeddedNavigator.Buttons.Remove.Visible = False
         Me.historyGrid.EmbeddedNavigator.TextStringFormat = "{0} / {1}"
-        Me.historyGrid.Location = New System.Drawing.Point(10, 20)
+        Me.historyGrid.Location = New System.Drawing.Point(10, 15)
         Me.historyGrid.LookAndFeel.UseWindowsXPTheme = True
         Me.historyGrid.MainView = Me.historyGridView
         Me.historyGrid.Name = "historyGrid"
-        Me.historyGrid.Size = New System.Drawing.Size(893, 439)
-        Me.historyGrid.TabIndex = 3
+        Me.historyGrid.Size = New System.Drawing.Size(900, 444)
+        Me.historyGrid.TabIndex = 11
         Me.historyGrid.UseEmbeddedNavigator = True
         Me.historyGrid.ViewCollection.AddRange(New DevExpress.XtraGrid.Views.Base.BaseView() {Me.historyGridView})
         '
@@ -474,20 +518,20 @@ Partial Class IHisResults
         '
         Me.exportButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.exportButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.exportButton.Location = New System.Drawing.Point(912, 58)
+        Me.exportButton.Location = New System.Drawing.Point(916, 53)
         Me.exportButton.Name = "exportButton"
         Me.exportButton.Size = New System.Drawing.Size(32, 32)
-        Me.exportButton.TabIndex = 2
+        Me.exportButton.TabIndex = 13
         Me.exportButton.UseVisualStyleBackColor = True
         '
         'historyDeleteButton
         '
         Me.historyDeleteButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.historyDeleteButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.historyDeleteButton.Location = New System.Drawing.Point(912, 20)
+        Me.historyDeleteButton.Location = New System.Drawing.Point(916, 15)
         Me.historyDeleteButton.Name = "historyDeleteButton"
         Me.historyDeleteButton.Size = New System.Drawing.Size(32, 32)
-        Me.historyDeleteButton.TabIndex = 2
+        Me.historyDeleteButton.TabIndex = 12
         Me.historyDeleteButton.UseVisualStyleBackColor = True
         '
         'IHisResults
@@ -538,8 +582,8 @@ Partial Class IHisResults
     Friend WithEvents statFlagLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents analyzerIDComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents statFlagComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
-    Friend WithEvents sampleIdTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
-    Friend WithEvents sampleIdLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsPatientDataTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsPatientDataLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents sampleTypeLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents sampleTypeChkComboBox As DevExpress.XtraEditors.CheckedComboBoxEdit
     Friend WithEvents testTypeChkComboBox As DevExpress.XtraEditors.CheckedComboBoxEdit
@@ -549,4 +593,6 @@ Partial Class IHisResults
     Friend WithEvents exportButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents PrintButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents CompactPrintButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents bsSpecimenIDTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsSpecimenIDLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
 End Class
