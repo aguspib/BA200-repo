@@ -1,3 +1,17 @@
+Private Sub DetailsTabPage_Click(sender As Object, e As EventArgs)
+
+End Sub
+
+Private Sub bsSlopeA2UpDown_KeyPress(sender As Object, e As KeyPressEventArgs)
+
+End Sub
+Private Sub RealNumericUpDown_KeyPress(sender As Object, e As KeyPressEventArgs)
+
+End Sub
+
+Private Sub bsSlopeA2UpDown_KeyPress(sender As Object, e As KeyPressEventArgs)
+
+End Sub
 Option Strict On
 Option Explicit On
 
@@ -4115,4 +4129,5 @@ Public Class IProgISETest
 
 
 
-End Class
+
+   

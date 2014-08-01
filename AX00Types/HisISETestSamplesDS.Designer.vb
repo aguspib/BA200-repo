@@ -297,6 +297,10 @@ Partial Public Class HisISETestSamplesDS
         
         Private columnTestLongName As Global.System.Data.DataColumn
 
+        Private columnSlopeFactorA2 As Global.System.Data.DataColumn
+
+        Private columnSlopeFactorB2 As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -389,6 +393,22 @@ Partial Public Class HisISETestSamplesDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property SlopeFactorA2Column() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnSlopeFactorA2
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property SlopeFactorB2Column() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnSlopeFactorB2
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -425,9 +445,9 @@ Partial Public Class HisISETestSamplesDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddthisISETestSamplesRow(ByVal HistISETestID As Integer, ByVal ISETestID As Integer, ByVal SampleType As String, ByVal ISETestName As String, ByVal MeasureUnit As String, ByVal DecimalsAllowed As Integer, ByVal TestLongName As String) As thisISETestSamplesRow
+        Public Overloads Function AddthisISETestSamplesRow(ByVal HistISETestID As Integer, ByVal ISETestID As Integer, ByVal SampleType As String, ByVal ISETestName As String, ByVal MeasureUnit As String, ByVal DecimalsAllowed As Integer, ByVal TestLongName As String, ByVal SlopeFactorA2 As Single, ByVal SlopeFactorB2 As Single) As thisISETestSamplesRow
             Dim rowthisISETestSamplesRow As thisISETestSamplesRow = CType(Me.NewRow, thisISETestSamplesRow)
-            Dim columnValuesArray() As Object = New Object() {HistISETestID, ISETestID, SampleType, ISETestName, MeasureUnit, DecimalsAllowed, TestLongName}
+            Dim columnValuesArray() As Object = New Object() {HistISETestID, ISETestID, SampleType, ISETestName, MeasureUnit, DecimalsAllowed, TestLongName, SlopeFactorA2, SlopeFactorB2}
             rowthisISETestSamplesRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowthisISETestSamplesRow)
             Return rowthisISETestSamplesRow
@@ -457,6 +477,8 @@ Partial Public Class HisISETestSamplesDS
             Me.columnMeasureUnit = MyBase.Columns("MeasureUnit")
             Me.columnDecimalsAllowed = MyBase.Columns("DecimalsAllowed")
             Me.columnTestLongName = MyBase.Columns("TestLongName")
+            Me.columnSlopeFactorA2 = MyBase.Columns("SlopeFactorA2")
+            Me.columnSlopeFactorB2 = MyBase.Columns("SlopeFactorB2")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -476,6 +498,10 @@ Partial Public Class HisISETestSamplesDS
             MyBase.Columns.Add(Me.columnDecimalsAllowed)
             Me.columnTestLongName = New Global.System.Data.DataColumn("TestLongName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTestLongName)
+            Me.columnSlopeFactorA2 = New Global.System.Data.DataColumn("SlopeFactorA2", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnSlopeFactorA2)
+            Me.columnSlopeFactorB2 = New Global.System.Data.DataColumn("SlopeFactorB2", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnSlopeFactorB2)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -727,6 +753,36 @@ Partial Public Class HisISETestSamplesDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property SlopeFactorA2() As Single
+            Get
+                Try
+                    Return CType(Me(Me.tablethisISETestSamples.SlopeFactorA2Column), Single)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'SlopeFactorA2' in table 'thisISETestSamples' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Single)
+                Me(Me.tablethisISETestSamples.SlopeFactorA2Column) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property SlopeFactorB2() As Single
+            Get
+                Try
+                    Return CType(Me(Me.tablethisISETestSamples.SlopeFactorB2Column), Single)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'SlopeFactorB2' in table 'thisISETestSamples' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Single)
+                Me(Me.tablethisISETestSamples.SlopeFactorB2Column) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsHistISETestIDNull() As Boolean
             Return Me.IsNull(Me.tablethisISETestSamples.HistISETestIDColumn)
         End Function
@@ -807,6 +863,30 @@ Partial Public Class HisISETestSamplesDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetTestLongNameNull()
             Me(Me.tablethisISETestSamples.TestLongNameColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsSlopeFactorA2Null() As Boolean
+            Return Me.IsNull(Me.tablethisISETestSamples.SlopeFactorA2Column)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetSlopeFactorA2Null()
+            Me(Me.tablethisISETestSamples.SlopeFactorA2Column) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsSlopeFactorB2Null() As Boolean
+            Return Me.IsNull(Me.tablethisISETestSamples.SlopeFactorB2Column)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetSlopeFactorB2Null()
+            Me(Me.tablethisISETestSamples.SlopeFactorB2Column) = Global.System.Convert.DBNull
         End Sub
     End Class
     

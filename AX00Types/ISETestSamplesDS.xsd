@@ -37,6 +37,8 @@
               <xs:element name="NumberOfSeries" msprop:Generator_ColumnVarNameInTable="columnNumberOfSeries" msprop:Generator_ColumnPropNameInRow="NumberOfSeries" msprop:Generator_ColumnPropNameInTable="NumberOfSeriesColumn" msprop:Generator_UserColumnName="NumberOfSeries" type="xs:int" minOccurs="0" />
               <xs:element name="TotalAllowedError" msprop:Generator_ColumnVarNameInTable="columnTotalAllowedError" msprop:Generator_ColumnPropNameInRow="TotalAllowedError" msprop:Generator_ColumnPropNameInTable="TotalAllowedErrorColumn" msprop:Generator_UserColumnName="TotalAllowedError" type="xs:float" minOccurs="0" />
               <xs:element name="TestLongName" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
+              <xs:element name="SlopeFactorA2" msprop:Generator_ColumnVarNameInTable="columnSlopeFactorA2" msprop:Generator_ColumnPropNameInRow="SlopeFactorA2" msprop:nullValue="_throw" msprop:Generator_ColumnPropNameInTable="SlopeFactorA2Column" msprop:Generator_UserColumnName="SlopeFactorA2" type="xs:float" minOccurs="0" />
+              <xs:element name="SlopeFactorB2" msprop:Generator_ColumnVarNameInTable="columnSlopeFactorB2" msprop:Generator_ColumnPropNameInRow="SlopeFactorB2" msprop:Generator_ColumnPropNameInTable="SlopeFactorB2Column" msprop:Generator_UserColumnName="SlopeFactorB2" type="xs:float" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

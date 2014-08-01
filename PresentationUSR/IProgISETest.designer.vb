@@ -34,6 +34,7 @@ Partial Class IProgISETest
         Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsCalTestDefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsReportNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.bsReportNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsDecimalsUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
         Me.bsDecimalsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -75,6 +76,12 @@ Partial Class IProgISETest
         Me.QCReplicNumberNumeric = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
         Me.ControlReplicatesNumberLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.DetailsTabPage = New System.Windows.Forms.TabPage()
+        Me.bsSeparatorPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsSlopeB2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSlopeA2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSlopeFunctionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSlopeB2UpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsSlopeA2UpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
         Me.bsTestRefRanges = New BSReferenceRanges()
         Me.bsDilutionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsDilutionUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
@@ -91,9 +98,16 @@ Partial Class IProgISETest
         Me.bsISETestsListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.DecimalsUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
         Me.ReportsNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
-        Me.bsReportNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.ReportNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.DecimalsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.SlopeFunctionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.SlopeAUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.SlopeBUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.ALabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.Separa2 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsReferenceRangesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.ReferenceRangesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsCalTestDefGroupBox.SuspendLayout()
         CType(Me.bsDecimalsUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.bsSampleTypePlusPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -110,11 +124,15 @@ Partial Class IProgISETest
         CType(Me.QCRejectionCriteria, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.QCReplicNumberNumeric, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.DetailsTabPage.SuspendLayout()
+        CType(Me.bsSlopeB2UpDown, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.bsSlopeA2UpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.bsDilutionUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.bsVolumeUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsISETestsListGroupBox.SuspendLayout()
         CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.SlopeAUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.SlopeBUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'bsExitButton
@@ -219,6 +237,19 @@ Partial Class IProgISETest
         Me.bsCalTestDefGroupBox.Size = New System.Drawing.Size(719, 598)
         Me.bsCalTestDefGroupBox.TabIndex = 14
         Me.bsCalTestDefGroupBox.TabStop = False
+        '
+        'bsReportNameTextBox
+        '
+        Me.bsReportNameTextBox.BackColor = System.Drawing.Color.White
+        Me.bsReportNameTextBox.DecimalsValues = False
+        Me.bsReportNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsReportNameTextBox.IsNumeric = False
+        Me.bsReportNameTextBox.Location = New System.Drawing.Point(10, 139)
+        Me.bsReportNameTextBox.Mandatory = False
+        Me.bsReportNameTextBox.MaxLength = 80
+        Me.bsReportNameTextBox.Name = "bsReportNameTextBox"
+        Me.bsReportNameTextBox.Size = New System.Drawing.Size(414, 21)
+        Me.bsReportNameTextBox.TabIndex = 45
         '
         'bsReportNameLabel
         '
@@ -739,6 +770,13 @@ Partial Class IProgISETest
         'DetailsTabPage
         '
         Me.DetailsTabPage.BackColor = System.Drawing.Color.Gainsboro
+        Me.DetailsTabPage.Controls.Add(Me.bsReferenceRangesLabel)
+        Me.DetailsTabPage.Controls.Add(Me.bsSeparatorPanel)
+        Me.DetailsTabPage.Controls.Add(Me.bsSlopeB2Label)
+        Me.DetailsTabPage.Controls.Add(Me.bsSlopeA2Label)
+        Me.DetailsTabPage.Controls.Add(Me.bsSlopeFunctionLabel)
+        Me.DetailsTabPage.Controls.Add(Me.bsSlopeB2UpDown)
+        Me.DetailsTabPage.Controls.Add(Me.bsSlopeA2UpDown)
         Me.DetailsTabPage.Controls.Add(Me.bsTestRefRanges)
         Me.DetailsTabPage.Controls.Add(Me.bsDilutionLabel)
         Me.DetailsTabPage.Controls.Add(Me.bsDilutionUpDown)
@@ -750,6 +788,71 @@ Partial Class IProgISETest
         Me.DetailsTabPage.TabIndex = 1
         Me.DetailsTabPage.Text = "Details"
         '
+        'bsSeparatorPanel
+        '
+        Me.bsSeparatorPanel.BackColor = System.Drawing.Color.DarkGray
+        Me.bsSeparatorPanel.Location = New System.Drawing.Point(25, 42)
+        Me.bsSeparatorPanel.MaximumSize = New System.Drawing.Size(750, 1)
+        Me.bsSeparatorPanel.MinimumSize = New System.Drawing.Size(600, 1)
+        Me.bsSeparatorPanel.Name = "bsSeparatorPanel"
+        Me.bsSeparatorPanel.Size = New System.Drawing.Size(640, 1)
+        Me.bsSeparatorPanel.TabIndex = 242
+        '
+        'bsSlopeB2Label
+        '
+        Me.bsSlopeB2Label.AutoSize = True
+        Me.bsSlopeB2Label.BackColor = System.Drawing.Color.Transparent
+        Me.bsSlopeB2Label.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsSlopeB2Label.ForeColor = System.Drawing.Color.Black
+        Me.bsSlopeB2Label.Location = New System.Drawing.Point(335, 19)
+        Me.bsSlopeB2Label.Name = "bsSlopeB2Label"
+        Me.bsSlopeB2Label.Size = New System.Drawing.Size(14, 13)
+        Me.bsSlopeB2Label.TabIndex = 241
+        Me.bsSlopeB2Label.Text = "b"
+        Me.bsSlopeB2Label.Title = False
+        '
+        'bsSlopeA2Label
+        '
+        Me.bsSlopeA2Label.AutoSize = True
+        Me.bsSlopeA2Label.BackColor = System.Drawing.Color.Transparent
+        Me.bsSlopeA2Label.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsSlopeA2Label.ForeColor = System.Drawing.Color.Black
+        Me.bsSlopeA2Label.Location = New System.Drawing.Point(208, 19)
+        Me.bsSlopeA2Label.Name = "bsSlopeA2Label"
+        Me.bsSlopeA2Label.Size = New System.Drawing.Size(14, 13)
+        Me.bsSlopeA2Label.TabIndex = 240
+        Me.bsSlopeA2Label.Text = "a"
+        Me.bsSlopeA2Label.Title = False
+        '
+        'bsSlopeFunctionLabel
+        '
+        Me.bsSlopeFunctionLabel.AutoSize = True
+        Me.bsSlopeFunctionLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsSlopeFunctionLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsSlopeFunctionLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsSlopeFunctionLabel.Location = New System.Drawing.Point(17, 19)
+        Me.bsSlopeFunctionLabel.Name = "bsSlopeFunctionLabel"
+        Me.bsSlopeFunctionLabel.Size = New System.Drawing.Size(155, 13)
+        Me.bsSlopeFunctionLabel.TabIndex = 239
+        Me.bsSlopeFunctionLabel.Text = "Slope Function [y=ax+b]:"
+        Me.bsSlopeFunctionLabel.Title = False
+        '
+        'bsSlopeB2UpDown
+        '
+        Me.bsSlopeB2UpDown.Location = New System.Drawing.Point(353, 14)
+        Me.bsSlopeB2UpDown.Name = "bsSlopeB2UpDown"
+        Me.bsSlopeB2UpDown.Size = New System.Drawing.Size(73, 21)
+        Me.bsSlopeB2UpDown.TabIndex = 238
+        Me.bsSlopeB2UpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsSlopeA2UpDown
+        '
+        Me.bsSlopeA2UpDown.Location = New System.Drawing.Point(224, 14)
+        Me.bsSlopeA2UpDown.Name = "bsSlopeA2UpDown"
+        Me.bsSlopeA2UpDown.Size = New System.Drawing.Size(73, 21)
+        Me.bsSlopeA2UpDown.TabIndex = 237
+        Me.bsSlopeA2UpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsTestRefRanges
         '
         Me.bsTestRefRanges.ActiveRangeType = ""
@@ -758,7 +861,7 @@ Partial Class IProgISETest
         Me.bsTestRefRanges.ChangesMade = False
         Me.bsTestRefRanges.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsTestRefRanges.ForeColor = System.Drawing.Color.Black
-        Me.bsTestRefRanges.Location = New System.Drawing.Point(20, 20)
+        Me.bsTestRefRanges.Location = New System.Drawing.Point(20, 63)
         Me.bsTestRefRanges.Name = "bsTestRefRanges"
         Me.bsTestRefRanges.Size = New System.Drawing.Size(650, 252)
         Me.bsTestRefRanges.TabIndex = 236
@@ -937,19 +1040,6 @@ Partial Class IProgISETest
         Me.ReportsNameTextBox.TabIndex = 9
         Me.ReportsNameTextBox.WordWrap = False
         '
-        'bsReportNameTextBox
-        '
-        Me.bsReportNameTextBox.BackColor = System.Drawing.Color.White
-        Me.bsReportNameTextBox.DecimalsValues = False
-        Me.bsReportNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.bsReportNameTextBox.IsNumeric = False
-        Me.bsReportNameTextBox.Location = New System.Drawing.Point(10, 139)
-        Me.bsReportNameTextBox.Mandatory = False
-        Me.bsReportNameTextBox.MaxLength = 80
-        Me.bsReportNameTextBox.Name = "bsReportNameTextBox"
-        Me.bsReportNameTextBox.Size = New System.Drawing.Size(414, 21)
-        Me.bsReportNameTextBox.TabIndex = 45
-        '
         'ReportNameLabel
         '
         Me.ReportNameLabel.AutoSize = True
@@ -975,6 +1065,97 @@ Partial Class IProgISETest
         Me.DecimalsLabel.TabIndex = 42
         Me.DecimalsLabel.Text = "Decimals:"
         Me.DecimalsLabel.Title = False
+        '
+        'SlopeFunctionLabel
+        '
+        Me.SlopeFunctionLabel.AutoSize = True
+        Me.SlopeFunctionLabel.BackColor = System.Drawing.Color.Transparent
+        Me.SlopeFunctionLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.SlopeFunctionLabel.ForeColor = System.Drawing.Color.Black
+        Me.SlopeFunctionLabel.Location = New System.Drawing.Point(17, 19)
+        Me.SlopeFunctionLabel.Name = "SlopeFunctionLabel"
+        Me.SlopeFunctionLabel.Size = New System.Drawing.Size(155, 13)
+        Me.SlopeFunctionLabel.TabIndex = 239
+        Me.SlopeFunctionLabel.Text = "Slope Function [y=ax+b]:"
+        Me.SlopeFunctionLabel.Title = False
+        '
+        'SlopeAUpDown
+        '
+        Me.SlopeAUpDown.Location = New System.Drawing.Point(224, 14)
+        Me.SlopeAUpDown.Name = "SlopeAUpDown"
+        Me.SlopeAUpDown.Size = New System.Drawing.Size(73, 20)
+        Me.SlopeAUpDown.TabIndex = 237
+        Me.SlopeAUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'SlopeBUpDown
+        '
+        Me.SlopeBUpDown.Location = New System.Drawing.Point(353, 14)
+        Me.SlopeBUpDown.Name = "SlopeBUpDown"
+        Me.SlopeBUpDown.Size = New System.Drawing.Size(73, 20)
+        Me.SlopeBUpDown.TabIndex = 238
+        Me.SlopeBUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'ALabel
+        '
+        Me.ALabel.AutoSize = True
+        Me.ALabel.BackColor = System.Drawing.Color.Transparent
+        Me.ALabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.ALabel.ForeColor = System.Drawing.Color.Black
+        Me.ALabel.Location = New System.Drawing.Point(208, 19)
+        Me.ALabel.Name = "ALabel"
+        Me.ALabel.Size = New System.Drawing.Size(14, 13)
+        Me.ALabel.TabIndex = 240
+        Me.ALabel.Text = "a"
+        Me.ALabel.Title = False
+        '
+        'BLabel
+        '
+        Me.BLabel.AutoSize = True
+        Me.BLabel.BackColor = System.Drawing.Color.Transparent
+        Me.BLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.BLabel.ForeColor = System.Drawing.Color.Black
+        Me.BLabel.Location = New System.Drawing.Point(335, 19)
+        Me.BLabel.Name = "BLabel"
+        Me.BLabel.Size = New System.Drawing.Size(14, 13)
+        Me.BLabel.TabIndex = 241
+        Me.BLabel.Text = "b"
+        Me.BLabel.Title = False
+        '
+        'Separa2
+        '
+        Me.Separa2.BackColor = System.Drawing.Color.DarkGray
+        Me.Separa2.Location = New System.Drawing.Point(25, 41)
+        Me.Separa2.MaximumSize = New System.Drawing.Size(750, 1)
+        Me.Separa2.MinimumSize = New System.Drawing.Size(600, 1)
+        Me.Separa2.Name = "Separa2"
+        Me.Separa2.Size = New System.Drawing.Size(640, 1)
+        Me.Separa2.TabIndex = 242
+        '
+        'bsReferenceRangesLabel
+        '
+        Me.bsReferenceRangesLabel.AutoSize = True
+        Me.bsReferenceRangesLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsReferenceRangesLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsReferenceRangesLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsReferenceRangesLabel.Location = New System.Drawing.Point(17, 49)
+        Me.bsReferenceRangesLabel.Name = "bsReferenceRangesLabel"
+        Me.bsReferenceRangesLabel.Size = New System.Drawing.Size(114, 13)
+        Me.bsReferenceRangesLabel.TabIndex = 243
+        Me.bsReferenceRangesLabel.Text = "Reference Interval"
+        Me.bsReferenceRangesLabel.Title = False
+        '
+        'ReferenceRangesLabel
+        '
+        Me.ReferenceRangesLabel.AutoSize = True
+        Me.ReferenceRangesLabel.BackColor = System.Drawing.Color.Transparent
+        Me.ReferenceRangesLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.ReferenceRangesLabel.ForeColor = System.Drawing.Color.Black
+        Me.ReferenceRangesLabel.Location = New System.Drawing.Point(17, 49)
+        Me.ReferenceRangesLabel.Name = "ReferenceRangesLabel"
+        Me.ReferenceRangesLabel.Size = New System.Drawing.Size(114, 13)
+        Me.ReferenceRangesLabel.TabIndex = 243
+        Me.ReferenceRangesLabel.Text = "Reference Interval"
+        Me.ReferenceRangesLabel.Title = False
         '
         'IProgISETest
         '
@@ -1024,11 +1205,15 @@ Partial Class IProgISETest
         CType(Me.QCReplicNumberNumeric, System.ComponentModel.ISupportInitialize).EndInit()
         Me.DetailsTabPage.ResumeLayout(False)
         Me.DetailsTabPage.PerformLayout()
+        CType(Me.bsSlopeB2UpDown, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.bsSlopeA2UpDown, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.bsDilutionUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.bsVolumeUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsISETestsListGroupBox.ResumeLayout(False)
         CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.SlopeAUpDown, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.SlopeBUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -1100,4 +1285,18 @@ Partial Class IProgISETest
     Friend WithEvents ReportsNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents ReportNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents DecimalsLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsSlopeB2Label As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsSlopeA2Label As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsSlopeFunctionLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsSlopeB2UpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents bsSlopeA2UpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents SlopeFunctionLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents SlopeAUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents SlopeBUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents ALabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents BLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsSeparatorPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
+    Friend WithEvents Separa2 As Biosystems.Ax00.Controls.UserControls.BSPanel
+    Friend WithEvents bsReferenceRangesLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents ReferenceRangesLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
 End Class
