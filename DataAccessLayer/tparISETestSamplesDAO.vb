@@ -192,10 +192,22 @@ Namespace Biosystems.Ax00.DAL.DAO
                     End If
 
                     ' WE 30/07/2014 - #1865
-                    If (pISETestSamplesRow.IsTestLongNameNull) Then
-                        cmdText &= " TestLongName = NULL "
+                    If (pISETestSamplesRow.IsTestLongNameNull Or pISETestSamplesRow.TestLongName = String.Empty) Then
+                        cmdText &= " TestLongName = NULL, "
                     Else
-                        cmdText &= " TestLongName = N'" & pISETestSamplesRow.TestLongName & "' "
+                        cmdText &= " TestLongName = N'" & pISETestSamplesRow.TestLongName.ToString.Replace("'", "''") & "', "
+                    End If
+
+                    If (pISETestSamplesRow.IsSlopeFactorA2Null) Then
+                        cmdText &= " SlopeFactorA2 = NULL, "
+                    Else
+                        cmdText &= " SlopeFactorA2 = " & pISETestSamplesRow.SlopeFactorA2.ToSQLString() & ", "
+                    End If
+
+                    If (pISETestSamplesRow.IsSlopeFactorB2Null) Then
+                        cmdText &= " SlopeFactorB2 = NULL "
+                    Else
+                        cmdText &= " SlopeFactorB2 = " & pISETestSamplesRow.SlopeFactorB2.ToSQLString() & " "
                     End If
                     ' WE 30/07/2014 - #1865 - End
 

@@ -1,17 +1,3 @@
-Private Sub DetailsTabPage_Click(sender As Object, e As EventArgs)
-
-End Sub
-
-Private Sub bsSlopeA2UpDown_KeyPress(sender As Object, e As KeyPressEventArgs)
-
-End Sub
-Private Sub RealNumericUpDown_KeyPress(sender As Object, e As KeyPressEventArgs)
-
-End Sub
-
-Private Sub bsSlopeA2UpDown_KeyPress(sender As Object, e As KeyPressEventArgs)
-
-End Sub
 Option Strict On
 Option Explicit On
 
@@ -178,20 +164,26 @@ Public Class IProgISETest
 
             bsDecimalsUpDown.Text = qTestSamples.First().Decimals.ToString()
             
-            ' ToDo:
             ' SlopeFactorA2 and SlopeFactorB2
+            If qTestSamples.First().IsSlopeFactorA2Null Then
+                bsSlopeA2UpDown.Value = 0
+                bsSlopeA2UpDown.ResetText()
+            Else
+                bsSlopeA2UpDown.Text = CType(qTestSamples.First().SlopeFactorA2, Decimal).ToString()
+            End If
 
-
+            If qTestSamples.First().IsSlopeFactorB2Null Then
+                bsSlopeB2UpDown.Value = 0
+                bsSlopeB2UpDown.ResetText()
+            Else
+                bsSlopeB2UpDown.Text = CType(qTestSamples.First().SlopeFactorB2, Decimal).ToString()
+            End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestSamplesData " & Name, EventLogEntryType.Error, _
-                                                            GetApplicationInfoSession().ActivateSystemLog)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestSamplesData " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-
         End Try
     End Sub
-
-
 
     ''' <summary>
     ''' Execute the cancelling of a ISE Test edition
@@ -477,6 +469,13 @@ Public Class IProgISETest
 
             bsQCPanel.Enabled = True
 
+            ' WE 01/08/2014 - #1865
+            bsSlopeA2UpDown.Enabled = True
+            bsSlopeA2UpDown.BackColor = Color.White
+            bsSlopeB2UpDown.Enabled = True
+            bsSlopeB2UpDown.BackColor = Color.White
+            ' WE 01/08/2014 - #1865 - End
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".EditModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".EditModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -739,14 +738,19 @@ Public Class IProgISETest
             bsReportNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_ReportName", currentLanguage) + ":"   ' WE 30/07/2014 - #1865
             bsDecimalsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decimals", currentLanguage) + ":"     ' WE 30/07/2014 - #1865
 
-            DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage)
-
             'For Tooltips
             bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
             bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+
+            ' WE 01/08/2014 - #1865
+            ' Details tab
+            DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_Options", currentLanguage)
+            bsSlopeFunctionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_SlopeFunction", currentLanguage) + ":"
+            bsReferenceRangesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage) + ":"
+            ' WE 01/08/2014 - #1865 - End
 
             'For BSTestRefRanges
             bsTestRefRanges.TextForGenericRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Generic", currentLanguage)
@@ -920,6 +924,9 @@ Public Class IProgISETest
 
             'RH 05/06/2012
             InitializeQCTab()
+
+            ' WE 01/08/2014 - #1865
+            InitializeOptionsTab()
 
             InitializeReferenceRangesControl()
             bsTestRefRanges.isEditing = False
@@ -1449,6 +1456,13 @@ Public Class IProgISETest
 
             bsQCPanel.Enabled = False
 
+            ' WE 01/08/2014 - #1865
+            bsSlopeA2UpDown.Enabled = False
+            bsSlopeA2UpDown.BackColor = SystemColors.MenuBar
+            bsSlopeB2UpDown.Enabled = False
+            bsSlopeB2UpDown.BackColor = SystemColors.MenuBar
+            ' WE 01/08/2014 - #1865 - End
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".QueryModeScreenStatus", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".QueryModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1648,24 +1662,20 @@ Public Class IProgISETest
                             .Decimals = CByte(bsDecimalsUpDown.Value)
 
                             'TR 29/03/2010 Add the slope factor to save.
-                            'If SlopeAUpDown.Text <> "" Then
-                            '    qTestSampleRow.First().SlopeFactorA = CType(SlopeAUpDown.Value, Single)
-                            'Else
-                            '    'TR 21/06/2010
-                            '    qTestSampleRow.First().SetSlopeFactorANull()
-                            'End If
+                            If Not String.IsNullOrEmpty(bsSlopeA2UpDown.Text) Then
+                                .SlopeFactorA2 = CType(bsSlopeA2UpDown.Value, Single)
+                            Else
+                                'TR 21/06/2010
+                                .SetSlopeFactorA2Null()
+                            End If
 
-                            'If SlopeBUpDown.Text <> "" Then
-                            '    qTestSampleRow.First().SlopeFactorB = CType(SlopeBUpDown.Value, Single)
-                            'Else
-                            '    'TR 21/06/2010
-                            '    qTestSampleRow.First().SetSlopeFactorBNull()
-                            'End If
-
+                            If Not String.IsNullOrEmpty(bsSlopeB2UpDown.Text) Then
+                                .SlopeFactorB2 = CType(bsSlopeB2UpDown.Value, Single)
+                            Else
+                                'TR 21/06/2010
+                                .SetSlopeFactorB2Null()
+                            End If
                             ' WE 31/07/2014 - #1865 - End
-
-
-
 
                             If Not String.IsNullOrEmpty(QCReplicNumberNumeric.Text) Then
                                 .ControlReplicates = CInt(QCReplicNumberNumeric.Value)
@@ -1998,6 +2008,7 @@ Public Class IProgISETest
             ShowMessage(Name & "ScreenStatusByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
+
 
 #End Region
 
@@ -3092,8 +3103,6 @@ Public Class IProgISETest
         Return decimalsNumber
     End Function
 
-
-
     ''' <summary>
     ''' Set the limits and step increments for all Numeric UpDown controls on the main part of the form.
     ''' </summary>
@@ -3119,6 +3128,69 @@ Public Class IProgISETest
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetISETestControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Setup the limits and step increments of all Numeric UpDown controls on the Options tab page. 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 01/08/2014 - #1865 
+    ''' </remarks>
+    Private Sub SetDetailsControlLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            '** FIELDS IN OPTIONS TAB ** '
+            'Slope Factor A2
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.SLOPE_FACTOR_A2)
+            If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                bsSlopeA2UpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsSlopeA2UpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsSlopeA2UpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull Then
+                    bsSlopeA2UpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+            'Slope Factor B2
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.SLOPE_FACTOR_B2)
+            If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                bsSlopeB2UpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsSlopeB2UpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsSlopeB2UpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull Then
+                    SlopeBUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetDetailsControlLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Initializes Options tab controls.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 01/08/2014 - #1865 
+    ''' </remarks>
+    Private Sub InitializeOptionsTab()
+
+        Try
+            bsSlopeA2UpDown.Enabled = False
+            bsSlopeA2UpDown.BackColor = SystemColors.MenuBar
+            bsSlopeB2UpDown.Enabled = False
+            bsSlopeB2UpDown.BackColor = SystemColors.MenuBar
+
+            SetDetailsControlLimits()
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "InitializeOptionsTab " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3763,6 +3835,112 @@ Public Class IProgISETest
     '    End Try
     'End Sub
 
+
+
+
+    ''' <summary>
+    ''' Handler for NumericUpDown controls allowing numbers with decimals.
+    ''' Only numbers and the decimal separator are allowed.
+    ''' </summary>
+    ''' <remarks>
+    '''    Created by: WE 01/08/2014 - #1865. Same as used in IProgTest.
+    '''    Modified:   SA 09/11/2012 - Implementation changed
+    '''                TR 09/10/2013 - Bug #1315 allow too introduce  (-)minus on SlopeFactor A  B. 
+    '''                                to allow negative values introduce by key press.
+    ''' </remarks>
+    Private Sub RealNumericUpDown_KeyPress(sender As Object, e As KeyPressEventArgs) Handles bsSlopeA2UpDown.KeyPress, bsSlopeB2UpDown.KeyPress
+
+        Try
+            If (e.KeyChar = CChar("") OrElse e.KeyChar = ChrW(Keys.Back)) Then
+                e.Handled = False
+            Else
+                Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
+                If (e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",")) Then
+                    e.KeyChar = CChar(myDecimalSeparator)
+
+                    If (CType(sender, BSNumericUpDown).Text.Contains(".") Or CType(sender, BSNumericUpDown).Text.Contains(",")) Then
+                        e.Handled = True
+                    Else
+                        e.Handled = False
+                    End If
+                Else
+                    'TR 09/10/2013 -BUG #1315 -Validate if slope controls to allow the -
+                    If (CType(sender, BSNumericUpDown).Name = "bsSlopeA2UpDown" OrElse CType(sender, BSNumericUpDown).Name = "bsSlopeB2UpDown") Then
+                        'Validate if it's a numeric value and not the - character used to indicate negative values.
+                        If (Not IsNumeric(e.KeyChar) AndAlso Not e.KeyChar = "-") Then
+                            e.Handled = True
+                        ElseIf e.KeyChar = "-" Then
+                            'Allow only one -Simbol on control
+                            If CType(sender, BSNumericUpDown).Text.Contains("-") Then
+                                e.Handled = True
+                            End If
+                        End If
+                        'TR 09/10/2013 -BUG #1315 -END.
+                    Else
+                        If (Not IsNumeric(e.KeyChar)) Then
+                            e.Handled = True
+                        End If
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RealNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".RealNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Generic event handler to capture the NumericUpDown content deletion
+    ''' </summary>
+    ''' <remarks>
+    '''     Created by:  WE 01/08/2014 - #1865. Same as used in IProgTest.
+    '''     Modified by: SG 18/06/2010
+    ''' </remarks>
+    Private Sub NumericUpDown_KeyUp(sender As Object, e As KeyEventArgs) Handles bsSlopeA2UpDown.KeyUp, bsSlopeB2UpDown.KeyUp
+
+        Try
+            Dim miNumericUpDown As NumericUpDown = CType(sender, NumericUpDown)
+
+            If miNumericUpDown.Text <> "" Then
+
+            Else
+                miNumericUpDown.Value = miNumericUpDown.Minimum
+                miNumericUpDown.ResetText()
+            End If
+
+            If EditionMode Then
+                ChangesMade = True
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "NumericUpDown_KeyUp " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".NumericUpDown_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    Private Sub SlopeUpDown_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles bsSlopeA2UpDown.Validating, bsSlopeB2UpDown.Validating
+
+        Try
+            BsErrorProvider1.Clear()
+            ValidationError = False
+            If Not SlopeAUpDown.Text = "" AndAlso SlopeAUpDown.Value = 0 Then
+                BsErrorProvider1.SetError(SlopeAUpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+                ValidationError = True
+                SlopeAUpDown.Select()
+            ElseIf Not SlopeAUpDown.Text = "" AndAlso SlopeBUpDown.Text = "" Then
+                BsErrorProvider1.SetError(SlopeBUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+                ValidationError = True
+
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeAUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".SlopeAUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
 #End Region
 
 #Region "Events"
@@ -4128,6 +4306,6 @@ Public Class IProgISETest
 #End Region
 
 
-
-
    
+
+End Class

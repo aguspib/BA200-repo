@@ -301,6 +301,8 @@ Namespace Biosystems.Ax00.Global
             SAMPLES_VOLUME
             SLOPE_FACTOR_A
             SLOPE_FACTOR_B
+            SLOPE_FACTOR_A2
+            SLOPE_FACTOR_B2
             SUBSTRATE_DEPLETION
             TEST_NUM_DECIMALS
             TEST_NUM_REPLICATES
