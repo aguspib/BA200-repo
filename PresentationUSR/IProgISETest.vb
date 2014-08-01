@@ -133,6 +133,52 @@ Public Class IProgISETest
         Return inUse
     End Function
 
+
+
+    ''' <summary>
+    ''' Binds ISE Test Samples data to the corresponding screen fields.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 30/07/2014 - #1865
+    ''' </remarks>
+    Private Sub BindISETestSamplesData(ByVal pTestID As Integer, ByVal pSampleType As String)
+
+        Try
+ 
+            '        EditionMode = False
+
+            'For the selected ISE TestID/SampleType get data of field TestLongName, Decimals, SlopeFactorA2 and SlopeFactorB2
+            'from global DataSet SelectedISETestSamplesDS (loaded in function LoadSampleTypesList).
+            Dim qTestSamples As List(Of ISETestSamplesDS.tparISETestSamplesRow)
+
+            qTestSamples = (From a In SelectedISETestSamplesDS.tparISETestSamples _
+                            Where String.Compare(a.SampleType, pSampleType, False) = 0 _
+                            AndAlso a.ISETestID = pTestID _
+                            Select a).ToList()
+
+            If Not qTestSamples.First().IsTestLongNameNull Then
+                bsReportNameTextBox.Text = qTestSamples.First().TestLongName
+            Else
+                bsReportNameTextBox.ResetText()
+            End If
+
+            bsDecimalsUpDown.Text = qTestSamples.First().Decimals.ToString()
+            
+            ' ToDo:
+            ' SlopeFactorA2 and SlopeFactorB2
+
+
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BindISETestSamplesData " & Name, EventLogEntryType.Error, _
+                                                            GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+
+        End Try
+    End Sub
+
+
+
     ''' <summary>
     ''' Execute the cancelling of a ISE Test edition
     ''' </summary>
@@ -176,6 +222,8 @@ Public Class IProgISETest
                 If (bsISETestListView.SelectedItems.Count > 0) Then
                     'Load screen fields with all data of the selected ISE Test 
                     Dim inUseISETest As Boolean = BindISETestData()
+
+                    BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
 
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
@@ -354,6 +402,8 @@ Public Class IProgISETest
                         SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                     End If
 
+                    BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
+
                     BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                     'Get the Reference Ranges defined for the ISE Test and the selected SampleType and shown them
@@ -397,6 +447,14 @@ Public Class IProgISETest
             bsShortNameTextbox.BackColor = Color.White
 
             bsAvailableISETestCheckBox.Enabled = False
+
+            ' WE 30/07/2014 - #1865 
+            bsReportNameTextBox.Enabled = True
+            bsReportNameTextBox.BackColor = Color.White
+
+            bsDecimalsUpDown.Enabled = True
+            bsDecimalsUpDown.BackColor = Color.White
+            ' WE 30/07/2014 - #1865 - End
 
             bsSaveButton.Enabled = True
             bsCancelButton.Enabled = True
@@ -664,6 +722,8 @@ Public Class IProgISETest
             bsUnitLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", currentLanguage) + ":"
             bsSampleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", currentLanguage) + ":" 'AG 21/10/2010
             bsAvailableISETestCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AvailableISETest", currentLanguage)  'AG 21/10/2010
+            bsReportNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_ReportName", currentLanguage) + ":"   ' WE 30/07/2014 - #1865
+            bsDecimalsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decimals", currentLanguage) + ":"     ' WE 30/07/2014 - #1865
 
             DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage)
 
@@ -820,6 +880,17 @@ Public Class IProgISETest
 
             bsAvailableISETestCheckBox.CheckState = CheckState.Unchecked
             bsAvailableISETestCheckBox.Enabled = False
+
+            ' WE 31/07/2014 - #1865
+            bsReportNameTextBox.Text = ""
+            bsReportNameTextBox.Enabled = False
+            bsReportNameTextBox.BackColor = SystemColors.MenuBar
+
+            bsDecimalsUpDown.Enabled = False
+            bsDecimalsUpDown.BackColor = SystemColors.MenuBar
+
+            SetISETestControlsLimits()
+            ' WE 31/07/2014 - #1865 - End
 
             'Area of Reference Ranges
             InitializeReferenceRangesControl()
@@ -1265,6 +1336,8 @@ Public Class IProgISETest
                     SelectedSampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 End If
 
+                BindISETestSamplesData(SelectedISETestID, SelectedSampleType)    ' WE 30/07/2014 - #1865
+
                 BindISETestQCData(SelectedISETestID, SelectedSampleType)
 
                 'Get the Reference Ranges defined for the ISE Test and the selected SampleType and shown them
@@ -1340,6 +1413,14 @@ Public Class IProgISETest
             bsUnitComboBox.BackColor = SystemColors.MenuBar
 
             bsAvailableISETestCheckBox.Enabled = False
+
+            ' WE 30/07/2014 - #1865
+            bsReportNameTextBox.Enabled = False
+            bsReportNameTextBox.BackColor = SystemColors.MenuBar
+
+            bsDecimalsUpDown.Enabled = False
+            bsDecimalsUpDown.BackColor = SystemColors.MenuBar
+            ' WE 30/07/2014 - #1865 - End
 
             bsVolumeUpDown.Enabled = False
             bsVolumeUpDown.BackColor = SystemColors.MenuBar
@@ -1546,6 +1627,31 @@ Public Class IProgISETest
 
                             'RH 11/06/2012
                             .QCActive = QCActiveCheckBox.Checked
+
+                            ' WE 31/07/2014 - #1865
+                            .TestLongName = bsReportNameTextBox.Text.Trim
+
+                            .Decimals = CByte(bsDecimalsUpDown.Value)
+
+                            'TR 29/03/2010 Add the slope factor to save.
+                            'If SlopeAUpDown.Text <> "" Then
+                            '    qTestSampleRow.First().SlopeFactorA = CType(SlopeAUpDown.Value, Single)
+                            'Else
+                            '    'TR 21/06/2010
+                            '    qTestSampleRow.First().SetSlopeFactorANull()
+                            'End If
+
+                            'If SlopeBUpDown.Text <> "" Then
+                            '    qTestSampleRow.First().SlopeFactorB = CType(SlopeBUpDown.Value, Single)
+                            'Else
+                            '    'TR 21/06/2010
+                            '    qTestSampleRow.First().SetSlopeFactorBNull()
+                            'End If
+
+                            ' WE 31/07/2014 - #1865 - End
+
+
+
 
                             If Not String.IsNullOrEmpty(QCReplicNumberNumeric.Text) Then
                                 .ControlReplicates = CInt(QCReplicNumberNumeric.Value)
@@ -1813,18 +1919,18 @@ Public Class IProgISETest
                 Dim resultDataName As GlobalDataTO
                 Dim myISETestDelegateName As New ISETestsDelegate
 
-                resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "FNAME")
-                If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
-                    Dim myISETestsDSname As ISETestsDS
-                    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
+                'resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "FNAME")
+                'If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
+                '    Dim myISETestsDSname As ISETestsDS
+                '    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
 
-                    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
-                        fieldsOK = False
+                '    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
+                '        fieldsOK = False
 
-                        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
-                        bsFullNameTextbox.Focus()
-                    End If
-                End If
+                '        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
+                '        bsFullNameTextbox.Focus()
+                '    End If
+                'End If
                 ' WE 29/07/2014 - #1865 - End.
 
                 'All mandatory fields are informed, verify the informed ShortName is unique
@@ -2468,6 +2574,7 @@ Public Class IProgISETest
             QCReplicNumberNumeric.Enabled = pEnable
             QCRejectionCriteria.Enabled = pEnable
 
+            ' Six-Sigma Values Group Box is not used at this moment. Therefore its Visibility property is set to True at design-time.
             'SixSigmaValuesGroupBox.Enabled = pEnable
             QCErrorAllowable.Enabled = pEnable
             BsButton1.Enabled = pEnable
@@ -2970,6 +3077,37 @@ Public Class IProgISETest
 
         Return decimalsNumber
     End Function
+
+
+
+    ''' <summary>
+    ''' Set the limits and step increments for all Numeric UpDown controls on the main part of the form.
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: WE 31/07/2014 - #1865
+    ''' </remarks>
+    Private Sub SetISETestControlsLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            '** FIELDS IN MAIN PART OF SCREEN (ABOVE TAB CONTROL PART) ** '
+            'Decimals
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.CTEST_NUM_DECIMALS)
+            If (myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0) Then
+                bsDecimalsUpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsDecimalsUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsDecimalsUpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+
+                If (Not myFieldLimitsDS.tfmwFieldLimits(0).IsStepValueNull) Then
+                    bsDecimalsUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                End If
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetISETestControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
 
 #End Region
 
@@ -3922,7 +4060,8 @@ Public Class IProgISETest
     ''' Modified by: SA SA 12/01/2011 - Changes due to new implementation of Reference Ranges Control 
     ''' </remarks>
     Private Sub bsTextbox_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsFullNameTextbox.TextChanged, _
-                                                                                                   bsShortNameTextbox.TextChanged
+                                                                                                   bsShortNameTextbox.TextChanged, ReportsNameTextBox.TextChanged
+        ' WE 30/07/2014 - #1865 - Added ReportsNameTextBox.
         Try
             Dim myTextBox As New TextBox
             myTextBox = CType(sender, TextBox)

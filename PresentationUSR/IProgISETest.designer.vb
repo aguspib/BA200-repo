@@ -20,73 +20,82 @@ Partial Class IProgISETest
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgISETest))
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsISETestListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsISETestListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCalTestDefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsSampleTypePlusPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.bsUnitLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsAvailableISETestCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.bsUnitComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsSampleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsISETestTabControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl
-        Me.QCTabPage = New System.Windows.Forms.TabPage
-        Me.bsQCPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.DeleteControlButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.UsedControlsGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.AddControlLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.AddControls = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.ControlsSelectionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.SixSigmaValuesGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.QCErrorAllowable = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.ErrorAllowableLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.RulesToApplyGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.x10CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.s41CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.r4sCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.x22CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.s13CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.s12CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.QCValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.CalculationModeGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.QCMinNumSeries = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.MinimumNumSeries = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.StaticRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.ManualRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.QCActiveCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox
-        Me.ControlValuesGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.SDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.RejectionCriteriaLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.QCRejectionCriteria = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.QCReplicNumberNumeric = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.ControlReplicatesNumberLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.DetailsTabPage = New System.Windows.Forms.TabPage
-        Me.bsTestRefRanges = New BSReferenceRanges
-        Me.bsDilutionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDilutionUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.bsVolumeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsVolumeUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.bsSampleTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsISETestLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsShortNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsFullNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsFullNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.bsISETestsListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsISETestListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsISETestListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCalTestDefGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsReportNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDecimalsUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsDecimalsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSampleTypePlusPictureBox = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.bsUnitLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsAvailableISETestCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.bsUnitComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsSampleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsISETestTabControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl()
+        Me.QCTabPage = New System.Windows.Forms.TabPage()
+        Me.bsQCPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.DeleteControlButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.UsedControlsGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.AddControlLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.AddControls = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ControlsSelectionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.SixSigmaValuesGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsButton1 = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.QCErrorAllowable = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.ErrorAllowableLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.RulesToApplyGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.x10CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.x22CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.s13CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.s41CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.s12CheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.r4sCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.QCValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.CalculationModeGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.QCMinNumSeries = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.MinimumNumSeries = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.StaticRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.ManualRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.QCActiveCheckBox = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()
+        Me.ControlValuesGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.SDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.RejectionCriteriaLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.QCRejectionCriteria = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.QCReplicNumberNumeric = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.ControlReplicatesNumberLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.DetailsTabPage = New System.Windows.Forms.TabPage()
+        Me.bsTestRefRanges = New BSReferenceRanges()
+        Me.bsDilutionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDilutionUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsVolumeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsVolumeUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsSampleTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsISETestLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsShortNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsFullNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsFullNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsISETestsListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.DecimalsUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.ReportsNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsReportNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.ReportNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.DecimalsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsCalTestDefGroupBox.SuspendLayout()
+        CType(Me.bsDecimalsUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.bsSampleTypePlusPictureBox, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsISETestTabControl.SuspendLayout()
         Me.QCTabPage.SuspendLayout()
@@ -105,6 +114,7 @@ Partial Class IProgISETest
         CType(Me.bsVolumeUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsISETestsListGroupBox.SuspendLayout()
+        CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'bsExitButton
@@ -185,6 +195,10 @@ Partial Class IProgISETest
         '
         'bsCalTestDefGroupBox
         '
+        Me.bsCalTestDefGroupBox.Controls.Add(Me.bsReportNameTextBox)
+        Me.bsCalTestDefGroupBox.Controls.Add(Me.bsReportNameLabel)
+        Me.bsCalTestDefGroupBox.Controls.Add(Me.bsDecimalsUpDown)
+        Me.bsCalTestDefGroupBox.Controls.Add(Me.bsDecimalsLabel)
         Me.bsCalTestDefGroupBox.Controls.Add(Me.bsSampleTypePlusPictureBox)
         Me.bsCalTestDefGroupBox.Controls.Add(Me.bsUnitLabel)
         Me.bsCalTestDefGroupBox.Controls.Add(Me.bsAvailableISETestCheckBox)
@@ -206,10 +220,45 @@ Partial Class IProgISETest
         Me.bsCalTestDefGroupBox.TabIndex = 14
         Me.bsCalTestDefGroupBox.TabStop = False
         '
+        'bsReportNameLabel
+        '
+        Me.bsReportNameLabel.AutoSize = True
+        Me.bsReportNameLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsReportNameLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsReportNameLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsReportNameLabel.Location = New System.Drawing.Point(10, 122)
+        Me.bsReportNameLabel.Name = "bsReportNameLabel"
+        Me.bsReportNameLabel.Size = New System.Drawing.Size(87, 13)
+        Me.bsReportNameLabel.TabIndex = 44
+        Me.bsReportNameLabel.Text = "Report Name:"
+        Me.bsReportNameLabel.Title = False
+        '
+        'bsDecimalsUpDown
+        '
+        Me.bsDecimalsUpDown.ForeColor = System.Drawing.Color.Black
+        Me.bsDecimalsUpDown.Location = New System.Drawing.Point(594, 139)
+        Me.bsDecimalsUpDown.Name = "bsDecimalsUpDown"
+        Me.bsDecimalsUpDown.Size = New System.Drawing.Size(100, 21)
+        Me.bsDecimalsUpDown.TabIndex = 10
+        Me.bsDecimalsUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsDecimalsLabel
+        '
+        Me.bsDecimalsLabel.AutoSize = True
+        Me.bsDecimalsLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsDecimalsLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsDecimalsLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsDecimalsLabel.Location = New System.Drawing.Point(594, 122)
+        Me.bsDecimalsLabel.Name = "bsDecimalsLabel"
+        Me.bsDecimalsLabel.Size = New System.Drawing.Size(64, 13)
+        Me.bsDecimalsLabel.TabIndex = 42
+        Me.bsDecimalsLabel.Text = "Decimals:"
+        Me.bsDecimalsLabel.Title = False
+        '
         'bsSampleTypePlusPictureBox
         '
         Me.bsSampleTypePlusPictureBox.ImageLocation = ""
-        Me.bsSampleTypePlusPictureBox.Location = New System.Drawing.Point(218, 102)
+        Me.bsSampleTypePlusPictureBox.Location = New System.Drawing.Point(218, 100)
         Me.bsSampleTypePlusPictureBox.Name = "bsSampleTypePlusPictureBox"
         Me.bsSampleTypePlusPictureBox.PositionNumber = 0
         Me.bsSampleTypePlusPictureBox.Size = New System.Drawing.Size(21, 21)
@@ -234,7 +283,7 @@ Partial Class IProgISETest
         Me.bsAvailableISETestCheckBox.AutoSize = True
         Me.bsAvailableISETestCheckBox.Enabled = False
         Me.bsAvailableISETestCheckBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.bsAvailableISETestCheckBox.Location = New System.Drawing.Point(391, 104)
+        Me.bsAvailableISETestCheckBox.Location = New System.Drawing.Point(391, 102)
         Me.bsAvailableISETestCheckBox.Name = "bsAvailableISETestCheckBox"
         Me.bsAvailableISETestCheckBox.Size = New System.Drawing.Size(130, 17)
         Me.bsAvailableISETestCheckBox.TabIndex = 8
@@ -249,7 +298,7 @@ Partial Class IProgISETest
         Me.bsUnitComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsUnitComboBox.ForeColor = System.Drawing.Color.Black
         Me.bsUnitComboBox.FormattingEnabled = True
-        Me.bsUnitComboBox.Location = New System.Drawing.Point(594, 58)
+        Me.bsUnitComboBox.Location = New System.Drawing.Point(594, 57)
         Me.bsUnitComboBox.Name = "bsUnitComboBox"
         Me.bsUnitComboBox.Size = New System.Drawing.Size(112, 21)
         Me.bsUnitComboBox.TabIndex = 6
@@ -259,7 +308,7 @@ Partial Class IProgISETest
         Me.bsSampleLabel.BackColor = System.Drawing.Color.Transparent
         Me.bsSampleLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsSampleLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsSampleLabel.Location = New System.Drawing.Point(10, 84)
+        Me.bsSampleLabel.Location = New System.Drawing.Point(10, 82)
         Me.bsSampleLabel.Name = "bsSampleLabel"
         Me.bsSampleLabel.Size = New System.Drawing.Size(203, 13)
         Me.bsSampleLabel.TabIndex = 27
@@ -271,10 +320,10 @@ Partial Class IProgISETest
         Me.bsISETestTabControl.Controls.Add(Me.QCTabPage)
         Me.bsISETestTabControl.Controls.Add(Me.DetailsTabPage)
         Me.bsISETestTabControl.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.bsISETestTabControl.Location = New System.Drawing.Point(10, 132)
+        Me.bsISETestTabControl.Location = New System.Drawing.Point(10, 166)
         Me.bsISETestTabControl.Name = "bsISETestTabControl"
         Me.bsISETestTabControl.SelectedIndex = 0
-        Me.bsISETestTabControl.Size = New System.Drawing.Size(699, 418)
+        Me.bsISETestTabControl.Size = New System.Drawing.Size(699, 384)
         Me.bsISETestTabControl.TabIndex = 9
         '
         'QCTabPage
@@ -284,7 +333,7 @@ Partial Class IProgISETest
         Me.QCTabPage.Location = New System.Drawing.Point(4, 22)
         Me.QCTabPage.Name = "QCTabPage"
         Me.QCTabPage.Padding = New System.Windows.Forms.Padding(3)
-        Me.QCTabPage.Size = New System.Drawing.Size(691, 392)
+        Me.QCTabPage.Size = New System.Drawing.Size(691, 358)
         Me.QCTabPage.TabIndex = 2
         Me.QCTabPage.Text = "Quality Control"
         '
@@ -306,13 +355,13 @@ Partial Class IProgISETest
         Me.bsQCPanel.Location = New System.Drawing.Point(3, 3)
         Me.bsQCPanel.Margin = New System.Windows.Forms.Padding(0)
         Me.bsQCPanel.Name = "bsQCPanel"
-        Me.bsQCPanel.Size = New System.Drawing.Size(685, 386)
+        Me.bsQCPanel.Size = New System.Drawing.Size(685, 352)
         Me.bsQCPanel.TabIndex = 0
         '
         'DeleteControlButton
         '
         Me.DeleteControlButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.DeleteControlButton.Location = New System.Drawing.Point(652, 291)
+        Me.DeleteControlButton.Location = New System.Drawing.Point(652, 255)
         Me.DeleteControlButton.Name = "DeleteControlButton"
         Me.DeleteControlButton.Size = New System.Drawing.Size(32, 32)
         Me.DeleteControlButton.TabIndex = 31
@@ -353,7 +402,7 @@ Partial Class IProgISETest
         Me.UsedControlsGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter
         Me.UsedControlsGridView.EnterToTab = True
         Me.UsedControlsGridView.GridColor = System.Drawing.Color.Silver
-        Me.UsedControlsGridView.Location = New System.Drawing.Point(0, 291)
+        Me.UsedControlsGridView.Location = New System.Drawing.Point(0, 255)
         Me.UsedControlsGridView.Name = "UsedControlsGridView"
         Me.UsedControlsGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
         DataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
@@ -384,7 +433,7 @@ Partial Class IProgISETest
         Me.AddControlLabel.BackColor = System.Drawing.Color.Transparent
         Me.AddControlLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.AddControlLabel.ForeColor = System.Drawing.Color.Black
-        Me.AddControlLabel.Location = New System.Drawing.Point(43, 264)
+        Me.AddControlLabel.Location = New System.Drawing.Point(43, 228)
         Me.AddControlLabel.Name = "AddControlLabel"
         Me.AddControlLabel.Size = New System.Drawing.Size(140, 13)
         Me.AddControlLabel.TabIndex = 29
@@ -394,7 +443,7 @@ Partial Class IProgISETest
         'AddControls
         '
         Me.AddControls.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.AddControls.Location = New System.Drawing.Point(5, 254)
+        Me.AddControls.Location = New System.Drawing.Point(5, 218)
         Me.AddControls.Name = "AddControls"
         Me.AddControls.Size = New System.Drawing.Size(32, 32)
         Me.AddControls.TabIndex = 28
@@ -405,7 +454,7 @@ Partial Class IProgISETest
         Me.ControlsSelectionLabel.BackColor = System.Drawing.Color.LightSteelBlue
         Me.ControlsSelectionLabel.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.ControlsSelectionLabel.ForeColor = System.Drawing.Color.Black
-        Me.ControlsSelectionLabel.Location = New System.Drawing.Point(-2, 228)
+        Me.ControlsSelectionLabel.Location = New System.Drawing.Point(-2, 192)
         Me.ControlsSelectionLabel.Name = "ControlsSelectionLabel"
         Me.ControlsSelectionLabel.Size = New System.Drawing.Size(689, 20)
         Me.ControlsSelectionLabel.TabIndex = 27
@@ -418,9 +467,9 @@ Partial Class IProgISETest
         Me.SixSigmaValuesGroupBox.Controls.Add(Me.QCErrorAllowable)
         Me.SixSigmaValuesGroupBox.Controls.Add(Me.ErrorAllowableLabel)
         Me.SixSigmaValuesGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.SixSigmaValuesGroupBox.Location = New System.Drawing.Point(306, 149)
+        Me.SixSigmaValuesGroupBox.Location = New System.Drawing.Point(419, 136)
         Me.SixSigmaValuesGroupBox.Name = "SixSigmaValuesGroupBox"
-        Me.SixSigmaValuesGroupBox.Size = New System.Drawing.Size(373, 66)
+        Me.SixSigmaValuesGroupBox.Size = New System.Drawing.Size(260, 45)
         Me.SixSigmaValuesGroupBox.TabIndex = 26
         Me.SixSigmaValuesGroupBox.TabStop = False
         Me.SixSigmaValuesGroupBox.Text = "Six-SigmaValues"
@@ -429,7 +478,7 @@ Partial Class IProgISETest
         'BsButton1
         '
         Me.BsButton1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.BsButton1.Location = New System.Drawing.Point(254, 23)
+        Me.BsButton1.Location = New System.Drawing.Point(141, 18)
         Me.BsButton1.Name = "BsButton1"
         Me.BsButton1.Size = New System.Drawing.Size(112, 27)
         Me.BsButton1.TabIndex = 2
@@ -438,7 +487,7 @@ Partial Class IProgISETest
         '
         'QCErrorAllowable
         '
-        Me.QCErrorAllowable.Location = New System.Drawing.Point(177, 28)
+        Me.QCErrorAllowable.Location = New System.Drawing.Point(127, 14)
         Me.QCErrorAllowable.Name = "QCErrorAllowable"
         Me.QCErrorAllowable.Size = New System.Drawing.Size(67, 21)
         Me.QCErrorAllowable.TabIndex = 1
@@ -450,7 +499,7 @@ Partial Class IProgISETest
         Me.ErrorAllowableLabel.BackColor = System.Drawing.Color.Transparent
         Me.ErrorAllowableLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.ErrorAllowableLabel.ForeColor = System.Drawing.Color.Black
-        Me.ErrorAllowableLabel.Location = New System.Drawing.Point(6, 30)
+        Me.ErrorAllowableLabel.Location = New System.Drawing.Point(6, 16)
         Me.ErrorAllowableLabel.Name = "ErrorAllowableLabel"
         Me.ErrorAllowableLabel.Size = New System.Drawing.Size(115, 13)
         Me.ErrorAllowableLabel.TabIndex = 0
@@ -460,15 +509,15 @@ Partial Class IProgISETest
         'RulesToApplyGroupBox
         '
         Me.RulesToApplyGroupBox.Controls.Add(Me.x10CheckBox)
-        Me.RulesToApplyGroupBox.Controls.Add(Me.s41CheckBox)
-        Me.RulesToApplyGroupBox.Controls.Add(Me.r4sCheckBox)
         Me.RulesToApplyGroupBox.Controls.Add(Me.x22CheckBox)
         Me.RulesToApplyGroupBox.Controls.Add(Me.s13CheckBox)
+        Me.RulesToApplyGroupBox.Controls.Add(Me.s41CheckBox)
         Me.RulesToApplyGroupBox.Controls.Add(Me.s12CheckBox)
+        Me.RulesToApplyGroupBox.Controls.Add(Me.r4sCheckBox)
         Me.RulesToApplyGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.RulesToApplyGroupBox.Location = New System.Drawing.Point(6, 149)
+        Me.RulesToApplyGroupBox.Location = New System.Drawing.Point(6, 136)
         Me.RulesToApplyGroupBox.Name = "RulesToApplyGroupBox"
-        Me.RulesToApplyGroupBox.Size = New System.Drawing.Size(295, 66)
+        Me.RulesToApplyGroupBox.Size = New System.Drawing.Size(407, 45)
         Me.RulesToApplyGroupBox.TabIndex = 25
         Me.RulesToApplyGroupBox.TabStop = False
         Me.RulesToApplyGroupBox.Text = "Rules to Apply"
@@ -476,37 +525,17 @@ Partial Class IProgISETest
         'x10CheckBox
         '
         Me.x10CheckBox.AutoSize = True
-        Me.x10CheckBox.Location = New System.Drawing.Point(190, 45)
+        Me.x10CheckBox.Location = New System.Drawing.Point(322, 21)
         Me.x10CheckBox.Name = "x10CheckBox"
         Me.x10CheckBox.Size = New System.Drawing.Size(59, 17)
         Me.x10CheckBox.TabIndex = 5
         Me.x10CheckBox.Text = "10Xm"
         Me.x10CheckBox.UseVisualStyleBackColor = True
         '
-        's41CheckBox
-        '
-        Me.s41CheckBox.AutoSize = True
-        Me.s41CheckBox.Location = New System.Drawing.Point(110, 45)
-        Me.s41CheckBox.Name = "s41CheckBox"
-        Me.s41CheckBox.Size = New System.Drawing.Size(51, 17)
-        Me.s41CheckBox.TabIndex = 4
-        Me.s41CheckBox.Text = "4-1s"
-        Me.s41CheckBox.UseVisualStyleBackColor = True
-        '
-        'r4sCheckBox
-        '
-        Me.r4sCheckBox.AutoSize = True
-        Me.r4sCheckBox.Location = New System.Drawing.Point(30, 45)
-        Me.r4sCheckBox.Name = "r4sCheckBox"
-        Me.r4sCheckBox.Size = New System.Drawing.Size(52, 17)
-        Me.r4sCheckBox.TabIndex = 3
-        Me.r4sCheckBox.Text = "R-4s"
-        Me.r4sCheckBox.UseVisualStyleBackColor = True
-        '
         'x22CheckBox
         '
         Me.x22CheckBox.AutoSize = True
-        Me.x22CheckBox.Location = New System.Drawing.Point(190, 21)
+        Me.x22CheckBox.Location = New System.Drawing.Point(139, 21)
         Me.x22CheckBox.Name = "x22CheckBox"
         Me.x22CheckBox.Size = New System.Drawing.Size(51, 17)
         Me.x22CheckBox.TabIndex = 2
@@ -517,12 +546,22 @@ Partial Class IProgISETest
         's13CheckBox
         '
         Me.s13CheckBox.AutoSize = True
-        Me.s13CheckBox.Location = New System.Drawing.Point(110, 21)
+        Me.s13CheckBox.Location = New System.Drawing.Point(81, 21)
         Me.s13CheckBox.Name = "s13CheckBox"
         Me.s13CheckBox.Size = New System.Drawing.Size(51, 17)
         Me.s13CheckBox.TabIndex = 1
         Me.s13CheckBox.Text = "1-3s"
         Me.s13CheckBox.UseVisualStyleBackColor = True
+        '
+        's41CheckBox
+        '
+        Me.s41CheckBox.AutoSize = True
+        Me.s41CheckBox.Location = New System.Drawing.Point(263, 21)
+        Me.s41CheckBox.Name = "s41CheckBox"
+        Me.s41CheckBox.Size = New System.Drawing.Size(51, 17)
+        Me.s41CheckBox.TabIndex = 4
+        Me.s41CheckBox.Text = "4-1s"
+        Me.s41CheckBox.UseVisualStyleBackColor = True
         '
         's12CheckBox
         '
@@ -530,12 +569,22 @@ Partial Class IProgISETest
         Me.s12CheckBox.Checked = True
         Me.s12CheckBox.CheckState = System.Windows.Forms.CheckState.Checked
         Me.s12CheckBox.Enabled = False
-        Me.s12CheckBox.Location = New System.Drawing.Point(30, 21)
+        Me.s12CheckBox.Location = New System.Drawing.Point(19, 21)
         Me.s12CheckBox.Name = "s12CheckBox"
         Me.s12CheckBox.Size = New System.Drawing.Size(51, 17)
         Me.s12CheckBox.TabIndex = 0
         Me.s12CheckBox.Text = "1-2s"
         Me.s12CheckBox.UseVisualStyleBackColor = True
+        '
+        'r4sCheckBox
+        '
+        Me.r4sCheckBox.AutoSize = True
+        Me.r4sCheckBox.Location = New System.Drawing.Point(199, 21)
+        Me.r4sCheckBox.Name = "r4sCheckBox"
+        Me.r4sCheckBox.Size = New System.Drawing.Size(52, 17)
+        Me.r4sCheckBox.TabIndex = 3
+        Me.r4sCheckBox.Text = "R-4s"
+        Me.r4sCheckBox.UseVisualStyleBackColor = True
         '
         'QCValuesLabel
         '
@@ -556,7 +605,7 @@ Partial Class IProgISETest
         Me.CalculationModeGroupBox.Controls.Add(Me.StaticRadioButton)
         Me.CalculationModeGroupBox.Controls.Add(Me.ManualRadioButton)
         Me.CalculationModeGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.CalculationModeGroupBox.Location = New System.Drawing.Point(306, 53)
+        Me.CalculationModeGroupBox.Location = New System.Drawing.Point(306, 49)
         Me.CalculationModeGroupBox.Name = "CalculationModeGroupBox"
         Me.CalculationModeGroupBox.Size = New System.Drawing.Size(373, 79)
         Me.CalculationModeGroupBox.TabIndex = 24
@@ -610,7 +659,7 @@ Partial Class IProgISETest
         'QCActiveCheckBox
         '
         Me.QCActiveCheckBox.AutoSize = True
-        Me.QCActiveCheckBox.Location = New System.Drawing.Point(6, 29)
+        Me.QCActiveCheckBox.Location = New System.Drawing.Point(6, 26)
         Me.QCActiveCheckBox.Name = "QCActiveCheckBox"
         Me.QCActiveCheckBox.Size = New System.Drawing.Size(150, 17)
         Me.QCActiveCheckBox.TabIndex = 22
@@ -625,7 +674,7 @@ Partial Class IProgISETest
         Me.ControlValuesGroupBox.Controls.Add(Me.QCReplicNumberNumeric)
         Me.ControlValuesGroupBox.Controls.Add(Me.ControlReplicatesNumberLabel)
         Me.ControlValuesGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.ControlValuesGroupBox.Location = New System.Drawing.Point(6, 53)
+        Me.ControlValuesGroupBox.Location = New System.Drawing.Point(6, 49)
         Me.ControlValuesGroupBox.Name = "ControlValuesGroupBox"
         Me.ControlValuesGroupBox.Size = New System.Drawing.Size(295, 79)
         Me.ControlValuesGroupBox.TabIndex = 23
@@ -697,7 +746,7 @@ Partial Class IProgISETest
         Me.DetailsTabPage.Controls.Add(Me.bsVolumeUpDown)
         Me.DetailsTabPage.Location = New System.Drawing.Point(4, 22)
         Me.DetailsTabPage.Name = "DetailsTabPage"
-        Me.DetailsTabPage.Size = New System.Drawing.Size(691, 392)
+        Me.DetailsTabPage.Size = New System.Drawing.Size(691, 358)
         Me.DetailsTabPage.TabIndex = 1
         Me.DetailsTabPage.Text = "Details"
         '
@@ -721,7 +770,7 @@ Partial Class IProgISETest
         Me.bsDilutionLabel.Enabled = False
         Me.bsDilutionLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsDilutionLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsDilutionLabel.Location = New System.Drawing.Point(384, 343)
+        Me.bsDilutionLabel.Location = New System.Drawing.Point(384, 330)
         Me.bsDilutionLabel.Name = "bsDilutionLabel"
         Me.bsDilutionLabel.Size = New System.Drawing.Size(55, 13)
         Me.bsDilutionLabel.TabIndex = 235
@@ -734,7 +783,7 @@ Partial Class IProgISETest
         Me.bsDilutionUpDown.BackColor = System.Drawing.SystemColors.MenuBar
         Me.bsDilutionUpDown.Enabled = False
         Me.bsDilutionUpDown.ForeColor = System.Drawing.SystemColors.GrayText
-        Me.bsDilutionUpDown.Location = New System.Drawing.Point(458, 341)
+        Me.bsDilutionUpDown.Location = New System.Drawing.Point(458, 328)
         Me.bsDilutionUpDown.Maximum = New Decimal(New Integer() {99999, 0, 0, 0})
         Me.bsDilutionUpDown.Name = "bsDilutionUpDown"
         Me.bsDilutionUpDown.Size = New System.Drawing.Size(52, 21)
@@ -749,7 +798,7 @@ Partial Class IProgISETest
         Me.bsVolumeLabel.Enabled = False
         Me.bsVolumeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsVolumeLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsVolumeLabel.Location = New System.Drawing.Point(216, 343)
+        Me.bsVolumeLabel.Location = New System.Drawing.Point(216, 330)
         Me.bsVolumeLabel.Name = "bsVolumeLabel"
         Me.bsVolumeLabel.Size = New System.Drawing.Size(55, 13)
         Me.bsVolumeLabel.TabIndex = 233
@@ -762,7 +811,7 @@ Partial Class IProgISETest
         Me.bsVolumeUpDown.BackColor = System.Drawing.SystemColors.MenuBar
         Me.bsVolumeUpDown.Enabled = False
         Me.bsVolumeUpDown.ForeColor = System.Drawing.SystemColors.GrayText
-        Me.bsVolumeUpDown.Location = New System.Drawing.Point(277, 341)
+        Me.bsVolumeUpDown.Location = New System.Drawing.Point(277, 328)
         Me.bsVolumeUpDown.Maximum = New Decimal(New Integer() {99999, 0, 0, 0})
         Me.bsVolumeUpDown.Name = "bsVolumeUpDown"
         Me.bsVolumeUpDown.Size = New System.Drawing.Size(52, 21)
@@ -777,7 +826,7 @@ Partial Class IProgISETest
         Me.bsSampleTypeComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsSampleTypeComboBox.ForeColor = System.Drawing.Color.Black
         Me.bsSampleTypeComboBox.FormattingEnabled = True
-        Me.bsSampleTypeComboBox.Location = New System.Drawing.Point(10, 102)
+        Me.bsSampleTypeComboBox.Location = New System.Drawing.Point(10, 98)
         Me.bsSampleTypeComboBox.Name = "bsSampleTypeComboBox"
         Me.bsSampleTypeComboBox.Size = New System.Drawing.Size(203, 21)
         Me.bsSampleTypeComboBox.TabIndex = 7
@@ -801,7 +850,7 @@ Partial Class IProgISETest
         Me.bsShortNameTextbox.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsShortNameTextbox.ForeColor = System.Drawing.Color.Black
         Me.bsShortNameTextbox.IsNumeric = False
-        Me.bsShortNameTextbox.Location = New System.Drawing.Point(391, 58)
+        Me.bsShortNameTextbox.Location = New System.Drawing.Point(391, 57)
         Me.bsShortNameTextbox.Mandatory = True
         Me.bsShortNameTextbox.MaxLength = 8
         Me.bsShortNameTextbox.Name = "bsShortNameTextbox"
@@ -828,7 +877,7 @@ Partial Class IProgISETest
         Me.bsFullNameTextbox.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsFullNameTextbox.ForeColor = System.Drawing.Color.Black
         Me.bsFullNameTextbox.IsNumeric = False
-        Me.bsFullNameTextbox.Location = New System.Drawing.Point(10, 58)
+        Me.bsFullNameTextbox.Location = New System.Drawing.Point(10, 57)
         Me.bsFullNameTextbox.Mandatory = True
         Me.bsFullNameTextbox.MaxLength = 16
         Me.bsFullNameTextbox.Name = "bsFullNameTextbox"
@@ -864,6 +913,69 @@ Partial Class IProgISETest
         Me.bsISETestsListGroupBox.TabIndex = 19
         Me.bsISETestsListGroupBox.TabStop = False
         '
+        'DecimalsUpDown
+        '
+        Me.DecimalsUpDown.ForeColor = System.Drawing.Color.Black
+        Me.DecimalsUpDown.Location = New System.Drawing.Point(594, 139)
+        Me.DecimalsUpDown.Name = "DecimalsUpDown"
+        Me.DecimalsUpDown.Size = New System.Drawing.Size(100, 20)
+        Me.DecimalsUpDown.TabIndex = 10
+        Me.DecimalsUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'ReportsNameTextBox
+        '
+        Me.ReportsNameTextBox.BackColor = System.Drawing.Color.White
+        Me.ReportsNameTextBox.DecimalsValues = False
+        Me.ReportsNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.ReportsNameTextBox.ForeColor = System.Drawing.Color.Black
+        Me.ReportsNameTextBox.IsNumeric = False
+        Me.ReportsNameTextBox.Location = New System.Drawing.Point(10, 139)
+        Me.ReportsNameTextBox.Mandatory = False
+        Me.ReportsNameTextBox.MaxLength = 80
+        Me.ReportsNameTextBox.Name = "ReportsNameTextBox"
+        Me.ReportsNameTextBox.Size = New System.Drawing.Size(414, 21)
+        Me.ReportsNameTextBox.TabIndex = 9
+        Me.ReportsNameTextBox.WordWrap = False
+        '
+        'bsReportNameTextBox
+        '
+        Me.bsReportNameTextBox.BackColor = System.Drawing.Color.White
+        Me.bsReportNameTextBox.DecimalsValues = False
+        Me.bsReportNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsReportNameTextBox.IsNumeric = False
+        Me.bsReportNameTextBox.Location = New System.Drawing.Point(10, 139)
+        Me.bsReportNameTextBox.Mandatory = False
+        Me.bsReportNameTextBox.MaxLength = 80
+        Me.bsReportNameTextBox.Name = "bsReportNameTextBox"
+        Me.bsReportNameTextBox.Size = New System.Drawing.Size(414, 21)
+        Me.bsReportNameTextBox.TabIndex = 45
+        '
+        'ReportNameLabel
+        '
+        Me.ReportNameLabel.AutoSize = True
+        Me.ReportNameLabel.BackColor = System.Drawing.Color.Transparent
+        Me.ReportNameLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.ReportNameLabel.ForeColor = System.Drawing.Color.Black
+        Me.ReportNameLabel.Location = New System.Drawing.Point(10, 122)
+        Me.ReportNameLabel.Name = "ReportNameLabel"
+        Me.ReportNameLabel.Size = New System.Drawing.Size(87, 13)
+        Me.ReportNameLabel.TabIndex = 44
+        Me.ReportNameLabel.Text = "Report Name:"
+        Me.ReportNameLabel.Title = False
+        '
+        'DecimalsLabel
+        '
+        Me.DecimalsLabel.AutoSize = True
+        Me.DecimalsLabel.BackColor = System.Drawing.Color.Transparent
+        Me.DecimalsLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.DecimalsLabel.ForeColor = System.Drawing.Color.Black
+        Me.DecimalsLabel.Location = New System.Drawing.Point(594, 122)
+        Me.DecimalsLabel.Name = "DecimalsLabel"
+        Me.DecimalsLabel.Size = New System.Drawing.Size(64, 13)
+        Me.DecimalsLabel.TabIndex = 42
+        Me.DecimalsLabel.Text = "Decimals:"
+        Me.DecimalsLabel.Title = False
+        '
         'IProgISETest
         '
         Me.AcceptButton = Me.bsExitButton
@@ -891,6 +1003,7 @@ Partial Class IProgISETest
         Me.Text = ""
         Me.bsCalTestDefGroupBox.ResumeLayout(False)
         Me.bsCalTestDefGroupBox.PerformLayout()
+        CType(Me.bsDecimalsUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.bsSampleTypePlusPictureBox, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsISETestTabControl.ResumeLayout(False)
         Me.QCTabPage.ResumeLayout(False)
@@ -915,6 +1028,7 @@ Partial Class IProgISETest
         CType(Me.bsVolumeUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BsErrorProvider1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsISETestsListGroupBox.ResumeLayout(False)
+        CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -978,4 +1092,12 @@ Partial Class IProgISETest
     Friend WithEvents QCRejectionCriteria As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
     Friend WithEvents QCReplicNumberNumeric As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
     Friend WithEvents ControlReplicatesNumberLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsDecimalsUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents bsDecimalsLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsReportNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents DecimalsUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents bsReportNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents ReportsNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents ReportNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents DecimalsLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
 End Class

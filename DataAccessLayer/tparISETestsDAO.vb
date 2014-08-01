@@ -511,6 +511,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  DL 23/02/2012
         ''' Modified by: XB 05/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+        ''' Modified by: WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name in IProgISETest.
         ''' </remarks>
         Public Function ReadByTestIDAndSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -521,7 +522,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT ISET.ISETestID, ISET.ShortName, ISET.Name, ISET.Units, ISETS.Decimals " & vbCrLf & _
+                        Dim cmdText As String = " SELECT ISET.ISETestID, ISET.ShortName, ISET.Name, ISET.Units, ISETS.Decimals, ISETS.TestLongName " & vbCrLf & _
                                                 " FROM   tparISETests ISET INNER JOIN tparISETestSamples ISETS ON ISET.ISETestID = ISETS.ISETestID " & vbCrLf & _
                                                 " WHERE  ISET.ISETestID = " & pISETestID & vbCrLf & _
                                                 " AND    ISETS.SampleType = '" & pSampleType & "' " & vbCrLf

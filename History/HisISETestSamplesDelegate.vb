@@ -53,6 +53,7 @@ Namespace Biosystems.Ax00.BL
                                             iseTestSampleRow.ISETestName = myISETestDataDS.tparISETests.First.Name
                                             iseTestSampleRow.MeasureUnit = myISETestDataDS.tparISETests.First.Units
                                             iseTestSampleRow.DecimalsAllowed = myISETestDataDS.tparISETests.First.Decimals
+                                            iseTestSampleRow.TestLongName = myISETestDataDS.tparISETests.First.TestLongName ' WE 30/07/2014 - #1865
                                             iseTestSampleRow.EndEdit()
                                         End If
                                     Else
@@ -69,6 +70,7 @@ Namespace Biosystems.Ax00.BL
                                     iseTestSampleRow.ISETestName = auxiliaryDS.thisISETestSamples.First.ISETestName
                                     iseTestSampleRow.MeasureUnit = auxiliaryDS.thisISETestSamples.First.MeasureUnit
                                     iseTestSampleRow.DecimalsAllowed = auxiliaryDS.thisISETestSamples.First.DecimalsAllowed
+                                    iseTestSampleRow.TestLongName = auxiliaryDS.thisISETestSamples.First.TestLongName   ' WE 30/07/2014 - #1865
                                     iseTestSampleRow.EndEdit()
                                 End If
                             Else
@@ -98,6 +100,7 @@ Namespace Biosystems.Ax00.BL
                                         lstISETestToUpdate.First.ISETestName = iseTestSampleRow.ISETestName
                                         lstISETestToUpdate.First.MeasureUnit = iseTestSampleRow.MeasureUnit
                                         lstISETestToUpdate.First.DecimalsAllowed = iseTestSampleRow.DecimalsAllowed
+                                        lstISETestToUpdate.First.TestLongName = iseTestSampleRow.TestLongName   ' WE 30/07/2014 - #1865
                                         lstISETestToUpdate.First.EndEdit()
                                     End If
                                 Next

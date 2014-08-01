@@ -21,6 +21,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet HisISETestSamplesDS with all created ISETest/SampleTypes with the generated HistISETestID</returns>
         ''' <remarks>
         ''' Created by:  SA 22/02/2012
+        ''' Modified by: WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name in IProgISETest.
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisISETestsDS As HisISETestSamplesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -34,11 +35,11 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     For Each hisISETestRow As HisISETestSamplesDS.thisISETestSamplesRow In pHisISETestsDS.thisISETestSamples
                         newISETestID = -1
-                        cmdText.Append(" INSERT INTO thisISETestSamples (ISETestID, SampleType, ISETestName, MeasureUnit, DecimalsAllowed) ")
+                        cmdText.Append(" INSERT INTO thisISETestSamples (ISETestID, SampleType, ISETestName, MeasureUnit, DecimalsAllowed, TestLongName) ")
                         cmdText.Append(" VALUES (")
 
-                        cmdText.AppendFormat("{0}, '{1}', N'{2}', '{3}', {4}", hisISETestRow.ISETestID, hisISETestRow.SampleType, _
-                                             hisISETestRow.ISETestName.Replace("'", "''"), hisISETestRow.MeasureUnit, hisISETestRow.DecimalsAllowed)
+                        cmdText.AppendFormat("{0}, '{1}', N'{2}', '{3}', {4}, {5}", hisISETestRow.ISETestID, hisISETestRow.SampleType, _
+                                             hisISETestRow.ISETestName.Replace("'", "''"), hisISETestRow.MeasureUnit, hisISETestRow.DecimalsAllowed, hisISETestRow.TestLongName)
 
                         'Add the last parenthesis and the sentence needed to get the ID automatically generated
                         cmdText.Append(") ")
