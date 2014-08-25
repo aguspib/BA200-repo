@@ -182,7 +182,8 @@
               <xs:element name="AwosID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AwosID" msprop:Generator_ColumnVarNameInTable="columnAwosID" msprop:Generator_ColumnPropNameInTable="AwosIDColumn" msprop:Generator_UserColumnName="AwosID" type="xs:string" minOccurs="0" />
               <xs:element name="ManualResultFlag" msprop:Generator_ColumnVarNameInTable="columnManualResultFlag" msprop:Generator_ColumnPropNameInRow="ManualResultFlag" msprop:Generator_ColumnPropNameInTable="ManualResultFlagColumn" msprop:Generator_UserColumnName="ManualResultFlag" type="xs:boolean" minOccurs="0" />
               <xs:element name="TestPosition" msprop:Generator_ColumnVarNameInTable="columnTestPosition" msprop:Generator_ColumnPropNameInRow="TestPosition" msprop:Generator_ColumnPropNameInTable="TestPositionColumn" msprop:Generator_UserColumnName="TestPosition" type="xs:int" minOccurs="0" />
-              <xs:element name="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
+              <xs:element name="BackColorGroup" msprop:Generator_ColumnVarNameInTable="columnBackColorGroup" msprop:Generator_ColumnPropNameInRow="BackColorGroup" msprop:Generator_ColumnPropNameInTable="BackColorGroupColumn" msprop:Generator_UserColumnName="BackColorGroup" type="xs:int" minOccurs="0" />
+              <xs:element name="TestLongName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
