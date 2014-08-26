@@ -3195,6 +3195,26 @@ Public Class IProgISETest
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Set up Decimals Number
+    ''' </summary>
+    ''' <param name="pDecimals"></param>
+    ''' <remarks>Created by: WE 25/08/2014 - #1865
+    ''' </remarks>
+    Private Sub SetupDecimalsNumber(ByVal pDecimals As Integer)
+        Try
+            Me.UsedControlsGridView.Refresh()
+
+            Me.bsTestRefRanges.RefNumDecimals = pDecimals
+
+            RecalculateAllTarget()
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetupDecimalsNumber ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
 
 #Region "Control Events"
@@ -3539,16 +3559,20 @@ Public Class IProgISETest
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Modified by: WE 25/08/2014 - #1865
+    ''' </remarks>
     Private Sub UsedControlsGridView_CellFormatting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellFormattingEventArgs) Handles UsedControlsGridView.CellFormatting
         Try
             If e.ColumnIndex = 4 OrElse e.ColumnIndex = 5 OrElse e.ColumnIndex = 6 Then
                 If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
-                    e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals())
+                    'e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals())
+                    e.Value = CSng(e.Value).ToString("F" & bsDecimalsUpDown.Value)
                 End If
             ElseIf e.ColumnIndex = 7 Then
                 If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
-                    e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals() + 1)
+                    'e.Value = CSng(e.Value).ToStringWithDecimals(GetDecimals() + 1)
+                    e.Value = CSng(e.Value).ToString("F" & (CInt(bsDecimalsUpDown.Value) + 1))
                 End If
             End If
 
@@ -3558,6 +3582,26 @@ Public Class IProgISETest
                                             EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+
+        ' Example code from IProgTest
+        'Try
+        '    If e.ColumnIndex = 4 OrElse e.ColumnIndex = 5 OrElse e.ColumnIndex = 6 Then
+        '        If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
+        '            e.Value = DirectCast(e.Value, Single).ToString("F" & DecimalsUpDown.Value)
+        '        End If
+        '    ElseIf e.ColumnIndex = 7 Then
+        '        If Not e.Value Is DBNull.Value AndAlso Not e.Value Is Nothing Then
+        '            'TR 10/05/2011  -Show the decimals allowed + 1 
+        '            e.Value = DirectCast(e.Value, Single).ToString("F" & (CInt(DecimalsUpDown.Value) + 1))
+        '        End If
+        '    End If
+        'Catch ex As Exception
+        '    'Write error SYSTEM_ERROR in the Application Log & show error message
+        '    CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " UsedControlsGridView_CellFormatting ", _
+        '                                    EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        'End Try
+
     End Sub
 
     Private Sub QCActiveCheckBox_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles QCActiveCheckBox.CheckedChanged
@@ -3889,6 +3933,24 @@ Public Class IProgISETest
         End Try
     End Sub
 
+    ''' <summary>
+    ''' To avoid entered following characters in the Numeric Up/Down allowing only integer numbers greater than zero:
+    '''   ** Minus sign
+    '''   ** Dot, Apostrophe or Comma as decimal point
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  WE 25/08/2014 - #1865. Same as used in IProgTest.
+    ''' Modified by: SA 09/11/2012
+    ''' </remarks>
+    Private Sub IntegerNumericUpDown_KeyPress(sender As Object, e As KeyPressEventArgs) Handles bsDecimalsUpDown.KeyPress
+
+        Try
+            If (e.KeyChar = CChar("-") OrElse e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = "'") Then e.Handled = True
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IntegerNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".IntegerNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
 
     ''' <summary>
     ''' Generic event handler to capture the NumericUpDown content deletion
@@ -3917,6 +3979,43 @@ Public Class IProgISETest
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "NumericUpDown_KeyUp " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".NumericUpDown_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  WE 25/08/2014 - #1865. Based on same concept as used in IProgTest.
+    ''' Modified by: AG 09/07/2010
+    '''              SA 09/11/2012 - Changes due to an error was raised when trying to convert to INT a "big" number that 
+    '''                              was entered in the numeric UpDown
+    ''' </remarks>
+    Private Sub bsDecimalsUpDown_Validated(sender As Object, e As EventArgs) Handles bsDecimalsUpDown.Validated
+
+        Try
+            Dim decimalsNumber As Integer = 0
+            Dim myDecimalNum As String = bsDecimalsUpDown.Text.ToString
+
+            If (myDecimalNum = String.Empty) Then
+                decimalsNumber = CInt(bsDecimalsUpDown.Minimum)
+            Else
+                If (myDecimalNum.Length = bsDecimalsUpDown.Maximum.ToString.Length) Then
+                    decimalsNumber = CInt(bsDecimalsUpDown.Text)
+                    decimalsNumber = CInt(IIf(decimalsNumber < bsDecimalsUpDown.Minimum, bsDecimalsUpDown.Minimum, decimalsNumber))
+                    decimalsNumber = CInt(IIf(decimalsNumber > bsDecimalsUpDown.Maximum, bsDecimalsUpDown.Maximum, decimalsNumber))
+                Else
+                    decimalsNumber = CInt(bsDecimalsUpDown.Maximum)
+                End If
+            End If
+
+            bsDecimalsUpDown.Text = decimalsNumber.ToString
+            SetupDecimalsNumber(decimalsNumber)
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsDecimalsUpDown_Validated " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".bsDecimalsUpDown_Validated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+
     End Sub
 
     Private Sub SlopeUpDown_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles bsSlopeA2UpDown.Validating, bsSlopeB2UpDown.Validating
@@ -4305,7 +4404,5 @@ Public Class IProgISETest
     End Sub
 #End Region
 
-
    
-
 End Class
