@@ -1202,6 +1202,8 @@ Partial Public Class HisWSResultsDS
 
         Private columnTestPosition As Global.System.Data.DataColumn
 
+        Private columnBackColorGroup As Global.System.Data.DataColumn
+
         Private columnTestLongName As Global.System.Data.DataColumn
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1729,6 +1731,14 @@ Partial Public Class HisWSResultsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property BackColorGroupColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnBackColorGroup
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public ReadOnly Property TestLongNameColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnTestLongName
@@ -1834,9 +1844,10 @@ Partial Public Class HisWSResultsDS
                     ByVal AwosID As String, _
                     ByVal ManualResultFlag As Boolean, _
                     ByVal TestPosition As Integer, _
+                    ByVal BackColorGroup As Integer, _
                     ByVal TestLongName As String) As vhisWSResultsRow
             Dim rowvhisWSResultsRow As vhisWSResultsRow = CType(Me.NewRow, vhisWSResultsRow)
-            Dim columnValuesArray() As Object = New Object() {HistOrderTestID, AnalyzerID, WorkSessionID, ResultDateTime, PatientID, SampleClass, StatFlag, TestType, SampleType, TestID, TestName, TestVersionNumber, CONCValue, MeasureUnit, MinRefRange, MaxRefRange, ExportStatus, AlarmList, FormulaText, StatFlagImage, ExportImage, GraphImage, RemarkAlert, RefRange, Remarks, AdditionalInfo, ABSValue, ABSWorkReagent, KineticBlankLimit, ABSInitial, ABSMainFilter, BlankAbsorbanceLimit, CalibratorName, LotNumber, NumberOfCalibrators, TheoreticalConcentration, CalibratorFactor, FactorLimits, FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, CONCValueString, MultiPointNumber, Selected, CalibPointUsed, ManualResult, ManualResultText, LISMessageID, LISRequest, ExternalQC, ESOrderID, LISOrderID, ESPatientID, LISPatientID, LISTestName, LISSampleType, LISUnits, SpecimenID, AwosID, ManualResultFlag, TestPosition, TestLongName}
+            Dim columnValuesArray() As Object = New Object() {HistOrderTestID, AnalyzerID, WorkSessionID, ResultDateTime, PatientID, SampleClass, StatFlag, TestType, SampleType, TestID, TestName, TestVersionNumber, CONCValue, MeasureUnit, MinRefRange, MaxRefRange, ExportStatus, AlarmList, FormulaText, StatFlagImage, ExportImage, GraphImage, RemarkAlert, RefRange, Remarks, AdditionalInfo, ABSValue, ABSWorkReagent, KineticBlankLimit, ABSInitial, ABSMainFilter, BlankAbsorbanceLimit, CalibratorName, LotNumber, NumberOfCalibrators, TheoreticalConcentration, CalibratorFactor, FactorLimits, FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, CONCValueString, MultiPointNumber, Selected, CalibPointUsed, ManualResult, ManualResultText, LISMessageID, LISRequest, ExternalQC, ESOrderID, LISOrderID, ESPatientID, LISPatientID, LISTestName, LISSampleType, LISUnits, SpecimenID, AwosID, ManualResultFlag, TestPosition, BackColorGroup, TestLongName}
             rowvhisWSResultsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowvhisWSResultsRow)
             Return rowvhisWSResultsRow
@@ -1920,6 +1931,7 @@ Partial Public Class HisWSResultsDS
             Me.columnAwosID = MyBase.Columns("AwosID")
             Me.columnManualResultFlag = MyBase.Columns("ManualResultFlag")
             Me.columnTestPosition = MyBase.Columns("TestPosition")
+            Me.columnBackColorGroup = MyBase.Columns("BackColorGroup")
             Me.columnTestLongName = MyBase.Columns("TestLongName")
         End Sub
 
@@ -2048,6 +2060,8 @@ Partial Public Class HisWSResultsDS
             MyBase.Columns.Add(Me.columnManualResultFlag)
             Me.columnTestPosition = New Global.System.Data.DataColumn("TestPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTestPosition)
+            Me.columnBackColorGroup = New Global.System.Data.DataColumn("BackColorGroup", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnBackColorGroup)
             Me.columnTestLongName = New Global.System.Data.DataColumn("TestLongName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTestLongName)
             Me.columnAnalyzerID.MaxLength = 25
@@ -4716,6 +4730,21 @@ Partial Public Class HisWSResultsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property BackColorGroup() As Integer
+            Get
+                Try
+                    Return CType(Me(Me.tablevhisWSResults.BackColorGroupColumn), Integer)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'BackColorGroup' in table 'vhisWSResults' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Integer)
+                Me(Me.tablevhisWSResults.BackColorGroupColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Property TestLongName() As String
             Get
                 If Me.IsTestLongNameNull Then
@@ -5459,6 +5488,18 @@ Partial Public Class HisWSResultsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetTestPositionNull()
             Me(Me.tablevhisWSResults.TestPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsBackColorGroupNull() As Boolean
+            Return Me.IsNull(Me.tablevhisWSResults.BackColorGroupColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetBackColorGroupNull()
+            Me(Me.tablevhisWSResults.BackColorGroupColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _

@@ -79,7 +79,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = String.Empty
 
                     For Each row As GridColsConfigDS.tcfgGridColsConfigurationRow In pGridColsConfigDS.tcfgGridColsConfiguration
-                        cmdText &= " UPDATE tcfgGridColsConfigurationRow " & vbCrLf & _
+                        cmdText &= " UPDATE tcfgGridColsConfiguration " & vbCrLf & _
                                    " SET    SavedWidth  = " & row.SavedWidth.ToString & ", " & vbCrLf & _
                                           " TS_User     = N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', " & vbCrLf & _
                                           " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _

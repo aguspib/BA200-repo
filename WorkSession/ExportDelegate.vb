@@ -30,6 +30,8 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pManualFileName">ONLINE or MANUAL file name</param>
+        ''' <param name="pIncludeSentResults">Allow RESENT results (manual exportation) or not (online exportation)</param>
         ''' <returns>>GlobalDataTO containing a typed DataSet ExecutionsDS with the group of Executions of all OrderTests with Results exported</returns>
         ''' <remarks>
         ''' Created by: TR 12/07/2012
@@ -43,9 +45,10 @@ Namespace Biosystems.Ax00.BL
         '''                              ElseIf setting LIS_ENABLE_COMMS = TRUE new parameter pAlternativeStatus = “SENDING”
         '''                              Else DO NOT CALL the UpdateExportStatus method
         '''              AG 14/02/2014 - #1505 Do not update ExportStatus = 'SENDING' when working with LIS, this status will be achieved when the xml is created!! - ACTIVATED 24/03/2014 (PAUSED 17/02/2014)
+        '''              AG 26/08/2014 - #1886 Make code more readable: change the parameter name pIsResetWS for pManualFileName
         ''' </remarks>
         Public Function ExportToLISManualNEW(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                             Optional ByVal pIsResetWS As Boolean = False, _
+                                             Optional ByVal pManualFileName As Boolean = False, _
                                              Optional pIncludeSentResults As Boolean = False) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -144,7 +147,7 @@ Namespace Biosystems.Ax00.BL
                         'DL 28/06/2013
                         If isLISWithFilesMode Then
                             'Write the Results in a TXT file and update export fields in myResultsData (ExportStatus, ExportDateTime)
-                            myGlobalDataTO = CreateExportFileNEW(Nothing, myResultsDataToFile, pIsResetWS) ' JB 22/10/2012 pWorkSessionID not needed
+                            myGlobalDataTO = CreateExportFileNEW(Nothing, myResultsDataToFile, pManualFileName) ' JB 22/10/2012 pWorkSessionID not needed
                         End If
                         'DL 28/06/2013
 
@@ -675,6 +678,7 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pLimsResultsList">Typed DataSet ResultsDS containing in subtable vwksResults the group of Results to Export</param>
+        ''' <param name="pManualFileName">ONLINE or MANUAL file name</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  TR 12/07/2012 - Based on CreateExportFile
@@ -684,9 +688,10 @@ Namespace Biosystems.Ax00.BL
         '''                              Depending if it is a reset worksession the file name prefix change from ONLINE to EXP.
         '''              JB 22/10/2012 - Removed parameter pWorkSessionID (not used)
         '''              SG 10/04/2012 - Get the filename from the SwParameters table in database not from the GlobalConstants
+        '''              AG 26/08/2014 - #1886 Make code more readable: change the parameter name pIsResetWS for pManualFileName
         ''' </remarks>
         Private Function CreateExportFileNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLIMSResultsList As ResultsDS, _
-                                             Optional ByVal pIsResetWS As Boolean = False) As GlobalDataTO
+                                             Optional ByVal pManualFileName As Boolean = False) As GlobalDataTO
 
             Dim TextFileWriter As StreamWriter
             Dim myGlobalDataTO As New GlobalDataTO
@@ -740,7 +745,7 @@ Namespace Biosystems.Ax00.BL
                 'SG 10/04/2012 - Get the filename from the SwParameters table in database not from the GlobalConstants
                 Dim mySWParametersDelegate As New SwParametersDelegate
                 Dim mySWParametersDS As New ParametersDS
-                If pIsResetWS Then
+                If pManualFileName Then
                     myGlobalDataTO = mySWParametersDelegate.ReadByParameterName(dbConnection, GlobalEnumerates.SwParameters.MANUAL_EXPORT_FILENAME.ToString, Nothing)
                     If Not myGlobalDataTO.HasError Then
                         mySWParametersDS = DirectCast(myGlobalDataTO.SetDatos, ParametersDS)

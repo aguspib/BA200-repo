@@ -39,8 +39,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText.Append(" INSERT INTO thisISETestSamples (ISETestID, SampleType, ISETestName, MeasureUnit, DecimalsAllowed, TestLongName, SlopeFactorA2, SlopeFactorB2) ")
                         cmdText.Append(" VALUES (")
 
-                        cmdText.AppendFormat("{0}, '{1}', N'{2}', '{3}', {4}, {5}", hisISETestRow.ISETestID, hisISETestRow.SampleType, _
-                                             hisISETestRow.ISETestName.Replace("'", "''"), hisISETestRow.MeasureUnit, hisISETestRow.DecimalsAllowed, hisISETestRow.TestLongName)
+                        cmdText.AppendFormat("{0}, '{1}', N'{2}', '{3}', {4}, N'{5}'", hisISETestRow.ISETestID, hisISETestRow.SampleType, _
+                                             hisISETestRow.ISETestName.Replace("'", "''"), hisISETestRow.MeasureUnit, hisISETestRow.DecimalsAllowed, hisISETestRow.TestLongName.Replace("'", "''"))
 
                         If (Not hisISETestRow.IsSlopeFactorA2Null) Then
                             cmdText.Append(", " & ReplaceNumericString(hisISETestRow.SlopeFactorA2))
@@ -69,7 +69,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Next
 
                     myGlobalDataTO.SetDatos = pHisISETestsDS
-
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True

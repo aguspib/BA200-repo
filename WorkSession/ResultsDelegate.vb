@@ -4327,7 +4327,11 @@ Namespace Biosystems.Ax00.BL
         '''                              HistPatientID and SampleID were saved as NULL
         '''              AG 24/04/2013 - Fill new fields to be added in new history records: LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, 
         '''                              ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
-        '''              AG 24/07/2014 - #1886 - RQ00086 v3.1.0 Historic patient results can be re-sent (all fields required has to be save although the result is already sent)
+        '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Historic patient results can be re-sent (all fields required has to be save although 
+        '''                                                            the result is already sent)
+        '''              SA 26/08/2014 - BT #1861 ==> Added changes to export field SpecimenID (Barcode) to the Historic Module also when the corresponding result has 
+        '''                                           been already exported and/or when the Order Test has been manually requested for a Patient Sample having Tests 
+        '''                                           requested by LIS.
         ''' </remarks>
         Private Function MoveWSOrderTestsToHISTModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
                                                       ByVal pHistSTDTestsDS As HisTestSamplesDS, ByVal pHistISETestsDS As HisISETestSamplesDS, _
@@ -4351,34 +4355,51 @@ Namespace Biosystems.Ax00.BL
                         'Get the SequenceNumber of the WorkSessionID in Historic Module (last two characters)
                         Dim myWSSequenceNum As String = pHistWorkSessionID.Substring(8)
 
-                        Dim myHistOrderTestsDS As New HisWSOrderTestsDS
-                        Dim myHistOrderTestsRow As HisWSOrderTestsDS.thisWSOrderTestsRow = Nothing
+                        'Get the WorkSessionID from the first record in the entry parameter pResultsDS
+                        Dim myWorkSessionID As String = pResultsDS.vwksResults.First.WorkSessionID
 
-                        'AG 24/05/2013 - Read required data for fill new fields to be able to upload results from LIS
-                        Dim lisInfoDlg As New OrderTestsLISInfoDelegate
+                        'Read required data needed to fill new fields needed to upload results to LIS
                         Dim lisInfoDS As New OrderTestsLISInfoDS
+                        Dim lisInfoDlg As New OrderTestsLISInfoDelegate
+
                         myGlobalDataTO = lisInfoDlg.ReadAll(dbConnection)
-                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             lisInfoDS = DirectCast(myGlobalDataTO.SetDatos, OrderTestsLISInfoDS)
                         End If
 
-                        Dim testMappDlg As New AllTestByTypeDelegate
                         Dim testMappDS As New AllTestsByTypeDS
+                        Dim testMappDlg As New AllTestByTypeDelegate
+
                         myGlobalDataTO = testMappDlg.ReadAll(dbConnection)
-                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             testMappDS = DirectCast(myGlobalDataTO.SetDatos, AllTestsByTypeDS)
                         End If
 
-                        Dim confMappDlg As New LISMappingsDelegate
                         Dim confMappDS As New LISMappingsDS
+                        Dim confMappDlg As New LISMappingsDelegate
+
                         myGlobalDataTO = confMappDlg.ReadAll(dbConnection)
-                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             confMappDS = DirectCast(myGlobalDataTO.SetDatos, LISMappingsDS)
                         End If
-                        Dim lisInfoLinqRes As List(Of OrderTestsLISInfoDS.twksOrderTestsLISInfoRow)
-                        'AG 24/05/2013
+
+                        'BT #1861 - Get the list of all required Patient Samples that have been sent by an external LIS system
+                        '           (those having field SpecimenIDList informed)
+                        Dim myDataSet As New WSRequiredElementsDS
+                        Dim myWSReqElemDelegate As New WSRequiredElementsDelegate
+
+                        myGlobalDataTO = myWSReqElemDelegate.GetLISPatientElements(Nothing, myWorkSessionID)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myDataSet = DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS)
+                        End If
 
                         'Load each Result in a HisWSOrderTestsDS
+                        Dim mySampleID As String = String.Empty
+                        Dim myHistOrderTestsDS As New HisWSOrderTestsDS
+                        Dim myHistOrderTestsRow As HisWSOrderTestsDS.thisWSOrderTestsRow = Nothing
+                        Dim lisInfoLinqRes As List(Of OrderTestsLISInfoDS.twksOrderTestsLISInfoRow)
+                        Dim lstSpecimenID As List(Of WSRequiredElementsDS.twksWSRequiredElementsRow)
+
                         For Each myResultsRow As ResultsDS.vwksResultsRow In pResultsDS.vwksResults.Rows
                             'For Multipoint Calibrators, process only data of the first point, the rest are ignored
                             If (myResultsRow.MultiPointNumber = 1) Then
@@ -4499,76 +4520,99 @@ Namespace Biosystems.Ax00.BL
                                             myHistOrderTestsRow.SampleID = myResultsRow.PatientID
                                             myHistOrderTestsRow.SetHistPatientIDNull()
                                         End If
+                                        mySampleID = myResultsRow.PatientID
 
                                     ElseIf (myResultsRow.SampleID.Substring(0, 1) = "#") Then
                                         'For autonumeric Patients, add the WS Sequence Number as suffix...
                                         myHistOrderTestsRow.SampleID = myResultsRow.SampleID & "-" & myWSSequenceNum
                                         myHistOrderTestsRow.SetHistPatientIDNull()
+
+                                        mySampleID = myHistOrderTestsRow.SampleID
                                     Else
                                         myHistOrderTestsRow.SampleID = myResultsRow.SampleID
                                         myHistOrderTestsRow.SetHistPatientIDNull()
+
+                                        mySampleID = myResultsRow.SampleID
                                     End If
                                 Else
                                     myHistOrderTestsRow.SetSampleIDNull()
                                     myHistOrderTestsRow.SetHistPatientIDNull()
                                 End If
 
-                                'AG 24/07/2014 - #1886 - RQ00086 v3.1.0 Historic patient results can be re-sent. Change condition and always save next fields
-                                'AG 24/04/2013 - new fields to be able upload results to LIS from history (only if ExportStatus <> "SENT")
-                                'LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
+                                'BT #1886 (RQ00086 v3.1.0) - Historic Patient Results can be always send to LIS, although they have been already exported. 
                                 'If (myResultsRow.SampleClass = "PATIENT") AndAlso ((Not myResultsRow.IsExportStatusNull AndAlso myResultsRow.ExportStatus <> "SENT") OrElse (myResultsRow.IsExportStatusNull)) Then
                                 If (myResultsRow.SampleClass = "PATIENT") Then
-                                    'AG 24/07/2014
+                                    'Fields obtained from OrderTests
+                                    If (Not myResultsRow.IsLISRequestNull) Then myHistOrderTestsRow.LISRequest = myResultsRow.LISRequest Else myHistOrderTestsRow.SetLISRequestNull()
+                                    If (Not myResultsRow.IsExternalQCNull) Then myHistOrderTestsRow.ExternalQC = myResultsRow.ExternalQC Else myHistOrderTestsRow.SetExternalQCNull()
 
-                                    'Fields get from OrderTests
-                                    If Not myResultsRow.IsLISRequestNull Then myHistOrderTestsRow.LISRequest = myResultsRow.LISRequest Else myHistOrderTestsRow.SetLISRequestNull()
-                                    If Not myResultsRow.IsExternalQCNull Then myHistOrderTestsRow.ExternalQC = myResultsRow.ExternalQC Else myHistOrderTestsRow.SetExternalQCNull()
-
-                                    'Fields get from OrderTestsLISInfo
+                                    'Fields obtained from OrderTestsLISInfo
                                     lisInfoLinqRes = (From a As OrderTestsLISInfoDS.twksOrderTestsLISInfoRow In lisInfoDS.twksOrderTestsLISInfo _
-                                                      Where a.OrderTestID = myResultsRow.OrderTestID And a.RerunNumber = myResultsRow.RerunNumber _
-                                                      Select a).ToList
-                                    If lisInfoLinqRes.Count > 0 Then
-                                        If Not lisInfoLinqRes(0).IsSpecimenIDNull Then myHistOrderTestsRow.SpecimenID = lisInfoLinqRes(0).SpecimenID Else myHistOrderTestsRow.SetSpecimenIDNull()
-                                        If Not lisInfoLinqRes(0).IsAwosIDNull Then myHistOrderTestsRow.AwosID = lisInfoLinqRes(0).AwosID Else myHistOrderTestsRow.SetAwosIDNull()
-                                        If Not lisInfoLinqRes(0).IsESOrderIDNull Then myHistOrderTestsRow.ESOrderID = lisInfoLinqRes(0).ESOrderID Else myHistOrderTestsRow.SetESOrderIDNull()
-                                        If Not lisInfoLinqRes(0).IsESPatientIDNull Then myHistOrderTestsRow.ESPatientID = lisInfoLinqRes(0).ESPatientID Else myHistOrderTestsRow.SetESPatientIDNull()
-                                        If Not lisInfoLinqRes(0).IsLISOrderIDNull Then myHistOrderTestsRow.LISOrderID = lisInfoLinqRes(0).LISOrderID Else myHistOrderTestsRow.SetLISOrderIDNull()
-                                        If Not lisInfoLinqRes(0).IsLISPatientIDNull Then myHistOrderTestsRow.LISPatientID = lisInfoLinqRes(0).LISPatientID Else myHistOrderTestsRow.SetLISPatientIDNull()
+                                                     Where a.OrderTestID = myResultsRow.OrderTestID _
+                                                   AndAlso a.RerunNumber = myResultsRow.RerunNumber _
+                                                    Select a).ToList
+
+                                    If (lisInfoLinqRes.Count > 0) Then
+                                        If (Not lisInfoLinqRes(0).IsSpecimenIDNull) Then myHistOrderTestsRow.SpecimenID = lisInfoLinqRes(0).SpecimenID Else myHistOrderTestsRow.SetSpecimenIDNull()
+                                        If (Not lisInfoLinqRes(0).IsAwosIDNull) Then myHistOrderTestsRow.AwosID = lisInfoLinqRes(0).AwosID Else myHistOrderTestsRow.SetAwosIDNull()
+                                        If (Not lisInfoLinqRes(0).IsESOrderIDNull) Then myHistOrderTestsRow.ESOrderID = lisInfoLinqRes(0).ESOrderID Else myHistOrderTestsRow.SetESOrderIDNull()
+                                        If (Not lisInfoLinqRes(0).IsESPatientIDNull) Then myHistOrderTestsRow.ESPatientID = lisInfoLinqRes(0).ESPatientID Else myHistOrderTestsRow.SetESPatientIDNull()
+                                        If (Not lisInfoLinqRes(0).IsLISOrderIDNull) Then myHistOrderTestsRow.LISOrderID = lisInfoLinqRes(0).LISOrderID Else myHistOrderTestsRow.SetLISOrderIDNull()
+                                        If (Not lisInfoLinqRes(0).IsLISPatientIDNull) Then myHistOrderTestsRow.LISPatientID = lisInfoLinqRes(0).LISPatientID Else myHistOrderTestsRow.SetLISPatientIDNull()
+                                    Else
+                                        'BT #1861 - It is a manual Patient Order Test; get the SpecimenID sent by LIS for the same PatientID and SampleType (if any), 
+                                        '           or set SpecimenID = SampleID if there is not LIS information for the PatientID and SampleType.
+                                        lstSpecimenID = (From b As WSRequiredElementsDS.twksWSRequiredElementsRow In myDataSet.twksWSRequiredElements _
+                                                        Where b.PatientID = mySampleID _
+                                                      AndAlso b.SampleType = myHistOrderTestsRow.SampleType _
+                                                       Select b).ToList
+
+                                        If (lstSpecimenID.Count > 0) Then
+                                            myHistOrderTestsRow.SpecimenID = lstSpecimenID.First.SpecimenIDList.Trim.Split(CChar(vbCrLf))(0)
+                                        Else
+                                            myHistOrderTestsRow.SpecimenID = mySampleID
+                                        End If
                                     End If
 
                                     'Fields get from LIS mapping values
                                     myGlobalDataTO = testMappDlg.GetLISTestID(testMappDS, myResultsRow.TestID, myResultsRow.TestType)
-                                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                         myHistOrderTestsRow.LISTestName = DirectCast(myGlobalDataTO.SetDatos, String)
                                     Else
                                         myHistOrderTestsRow.SetLISTestNameNull()
                                     End If
 
                                     myGlobalDataTO = confMappDlg.GetLISSampleType(confMappDS, myResultsRow.SampleType)
-                                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                         myHistOrderTestsRow.LISSampleType = DirectCast(myGlobalDataTO.SetDatos, String)
                                     Else
                                         myHistOrderTestsRow.SetLISSampleTypeNull()
                                     End If
 
                                     myGlobalDataTO = confMappDlg.GetLISUnits(confMappDS, myHistOrderTestsRow.MeasureUnit) 'AG 24/04/2013 - Do not use myResultsRow.MeasureUnit because is NULL
-                                    If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                         myHistOrderTestsRow.LISUnits = DirectCast(myGlobalDataTO.SetDatos, String)
                                     Else
                                         myHistOrderTestsRow.SetLISUnitsNull()
                                     End If
                                 End If
-                                'AG 24/04/2013
-
                                 myHistOrderTestsDS.thisWSOrderTests.AddthisWSOrderTestsRow(myHistOrderTestsRow)
                             End If
                         Next
-                        lisInfoLinqRes = Nothing
 
                         'Create all Order Tests added to HistWSOrderTestsDS
                         Dim myHistOrderTestsDelegate As New HisWSOrderTestsDelegate
                         myGlobalDataTO = myHistOrderTestsDelegate.Create(dbConnection, myHistOrderTestsDS)
+
+                        'Set all created lists to Nothing to release memory
+                        mySTDTestList = Nothing
+                        myCALTestList = Nothing
+                        myOFFTestList = Nothing
+                        myISETestList = Nothing
+                        myCALIBList = Nothing
+                        myPATIENTList = Nothing
+                        lstSpecimenID = Nothing
+                        lisInfoLinqRes = Nothing
 
                         If (Not myGlobalDataTO.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
