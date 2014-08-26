@@ -1564,7 +1564,7 @@ Public Class IResults
                 resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'Include the already exported results
             Else
                 'TESTs view re-send process
-                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'PENDING to get data in a special way for TESTs view re-send process
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'From test view user export only the still not sent results!!! (SPECIFICATION: NO changes in export from tests view)
             End If
             'AG 29/07/2014
 
