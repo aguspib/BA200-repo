@@ -22,6 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  SA 22/02/2012
         ''' Modified by: WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name in IProgISETest.
+        '''              SA 26/08/2014 - Changed the SQL Query to fix an error when insert new field TestLongName: it has to be formatted as an nvarchar field
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisISETestsDS As HisISETestSamplesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -38,8 +39,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText.Append(" INSERT INTO thisISETestSamples (ISETestID, SampleType, ISETestName, MeasureUnit, DecimalsAllowed, TestLongName) ")
                         cmdText.Append(" VALUES (")
 
-                        cmdText.AppendFormat("{0}, '{1}', N'{2}', '{3}', {4}, {5}", hisISETestRow.ISETestID, hisISETestRow.SampleType, _
-                                             hisISETestRow.ISETestName.Replace("'", "''"), hisISETestRow.MeasureUnit, hisISETestRow.DecimalsAllowed, hisISETestRow.TestLongName)
+                        cmdText.AppendFormat("{0}, '{1}', N'{2}', '{3}', {4}, N'{5}'", hisISETestRow.ISETestID, hisISETestRow.SampleType, _
+                                             hisISETestRow.ISETestName.Replace("'", "''"), hisISETestRow.MeasureUnit, hisISETestRow.DecimalsAllowed, hisISETestRow.TestLongName.Replace("'", "''"))
 
                         'Add the last parenthesis and the sentence needed to get the ID automatically generated
                         cmdText.Append(") ")
@@ -56,7 +57,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Next
 
                     myGlobalDataTO.SetDatos = pHisISETestsDS
-
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
