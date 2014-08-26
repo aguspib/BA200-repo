@@ -2531,4 +2531,74 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New table tcfgGridColsConfiguration has been created</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE type = 'U' AND name = 'tcfgGridColsConfiguration') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Historic Patient Results Screen (HIS001) has been added to Screens table (tfmwScreens)</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM dbo.tfmwScreens WHERE ScreenID = 'HIS001') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New table tcfgGridColsConfiguration has been loaded with columns of Historic Patient Results grid</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE type = 'U' AND name = 'tcfgGridColsConfiguration') = 1)
+        IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'AdditionalInfo') = 1) AND   
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'AnalyzerID') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'CONCValueString') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'ExportImage') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'FirstName') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'LastName') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'MeasureUnit') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'PatientID') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'RefRange') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'RemarkAlert') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'Remarks') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'ResultDateTime') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'SampleType') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'SpecimenID') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'StatFlagImage') = 1) AND
+           ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgGridColsConfiguration] WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'TestName') = 1) 
+          SELECT 'True'
+        ELSE
+          SELECT 'False'
+      ELSE
+        SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>View vhisWSResults has been changed to return also the SpecimenID and all Patient Demographics</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'SpecimenID') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'FirstName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'LastName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'Gender') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'DateOfBirth') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSResults' AND sc.name = 'Comments') = 1) 
+        SELECT 'True'
+      ELSE
+        SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
+
+
+	
