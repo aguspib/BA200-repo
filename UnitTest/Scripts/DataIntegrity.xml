@@ -2535,7 +2535,7 @@
     <Version>3.10</Version>
     <Label>New table tcfgGridColsConfiguration has been created</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE type = 'U' AND name = 'tcfgGridColsConfiguration') = 1)
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE type = 'U' AND name = 'tcfgGridColsConfiguration') = 1)
       SELECT 'True'
       ELSE
       SELECT 'False'
