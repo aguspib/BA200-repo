@@ -586,8 +586,6 @@ Namespace Biosystems.Ax00.BL
                             myHistoryTestSamplesRow.TestShortName = pUpdatedISETestSamples.tparISETestSamples(0).ISETestShortName
                             myHistoryTestSamplesRow.PreloadedTest = False
                             myHistoryTestSamplesRow.MeasureUnit = pUpdatedISETestSamples.tparISETestSamples(0).MeasureUnit
-                            myHistoryTestSamplesRow.DecimalsAllowed = pUpdatedISETestSamples.tparISETestSamples(0).Decimals
-                            myHistoryTestSamplesRow.TestLongName = pUpdatedISETestSamples.tparISETestSamples(0).TestLongName    ' WE 31/07/2014 - #1865
                             myHistoryTestSamplesDS.tqcHistoryTestSamples.AddtqcHistoryTestSamplesRow(myHistoryTestSamplesRow)
 
                             resultData = myHistoryTestSamplesDelegate.UpdateByTestIDNEW(dbConnection, myHistoryTestSamplesDS)
@@ -604,6 +602,10 @@ Namespace Biosystems.Ax00.BL
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).RejectionCriteria = pUpdatedISETestSamples.tparISETestSamples(0).RejectionCriteria
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode = pUpdatedISETestSamples.tparISETestSamples(0).CalculationMode
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries = pUpdatedISETestSamples.tparISETestSamples(0).NumberOfSeries
+
+                                        ' WE 26/08/2014 - #1865 Moved update Decimals and new field TestLongName to here from above ('UPDATE data of the ISE Test in QC Module).
+                                        myHistoryTestSamplesDS.tqcHistoryTestSamples(0).DecimalsAllowed = pUpdatedISETestSamples.tparISETestSamples(0).Decimals
+                                        myHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName = pUpdatedISETestSamples.tparISETestSamples(0).TestLongName    ' WE 31/07/2014 - #1865
 
                                         resultData = myHistoryTestSamplesDelegate.UpdateByQCTestIdAndSampleTypeNEW(dbConnection, myHistoryTestSamplesDS)
                                         If (Not resultData.HasError) Then

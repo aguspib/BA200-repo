@@ -347,7 +347,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 ElseIf (Not pHistoryTestSamplesDS Is Nothing) Then
-                    Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName))
+                    Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
                     Dim cmdText As String = ""
 
                     If pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType = "ISE" Then
