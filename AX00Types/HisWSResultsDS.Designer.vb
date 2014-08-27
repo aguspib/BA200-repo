@@ -1088,7 +1088,13 @@ Partial Public Class HisWSResultsDS
 
         Private columnResultDateTime As Global.System.Data.DataColumn
 
+        Private columnHistPatientID As Global.System.Data.DataColumn
+
         Private columnPatientID As Global.System.Data.DataColumn
+
+        Private columnFirstName As Global.System.Data.DataColumn
+
+        Private columnLastName As Global.System.Data.DataColumn
 
         Private columnSampleClass As Global.System.Data.DataColumn
 
@@ -1275,9 +1281,33 @@ Partial Public Class HisWSResultsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property HistPatientIDColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnHistPatientID
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public ReadOnly Property PatientIDColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnPatientID
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property FirstNameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnFirstName
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property LastNameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnLastName
             End Get
         End Property
 
@@ -1787,7 +1817,10 @@ Partial Public Class HisWSResultsDS
                     ByVal AnalyzerID As String, _
                     ByVal WorkSessionID As String, _
                     ByVal ResultDateTime As Date, _
+                    ByVal HistPatientID As Integer, _
                     ByVal PatientID As String, _
+                    ByVal FirstName As String, _
+                    ByVal LastName As String, _
                     ByVal SampleClass As String, _
                     ByVal StatFlag As Boolean, _
                     ByVal TestType As String, _
@@ -1847,7 +1880,7 @@ Partial Public Class HisWSResultsDS
                     ByVal BackColorGroup As Integer, _
                     ByVal TestLongName As String) As vhisWSResultsRow
             Dim rowvhisWSResultsRow As vhisWSResultsRow = CType(Me.NewRow, vhisWSResultsRow)
-            Dim columnValuesArray() As Object = New Object() {HistOrderTestID, AnalyzerID, WorkSessionID, ResultDateTime, PatientID, SampleClass, StatFlag, TestType, SampleType, TestID, TestName, TestVersionNumber, CONCValue, MeasureUnit, MinRefRange, MaxRefRange, ExportStatus, AlarmList, FormulaText, StatFlagImage, ExportImage, GraphImage, RemarkAlert, RefRange, Remarks, AdditionalInfo, ABSValue, ABSWorkReagent, KineticBlankLimit, ABSInitial, ABSMainFilter, BlankAbsorbanceLimit, CalibratorName, LotNumber, NumberOfCalibrators, TheoreticalConcentration, CalibratorFactor, FactorLimits, FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, CONCValueString, MultiPointNumber, Selected, CalibPointUsed, ManualResult, ManualResultText, LISMessageID, LISRequest, ExternalQC, ESOrderID, LISOrderID, ESPatientID, LISPatientID, LISTestName, LISSampleType, LISUnits, SpecimenID, AwosID, ManualResultFlag, TestPosition, BackColorGroup, TestLongName}
+            Dim columnValuesArray() As Object = New Object() {HistOrderTestID, AnalyzerID, WorkSessionID, ResultDateTime, HistPatientID, PatientID, FirstName, LastName, SampleClass, StatFlag, TestType, SampleType, TestID, TestName, TestVersionNumber, CONCValue, MeasureUnit, MinRefRange, MaxRefRange, ExportStatus, AlarmList, FormulaText, StatFlagImage, ExportImage, GraphImage, RemarkAlert, RefRange, Remarks, AdditionalInfo, ABSValue, ABSWorkReagent, KineticBlankLimit, ABSInitial, ABSMainFilter, BlankAbsorbanceLimit, CalibratorName, LotNumber, NumberOfCalibrators, TheoreticalConcentration, CalibratorFactor, FactorLimits, FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, CONCValueString, MultiPointNumber, Selected, CalibPointUsed, ManualResult, ManualResultText, LISMessageID, LISRequest, ExternalQC, ESOrderID, LISOrderID, ESPatientID, LISPatientID, LISTestName, LISSampleType, LISUnits, SpecimenID, AwosID, ManualResultFlag, TestPosition, BackColorGroup, TestLongName}
             rowvhisWSResultsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowvhisWSResultsRow)
             Return rowvhisWSResultsRow
@@ -1874,7 +1907,10 @@ Partial Public Class HisWSResultsDS
             Me.columnAnalyzerID = MyBase.Columns("AnalyzerID")
             Me.columnWorkSessionID = MyBase.Columns("WorkSessionID")
             Me.columnResultDateTime = MyBase.Columns("ResultDateTime")
+            Me.columnHistPatientID = MyBase.Columns("HistPatientID")
             Me.columnPatientID = MyBase.Columns("PatientID")
+            Me.columnFirstName = MyBase.Columns("FirstName")
+            Me.columnLastName = MyBase.Columns("LastName")
             Me.columnSampleClass = MyBase.Columns("SampleClass")
             Me.columnStatFlag = MyBase.Columns("StatFlag")
             Me.columnTestType = MyBase.Columns("TestType")
@@ -1946,8 +1982,14 @@ Partial Public Class HisWSResultsDS
             MyBase.Columns.Add(Me.columnWorkSessionID)
             Me.columnResultDateTime = New Global.System.Data.DataColumn("ResultDateTime", GetType(Date), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnResultDateTime)
+            Me.columnHistPatientID = New Global.System.Data.DataColumn("HistPatientID", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnHistPatientID)
             Me.columnPatientID = New Global.System.Data.DataColumn("PatientID", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnPatientID)
+            Me.columnFirstName = New Global.System.Data.DataColumn("FirstName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnFirstName)
+            Me.columnLastName = New Global.System.Data.DataColumn("LastName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnLastName)
             Me.columnSampleClass = New Global.System.Data.DataColumn("SampleClass", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnSampleClass)
             Me.columnStatFlag = New Global.System.Data.DataColumn("StatFlag", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
@@ -3874,6 +3916,21 @@ Partial Public Class HisWSResultsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property HistPatientID() As Integer
+            Get
+                Try
+                    Return CType(Me(Me.tablevhisWSResults.HistPatientIDColumn), Integer)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'HistPatientID' in table 'vhisWSResults' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Integer)
+                Me(Me.tablevhisWSResults.HistPatientIDColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Property PatientID() As String
             Get
                 If Me.IsPatientIDNull Then
@@ -3884,6 +3941,36 @@ Partial Public Class HisWSResultsDS
             End Get
             Set(value As String)
                 Me(Me.tablevhisWSResults.PatientIDColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property FirstName() As String
+            Get
+                If Me.IsFirstNameNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tablevhisWSResults.FirstNameColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tablevhisWSResults.FirstNameColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property LastName() As String
+            Get
+                If Me.IsLastNameNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tablevhisWSResults.LastNameColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tablevhisWSResults.LastNameColumn) = value
             End Set
         End Property
 
@@ -4808,6 +4895,18 @@ Partial Public Class HisWSResultsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsHistPatientIDNull() As Boolean
+            Return Me.IsNull(Me.tablevhisWSResults.HistPatientIDColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetHistPatientIDNull()
+            Me(Me.tablevhisWSResults.HistPatientIDColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsPatientIDNull() As Boolean
             Return Me.IsNull(Me.tablevhisWSResults.PatientIDColumn)
         End Function
@@ -4816,6 +4915,30 @@ Partial Public Class HisWSResultsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetPatientIDNull()
             Me(Me.tablevhisWSResults.PatientIDColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsFirstNameNull() As Boolean
+            Return Me.IsNull(Me.tablevhisWSResults.FirstNameColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetFirstNameNull()
+            Me(Me.tablevhisWSResults.FirstNameColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsLastNameNull() As Boolean
+            Return Me.IsNull(Me.tablevhisWSResults.LastNameColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetLastNameNull()
+            Me(Me.tablevhisWSResults.LastNameColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _

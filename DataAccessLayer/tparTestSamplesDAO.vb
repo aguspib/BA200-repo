@@ -1052,6 +1052,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet HistoryQCTestSamples with all data needed to export the Test/SampleType to QC Module</returns>
         ''' <remarks>
         ''' Created by:  SA 21/05/2012
+        ''' Modified by: SA 27/08/2014 - Changed the SQL Query to return also field TestLongName from table tparTestSamples (added as part of BT #1865, in which
+        '''                              field TestLongName is also exported to QC Module for ISE Tests; this change is to export the field also for Standard Tests)
         ''' </remarks>
         Public Function GetDefinitionForQCModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1063,7 +1065,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT T.TestName, T.ShortName AS TestShortName, T.PreloadedTest, T.MeasureUnit, T.DecimalsAllowed, " & vbCrLf & _
-                                                       " TS.RejectionCriteria, TS.CalculationMode, TS.NumberOfSeries " & vbCrLf & _
+                                                       " TS.RejectionCriteria, TS.CalculationMode, TS.NumberOfSeries, TS.TestLongName " & vbCrLf & _
                                                 " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
                                                 " WHERE  TS.TestID     = " & pTestID.ToString & vbCrLf & _
                                                 " AND    TS.SampleType = '" & pSampleType & "' " & vbCrLf

@@ -400,28 +400,28 @@ Public Class IHisResults
             GetTestTypes()
             GetAnalyzerList()
 
-            statFlagComboBox.DataSource = mStatFlags.Values.ToList
+            bsStatFlagComboBox.DataSource = mStatFlags.Values.ToList
 
-            With sampleTypeChkComboBox.Properties.Items
+            With sampleTypesChkComboBox.Properties.Items
                 For Each kvp As KeyValuePair(Of String, String) In mSampleTypes
                     .Add(kvp.Key, kvp.Key + kvp.Value)
                 Next
             End With
 
-            With testTypeChkComboBox.Properties.Items
+            With testTypesChkComboBox.Properties.Items
                 For Each kvp As KeyValuePair(Of String, String) In mTestTypes
                     .Add(kvp.Key, kvp.Key + kvp.Value)
                 Next
             End With
 
-            analyzerIDComboBox.DataSource = mAnalyzers
+            bsAnalyzersComboBox.DataSource = mAnalyzers
 
-            sampleTypeChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
-            testTypeChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
+            sampleTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
+            testTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
 
-            analyzerIDComboBox.Enabled = mAnalyzers.Count > 1
-            analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
-            analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+            bsAnalyzersComboBox.Enabled = mAnalyzers.Count > 1
+            bsAnalyzersComboBox.Visible = bsAnalyzersComboBox.Enabled
+            analyzerIDLabel.Visible = bsAnalyzersComboBox.Visible
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -486,7 +486,8 @@ Public Class IHisResults
     '''             AG 14/02/2014 - BT #1505 ==> User can sort grid data also by column ExportStatus
     '''             SA 29/04/2014 - BT #1608 ==> Added a hidden column for field TestLongName (this field has to be shown as Test Name in reports
     '''                                          when it is informed)
-    '''             SA 01/08/2014 - BT #1861 ==> Added new grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
+    '''             SA 01/08/2014 - BT #1861 ==> Added new visible grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
+    '''                                          Added new hidden grid column> HistPatientID.
     '''                                          Call new function to get the saved width of all visible grid columns and assign the value.
     ''' </remarks>
     Private Sub InitializeResultHistoryGrid()
@@ -673,7 +674,7 @@ Public Class IHisResults
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
-            'BT #1608 - TEST LONG NAME Column (hidden, used when print reports)
+            'BT #1608 - TEST LONG NAME Column (hidden, used to print reports)
             column = historyGridView.Columns.Add()
             With column
                 .FieldName = "TestLongName"
@@ -740,7 +741,7 @@ Public Class IHisResults
                 .OptionsColumn.ShowCaption = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'EXPORTED TO LIS column
@@ -827,16 +828,21 @@ Public Class IHisResults
             'BT #1309 - TEST POSITION Column (hidden, used when print reports)
             column = historyGridView.Columns.Add()
             With column
-                .Caption = "TestPosition"
+                .Caption = String.Empty
                 .FieldName = "TestPosition"
                 .Name = "TestPosition"
                 .Visible = False
                 .Width = 0
-                .OptionsColumn.AllowSize = False
-                .OptionsColumn.ShowCaption = False
-                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
-                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
+            End With
+
+            'BT #1861 - HISTORIC PATIENT IDENTIFIER Column (hidden)
+            column = historyGridView.Columns.Add()
+            With column
+                .Caption = String.Empty
+                .FieldName = "HistPatientID"
+                .Name = "HistPatientID"
+                .Visible = False
+                .Width = 0
             End With
 
             'BT #1861 - BACKCOLOR GROUP Column (hidden, used to set the Row BackColor in grid event RowStyle)
@@ -847,11 +853,6 @@ Public Class IHisResults
                 .Name = "BackColorGroup"
                 .Visible = False
                 .Width = 0
-                .OptionsColumn.AllowSize = False
-                .OptionsColumn.ShowCaption = False
-                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
-                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'BT #1861 - Get the saved width of all visible grid columns and assign the value
@@ -880,16 +881,16 @@ Public Class IHisResults
     ''' </remarks>
     Private Sub InitializeFilterSearch()
         Try
-            dateFromDateTimePick.Checked = True
-            dateFromDateTimePick.Value = Today.AddDays(-1)
+            bsDateFromDateTimePick.Checked = True
+            bsDateFromDateTimePick.Value = Today.AddDays(-1)
 
             dateToDateTimePick.Checked = True
             dateToDateTimePick.Value = Today
 
-            statFlagComboBox.SelectedIndex = 0
+            bsStatFlagComboBox.SelectedIndex = 0
 
-            If (analyzerIDComboBox.Items.Count > 0) Then
-                analyzerIDComboBox.SelectedIndex = 0
+            If (bsAnalyzersComboBox.Items.Count > 0) Then
+                bsAnalyzersComboBox.SelectedIndex = 0
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -956,10 +957,10 @@ Public Class IHisResults
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
-            .analyzerId = analyzerIDComboBox.SelectedItem.ToString
+            .analyzerId = bsAnalyzersComboBox.SelectedItem.ToString
 
-            If (dateFromDateTimePick.Checked) Then
-                .dateFrom = dateFromDateTimePick.Value
+            If (bsDateFromDateTimePick.Checked) Then
+                .dateFrom = bsDateFromDateTimePick.Value
             Else
                 .dateFrom = Nothing
             End If
@@ -974,20 +975,20 @@ Public Class IHisResults
             .specimenID = bsSpecimenIDTextBox.Text
 
             .statFlag = (From kvp As KeyValuePair(Of TriState, String) In mStatFlags _
-                        Where kvp.Value = statFlagComboBox.SelectedItem.ToString _
+                        Where kvp.Value = bsStatFlagComboBox.SelectedItem.ToString _
                        Select kvp.Key).FirstOrDefault
 
             .sampleTypes = New List(Of String)
-            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In sampleTypeChkComboBox.Properties.Items
+            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In sampleTypesChkComboBox.Properties.Items
                 If (elem.CheckState = CheckState.Checked) Then .sampleTypes.Add(elem.Value.ToString)
             Next
 
             .testTypes = New List(Of String)
-            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In testTypeChkComboBox.Properties.Items
+            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In testTypesChkComboBox.Properties.Items
                 If (elem.CheckState = CheckState.Checked) Then .testTypes.Add(elem.Value.ToString)
             Next
 
-            .testName = testNameTextBox.Text
+            .testName = bsTestNameTextBox.Text
         End With
         Return filter
     End Function
@@ -1005,7 +1006,7 @@ Public Class IHisResults
         Dim myHisWSResultsDS As HisWSResultsDS
 
         historyGrid.DataSource = Nothing
-        If (analyzerIDComboBox.Items.Count = 0) Then Exit Sub
+        If (bsAnalyzersComboBox.Items.Count = 0) Then Exit Sub
 
         Try
             UpdateFormBehavior(False)
@@ -1126,22 +1127,32 @@ Public Class IHisResults
     End Function
 
     ''' <summary>
-    ''' Set value of field BackColorGroup for the Result row beign processed: if the Result is for the same PatientID/SpecimenID than the 
+    ''' Set value of field BackColorGroup for the Result row beign processed: if the Result is for the same HistPatientID/PatientID/SpecimenID than the 
     ''' previous Result row, the same BackColor is assigned; otherwise, the alternate BackColor value is assigned
     ''' </summary>
     ''' <param name="pRow">Result row in process</param>
     ''' <param name="pPreviousBackColorGroup">BackColorGroup assigned to the previous Result Row in the DataSet</param>
     ''' <param name="pPreviousSpecimenID">SpecimenID in the previous Result Row in the DataSet</param>
     ''' <param name="pPreviousPatientID">PatientID in the previous Result Row in the DataSet</param>
+    ''' <param name="pPreviousHistPatientID">HistPatientID in the previous Result Row in the DataSet. It is an optional parameter due to if the
+    '''                                      previous Result Row corresponds to an unknown Patient, HistPatientID is NULL in the DataSet</param>
     ''' <remarks>
     ''' Created by: SA 25/08/2014 - BT #1861
     ''' </remarks>
     Private Sub SetRowBackColorGroup(ByRef pRow As HisWSResultsDS.vhisWSResultsRow, ByVal pPreviousBackColorGroup As Integer, ByVal pPreviousSpecimenID As String, _
-                                     ByVal pPreviousPatientID As String)
+                                     ByVal pPreviousPatientID As String, Optional ByVal pPreviousHistPatientID As Integer = 0)
         Try
+            Dim changeRowBC As Boolean = True
+
             If (pRow.SpecimenID = pPreviousSpecimenID AndAlso pRow.PatientID = pPreviousPatientID) Then
-                pRow.BackColorGroup = pPreviousBackColorGroup
-            Else
+                If (pRow.IsHistPatientIDNull AndAlso pPreviousHistPatientID = 0) OrElse _
+                   (Not pRow.IsHistPatientIDNull AndAlso pPreviousHistPatientID <> 0 AndAlso pRow.HistPatientID = pPreviousHistPatientID) Then
+                    pRow.BackColorGroup = pPreviousBackColorGroup
+                    changeRowBC = False
+                End If
+            End If
+
+            If (changeRowBC) Then
                 If (pPreviousBackColorGroup = 1) Then
                     pRow.BackColorGroup = 2
                 Else
@@ -1177,6 +1188,7 @@ Public Class IHisResults
             Dim i As Integer = 0
             Dim myPrevBackColor As Integer = 1
             Dim myPrevPatientID As String = String.Empty
+            Dim myPrevHistPatientID As Integer = 0
             Dim myPrevSpecimenID As String = String.Empty
 
             For Each row As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable
@@ -1192,15 +1204,16 @@ Public Class IHisResults
 
                 'BT #1861 - Set the group BackColor for each grid row 
                 If (i = 0) Then
-                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID)
+                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID, 0)
                 Else
-                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID)
+                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID, myPrevHistPatientID)
                 End If
 
                 i += 1
                 myPrevBackColor = row.BackColorGroup
-                myPrevSpecimenID = row.SpecimenID
                 myPrevPatientID = row.PatientID
+                myPrevSpecimenID = row.SpecimenID
+                If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
             Next
 
             CreateLogActivity("PrepareAndSetDataToGrid : " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".PrepareAndSetDataToGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
@@ -1507,7 +1520,7 @@ Public Class IHisResults
             'AG 24/07/2014
 
             PrintButton.Enabled = pStatus AndAlso selectedRows.Count > 0
-            searchGroup.Enabled = pStatus AndAlso analyzerIDComboBox.Items.Count > 0
+            searchGroup.Enabled = pStatus AndAlso bsAnalyzersComboBox.Items.Count > 0
             CompactPrintButton.Enabled = pStatus AndAlso selectedRows.Count > 0
 
             ScreenStatusByUserLevel()
@@ -1793,7 +1806,7 @@ Public Class IHisResults
             Dim myHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)
 
             myHisWSResults = GetSelectedRows()
-            sampleTypeChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
+            sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
 
             If (myHisWSResults.Count > 0) Then
                 'BT #1309 - Sort data to print by TestPosition field
@@ -1834,7 +1847,7 @@ Public Class IHisResults
             Dim myHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)
 
             myHisWSResults = GetSelectedRows()
-            sampleTypeChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
+            sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
 
             If (myHisWSResults.Count > 0) Then
                 'BT #1309 - Sort data to print by TestPosition field
@@ -1861,10 +1874,10 @@ Public Class IHisResults
 #End Region
 
 #Region "DateTimePicker Events"
-    Private Sub bsDateFromDateTimePick_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dateFromDateTimePick.ValueChanged
+    Private Sub bsDateFromDateTimePick_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsDateFromDateTimePick.ValueChanged
         Try
-            If (dateFromDateTimePick.Checked) Then
-                dateToDateTimePick.MinDate = dateFromDateTimePick.Value
+            If (bsDateFromDateTimePick.Checked) Then
+                dateToDateTimePick.MinDate = bsDateFromDateTimePick.Value
             Else
                 dateToDateTimePick.MinDate = Today.AddYears(-100)
             End If
@@ -1877,9 +1890,9 @@ Public Class IHisResults
     Private Sub bsDateToDateTimePick_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dateToDateTimePick.ValueChanged
         Try
             If (dateToDateTimePick.Checked) Then
-                dateFromDateTimePick.MaxDate = dateToDateTimePick.Value
+                bsDateFromDateTimePick.MaxDate = dateToDateTimePick.Value
             Else
-                dateFromDateTimePick.MaxDate = Today.AddYears(100)
+                bsDateFromDateTimePick.MaxDate = Today.AddYears(100)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDateToDateTimePick_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1889,7 +1902,7 @@ Public Class IHisResults
 #End Region
 
 #Region "CheckComboBox Events"
-    Private Sub sampleTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles sampleTypeChkComboBox.CustomDisplayText
+    Private Sub sampleTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles sampleTypesChkComboBox.CustomDisplayText
         Try
             Dim numChecks As Integer = 0
             Dim text As String = String.Empty
@@ -1912,7 +1925,7 @@ Public Class IHisResults
         End Try
     End Sub
 
-    Private Sub testTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles testTypeChkComboBox.CustomDisplayText
+    Private Sub testTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles testTypesChkComboBox.CustomDisplayText
         Try
             Dim numChecks As Integer = 0
 
@@ -1930,6 +1943,7 @@ Public Class IHisResults
 #End Region
 
 #Region "Grid Events"
+
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by:  JB 23/10/2012 
@@ -2063,8 +2077,8 @@ Public Class IHisResults
 
             If (e.RowHandle >= 0) Then
                 If (Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup"))) = 1) Then
-                    e.Appearance.BackColor = Color.LightBlue
-                    e.Appearance.BackColor2 = Color.LightBlue
+                    e.Appearance.BackColor = Color.AntiqueWhite
+                    e.Appearance.BackColor2 = Color.AntiqueWhite
                 Else
                     e.Appearance.BackColor = Color.White
                     e.Appearance.BackColor2 = Color.White
@@ -2073,6 +2087,59 @@ Public Class IHisResults
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_RowStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".historyGridView_RowStyle ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' When the grid is sorted for a Column different of PatientID and/or SpecimenID, the Back Color of colored rows is changed to White; otherwise
+    ''' function SetRowBackColorGroup is called to set for each different HistPatientID/PatientID/SpecimenID the proper BackColorGroup
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 27/08/2014 - BT #1861
+    ''' </remarks>
+    Private Sub historyGridView_MouseDown(sender As Object, e As MouseEventArgs) Handles historyGridView.MouseDown
+        Try
+            Dim dataTable As HisWSResultsDS.vhisWSResultsDataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
+            If (Not dataTable Is Nothing) Then
+                With historyGridView.CalcHitInfo(New Point(e.X, e.Y))
+                    If (.InColumnPanel AndAlso Not .Column Is Nothing) Then
+                        Dim colName As String = .Column.Name
+                        If (colName = "ResultDateTime") OrElse (colName = "LastName") OrElse (colName = "FirstName") OrElse (colName = "SampleType") OrElse _
+                           (colName = "TestName") OrElse (colName = "RemarkAlert") OrElse (colName = "ExportImage") Then
+
+                            Dim lstColoredRows As List(Of HisWSResultsDS.vhisWSResultsRow) = (From row In dataTable Where row.BackColorGroup = 1).ToList
+                            For Each coloredRow As HisWSResultsDS.vhisWSResultsRow In lstColoredRows
+                                coloredRow.BackColorGroup = 2 'Set BackColor to White
+                            Next
+
+                        ElseIf (colName = "SpecimenID") OrElse (colName = "PatientID") Then
+                            Dim i As Integer = 0
+                            Dim myPrevBackColor As Integer = 1
+                            Dim myPrevPatientID As String = String.Empty
+                            Dim myPrevHistPatientID As Integer = 0
+                            Dim myPrevSpecimenID As String = String.Empty
+
+                            For Each row As HisWSResultsDS.vhisWSResultsRow In dataTable
+                                'Set the group BackColor for each grid row 
+                                If (i = 0) Then
+                                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID, 0)
+                                Else
+                                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID, myPrevHistPatientID)
+                                End If
+
+                                i += 1
+                                myPrevBackColor = row.BackColorGroup
+                                myPrevPatientID = row.PatientID
+                                myPrevSpecimenID = row.SpecimenID
+                                If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
+                            Next
+                        End If
+                    End If
+                End With
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_MouseDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".historyGridView_MouseDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 #End Region

@@ -26,11 +26,19 @@ Public Class IWSSampleRequest
     Private isHeaderControlCheckBoxClicked As Boolean
     Private isHeaderPatientCheckBoxClicked As Boolean
 
-    Private totalBlkCalCheckBoxes As Integer
+    ' XB 26/08/2014 - BT #1868
+    'Private totalBlkCalCheckBoxes As Integer
+    Private totalBlankCheckBoxes As Integer
+    Private totalCalibCheckBoxes As Integer
+
     Private totalControlCheckBoxes As Integer
     Private totalPatientCheckBoxes As Integer
 
-    Private totalBlkCalCheckedCheckBoxes As Integer
+    ' XB 26/08/2014 - BT #1868
+    'Private totalBlkCalCheckedCheckBoxes As Integer
+    Private totalBlankCheckedCheckBoxes As Integer
+    Private totalCalibCheckedCheckBoxes As Integer
+
     Private totalControlCheckedCheckBoxes As Integer
     Private totalPatientCheckedCheckBoxes As Integer
 
@@ -798,6 +806,7 @@ Public Class IWSSampleRequest
     '''                              requested for any of the requested Sample Types, parameter with the "real" SampleType (the one for which
     '''                              the Calibrator was defined) is informed (due to when validation of existing previous results for the 
     '''                              Calibrator is done, the informed SampleType has to be always the one for which the Calibrator was defined)
+    '''              XB 26/08/2014 - remove parameter on the call RowBlkCalCheckBoxClick function - BT #1868
     ''' </remarks>
     Private Sub ChangeBlankCalibratorSelectedColumn()
         Try
@@ -817,7 +826,7 @@ Public Class IWSSampleRequest
                         End If
 
                         'Verify if the CheckBox for select/unselect all Blanks and Calibrators have to be checked
-                        RowBlkCalCheckBoxClick(Nothing)
+                        RowBlkCalCheckBoxClick()
                     Else
                         Dim myVerification As Boolean = False
                         If (bsBlkCalibDataGridView.CurrentRow.Cells("PreviousOrderTestID").Value.ToString = "") Then
@@ -945,6 +954,7 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 13/04/2010 - Code moved from the event
+    ''' Modified by: XB 26/08/2014 - remove parameter on the call RowBlkCalCheckBoxClick function - BT #1868
     ''' </remarks>
     Private Sub ChangeBlkCalibSelectedState()
         Try
@@ -953,7 +963,7 @@ Public Class IWSSampleRequest
                 bsBlkCalibDataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit)
 
                 If (bsBlkCalibDataGridView.CurrentCell.OwningColumn.Name = "Selected") Then
-                    RowBlkCalCheckBoxClick(Nothing)
+                    RowBlkCalCheckBoxClick()
                 End If
             End If
         Catch ex As Exception
@@ -1636,34 +1646,62 @@ Public Class IWSSampleRequest
     ''' Created by:  GDS
     ''' Modified by: DL 09/03/2010
     '''              SA 17/03/2010 - CheckBox for select/unselect all Blank and Calibrators is only for those with Status OPEN                              
+    '''              XB 26/08/2014 - changes to control availability of both Check Boxes - BT #1868
     ''' </remarks>
     Private Sub CheckAddRemoveBlkCalRows()
         Try
             If (Not isHeaderBlkCalCheckBoxClicked) Then
                 'Check how many OPEN Blanks and Calibrators are currently in the grid of Blank and Calibrator Order Tests
                 Dim lstWSOpenDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+
+                ' Blanks
                 lstWSOpenDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                              Where a.OTStatus = "OPEN" _
-                             Select a).ToList()
-                totalBlkCalCheckBoxes = lstWSOpenDS.Count
+                               Where a.SampleClass = "BLANK" _
+                               AndAlso a.OTStatus = "OPEN" _
+                               Select a).ToList()
+                totalBlankCheckBoxes = lstWSOpenDS.Count
+
+                ' Calibrators
+                lstWSOpenDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                               Where a.SampleClass = "CALIB" _
+                               AndAlso a.OTStatus = "OPEN" _
+                               Select a).ToList()
+                totalCalibCheckBoxes = lstWSOpenDS.Count
+
 
                 'Check how many of the opened Blanks and Calibrators are currently selected
                 Dim lstWSSelectedDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+
+                ' Blanks
                 lstWSSelectedDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                                  Where a.OTStatus = "OPEN" _
+                               Where a.SampleClass = "BLANK" _
+                               AndAlso a.OTStatus = "OPEN" _
                                 AndAlso a.Selected = True _
                                  Select a).ToList()
-                totalBlkCalCheckedCheckBoxes = lstWSSelectedDS.Count
+                totalBlankCheckedCheckBoxes = lstWSSelectedDS.Count
+
+                ' Calibrators
+                lstWSSelectedDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                               Where a.SampleClass = "CALIB" _
+                               AndAlso a.OTStatus = "OPEN" _
+                                AndAlso a.Selected = True _
+                                 Select a).ToList()
+                totalCalibCheckedCheckBoxes = lstWSSelectedDS.Count
 
                 'Delete button is enabled only if there is at least a Blank or Calibrator with status OPEN
-                bsDelCalibratorsButton.Enabled = (lstWSOpenDS.Count > 0)
+                bsDelCalibratorsButton.Enabled = (totalBlankCheckBoxes + totalCalibCheckBoxes > 0)
 
-                'Control for Check/Uncheck all Blanks and Calibrators is enabled only when there is at least a Blank or Calibrator with status OPEN
-                bsAllBlkCalCheckBox.Enabled = (lstWSOpenDS.Count > 0)
+                'Control for Check/Uncheck all Blanks is enabled only when there is at least a Blank with status OPEN
+                bsAllBlanksCheckBox.Enabled = (totalBlankCheckBoxes > 0)
+                'Control for Check/Uncheck all Calibrators is enabled only when there is at least a Calibrator with status OPEN
+                bsAllCalibsCheckBox.Enabled = (totalCalibCheckBoxes > 0)
 
-                '...additionally, it is Checked when all Blanks and Calibrators with Status OPEN are selected
-                bsAllBlkCalCheckBox.Checked = (lstWSOpenDS.Count > 0) AndAlso _
-                                              (totalBlkCalCheckedCheckBoxes = totalBlkCalCheckBoxes)
+                '...additionally, it is Checked when all Blanks with Status OPEN are selected
+                bsAllBlanksCheckBox.Checked = (totalBlankCheckBoxes > 0) AndAlso _
+                                              (totalBlankCheckedCheckBoxes = totalBlankCheckBoxes)
+                '...additionally, it is Checked when all Calibrators with Status OPEN are selected
+                bsAllCalibsCheckBox.Checked = (totalCalibCheckBoxes > 0) AndAlso _
+                                              (totalCalibCheckedCheckBoxes = totalCalibCheckBoxes)
 
                 lstWSOpenDS = Nothing
                 lstWSSelectedDS = Nothing
@@ -1815,20 +1853,130 @@ Public Class IWSSampleRequest
         End Try
     End Sub
 
+    ' XB 26/08/2014 - Comment function ClickAllBlkCalibCheckBox, it will not be used anymore - BT #1868
+    ' ''' <summary>
+    ' ''' Manage the check/uncheck of all selectable rows in the grid of Blanks and Calibrators
+    ' ''' For event bsAllBlkCalCheckBox_MouseClick
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by:  SA 12/04/2010 - Code moved from the event; changes to fix errors
+    ' ''' Modified by: SA 15/04/2010 - When a Calibrator used as alternative for different SampleTypes is unselected, verify that there are
+    ' '''                              not Patient or Control Order Tests requested for any of the requested Sample Types
+    ' '''              SA 09/11/2012 - When function VerifyUnselectedOrderTest is called to validate if there are Patient or Control Order Tests 
+    ' '''                              requested for any of the requested Sample Types, parameter with the "real" SampleType (the one for which
+    ' '''                              the Calibrator was defined) is informed (due to when validation of existing previous results for the 
+    ' '''                              Calibrator is done, the informed SampleType has to be always the one for which the Calibrator was defined)
+    ' ''' </remarks>
+    'Private Sub ClickAllBlkCalibCheckBox()
+    '    Try
+    '        Dim numLocked As Integer = 0
+    '        isHeaderBlkCalCheckBoxClicked = True
+
+    '        'Empty the collection of selected rows in the grid of Blank and Calibrators
+    '        bsBlkCalibDataGridView.ClearSelection()
+
+    '        Dim checkedValue As Boolean = bsAllBlanksCheckBox.Checked
+    '        Dim myOrderTestsDelegate As New OrderTestsDelegate
+
+    '        'Get all Calibrators that can be selected/unselected
+    '        Dim lstWSOpenCalibratorsDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+    '        lstWSOpenCalibratorsDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+    '                                 Where a.SampleClass = "CALIB" _
+    '                               AndAlso a.OTStatus = "OPEN" _
+    '                                Select a).ToList()
+
+    '        Dim verifyUnCheck As Boolean
+    '        For Each openCalibRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenCalibratorsDS
+    '            verifyUnCheck = True
+    '            If (Not checkedValue) Then
+    '                'Verify if the Calibrator can be unselected: there are not selected Patient and/or Control Order Tests using it
+    '                verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openCalibRow.SampleClass.ToString, openCalibRow.TestType.ToString, _
+    '                                                                               CInt(openCalibRow.TestID), openCalibRow.SampleType.ToString, _
+    '                                                                               myWorkSessionResultDS)
+    '            End If
+
+    '            If (verifyUnCheck) Then
+    '                If (Not checkedValue) Then
+    '                    If (openCalibRow.RequestedSampleTypes <> openCalibRow.SampleType) Then
+    '                        'Verify also if there are not selected Patient and/or Control Order Tests using any of the requested Sample Types
+    '                        Dim additionalSampleTypes() As String = Split(openCalibRow.RequestedSampleTypes.Trim)
+
+    '                        For Each reqSampleType As String In additionalSampleTypes
+    '                            verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openCalibRow.SampleClass.ToString, openCalibRow.TestType.ToString, _
+    '                                                                                           CInt(openCalibRow.TestID), reqSampleType.ToString, _
+    '                                                                                           myWorkSessionResultDS, openCalibRow.SampleType)
+    '                            If (Not verifyUnCheck) Then Exit For
+    '                        Next
+    '                    End If
+    '                End If
+
+    '                If (verifyUnCheck) Then
+    '                    openCalibRow.Selected = checkedValue
+    '                    If (Not openCalibRow.IsPreviousOrderTestIDNull) Then openCalibRow.NewCheck = checkedValue
+    '                Else
+    '                    If (Not checkedValue) Then numLocked += 1
+    '                End If
+    '            Else
+    '                If (Not checkedValue) Then numLocked += 1
+    '            End If
+    '        Next
+    '        myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+    '        lstWSOpenCalibratorsDS = Nothing
+
+    '        'Get all Blanks that can be selected/unselected
+    '        Dim lstWSOpenBlanksDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+    '        lstWSOpenBlanksDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+    '                            Where a.SampleClass = "BLANK" _
+    '                          AndAlso a.OTStatus = "OPEN" _
+    '                           Select a).ToList()
+
+    '        For Each openBlankRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenBlanksDS
+    '            verifyUnCheck = True
+    '            If (Not checkedValue) Then
+    '                'Verify if the Blank can be unselected: there are not selected Patient, Control and/or Calibrator Order Tests using it
+    '                verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openBlankRow.SampleClass.ToString, openBlankRow.TestType.ToString, _
+    '                                                                               CInt(openBlankRow.TestID), openBlankRow.SampleType.ToString, _
+    '                                                                               myWorkSessionResultDS)
+    '            End If
+
+    '            If (verifyUnCheck) Then
+    '                openBlankRow.Selected = checkedValue
+    '                If (Not openBlankRow.IsPreviousOrderTestIDNull) Then openBlankRow.NewCheck = checkedValue
+    '            Else
+    '                If (Not checkedValue) Then numLocked += 1
+    '            End If
+    '        Next
+    '        myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+    '        lstWSOpenBlanksDS = Nothing
+
+    '        bsBlkCalibDataGridView.RefreshEdit()
+    '        totalBlkCalCheckedCheckBoxes = If(checkedValue, totalBlkCalCheckBoxes, 0)
+
+    '        'If all rows remained checked and the CheckBox in the header was unchecked, it is checked again
+    '        If (Not checkedValue) AndAlso (numLocked = bsBlkCalibDataGridView.Rows.Count) Then
+    '            bsAllBlanksCheckBox.Checked = True
+    '        End If
+
+    '        'Verify if OpenRotor button can be enabled
+    '        OpenRotorButtonEnabled()
+
+    '        isHeaderBlkCalCheckBoxClicked = False
+    '        ChangesMadeAttribute = True
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllBlkCalibCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".ClickAllBlkCalibCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+    '    End Try
+    'End Sub
+
+
     ''' <summary>
-    ''' Manage the check/uncheck of all selectable rows in the grid of Blanks and Calibrators
-    ''' For event bsAllBlkCalCheckBox_MouseClick
+    ''' Manage the check/uncheck of all selectable rows in the grid just for the Blanks
+    ''' For event bsAllBlanksCheckBox_MouseClick
     ''' </summary>
     ''' <remarks>
-    ''' Created by:  SA 12/04/2010 - Code moved from the event; changes to fix errors
-    ''' Modified by: SA 15/04/2010 - When a Calibrator used as alternative for different SampleTypes is unselected, verify that there are
-    '''                              not Patient or Control Order Tests requested for any of the requested Sample Types
-    '''              SA 09/11/2012 - When function VerifyUnselectedOrderTest is called to validate if there are Patient or Control Order Tests 
-    '''                              requested for any of the requested Sample Types, parameter with the "real" SampleType (the one for which
-    '''                              the Calibrator was defined) is informed (due to when validation of existing previous results for the 
-    '''                              Calibrator is done, the informed SampleType has to be always the one for which the Calibrator was defined)
+    ''' Created by:  XB 26/08/2014 - from older function ClickAllBlkCalCheckBox with the code for SampleClass BLANKS extracted - BT #1868
     ''' </remarks>
-    Private Sub ClickAllBlkCalibCheckBox()
+    Private Sub ClickAllBlanksCheckBox()
         Try
             Dim numLocked As Integer = 0
             isHeaderBlkCalCheckBoxClicked = True
@@ -1836,7 +1984,75 @@ Public Class IWSSampleRequest
             'Empty the collection of selected rows in the grid of Blank and Calibrators
             bsBlkCalibDataGridView.ClearSelection()
 
-            Dim checkedValue As Boolean = bsAllBlkCalCheckBox.Checked
+            Dim checkedValue As Boolean = bsAllBlanksCheckBox.Checked
+            Dim myOrderTestsDelegate As New OrderTestsDelegate
+
+            Dim verifyUnCheck As Boolean
+
+            'Get all Blanks that can be selected/unselected
+            Dim lstWSOpenBlanksDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+            lstWSOpenBlanksDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                                Where a.SampleClass = "BLANK" _
+                              AndAlso a.OTStatus = "OPEN" _
+                               Select a).ToList()
+
+            Dim OpenBlanksNum As Integer = lstWSOpenBlanksDS.Count
+
+            For Each openBlankRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenBlanksDS
+                verifyUnCheck = True
+                If (Not checkedValue) Then
+                    'Verify if the Blank can be unselected: there are not selected Patient, Control and/or Calibrator Order Tests using it
+                    verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openBlankRow.SampleClass.ToString, openBlankRow.TestType.ToString, _
+                                                                                   CInt(openBlankRow.TestID), openBlankRow.SampleType.ToString, _
+                                                                                   myWorkSessionResultDS)
+                End If
+
+                If (verifyUnCheck) Then
+                    openBlankRow.Selected = checkedValue
+                    If (Not openBlankRow.IsPreviousOrderTestIDNull) Then openBlankRow.NewCheck = checkedValue
+                Else
+                    If (Not checkedValue) Then numLocked += 1
+                End If
+            Next
+            myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+            lstWSOpenBlanksDS = Nothing
+
+            bsBlkCalibDataGridView.RefreshEdit()
+            totalBlankCheckedCheckBoxes = If(checkedValue, totalBlankCheckBoxes, 0)
+
+            'If all rows remained checked and the CheckBox in the header was unchecked, it is checked again
+            If (Not checkedValue) AndAlso (numLocked = OpenBlanksNum) Then
+                bsAllBlanksCheckBox.Checked = True
+            End If
+
+            'Verify if OpenRotor button can be enabled
+            OpenRotorButtonEnabled()
+
+            isHeaderBlkCalCheckBoxClicked = False
+            ChangesMadeAttribute = True
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllBlanksCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ClickAllBlanksCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Manage the check/uncheck of all selectable rows in the grid just for the Calibrators
+    ''' For event bsAllCalibsCheckBox_MouseClick
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  XB 26/08/2014 - from older function ClickAllBlkCalCheckBox with the code for SampleClass CALIBS extracted - BT #1868
+    ''' </remarks>
+    Private Sub ClickAllCalibsCheckBox()
+        Try
+            Dim numLocked As Integer = 0
+            isHeaderBlkCalCheckBoxClicked = True
+
+            'Empty the collection of selected rows in the grid of Blank and Calibrators
+            bsBlkCalibDataGridView.ClearSelection()
+
+            Dim checkedValue As Boolean = bsAllCalibsCheckBox.Checked
             Dim myOrderTestsDelegate As New OrderTestsDelegate
 
             'Get all Calibrators that can be selected/unselected
@@ -1845,6 +2061,8 @@ Public Class IWSSampleRequest
                                      Where a.SampleClass = "CALIB" _
                                    AndAlso a.OTStatus = "OPEN" _
                                     Select a).ToList()
+
+            Dim OpenCalibsNum As Integer = lstWSOpenCalibratorsDS.Count
 
             Dim verifyUnCheck As Boolean
             For Each openCalibRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenCalibratorsDS
@@ -1884,38 +2102,31 @@ Public Class IWSSampleRequest
             myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
             lstWSOpenCalibratorsDS = Nothing
 
-            'Get all Blanks that can be selected/unselected
-            Dim lstWSOpenBlanksDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
-            lstWSOpenBlanksDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                                Where a.SampleClass = "BLANK" _
-                              AndAlso a.OTStatus = "OPEN" _
-                               Select a).ToList()
 
-            For Each openBlankRow As WorkSessionResultDS.BlankCalibratorsRow In lstWSOpenBlanksDS
-                verifyUnCheck = True
-                If (Not checkedValue) Then
-                    'Verify if the Blank can be unselected: there are not selected Patient, Control and/or Calibrator Order Tests using it
-                    verifyUnCheck = myOrderTestsDelegate.VerifyUnselectedOrderTest(openBlankRow.SampleClass.ToString, openBlankRow.TestType.ToString, _
-                                                                                   CInt(openBlankRow.TestID), openBlankRow.SampleType.ToString, _
-                                                                                   myWorkSessionResultDS)
-                End If
+            'Get all different TestID and Sample Type for all selected Calibrators in order to search all needed Blanks
+            Dim listOfDifElem As List(Of String)
+            listOfDifElem = (From a In myWorkSessionResultDS.BlankCalibrators _
+                            Where a.SampleClass = "CALIB" _
+                            AndAlso a.OTStatus = "OPEN" _
+                            Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList()
 
-                If (verifyUnCheck) Then
-                    openBlankRow.Selected = checkedValue
-                    If (Not openBlankRow.IsPreviousOrderTestIDNull) Then openBlankRow.NewCheck = checkedValue
-                Else
-                    If (Not checkedValue) Then numLocked += 1
-                End If
+            For Each difElement As String In listOfDifElem
+                Dim elements As String() = difElement.Split(CChar("|"))
+                myOrderTestsDelegate.SelectAllNeededOrderTests("CALIB", elements(0), CInt(elements(1)), elements(2), myWorkSessionResultDS)
+
+                isHeaderBlkCalCheckBoxClicked = False
+                ChangeBlankCalibratorSelectedColumn()
+                isHeaderBlkCalCheckBoxClicked = True
             Next
-            myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
-            lstWSOpenBlanksDS = Nothing
+            listOfDifElem = Nothing
+
 
             bsBlkCalibDataGridView.RefreshEdit()
-            totalBlkCalCheckedCheckBoxes = If(checkedValue, totalBlkCalCheckBoxes, 0)
+            totalCalibCheckedCheckBoxes = If(checkedValue, totalCalibCheckBoxes, 0)
 
             'If all rows remained checked and the CheckBox in the header was unchecked, it is checked again
-            If (Not checkedValue) AndAlso (numLocked = bsBlkCalibDataGridView.Rows.Count) Then
-                bsAllBlkCalCheckBox.Checked = True
+            If (Not checkedValue) AndAlso (numLocked = OpenCalibsNum) Then
+                bsAllCalibsCheckBox.Checked = True
             End If
 
             'Verify if OpenRotor button can be enabled
@@ -1923,9 +2134,11 @@ Public Class IWSSampleRequest
 
             isHeaderBlkCalCheckBoxClicked = False
             ChangesMadeAttribute = True
+
+            RowBlkCalCheckBoxClick()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllBlkCalibCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ClickAllBlkCalibCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ClickAllCalibsCheckBox", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ClickAllCalibsCheckBox", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -2752,6 +2965,7 @@ Public Class IWSSampleRequest
     ''' Created by:  PG 07/10/2010
     ''' Modified by: SA 18/01/2010 - Get multilanguage text for tooltip of new button to opening the auxiliary 
     '''                              screen to add results for requested Off-System Tests
+    '''              XB 26/08/2014 - Use Multilanguage resource LBL_Blanks instead of LBL_WSPrep_AllBlanksCalibs - BT #1868
     ''' </remarks>
     Private Sub GetScreenLabels(ByVal pLanguageID As String)
         Try
@@ -2769,7 +2983,10 @@ Public Class IWSSampleRequest
             bsSampleTypeLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", pLanguageID) + ":"
             bsPrepareWSLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_WSPreparation", pLanguageID)
 
-            bsAllBlkCalCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_AllBlanksCalibs", pLanguageID)
+            ' XB 26/08/2014 - BT #1868
+            bsAllBlanksCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Blanks", pLanguageID)
+            bsAllCalibsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Calibrators", pLanguageID)
+
             bsAllCtrlsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Controls", pLanguageID)
             bsAllPatientsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_AllPatients", pLanguageID)
             bsStatCheckbox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Stat", pLanguageID)
@@ -5065,7 +5282,7 @@ Public Class IWSSampleRequest
                     SetPropertyThreadSafe("Cursor", Cursors.Default)
                     ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                 End If
-                End If
+            End If
 
         Catch ex As Exception
             SetPropertyThreadSafe("Cursor", Cursors.Default)
@@ -5239,7 +5456,8 @@ Public Class IWSSampleRequest
             bsLIMSErrorsButton = Nothing
             bsScreenToolTips = Nothing
             bsAllPatientsCheckBox = Nothing
-            bsAllBlkCalCheckBox = Nothing
+            bsAllBlanksCheckBox = Nothing
+            bsAllCalibsCheckBox = Nothing
             bsAllCtrlsCheckBox = Nothing
             bsBlkCalibDataGridView = Nothing
             bsControlOrdersDataGridView = Nothing
@@ -5262,37 +5480,45 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Modified by: DL 09/03/2010
+    '''              XB 26/08/2014 - Remove parameter and the block of code executed when parameter was not Nothing (due to the function is called just once using Nothing) - BT #1868
+    '''                              Get value of cell SampleClass for the current row and divide code according the SampleClass - BT #1868
     ''' </remarks>
-    Private Sub RowBlkCalCheckBoxClick(ByVal pRowCheckBox As DataGridViewCheckBoxCell)
+    Private Sub RowBlkCalCheckBoxClick()
         Try
             ChangesMadeAttribute = True
-            If (Not pRowCheckBox Is Nothing) Then
-                'Modify the global counter
-                If (CBool(pRowCheckBox.Value) AndAlso totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
-                    totalBlkCalCheckedCheckBoxes += 1
 
-                ElseIf (totalBlkCalCheckedCheckBoxes > 0) Then
-                    totalBlkCalCheckedCheckBoxes -= 1
-                End If
+            ' XB 26/08/2014 - BT #1868
+            'If (Not pRowCheckBox Is Nothing) Then
+            '    'Modify the global counter
+            '    If (CBool(pRowCheckBox.Value) AndAlso totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
+            '        totalBlkCalCheckedCheckBoxes += 1
 
-                'Change state of the header CheckBox...
-                If (totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
-                    bsAllBlkCalCheckBox.Checked = False
+            '    ElseIf (totalBlkCalCheckedCheckBoxes > 0) Then
+            '        totalBlkCalCheckedCheckBoxes -= 1
+            '    End If
 
-                ElseIf (totalBlkCalCheckedCheckBoxes = totalBlkCalCheckBoxes) Then
-                    bsAllBlkCalCheckBox.Checked = True
-                End If
-            Else
-                'Count the number of selected rows in grid of Blanks and Calibrators
-                Dim lstWSSelectedRowsDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
-                lstWSSelectedRowsDS = (From a In myWorkSessionResultDS.BlankCalibrators _
-                                      Where a.Selected = True _
-                                     Select a).ToList()
+            '    'Change state of the header CheckBox...
+            '    If (totalBlkCalCheckedCheckBoxes < totalBlkCalCheckBoxes) Then
+            '        bsAllBlanksCheckBox.Checked = False
 
-                'If all rows are selected, then the CheckBox for select/unselect all Blanks and Calibrators is checked
-                bsAllBlkCalCheckBox.Checked = (lstWSSelectedRowsDS.Count = bsBlkCalibDataGridView.Rows.Count)
-                lstWSSelectedRowsDS = Nothing
-            End If
+            '    ElseIf (totalBlkCalCheckedCheckBoxes = totalBlkCalCheckBoxes) Then
+            '        bsAllBlanksCheckBox.Checked = True
+            '    End If
+            'Else
+            ''Count the number of selected rows in grid of Blanks and Calibrators
+            'Dim lstWSSelectedRowsDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+            'lstWSSelectedRowsDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+            '                      Where a.Selected = True _
+            '                     Select a).ToList()
+
+
+            ''If all rows are selected, then the CheckBox for select/unselect all Blanks and Calibrators is checked
+            'bsAllBlanksCheckBox.Checked = (lstWSSelectedRowsDS.Count = bsBlkCalibDataGridView.Rows.Count)
+            'lstWSSelectedRowsDS = Nothing
+            'End If
+
+            CheckAddRemoveBlkCalRows()
+            ' XB 26/08/2014 - BT #1868
 
             'Verify if button for Positioning should be enabled
             OpenRotorButtonEnabled()
@@ -7335,12 +7561,30 @@ Public Class IWSSampleRequest
         End Try
     End Sub
 
-    Private Sub bsAllBlkCalCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllBlkCalCheckBox.MouseClick
+    ' XB 26/08/2014 - rename bsAllBlkCalCheckBox as bsAllBlanksCheckBox - BT #1868
+    Private Sub bsAllBlanksCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllBlanksCheckBox.MouseClick
         Try
-            ClickAllBlkCalibCheckBox()
+            ClickAllBlanksCheckBox()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllBlkCalCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & "bsAllBlkCalCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllBlanksCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllBlanksCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' bsAllCalibsCheckBox event click
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by XB 26/08/2014 - BT #1868
+    ''' </remarks>
+    Private Sub bsAllCalibsCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllCalibsCheckBox.MouseClick
+        Try
+            ClickAllCalibsCheckBox()
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllCalibsCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllCalibsCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -8382,6 +8626,5 @@ Public Class IWSSampleRequest
     '    SavingWS = False
     'End Sub
 #End Region
-
 
 End Class

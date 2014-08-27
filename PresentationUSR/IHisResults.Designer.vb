@@ -27,21 +27,21 @@ Partial Class IHisResults
         Me.bsSpecimenIDTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.bsSpecimenIDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.subtitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.testTypeChkComboBox = New DevExpress.XtraEditors.CheckedComboBoxEdit()
-        Me.sampleTypeChkComboBox = New DevExpress.XtraEditors.CheckedComboBoxEdit()
+        Me.testTypesChkComboBox = New DevExpress.XtraEditors.CheckedComboBoxEdit()
+        Me.sampleTypesChkComboBox = New DevExpress.XtraEditors.CheckedComboBoxEdit()
         Me.sampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.testNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsTestNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.bsPatientDataTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.analyzerIDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.testTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.statFlagLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.analyzerIDComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
-        Me.statFlagComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsAnalyzersComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsStatFlagComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
         Me.testNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.dateToDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
         Me.bsPatientDataLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.dateToLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
-        Me.dateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.bsDateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
         Me.dateFromLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.searchButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.historyGroup = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
@@ -52,8 +52,8 @@ Partial Class IHisResults
         Me.exportButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.historyDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.searchGroup.SuspendLayout()
-        CType(Me.testTypeChkComboBox.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.sampleTypeChkComboBox.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.testTypesChkComboBox.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.sampleTypesChkComboBox.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.historyGroup.SuspendLayout()
         CType(Me.historyGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.historyGridView, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -73,21 +73,21 @@ Partial Class IHisResults
         Me.searchGroup.Controls.Add(Me.bsSpecimenIDTextBox)
         Me.searchGroup.Controls.Add(Me.bsSpecimenIDLabel)
         Me.searchGroup.Controls.Add(Me.subtitleLabel)
-        Me.searchGroup.Controls.Add(Me.testTypeChkComboBox)
-        Me.searchGroup.Controls.Add(Me.sampleTypeChkComboBox)
+        Me.searchGroup.Controls.Add(Me.testTypesChkComboBox)
+        Me.searchGroup.Controls.Add(Me.sampleTypesChkComboBox)
         Me.searchGroup.Controls.Add(Me.sampleTypeLabel)
-        Me.searchGroup.Controls.Add(Me.testNameTextBox)
+        Me.searchGroup.Controls.Add(Me.bsTestNameTextBox)
         Me.searchGroup.Controls.Add(Me.bsPatientDataTextBox)
         Me.searchGroup.Controls.Add(Me.analyzerIDLabel)
         Me.searchGroup.Controls.Add(Me.testTypeLabel)
         Me.searchGroup.Controls.Add(Me.statFlagLabel)
-        Me.searchGroup.Controls.Add(Me.analyzerIDComboBox)
-        Me.searchGroup.Controls.Add(Me.statFlagComboBox)
+        Me.searchGroup.Controls.Add(Me.bsAnalyzersComboBox)
+        Me.searchGroup.Controls.Add(Me.bsStatFlagComboBox)
         Me.searchGroup.Controls.Add(Me.testNameLabel)
         Me.searchGroup.Controls.Add(Me.dateToDateTimePick)
         Me.searchGroup.Controls.Add(Me.bsPatientDataLabel)
         Me.searchGroup.Controls.Add(Me.dateToLabel)
-        Me.searchGroup.Controls.Add(Me.dateFromDateTimePick)
+        Me.searchGroup.Controls.Add(Me.bsDateFromDateTimePick)
         Me.searchGroup.Controls.Add(Me.dateFromLabel)
         Me.searchGroup.Controls.Add(Me.searchButton)
         Me.searchGroup.ForeColor = System.Drawing.Color.Black
@@ -132,51 +132,53 @@ Partial Class IHisResults
         Me.subtitleLabel.Name = "subtitleLabel"
         Me.subtitleLabel.Size = New System.Drawing.Size(938, 20)
         Me.subtitleLabel.TabIndex = 26
-        Me.subtitleLabel.Text = "*Historical Results patient"
+        Me.subtitleLabel.Text = "*Historic Patient Results"
         Me.subtitleLabel.Title = True
         '
-        'testTypeChkComboBox
+        'testTypesChkComboBox
         '
-        Me.testTypeChkComboBox.EditValue = ""
-        Me.testTypeChkComboBox.Location = New System.Drawing.Point(707, 57)
-        Me.testTypeChkComboBox.Name = "testTypeChkComboBox"
-        Me.testTypeChkComboBox.Properties.Appearance.BackColor = System.Drawing.Color.White
-        Me.testTypeChkComboBox.Properties.Appearance.ForeColor = System.Drawing.Color.Black
-        Me.testTypeChkComboBox.Properties.Appearance.Options.UseBackColor = True
-        Me.testTypeChkComboBox.Properties.Appearance.Options.UseForeColor = True
-        Me.testTypeChkComboBox.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
-        Me.testTypeChkComboBox.Properties.HideSelection = False
-        Me.testTypeChkComboBox.Properties.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.testTypeChkComboBox.Properties.LookAndFeel.UseWindowsXPTheme = True
-        Me.testTypeChkComboBox.Properties.PopupFormSize = New System.Drawing.Size(110, 110)
-        Me.testTypeChkComboBox.Properties.PopupSizeable = False
-        Me.testTypeChkComboBox.Properties.SelectAllItemCaption = "All"
-        Me.testTypeChkComboBox.Properties.ShowButtons = False
-        Me.testTypeChkComboBox.Properties.ShowPopupCloseButton = False
-        Me.testTypeChkComboBox.Size = New System.Drawing.Size(170, 20)
-        Me.testTypeChkComboBox.TabIndex = 5
+        Me.testTypesChkComboBox.EditValue = ""
+        Me.testTypesChkComboBox.Location = New System.Drawing.Point(707, 57)
+        Me.testTypesChkComboBox.Name = "testTypesChkComboBox"
+        Me.testTypesChkComboBox.Properties.Appearance.BackColor = System.Drawing.Color.White
+        Me.testTypesChkComboBox.Properties.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.testTypesChkComboBox.Properties.Appearance.ForeColor = System.Drawing.Color.Black
+        Me.testTypesChkComboBox.Properties.Appearance.Options.UseBackColor = True
+        Me.testTypesChkComboBox.Properties.Appearance.Options.UseFont = True
+        Me.testTypesChkComboBox.Properties.Appearance.Options.UseForeColor = True
+        Me.testTypesChkComboBox.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
+        Me.testTypesChkComboBox.Properties.HideSelection = False
+        Me.testTypesChkComboBox.Properties.LookAndFeel.UseDefaultLookAndFeel = False
+        Me.testTypesChkComboBox.Properties.LookAndFeel.UseWindowsXPTheme = True
+        Me.testTypesChkComboBox.Properties.PopupFormSize = New System.Drawing.Size(110, 110)
+        Me.testTypesChkComboBox.Properties.PopupSizeable = False
+        Me.testTypesChkComboBox.Properties.SelectAllItemCaption = "All"
+        Me.testTypesChkComboBox.Properties.ShowButtons = False
+        Me.testTypesChkComboBox.Properties.ShowPopupCloseButton = False
+        Me.testTypesChkComboBox.Size = New System.Drawing.Size(170, 20)
+        Me.testTypesChkComboBox.TabIndex = 5
         '
-        'sampleTypeChkComboBox
+        'sampleTypesChkComboBox
         '
-        Me.sampleTypeChkComboBox.EditValue = ""
-        Me.sampleTypeChkComboBox.Location = New System.Drawing.Point(498, 101)
-        Me.sampleTypeChkComboBox.Name = "sampleTypeChkComboBox"
-        Me.sampleTypeChkComboBox.Properties.Appearance.BackColor = System.Drawing.Color.White
-        Me.sampleTypeChkComboBox.Properties.Appearance.ForeColor = System.Drawing.Color.Black
-        Me.sampleTypeChkComboBox.Properties.Appearance.Options.UseBackColor = True
-        Me.sampleTypeChkComboBox.Properties.Appearance.Options.UseForeColor = True
-        Me.sampleTypeChkComboBox.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
-        Me.sampleTypeChkComboBox.Properties.DropDownRows = 15
-        Me.sampleTypeChkComboBox.Properties.HideSelection = False
-        Me.sampleTypeChkComboBox.Properties.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.sampleTypeChkComboBox.Properties.LookAndFeel.UseWindowsXPTheme = True
-        Me.sampleTypeChkComboBox.Properties.PopupFormSize = New System.Drawing.Size(110, 150)
-        Me.sampleTypeChkComboBox.Properties.PopupSizeable = False
-        Me.sampleTypeChkComboBox.Properties.SelectAllItemCaption = "All"
-        Me.sampleTypeChkComboBox.Properties.ShowButtons = False
-        Me.sampleTypeChkComboBox.Properties.ShowPopupCloseButton = False
-        Me.sampleTypeChkComboBox.Size = New System.Drawing.Size(170, 20)
-        Me.sampleTypeChkComboBox.TabIndex = 8
+        Me.sampleTypesChkComboBox.EditValue = ""
+        Me.sampleTypesChkComboBox.Location = New System.Drawing.Point(498, 101)
+        Me.sampleTypesChkComboBox.Name = "sampleTypesChkComboBox"
+        Me.sampleTypesChkComboBox.Properties.Appearance.BackColor = System.Drawing.Color.White
+        Me.sampleTypesChkComboBox.Properties.Appearance.ForeColor = System.Drawing.Color.Black
+        Me.sampleTypesChkComboBox.Properties.Appearance.Options.UseBackColor = True
+        Me.sampleTypesChkComboBox.Properties.Appearance.Options.UseForeColor = True
+        Me.sampleTypesChkComboBox.Properties.Buttons.AddRange(New DevExpress.XtraEditors.Controls.EditorButton() {New DevExpress.XtraEditors.Controls.EditorButton(DevExpress.XtraEditors.Controls.ButtonPredefines.Combo)})
+        Me.sampleTypesChkComboBox.Properties.DropDownRows = 15
+        Me.sampleTypesChkComboBox.Properties.HideSelection = False
+        Me.sampleTypesChkComboBox.Properties.LookAndFeel.UseDefaultLookAndFeel = False
+        Me.sampleTypesChkComboBox.Properties.LookAndFeel.UseWindowsXPTheme = True
+        Me.sampleTypesChkComboBox.Properties.PopupFormSize = New System.Drawing.Size(110, 150)
+        Me.sampleTypesChkComboBox.Properties.PopupSizeable = False
+        Me.sampleTypesChkComboBox.Properties.SelectAllItemCaption = "All"
+        Me.sampleTypesChkComboBox.Properties.ShowButtons = False
+        Me.sampleTypesChkComboBox.Properties.ShowPopupCloseButton = False
+        Me.sampleTypesChkComboBox.Size = New System.Drawing.Size(170, 20)
+        Me.sampleTypesChkComboBox.TabIndex = 8
         '
         'sampleTypeLabel
         '
@@ -190,19 +192,19 @@ Partial Class IHisResults
         Me.sampleTypeLabel.Text = "* Sample Type:"
         Me.sampleTypeLabel.Title = False
         '
-        'testNameTextBox
+        'bsTestNameTextBox
         '
-        Me.testNameTextBox.BackColor = System.Drawing.Color.White
-        Me.testNameTextBox.DecimalsValues = False
-        Me.testNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.testNameTextBox.ForeColor = System.Drawing.Color.Black
-        Me.testNameTextBox.IsNumeric = False
-        Me.testNameTextBox.Location = New System.Drawing.Point(707, 101)
-        Me.testNameTextBox.Mandatory = False
-        Me.testNameTextBox.MaxLength = 16
-        Me.testNameTextBox.Name = "testNameTextBox"
-        Me.testNameTextBox.Size = New System.Drawing.Size(170, 21)
-        Me.testNameTextBox.TabIndex = 9
+        Me.bsTestNameTextBox.BackColor = System.Drawing.Color.White
+        Me.bsTestNameTextBox.DecimalsValues = False
+        Me.bsTestNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsTestNameTextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsTestNameTextBox.IsNumeric = False
+        Me.bsTestNameTextBox.Location = New System.Drawing.Point(707, 101)
+        Me.bsTestNameTextBox.Mandatory = False
+        Me.bsTestNameTextBox.MaxLength = 16
+        Me.bsTestNameTextBox.Name = "bsTestNameTextBox"
+        Me.bsTestNameTextBox.Size = New System.Drawing.Size(170, 21)
+        Me.bsTestNameTextBox.TabIndex = 9
         '
         'bsPatientDataTextBox
         '
@@ -254,29 +256,29 @@ Partial Class IHisResults
         Me.statFlagLabel.Text = "* Stat Flag:"
         Me.statFlagLabel.Title = False
         '
-        'analyzerIDComboBox
+        'bsAnalyzersComboBox
         '
-        Me.analyzerIDComboBox.BackColor = System.Drawing.Color.White
-        Me.analyzerIDComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.analyzerIDComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.analyzerIDComboBox.ForeColor = System.Drawing.Color.Black
-        Me.analyzerIDComboBox.FormattingEnabled = True
-        Me.analyzerIDComboBox.Location = New System.Drawing.Point(10, 101)
-        Me.analyzerIDComboBox.Name = "analyzerIDComboBox"
-        Me.analyzerIDComboBox.Size = New System.Drawing.Size(240, 21)
-        Me.analyzerIDComboBox.TabIndex = 6
+        Me.bsAnalyzersComboBox.BackColor = System.Drawing.Color.White
+        Me.bsAnalyzersComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.bsAnalyzersComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsAnalyzersComboBox.ForeColor = System.Drawing.Color.Black
+        Me.bsAnalyzersComboBox.FormattingEnabled = True
+        Me.bsAnalyzersComboBox.Location = New System.Drawing.Point(10, 101)
+        Me.bsAnalyzersComboBox.Name = "bsAnalyzersComboBox"
+        Me.bsAnalyzersComboBox.Size = New System.Drawing.Size(240, 21)
+        Me.bsAnalyzersComboBox.TabIndex = 6
         '
-        'statFlagComboBox
+        'bsStatFlagComboBox
         '
-        Me.statFlagComboBox.BackColor = System.Drawing.Color.White
-        Me.statFlagComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.statFlagComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.statFlagComboBox.ForeColor = System.Drawing.Color.Black
-        Me.statFlagComboBox.FormattingEnabled = True
-        Me.statFlagComboBox.Location = New System.Drawing.Point(498, 57)
-        Me.statFlagComboBox.Name = "statFlagComboBox"
-        Me.statFlagComboBox.Size = New System.Drawing.Size(170, 21)
-        Me.statFlagComboBox.TabIndex = 4
+        Me.bsStatFlagComboBox.BackColor = System.Drawing.Color.White
+        Me.bsStatFlagComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.bsStatFlagComboBox.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsStatFlagComboBox.ForeColor = System.Drawing.Color.Black
+        Me.bsStatFlagComboBox.FormattingEnabled = True
+        Me.bsStatFlagComboBox.Location = New System.Drawing.Point(498, 57)
+        Me.bsStatFlagComboBox.Name = "bsStatFlagComboBox"
+        Me.bsStatFlagComboBox.Size = New System.Drawing.Size(170, 21)
+        Me.bsStatFlagComboBox.TabIndex = 4
         '
         'testNameLabel
         '
@@ -331,22 +333,22 @@ Partial Class IHisResults
         Me.dateToLabel.Text = "* To:"
         Me.dateToLabel.Title = False
         '
-        'dateFromDateTimePick
+        'bsDateFromDateTimePick
         '
-        Me.dateFromDateTimePick.CalendarFont = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dateFromDateTimePick.CalendarForeColor = System.Drawing.Color.Black
-        Me.dateFromDateTimePick.CalendarMonthBackground = System.Drawing.Color.White
-        Me.dateFromDateTimePick.CalendarTitleBackColor = System.Drawing.Color.LightSlateGray
-        Me.dateFromDateTimePick.CalendarTitleForeColor = System.Drawing.Color.Black
-        Me.dateFromDateTimePick.CalendarTrailingForeColor = System.Drawing.Color.Silver
-        Me.dateFromDateTimePick.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.dateFromDateTimePick.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dateFromDateTimePick.Location = New System.Drawing.Point(10, 57)
-        Me.dateFromDateTimePick.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
-        Me.dateFromDateTimePick.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
-        Me.dateFromDateTimePick.Name = "dateFromDateTimePick"
-        Me.dateFromDateTimePick.Size = New System.Drawing.Size(108, 21)
-        Me.dateFromDateTimePick.TabIndex = 1
+        Me.bsDateFromDateTimePick.CalendarFont = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsDateFromDateTimePick.CalendarForeColor = System.Drawing.Color.Black
+        Me.bsDateFromDateTimePick.CalendarMonthBackground = System.Drawing.Color.White
+        Me.bsDateFromDateTimePick.CalendarTitleBackColor = System.Drawing.Color.LightSlateGray
+        Me.bsDateFromDateTimePick.CalendarTitleForeColor = System.Drawing.Color.Black
+        Me.bsDateFromDateTimePick.CalendarTrailingForeColor = System.Drawing.Color.Silver
+        Me.bsDateFromDateTimePick.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.bsDateFromDateTimePick.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.bsDateFromDateTimePick.Location = New System.Drawing.Point(10, 57)
+        Me.bsDateFromDateTimePick.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
+        Me.bsDateFromDateTimePick.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
+        Me.bsDateFromDateTimePick.Name = "bsDateFromDateTimePick"
+        Me.bsDateFromDateTimePick.Size = New System.Drawing.Size(108, 21)
+        Me.bsDateFromDateTimePick.TabIndex = 1
         '
         'dateFromLabel
         '
@@ -555,11 +557,11 @@ Partial Class IHisResults
         Me.MinimizeBox = False
         Me.Name = "IHisResults"
         Me.ShowInTaskbar = False
-        Me.Text = "IHisAlarms"
+        Me.Text = "IHisResults"
         Me.searchGroup.ResumeLayout(False)
         Me.searchGroup.PerformLayout()
-        CType(Me.testTypeChkComboBox.Properties, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.sampleTypeChkComboBox.Properties, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.testTypesChkComboBox.Properties, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.sampleTypesChkComboBox.Properties, System.ComponentModel.ISupportInitialize).EndInit()
         Me.historyGroup.ResumeLayout(False)
         CType(Me.historyGrid, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.historyGridView, System.ComponentModel.ISupportInitialize).EndInit()
@@ -576,19 +578,19 @@ Partial Class IHisResults
     Friend WithEvents historyGridView As DevExpress.XtraGrid.Views.Grid.GridView
     Friend WithEvents dateToDateTimePick As Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
     Friend WithEvents dateToLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents dateFromDateTimePick As Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
+    Friend WithEvents bsDateFromDateTimePick As Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
     Friend WithEvents dateFromLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents analyzerIDLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents statFlagLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents analyzerIDComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
-    Friend WithEvents statFlagComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
+    Friend WithEvents bsAnalyzersComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
+    Friend WithEvents bsStatFlagComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents bsPatientDataTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents bsPatientDataLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents sampleTypeLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents sampleTypeChkComboBox As DevExpress.XtraEditors.CheckedComboBoxEdit
-    Friend WithEvents testTypeChkComboBox As DevExpress.XtraEditors.CheckedComboBoxEdit
+    Friend WithEvents sampleTypesChkComboBox As DevExpress.XtraEditors.CheckedComboBoxEdit
+    Friend WithEvents testTypesChkComboBox As DevExpress.XtraEditors.CheckedComboBoxEdit
     Friend WithEvents testTypeLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents testNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsTestNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents testNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents exportButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents PrintButton As Biosystems.Ax00.Controls.UserControls.BSButton
