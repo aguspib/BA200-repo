@@ -1207,12 +1207,15 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDelTestReagentsVolumeList"></param>
         ''' <param name="pDeletedTestProgramingList"></param>
         ''' <returns></returns>
-        ''' <remarks>Modified by AG 22/03/2010: Delete curve results when needed
-        ''' MODIFIED BY: TR 14/06/2010 -add calibrators parammeters (pTestReagentesDS,
-        ''' pTestCalibratorDS, pTestCalibratorValuesDS)
-        ''' MODIFIED BY: SG 17/06/2010 add test ref ranges (pTestRefRangesDS)
-        '''            : TR Add parammeters  pTestSamplesMultiRulesDS, pTestControlsDS, 
-        '''              Optional pUpdateSampleType 
+        ''' <remarks>
+        ''' Created by:
+        ''' Modified by: AG 22/03/2010 - Delete curve results when needed
+        '''              TR 14/06/2010 - Add calibrators parammeters (pTestReagentesDS, pTestCalibratorDS, pTestCalibratorValuesDS)
+        '''              SG 17/06/2010 - Add test reference ranges (pTestRefRangesDS)
+        '''              TR            - Add parameters pTestSamplesMultiRulesDS, pTestControlsDS, and pUpdateSampleType (optional)
+        '''              SA 27/08/2014 - Inform field TestLongName when preparing the HistoryTestSamplesDS that is passed to function UpdateByQCTestIDAndSampleTypeNEW
+        '''                              in HistoryTestSamplesDelegate (added as part of BT #1865, in which field TestLongName is also exported to QC Module for ISE Tests; 
+        '''                              this change is to export the field also for Standard Tests)  
         ''' </remarks>
         Public Function PrepareTestToSave(ByVal pDBConnection As SqlClient.SqlConnection, _
                                           ByVal pAnalyzerID As String, _
@@ -1508,10 +1511,13 @@ Namespace Biosystems.Ax00.BL
                                     If (myHistoryTestSamplesDS.tqcHistoryTestSamples.Count > 0) Then myQCTestSampleID = myHistoryTestSamplesDS.tqcHistoryTestSamples(0).QCTestSampleID
 
                                     If (Not myQCTestSampleID = 0) Then
-                                        'Update fileds of QC Calculation Criteria
+                                        'Update fields of QC Calculation Criteria
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).RejectionCriteria = TestSampleRow.RejectionCriteria
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).CalculationMode = TestSampleRow.CalculationMode
                                         myHistoryTestSamplesDS.tqcHistoryTestSamples(0).NumberOfSeries = TestSampleRow.NumberOfSeries
+
+                                        'Update field TestLongName (Report Name) 
+                                        myHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName = TestSampleRow.TestLongName
 
                                         myGlobalDataTO = myHistoryTestSamplesDelegate.UpdateByQCTestIdAndSampleTypeNEW(dbConnection, myHistoryTestSamplesDS)
                                         If (myGlobalDataTO.HasError) Then Exit For
