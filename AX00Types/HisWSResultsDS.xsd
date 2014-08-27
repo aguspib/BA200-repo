@@ -71,6 +71,7 @@
                 </xs:simpleType>
               </xs:element>
               <xs:element name="ResultDateTime" msprop:Generator_ColumnVarNameInTable="columnResultDateTime" msprop:Generator_ColumnPropNameInRow="ResultDateTime" msprop:Generator_ColumnPropNameInTable="ResultDateTimeColumn" msprop:Generator_UserColumnName="ResultDateTime" type="xs:dateTime" minOccurs="0" />
+              <xs:element name="HistPatientID" msprop:Generator_ColumnVarNameInTable="columnHistPatientID" msprop:Generator_ColumnPropNameInRow="HistPatientID" msprop:Generator_ColumnPropNameInTable="HistPatientIDColumn" msprop:Generator_UserColumnName="HistPatientID" type="xs:int" minOccurs="0" />
               <xs:element name="PatientID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PatientID" msprop:Generator_ColumnVarNameInTable="columnPatientID" msprop:Generator_ColumnPropNameInTable="PatientIDColumn" msprop:Generator_UserColumnName="PatientID" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
@@ -78,6 +79,8 @@
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="FirstName" msprop:Generator_ColumnVarNameInTable="columnFirstName" msprop:Generator_ColumnPropNameInRow="FirstName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="FirstNameColumn" msprop:Generator_UserColumnName="FirstName" type="xs:string" minOccurs="0" />
+              <xs:element name="LastName" msprop:Generator_ColumnVarNameInTable="columnLastName" msprop:Generator_ColumnPropNameInRow="LastName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="LastNameColumn" msprop:Generator_UserColumnName="LastName" type="xs:string" minOccurs="0" />
               <xs:element name="SampleClass" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SampleClass" msprop:Generator_ColumnVarNameInTable="columnSampleClass" msprop:Generator_ColumnPropNameInTable="SampleClassColumn" msprop:Generator_UserColumnName="SampleClass" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
