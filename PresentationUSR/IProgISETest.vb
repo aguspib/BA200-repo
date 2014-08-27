@@ -144,9 +144,6 @@ Public Class IProgISETest
     Private Sub BindISETestSamplesData(ByVal pTestID As Integer, ByVal pSampleType As String)
 
         Try
- 
-            '        EditionMode = False
-
             'For the selected ISE TestID/SampleType get data of field TestLongName, Decimals, SlopeFactorA2 and SlopeFactorB2
             'from global DataSet SelectedISETestSamplesDS (loaded in function LoadSampleTypesList).
             Dim qTestSamples As List(Of ISETestSamplesDS.tparISETestSamplesRow)
@@ -1883,6 +1880,8 @@ Public Class IProgISETest
     '''              SA 13/01/2010 - Verify also if the informed ShortName is unique
     '''              RH 08/06/2012 - Added validation of data in QCTab by calling function ValidateErrorOnQCTab
     '''              SA 21/06/2012 - Set global variable ValidationError = True when there is at least a wrong value in the screen fields
+    '''              WE 29/07/2014 - Added validation for Name field.
+    '''              WE 26/08/2014 - Introduction of Form-level validation for SlopeFactor A2/B2 likewise in IProgTest.
     '''             
     ''' </remarks>
     Private Function ValidateSavingConditions() As Boolean
@@ -1920,6 +1919,23 @@ Public Class IProgISETest
                 If (setFocusTo = -1) Then setFocusTo = 4
             End If
 
+            ' WE 26/08/2014 - #1865 - Validation of SlopeFactors A2/B2.
+            If Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Value = 0 Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+                If (setFocusTo = -1) Then setFocusTo = 5
+
+            ElseIf Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeB2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeB2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+                If (setFocusTo = -1) Then setFocusTo = 6
+
+                'AG 07/07/2010 - If B informed then A is required
+            ElseIf Not bsSlopeB2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                If (setFocusTo = -1) Then setFocusTo = 5
+
+            End If
+            ' WE 26/08/2014 - #1865 - End.
+
             'Select the proper field to put the focus
             If (setFocusTo >= 0) Then
                 fieldsOK = False
@@ -1936,6 +1952,12 @@ Public Class IProgISETest
                         bsISETestTabControl.SelectedTab = DetailsTabPage
                     Case 4
                         bsISETestTabControl.SelectedTab = QCTabPage
+                    Case 5
+                        bsISETestTabControl.SelectedTab = DetailsTabPage
+                        bsSlopeA2UpDown.Focus()
+                    Case 6
+                        bsISETestTabControl.SelectedTab = DetailsTabPage
+                        bsSlopeB2UpDown.Focus()
                 End Select
             Else
                 'All mandatory fields have been completed, verify that the Full Name is unique.
@@ -1943,18 +1965,18 @@ Public Class IProgISETest
                 Dim resultDataName As GlobalDataTO
                 Dim myISETestDelegateName As New ISETestsDelegate
 
-                'resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "FNAME")
-                'If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
-                '    Dim myISETestsDSname As ISETestsDS
-                '    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
+                resultDataName = myISETestDelegateName.ExistsISETestName(Nothing, bsFullNameTextbox.Text, "LNAME", SelectedISETestID)
+                If (Not resultDataName.HasError AndAlso Not resultDataName.SetDatos Is Nothing) Then
+                    Dim myISETestsDSname As ISETestsDS
+                    myISETestsDSname = DirectCast(resultDataName.SetDatos, ISETestsDS)
 
-                '    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
-                '        fieldsOK = False
+                    If (myISETestsDSname.tparISETests.Rows.Count > 0) Then
+                        fieldsOK = False
 
-                '        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
-                '        bsFullNameTextbox.Focus()
-                '    End If
-                'End If
+                        BsErrorProvider1.SetError(bsFullNameTextbox, GetMessageText(GlobalEnumerates.Messages.DUPLICATED_TEST_NAME.ToString))
+                        bsFullNameTextbox.Focus()
+                    End If
+                End If
                 ' WE 29/07/2014 - #1865 - End.
 
                 'All mandatory fields are informed, verify the informed ShortName is unique
@@ -4018,25 +4040,49 @@ Public Class IProgISETest
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  WE 26/08/2014 - #1865. Based on same concept as used in IProgTest. Extended with 3rd check as used by form-level validation and
+    '''                              included control activation in all cases.
+    ''' </remarks>
     Private Sub SlopeUpDown_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles bsSlopeA2UpDown.Validating, bsSlopeB2UpDown.Validating
 
         Try
             BsErrorProvider1.Clear()
             ValidationError = False
-            If Not SlopeAUpDown.Text = "" AndAlso SlopeAUpDown.Value = 0 Then
-                BsErrorProvider1.SetError(SlopeAUpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+            If Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Value = 0 Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
                 ValidationError = True
-                SlopeAUpDown.Select()
-            ElseIf Not SlopeAUpDown.Text = "" AndAlso SlopeBUpDown.Text = "" Then
-                BsErrorProvider1.SetError(SlopeBUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+                bsSlopeA2UpDown.Select()
+            ElseIf Not bsSlopeA2UpDown.Text = "" AndAlso bsSlopeB2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeB2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
                 ValidationError = True
-
+                bsSlopeB2UpDown.Select()
+            ElseIf Not bsSlopeB2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Text = "" Then
+                BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                ValidationError = True
+                bsSlopeA2UpDown.Select()
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeAUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".SlopeAUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".SlopeUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' Activate the ChangesMade variable whenever the value of the corresponding control is changed.
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>WE 27/08/2014 - #1865. Generic event handler method that triggers ChangesMade whenever the value of a control is changed.
+    '''                          Only used for new fields for which ChangesMade can not be handled properly by PendingChangesVerification.</remarks>
+    Private Sub ControlValueChanged(sender As Object, e As EventArgs) Handles bsReportNameTextBox.TextChanged, bsDecimalsUpDown.ValueChanged, bsSlopeB2UpDown.ValueChanged, bsSlopeA2UpDown.ValueChanged
+        If EditionMode Then
+            ChangesMade = True
+        End If
     End Sub
 
 
@@ -4404,5 +4450,6 @@ Public Class IProgISETest
     End Sub
 #End Region
 
-   
+
+    
 End Class

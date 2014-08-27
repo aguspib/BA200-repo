@@ -84,11 +84,15 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pISETestName">ISE Test Name to search by</param>
-        ''' <param name="pNameToSearch">Value indicating which is the name to validate: the short name or the long one</param>
+        ''' <param name="pNameToSearch">Value indicating which is the name to validate: the short name or the long one. Possible values are: 
+        '''                             FNAME, NAME, LNAME; Calling method must pass one of these values, otherwise function ReadName will result in an error.</param>
         ''' <param name="pISETestID">ISE Test Identifier. It is an optional parameter informed only in case of updation</param>
         ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS with data of the informed ISE Test</returns>
         ''' <remarks>
         ''' Created by:  SA 25/10/2010
+        ''' Modified by: WE 27/08/2014 - #1865. Modified for use with new function ReadName, which replaces former functions ReadByName and ReadByShortName.
+        '''                              FNAME and NAME (param pNameToSearch) are used for compatibility with former function calls to ReadByName and ReadByShortName respectively.
+        '''                              LNAME has been introduced to correctly determine the uniqueness of an occurrence of field [Name] in [tparISETests].
         ''' </remarks>
         Public Function ExistsISETestName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestName As String, _
                                           Optional ByVal pNameToSearch As String = "FNAME", Optional ByVal pISETestID As Integer = 0) _
@@ -102,11 +106,13 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tparISETestsDAO
-                        If String.Equals(pNameToSearch, "FNAME") Then
-                            resultData = myDAO.ReadByName(dbConnection, pISETestName)
-                        Else
-                            resultData = myDAO.ReadByShortName(dbConnection, pISETestName, pISETestID)
-                        End If
+
+                        'If String.Equals(pNameToSearch, "FNAME") Then
+                        '    resultData = myDAO.ReadByName(dbConnection, pISETestName)
+                        'Else
+                        '    resultData = myDAO.ReadByShortName(dbConnection, pISETestName, pISETestID)
+                        'End If
+                        resultData = myDAO.ReadName(dbConnection, pISETestName, pNameToSearch, pISETestID)
                     End If
                 End If
             Catch ex As Exception

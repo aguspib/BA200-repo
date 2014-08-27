@@ -389,92 +389,62 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Search ISE test data for the informed Test Name (for Import from LIMS process)
+        ''' Search ISE test data for the given Test Name.
         ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pISETestName">ISE Test Name to search by</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS containing data of the 
-        '''          informed ISE Test</returns>
-        ''' <remarks>
-        ''' Created by:  SA 25/10/2010
-        ''' Modified by: XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
-        '''              DL 05/02/2013 - Add optional parameter DataBaseName and use it in query
-        '''              SG 14/02/2013 - Add optional parameter IncludeDisabled and use it in query Bug #1134
-        ''' </remarks>
-        Public Function ReadByName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestName As String, Optional pIncludeDisabled As Boolean = False, Optional pDataBaseName As String = "") As GlobalDataTO
-            Dim myGlobalDataTO As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
-                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim strFromLeft As String = ""
-                        If (Not String.IsNullOrEmpty(pDataBaseName)) Then strFromLeft = pDataBaseName & ".dbo."
-
-                        Dim cmdText As String = " SELECT * FROM " & strFromLeft & "tparISETests " & vbCrLf & _
-                                                " WHERE  UPPER([Name]) = UPPER(N'" & pISETestName.Replace("'", "''") & "') " & vbCrLf
-
-                        'SG 14/02/2013 Bug #1134
-                        If Not pIncludeDisabled Then
-                            cmdText &= " AND    Enabled = 1 " & vbCrLf
-                        End If
-
-                        '" WHERE  UPPER([Name]) = N'" & pISETestName.Replace("'", "''").ToUpper & "' " & vbCrLf & _
-
-                        Dim myISETests As New ISETestsDS
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myISETests.tparISETests)
-                            End Using
-                        End Using
-
-                        myGlobalDataTO.SetDatos = myISETests
-                        myGlobalDataTO.HasError = False
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO = New GlobalDataTO()
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByName", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return myGlobalDataTO
-        End Function
-
-        ''' <summary>
-        ''' Search ISE test data for the informed Test ShortName
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pISETestShortName">ISE Test ShortName to search by</param>
+        ''' <param name="pDBConnection">Open DB Connection.</param>
+        ''' <param name="pISETestName">ISE Test Name to search for.</param>
+        ''' <param name="pNameType">Type of search to perform; possible values are: FNAME, NAME, LNAME. Calling method must pass one of these values, otherwise this function will result in an error.</param>
         ''' <param name="pISETestIDToExclude">Identifier of the ISE Test to exclude (to avoid errors in case of
-        '''                                   updation when the ShortName was not changed</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS containing data of the 
-        '''          informed ISE Test</returns>
+        '''                                   updation when the ShortName was not changed.</param>
+        ''' <param name="pIncludeDisabled">If or not to include ISE Test records that have been disabled.</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS containing data of the informed ISE Test.</returns>
         ''' <remarks>
-        ''' Created by:  SA 10/11/2010
-        ''' Modified by: XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' Created by:  WE 27/08/2014 - #1865. New function to solve problem with incorrect determination of unique name of field 'Name' when using ReadByName.
+        '''                              This function replaces the existing functions ReadByName and ReadByShortName.
+        '''                              FNAME and NAME (param pNameType) are used for compatibility with former functionality provided by ReadByName and ReadByShortName respectively.
+        '''                              LNAME has been introduced to correctly determine the uniqueness of an occurrence of field [Name] in [tparISETests].
         ''' </remarks>
-        Public Function ReadByShortName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestShortName As String, _
-                                        Optional ByVal pISETestIDToExclude As Integer = -1) As GlobalDataTO
+        Public Function ReadName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestName As String, ByVal pNameType As String, _
+                                 Optional ByVal pISETestIDToExclude As Integer = -1, Optional pIncludeDisabled As Boolean = False) As GlobalDataTO
+
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim cmdText As String = ""
 
             Try
                 myGlobalDataTO = GetOpenDBConnection(pDBConnection)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM tparISETests " & vbCrLf & _
-                                                " WHERE  UPPER(ShortName) = UPPER(N'" & pISETestShortName.Replace("'", "''") & "') " & vbCrLf
-                        '" WHERE  UPPER(ShortName) = N'" & pISETestShortName.Replace("'", "''").ToUpper & "' " & vbCrLf
-                        If (pISETestIDToExclude <> -1) Then cmdText &= " AND ISETestID <> " & pISETestIDToExclude & vbCrLf
+
+                        Select Case pNameType
+
+                            Case "FNAME"
+                                cmdText = " SELECT * FROM tparISETests " & vbCrLf & _
+                                               " WHERE  UPPER([Name]) = UPPER(N'" & pISETestName.Replace("'", "''") & "') " & vbCrLf
+
+                                'SG 14/02/2013 Bug #1134
+                                If Not pIncludeDisabled Then
+                                    cmdText &= " AND    Enabled = 1 " & vbCrLf
+                                End If
+
+                            Case "NAME"
+                                cmdText = " SELECT * FROM tparISETests " & vbCrLf & _
+                                                        " WHERE  UPPER([ShortName]) = UPPER(N'" & pISETestName.Replace("'", "''") & "') " & vbCrLf
+
+                                If (pISETestIDToExclude <> -1) Then
+                                    cmdText &= " AND ISETestID <> " & pISETestIDToExclude & vbCrLf
+                                End If
+
+                            Case "LNAME"
+                                cmdText = " SELECT * FROM tparISETests " & vbCrLf & _
+                                                        " WHERE  UPPER([Name]) = UPPER(N'" & pISETestName.Replace("'", "''") & "') " & vbCrLf
+
+                                If (pISETestIDToExclude <> -1) Then
+                                    cmdText &= " AND ISETestID <> " & pISETestIDToExclude & vbCrLf
+                                End If
+
+                        End Select
 
                         Dim myISETests As New ISETestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -487,6 +457,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         myGlobalDataTO.HasError = False
                     End If
                 End If
+
             Catch ex As Exception
                 myGlobalDataTO = New GlobalDataTO()
                 myGlobalDataTO.HasError = True
@@ -494,11 +465,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByShortName", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
+
         End Function
 
         ''' <summary>
@@ -553,7 +525,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Update the LISValue by the ISETestID.
@@ -828,6 +799,128 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
 #End Region
+
+
+#Region "TO DELETE-REVIEW"
+
+        ' WE 27/08/2014 -  #1865. Function ReadByName and ReadByShortName have been replaced by new function ReadName.
+
+        ' ''' <summary>
+        ' ''' Search ISE test data for the informed Test Name (for Import from LIMS process)
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pISETestName">ISE Test Name to search by</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS containing data of the 
+        ' '''          informed ISE Test</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  SA 25/10/2010
+        ' ''' Modified by: XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ' '''              DL 05/02/2013 - Add optional parameter DataBaseName and use it in query
+        ' '''              SG 14/02/2013 - Add optional parameter IncludeDisabled and use it in query Bug #1134
+        ' ''' </remarks>
+        'Public Function ReadByName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestName As String, Optional pIncludeDisabled As Boolean = False, Optional pDataBaseName As String = "") As GlobalDataTO
+        '    Dim myGlobalDataTO As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '    Try
+        '        myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+        '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim strFromLeft As String = ""
+        '                If (Not String.IsNullOrEmpty(pDataBaseName)) Then strFromLeft = pDataBaseName & ".dbo."
+
+        '                Dim cmdText As String = " SELECT * FROM " & strFromLeft & "tparISETests " & vbCrLf & _
+        '                                        " WHERE  UPPER([Name]) = UPPER(N'" & pISETestName.Replace("'", "''") & "') " & vbCrLf
+
+        '                'SG 14/02/2013 Bug #1134
+        '                If Not pIncludeDisabled Then
+        '                    cmdText &= " AND    Enabled = 1 " & vbCrLf
+        '                End If
+
+        '                '" WHERE  UPPER([Name]) = N'" & pISETestName.Replace("'", "''").ToUpper & "' " & vbCrLf & _
+
+        '                Dim myISETests As New ISETestsDS
+        '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+        '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+        '                        dbDataAdapter.Fill(myISETests.tparISETests)
+        '                    End Using
+        '                End Using
+
+        '                myGlobalDataTO.SetDatos = myISETests
+        '                myGlobalDataTO.HasError = False
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        myGlobalDataTO = New GlobalDataTO()
+        '        myGlobalDataTO.HasError = True
+        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        myGlobalDataTO.ErrorMessage = ex.Message
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByName", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return myGlobalDataTO
+        'End Function
+
+        ' ''' <summary>
+        ' ''' Search ISE test data for the informed Test ShortName
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pISETestShortName">ISE Test ShortName to search by</param>
+        ' ''' <param name="pISETestIDToExclude">Identifier of the ISE Test to exclude (to avoid errors in case of
+        ' '''                                   updation when the ShortName was not changed</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS containing data of the 
+        ' '''          informed ISE Test</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  SA 10/11/2010
+        ' ''' Modified by: XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ' ''' </remarks>
+
+        'Public Function ReadByShortName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestShortName As String, _
+        '                                Optional ByVal pISETestIDToExclude As Integer = -1) As GlobalDataTO
+        '    Dim myGlobalDataTO As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '    Try
+        '        myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+        '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim cmdText As String = " SELECT * FROM tparISETests " & vbCrLf & _
+        '                                        " WHERE  UPPER(ShortName) = UPPER(N'" & pISETestShortName.Replace("'", "''") & "') " & vbCrLf
+        '                '" WHERE  UPPER(ShortName) = N'" & pISETestShortName.Replace("'", "''").ToUpper & "' " & vbCrLf
+        '                If (pISETestIDToExclude <> -1) Then cmdText &= " AND ISETestID <> " & pISETestIDToExclude & vbCrLf
+
+        '                Dim myISETests As New ISETestsDS
+        '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+        '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+        '                        dbDataAdapter.Fill(myISETests.tparISETests)
+        '                    End Using
+        '                End Using
+
+        '                myGlobalDataTO.SetDatos = myISETests
+        '                myGlobalDataTO.HasError = False
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        myGlobalDataTO = New GlobalDataTO()
+        '        myGlobalDataTO.HasError = True
+        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        myGlobalDataTO.ErrorMessage = ex.Message
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByShortName", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return myGlobalDataTO
+        'End Function
+
+#End Region
+
 
     End Class
 

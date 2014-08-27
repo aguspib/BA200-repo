@@ -36,51 +36,51 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Public myISETestsDS As ISETestsDS
             Public myRefRangsDS As TestRefRangesDS
 
-            ''' <summary>
-            ''' Fill sie Test Data Set in structure, searching by ise Test Name
-            ''' </summary>
-            ''' <param name="pDBConnection"></param>
-            ''' <param name="pISETestName"></param>
-            ''' <returns></returns>
-            ''' <remarks>
-            ''' Created By: DL - 06/02/2013
-            ''' </remarks>
-            Public Function SearchISETestByName(pDBConnection As SqlClient.SqlConnection,
-                                                pISETestName As String,
-                                                Optional factoryDB As Boolean = False) As Boolean
+            ' ''' <summary>
+            ' ''' Fill sie Test Data Set in structure, searching by ise Test Name
+            ' ''' </summary>
+            ' ''' <param name="pDBConnection"></param>
+            ' ''' <param name="pISETestName"></param>
+            ' ''' <returns></returns>
+            ' ''' <remarks>
+            ' ''' Created By: DL - 06/02/2013
+            ' ''' </remarks>
+            'Public Function SearchISETestByName(pDBConnection As SqlClient.SqlConnection,
+            '                                    pISETestName As String,
+            '                                    Optional factoryDB As Boolean = False) As Boolean
 
-                Dim dbConnection As SqlClient.SqlConnection = Nothing
-                myISETestsDS = New ISETestsDS
+            '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+            '    myISETestsDS = New ISETestsDS
 
-                Try
-                    Dim resultData As GlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-                    If resultData.HasError Then Return False
-                    If resultData.SetDatos Is Nothing Then Return False
+            '    Try
+            '        Dim resultData As GlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+            '        If resultData.HasError Then Return False
+            '        If resultData.SetDatos Is Nothing Then Return False
 
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If dbConnection Is Nothing Then Return False
+            '        dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+            '        If dbConnection Is Nothing Then Return False
 
-                    Dim dbName As String = ""
-                    If factoryDB Then dbName = GlobalBase.TemporalDBName
+            '        Dim dbName As String = ""
+            '        If factoryDB Then dbName = GlobalBase.TemporalDBName
 
-                    Dim mytparISETests As New tparISETestsDAO
-                    resultData = mytparISETests.ReadByName(dbConnection, pISETestName, True, pDataBaseName:=dbName)
+            '        Dim mytparISETests As New tparISETestsDAO
+            '        resultData = mytparISETests.ReadByName(dbConnection, pISETestName, True, pDataBaseName:=dbName)
 
-                    If resultData.HasError Then Return False
-                    If resultData.SetDatos Is Nothing Then Return False
+            '        If resultData.HasError Then Return False
+            '        If resultData.SetDatos Is Nothing Then Return False
 
-                    'load data to structure member
-                    MyClass.myISETestsDS = DirectCast(resultData.SetDatos, ISETestsDS)
-                    Return True
+            '        'load data to structure member
+            '        MyClass.myISETestsDS = DirectCast(resultData.SetDatos, ISETestsDS)
+            '        Return True
 
-                Catch ex As Exception
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchISETestByName", EventLogEntryType.Error, False)
-                Finally
-                    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-                End Try
-                Return False
-            End Function
+            '    Catch ex As Exception
+            '        Dim myLogAcciones As New ApplicationLogManager()
+            '        myLogAcciones.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchISETestByName", EventLogEntryType.Error, False)
+            '    Finally
+            '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            '    End Try
+            '    Return False
+            'End Function
 
             ''' <summary>
             ''' Fill sie Test Data Set in structure, searching by ise Test Name
