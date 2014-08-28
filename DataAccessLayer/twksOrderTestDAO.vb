@@ -28,6 +28,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              in the parameter DS, use the current logged User and the current date
         '''              TR 06/08/2011 - Do not declare variables inside loops 
         '''              SA 26/03/2013 - When fields LISRequest and/or ExternalQC have NULL as value in the entry DS, insert them as FALSE
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewOrderTests As OrderTestsDS) As GlobalDataTO
             Dim dataToReturn As New GlobalDataTO
@@ -48,7 +49,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'SQL Sentence to insert the new Order Test
                         cmdText = " INSERT INTO twksOrderTests(OrderID, TestType, TestID, SampleType, OrderTestStatus, TubeType, AnalyzerID, " & _
                                                              " TestProfileID, ExportDateTime, ReplicatesNumber, PreviousOrderTestID, AlternativeOrderTestID, " & _
-                                                             " ControlID, CreationOrder, LISRequest, ExternalQC, TS_User, TS_DateTime) " & _
+                                                             " ControlID, CreationOrder, LISRequest, ExternalQC, TS_User, TS_DateTime, Selected) " & _
                                   " VALUES('" & pNewOrderTests.twksOrderTests(i).OrderID & "', " & _
                                          " '" & pNewOrderTests.twksOrderTests(i).TestType & "', " & _
                                                 pNewOrderTests.twksOrderTests(i).TestID & ", " & _
@@ -128,9 +129,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " N'" & pNewOrderTests.twksOrderTests(i).TS_User.Replace("'", "''") & "', "
                         End If
                         If (pNewOrderTests.twksOrderTests(i).IsTS_DateTimeNull) Then
-                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', "
                         Else
-                            cmdText += " '" & pNewOrderTests.twksOrderTests(i).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText += " '" & pNewOrderTests.twksOrderTests(i).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', "
+                        End If
+
+                        ' XB 27/08/2014 - BT #1868
+                        If (pNewOrderTests.twksOrderTests(i).IsSelectedNull) Then
+                            cmdText &= " 0) "
+                        Else
+                            cmdText &= IIf(pNewOrderTests.twksOrderTests(i).Selected, 1, 0).ToString & ") "
                         End If
 
                         'Execute the SQL Sentence
@@ -314,6 +322,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 31/01/2012 - Use the Using clause to manage the SQL Commands defined in the function
         '''              SA 26/03/2013 - When fields LISRequest and ExternalQC are informed in the entry DS, update the corresponding value. 
         '''                              When value is NULL, do not change the current value.
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestsDS As OrderTestsDS) As GlobalDataTO
             Dim cmdText As New StringBuilder()
@@ -416,6 +425,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText.AppendFormat("'{0}'", Now.ToString("yyyyMMdd HH:mm:ss"))
                         Else
                             cmdText.AppendFormat("'{0}'", orderTestRow.TS_DateTime.ToString("yyyyMMdd HH:mm:ss"))
+                        End If
+
+                        ' XB 27/08/2014 - BT #1868
+                        If (Not orderTestRow.IsSelectedNull) Then
+                            cmdText.Append(", Selected = ")
+                            cmdText.AppendFormat("{0}", IIf(orderTestRow.Selected, 1, 0).ToString)
                         End If
 
                         cmdText.Append(" WHERE  OrderTestID = ")
@@ -1163,6 +1178,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 04/04/2013 - Added new optional parameter to indicate if OPEN Blanks and Calibrators have to be returned as SELECTED.
         '''                              Optional parameter with TRUE as default value. Changed the subQuery for OPEN OrderTests to return them
         '''                              selected or not according value of this new parameter  
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table - BT #1868
         ''' </remarks>
         Public Function GetBlankCalibOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                 Optional ByVal pReturnOpenAsSelected As Boolean = True) As GlobalDataTO
@@ -1174,10 +1190,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
+
+                        ' XB 28/08/2014 - this value is not used from this moment - BT #1868
+                        'Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
 
                         'Get Open Blanks and Calibrators linked to the informed WorkSession
-                        Dim cmdText As String = " SELECT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, " & vbCrLf & _
+                        Dim cmdText As String = " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, " & vbCrLf & _
                                                        " OT.TubeType,  OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates, " & vbCrLf & _
                                                        " 1 AS NewCheck,  OT.PreviousOrderTestID, OT.OrderTestStatus AS OTStatus, " & vbCrLf & _
                                                        " OT.CreationOrder, WSOT.ToSendFlag, T.BlankMode " & vbCrLf & _
@@ -1192,7 +1210,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         '... and get In Process Blanks and Calibrators linked to the informed WorkSession
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT 1 AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, " & vbCrLf & _
                                           " OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates, 1 AS NewCheck, " & vbCrLf & _
                                           " OT.PreviousOrderTestID, 'INPROCESS' AS OTStatus, OT.CreationOrder, WSOT.ToSendFlag, T.BlankMode " & vbCrLf & _
                                    " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
@@ -1390,6 +1408,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 18/06/2012 - Changed the query to get the Test Name from the proper table depending on the TestType: for 
         '''                              Standard Tests, field TestName in tparTests, but for ISE Tests, field Name in tparISETests 
         '''              TR 12/03/2013 - Changed the query to get also field LISRequest from twksOrderTests table
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table - BT #1868
         ''' </remarks>
         Public Function GetControlOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1401,7 +1420,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get Open Controls linked to the informed WorkSession
-                        Dim cmdText As String = " SELECT 0 AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
+                        Dim cmdText As String = " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
                                                       " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
                                                             " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
                                                        " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, OT.OrderTestStatus AS OTStatus, C.ControlID, " & vbCrLf & _
@@ -1413,7 +1432,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND O.SampleClass = 'CTRL' " & vbCrLf
                         '... and get In Process Controls linked to the informed WorkSession
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT 1 AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
+                                   " SELECT OT.Selected AS Selected, O.SampleClass AS SampleClass, OT.OrderID, OT.OrderTestID, OT.TubeType, OT.TestType, OT.TestID, OT.LISRequest, " & vbCrLf & _
                                          " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
                                                " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
                                           " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, 'INPROCESS' AS OTStatus, C.ControlID, " & vbCrLf & _
@@ -2191,6 +2210,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 01/04/2014 - Changed all subqueries to filter by RerunNumber = 1 all LEFT OUTER JOINs over table twksOrderTestsLISInfo, 
         '''                              to prevent Order Tests with Reruns requested by LIS are returned as many times as requested LIS Rerun they have 
         '''                              (error detected when testing changes due to BT #1564)
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table when value of entry parameter pReturnOpenAsSelected is True - BT #1868
         '''</remarks>
         Public Function GetPatientOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                              Optional ByVal pReturnOpenAsSelected As Boolean = True) As GlobalDataTO
@@ -2201,7 +2221,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
+
+                        ' XB 27/08/2014 - BT #1868
+                        'Dim selectedValue As String = IIf(pReturnOpenAsSelected, 1, 0).ToString
+                        Dim selectedValue As String = "0"
+                        If pReturnOpenAsSelected Then
+                            selectedValue = "OT.Selected"
+                        End If
 
                         'Get Open Patient Samples linked to the informed WorkSession for Standard Tests
                         Dim cmdText As String = " SELECT DISTINCT " & selectedValue & " AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
@@ -2252,7 +2278,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         '... get also In Process Patient Samples linked to the informed WorkSession for Standard Tests
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 1 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, T.TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " 'INPROCESS' AS OTStatus, OT.TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2268,7 +2294,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         '... get also In Process Patient Samples linked to the informed WorkSession for Calculated Tests
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 1 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, CT.CalcTestLongName AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " 'INPROCESS' AS OTStatus, OT.TestProfileID, TP.TestProfileName, '=' + CT.FormulaText AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2284,7 +2310,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         '...get also In Process Patient Samples linked to the informed WorkSession for ISE Tests
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 1 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, IT.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " OT.OrderTestStatus AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _
@@ -2300,7 +2326,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         '...finally, get all Patient Samples linked to the informed WorkSession for Off-System Tests as unselected and Open
                         cmdText &= " UNION " & vbCrLf & _
-                                   " SELECT DISTINCT 0 AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
+                                   " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                                           " OT.OrderTestID, OT.TestType, OT.TestID, OST.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _
                                           " 'OPEN' AS OTStatus, OT.TestProfileID AS TestProfileID, TP.TestProfileName, NULL AS CalcTestFormula, OT.CreationOrder, OT.ExternalQC, " & vbCrLf & _
                                           " OTL.SpecimenID, OTL.AwosID " & vbCrLf & _

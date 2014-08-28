@@ -381,6 +381,8 @@ Partial Public Class OrderTestsDS
 
         Private columnLISRequest As Global.System.Data.DataColumn
 
+        Private columnSelected As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -809,6 +811,14 @@ Partial Public Class OrderTestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property SelectedColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnSelected
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -894,9 +904,10 @@ Partial Public Class OrderTestsDS
                     ByVal ESOrderID As String, _
                     ByVal LISOrderID As String, _
                     ByVal ExternalQC As Boolean, _
-                    ByVal LISRequest As Boolean) As twksOrderTestsRow
+                    ByVal LISRequest As Boolean, _
+                    ByVal Selected As Boolean) As twksOrderTestsRow
             Dim rowtwksOrderTestsRow As twksOrderTestsRow = CType(Me.NewRow, twksOrderTestsRow)
-            Dim columnValuesArray() As Object = New Object() {OrderTestID, OrderID, TestType, TestID, TestName, SampleType, OrderTestStatus, TubeType, AnalyzerID, ExportDateTime, TS_User, TS_DateTime, ReplicatesNumber, TestProfileID, PreviousOrderTestID, PreviousWSID, AlternativeOrderTestID, ControlID, CalibratorType, SampleTypeAlternative, CreationOrder, SampleClass, OrderStatus, ControlName, LotNumber, PreloadedTest, MeasureUnit, RejectionCriteria, CalculationMode, NumberOfSeries, TestShortName, DecimalsAllowed, Stat, SampleID, PatientID, PatientIDType, OpenOTFlag, TestVersionNumber, CalibratorID, CalibrationFactor, AwosID, RerunNumber, SpecimenID, ESPatientID, LISPatientID, ESOrderID, LISOrderID, ExternalQC, LISRequest}
+            Dim columnValuesArray() As Object = New Object() {OrderTestID, OrderID, TestType, TestID, TestName, SampleType, OrderTestStatus, TubeType, AnalyzerID, ExportDateTime, TS_User, TS_DateTime, ReplicatesNumber, TestProfileID, PreviousOrderTestID, PreviousWSID, AlternativeOrderTestID, ControlID, CalibratorType, SampleTypeAlternative, CreationOrder, SampleClass, OrderStatus, ControlName, LotNumber, PreloadedTest, MeasureUnit, RejectionCriteria, CalculationMode, NumberOfSeries, TestShortName, DecimalsAllowed, Stat, SampleID, PatientID, PatientIDType, OpenOTFlag, TestVersionNumber, CalibratorID, CalibrationFactor, AwosID, RerunNumber, SpecimenID, ESPatientID, LISPatientID, ESOrderID, LISOrderID, ExternalQC, LISRequest, Selected}
             rowtwksOrderTestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtwksOrderTestsRow)
             Return rowtwksOrderTestsRow
@@ -968,6 +979,7 @@ Partial Public Class OrderTestsDS
             Me.columnLISOrderID = MyBase.Columns("LISOrderID")
             Me.columnExternalQC = MyBase.Columns("ExternalQC")
             Me.columnLISRequest = MyBase.Columns("LISRequest")
+            Me.columnSelected = MyBase.Columns("Selected")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1071,6 +1083,8 @@ Partial Public Class OrderTestsDS
             MyBase.Columns.Add(Me.columnExternalQC)
             Me.columnLISRequest = New Global.System.Data.DataColumn("LISRequest", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnLISRequest)
+            Me.columnSelected = New Global.System.Data.DataColumn("Selected", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnSelected)
             Me.columnOrderTestID.AutoIncrementSeed = -1
             Me.columnOrderTestID.AutoIncrementStep = -1
         End Sub
@@ -1955,6 +1969,21 @@ Partial Public Class OrderTestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Selected() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletwksOrderTests.SelectedColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Selected' in table 'twksOrderTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletwksOrderTests.SelectedColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsOrderTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletwksOrderTests.OrderTestIDColumn)
         End Function
@@ -2539,6 +2568,18 @@ Partial Public Class OrderTestsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetLISRequestNull()
             Me(Me.tabletwksOrderTests.LISRequestColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsSelectedNull() As Boolean
+            Return Me.IsNull(Me.tabletwksOrderTests.SelectedColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetSelectedNull()
+            Me(Me.tabletwksOrderTests.SelectedColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 
