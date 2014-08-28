@@ -2212,6 +2212,11 @@
       LEFT OUTER JOIN dbo.tcfgMasterData AS MD ON MD.SubTableID = 'TEST_UNITS' AND MD.ItemID = OT.MeasureUnit
       LEFT OUTER JOIN dbo.thisPatients AS P ON P.HistPatientID = OT.HistPatientID
       GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'Selected') = 0
+      BEGIN
+	    ALTER TABLE [Ax00].[dbo].twksOrderTests ADD Selected bit NOT NULL default 0
+      END
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'
