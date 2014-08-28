@@ -60,6 +60,11 @@ Public Class IHisResults
     'SA 01/08/2014
     'BT #1861 ==> Global DS to get/save the width of all visible grid columns
     Private gridColWidthConfigDS As GridColsConfigDS
+
+    'SA 28/08/2014 
+    'BT #1861 ==> Global variable to control if the intercalated BackColor has to be applied for grid rows 
+    '             (it is applied only when the grid is sorted by PatientID/SpecimenID)
+    Private applyRowStyles As Boolean = False
 #End Region
 
 #Region "Constructor"
@@ -929,6 +934,7 @@ Public Class IHisResults
 
             'Get data to shown in the grid according the default search criteria
             FindHistoricalResults()
+            applyRowStyles = True
 
             'Get Level of the connected User and set the screen status according the Level of the current User
             Dim myGlobalBase As New GlobalBase
@@ -1944,6 +1950,66 @@ Public Class IHisResults
 
 #Region "Grid Events"
 
+    ''' <summary>
+    ''' When the grid is sorted for a Column different of PatientID and/or SpecimenID, the Back Color of colored 
+    '''                                           rows is changed to White; otherwise function SetRowBackColorGroup is called to set for each different 
+    '''                                           HistPatientID/PatientID/SpecimenID the proper BackColorGroup
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 28/08/2014 - BT #1861 ==> 
+    ''' </remarks>
+    Private Sub historyGridView_MouseUp(sender As Object, e As MouseEventArgs) Handles historyGridView.MouseUp
+        Try
+            Dim dataTable As HisWSResultsDS.vhisWSResultsDataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
+            If (Not dataTable Is Nothing) Then
+                Dim pos As New Point(e.X, e.Y)
+
+                With historyGridView.CalcHitInfo(pos)
+                    If (.InColumnPanel AndAlso Not .Column Is Nothing AndAlso .HitTest = DevExpress.XtraGrid.Views.Grid.ViewInfo.GridHitTest.Column) Then
+                        Dim colName As String = .Column.Name
+
+                        Select Case (colName)
+                            Case "ResultDateTime", "LastName", "FirstName", "SampleType", "TestName", "RemarkAlert", "ExportImage"
+
+                                'Dim lstColoredRows As List(Of HisWSResultsDS.vhisWSResultsRow) = (From row In dataTable Where row.BackColorGroup = 1).ToList
+                                'For Each coloredRow As HisWSResultsDS.vhisWSResultsRow In lstColoredRows
+                                '    coloredRow.BackColorGroup = 2 'Set BackColor to White
+                                'Next
+                                'lstColoredRows = Nothing
+                                applyRowStyles = False
+
+                            Case "SpecimenID", "PatientID"
+                                'Dim i As Integer = 0
+                                'Dim myPrevBackColor As Integer = 1
+                                'Dim myPrevPatientID As String = String.Empty
+                                'Dim myPrevHistPatientID As Integer = 0
+                                'Dim myPrevSpecimenID As String = String.Empty
+
+                                'For Each row As HisWSResultsDS.vhisWSResultsRow In dataTable
+                                '    'Set the group BackColor for each grid row 
+                                '    If (i = 0) Then
+                                '        SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID, 0)
+                                '    Else
+                                '        SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID, myPrevHistPatientID)
+                                '    End If
+
+                                '    i += 1
+                                '    myPrevBackColor = row.BackColorGroup
+                                '    myPrevPatientID = row.PatientID
+                                '    myPrevSpecimenID = row.SpecimenID
+                                '    If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
+                                'Next
+                                applyRowStyles = True
+                        End Select
+                    End If
+                End With
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_MouseUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".historyGridView_MouseUp ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by:  JB 23/10/2012 
@@ -2043,18 +2109,16 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 24/10/2012
-    ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory 
+    ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory  
     ''' </remarks>
     Private Sub historyGridView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles historyGridView.Click
         Try
             With historyGridView.CalcHitInfo(historyGrid.PointToClient(MousePosition))
-                If (.Column IsNot Nothing AndAlso .Column.Name = "Selected" AndAlso .InColumn) Then
+                If (.InColumnPanel AndAlso Not .Column Is Nothing AndAlso .Column.Name = "Selected") Then
                     Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
-
                     If (historyGridView.DataRowCount > 0) Then
                         SelectAllRows(selectedRows.Count <> historyGridView.DataRowCount)
                     End If
-
                     selectedRows = Nothing
                 End If
             End With
@@ -2076,9 +2140,14 @@ Public Class IHisResults
             Dim myGridView As DevExpress.XtraGrid.Views.Grid.GridView = DirectCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
 
             If (e.RowHandle >= 0) Then
-                If (Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup"))) = 1) Then
-                    e.Appearance.BackColor = Color.AntiqueWhite
-                    e.Appearance.BackColor2 = Color.AntiqueWhite
+                If (applyRowStyles) Then
+                    If (Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup"))) = 1) Then
+                        e.Appearance.BackColor = Color.AntiqueWhite
+                        e.Appearance.BackColor2 = Color.AntiqueWhite
+                    Else
+                        e.Appearance.BackColor = Color.White
+                        e.Appearance.BackColor2 = Color.White
+                    End If
                 Else
                     e.Appearance.BackColor = Color.White
                     e.Appearance.BackColor2 = Color.White
@@ -2087,59 +2156,6 @@ Public Class IHisResults
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_RowStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".historyGridView_RowStyle ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' When the grid is sorted for a Column different of PatientID and/or SpecimenID, the Back Color of colored rows is changed to White; otherwise
-    ''' function SetRowBackColorGroup is called to set for each different HistPatientID/PatientID/SpecimenID the proper BackColorGroup
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: SA 27/08/2014 - BT #1861
-    ''' </remarks>
-    Private Sub historyGridView_MouseDown(sender As Object, e As MouseEventArgs) Handles historyGridView.MouseDown
-        Try
-            Dim dataTable As HisWSResultsDS.vhisWSResultsDataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
-            If (Not dataTable Is Nothing) Then
-                With historyGridView.CalcHitInfo(New Point(e.X, e.Y))
-                    If (.InColumnPanel AndAlso Not .Column Is Nothing) Then
-                        Dim colName As String = .Column.Name
-                        If (colName = "ResultDateTime") OrElse (colName = "LastName") OrElse (colName = "FirstName") OrElse (colName = "SampleType") OrElse _
-                           (colName = "TestName") OrElse (colName = "RemarkAlert") OrElse (colName = "ExportImage") Then
-
-                            Dim lstColoredRows As List(Of HisWSResultsDS.vhisWSResultsRow) = (From row In dataTable Where row.BackColorGroup = 1).ToList
-                            For Each coloredRow As HisWSResultsDS.vhisWSResultsRow In lstColoredRows
-                                coloredRow.BackColorGroup = 2 'Set BackColor to White
-                            Next
-
-                        ElseIf (colName = "SpecimenID") OrElse (colName = "PatientID") Then
-                            Dim i As Integer = 0
-                            Dim myPrevBackColor As Integer = 1
-                            Dim myPrevPatientID As String = String.Empty
-                            Dim myPrevHistPatientID As Integer = 0
-                            Dim myPrevSpecimenID As String = String.Empty
-
-                            For Each row As HisWSResultsDS.vhisWSResultsRow In dataTable
-                                'Set the group BackColor for each grid row 
-                                If (i = 0) Then
-                                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID, 0)
-                                Else
-                                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID, myPrevHistPatientID)
-                                End If
-
-                                i += 1
-                                myPrevBackColor = row.BackColorGroup
-                                myPrevPatientID = row.PatientID
-                                myPrevSpecimenID = row.SpecimenID
-                                If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
-                            Next
-                        End If
-                    End If
-                End With
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_MouseDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".historyGridView_MouseDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 #End Region
