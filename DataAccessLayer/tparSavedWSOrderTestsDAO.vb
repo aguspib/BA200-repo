@@ -31,6 +31,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA  27/10/2010 - Added N preffix for multilanguage of fields SampleID (it can be a PatientID), TestName  
         '''                               and FormulaText (Test names can be included in it)
         '''              TR  14/03/2013 - Add new columns needed for the LIS process.
+        '''              XB  28/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSavedWSOrderTestsDS As SavedWSOrderTestsDS, _
                                Optional pSavedWSID As Integer = -1) As GlobalDataTO
@@ -56,7 +57,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText = " INSERT INTO tparSavedWSOrderTests (SavedWSID, SampleClass, StatFlag, TestType, TestID, SampleType, " & _
                                                                     " ReplicatesNumber,  TestName, CreationOrder, SampleID, TubeType, " & _
                                                                     " ControlID, FormulaText, PatientIDType, AwosID, SpecimenID, ESOrderID, LISOrderID, " & _
-                                                                    " ESPatientID, LISPatientID, CalcTestIDs, CalcTestNames, ExternalQC) " & _
+                                                                    " ESPatientID, LISPatientID, CalcTestIDs, CalcTestNames, ExternalQC, Selected) " & _
                                   " VALUES(" & rowtparSavedWSOrderTest.SavedWSID & ", " & _
                                         " '" & rowtparSavedWSOrderTest.SampleClass.Trim & "', " & _
                                         " '" & IIf(rowtparSavedWSOrderTest.StatFlag, "True", "False").ToString & "', " & _
@@ -99,63 +100,69 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         If (rowtparSavedWSOrderTest.IsPatientIDTypeNull) Then
-                            cmdText &= "NULL,"
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.PatientIDType & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsAwosIDNull) Then
-                            cmdText &= "NULL,"
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.AwosID & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsSpecimenIDNull) Then
-                            cmdText &= "NULL,"
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.SpecimenID & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsESOrderIDNull) Then
-                            cmdText &= "NULL,"
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.ESOrderID & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsLISOrderIDNull) Then
-                            cmdText &= "NULL," & vbCrLf
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.LISOrderID & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsESPatientIDNull) Then
-                            cmdText &= "NULL," & vbCrLf
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.ESPatientID & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsLISPatientIDNull) Then
-                            cmdText &= "NULL," & vbCrLf
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.LISPatientID & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsCalcTestIDsNull) Then
-                            cmdText &= "NULL," & vbCrLf
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.CalcTestIDs & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsCalcTestNamesNull) Then
-                            cmdText &= "NULL," & vbCrLf
+                            cmdText &= "NULL, "
                         Else
                             cmdText &= "N'" & rowtparSavedWSOrderTest.CalcTestNames & "', "
                         End If
 
                         If (rowtparSavedWSOrderTest.IsExternalQCNull) Then
-                            cmdText &= "NULL)" & vbCrLf
+                            cmdText &= "NULL, "
                         Else
-                            cmdText &= "'" & rowtparSavedWSOrderTest.ExternalQC & "' ) " & vbCrLf
+                            cmdText &= "'" & rowtparSavedWSOrderTest.ExternalQC & "', "
+                        End If
+
+                        If (rowtparSavedWSOrderTest.IsSelectedNull) Then
+                            cmdText &= "0) "
+                        Else
+                            cmdText &= IIf(rowtparSavedWSOrderTest.Selected, 1, 0).ToString & ") "
                         End If
 
                         dbCmd.Connection = pDBConnection
@@ -683,6 +690,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''               SA 18/04/2012 - Changed the function template
         '''               TR 14/03/2013 - Changed the SQL by adding an INNER JOIN with table tparSavedWS to get value of field SavedWSName
         '''               SA 09/05/2013 - Changed the SQL to get also value of new field DeletedTestFlag
+        '''               XB 28/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function ReadBySavedWSID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSavedWSID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -693,7 +701,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, " & vbCrLf & _
+                        Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.Selected, " & vbCrLf & _
                                                        " OT.ReplicatesNumber, OT.ControlID, OT.CreationOrder, OT.TestName, OT.FormulaText, OT.AwosID, OT.SpecimenID, " & vbCrLf & _
                                                        " OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.CalcTestIDs, OT.CalcTestNames, SW.SavedWSName, " & vbCrLf & _
                                                        " (CASE WHEN OT.ExternalQC IS NULL THEN 0 ELSE OT.ExternalQC END) AS ExternalQC,  " & vbCrLf & _

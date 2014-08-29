@@ -297,6 +297,7 @@ Namespace Biosystems.Ax00.BL
         '''                                 ** Removed assignation of NumReplicates for CALC and OFFS Tests due to import of these Test Types is not allowed  
         '''              SA  12/06/2012 - For Blanks, if TubeType is informed, save it.     
         '''              XB  25/04/2013 - Read required LIS data info to match it with every Control/Patient OrderTest requested from LIS
+        '''              XB  28/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Public Function Save(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSavedWSName As String, ByVal pWorkSessionResultDS As WorkSessionResultDS, _
                              ByVal pSavedWSID As Integer, Optional ByVal pFromLIMS As Boolean = False, _
@@ -362,6 +363,9 @@ Namespace Biosystems.Ax00.BL
                                     mySavedWSOrderTestRow.ReplicatesNumber = myBlankCalibratorsRow.NumReplicates
                                     mySavedWSOrderTestRow.CreationOrder = myBlankCalibratorsRow.CreationOrder
 
+                                    ' XB 28/08/2014 -- BT #1868
+                                    mySavedWSOrderTestRow.Selected = myBlankCalibratorsRow.Selected
+
                                     If (Not myBlankCalibratorsRow.IsTubeTypeNull) Then
                                         mySavedWSOrderTestRow.TubeType = myBlankCalibratorsRow.TubeType
                                     End If
@@ -399,6 +403,9 @@ Namespace Biosystems.Ax00.BL
                                     mySavedWSOrderTestRow.ControlID = myControlsRow.ControlID
                                     mySavedWSOrderTestRow.CreationOrder = myControlsRow.CreationOrder
 
+                                    ' XB 28/08/2014 -- BT #1868
+                                    mySavedWSOrderTestRow.Selected = myControlsRow.Selected
+
                                     ' XB 25/04/2013 - Match with the LIS data information for the corresponding OrderTestID
                                     If myControlsRow.LISRequest Then
                                         Dim lisInfoLinqRes As List(Of OrderTestsLISInfoDS.twksOrderTestsLISInfoRow)
@@ -431,6 +438,9 @@ Namespace Biosystems.Ax00.BL
                                     mySavedWSOrderTestRow.TestName = myPatientsRow.TestName
                                     mySavedWSOrderTestRow.SampleType = myPatientsRow.SampleType
                                     mySavedWSOrderTestRow.CreationOrder = myPatientsRow.CreationOrder
+
+                                    ' XB 28/08/2014 -- BT #1868
+                                    mySavedWSOrderTestRow.Selected = myPatientsRow.Selected
 
                                     If (myPatientsRow.TestType = "STD" Or myPatientsRow.TestType = "ISE") Then
                                         mySavedWSOrderTestRow.TubeType = myPatientsRow.TubeType

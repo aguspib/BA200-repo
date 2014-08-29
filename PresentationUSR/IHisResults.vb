@@ -487,7 +487,7 @@ Public Class IHisResults
     '''             SA 29/04/2014 - BT #1608 ==> Added a hidden column for field TestLongName (this field has to be shown as Test Name in reports
     '''                                          when it is informed)
     '''             SA 01/08/2014 - BT #1861 ==> Added new visible grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
-    '''                                          Added new hidden grid column> HistPatientID.
+    '''                                          Added new hidden grid column: HistPatientID.
     '''                                          Call new function to get the saved width of all visible grid columns and assign the value.
     ''' </remarks>
     Private Sub InitializeResultHistoryGrid()
@@ -1127,24 +1127,23 @@ Public Class IHisResults
     End Function
 
     ''' <summary>
-    ''' Set value of field BackColorGroup for the Result row beign processed: if the Result is for the same HistPatientID/PatientID/SpecimenID than the 
+    ''' Set value of field BackColorGroup for the Result row beign processed: if the Result is for the same PatientID/HistPatientID than the 
     ''' previous Result row, the same BackColor is assigned; otherwise, the alternate BackColor value is assigned
     ''' </summary>
     ''' <param name="pRow">Result row in process</param>
     ''' <param name="pPreviousBackColorGroup">BackColorGroup assigned to the previous Result Row in the DataSet</param>
-    ''' <param name="pPreviousSpecimenID">SpecimenID in the previous Result Row in the DataSet</param>
     ''' <param name="pPreviousPatientID">PatientID in the previous Result Row in the DataSet</param>
     ''' <param name="pPreviousHistPatientID">HistPatientID in the previous Result Row in the DataSet. It is an optional parameter due to if the
     '''                                      previous Result Row corresponds to an unknown Patient, HistPatientID is NULL in the DataSet</param>
     ''' <remarks>
     ''' Created by: SA 25/08/2014 - BT #1861
     ''' </remarks>
-    Private Sub SetRowBackColorGroup(ByRef pRow As HisWSResultsDS.vhisWSResultsRow, ByVal pPreviousBackColorGroup As Integer, ByVal pPreviousSpecimenID As String, _
+    Private Sub SetRowBackColorGroup(ByRef pRow As HisWSResultsDS.vhisWSResultsRow, ByVal pPreviousBackColorGroup As Integer, _
                                      ByVal pPreviousPatientID As String, Optional ByVal pPreviousHistPatientID As Integer = 0)
         Try
             Dim changeRowBC As Boolean = True
 
-            If (pRow.SpecimenID = pPreviousSpecimenID AndAlso pRow.PatientID = pPreviousPatientID) Then
+            If (pRow.PatientID = pPreviousPatientID) Then
                 If (pRow.IsHistPatientIDNull AndAlso pPreviousHistPatientID = 0) OrElse _
                    (Not pRow.IsHistPatientIDNull AndAlso pPreviousHistPatientID <> 0 AndAlso pRow.HistPatientID = pPreviousHistPatientID) Then
                     pRow.BackColorGroup = pPreviousBackColorGroup
@@ -1174,22 +1173,20 @@ Public Class IHisResults
     ''' Modified by: JV 03/01/2014 - BT #1285 ==> Removed Application.DoEvents from the For/Next to avoid flicking on the DataGrid area 
     '''                                           (data, images, etc.) and also on the form
     '''              AG 13/02/2014 - BT #1505 ==> Added traces in the LOG 
-    '''              SA 25/08/2014 - BT #1861 ==> For each processed row, set value of field BackColorGroup: all results for the same PatientID/SpecimenID
-    '''                                           will have the same BackColor, and there will be an alternate color for the different pairs of 
-    '''                                           PatientID/SpecimenID loaded
+    '''              SA 25/08/2014 - BT #1861 ==> For each processed row, set value of field BackColorGroup: all results for the same PatientID/HistPatientID
+    '''                                           will have the same BackColor, and there will be an alternate color for the different PatientID/HistPatientIDs loaded 
     ''' </remarks>
     Private Sub PrepareAndSetDataToGrid(ByVal pHisResultsDataTable As HisWSResultsDS.vhisWSResultsDataTable)
         Dim myGlobalDataTO As New GlobalDataTO
 
         Try
             UpdateFormBehavior(False)
-            Dim StartTime As DateTime = Now 'AG 13/02/2014 - #1505
+            Dim StartTime As DateTime = Now
 
             Dim i As Integer = 0
             Dim myPrevBackColor As Integer = 1
             Dim myPrevPatientID As String = String.Empty
             Dim myPrevHistPatientID As Integer = 0
-            Dim myPrevSpecimenID As String = String.Empty
 
             For Each row As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable
                 'Mark the row as "not selected"
@@ -1204,20 +1201,19 @@ Public Class IHisResults
 
                 'BT #1861 - Set the group BackColor for each grid row 
                 If (i = 0) Then
-                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID, 0)
+                    SetRowBackColorGroup(row, 1, row.PatientID, 0)
                 Else
-                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID, myPrevHistPatientID)
+                    SetRowBackColorGroup(row, myPrevBackColor, myPrevPatientID, myPrevHistPatientID)
                 End If
 
                 i += 1
                 myPrevBackColor = row.BackColorGroup
                 myPrevPatientID = row.PatientID
-                myPrevSpecimenID = row.SpecimenID
                 If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
             Next
 
             CreateLogActivity("PrepareAndSetDataToGrid : " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".PrepareAndSetDataToGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
-            StartTime = Now 'AG 13/02/2014 - #1505
+            StartTime = Now
 
             If (Not myGlobalDataTO.HasError) Then
                 historyGrid.DataSource = pHisResultsDataTable
@@ -1685,6 +1681,54 @@ Public Class IHisResults
             UpdateFormBehavior(True)
         End Try
     End Sub
+
+    ''' <summary>
+    ''' When the grid is sorted for a Column different of PatientID, the Back Color of colored rows is changed to White; 
+    ''' otherwise the value previously set for field BackColorGroup of each row is used to set the Row BackColor. When the grid
+    ''' has been sorted by several columns, the intercalated BackColor is applied only if the first column in the grid is PatientID
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 29/08/2014 - BT #1861
+    ''' </remarks>
+    Private Sub ApplyRowStyles(ByVal sender As Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs)
+        Try
+            If (e.RowHandle >= 0) Then
+                Dim applyStyles As Boolean = False
+                Dim myGridView As DevExpress.XtraGrid.Views.Grid.GridView = DirectCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
+                Dim rowBCGroup As Integer = Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup")))
+
+                If (Not myGridView.SortedColumns Is Nothing AndAlso myGridView.SortedColumns.Count > 0) Then
+                    'The intercalated Row Backcolor is applied only if the User has sort the grid for one or more columns and the first sort column is PatientID
+                    Dim mySortedColumnName As String = myGridView.SortedColumns.Item(0).Name.ToString
+                    If (mySortedColumnName = "PatientID") Then
+                        If (rowBCGroup = 1) Then
+                            e.Appearance.BackColor = Color.LightCyan
+                            e.Appearance.BackColor2 = Color.Azure
+                        Else
+                            e.Appearance.BackColor = Color.White
+                            e.Appearance.BackColor2 = Color.White
+                        End If
+                    Else
+                        e.Appearance.BackColor = Color.White
+                        e.Appearance.BackColor2 = Color.White
+                    End If
+                Else
+                    'If SortedColumns has not elements, then the grid is using the sort by default (by PatientID/SpecimenID/ResultDateTime) and the 
+                    'intercalated Row Backcolor has to be applied
+                    If (rowBCGroup = 1) Then
+                        e.Appearance.BackColor = Color.LightCyan
+                        e.Appearance.BackColor2 = Color.Azure
+                    Else
+                        e.Appearance.BackColor = Color.White
+                        e.Appearance.BackColor2 = Color.White
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRowStyles ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ApplyRowStyles ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
 #End Region
 
 #Region "Screen Events"
@@ -1943,7 +1987,6 @@ Public Class IHisResults
 #End Region
 
 #Region "Grid Events"
-
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by:  JB 23/10/2012 
@@ -2043,18 +2086,16 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 24/10/2012
-    ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory 
+    ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory  
     ''' </remarks>
     Private Sub historyGridView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles historyGridView.Click
         Try
             With historyGridView.CalcHitInfo(historyGrid.PointToClient(MousePosition))
-                If (.Column IsNot Nothing AndAlso .Column.Name = "Selected" AndAlso .InColumn) Then
+                If (.InColumnPanel AndAlso Not .Column Is Nothing AndAlso .Column.Name = "Selected") Then
                     Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
-
                     If (historyGridView.DataRowCount > 0) Then
                         SelectAllRows(selectedRows.Count <> historyGridView.DataRowCount)
                     End If
-
                     selectedRows = Nothing
                 End If
             End With
@@ -2066,80 +2107,17 @@ Public Class IHisResults
     End Sub
 
     ''' <summary>
-    ''' Set the BackColor of each grid Row according value of field BackColorGroup in the DS used as DataSource for the grid
+    ''' Call the function that set the proper back color for all rows loaded in the grid
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 25/08/2014 - BT #1861
+    ''' Created by: SA 29/08/2014 - BT #1861
     ''' </remarks>
     Private Sub historyGridView_RowStyle(ByVal sender As Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs) Handles historyGridView.RowStyle
         Try
-            Dim myGridView As DevExpress.XtraGrid.Views.Grid.GridView = DirectCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
-
-            If (e.RowHandle >= 0) Then
-                If (Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup"))) = 1) Then
-                    e.Appearance.BackColor = Color.AntiqueWhite
-                    e.Appearance.BackColor2 = Color.AntiqueWhite
-                Else
-                    e.Appearance.BackColor = Color.White
-                    e.Appearance.BackColor2 = Color.White
-                End If
-            End If
+            ApplyRowStyles(sender, e)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_RowStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".historyGridView_RowStyle ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' When the grid is sorted for a Column different of PatientID and/or SpecimenID, the Back Color of colored rows is changed to White; otherwise
-    ''' function SetRowBackColorGroup is called to set for each different HistPatientID/PatientID/SpecimenID the proper BackColorGroup
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: SA 27/08/2014 - BT #1861
-    ''' </remarks>
-    Private Sub historyGridView_MouseDown(sender As Object, e As MouseEventArgs) Handles historyGridView.MouseDown
-        Try
-            Dim dataTable As HisWSResultsDS.vhisWSResultsDataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
-            If (Not dataTable Is Nothing) Then
-                With historyGridView.CalcHitInfo(New Point(e.X, e.Y))
-                    If (.InColumnPanel AndAlso Not .Column Is Nothing) Then
-                        Dim colName As String = .Column.Name
-                        If (colName = "ResultDateTime") OrElse (colName = "LastName") OrElse (colName = "FirstName") OrElse (colName = "SampleType") OrElse _
-                           (colName = "TestName") OrElse (colName = "RemarkAlert") OrElse (colName = "ExportImage") Then
-
-                            Dim lstColoredRows As List(Of HisWSResultsDS.vhisWSResultsRow) = (From row In dataTable Where row.BackColorGroup = 1).ToList
-                            For Each coloredRow As HisWSResultsDS.vhisWSResultsRow In lstColoredRows
-                                coloredRow.BackColorGroup = 2 'Set BackColor to White
-                            Next
-
-                        ElseIf (colName = "SpecimenID") OrElse (colName = "PatientID") Then
-                            Dim i As Integer = 0
-                            Dim myPrevBackColor As Integer = 1
-                            Dim myPrevPatientID As String = String.Empty
-                            Dim myPrevHistPatientID As Integer = 0
-                            Dim myPrevSpecimenID As String = String.Empty
-
-                            For Each row As HisWSResultsDS.vhisWSResultsRow In dataTable
-                                'Set the group BackColor for each grid row 
-                                If (i = 0) Then
-                                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID, 0)
-                                Else
-                                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID, myPrevHistPatientID)
-                                End If
-
-                                i += 1
-                                myPrevBackColor = row.BackColorGroup
-                                myPrevPatientID = row.PatientID
-                                myPrevSpecimenID = row.SpecimenID
-                                If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
-                            Next
-                        End If
-                    End If
-                End With
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_MouseDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".historyGridView_MouseDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 #End Region
