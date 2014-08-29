@@ -5749,8 +5749,9 @@ Public Class IWSSampleRequest
     '''              RH  19/10/2010 - Introduced the Using statement               
     '''              DL  27/07/2011 - If a WS was saved, enable button LoadSavedWS
     '''              SA  08/03/2012 - Button LoadSavedWS cannot be always enabled; it is enabled only when WSStatus is EMPTY or OPEN
+    '''              XB  29/08/2014 - Make this method as Public - BT #1868
     ''' </remarks>
-    Private Sub SaveWorkSession()
+    Public Sub SaveWorkSession()
         Try
             Dim mySavedWS As New SavedWSDelegate
             Dim myGlobalDataTo As New GlobalDataTO

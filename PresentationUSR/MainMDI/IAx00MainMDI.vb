@@ -1636,6 +1636,7 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>
     ''' Modified by: SA 23/09/2010 - Open the Load Saved WS screen as MDIChild instead of as MODAL
     '''              SA 29/08/2012 - Inform property for the active AnalyzerID before opening the auxiliary screen
+    '''              XB 29/08/2014 - Execute the same code include into SaveWS button inside ISampleRequest screen when this screen is Active and this button is enabled - BT #1868
     ''' </remarks>
     Private Sub SaveSessionToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SaveSessionToolStripMenuItem.Click
         Try
@@ -1657,13 +1658,22 @@ Partial Public Class IAx00MainMDI
             End If
 
             If (Not cancelOpening) Then
-                'Inform screen properties needed for initial configuration and open the screen as MDIChild
-                IWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
-                IWSLoadSaveAuxScreen.SourceButton = "SAVE"
-                IWSLoadSaveAuxScreen.ActiveWorkSession = WorkSessionIDAttribute
-                IWSLoadSaveAuxScreen.ActiveAnalyzer = AnalyzerIDAttribute
+                ' XB 29/08/2014 - BT #1868
+                If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0) Then
+                    ' code when ISampleRequest is active
+                    If IWSSampleRequest.bsSaveWSButton.Enabled Then
+                        IWSSampleRequest.SaveWorkSession()
+                    End If
+                Else
+                    ' old code
+                    'Inform screen properties needed for initial configuration and open the screen as MDIChild
+                    IWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
+                    IWSLoadSaveAuxScreen.SourceButton = "SAVE"
+                    IWSLoadSaveAuxScreen.ActiveWorkSession = WorkSessionIDAttribute
+                    IWSLoadSaveAuxScreen.ActiveAnalyzer = AnalyzerIDAttribute
 
-                OpenMDIChildForm(IWSLoadSaveAuxScreen)
+                    OpenMDIChildForm(IWSLoadSaveAuxScreen)
+                End If
             End If
 
         Catch ex As Exception
