@@ -702,10 +702,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                         '(8) Work Session Identifier
                         If (pWorkSessionID.Trim <> String.Empty) Then cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
 
-                        '******************************************************************
-                        '* Sort returned data by PatientID, SpecimenID and ResultDateTime *
-                        '******************************************************************
-                        cmdText &= " ORDER BY PatientID, SpecimenID, ResultDateTime DESC "
+                        '*********************************************************************************
+                        '* Sort returned data by PatientID, HistPatientID, SpecimenID and ResultDateTime *
+                        '*********************************************************************************
+                        cmdText &= " ORDER BY PatientID, HistPatientID, SpecimenID, ResultDateTime DESC "
 
                         Dim myDataSet As New HisWSResultsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
