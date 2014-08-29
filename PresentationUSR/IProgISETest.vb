@@ -4045,9 +4045,11 @@ Public Class IProgISETest
     ''' </summary>
     ''' <remarks>
     ''' Created by:  WE 26/08/2014 - #1865. Based on same concept as used in IProgTest. Extended with 3rd check as used by form-level validation and
-    '''                              included control activation in all cases.
+    '''                              included control activation in first 2 cases. This event handler method may only be used in conjunction with field
+    '''                              SlopeFactorA2 to avoid situation in which user will never be able to set both fields (SlopeFactorA2 and SlopeFactorB2)
+    '''                              to empty value again.
     ''' </remarks>
-    Private Sub SlopeUpDown_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles bsSlopeA2UpDown.Validating, bsSlopeB2UpDown.Validating
+    Private Sub SlopeUpDown_Validating(sender As Object, e As System.ComponentModel.CancelEventArgs) Handles bsSlopeA2UpDown.Validating
 
         Try
             BsErrorProvider1.Clear()
@@ -4063,7 +4065,6 @@ Public Class IProgISETest
             ElseIf Not bsSlopeB2UpDown.Text = "" AndAlso bsSlopeA2UpDown.Text = "" Then
                 BsErrorProvider1.SetError(bsSlopeA2UpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
                 ValidationError = True
-                bsSlopeA2UpDown.Select()
             End If
 
         Catch ex As Exception
@@ -4451,5 +4452,5 @@ Public Class IProgISETest
 #End Region
 
 
-    
+
 End Class

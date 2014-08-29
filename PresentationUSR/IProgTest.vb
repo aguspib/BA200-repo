@@ -12058,15 +12058,8 @@ Public Class IProgTest
 
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks>
-    ''' Modified by:  WE 27/08/2014 - #1865. Use same common approach as introduced in ISE Test -> Extended with 3rd check as used by form-level validation and
-    '''                               included control activation in all cases.
-    ''' </remarks>
-    Private Sub SlopeUpDown_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles SlopeAUpDown.Validating, _
-                                                                                                                                 SlopeBUpDown.Validating
+    Private Sub SlopeAUpDown_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles SlopeAUpDown.Validating
+
         Try
             BsErrorProvider1.Clear()
             ValidationError = False
@@ -12077,16 +12070,11 @@ Public Class IProgTest
             ElseIf Not SlopeAUpDown.Text = "" AndAlso SlopeBUpDown.Text = "" Then
                 BsErrorProvider1.SetError(SlopeBUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
                 ValidationError = True
-                SlopeBUpDown.Select()
-            ElseIf Not SlopeBUpDown.Text = "" AndAlso SlopeAUpDown.Text = "" Then
-                BsErrorProvider1.SetError(SlopeAUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                ValidationError = True
-                SlopeAUpDown.Select()
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".SlopeUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeAUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".SlopeAUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 

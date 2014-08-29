@@ -47,6 +47,7 @@
               <xs:element name="LISSampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LISSampleType" msprop:Generator_ColumnVarNameInTable="columnLISSampleType" msprop:Generator_ColumnPropNameInTable="LISSampleTypeColumn" msprop:Generator_UserColumnName="LISSampleType" type="xs:string" minOccurs="0" />
               <xs:element name="LISTestID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LISTestID" msprop:Generator_ColumnVarNameInTable="columnLISTestID" msprop:Generator_ColumnPropNameInTable="LISTestIDColumn" msprop:Generator_UserColumnName="LISTestID" type="xs:string" minOccurs="0" />
               <xs:element name="RerunNumber" msprop:Generator_ColumnVarNameInTable="columnRerunNumber" msprop:Generator_ColumnPropNameInRow="RerunNumber" msprop:Generator_ColumnPropNameInTable="RerunNumberColumn" msprop:Generator_UserColumnName="RerunNumber" type="xs:int" minOccurs="0" />
+              <xs:element name="Selected" msprop:Generator_ColumnVarNameInTable="columnSelected" msprop:Generator_ColumnPropNameInRow="Selected" msprop:Generator_ColumnPropNameInTable="SelectedColumn" msprop:Generator_UserColumnName="Selected" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
