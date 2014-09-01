@@ -45,7 +45,7 @@ Namespace Biosystems.Ax00.BL
                         'AG 01/09/2014 - BA-1869 new calc test customposition value = MAX current value + 1
                         resultData = calTestToAdd.GetLastCustomPosition(dbConnection)
                         If Not resultData.HasError Then
-                            If resultData.SetDatos Is Nothing OrElse DBNull.Value.Equals(resultData.SetDatos) Then
+                            If resultData.SetDatos Is Nothing OrElse resultData.SetDatos Is DBNull.Value Then
                                 pCalcTest.tparCalculatedTests(0).CustomPosition = 1
                             Else
                                 pCalcTest.tparCalculatedTests(0).CustomPosition = DirectCast(resultData.SetDatos, Integer) + 1

@@ -986,11 +986,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE PreloadedTest = 1 "
 
 
-                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
-                        cmd.CommandText = cmdText
-                        cmd.Connection = dbConnection
-
-                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
 
                     End If
                 End If
@@ -1286,11 +1284,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " AND PreloadedTest = 1"
                         End If
 
-                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
-                        cmd.CommandText = cmdText
-                        cmd.Connection = dbConnection
-
-                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
                     End If
                 End If
             Catch ex As Exception
@@ -1324,11 +1320,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT MAX(TestPosition) FROM tparTests "
 
-                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
-                        cmd.CommandText = cmdText
-                        cmd.Connection = dbConnection
-
-                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
                     End If
                 End If
             Catch ex As Exception
@@ -1362,11 +1356,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparTests "
 
-                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
-                        cmd.CommandText = cmdText
-                        cmd.Connection = dbConnection
-
-                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
                     End If
                 End If
             Catch ex As Exception

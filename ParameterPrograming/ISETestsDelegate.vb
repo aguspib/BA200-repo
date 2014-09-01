@@ -811,255 +811,255 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "TO DELETE - NOT USED"
-        ''' <summary>
-        ''' Add a new ISETest (NOT USED)
-        ''' </summary>
-        ''' <param name="pDbConnection">Open DB Connection</param>
-        ''' <param name="pISETestsDetails">Typed DataSet ISETestsDS containing the data of the ISETest to add</param>
-        ''' <returns>GlobalDataTO containing the added record and/or error information</returns>
-        ''' <remarks>Created by: XBC 15/10/2010
-        ''' AG 27/10/2010 - Perfom loop and pass Row to DAO</remarks>
-        Public Function Create(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pISETestsDetails As ISETestsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDbConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim ISETestToAdd As New tparISETestsDAO
+        ' ''' <summary>
+        ' ''' Add a new ISETest (NOT USED)
+        ' ''' </summary>
+        ' ''' <param name="pDbConnection">Open DB Connection</param>
+        ' ''' <param name="pISETestsDetails">Typed DataSet ISETestsDS containing the data of the ISETest to add</param>
+        ' ''' <returns>GlobalDataTO containing the added record and/or error information</returns>
+        ' ''' <remarks>Created by: XBC 15/10/2010
+        ' ''' AG 27/10/2010 - Perfom loop and pass Row to DAO</remarks>
+        'Public Function Create(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pISETestsDetails As ISETestsDS) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBTransaction(pDbConnection)
+        '        If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim ISETestToAdd As New tparISETestsDAO
 
-                        For Each row As ISETestsDS.tparISETestsRow In pISETestsDetails.tparISETests.Rows
-                            'Validate if there is another ISETest with the same ID --> PDT !!!!!!!!!!!!!
+        '                For Each row As ISETestsDS.tparISETestsRow In pISETestsDetails.tparISETests.Rows
+        '                    'Validate if there is another ISETest with the same ID --> PDT !!!!!!!!!!!!!
 
-                            If (Not resultData.HasError) Then
-                                'Add the new ISETestSample
-                                resultData = ISETestToAdd.Create(dbConnection, row)
-                            End If
+        '                    If (Not resultData.HasError) Then
+        '                        'Add the new ISETestSample
+        '                        resultData = ISETestToAdd.Create(dbConnection, row)
+        '                    End If
 
-                            If resultData.HasError Then Exit For
-                        Next
+        '                    If resultData.HasError Then Exit For
+        '                Next
 
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
+        '                If (Not resultData.HasError) Then
+        '                    'When the Database Connection was opened locally, then the Commit is executed
+        '                    If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                    'resultData.SetDatos = <value to return; if any>
+        '                Else
+        '                    'When the Database Connection was opened locally, then the Rollback is executed
+        '                    If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                End If
+        '            End If
+        '        End If
 
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '    Catch ex As Exception
+        '        'When the Database Connection was opened locally, then the Rollback is executed
+        '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.Create", EventLogEntryType.Error, False)
-            Finally
-                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.Create", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
 
-        ''' <summary>
-        ''' Delete the specified ISETest (NOT USED)
-        ''' </summary>
-        ''' <param name="pDbConnection">Open DB Connection</param>
-        ''' <param name="pISETestsList">Typed DataSet ISETestsDS containing the list of the ISETests to be deleted</param>
-        ''' <returns>GlobalDataTO containing the added record and/or error information</returns>
-        ''' <remarks>Created by: XBC 15/10/2010</remarks>
-        Public Function Delete(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pISETestsList As ISETestsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDbConnection)
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim ISETestToDelete As New tparISETestsDAO
-                        Dim myISETestSamplesDelegate As New ISETestSamplesDelegate
+        ' ''' <summary>
+        ' ''' Delete the specified ISETest (NOT USED)
+        ' ''' </summary>
+        ' ''' <param name="pDbConnection">Open DB Connection</param>
+        ' ''' <param name="pISETestsList">Typed DataSet ISETestsDS containing the list of the ISETests to be deleted</param>
+        ' ''' <returns>GlobalDataTO containing the added record and/or error information</returns>
+        ' ''' <remarks>Created by: XBC 15/10/2010</remarks>
+        'Public Function Delete(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pISETestsList As ISETestsDS) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBTransaction(pDbConnection)
+        '        If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim ISETestToDelete As New tparISETestsDAO
+        '                Dim myISETestSamplesDelegate As New ISETestSamplesDelegate
 
-                        For Each ISETestRow As ISETestsDS.tparISETestsRow In pISETestsList.tparISETests.Rows
-                            'First Setp : Delete ISETestSamples
-                            resultData = myISETestSamplesDelegate.Delete(dbConnection, ISETestRow.ISETestID)
-                            If (resultData.HasError) Then Exit For
+        '                For Each ISETestRow As ISETestsDS.tparISETestsRow In pISETestsList.tparISETests.Rows
+        '                    'First Setp : Delete ISETestSamples
+        '                    resultData = myISETestSamplesDelegate.Delete(dbConnection, ISETestRow.ISETestID)
+        '                    If (resultData.HasError) Then Exit For
 
-                            'Second step : Delete ISETests
-                            resultData = ISETestToDelete.Delete(dbConnection, ISETestRow.ISETestID)
-                            If (resultData.HasError) Then Exit For
-                        Next
+        '                    'Second step : Delete ISETests
+        '                    resultData = ISETestToDelete.Delete(dbConnection, ISETestRow.ISETestID)
+        '                    If (resultData.HasError) Then Exit For
+        '                Next
 
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                If (Not resultData.HasError) Then
+        '                    'When the Database Connection was opened locally, then the Commit is executed
+        '                    If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                    'resultData.SetDatos = <value to return; if any>
+        '                Else
+        '                    'When the Database Connection was opened locally, then the Rollback is executed
+        '                    If (pDbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        'When the Database Connection was opened locally, then the Rollback is executed
+        '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.Delete", EventLogEntryType.Error, False)
-            Finally
-                If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.Delete", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
 
-        ''' <summary>
-        ''' Save an ISE Test: basic data, SampleType data, Quality Control data and Reference Ranges
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pNewISETests">NOT USED - Typed DataSet ISETestsDS containing basic data of an added ISE Test</param>
-        ''' <param name="pUpdatedISETests">Typed DataSet ISETestsDS containing updated basic data for an specific ISE Test</param>
-        ''' <param name="pNewISETestSamples">NOT USED - Typed DataSet ISETestSamplesDS containing SampleType-related data for an added
-        '''                                  ISE Test and SampleType</param>
-        ''' <param name="pUpdatedISETestSamples">Typed DataSet ISETestSamplesDS containing SampleType-related data for an specific 
-        '''                                       ISE Test and SampleType</param>
-        ''' <param name="pNewISERefRanges">Typed DataSet TestRefRangesDS containing all Range Types to add for the ISETest/SampleType</param>
-        ''' <param name="pUpdatedISERefRanges">Typed DataSet TestRefRangesDS containing all Range Types to update for the ISETest/SampleType</param>
-        ''' <param name="pDeletedISERefRanges">Typed DataSet TestRefRangesDS containing all Range Types to delete for the ISETest/SampleType</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' Created by:  AG
-        ''' Modified by: RH 08/06/2012 - Code optimization. Add new parameters to allow saving the Quality Control data for an 
-        '''                              specific ISE Test and SampleType
-        ''' </remarks>
-        Public Function SaveISETest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewISETests As ISETestsDS, ByVal pUpdatedISETests As ISETestsDS, _
-                                    ByVal pNewISETestSamples As ISETestSamplesDS, ByVal pUpdatedISETestSamples As ISETestSamplesDS, _
-                                    ByVal pNewISERefRanges As TestRefRangesDS, ByVal pUpdatedISERefRanges As TestRefRangesDS, ByVal pDeletedISERefRanges As TestRefRangesDS, _
-                                    ByVal pTestSamplesMultiRulesDS As TestSamplesMultirulesDS, ByVal pTestsControlsDS As TestControlsDS, _
-                                    ByVal pDeleteControlTOList As List(Of DeletedControlTO)) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+        ' ''' <summary>
+        ' ''' Save an ISE Test: basic data, SampleType data, Quality Control data and Reference Ranges
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pNewISETests">NOT USED - Typed DataSet ISETestsDS containing basic data of an added ISE Test</param>
+        ' ''' <param name="pUpdatedISETests">Typed DataSet ISETestsDS containing updated basic data for an specific ISE Test</param>
+        ' ''' <param name="pNewISETestSamples">NOT USED - Typed DataSet ISETestSamplesDS containing SampleType-related data for an added
+        ' '''                                  ISE Test and SampleType</param>
+        ' ''' <param name="pUpdatedISETestSamples">Typed DataSet ISETestSamplesDS containing SampleType-related data for an specific 
+        ' '''                                       ISE Test and SampleType</param>
+        ' ''' <param name="pNewISERefRanges">Typed DataSet TestRefRangesDS containing all Range Types to add for the ISETest/SampleType</param>
+        ' ''' <param name="pUpdatedISERefRanges">Typed DataSet TestRefRangesDS containing all Range Types to update for the ISETest/SampleType</param>
+        ' ''' <param name="pDeletedISERefRanges">Typed DataSet TestRefRangesDS containing all Range Types to delete for the ISETest/SampleType</param>
+        ' ''' <returns>GlobalDataTO containing success/error information</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  AG
+        ' ''' Modified by: RH 08/06/2012 - Code optimization. Add new parameters to allow saving the Quality Control data for an 
+        ' '''                              specific ISE Test and SampleType
+        ' ''' </remarks>
+        'Public Function SaveISETest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewISETests As ISETestsDS, ByVal pUpdatedISETests As ISETestsDS, _
+        '                            ByVal pNewISETestSamples As ISETestSamplesDS, ByVal pUpdatedISETestSamples As ISETestSamplesDS, _
+        '                            ByVal pNewISERefRanges As TestRefRangesDS, ByVal pUpdatedISERefRanges As TestRefRangesDS, ByVal pDeletedISERefRanges As TestRefRangesDS, _
+        '                            ByVal pTestSamplesMultiRulesDS As TestSamplesMultirulesDS, ByVal pTestsControlsDS As TestControlsDS, _
+        '                            ByVal pDeleteControlTOList As List(Of DeletedControlTO)) As GlobalDataTO
+        '    Dim resultData As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
 
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        'New ISE tests
-                        If (pNewISETests.tparISETests.Rows.Count > 0) Then
-                            resultData = Me.Create(dbConnection, pNewISETests)
-                        End If
+        '    Try
+        '        resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                'New ISE tests
+        '                If (pNewISETests.tparISETests.Rows.Count > 0) Then
+        '                    resultData = Me.Create(dbConnection, pNewISETests)
+        '                End If
 
-                        If (Not resultData.HasError) Then '(1)
-                            'Updated ISE tests
-                            If (pUpdatedISETests.tparISETests.Rows.Count > 0) Then
-                                resultData = Me.Modify(dbConnection, pUpdatedISETests)
-                            End If
+        '                If (Not resultData.HasError) Then '(1)
+        '                    'Updated ISE tests
+        '                    If (pUpdatedISETests.tparISETests.Rows.Count > 0) Then
+        '                        resultData = Me.Modify(dbConnection, pUpdatedISETests)
+        '                    End If
 
-                            If Not resultData.HasError Then '(2)
-                                'New ISE test sample types
-                                Dim myISESampleType As New ISETestSamplesDelegate
-                                If (pNewISETestSamples.tparISETestSamples.Rows.Count > 0) Then
-                                    resultData = myISESampleType.Add(dbConnection, pNewISETestSamples)
-                                End If
+        '                    If Not resultData.HasError Then '(2)
+        '                        'New ISE test sample types
+        '                        Dim myISESampleType As New ISETestSamplesDelegate
+        '                        If (pNewISETestSamples.tparISETestSamples.Rows.Count > 0) Then
+        '                            resultData = myISESampleType.Add(dbConnection, pNewISETestSamples)
+        '                        End If
 
-                                If (Not resultData.HasError) Then '(3)
-                                    'Updated ISE test sample types
-                                    If (pUpdatedISETestSamples.tparISETestSamples.Rows.Count > 0) Then
-                                        resultData = myISESampleType.Modify(dbConnection, pUpdatedISETestSamples)
-                                    End If
+        '                        If (Not resultData.HasError) Then '(3)
+        '                            'Updated ISE test sample types
+        '                            If (pUpdatedISETestSamples.tparISETestSamples.Rows.Count > 0) Then
+        '                                resultData = myISESampleType.Modify(dbConnection, pUpdatedISETestSamples)
+        '                            End If
 
-                                    If Not resultData.HasError Then '(4)
-                                        Dim myRefRangesDel As New TestRefRangesDelegate
-                                        If (pDeletedISERefRanges.tparTestRefRanges.Rows.Count > 0) Then
-                                            resultData = myRefRangesDel.Delete(dbConnection, pDeletedISERefRanges, "ISE")
-                                        End If
+        '                            If Not resultData.HasError Then '(4)
+        '                                Dim myRefRangesDel As New TestRefRangesDelegate
+        '                                If (pDeletedISERefRanges.tparTestRefRanges.Rows.Count > 0) Then
+        '                                    resultData = myRefRangesDel.Delete(dbConnection, pDeletedISERefRanges, "ISE")
+        '                                End If
 
-                                        If Not resultData.HasError Then '(5)
-                                            If pNewISERefRanges.tparTestRefRanges.Rows.Count > 0 Then
-                                                resultData = myRefRangesDel.Create(dbConnection, pNewISERefRanges, "ISE")
-                                            End If
+        '                                If Not resultData.HasError Then '(5)
+        '                                    If pNewISERefRanges.tparTestRefRanges.Rows.Count > 0 Then
+        '                                        resultData = myRefRangesDel.Create(dbConnection, pNewISERefRanges, "ISE")
+        '                                    End If
 
-                                            If Not resultData.HasError Then '(6)
-                                                If pUpdatedISERefRanges.tparTestRefRanges.Rows.Count > 0 Then
-                                                    resultData = myRefRangesDel.Update(dbConnection, pUpdatedISERefRanges, "ISE")
-                                                End If
+        '                                    If Not resultData.HasError Then '(6)
+        '                                        If pUpdatedISERefRanges.tparTestRefRanges.Rows.Count > 0 Then
+        '                                            resultData = myRefRangesDel.Update(dbConnection, pUpdatedISERefRanges, "ISE")
+        '                                        End If
 
-                                                'Save the TestControl
-                                                If Not resultData.HasError Then
-                                                    'Call the Multirules Delegate
-                                                    Dim myTestSamplesMultiRulesDelegate As New TestSamplesMultirulesDelegate
-                                                    Dim myTestControlsDelegate As New TestControlsDelegate
+        '                                        'Save the TestControl
+        '                                        If Not resultData.HasError Then
+        '                                            'Call the Multirules Delegate
+        '                                            Dim myTestSamplesMultiRulesDelegate As New TestSamplesMultirulesDelegate
+        '                                            Dim myTestControlsDelegate As New TestControlsDelegate
 
-                                                    resultData = myTestSamplesMultiRulesDelegate.SaveMultiRulesNEW(dbConnection, pTestSamplesMultiRulesDS)
+        '                                            resultData = myTestSamplesMultiRulesDelegate.SaveMultiRulesNEW(dbConnection, pTestSamplesMultiRulesDS)
 
-                                                    If Not resultData.HasError Then
-                                                        If (Not pDeleteControlTOList Is Nothing AndAlso pDeleteControlTOList.Count > 0) Then
-                                                            'Calculate Cumulate if exist.
-                                                            For Each myDeleteControlTO As DeletedControlTO In pDeleteControlTOList
-                                                                resultData = CalculateQCCumulate(dbConnection, myDeleteControlTO.TestID, myDeleteControlTO.SampleType)
-                                                            Next
-                                                        End If
-                                                    End If
+        '                                            If Not resultData.HasError Then
+        '                                                If (Not pDeleteControlTOList Is Nothing AndAlso pDeleteControlTOList.Count > 0) Then
+        '                                                    'Calculate Cumulate if exist.
+        '                                                    For Each myDeleteControlTO As DeletedControlTO In pDeleteControlTOList
+        '                                                        resultData = CalculateQCCumulate(dbConnection, myDeleteControlTO.TestID, myDeleteControlTO.SampleType)
+        '                                                    Next
+        '                                                End If
+        '                                            End If
 
-                                                    'Save the TestControl
-                                                    If Not resultData.HasError Then
-                                                        If pTestsControlsDS.tparTestControls.Count > 0 Then
-                                                            'Call the delegate to save Testcontrol
-                                                            resultData = myTestControlsDelegate.SaveTestControlsNEW( _
-                                                                    dbConnection, pTestsControlsDS, Nothing, False)
-                                                        Else
-                                                            If Not pDeleteControlTOList Is Nothing AndAlso pDeleteControlTOList.Count > 0 Then
-                                                                'If no test control then remove all by testid and sample type.
-                                                                'Use the parammeter pUpdateSampleType indicating the updated sample type.
-                                                                resultData = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, _
-                                                                                                                                             pDeleteControlTOList(0).TestID, _
-                                                                                                                                             "ISE")
-                                                            End If
-                                                        End If
-                                                    End If
-                                                End If
-                                            End If '(6)
-                                        End If '(5)
-                                    End If '(4)
-                                End If '(3)
-                            End If '(2)
-                        End If '(1)
+        '                                            'Save the TestControl
+        '                                            If Not resultData.HasError Then
+        '                                                If pTestsControlsDS.tparTestControls.Count > 0 Then
+        '                                                    'Call the delegate to save Testcontrol
+        '                                                    resultData = myTestControlsDelegate.SaveTestControlsNEW( _
+        '                                                            dbConnection, pTestsControlsDS, Nothing, False)
+        '                                                Else
+        '                                                    If Not pDeleteControlTOList Is Nothing AndAlso pDeleteControlTOList.Count > 0 Then
+        '                                                        'If no test control then remove all by testid and sample type.
+        '                                                        'Use the parammeter pUpdateSampleType indicating the updated sample type.
+        '                                                        resultData = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, _
+        '                                                                                                                                     pDeleteControlTOList(0).TestID, _
+        '                                                                                                                                     "ISE")
+        '                                                    End If
+        '                                                End If
+        '                                            End If
+        '                                        End If
+        '                                    End If '(6)
+        '                                End If '(5)
+        '                            End If '(4)
+        '                        End If '(3)
+        '                    End If '(2)
+        '                End If '(1)
 
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                If (Not resultData.HasError) Then
+        '                    'When the Database Connection was opened locally, then the Commit is executed
+        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                    'resultData.SetDatos = <value to return; if any>
+        '                Else
+        '                    'When the Database Connection was opened locally, then the Rollback is executed
+        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        'When the Database Connection was opened locally, then the Rollback is executed
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message
+        '        resultData = New GlobalDataTO()
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+        '        resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.SaveISETest", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.SaveISETest", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
 #End Region
 
     End Class

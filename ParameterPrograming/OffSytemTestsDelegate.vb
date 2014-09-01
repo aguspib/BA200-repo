@@ -26,6 +26,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  DL 29/11/2010
         ''' Modified by: SA 03/01/2011 - Function name changed to Add; function logic changed: add also the Sample Type information;
         '''                              call new function SaveReferenceRanges to save the Reference Ranges
+        ''' AG 01/09/2014 - BA-1869 when new OFFS test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS, _
                             ByVal pTestSampleTypesDS As OffSystemTestSamplesDS, ByVal pRefRangesDS As TestRefRangesDS) _
@@ -40,33 +41,46 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Insert the new OFF-SYSTEM Test 
                         Dim offSystemTestToAdd As New tparOffSystemTestsDAO
-                        resultData = offSystemTestToAdd.Create(dbConnection, pOffSystemTestDS)
 
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            'Get the generated OffSystemTestID from the dataset returned 
-                            Dim generatedID As Integer = -1
-                            generatedID = DirectCast(resultData.SetDatos, OffSystemTestsDS).tparOffSystemTests(0).OffSystemTestID
+                        'AG 01/09/2014 - BA-1869 new calc test customposition value = MAX current value + 1
+                        resultData = offSystemTestToAdd.GetLastCustomPosition(dbConnection)
+                        If Not resultData.HasError Then
+                            If resultData.SetDatos Is Nothing OrElse resultData.SetDatos Is DBNull.Value Then
+                                pOffSystemTestDS.tparOffSystemTests(0).CustomPosition = 1
+                            Else
+                                pOffSystemTestDS.tparOffSystemTests(0).CustomPosition = DirectCast(resultData.SetDatos, Integer) + 1
+                            End If
+                            'AG 01/09/2014 - BA-1869
 
-                            'Set value of OffSystemTestID in the dataset containing the data of the Selected Sample Type
-                            For i As Integer = 0 To pTestSampleTypesDS.tparOffSystemTestSamples.Rows.Count - 1
-                                pTestSampleTypesDS.tparOffSystemTestSamples(i).OffSystemTestID = generatedID
-                            Next i
+                            resultData = offSystemTestToAdd.Create(dbConnection, pOffSystemTestDS)
 
-                            'Set value of OffSystemTestID in the dataset containing the Reference Ranges
-                            For i As Integer = 0 To pRefRangesDS.tparTestRefRanges.Rows.Count - 1
-                                pRefRangesDS.tparTestRefRanges(i).TestID = generatedID
-                            Next
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                'Get the generated OffSystemTestID from the dataset returned 
+                                Dim generatedID As Integer = -1
+                                generatedID = DirectCast(resultData.SetDatos, OffSystemTestsDS).tparOffSystemTests(0).OffSystemTestID
 
-                            'Insert the Test Sample Type values
-                            Dim sampleTypeToAdd As New OffSystemTestSamplesDelegate
-                            resultData = sampleTypeToAdd.Add(dbConnection, pTestSampleTypesDS)
-                            If (Not resultData.HasError) Then
-                                'Finally, insert the Reference Ranges
-                                If (pRefRangesDS.tparTestRefRanges.Rows.Count > 0) Then
-                                    resultData = SaveReferenceRanges(dbConnection, pRefRangesDS)
+                                'Set value of OffSystemTestID in the dataset containing the data of the Selected Sample Type
+                                For i As Integer = 0 To pTestSampleTypesDS.tparOffSystemTestSamples.Rows.Count - 1
+                                    pTestSampleTypesDS.tparOffSystemTestSamples(i).OffSystemTestID = generatedID
+                                Next i
+
+                                'Set value of OffSystemTestID in the dataset containing the Reference Ranges
+                                For i As Integer = 0 To pRefRangesDS.tparTestRefRanges.Rows.Count - 1
+                                    pRefRangesDS.tparTestRefRanges(i).TestID = generatedID
+                                Next
+
+                                'Insert the Test Sample Type values
+                                Dim sampleTypeToAdd As New OffSystemTestSamplesDelegate
+                                resultData = sampleTypeToAdd.Add(dbConnection, pTestSampleTypesDS)
+                                If (Not resultData.HasError) Then
+                                    'Finally, insert the Reference Ranges
+                                    If (pRefRangesDS.tparTestRefRanges.Rows.Count > 0) Then
+                                        resultData = SaveReferenceRanges(dbConnection, pRefRangesDS)
+                                    End If
                                 End If
                             End If
-                        End If
+
+                        End If 'AG 01/09/2014 - BA-1869
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed

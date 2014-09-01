@@ -20,6 +20,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  DL 25/11/2010
         ''' Modified by: SA 03/01/2011
+        ''' AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -30,7 +31,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = ""
 
-                    cmdText &= "INSERT INTO tparOffSystemTests([Name], ShortName, Units, ResultType, Decimals, TS_User, TS_DateTime) " & vbCrLf
+                    cmdText &= "INSERT INTO tparOffSystemTests([Name], ShortName, Units, ResultType, Decimals, TS_User, TS_DateTime, CustomPosition ) " & vbCrLf
                     cmdText &= "     VALUES (N'" & pOffSystemTestDS.tparOffSystemTests(0).Name.ToString.Replace("'", "''") & "'" & vbCrLf
                     cmdText &= "           , N'" & pOffSystemTestDS.tparOffSystemTests(0).ShortName.ToString.Replace("'", "''") & "'" & vbCrLf
 
@@ -54,10 +55,14 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (String.IsNullOrEmpty(pOffSystemTestDS.tparOffSystemTests(0).TS_DateTime.ToString)) Then
                         'Get the current DateTime
-                        cmdText &= " , '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                        cmdText &= " , '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
                     Else
-                        cmdText &= " , '" & pOffSystemTestDS.tparOffSystemTests(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                        cmdText &= " , '" & pOffSystemTestDS.tparOffSystemTests(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
+
+                    'AG 01/09/2014 BA-1869
+                    cmdText &= " , " & pOffSystemTestDS.tparOffSystemTests(0).CustomPosition & " ) "
+                    'AG 01/09/2014 BA-1869
 
                     'Finally, get the automatically generated ID for the created OFF-SYSTEM Test
                     cmdText &= " SELECT SCOPE_IDENTITY() "
@@ -668,6 +673,43 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparOffSystemTests "
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparOffSystemTestsDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
         End Function
 
 #End Region

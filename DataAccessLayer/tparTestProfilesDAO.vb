@@ -22,6 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -39,7 +40,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         Dim cmdText As String
                         cmdText = " INSERT INTO tparTestProfiles (TestProfileName, SampleType, TestProfilePosition, InUse, " & _
-                                                                " TS_User, TS_DateTime) " & _
+                                                                " TS_User, TS_DateTime, CustomPosition ) " & _
                                   " VALUES(N'" & pTestProfile.tparTestProfiles(0).TestProfileName.Replace("'", "''") & "', " & _
                                          "  '" & pTestProfile.tparTestProfiles(0).SampleType.ToString & "', " & _
                                                 testProfilePosition & ", 0, "
@@ -52,10 +53,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         If (pTestProfile.tparTestProfiles(0).IsTS_DateTimeNull) Then
-                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
                         Else
-                            cmdText &= " '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                         End If
+
+                        'AG 01/09/2014 - BA-1869
+                        cmdText &= " , " & pTestProfile.tparTestProfiles(0).CustomPosition.ToString & " ) "
+                        'AG 01/09/2014 - BA-1869
+
                         cmdText &= " SELECT SCOPE_IDENTITY() "
 
                         Dim dbCmd As New SqlClient.SqlCommand
@@ -675,6 +681,43 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparTestProfiles "
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function

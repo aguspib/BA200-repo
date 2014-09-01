@@ -243,7 +243,10 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pTestProfile">Typed Dataset TestProfilesDS with data of the Test Profile to add</param>
         ''' <param name="pTestList">Typed Dataset TestProfileTestsDS with the list of Tests to include in the Profile</param>
         ''' <returns>GlobalDataTO containing the added Profile and/or error information</returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Creation ?
+        ''' AG 01/09/2014 - BA-1869 when new profile is created the CustomPosition informed = MAX current value + 1
+        ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS, _
                             ByVal pTestList As TestProfileTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -269,21 +272,38 @@ Namespace Biosystems.Ax00.BL
                                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                                     pTestProfile.tparTestProfiles(0).BeginEdit()
                                     pTestProfile.tparTestProfiles(0).TestProfilePosition = Convert.ToInt32(resultData.SetDatos)
-                                    pTestProfile.tparTestProfiles(0).EndEdit()
 
-                                    'Se agrega el nuevo Test Profile
-                                    resultData = testProfileToAdd.Create(dbConnection, pTestProfile)
-                                    If (Not resultData.HasError) Then
-                                        'Get the generated TestProfileID from the dataset returned and insert it in 
-                                        'the dataset containing the Tests List
-                                        For i As Integer = 0 To pTestList.tparTestProfileTests.Rows.Count - 1
-                                            pTestList.tparTestProfileTests(i).TestProfileID = pTestProfile.tparTestProfiles(0).TestProfileID
-                                        Next
+                                    'AG 01/09/2014 - BA-1869 new calc test customposition value = MAX current value + 1
+                                    'pTestProfile.tparTestProfiles(0).EndEdit()
+                                    resultData = testProfileToAdd.GetLastCustomPosition(dbConnection)
+                                    If Not resultData.HasError Then
+                                        If resultData.SetDatos Is Nothing OrElse resultData.SetDatos Is DBNull.Value Then
+                                            pTestProfile.tparTestProfiles(0).CustomPosition = 1
+                                        Else
+                                            pTestProfile.tparTestProfiles(0).CustomPosition = DirectCast(resultData.SetDatos, Integer) + 1
+                                        End If
+                                        pTestProfile.tparTestProfiles(0).EndEdit()
+                                        'AG 01/09/2014 - BA-1869
 
-                                        'Insert the list of Tests 
-                                        Dim testListToAdd As New tparTestProfileTestsDAO
-                                        resultData = testListToAdd.Create(dbConnection, pTestList)
+                                        'Se agrega el nuevo Test Profile
+                                        resultData = testProfileToAdd.Create(dbConnection, pTestProfile)
+                                        If (Not resultData.HasError) Then
+                                            'Get the generated TestProfileID from the dataset returned and insert it in 
+                                            'the dataset containing the Tests List
+                                            For i As Integer = 0 To pTestList.tparTestProfileTests.Rows.Count - 1
+                                                pTestList.tparTestProfileTests(i).TestProfileID = pTestProfile.tparTestProfiles(0).TestProfileID
+                                            Next
+
+                                            'Insert the list of Tests 
+                                            Dim testListToAdd As New tparTestProfileTestsDAO
+                                            resultData = testListToAdd.Create(dbConnection, pTestList)
+                                        End If
+
+
+                                    Else
+                                        pTestProfile.tparTestProfiles(0).EndEdit()
                                     End If
+
                                 End If
                             End If
 
