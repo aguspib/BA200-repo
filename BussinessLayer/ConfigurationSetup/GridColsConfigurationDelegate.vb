@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet GridColsConfigDS with the list of columns for the specified Screen Grid
         '''          and the default and the last saved width of each one of them</returns>
         ''' <remarks>
-        ''' Created by:  SA 31/07/2014 - BT #1861
+        ''' Created by:  SA 31/07/2014 - BA-1861
         ''' </remarks>
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pScreenID As String, ByVal pGridName As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -55,7 +55,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pGridColsConfigDS">Typed DataSet GridColsConfigDS containing data of all columns of the Screen Grid to update </param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 31/07/2014 - BT #1861
+        ''' Created by:  SA 31/07/2014 - BA-1861
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pGridColsConfigDS As GridColsConfigDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing

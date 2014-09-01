@@ -166,6 +166,51 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get all different Analyzers having Results in Historic Module
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSAnalyzerAlarmsDS with the list of different Analyzers having Historical Results</returns>
+        ''' <remarks>
+        ''' Created by:  SA 01/09/2014 - BA-1910
+        ''' </remarks>
+        Public Function ReadAllDistinctAnalyzers(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim dataToReturn As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                dataToReturn = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT AnalyzerID " & vbCrLf & _
+                                                " FROM   thisAnalyzerWorkSessions " & vbCrLf
+
+                        Dim myDs As New HisWSAnalyzerAlarmsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDs.thisWSAnalyzerAlarms)
+                            End Using
+                        End Using
+
+                        dataToReturn.SetDatos = myDs
+                        dataToReturn.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                dataToReturn = New GlobalDataTO()
+                dataToReturn.HasError = True
+                dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                dataToReturn.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "thisAnalyzerWorkSessionsDAO.ReadAllDistinctAnalyzers", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return dataToReturn
+        End Function
 #End Region
 
 #Region "NOT USED"

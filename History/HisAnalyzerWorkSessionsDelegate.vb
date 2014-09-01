@@ -107,6 +107,54 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
+        ''' Get all different Analyzers having Results in Historic Module
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an String list with the list of Analyzers</returns>
+        ''' <remarks>
+        ''' Created by:  SA 01/09/2014 - BA-1910
+        ''' </remarks>
+        Public Function GetDistinctAnalyzers(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim returnedData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                returnedData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not returnedData.HasError AndAlso Not returnedData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(returnedData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myHisAnalyzerWSsDAO As New thisAnalyzerWorkSessionsDAO
+                        returnedData = myHisAnalyzerWSsDAO.ReadAllDistinctAnalyzers(dbConnection)
+
+                        Dim myAnalyzersList As New List(Of String)
+                        If (Not returnedData.HasError AndAlso Not returnedData.SetDatos Is Nothing) Then
+                            Dim myDs As HisWSAnalyzerAlarmsDS = DirectCast(returnedData.SetDatos, HisWSAnalyzerAlarmsDS)
+
+                            myAnalyzersList = (From a As HisWSAnalyzerAlarmsDS.thisWSAnalyzerAlarmsRow In myDs.thisWSAnalyzerAlarms _
+                                              Select a.AnalyzerID).ToList
+                        End If
+
+                        returnedData.SetDatos = myAnalyzersList
+                        returnedData.HasError = False
+
+                        myAnalyzersList = Nothing
+                    End If
+                End If
+
+            Catch ex As Exception
+                returnedData.HasError = True
+                returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                returnedData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "HisAnalyzerWorkSessionsDelegate.GetDistinctAnalyzers", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return returnedData
+        End Function
+
+        ''' <summary>
         ''' Get data of the specified WorkSession 
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>

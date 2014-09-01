@@ -4329,9 +4329,9 @@ Namespace Biosystems.Ax00.BL
         '''                              ESPatientID, LISOrderID, LISPatientID, LISTestName, LISSampleType, LISUnits
         '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Historic patient results can be re-sent (all fields required has to be save although 
         '''                                                            the result is already sent)
-        '''              SA 26/08/2014 - BT #1861 ==> Added changes to export field SpecimenID (Barcode) to the Historic Module also when the corresponding result has 
-        '''                                           been already exported and/or when the Order Test has been manually requested for a Patient Sample having Tests 
-        '''                                           requested by LIS.
+        '''              SA 26/08/2014 - BA-1861 ==> Added changes to export field SpecimenID (Barcode) to the Historic Module also when the corresponding result has 
+        '''                                          been already exported and/or when the Order Test has been manually requested for a Patient Sample having Tests 
+        '''                                          requested by LIS.
         ''' </remarks>
         Private Function MoveWSOrderTestsToHISTModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
                                                       ByVal pHistSTDTestsDS As HisTestSamplesDS, ByVal pHistISETestsDS As HisISETestSamplesDS, _
@@ -4383,8 +4383,8 @@ Namespace Biosystems.Ax00.BL
                             confMappDS = DirectCast(myGlobalDataTO.SetDatos, LISMappingsDS)
                         End If
 
-                        'BT #1861 - Get the list of all required Patient Samples that have been sent by an external LIS system
-                        '           (those having field SpecimenIDList informed)
+                        'BA-1861 - Get the list of all required Patient Samples that have been sent by an external LIS system
+                        '          (those having field SpecimenIDList informed)
                         Dim myDataSet As New WSRequiredElementsDS
                         Dim myWSReqElemDelegate As New WSRequiredElementsDelegate
 
@@ -4560,8 +4560,8 @@ Namespace Biosystems.Ax00.BL
                                         If (Not lisInfoLinqRes(0).IsLISOrderIDNull) Then myHistOrderTestsRow.LISOrderID = lisInfoLinqRes(0).LISOrderID Else myHistOrderTestsRow.SetLISOrderIDNull()
                                         If (Not lisInfoLinqRes(0).IsLISPatientIDNull) Then myHistOrderTestsRow.LISPatientID = lisInfoLinqRes(0).LISPatientID Else myHistOrderTestsRow.SetLISPatientIDNull()
                                     Else
-                                        'BT #1861 - It is a manual Patient Order Test; get the SpecimenID sent by LIS for the same PatientID and SampleType (if any), 
-                                        '           or set SpecimenID = SampleID if there is not LIS information for the PatientID and SampleType.
+                                        'BA-1861 - It is a manual Patient Order Test; get the SpecimenID sent by LIS for the same PatientID and SampleType (if any), 
+                                        '          or set SpecimenID = SampleID if there is not LIS information for the PatientID and SampleType.
                                         lstSpecimenID = (From b As WSRequiredElementsDS.twksWSRequiredElementsRow In myDataSet.twksWSRequiredElements _
                                                         Where b.PatientID = mySampleID _
                                                       AndAlso b.SampleType = myHistOrderTestsRow.SampleType _

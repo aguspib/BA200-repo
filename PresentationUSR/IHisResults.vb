@@ -17,7 +17,7 @@ Public Class IHisResults
 
 #Region "Structures"
     'SA 01/08/2014
-    'BT #1861 ==> Added new field specimenID. Removed field sampleClasses, it is not needed.
+    'BA-1861 ==> Added new field specimenID. Removed field sampleClasses, it is not needed.
     Public Structure SearchFilter
         Public analyzerId As String
         Public dateFrom As Date
@@ -58,7 +58,7 @@ Public Class IHisResults
     Private DeletingHistOrderTests As Boolean = False
 
     'SA 01/08/2014
-    'BT #1861 ==> Global DS to get/save the width of all visible grid columns
+    'BA-1861 ==> Global DS to get/save the width of all visible grid columns
     Private gridColWidthConfigDS As GridColsConfigDS
 #End Region
 
@@ -199,18 +199,20 @@ Public Class IHisResults
     End Sub
 
     ''' <summary>
-    ''' Read the list of Analyzers for which there are Historic Patient Results in DB and load the global Analyzers list
+    ''' Read the list of Analyzers for which there are Historic Results in DB and load the global Analyzers list
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 28/09/2012
     ''' Modified by: IR 04/10/2012 - Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
+    '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms)
     ''' </remarks>
     Private Sub GetAnalyzerList()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myAnalyzerDelegate As New AnalyzersDelegate
+            Dim myHisAnalyzerWSDelegate As New HisAnalyzerWorkSessionsDelegate
 
-            myGlobalDataTO = myAnalyzerDelegate.GetDistinctAnalyzers(Nothing)
+            myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
 
@@ -220,7 +222,7 @@ Public Class IHisResults
             End If
 
             myGlobalDataTO = Nothing
-            myAnalyzerDelegate = Nothing
+            myHisAnalyzerWSDelegate = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetAnalyzerList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -486,7 +488,7 @@ Public Class IHisResults
     '''             AG 14/02/2014 - BT #1505 ==> User can sort grid data also by column ExportStatus
     '''             SA 29/04/2014 - BT #1608 ==> Added a hidden column for field TestLongName (this field has to be shown as Test Name in reports
     '''                                          when it is informed)
-    '''             SA 01/08/2014 - BT #1861 ==> Added new visible grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
+    '''             SA 01/08/2014 - BA-1861  ==> Added new visible grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
     '''                                          Added new hidden grid column: HistPatientID.
     '''                                          Call new function to get the saved width of all visible grid columns and assign the value.
     ''' </remarks>
@@ -835,7 +837,7 @@ Public Class IHisResults
                 .Width = 0
             End With
 
-            'BT #1861 - HISTORIC PATIENT IDENTIFIER Column (hidden)
+            'BA-1861 - HISTORIC PATIENT IDENTIFIER Column (hidden)
             column = historyGridView.Columns.Add()
             With column
                 .Caption = String.Empty
@@ -845,7 +847,7 @@ Public Class IHisResults
                 .Width = 0
             End With
 
-            'BT #1861 - BACKCOLOR GROUP Column (hidden, used to set the Row BackColor in grid event RowStyle)
+            'BA-1861 - BACKCOLOR GROUP Column (hidden, used to set the Row BackColor in grid event RowStyle)
             column = historyGridView.Columns.Add()
             With column
                 .Caption = String.Empty
@@ -855,7 +857,7 @@ Public Class IHisResults
                 .Width = 0
             End With
 
-            'BT #1861 - Get the saved width of all visible grid columns and assign the value
+            'BA-1861 - Get the saved width of all visible grid columns and assign the value
             Dim resultData As New GlobalDataTO
             Dim myColWidthConfigDelegate As New GridColsConfigurationDelegate
 
@@ -951,8 +953,8 @@ Public Class IHisResults
     ''' <returns>SearchFilter structure filled with filters selected in Search Area</returns>
     ''' <remarks>
     ''' Created by:  JB
-    ''' Modified by: SA 01/08/2014 - BT #1861 ==> Inform SpecimenID in the structure with value of the corresponding filter.
-    '''                                           Added Try/Catch block
+    ''' Modified by: SA 01/08/2014 - BA-1861 ==> Inform SpecimenID in the structure with value of the corresponding filter.
+    '''                                          Added Try/Catch block
     ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
@@ -999,7 +1001,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB 18/10/2012
     ''' Modified by: AG 13/02/2014 - BT #1505 ==> Added traces in the LOG 
-    '''              SA 01/08/2014 - BT #1861 ==> Changed the call to function GetHistoricalResultsByFilter due to its parameters have been changed
+    '''              SA 01/08/2014 - BA-1861  ==> Changed the call to function GetHistoricalResultsByFilter due to its parameters have been changed
     ''' </remarks>
     Private Sub FindHistoricalResults()
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1136,7 +1138,7 @@ Public Class IHisResults
     ''' <param name="pPreviousHistPatientID">HistPatientID in the previous Result Row in the DataSet. It is an optional parameter due to if the
     '''                                      previous Result Row corresponds to an unknown Patient, HistPatientID is NULL in the DataSet</param>
     ''' <remarks>
-    ''' Created by: SA 25/08/2014 - BT #1861
+    ''' Created by: SA 25/08/2014 - BA-1861
     ''' </remarks>
     Private Sub SetRowBackColorGroup(ByRef pRow As HisWSResultsDS.vhisWSResultsRow, ByVal pPreviousBackColorGroup As Integer, _
                                      ByVal pPreviousPatientID As String, Optional ByVal pPreviousHistPatientID As Integer = 0)
@@ -1173,7 +1175,7 @@ Public Class IHisResults
     ''' Modified by: JV 03/01/2014 - BT #1285 ==> Removed Application.DoEvents from the For/Next to avoid flicking on the DataGrid area 
     '''                                           (data, images, etc.) and also on the form
     '''              AG 13/02/2014 - BT #1505 ==> Added traces in the LOG 
-    '''              SA 25/08/2014 - BT #1861 ==> For each processed row, set value of field BackColorGroup: all results for the same PatientID/HistPatientID
+    '''              SA 25/08/2014 - BA-1861  ==> For each processed row, set value of field BackColorGroup: all results for the same PatientID/HistPatientID
     '''                                           will have the same BackColor, and there will be an alternate color for the different PatientID/HistPatientIDs loaded 
     ''' </remarks>
     Private Sub PrepareAndSetDataToGrid(ByVal pHisResultsDataTable As HisWSResultsDS.vhisWSResultsDataTable)
@@ -1199,7 +1201,7 @@ Public Class IHisResults
                 myGlobalDataTO = DecodeRowTexts(row)
                 If (myGlobalDataTO.HasError) Then Exit For
 
-                'BT #1861 - Set the group BackColor for each grid row 
+                'BA-1861 - Set the group BackColor for each grid row 
                 If (i = 0) Then
                     SetRowBackColorGroup(row, 1, row.PatientID, 0)
                 Else
@@ -1570,7 +1572,7 @@ Public Class IHisResults
     ''' </summary>
     ''' <returns>GlobalDataTO containing success/error information</returns>
     ''' <remarks>
-    ''' Created by: SA 25/08/2014 - BT #1861
+    ''' Created by: SA 25/08/2014 - BA-1861
     ''' </remarks>
     Private Function SaveGridColumnsWidth() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1607,8 +1609,8 @@ Public Class IHisResults
     ''' Code executed when the Click Event of Exit Button is raised
     ''' </summary>
     ''' <remarks>
-    ''' Created by:  SA 25/08/2014 - BT #1861 ==> Code moved from the button click event. Added call to function SaveGridColumnsWidth to save the 
-    '''                                           current width of all visible grid columns to be used the next time the screen is loaded 
+    ''' Created by:  SA 25/08/2014 - BA-1861 ==> Code moved from the button click event. Added call to function SaveGridColumnsWidth to save the 
+    '''                                          current width of all visible grid columns to be used the next time the screen is loaded 
     ''' </remarks>
     Private Sub ExitScreen()
         Try
@@ -1688,7 +1690,7 @@ Public Class IHisResults
     ''' has been sorted by several columns, the intercalated BackColor is applied only if the first column in the grid is PatientID
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 29/08/2014 - BT #1861
+    ''' Created by: SA 29/08/2014 - BA-1861
     ''' </remarks>
     Private Sub ApplyRowStyles(ByVal sender As Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs)
         Try
@@ -1761,7 +1763,7 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB
-    ''' Modified by: SA 25/08/2014 - BT #1861 ==> Code moved to new function ExitScreen
+    ''' Modified by: SA 25/08/2014 - BA-1861 ==> Code moved to new function ExitScreen
     ''' </remarks>
     Private Sub ExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles exitButton.Click
         Try
@@ -1778,7 +1780,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB
     ''' Modified by: XB 14/02/2014 - BT #1495 ==> Register Historic screen user actions into the Application Log
-    '''              SA 25/08/2014 - BT #1861 ==> Added Try/Catch block
+    '''              SA 25/08/2014 - BA-1861  ==> Added Try/Catch block
     ''' </remarks>
     Private Sub bsSearchButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles searchButton.Click
         Try
@@ -1799,7 +1801,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB
     ''' Modified by: XB 14/02/2014 - BT #1495 ==> Register Historic screen user actions into the Application Log
-    '''              SA 25/08/2014 - BT #1861 ==> Added Try/Catch block
+    '''              SA 25/08/2014 - BA-1861  ==> Added Try/Catch block
     ''' </remarks>
     Private Sub bsHistoryDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles historyDeleteButton.Click
         Try
@@ -1820,7 +1822,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB
     ''' Modified by: XB 14/02/2014 - BT #1495 ==> Register Historic screen user actions into the Application Log
-    '''              SA 25/08/2014 - BT #1861 ==> Added Try/Catch block
+    '''              SA 25/08/2014 - BA-1861  ==> Added Try/Catch block
     ''' </remarks>
     Private Sub ExportButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles exportButton.Click
         Try
@@ -2110,7 +2112,7 @@ Public Class IHisResults
     ''' Call the function that set the proper back color for all rows loaded in the grid
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 29/08/2014 - BT #1861
+    ''' Created by: SA 29/08/2014 - BA-1861
     ''' </remarks>
     Private Sub historyGridView_RowStyle(ByVal sender As Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs) Handles historyGridView.RowStyle
         Try
