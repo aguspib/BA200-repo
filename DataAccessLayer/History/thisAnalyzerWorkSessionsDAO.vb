@@ -171,7 +171,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Get all different Analyzers having Results in Historic Module
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet HisWSAnalyzerAlarmsDS with the list of different Analyzers having Historical Results</returns>
+        ''' <returns>GlobalDataTO containing a typed DataSet AnalyzersDS with the list of different Analyzers having Historical Results</returns>
         ''' <remarks>
         ''' Created by:  SA 01/09/2014 - BA-1910
         ''' </remarks>
@@ -187,10 +187,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT DISTINCT AnalyzerID " & vbCrLf & _
                                                 " FROM   thisAnalyzerWorkSessions " & vbCrLf
 
-                        Dim myDs As New HisWSAnalyzerAlarmsDS
+                        Dim myDs As New AnalyzersDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myDs.thisWSAnalyzerAlarms)
+                                dbDataAdapter.Fill(myDs.tcfgAnalyzers)
                             End Using
                         End Using
 

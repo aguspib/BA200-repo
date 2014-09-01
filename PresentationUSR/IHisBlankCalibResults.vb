@@ -226,35 +226,27 @@ Public Class IHisBlankCalibResults
     ''' Load all the Analyzers
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 28/09/2012
+    ''' Created by:  JB 28/09/2012
     ''' Modified by: IR 04/10/2012 (adapted to screen AG 19/10/2012)
+    '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms)
     ''' </remarks>
     Private Sub GetAnalyzerList()
-        Dim myAnalyzerDelegate As New AnalyzersDelegate
-        Dim myGlobalDataTO As New GlobalDataTO
-        'Dim myAnalyzerData As AnalyzersDS
-        Dim myAnalyzerData As List(Of String)
         Try
-            'Begin IR 04/10/2012 Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
-            'myGlobalDataTO = myAnalyzerDelegate.GetAllAnalyzers(Nothing)
-            myGlobalDataTO = myAnalyzerDelegate.GetDistinctAnalyzers(Nothing)
-            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                'myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
-                myAnalyzerData = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
-                'mAnalyzers = (From a In myAnalyzerData.tcfgAnalyzers _
-                '              Where Not a.Generic _
-                '              Order By a.Active Descending _
-                '              Select a.AnalyzerID).ToList
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim myHisAnalyzerWSDelegate As New HisAnalyzerWorkSessionsDelegate
 
-                Dim o As String
-                For Each o In myAnalyzerData
+            myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
+            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+
+                For Each o As String In myAnalyzerData
                     mAnalyzers.Add(o.ToString)
                 Next
-
-                'mAnalyzers = myGlobalDataTO.SetDatos
             End If
-            'End IR 04/10/2012
 
+            myGlobalDataTO = Nothing
+            myHisAnalyzerWSDelegate = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetAnalyzerList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

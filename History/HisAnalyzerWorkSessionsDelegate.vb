@@ -128,9 +128,9 @@ Namespace Biosystems.Ax00.BL
 
                         Dim myAnalyzersList As New List(Of String)
                         If (Not returnedData.HasError AndAlso Not returnedData.SetDatos Is Nothing) Then
-                            Dim myDs As HisWSAnalyzerAlarmsDS = DirectCast(returnedData.SetDatos, HisWSAnalyzerAlarmsDS)
+                            Dim myDs As AnalyzersDS = DirectCast(returnedData.SetDatos, AnalyzersDS)
 
-                            myAnalyzersList = (From a As HisWSAnalyzerAlarmsDS.thisWSAnalyzerAlarmsRow In myDs.thisWSAnalyzerAlarms _
+                            myAnalyzersList = (From a As AnalyzersDS.tcfgAnalyzersRow In myDs.tcfgAnalyzers _
                                               Select a.AnalyzerID).ToList
                         End If
 
