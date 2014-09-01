@@ -2189,6 +2189,68 @@
       ALTER TABLE [dbo].[tcfgGridColsConfiguration] CHECK CONSTRAINT [FK_tfmwScreens_tcfgGridColsConfiguration]
       END
       GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'Selected') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].twksOrderTests ADD Selected bit NOT NULL default 0
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparSavedWSOrderTests' AND sc.name = 'Selected') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparSavedWSOrderTests ADD Selected bit NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparCalculatedTests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparCalculatedTests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparISETests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparISETests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparOffSystemTests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparOffSystemTests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTestProfiles ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTestProfiles ADD Available bit NOT NULL default 1
+      END
+      GO
       
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vhisWSResults') = 1)
       DROP VIEW [dbo].vhisWSResults
@@ -2211,16 +2273,6 @@
       INNER JOIN dbo.vhisTestSamples AS TS ON OT.HistTestID = TS.HistTestID AND OT.TestType = TS.TestType AND TS.TestVersionNumber = COALESCE (OT.TestVersionNumber, 0)
       LEFT OUTER JOIN dbo.tcfgMasterData AS MD ON MD.SubTableID = 'TEST_UNITS' AND MD.ItemID = OT.MeasureUnit
       LEFT OUTER JOIN dbo.thisPatients AS P ON P.HistPatientID = OT.HistPatientID
-      GO
-      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'Selected') = 0
-      BEGIN
-	    ALTER TABLE [Ax00].[dbo].twksOrderTests ADD Selected bit NOT NULL default 0
-      END
-      GO
-      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparSavedWSOrderTests' AND sc.name = 'Selected') = 0
-      BEGIN
-	    ALTER TABLE [Ax00].[dbo].tparSavedWSOrderTests ADD Selected bit NULL
-      END
       GO
     </StructureScript>
     <UpdateScript>
@@ -2298,6 +2350,32 @@
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'AnalyzerID', 120, 120, 'BIOSYSTEMS', GETDATE())
       END
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparTests SET CustomPosition = TestPosition
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparCalculatedTests SET CustomPosition = CalcTestID
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparISETests SET CustomPosition = ISETestID
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparOffSystemTests SET CustomPosition = OffSystemTestID
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparTestProfiles SET CustomPosition = TestProfilePosition
       END
       GO
     </UpdateScript>
