@@ -137,15 +137,17 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pGetForControls">When FALSE it indicates all ISE Tests using the specified SampleType have to be returned
         '''                               When TRUE it indicates that only ISE Tests using the specified SampleType, having QC active and
         '''                               at least an active linked Control will be returned</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS with data of the ISETests using
         '''          the specified SampleType</returns>
         ''' <remarks>
         ''' Created by:  DL 21/10/2010
         ''' Modified by: SA 22/06/2012 - Added parameter to indicate if the group of ISE Tests returned have to be restricted to only 
         '''                              those having QC active and at least an active linked Control
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
         Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, _
-                                        ByVal pGetForControls As Boolean) As GlobalDataTO
+                                        ByVal pGetForControls As Boolean, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -156,9 +158,9 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myISETests As New tparISETestsDAO
                         If (Not pGetForControls) Then
-                            resultData = myISETests.ReadBySampleType(dbConnection, pSampleType)
+                            resultData = myISETests.ReadBySampleType(dbConnection, pSampleType, pCustomizedTestSelection) 'AG 01/09/2014 - BA-1869 parameter pCustomizedTestSelection
                         Else
-                            resultData = myISETests.GetAllWithQCActive(dbConnection, pSampleType)
+                            resultData = myISETests.GetAllWithQCActive(dbConnection, pSampleType, pCustomizedTestSelection) 'AG 01/09/2014 - BA-1869 parameter pCustomizedTestSelection
                         End If
                     End If
                 End If

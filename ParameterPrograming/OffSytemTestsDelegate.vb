@@ -229,12 +229,14 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet OffSystemTestsDS with data of the OffSystemTests using
         '''          the specified SampleType</returns>
         ''' <remarks>
         ''' Created by DL: 29/11/2010
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -244,7 +246,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOffSystemTests As New tparOffSystemTestsDAO
-                        resultData = myOffSystemTests.ReadBySampleType(dbConnection, pSampleType)
+                        resultData = myOffSystemTests.ReadBySampleType(dbConnection, pSampleType, pCustomizedTestSelection)
                     End If
                 End If
             Catch ex As Exception

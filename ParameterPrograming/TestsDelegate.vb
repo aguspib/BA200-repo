@@ -543,11 +543,13 @@ Namespace Biosystems.Ax00.BL
         ''' Get all Standard Tests
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing data of all Standard Tests</returns>
         ''' <remarks>
         ''' Created by: TR 08/02/2010
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pCustomizedTestSelection As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -557,7 +559,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myTestsDAO As New tparTestsDAO()
-                        myGlobalDataTO = myTestsDAO.ReadAll(dbConnection)
+                        myGlobalDataTO = myTestsDAO.ReadAll(dbConnection, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 - Inform pForTestSelectionScreen
                     End If
                 End If
 
@@ -781,6 +783,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pSampleTypeCode">Sample Type to filter the Tests</param>
         ''' <param name="pSampleClass">Optional parameter. When informed, get only Test/SampleType for which Controls or Calibrators
         '''                            have been defined</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing basic data of the obtained Standard Tests</returns>
         ''' <remarks>
         ''' Modified by: SA 27/06/2010 - Changed the way of getting the Icon Path for System and User Tests
@@ -790,9 +793,10 @@ Namespace Biosystems.Ax00.BL
         '''                              filtered by SampleType for the informed SampleClass. Removed also optional parameter for TestProfileID
         '''                              due to this function is not called from the screen of Programming Test Profiles anymore. Name changed 
         '''                              to GetBySampleType. Removed the getting of the ICON according the TestType
+        '''              AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen (define 2 last parameters as required)
         ''' </remarks>
         Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleTypeCode As String, _
-                                        Optional ByVal pSampleClass As String = "") As GlobalDataTO
+                                         ByVal pSampleClass As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -802,7 +806,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim testsDAO As New tparTestsDAO
-                        resultData = testsDAO.GetBySampleType(dbConnection, pSampleTypeCode, pSampleClass)
+                        resultData = testsDAO.GetBySampleType(dbConnection, pSampleTypeCode, pSampleClass, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 - Inform pCustomizedTestSelection
                     End If
                 End If
             Catch ex As Exception

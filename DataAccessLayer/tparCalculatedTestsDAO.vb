@@ -415,10 +415,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the CalculatedTests using
         '''          the specified SampleType</returns>
-        ''' <remarks></remarks>
-        Public Function ReadBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        ''' <remarks>
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
+        ''' </remarks>
+        Public Function ReadBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -428,16 +431,30 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT CT.CalcTestID, CT.CalcTestName, CT.CalcTestLongName, CT.FormulaText " & vbCrLf & _
+                                                " , CT.CustomPosition  " & vbCrLf & _
                                                 " FROM   tparCalculatedTests CT " & vbCrLf & _
                                                 " WHERE  CT.UniqueSampleType = 1 " & vbCrLf & _
                                                 " AND    CT.SampleType = '" & pSampleType.ToUpper & "' " & vbCrLf & _
-                                                " AND    CT.EnableStatus = 1 " & vbCrLf & _
-                                                " UNION " & vbCrLf & _
-                                                " SELECT CT.CalcTestID, CT.CalcTestName, CT.CalcTestLongName, CT.FormulaText " & vbCrLf & _
-                                                " FROM   tparCalculatedTests CT INNER JOIN tparFormulas F ON CT.CalcTestID = F.CalcTestID " & vbCrLf & _
-                                                " WHERE  CT.UniqueSampleType = 0 " & vbCrLf & _
-                                                " AND    F.SampleType = '" & pSampleType.ToUpper & "' " & vbCrLf & _
                                                 " AND    CT.EnableStatus = 1 " & vbCrLf
+                        'AG 29/08/2014 BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND CT.Available = 1 "
+                        End If
+                        'AG 29/08/2014 BA-1869
+
+                        cmdText &= " UNION " & vbCrLf & _
+                                   " SELECT CT.CalcTestID, CT.CalcTestName, CT.CalcTestLongName, CT.FormulaText " & vbCrLf & _
+                                   " , CT.CustomPosition  " & vbCrLf & _
+                                   " FROM   tparCalculatedTests CT INNER JOIN tparFormulas F ON CT.CalcTestID = F.CalcTestID " & vbCrLf & _
+                                   " WHERE  CT.UniqueSampleType = 0 " & vbCrLf & _
+                                   " AND    F.SampleType = '" & pSampleType.ToUpper & "' " & vbCrLf & _
+                                   " AND    CT.EnableStatus = 1 " & vbCrLf
+
+                        'AG 29/08/2014 BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND CT.Available = 1  ORDER BY CT.CustomPosition "
+                        End If
+                        'AG 29/08/2014 BA-1869
 
                         Dim myCalculatedTests As New CalculatedTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

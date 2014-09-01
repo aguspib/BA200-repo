@@ -503,6 +503,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestProfilesTestsDS with the list of all Test Profiles defined
         '''          for the specified SampleType plus the list of Tests included in each one</returns>
         ''' <remarks>
@@ -510,8 +511,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 19/10/2010 - Changed the SQL to get also Calculated and ISE Tests included in the returned Profiles
         '''              SA 02/12/2010 - Changed the SQL to get also OffSystem Tests included in the returned Profiles
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetProfilesBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        Public Function GetProfilesBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -522,35 +524,63 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String
                         cmdText = " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, T.TestID, T.TestName, " & _
-                                           " T.TestPosition, TP.TestProfilePosition, 1 AS TestTypePos " & _
+                                           " T.TestPosition, TP.TestProfilePosition, 1 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparTests T ON TPT.TestID = T.TestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'STD' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'STD' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
-                                           " CT.CalcTestID AS TestPosition, TP.TestProfilePosition, 2 AS TestTypePos " & _
+                                           " CT.CalcTestID AS TestPosition, TP.TestProfilePosition, 2 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparCalculatedTests CT ON TPT.TestID = CT.CalcTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'CALC' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'CALC' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, IT.IseTestID AS TestID, IT.[Name] AS TestName, " & _
-                                           " IT.IseTestID AS TestPosition,  TP.TestProfilePosition, 3 AS TestTypePos " & _
+                                           " IT.IseTestID AS TestPosition,  TP.TestProfilePosition, 3 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparISETests IT ON TPT.TestID = IT.IseTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'ISE' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'ISE' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, " & _
-                                           " OT.OffSystemTestID AS TestPosition,  TP.TestProfilePosition, 4 AS TestTypePos " & _
+                                           " OT.OffSystemTestID AS TestPosition,  TP.TestProfilePosition, 4 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparOffSystemTests OT ON TPT.TestID = OT.OffSystemTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'OFFS' " & _
-                                  " ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                                  " AND      TPT.TestType = 'OFFS' "
 
-                        '" WHERE    UPPER(TP.SampleType) = '" & pSampleType.ToUpper & "' " & _
+                        'AG 01/09/2014 - BA-1869
+                        '" ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                        If Not pCustomizedTestSelection Then 'Use the old order by clause
+                            cmdText &= " ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                        Else 'New order by clause by customized order
+                            cmdText &= " AND TP.Available = 1 "
+                            cmdText &= " ORDER BY TP.CustomPosition ASC "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim dbCmd As New SqlClient.SqlCommand
                         dbCmd.Connection = dbConnection

@@ -579,11 +579,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Get all Standard Tests
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing all Standard Tests sorted by position</returns>
         ''' <remarks>
         ''' Created by:  TR 08/02/2010
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function ReadAll(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -592,8 +594,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM tparTests " & vbCrLf & _
-                                                " ORDER BY TestPosition "
+                        Dim cmdText As String = String.Empty
+                        If Not pCustomizedTestSelection Then 'AG 29/08/2014 BA-1869 Old query
+                            cmdText = " SELECT * FROM tparTests " & vbCrLf & _
+                                                    " ORDER BY TestPosition "
+
+                        Else 'AG 29/08/2014 BA-1869 New query
+                            cmdText = " SELECT * FROM tparTests WHERE Available = 1 " & vbCrLf & _
+                                                    " ORDER BY CustomPosition "
+                        End If
 
                         Dim myTestDataDS As New TestsDS()
                         Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1159,6 +1168,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pSampleTypeCode">Sample Type to filter the Tests</param>
         ''' <param name="pSampleClass">Optional parameter. When informed, get only Test/SampleType for which Controls or Calibrators
         '''                            have been defined</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestsDS with the list of obtained Tests</returns>
         ''' <remarks>
         ''' Modified by: TR 05/02/2010 - Add more functionality, to validate the controls sample type code.
@@ -1179,9 +1189,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 21/06/2011 - Added new filter when SampleClass is CTRL: the Test/SampleType has to have at least an ActiveControl
         '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
         '''              TR 29/04/2014 - BT #1494 Adde the EnableStatus column, use to indicate if the Test is complete or incomplete programming.
+        '''              AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen (define the last 2 parameters as required)
         ''' </remarks>
         Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleTypeCode As String, _
-                                        Optional ByVal pSampleClass As String = "") As GlobalDataTO
+                                         ByVal pSampleClass As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1194,7 +1205,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                        " TS.NumberOfControls, TS.FactoryCalib, TS.EnableStatus " & vbCrLf & _
                                                 " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
                                                 " WHERE  UPPER(TS.SampleType) = '" & pSampleTypeCode & "' " & vbCrLf
-                        '" WHERE  UPPER(TS.SampleType) = '" & pSampleTypeCode.ToUpper & "' " & vbCrLf
 
                         Select Case (pSampleClass)
                             Case "CTRL"
@@ -1209,7 +1219,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                       " AND    TS2.SampleType = TS.SampleTypeAlternative) = 'EXPERIMENT')) " & vbCrLf
                                 Exit Select
                         End Select
-                        cmdText &= " ORDER BY T.TestPosition "
+
+                        'AG 29/08/2014 BA-1869
+                        If Not pCustomizedTestSelection Then 'Old order
+                            cmdText &= " ORDER BY T.TestPosition "
+                        Else 'New conditions
+                            cmdText &= " AND T.Available = 1  ORDER BY T.CustomPosition "
+                        End If
+                        'AG 29/08/2014 BA-1869
+
 
                         Dim myTestDataDS As New TestsDS()
                         Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
