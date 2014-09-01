@@ -48,7 +48,10 @@ Public Class IHisBlankCalibResults
     Private mSampleTypes As Dictionary(Of String, String)   ' The Sample Types: {SampleType, Multilanguage Text}
     Private mImageGridDict As Dictionary(Of String, Byte())   ' The images inside the grid
 
-    Private mAnalyzers As List(Of String)
+    'SA 01/09/2014
+    'BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties DisplayMember and ValueMember in the ComboBox
+    Private mAnalyzers As New AnalyzersDS
+
     Private alarmsDefiniton As New AlarmsDS 'AG 22/10/2012
     Dim myHisWSResultsDelegate As New HisWSResultsDelegate 'AG 22/10/2012
 
@@ -230,7 +233,7 @@ Public Class IHisBlankCalibResults
     ''' Modified by: IR 04/10/2012 (adapted to screen AG 19/10/2012)
     '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
     '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms).
-    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox.
+    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox
     ''' </remarks>
     Private Sub GetAnalyzerList()
         Try
@@ -239,16 +242,15 @@ Public Class IHisBlankCalibResults
 
             myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+                mAnalyzers = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
 
                 'Search if the connected Analyzer is in the returned list; add it to list in case it has not Historic Results yet
-                If (Not myAnalyzerData.Contains(AnalyzerIDAttribute)) Then
-                    myAnalyzerData.Add(AnalyzerIDAttribute)
+                If ((mAnalyzers.tcfgAnalyzers.ToList.Where(Function(a) a.AnalyzerID = AnalyzerIDAttribute)).Count = 0) Then
+                    Dim myRow As AnalyzersDS.tcfgAnalyzersRow = mAnalyzers.tcfgAnalyzers.NewtcfgAnalyzersRow()
+                    myRow.AnalyzerID = AnalyzerIDAttribute
+                    mAnalyzers.tcfgAnalyzers.AddtcfgAnalyzersRow(myRow)
+                    mAnalyzers.AcceptChanges()
                 End If
-
-                For Each o As String In myAnalyzerData
-                    mAnalyzers.Add(o.ToString)
-                Next
             End If
 
             myGlobalDataTO = Nothing
@@ -259,61 +261,28 @@ Public Class IHisBlankCalibResults
         End Try
     End Sub
 
-    ' ''' <summary>
-    ' ''' Load all the Sample Type availables (with its multilanguage text)
-    ' ''' </summary>
-    ' ''' <remarks>
-    ' ''' Created by: JB 18/10/2012
-    ' '''             AG 27/05/2013 - Add new samples types LIQ and SER
-    ' '''             TR 27/05/2013 -  This method is not in use (DELETE)
-    ' '''             XB 04/06/2013 - Commented
-    ' ''' </remarks>
-    'Private Sub GetSampleTypes()
-    '    With mSampleTypes
-    '        .Clear()
-    '        .Add("SER", "SER-" & GetText("MAD_SAMPLE_TYPES_SER"))
-    '        .Add("URI", "URI-" & GetText("MAD_SAMPLE_TYPES_URI"))
-    '        .Add("PLM", "PLM-" & GetText("MAD_SAMPLE_TYPES_PLM"))
-    '        .Add("WBL", "WBL-" & GetText("MAD_SAMPLE_TYPES_WBL"))
-    '        .Add("CSF", "CSF-" & GetText("MAD_SAMPLE_TYPES_CSF"))
-    '        .Add("LIQ", "LIQ-" & GetText("MAD_SAMPLE_TYPES_LIQ"))
-    '        .Add("SEM", "SEM-" & GetText("MAD_SAMPLE_TYPES_SEM"))
-    '    End With
-    'End Sub
-
     ''' <summary>
     '''  Fills the DropDownLists
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 18/10/2012
     ''' Modified by: SA 01/08/2014 - Added Try/Catch block
-    '''              SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
-    '''                                          the currently connected one
+    '''              SA 01/09/2014 - BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
     ''' </remarks>
     Private Sub FillDropDownLists()
         Try
+            'Get the list of Analyzers and load the ComboBox
             GetAnalyzerList()
-            analyzerIDComboBox.DataSource = mAnalyzers
+            analyzerIDComboBox.DataSource = mAnalyzers.tcfgAnalyzers.DefaultView
 
-            'BA-1910 - When the ComboBox of Analyzers contains more than one element, select by default the currently connected one
-            If (mAnalyzers.Count > 1) Then
-                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
-                analyzerIDComboBox.SelectedValue = AnalyzerIDAttribute
+            'BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
+            analyzerIDComboBox.DisplayMember = "AnalyzerID"
+            analyzerIDComboBox.ValueMember = "AnalyzerID"
 
-                'The label and the ComboBox are visible and enabled
-                analyzerIDComboBox.Enabled = True
-                analyzerIDComboBox.Visible = True
-                analyzerIDLabel.Visible = True
-            Else
-                'The label and the ComboBox are hidden and disabled
-                analyzerIDComboBox.Enabled = False
-                analyzerIDComboBox.Visible = False
-                analyzerIDLabel.Visible = False
-            End If
-
-            'analyzerIDComboBox.Enabled = mAnalyzers.Count > 1
-            'analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
-            'analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+            'The label and the ComboBox are visible and enabled only when there are several Analyzers loaded in the ComboBox
+            analyzerIDComboBox.Enabled = (mAnalyzers.tcfgAnalyzers.Rows.Count > 1)
+            analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
+            analyzerIDLabel.Visible = analyzerIDComboBox.Visible
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -966,7 +935,9 @@ Public Class IHisBlankCalibResults
     ''' Initializes the filter search
     ''' </summary>
     ''' <remarks>
-    ''' Created by JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Created by:  JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
+    '''                                          the currently connected one  
     ''' </remarks>
     Private Sub InitializeFilterSearch()
         Try
@@ -976,10 +947,13 @@ Public Class IHisBlankCalibResults
             dateToDateTimePick.Checked = True
             dateToDateTimePick.Value = Today
 
-            If analyzerIDComboBox.Items.Count > 0 Then
+            If (analyzerIDComboBox.Items.Count > 0) Then
+                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
+                analyzerIDComboBox.SelectedValue = AnalyzerIDAttribute
+            Else
+                'Select the unique element in the list
                 analyzerIDComboBox.SelectedIndex = 0
             End If
-
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -992,24 +966,25 @@ Public Class IHisBlankCalibResults
     ''' Initialize all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Created by:  JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties 
+    '''                                          DisplayMember and ValueMember in the ComboBox
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
             mImageDict = New Dictionary(Of String, Image)()
             mTextDict = New Dictionary(Of String, String)()
             mSampleTypes = New Dictionary(Of String, String)
-            mAnalyzers = New List(Of String)
             mImageGridDict = New Dictionary(Of String, Byte())()
 
-            'GetSampleTypes()   ' XB 04/06/2013 - Commented
+            'BA-1910 - Changed from list of Strings to a typed DataSet AnalyzersDS 
+            mAnalyzers = New AnalyzersDS
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels()
-            'InitializeAlarmTexts()
             PrepareButtons()
             FillDropDownLists()
 
@@ -1035,16 +1010,18 @@ Public Class IHisBlankCalibResults
 
 #Region " Search "
     ''' <summary>
-    ''' Returns the selected search filter
+    ''' Fill a SearchFilter structure with filters selected in Search Area
     ''' </summary>
-    ''' <returns></returns>
+    ''' <returns>SearchFilter structure filled with filters selected in Search Area</returns>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Created by:  JB 18/10/2012 (adapted to screen by AG 19/10/2012)
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> To get the selected Analyzer, used SelectedValue instead of SelectedItem, due to the ComboBox is loaded
+    '''                                          in a different way
     ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
-            .analyzerId = analyzerIDComboBox.SelectedItem.ToString
+            .analyzerId = analyzerIDComboBox.SelectedValue.ToString
 
             If dateFromDateTimePick.Checked Then
                 .dateFrom = dateFromDateTimePick.Value

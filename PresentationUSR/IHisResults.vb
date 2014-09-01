@@ -60,7 +60,10 @@ Public Class IHisResults
     Private mStatFlags As Dictionary(Of TriState, String)     'Stat Flags:   {StatFlag Code, Multilanguage Text}
     Private mSampleTypes As Dictionary(Of String, String)     'Sample Types: {SampleType Code, Multilanguage Text}
     Private mTestTypes As Dictionary(Of String, String)       'Test Types:   {TestType Code, Multilanguage Text}
-    Private mAnalyzers As List(Of String)                     'AnalyzerIDs
+
+    'SA 01/09/2014
+    'BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties DisplayMember and ValueMember in the ComboBox
+    Private mAnalyzers As AnalyzersDS
 
     'AG 22/10/2012
     'Typed DataSet containing the list of all defined Alarms
@@ -90,7 +93,10 @@ Public Class IHisResults
         mStatFlags = New Dictionary(Of TriState, String)
         mSampleTypes = New Dictionary(Of String, String)
         mTestTypes = New Dictionary(Of String, String)
-        mAnalyzers = New List(Of String)
+
+        'SA 01/09/2014
+        'BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties DisplayMember and ValueMember in the ComboBox
+        mAnalyzers = New AnalyzersDS
 
         'Initialize the global variable for the Delegate Class 
         myHisWSResultsDelegate = New HisWSResultsDelegate
@@ -231,16 +237,15 @@ Public Class IHisResults
 
             myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+                mAnalyzers = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
 
                 'Search if the connected Analyzer is in the returned list; add it to list in case it has not Historic Results yet
-                If (Not myAnalyzerData.Contains(AnalyzerIDAttribute)) Then
-                    myAnalyzerData.Add(AnalyzerIDAttribute)
+                If ((mAnalyzers.tcfgAnalyzers.ToList.Where(Function(a) a.AnalyzerID = AnalyzerIDAttribute)).Count = 0) Then
+                    Dim myRow As AnalyzersDS.tcfgAnalyzersRow = mAnalyzers.tcfgAnalyzers.NewtcfgAnalyzersRow()
+                    myRow.AnalyzerID = AnalyzerIDAttribute
+                    mAnalyzers.tcfgAnalyzers.AddtcfgAnalyzersRow(myRow)
+                    mAnalyzers.AcceptChanges()
                 End If
-
-                For Each o As String In myAnalyzerData
-                    mAnalyzers.Add(o.ToString)
-                Next
             End If
 
             myGlobalDataTO = Nothing
@@ -416,51 +421,44 @@ Public Class IHisResults
     ''' Modified by: TR 08/05/2013 - Take values from DB
     '''              XB 06/06/2013 - Added kvp.Key for the Sample Type description into the corresponding combo
     '''              SA 01/08/2014 - Added Try/Catch block
-    '''              SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
-    '''                                          the currently connected one
+    '''              SA 01/09/2014 - BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
     ''' </remarks>
     Private Sub FillDropDownLists()
         Try
+            'Get the list of Priorities and load the ComboBox
             GetStatFlags()
-            GetSampleTypes()
-            GetTestTypes()
-            GetAnalyzerList()
-
             bsStatFlagComboBox.DataSource = mStatFlags.Values.ToList
 
+            'Get the list of Sample Types and load the ComboBox
+            GetSampleTypes()
             With sampleTypesChkComboBox.Properties.Items
                 For Each kvp As KeyValuePair(Of String, String) In mSampleTypes
                     .Add(kvp.Key, kvp.Key + kvp.Value)
                 Next
             End With
+            sampleTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
 
+            'Get the list of Test Types and load the ComboBox
+            GetTestTypes()
             With testTypesChkComboBox.Properties.Items
                 For Each kvp As KeyValuePair(Of String, String) In mTestTypes
                     .Add(kvp.Key, kvp.Key + kvp.Value)
                 Next
             End With
-
-            bsAnalyzersComboBox.DataSource = mAnalyzers
-
-            sampleTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
             testTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
 
-            'BA-1910 - When the ComboBox of Analyzers contains more than one element, select by default the currently connected one
-            If (mAnalyzers.Count > 1) Then
-                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
-                bsAnalyzersComboBox.SelectedValue = AnalyzerIDAttribute
+            'Get the list of Analyzers and load the ComboBox
+            GetAnalyzerList()
+            bsAnalyzersComboBox.DataSource = mAnalyzers.tcfgAnalyzers.DefaultView
 
-                'The label and the ComboBox are visible and enabled
-                bsAnalyzersComboBox.Enabled = True
-                bsAnalyzersComboBox.Visible = True
-                analyzerIDLabel.Visible = True
-            Else
-                'The label and the ComboBox are hidden and disabled
-                bsAnalyzersComboBox.Enabled = False
-                bsAnalyzersComboBox.Visible = False
-                analyzerIDLabel.Visible = False
-            End If
+            'BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
+            bsAnalyzersComboBox.DisplayMember = "AnalyzerID"
+            bsAnalyzersComboBox.ValueMember = "AnalyzerID"
 
+            'The label and the ComboBox are visible and enabled only when there are several Analyzers loaded in the ComboBox
+            bsAnalyzersComboBox.Enabled = (mAnalyzers.tcfgAnalyzers.Rows.Count > 1)
+            bsAnalyzersComboBox.Visible = bsAnalyzersComboBox.Enabled
+            analyzerIDLabel.Visible = bsAnalyzersComboBox.Enabled
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -916,7 +914,9 @@ Public Class IHisResults
     ''' Initializes the filter search
     ''' </summary>
     ''' <remarks>
-    ''' Created by JB 18/10/2012
+    ''' Created by:  JB 18/10/2012
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
+    '''                                          the currently connected one  
     ''' </remarks>
     Private Sub InitializeFilterSearch()
         Try
@@ -929,6 +929,10 @@ Public Class IHisResults
             bsStatFlagComboBox.SelectedIndex = 0
 
             If (bsAnalyzersComboBox.Items.Count > 0) Then
+                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
+                bsAnalyzersComboBox.SelectedValue = AnalyzerIDAttribute
+            Else
+                'Select the unique element in the list
                 bsAnalyzersComboBox.SelectedIndex = 0
             End If
         Catch ex As Exception
@@ -992,11 +996,13 @@ Public Class IHisResults
     ''' Created by:  JB
     ''' Modified by: SA 01/08/2014 - BA-1861 ==> Inform SpecimenID in the structure with value of the corresponding filter.
     '''                                          Added Try/Catch block
+    '''              SA 01/09/2014 - BA-1910 ==> To get the selected Analyzer, used SelectedValue instead of SelectedItem, due to the ComboBox is loaded
+    '''                                          in a different way
     ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
-            .analyzerId = bsAnalyzersComboBox.SelectedItem.ToString
+            .analyzerId = bsAnalyzersComboBox.SelectedValue.ToString
 
             If (bsDateFromDateTimePick.Checked) Then
                 .dateFrom = bsDateFromDateTimePick.Value
