@@ -15,6 +15,22 @@ Imports LIS.Biosystems.Ax00.LISCommunications
 
 Public Class IHisResults
 
+#Region "Attributes"
+    'SA 01/09/2014
+    'BA-1910 ==> Added new screen attribute to manage the ActiveAnalyzer Property
+    Private AnalyzerIDAttribute As String = String.Empty
+#End Region
+
+#Region "Properties"
+    'SA 01/09/2014
+    'BA-1910 ==> Added new screen property to receive the ID of the connected Analyzer
+    Public WriteOnly Property ActiveAnalyzer() As String
+        Set(ByVal value As String)
+            AnalyzerIDAttribute = value
+        End Set
+    End Property
+#End Region
+
 #Region "Structures"
     'SA 01/08/2014
     'BA-1861 ==> Added new field specimenID. Removed field sampleClasses, it is not needed.
@@ -205,7 +221,8 @@ Public Class IHisResults
     ''' Created by:  JB 28/09/2012
     ''' Modified by: IR 04/10/2012 - Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
     '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
-    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms)
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms).
+    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox
     ''' </remarks>
     Private Sub GetAnalyzerList()
         Try
@@ -215,6 +232,11 @@ Public Class IHisResults
             myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+
+                'Search if the connected Analyzer is in the returned list; add it to list in case it has not Historic Results yet
+                If (Not myAnalyzerData.Contains(AnalyzerIDAttribute)) Then
+                    myAnalyzerData.Add(AnalyzerIDAttribute)
+                End If
 
                 For Each o As String In myAnalyzerData
                     mAnalyzers.Add(o.ToString)
@@ -394,6 +416,8 @@ Public Class IHisResults
     ''' Modified by: TR 08/05/2013 - Take values from DB
     '''              XB 06/06/2013 - Added kvp.Key for the Sample Type description into the corresponding combo
     '''              SA 01/08/2014 - Added Try/Catch block
+    '''              SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
+    '''                                          the currently connected one
     ''' </remarks>
     Private Sub FillDropDownLists()
         Try
@@ -421,9 +445,22 @@ Public Class IHisResults
             sampleTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
             testTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
 
-            bsAnalyzersComboBox.Enabled = mAnalyzers.Count > 1
-            bsAnalyzersComboBox.Visible = bsAnalyzersComboBox.Enabled
-            analyzerIDLabel.Visible = bsAnalyzersComboBox.Visible
+            'BA-1910 - When the ComboBox of Analyzers contains more than one element, select by default the currently connected one
+            If (mAnalyzers.Count > 1) Then
+                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
+                bsAnalyzersComboBox.SelectedValue = AnalyzerIDAttribute
+
+                'The label and the ComboBox are visible and enabled
+                bsAnalyzersComboBox.Enabled = True
+                bsAnalyzersComboBox.Visible = True
+                analyzerIDLabel.Visible = True
+            Else
+                'The label and the ComboBox are hidden and disabled
+                bsAnalyzersComboBox.Enabled = False
+                bsAnalyzersComboBox.Visible = False
+                analyzerIDLabel.Visible = False
+            End If
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

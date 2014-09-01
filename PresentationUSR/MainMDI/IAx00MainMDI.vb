@@ -2255,11 +2255,18 @@ Partial Public Class IAx00MainMDI
     End Sub
 
     Private Sub SampleResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SampleResultsToolStripMenuItem.Click
-        'OpenMDIChildForm(IHistoricResultsReview)
+        'SA 01/09/2014
+        'BA-1910 ==> Inform the property for the connected Analyzer before open the Historic Patient Results screen
+        IHisResults.ActiveAnalyzer = AnalyzerIDAttribute
+
         OpenMDIChildForm(IHisResults) 'JB 22/10/2012
     End Sub
 
     Private Sub BlankCalibratorResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BlankCalibratorResultsToolStripMenuItem.Click
+        'SA 01/09/2014
+        'BA-1910 ==> Inform the property for the connected Analyzer before open the Historic Blank&Calibrator Results screen
+        IHisBlankCalibResults.AnalyzerID = AnalyzerIDAttribute
+
         OpenMDIChildForm(IHisBlankCalibResults)
     End Sub
 
