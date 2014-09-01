@@ -23,6 +23,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by: TR 02/03/2010
+        ''' AG 01/09/2014 - BA-1869 when new STD test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestDS As TestsDS, Optional pIsPreloadedTest As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -44,8 +45,18 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                     pTestDS.tparTests(0).TestPosition = CType(myGlobalDataTO.SetDatos, Integer)
 
-                                    'Finally, create the new Test
-                                    myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    'AG 01/09/2014 - BA-1869 Get the next Custom Position
+                                    ''Finally, create the new Test
+                                    'myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    myGlobalDataTO = GetNextCustomPosition(dbConnection)
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                        pTestDS.tparTests(0).CustomPosition = CType(myGlobalDataTO.SetDatos, Integer)
+
+                                        'Finally, create the new Test
+                                        myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    End If
+                                    'AG 01/09/2014 - BA-1869
+
                                 End If
                             End If
                         End If
@@ -769,6 +780,48 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetNextTestPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the next custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an Integer value with the next Custom Position</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetNextCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myTestsDAO As New tparTestsDAO()
+
+                        myGlobalDataTO = myTestsDAO.GetLastCustomPosition(dbConnection)
+                        If (Not myGlobalDataTO.HasError) Then
+                            If (myGlobalDataTO.SetDatos Is Nothing OrElse myGlobalDataTO.SetDatos Is DBNull.Value) Then
+                                myGlobalDataTO.SetDatos = 1
+                            Else
+                                myGlobalDataTO.SetDatos = CType(myGlobalDataTO.SetDatos, Integer) + 1
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetNextCustomPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

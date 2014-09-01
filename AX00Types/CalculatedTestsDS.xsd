@@ -33,6 +33,7 @@
               <xs:element name="PreloadedCalculatedTest" msprop:Generator_ColumnVarNameInTable="columnPreloadedCalculatedTest" msprop:Generator_ColumnPropNameInRow="PreloadedCalculatedTest" msprop:Generator_ColumnPropNameInTable="PreloadedCalculatedTestColumn" msprop:Generator_UserColumnName="PreloadedCalculatedTest" type="xs:boolean" default="false" minOccurs="0" />
               <xs:element name="BiosystemsID" msprop:Generator_ColumnVarNameInTable="columnBiosystemsID" msprop:Generator_ColumnPropNameInRow="BiosystemsID" msprop:Generator_ColumnPropNameInTable="BiosystemsIDColumn" msprop:Generator_UserColumnName="BiosystemsID" type="xs:int" minOccurs="0" />
               <xs:element name="LISValue" msprop:Generator_ColumnVarNameInTable="columnLISValue" msprop:Generator_ColumnPropNameInRow="LISValue" msprop:Generator_ColumnPropNameInTable="LISValueColumn" msprop:Generator_UserColumnName="LISValue" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="CustomPosition" msprop:Generator_ColumnVarNameInTable="columnCustomPosition" msprop:Generator_ColumnPropNameInRow="CustomPosition" msprop:Generator_ColumnPropNameInTable="CustomPositionColumn" msprop:Generator_UserColumnName="CustomPosition" type="xs:int" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

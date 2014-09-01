@@ -29,6 +29,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              XB 14/02/2013 - Add PreloadedCalculatedTest field on INSERT operation (Bugs tracking #1134)
         '''              SG 20/02/2013 - Add BiosystemsID field on INSERT operation (Bugs tracking #1134)
         '''              TR 10/05/2013 - Add LISValue field used on the update process.
+        '''              AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTest As CalculatedTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -41,7 +42,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     cmdText = " INSERT INTO tparCalculatedTests(CalcTestName, CalcTestLongName, MeasureUnit, UniqueSampleType, " & _
                                                               " SampleType, Decimals, PrintExpTests, FormulaText, " & _
-                                                              " ActiveRangeType, TS_User, TS_DateTime, PreloadedCalculatedTest, BiosystemsID, LISValue) " & _
+                                                              " ActiveRangeType, TS_User, TS_DateTime, PreloadedCalculatedTest, BiosystemsID, LISValue, CustomPosition ) " & _
                               " VALUES (N'" & pCalcTest.tparCalculatedTests(0).CalcTestName.ToString.Replace("'", "''") & "', " & _
                                       " N'" & pCalcTest.tparCalculatedTests(0).CalcTestLongName.ToString.Replace("'", "''") & "', " & _
                                       " '" & pCalcTest.tparCalculatedTests(0).MeasureUnit.ToString & "', " & _
@@ -93,13 +94,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     End If
                     'end SGM 20/02/2013
 
+                    'AG 01/09/2014 - BA-1869 - inform last column CustomPosition
                     'TR 10/05/2013 Add the LISValue Column.
                     If (pCalcTest.tparCalculatedTests(0).IsLISValueNull) Then
-                        cmdText &= " NULL)"
+                        cmdText &= " NULL, "
                     Else
-                        cmdText &= " N'" & pCalcTest.tparCalculatedTests(0).LISValue & "') "
+                        cmdText &= " N'" & pCalcTest.tparCalculatedTests(0).LISValue & "', "
                     End If
 
+                    cmdText &= pCalcTest.tparCalculatedTests(0).CustomPosition & " ) "
+                    'AG 01/09/2014 - BA-1869
 
                     'Finally, get the automatically generated ID for the created Calculated Test
                     cmdText &= " SELECT SCOPE_IDENTITY() "
@@ -1001,6 +1005,45 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return myGlobalDataTO
         End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparCalculatedTests "
+
+                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
+                        cmd.CommandText = cmdText
+                        cmd.Connection = dbConnection
+
+                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparCalculatedTestsDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 #End Region
 
 #Region "TO REVIEW - DELETE"

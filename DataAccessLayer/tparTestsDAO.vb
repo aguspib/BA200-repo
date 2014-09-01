@@ -27,6 +27,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              DS, then get the UserName of the current loggged User. Mandatory fields have to be informed,
         '''                              they do not allow NULL values
         '''              TR 09/05/2013 - Add new column LISValue used to indicate the mapping with list values.
+        '''              AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsDS As TestsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -43,7 +44,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                          " AbsorbanceFlag, ReadingMode, FirstReadingCycle, SecondReadingCycle, MainWavelength, " & _
                                          " ReferenceWavelength, BlankMode, BlankReplicates, KineticBlankLimit, ProzoneRatio, " & _
                                          " ProzoneTime1, ProzoneTime2, InUse, TestVersionNumber, TestVersionDateTime, TS_User, " & _
-                                         " TS_DateTime, LISValue) "
+                                         " TS_DateTime, LISValue, CustomPosition ) "
 
                     Dim cmd As New SqlCommand
                     cmd.Connection = pDBConnection
@@ -151,6 +152,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Else
                             values &= " N'" & tpartestsDR.LISValue & "' "
                         End If
+
+                        'AG 01/09/2014 - BA-1869 - Inform the customPosition column
+                        values &= " , " & tpartestsDR.CustomPosition.ToString()
+                        'AG 01/09/2014 - BA-1869
 
                         cmdText = "INSERT INTO tparTests  " & keys & " VALUES (" & values & ")"
                         cmd.CommandText = cmdText
@@ -1338,6 +1343,45 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return myGlobalDataTO
         End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparTests "
+
+                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
+                        cmd.CommandText = cmdText
+                        cmd.Connection = dbConnection
+
+                        myGlobalDataTO.SetDatos = cmd.ExecuteScalar()
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
 
         ''' <summary>
         ''' Get all not InUse Tests not linked to the specified Calibrator, that is, all Tests that can be
