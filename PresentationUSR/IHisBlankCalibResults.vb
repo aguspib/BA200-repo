@@ -229,7 +229,8 @@ Public Class IHisBlankCalibResults
     ''' Created by:  JB 28/09/2012
     ''' Modified by: IR 04/10/2012 (adapted to screen AG 19/10/2012)
     '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
-    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms)
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms).
+    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox.
     ''' </remarks>
     Private Sub GetAnalyzerList()
         Try
@@ -239,6 +240,11 @@ Public Class IHisBlankCalibResults
             myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+
+                'Search if the connected Analyzer is in the returned list; add it to list in case it has not Historic Results yet
+                If (Not myAnalyzerData.Contains(AnalyzerIDAttribute)) Then
+                    myAnalyzerData.Add(AnalyzerIDAttribute)
+                End If
 
                 For Each o As String In myAnalyzerData
                     mAnalyzers.Add(o.ToString)
@@ -279,16 +285,39 @@ Public Class IHisBlankCalibResults
     '''  Fills the DropDownLists
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 18/10/2012
+    ''' Created by:  JB 18/10/2012
+    ''' Modified by: SA 01/08/2014 - Added Try/Catch block
+    '''              SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
+    '''                                          the currently connected one
     ''' </remarks>
     Private Sub FillDropDownLists()
+        Try
+            GetAnalyzerList()
+            analyzerIDComboBox.DataSource = mAnalyzers
 
-        GetAnalyzerList()
-        analyzerIDComboBox.DataSource = mAnalyzers
+            'BA-1910 - When the ComboBox of Analyzers contains more than one element, select by default the currently connected one
+            If (mAnalyzers.Count > 1) Then
+                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
+                analyzerIDComboBox.SelectedValue = AnalyzerIDAttribute
 
-        analyzerIDComboBox.Enabled = mAnalyzers.Count > 1
-        analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
-        analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+                'The label and the ComboBox are visible and enabled
+                analyzerIDComboBox.Enabled = True
+                analyzerIDComboBox.Visible = True
+                analyzerIDLabel.Visible = True
+            Else
+                'The label and the ComboBox are hidden and disabled
+                analyzerIDComboBox.Enabled = False
+                analyzerIDComboBox.Visible = False
+                analyzerIDLabel.Visible = False
+            End If
+
+            'analyzerIDComboBox.Enabled = mAnalyzers.Count > 1
+            'analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
+            'analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
     End Sub
 
     ''' <summary>
