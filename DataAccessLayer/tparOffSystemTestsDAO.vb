@@ -294,14 +294,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet offsystemTestsDS with data of the system Tests using
         '''          the specified SampleType</returns>
         ''' <remarks>
         ''' Created by:  DL 25/11/2010
         ''' Modified by: XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
         Public Function ReadBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                         ByVal pSampleType As String) As GlobalDataTO
+                                         ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -314,7 +316,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " SELECT OST.OffSystemTestID, OST.ShortName, OST.Name " & vbCrLf
                         cmdText &= " FROM   tparOffSystemTests OST INNER JOIN tparOffSystemTestSamples OSTS ON OST.OffSystemTestID = OSTS.OffSystemTestID " & vbCrLf
                         cmdText &= " WHERE  OSTS.SampleType = '" & pSampleType.Replace("'", "''") & "' "
-                        'cmdText &= " WHERE  OSTS.SampleType = '" & pSampleType.ToUpper.Replace("'", "''") & "' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND OST.Available = 1 ORDER BY OST.CustomPosition ASC "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim dbCmd As New SqlClient.SqlCommand() With {.Connection = dbConnection, .CommandText = cmdText}
 
