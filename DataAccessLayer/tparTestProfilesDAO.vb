@@ -161,6 +161,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 02/09/2014 - BA-1869 update Available only when informed
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -189,6 +190,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         cmdText &= " TS_DateTime = '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
+
+                    'AG 02/09/2014 - BA-1869
+                    If Not pTestProfile.tparTestProfiles(0).IsAvailableNull Then
+                        cmdText &= " , Available = " & CInt(IIf(pTestProfile.tparTestProfiles(0).Available, 1, 0))
+                    End If
+                    'AG 02/09/2014 - BA-1869
 
                     cmdText &= " WHERE TestProfileID = " & pTestProfile.tparTestProfiles(0).TestProfileID
 

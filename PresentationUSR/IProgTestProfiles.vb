@@ -790,7 +790,6 @@ Public Class IProgTestProfiles
     ''' <returns>A dataset with structure of table tparTestProfiles</returns>
     ''' <remarks>
     ''' Modified by: BK 24/12/2009 - Calls to ApplicationLog_ForTESTING were replaced by calls to the generic function ShowMessage
-    ''' AG 02/09/2014 - BA-1869 assign Available to his default value TRUE
     ''' </remarks>
     Private Function LoadTestProfileDS() As TestProfilesDS
         Dim testProfileData As New TestProfilesDS
@@ -817,7 +816,7 @@ Public Class IProgTestProfiles
                 testProfileRow.TS_User = bsTestProfilesListView.SelectedItems(0).SubItems(4).Text.ToString
                 testProfileRow.TS_DateTime = CDate(bsTestProfilesListView.SelectedItems(0).SubItems(5).Text)
             End If
-            testProfileRow.Available = True 'AG 02/09/2014 - BA-1869 set Available = TRUE (by default, this value will be reevaluated later)
+
             testProfileData.tparTestProfiles.Rows.Add(testProfileRow)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestProfileDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1407,11 +1406,17 @@ Public Class IProgTestProfiles
                         testProfileTestRow.TestType = auxTestsList.Tables(0).Rows(i).Item("Type").ToString
 
                         'AG 02/09/2014 - BA-1869 - If some component not available then the profile is also not available
-                        If Not CBool(auxTestsList.Tables(0).Rows(i).Item("Available")) AndAlso Not testProfileData Is Nothing AndAlso _
-                            testProfileData.tparTestProfiles.Rows.Count > 0 AndAlso testProfileData.tparTestProfiles(0).Available Then
-                            testProfileData.tparTestProfiles(0).BeginEdit()
-                            testProfileData.tparTestProfiles(0).Available = False
-                            testProfileData.tparTestProfiles(0).EndEdit()
+                        If Not testProfileData Is Nothing AndAlso testProfileData.tparTestProfiles.Rows.Count > 0 Then
+                            If Not auxTestsList.Tables(0).Rows(i).Item("Available") Is DBNull.Value Then
+                                If testProfileData.tparTestProfiles(0).IsAvailableNull Then
+                                    testProfileData.tparTestProfiles(0).Available = CBool(auxTestsList.Tables(0).Rows(i).Item("Available")) 'Initialize value
+                                ElseIf Not CBool(auxTestsList.Tables(0).Rows(i).Item("Available")) AndAlso testProfileData.tparTestProfiles(0).Available Then
+                                    testProfileData.tparTestProfiles(0).Available = False
+                                End If
+
+                            Else
+                                'Do nothing: Add method will use the default 1 value / Modify method wont modify Available column
+                            End If
                         End If
                         'AG 02/09/2014 - BA-1869
 

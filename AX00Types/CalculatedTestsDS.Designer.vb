@@ -321,6 +321,8 @@ Partial Public Class CalculatedTestsDS
 
         Private columnCustomPosition As Global.System.Data.DataColumn
 
+        Private columnAvailable As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -509,6 +511,14 @@ Partial Public Class CalculatedTestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property AvailableColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAvailable
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -564,9 +574,10 @@ Partial Public Class CalculatedTestsDS
                     ByVal PreloadedCalculatedTest As Boolean, _
                     ByVal BiosystemsID As Integer, _
                     ByVal LISValue As String, _
-                    ByVal CustomPosition As Integer) As tparCalculatedTestsRow
+                    ByVal CustomPosition As Integer, _
+                    ByVal Available As Boolean) As tparCalculatedTestsRow
             Dim rowtparCalculatedTestsRow As tparCalculatedTestsRow = CType(Me.NewRow, tparCalculatedTestsRow)
-            Dim columnValuesArray() As Object = New Object() {CalcTestID, CalcTestName, CalcTestLongName, MeasureUnit, UniqueSampleType, SampleType, Decimals, PrintExpTests, FormulaText, TS_User, TS_DateTime, IconPath, EnableStatus, InUse, ActiveRangeType, PreloadedCalculatedTest, BiosystemsID, LISValue, CustomPosition}
+            Dim columnValuesArray() As Object = New Object() {CalcTestID, CalcTestName, CalcTestLongName, MeasureUnit, UniqueSampleType, SampleType, Decimals, PrintExpTests, FormulaText, TS_User, TS_DateTime, IconPath, EnableStatus, InUse, ActiveRangeType, PreloadedCalculatedTest, BiosystemsID, LISValue, CustomPosition, Available}
             rowtparCalculatedTestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparCalculatedTestsRow)
             Return rowtparCalculatedTestsRow
@@ -608,6 +619,7 @@ Partial Public Class CalculatedTestsDS
             Me.columnBiosystemsID = MyBase.Columns("BiosystemsID")
             Me.columnLISValue = MyBase.Columns("LISValue")
             Me.columnCustomPosition = MyBase.Columns("CustomPosition")
+            Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -651,6 +663,8 @@ Partial Public Class CalculatedTestsDS
             MyBase.Columns.Add(Me.columnLISValue)
             Me.columnCustomPosition = New Global.System.Data.DataColumn("CustomPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCustomPosition)
+            Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAvailable)
             Me.columnPreloadedCalculatedTest.DefaultValue = CType(False, Boolean)
             Me.columnLISValue.DefaultValue = CType("", String)
         End Sub
@@ -1086,6 +1100,21 @@ Partial Public Class CalculatedTestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Available() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparCalculatedTests.AvailableColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Available' in table 'tparCalculatedTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparCalculatedTests.AvailableColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsCalcTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparCalculatedTests.CalcTestIDColumn)
         End Function
@@ -1310,6 +1339,18 @@ Partial Public Class CalculatedTestsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetCustomPositionNull()
             Me(Me.tabletparCalculatedTests.CustomPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsAvailableNull() As Boolean
+            Return Me.IsNull(Me.tabletparCalculatedTests.AvailableColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetAvailableNull()
+            Me(Me.tabletparCalculatedTests.AvailableColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

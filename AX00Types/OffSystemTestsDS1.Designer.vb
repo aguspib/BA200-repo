@@ -305,6 +305,8 @@ Partial Public Class OffSystemTestsDS
 
         Private columnCustomPosition As Global.System.Data.DataColumn
 
+        Private columnAvailable As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -429,6 +431,14 @@ Partial Public Class OffSystemTestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property AvailableColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAvailable
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -465,9 +475,9 @@ Partial Public Class OffSystemTestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparOffSystemTestsRow(ByVal OffSystemTestID As Integer, ByVal Name As String, ByVal ShortName As String, ByVal Decimals As Decimal, ByVal Units As String, ByVal ResultType As String, ByVal InUse As Boolean, ByVal ActiveRangeType As String, ByVal TS_User As String, ByVal TS_DateTime As Date, ByVal CustomPosition As Integer) As tparOffSystemTestsRow
+        Public Overloads Function AddtparOffSystemTestsRow(ByVal OffSystemTestID As Integer, ByVal Name As String, ByVal ShortName As String, ByVal Decimals As Decimal, ByVal Units As String, ByVal ResultType As String, ByVal InUse As Boolean, ByVal ActiveRangeType As String, ByVal TS_User As String, ByVal TS_DateTime As Date, ByVal CustomPosition As Integer, ByVal Available As Boolean) As tparOffSystemTestsRow
             Dim rowtparOffSystemTestsRow As tparOffSystemTestsRow = CType(Me.NewRow, tparOffSystemTestsRow)
-            Dim columnValuesArray() As Object = New Object() {OffSystemTestID, Name, ShortName, Decimals, Units, ResultType, InUse, ActiveRangeType, TS_User, TS_DateTime, CustomPosition}
+            Dim columnValuesArray() As Object = New Object() {OffSystemTestID, Name, ShortName, Decimals, Units, ResultType, InUse, ActiveRangeType, TS_User, TS_DateTime, CustomPosition, Available}
             rowtparOffSystemTestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparOffSystemTestsRow)
             Return rowtparOffSystemTestsRow
@@ -501,6 +511,7 @@ Partial Public Class OffSystemTestsDS
             Me.columnTS_User = MyBase.Columns("TS_User")
             Me.columnTS_DateTime = MyBase.Columns("TS_DateTime")
             Me.columnCustomPosition = MyBase.Columns("CustomPosition")
+            Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -528,6 +539,8 @@ Partial Public Class OffSystemTestsDS
             MyBase.Columns.Add(Me.columnTS_DateTime)
             Me.columnCustomPosition = New Global.System.Data.DataColumn("CustomPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCustomPosition)
+            Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAvailable)
             Me.columnName.MaxLength = 16
             Me.columnShortName.MaxLength = 8
             Me.columnUnits.MaxLength = 20
@@ -842,6 +855,21 @@ Partial Public Class OffSystemTestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Available() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparOffSystemTests.AvailableColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Available' in table 'tparOffSystemTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparOffSystemTests.AvailableColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsOffSystemTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparOffSystemTests.OffSystemTestIDColumn)
         End Function
@@ -970,6 +998,18 @@ Partial Public Class OffSystemTestsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetCustomPositionNull()
             Me(Me.tabletparOffSystemTests.CustomPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsAvailableNull() As Boolean
+            Return Me.IsNull(Me.tabletparOffSystemTests.AvailableColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetAvailableNull()
+            Me(Me.tabletparOffSystemTests.AvailableColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

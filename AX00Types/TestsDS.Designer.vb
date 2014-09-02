@@ -414,6 +414,8 @@ Partial Public Class TestsDS
 
         Private columnCustomPosition As Global.System.Data.DataColumn
 
+        Private columnAvailable As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -834,6 +836,14 @@ Partial Public Class TestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property AvailableColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAvailable
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -918,9 +928,10 @@ Partial Public Class TestsDS
                     ByVal ActiveControl As Boolean, _
                     ByVal ControlID As Integer, _
                     ByVal LISValue As String, _
-                    ByVal CustomPosition As Integer) As tparTestsRow
+                    ByVal CustomPosition As Integer, _
+                    ByVal Available As Boolean) As tparTestsRow
             Dim rowtparTestsRow As tparTestsRow = CType(Me.NewRow, tparTestsRow)
-            Dim columnValuesArray() As Object = New Object() {TestID, TestName, ShortName, TestPosition, PreloadedTest, MeasureUnit, AnalysisMode, ReagentsNumber, ReactionType, ReplicatesNumber, DecimalsAllowed, TurbidimetryFlag, AbsorbanceFlag, ReadingMode, FirstReadingCycle, SecondReadingCycle, MainWavelength, ReferenceWavelength, BlankMode, BlankReplicates, KineticBlankLimit, ProzoneRatio, ProzoneTime1, ProzoneTime2, InUse, TestVersionNumber, TestVersionDateTime, SpecialTest, TS_User, TS_DateTime, IconPath, NewTest, ExistBlankResult, DeleteResultAnswer, NumberOfControls, SampleType, EnableStatus, Type, CalibratorID, TestCalibratorID, CalibratorName, FactoryCalib, RejectionCriteria, QCActive, ActiveControl, ControlID, LISValue, CustomPosition}
+            Dim columnValuesArray() As Object = New Object() {TestID, TestName, ShortName, TestPosition, PreloadedTest, MeasureUnit, AnalysisMode, ReagentsNumber, ReactionType, ReplicatesNumber, DecimalsAllowed, TurbidimetryFlag, AbsorbanceFlag, ReadingMode, FirstReadingCycle, SecondReadingCycle, MainWavelength, ReferenceWavelength, BlankMode, BlankReplicates, KineticBlankLimit, ProzoneRatio, ProzoneTime1, ProzoneTime2, InUse, TestVersionNumber, TestVersionDateTime, SpecialTest, TS_User, TS_DateTime, IconPath, NewTest, ExistBlankResult, DeleteResultAnswer, NumberOfControls, SampleType, EnableStatus, Type, CalibratorID, TestCalibratorID, CalibratorName, FactoryCalib, RejectionCriteria, QCActive, ActiveControl, ControlID, LISValue, CustomPosition, Available}
             rowtparTestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparTestsRow)
             Return rowtparTestsRow
@@ -991,6 +1002,7 @@ Partial Public Class TestsDS
             Me.columnControlID = MyBase.Columns("ControlID")
             Me.columnLISValue = MyBase.Columns("LISValue")
             Me.columnCustomPosition = MyBase.Columns("CustomPosition")
+            Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1092,6 +1104,8 @@ Partial Public Class TestsDS
             MyBase.Columns.Add(Me.columnLISValue)
             Me.columnCustomPosition = New Global.System.Data.DataColumn("CustomPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCustomPosition)
+            Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAvailable)
             Me.columnTestName.MaxLength = 16
             Me.columnMeasureUnit.MaxLength = 20
             Me.columnAnalysisMode.MaxLength = 15
@@ -2760,6 +2774,21 @@ Partial Public Class TestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Available() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparTests.AvailableColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Available' in table 'tparTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparTests.AvailableColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparTests.TestIDColumn)
         End Function
@@ -3332,6 +3361,18 @@ Partial Public Class TestsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetCustomPositionNull()
             Me(Me.tabletparTests.CustomPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsAvailableNull() As Boolean
+            Return Me.IsNull(Me.tabletparTests.AvailableColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetAvailableNull()
+            Me(Me.tabletparTests.AvailableColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

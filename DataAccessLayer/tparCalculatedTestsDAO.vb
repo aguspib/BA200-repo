@@ -29,7 +29,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              XB 14/02/2013 - Add PreloadedCalculatedTest field on INSERT operation (Bugs tracking #1134)
         '''              SG 20/02/2013 - Add BiosystemsID field on INSERT operation (Bugs tracking #1134)
         '''              TR 10/05/2013 - Add LISValue field used on the update process.
-        '''              AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
+        '''              AG 01/09/2014 - BA-1869 new column CustomPosition, Available are informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTest As CalculatedTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -42,7 +42,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     cmdText = " INSERT INTO tparCalculatedTests(CalcTestName, CalcTestLongName, MeasureUnit, UniqueSampleType, " & _
                                                               " SampleType, Decimals, PrintExpTests, FormulaText, " & _
-                                                              " ActiveRangeType, TS_User, TS_DateTime, PreloadedCalculatedTest, BiosystemsID, LISValue, CustomPosition ) " & _
+                                                              " ActiveRangeType, TS_User, TS_DateTime, PreloadedCalculatedTest, BiosystemsID, LISValue, CustomPosition, Available ) " & _
                               " VALUES (N'" & pCalcTest.tparCalculatedTests(0).CalcTestName.ToString.Replace("'", "''") & "', " & _
                                       " N'" & pCalcTest.tparCalculatedTests(0).CalcTestLongName.ToString.Replace("'", "''") & "', " & _
                                       " '" & pCalcTest.tparCalculatedTests(0).MeasureUnit.ToString & "', " & _
@@ -102,7 +102,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " N'" & pCalcTest.tparCalculatedTests(0).LISValue & "', "
                     End If
 
-                    cmdText &= pCalcTest.tparCalculatedTests(0).CustomPosition & " ) "
+                    cmdText &= pCalcTest.tparCalculatedTests(0).CustomPosition & " "
+                    If pCalcTest.tparCalculatedTests(0).IsAvailableNull OrElse pCalcTest.tparCalculatedTests(0).Available Then
+                        cmdText &= ", 1 )"
+                    Else
+                        cmdText &= ", 0 )"
+                    End If
                     'AG 01/09/2014 - BA-1869
 
                     'Finally, get the automatically generated ID for the created Calculated Test
@@ -568,6 +573,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              of value of AffectedRecords. Update also field CalcTestName, it was missing in the query
         '''              SA 05/10/2011 - In field FormulaText, replace commas by dots, to store operands with decimals in the string in 
         '''                              the same way they are saved in the Formula table
+        '''              AG 02/09/2014 BA-1869 if informed update also the Available column
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTest As CalculatedTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -620,6 +626,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         cmdText &= " Decimals = " & ReplaceNumericString(pCalcTest.tparCalculatedTests(0).Decimals)
                     End If
+
+                    'AG 02/09/2014 - BA-1869 - Update also Available when informed on dataset
+                    If Not pCalcTest.tparCalculatedTests(0).IsAvailableNull Then
+                        cmdText &= " , Available = " & CInt(IIf(pCalcTest.tparCalculatedTests(0).Available, 1, 0))
+                    End If
+                    'AG 02/09/2014 - BA-1869
 
                     cmdText &= " WHERE CalcTestID = " & pCalcTest.tparCalculatedTests(0).CalcTestID
 
@@ -847,6 +859,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Modified by: DL 13/05/2010
         '''              TR 09/03/2011 - Added the FactoryCalib on the Case STD.
+        '''              AG 02/09/2014 - BA-1869 add the Available column
         ''' </remarks>
         Public Function ReadAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pTypeTest As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -860,21 +873,21 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String
                         Select Case (pTypeTest)
                             Case ""
-                                cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest " & vbCrLf
+                                cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, T.Available " & vbCrLf
                                 cmdText &= " FROM   tparTestSamples TS INNER JOIN tparTests T ON TS.TestID = T.TestID " & vbCrLf
                                 cmdText &= " UNION " & vbCrLf
-                                cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestName AS TestName, 1 " & vbCrLf
+                                cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestName AS TestName, 1, Available " & vbCrLf
                                 cmdText &= " FROM   tparCalculatedTests" & vbCrLf
                                 cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
                                 cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf
                                 cmdText &= " ORDER BY TestTypeCode, SampleTypeCode, TestName"
 
                             Case "STD"
-                                cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, TS.FactoryCalib " & vbCrLf
+                                cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, TS.FactoryCalib, T.Available " & vbCrLf
                                 cmdText &= " FROM   tparTestSamples TS INNER JOIN tparTests T ON TS.TestID = T.TestID " & vbCrLf
 
                             Case "CALC"
-                                cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestLongName AS TestName " & vbCrLf
+                                cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestLongName AS TestName, Available " & vbCrLf
                                 cmdText &= " FROM   tparCalculatedTests" & vbCrLf
                                 cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
                                 cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf

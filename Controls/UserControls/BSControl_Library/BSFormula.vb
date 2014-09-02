@@ -582,6 +582,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <param name="pTestsListDataSet">DataSet containing the Standard Tests to load</param>
         ''' <remarks>
         ''' Created by:  DL 13/05/2010
+        ''' AG 02/09/2014 - BA-1869 get information about components availability
         ''' </remarks>
         Private Sub FillStandardListView(ByVal pTestsListDataSet As DataSet)
             'Try
@@ -614,6 +615,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             'TR 09/03/2011 -Add the FactoryCalib item.
                             .SubItems.Add(myTest("FactoryCalib").ToString().TrimEnd())
                             'TR 09/03/2011 -END.
+                            .SubItems.Add(myTest("Available").ToString().TrimEnd()) 'AG 02/09/2014 - BA-1869
                         End With
                     Next myTest
                 End If
@@ -641,6 +643,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <param name="pTestsListDataSet">DataSet containing the Calculated Tests to load</param>
         ''' <remarks>
         ''' Created by:  DL 13/05/2010
+        ''' AG 02/09/2014 - BA-1869 get information about components availability
         ''' </remarks>
         Private Sub FillCalculatedListView(ByVal pTestsListDataSet As DataSet)
             'Try
@@ -670,6 +673,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             .SubItems.Add(myTest("TestTypeCode").ToString().TrimEnd())
                             .SubItems.Add(myTest("TestCode").ToString().TrimEnd())
                             .SubItems.Add(myTest("SampleTypeCode").ToString().TrimEnd())
+                            .SubItems.Add(myTest("Available").ToString().TrimEnd()) 'AG 02/09/2014 - BA-1869
                         End With
                     Next myTest
                 End If
@@ -705,6 +709,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             myFormulaValuesLisTable.Columns.Add("SampleType", System.Type.GetType("System.String"))
             myFormulaValuesLisTable.Columns.Add("TestType", System.Type.GetType("System.String"))
             myFormulaValuesLisTable.Columns.Add("TestName", System.Type.GetType("System.String"))
+            myFormulaValuesLisTable.Columns.Add("Available", System.Type.GetType("System.String")) 'AG 02/09/2014 - BA-1869
 
             FormulaValuesListAttribute = New DataSet
             FormulaValuesListAttribute.Tables.Add(myFormulaValuesLisTable)
@@ -826,6 +831,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' </summary>
         ''' <remarks>
         ''' Created by:  DL 13/05/2010
+        ''' AG 02/09/2014 - BA-1869 get information about components availability
         ''' </remarks>
         Private Sub EnterSelectedTest()
             'Try
@@ -843,6 +849,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     myRow("TestName") = selectItem.Text & " [" & selectItem.SubItems(3).Text & "]"
                     myRow("SampleType") = selectItem.SubItems(3).Text
                     myRow("TestType") = selectItem.SubItems(1).Text
+                    myRow("Available") = CBool(selectItem.SubItems(5).Text) 'AG 02/09/2014 - BA-1869
 
                     FormulaValuesListAttribute.Tables(0).Rows.Add(myRow)
                     nPosition = FormulaValuesListAttribute.Tables(0).Rows.Count
@@ -861,6 +868,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     myRow("TestName") = selectItem.Text & " [" & selectItem.SubItems(3).Text & "]"
                     myRow("SampleType") = selectItem.SubItems(3).Text
                     myRow("TestType") = selectItem.SubItems(1).Text
+                    myRow("Available") = CBool(selectItem.SubItems(4).Text) 'AG 02/09/2014 - BA-1869
 
                     FormulaValuesListAttribute.Tables(0).Rows.Add(myRow)
                     nPosition = FormulaValuesListAttribute.Tables(0).Rows.Count
@@ -888,6 +896,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' </summary>
         ''' <remarks>
         ''' Created by:  DL 13/05/2010
+        ''' AG 02/09/2014 - BA-1869 get information about components availability
         ''' </remarks>
         Private Sub EnterSelectedCommand(ByVal pCommand As String)
             'Try
@@ -907,6 +916,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             myRow("SampleType") = "NULL"
             myRow("TestType") = "NULL"
             myRow("TestName") = "NULL"
+            myRow("Available") = True 'AG 02/09/2014 - BA-1869
 
             FormulaValuesListAttribute.Tables(0).Rows.Add(myRow)
             nPosition = FormulaValuesListAttribute.Tables(0).Rows.Count
@@ -979,6 +989,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' </summary>
         ''' <remarks>
         ''' Created by:  DL 13/05/2010
+        ''' AG 02/09/2014 - BA-1869 get information about components availability
         ''' </remarks>
         Private Sub EnterSelectedNumber(ByVal pNumber As String)
             'Try
@@ -1007,6 +1018,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 myRow("SampleType") = "NULL"
                 myRow("TestType") = "NULL"
                 myRow("TestName") = "NULL"
+                myRow("Available") = True 'AG 02/09/2014 - BA-1869
 
                 FormulaValuesListAttribute.Tables(0).Rows.Add(myRow)
                 nPosition = FormulaValuesListAttribute.Tables(0).Rows.Count
