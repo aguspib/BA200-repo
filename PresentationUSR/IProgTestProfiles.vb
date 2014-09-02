@@ -650,6 +650,7 @@ Public Class IProgTestProfiles
     '''                              according the value selected in the Test Types ComboBox
     ''' Modified by: DL 26/11/2010 - Added case for OffSystem Tests
     '''              TR 09/03/2011 - Insert FactoryCalib as column in the list of Tests and fill it for each Standard Test
+    ''' AG 01/09/2014 - BA-1869 Insert Available as column in the list of Tests and fill it for each Test (std, ise, calc, off)
     ''' </remarks>
     Private Sub LoadSelectableTestsList(ByVal pSampleType As String, Optional ByVal pTestProfileID As Integer = 0)
         Try
@@ -670,6 +671,7 @@ Public Class IProgTestProfiles
                 auxTable.Columns.Add("SecondaryPos", System.Type.GetType("System.Int32"))
                 auxTable.Columns.Add("Icon")
                 auxTable.Columns.Add("FactoryCalib", System.Type.GetType("System.Boolean"))
+                auxTable.Columns.Add("Available", System.Type.GetType("System.Boolean")) 'AG 01/09/2014 - BA-1869
 
                 'Load the list of selectable Tests
                 Dim auxTableRow As DataRow
@@ -694,6 +696,7 @@ Public Class IProgTestProfiles
                     auxTableRow("SecondaryPos") = originalSelectedTests.tparTestProfileTests(i).TestPosition
                     auxTableRow("Icon") = originalSelectedTests.tparTestProfileTests(i).IconPath
                     auxTableRow("FactoryCalib") = CBool(originalSelectedTests.tparTestProfileTests(i)("FactoryCalib").ToString())
+                    auxTableRow("Available") = CBool(originalSelectedTests.tparTestProfileTests(i)("Available").ToString()) 'AG 01/09/2014 - BA-1869
                     auxTable.Rows.Add(auxTableRow)
                 Next
 
@@ -720,6 +723,7 @@ Public Class IProgTestProfiles
     '''              DL 14/10/2010 - Added column TestType to the DataSet
     '''              DL 26/11/2010 - Added case for OffSystem Tests
     '''              TR 09/03/2011 - Insert FactoryCalib as column in the list of Tests and fill it for each Standard Test
+    ''' AG 01/09/2014 - BA-1869 Insert Available as column in the list of Tests and fill it for each TEST (std, calc, ise, off)
     ''' </remarks>
     Private Sub LoadSelectedTestsList(ByVal pTestProfileID As Integer)
         Try
@@ -740,6 +744,7 @@ Public Class IProgTestProfiles
                 auxTable.Columns.Add("SecondaryPos", System.Type.GetType("System.Int32"))
                 auxTable.Columns.Add("Icon")
                 auxTable.Columns.Add("FactoryCalib", System.Type.GetType("System.Boolean"))
+                auxTable.Columns.Add("Available", System.Type.GetType("System.Boolean")) 'AG 01/09/2014 - BA-1869
 
                 'Load the list of selected Tests
                 Dim auxTableRow As DataRow
@@ -762,6 +767,7 @@ Public Class IProgTestProfiles
                     auxTableRow("SecondaryPos") = originalSelectedTests.tparTestProfileTests(i).TestPosition
                     auxTableRow("Icon") = originalSelectedTests.tparTestProfileTests(i).IconPath
                     auxTableRow("FactoryCalib") = CBool(originalSelectedTests.tparTestProfileTests(i)("FactoryCalib").ToString())
+                    auxTableRow("Available") = CBool(originalSelectedTests.tparTestProfileTests(i)("Available").ToString()) 'AG 01/09/2014 - BA-1869
                     auxTable.Rows.Add(auxTableRow)
                 Next
 
@@ -784,6 +790,7 @@ Public Class IProgTestProfiles
     ''' <returns>A dataset with structure of table tparTestProfiles</returns>
     ''' <remarks>
     ''' Modified by: BK 24/12/2009 - Calls to ApplicationLog_ForTESTING were replaced by calls to the generic function ShowMessage
+    ''' AG 02/09/2014 - BA-1869 assign Available to his default value TRUE
     ''' </remarks>
     Private Function LoadTestProfileDS() As TestProfilesDS
         Dim testProfileData As New TestProfilesDS
@@ -810,6 +817,7 @@ Public Class IProgTestProfiles
                 testProfileRow.TS_User = bsTestProfilesListView.SelectedItems(0).SubItems(4).Text.ToString
                 testProfileRow.TS_DateTime = CDate(bsTestProfilesListView.SelectedItems(0).SubItems(5).Text)
             End If
+            testProfileRow.Available = True 'AG 02/09/2014 - BA-1869 set Available = TRUE (by default, this value will be reevaluated later)
             testProfileData.tparTestProfiles.Rows.Add(testProfileRow)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadTestProfileDS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1372,6 +1380,7 @@ Public Class IProgTestProfiles
     ''' <remarks>
     ''' Modified by: BK 24/12/2009 - Calls to ApplicationLog_ForTESTING were replaced by calls to the generic function ShowMessage
     '''              SG 07/07/2010 - Added ErrorProvider functionality
+    '''              AG 02/09/2014 - BA1869 get also the Available column in order to calculate the profile availability
     ''' </remarks>
     Private Sub SaveChanges()
         Try
@@ -1396,6 +1405,15 @@ Public Class IProgTestProfiles
                         testProfileTestRow.TestProfileID = selectedTestProfileID
                         testProfileTestRow.TestID = CInt(auxTestsList.Tables(0).Rows(i).Item("Code"))
                         testProfileTestRow.TestType = auxTestsList.Tables(0).Rows(i).Item("Type").ToString
+
+                        'AG 02/09/2014 - BA-1869 - If some component not available then the profile is also not available
+                        If Not CBool(auxTestsList.Tables(0).Rows(i).Item("Available")) AndAlso Not testProfileData Is Nothing AndAlso _
+                            testProfileData.tparTestProfiles.Rows.Count > 0 AndAlso testProfileData.tparTestProfiles(0).Available Then
+                            testProfileData.tparTestProfiles(0).BeginEdit()
+                            testProfileData.tparTestProfiles(0).Available = False
+                            testProfileData.tparTestProfiles(0).EndEdit()
+                        End If
+                        'AG 02/09/2014 - BA-1869
 
                         selectedTestsList.tparTestProfileTests.Rows.Add(testProfileTestRow)
                     Next i

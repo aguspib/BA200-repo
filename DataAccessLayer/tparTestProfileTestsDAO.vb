@@ -405,6 +405,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              DL 26/11/2010 - Get also Off-System Tests
         '''              TR 09/03/2011 - Add the FactoryCalib row on the Standard Test
         '''              DL 22/07/2013 - Filter by Sample type. Bug#1181
+        '''              AG 01/09/2014 - BA-1869 Add the Available row
         ''' </remarks>
         Public Function ReadByTestProfileID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pTestProfileID As Integer) As GlobalDataTO
@@ -419,26 +420,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
 
                         'DL 22/07/2013
-                        cmdText &= "    SELECT TPT.TestProfileID, TPT.TestType, TPT.TestID, T.TestName, T.TestPosition, T.PreloadedTest, 1 AS TestTypePosition, TS.FactoryCalib " & vbCrLf
+                        cmdText &= "    SELECT TPT.TestProfileID, TPT.TestType, TPT.TestID, T.TestName, T.TestPosition, T.PreloadedTest, 1 AS TestTypePosition, TS.FactoryCalib, T.Available " & vbCrLf
                         cmdText &= "      FROM tparTestProfileTests TPT INNER JOIN tparTests T ON TPT.TesTID = T.TestID " & vbCrLf
                         cmdText &= "                                INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf
                         cmdText &= "                                INNER JOIN tparTestProfiles TP ON TPT.TestProfileID = TP.TestProfileID and tp.SampleType = ts.SampleType  " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'STD' " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
-                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 2 AS TestTypePosition, 0 as FactoryCalib " & vbCrLf
+                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 2 AS TestTypePosition, 0 as FactoryCalib, CT.Available  " & vbCrLf
                         cmdText &= "     FROM tparTestProfileTests TPT INNER JOIN tparCalculatedTests CT ON TPT.TesTID = CT.CalcTestID " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'CALC' " & vbCrLf
                         cmdText &= "      AND CT.EnableStatus = 1 " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
-                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, IT.ISETestID AS TestID, IT.[Name] AS TestName,  IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 3 AS TestTypePosition, 0 as FactoryCalib " & vbCrLf
+                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, IT.ISETestID AS TestID, IT.[Name] AS TestName,  IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 3 AS TestTypePosition, 0 as FactoryCalib, IT.Available  " & vbCrLf
                         cmdText &= "     FROM tparTestProfileTests TPT INNER JOIN tparISETests IT ON TPT.TesTID = IT.ISETestID " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'ISE' " & vbCrLf
                         cmdText &= "      AND IT.Enabled = 1 " & vbCrLf
                         cmdText &= "UNION " & vbCrLf
-                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 4 AS TestTypePosition, 0 as FactoryCalib " & vbCrLf
+                        cmdText &= "   SELECT TPT.TestProfileID, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 4 AS TestTypePosition, 0 as FactoryCalib, OT.Available  " & vbCrLf
                         cmdText &= "     FROM tparTestProfileTests TPT INNER JOIN tparOffSystemTests OT ON TPT.TesTID = OT.OffSystemTestID " & vbCrLf
                         cmdText &= "    WHERE TPT.TestProfileID = " & pTestProfileID & vbCrLf
                         cmdText &= "      AND TPT.TestType = 'OFFS' " & vbCrLf
@@ -516,6 +517,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              DL 26/11/2010 - Get also Off-System Tests
         '''              TR 09/03/2011 - Add the FactoryCalib row on the Standard Test
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        '''              AG 01/09/2014 - BA-1869 Add the Available row
         ''' </remarks>
         Public Function ReadTestsNotInProfile(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, _
                                               Optional ByVal pTestProfileID As Integer = 0) As GlobalDataTO
@@ -530,7 +532,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
 
                         'Get STANDARD Tests
-                        cmdText = " SELECT 'STD' AS TestType, T.TestID, T.TestName, T.TestPosition, T.PreloadedTest, TS.FactoryCalib " & _
+                        cmdText = " SELECT 'STD' AS TestType, T.TestID, T.TestName, T.TestPosition, T.PreloadedTest, TS.FactoryCalib, T.Available  " & _
                                   " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & _
                                   " WHERE  UPPER(TS.SampleType) = UPPER(N'" & pSampleType & "') "
                         '" WHERE  UPPER(TS.SampleType) = '" & pSampleType.ToUpper & "' "
@@ -543,7 +545,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'Get CALCULATED Tests
                         cmdText &= " UNION " & _
                                    " SELECT 'CALC' AS TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
-                                          " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib " & _
+                                          " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, CT.Available  " & _
                                    " FROM   tparCalculatedTests CT " & _
                                    " WHERE ((CT.UniqueSampleType = 1 AND UPPER(CT.SampleType) = UPPER(N'" & pSampleType & "')) " & _
                                    " OR     (CT.UniqueSampleType = 0 AND CT.CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & _
@@ -560,7 +562,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'Get ISE Tests
                         cmdText &= " UNION " & _
                                    " SELECT 'ISE' AS TestType, IT.ISETestID AS TestID, IT.[Name] AS TestName,  " & _
-                                          " IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib " & _
+                                          " IT.ISETestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, IT.Available  " & _
                                    " FROM   tparISETests IT INNER JOIN tparISETestSamples ITS ON IT.ISETestID = ITS.ISETestID " & _
                                    " WHERE  UPPER(ITS.SampleType) = UPPER(N'" & pSampleType & "') " & _
                                    " AND    IT.Enabled = 1 "
@@ -574,7 +576,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'Get OFF-SYSTEM Tests
                         cmdText &= " UNION " & _
                                    " SELECT 'OFFS' AS TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName,  " & _
-                                          " OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib " & _
+                                          " OT.OffSystemTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, OT.Available  " & _
                                    " FROM   tparOffSystemTests OT INNER JOIN tparOffSystemTestSamples OTS ON OT.OffSystemTestID = OTS.OffSystemTestID " & _
                                    " WHERE  UPPER(OTS.SampleType) = UPPER(N'" & pSampleType & "') " '& _
                         

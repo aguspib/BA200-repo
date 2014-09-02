@@ -22,7 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
-        ''' AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
+        ''' AG 01/09/2014 - BA-1869 new columns CustomPosition, Available are informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         Dim cmdText As String
                         cmdText = " INSERT INTO tparTestProfiles (TestProfileName, SampleType, TestProfilePosition, InUse, " & _
-                                                                " TS_User, TS_DateTime, CustomPosition ) " & _
+                                                                " TS_User, TS_DateTime, CustomPosition, Available ) " & _
                                   " VALUES(N'" & pTestProfile.tparTestProfiles(0).TestProfileName.Replace("'", "''") & "', " & _
                                          "  '" & pTestProfile.tparTestProfiles(0).SampleType.ToString & "', " & _
                                                 testProfilePosition & ", 0, "
@@ -59,7 +59,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         'AG 01/09/2014 - BA-1869
-                        cmdText &= " , " & pTestProfile.tparTestProfiles(0).CustomPosition.ToString & " ) "
+                        cmdText &= " , " & pTestProfile.tparTestProfiles(0).CustomPosition.ToString & " "
+                        If pTestProfile.tparTestProfiles(0).IsAvailableNull OrElse pTestProfile.tparTestProfiles(0).Available Then
+                            cmdText &= " , 1 )"
+                        Else
+                            cmdText &= " , 0 )"
+                        End If
                         'AG 01/09/2014 - BA-1869
 
                         cmdText &= " SELECT SCOPE_IDENTITY() "
