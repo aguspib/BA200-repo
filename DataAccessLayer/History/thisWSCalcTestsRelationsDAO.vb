@@ -60,6 +60,72 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 #End Region
 
+#Region "Other Methods"
+        ''' <summary>
+        ''' Get value of PrintExpTests for all Tests included in the Formula of all selected Calculated Tests. 
+        ''' ** For all Order Tests with a Calculated Test marked as CLOSED (ClosedCalcTest = True), the Experimental Tests will not be printed (PrintExpTests 
+        '''    returned as FALSE)
+        ''' ** For all Order Tests with a Calculated Test that is still open (ClosedCalcTest = False), the Experimental Tests will be printed only when the value 
+        '''    currently assigned for the Calculated Test in Parameters Programming (table tparCalculatedTests) for field PrintExpTests is TRUE 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pHisCalcOrderTestIDs">List of Historic Order Tests of Calculated Tests that have been selected to be printed</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisWSCalcTestRelations containing, for each informed Historic Order Test of a Calculated Test, 
+        '''          the Historic Order Test of all the Tests included in its Formula and the PrintExpTests for them</returns>
+        ''' <remarks>
+        ''' Created by:  SA 02/09/2014 - BA-1898 
+        ''' </remarks>
+        Public Function GetExpTestsToExclude(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisCalcOrderTestIDs As List(Of Integer), _
+                                             ByVal pAnalyzerID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Convert the list of IDs of Historic Order Tests of Calculated Tests in a String with values divided by commas
+                        Dim lstCalcOrderTestsID As String = String.Join(",", pHisCalcOrderTestIDs.ToArray())
+
+                        'Query to get the PrintExpTests of all Tests included in the Formula of all selected Calculated Tests
+                        Dim cmdText As String = " SELECT CTR.AnalyzerID, CTR.WorkSessionID, CTR.HistOrderTestIDCALC, CTR.HistOrderTestID, " & vbCrLf & _
+                                                      " (CASE WHEN C.ClosedCalcTest = 1 THEN 0 " & vbCrLf & _
+                                                      "  ELSE (SELECT PrintExpTests FROM tparCalculatedTests CT WHERE C.CalcTestID = CT.CalcTestID) END) AS PrintExpTests " & vbCrLf & _
+                                                " FROM   thisWSCalcTestsRelations CTR INNER JOIN thisWSOrderTests OT ON CTR.AnalyzerID = OT.AnalyzerID " & vbCrLf & _
+                                                                                                                   " AND CTR.WorkSessionID = OT.WorkSessionID " & vbCrLf & _
+                                                                                                                   " AND CTR.HistOrderTestIDCALC = OT.HistOrderTestID " & vbCrLf & _
+                                                                                    " INNER JOIN thisCalculatedTests C ON OT.HistTestID = C.HistCalcTestID AND OT.TestType = 'CALC' " & vbCrLf & _
+                                                " WHERE  CTR.AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " AND    CTR.HistOrderTestIDCALC IN (" & lstCalcOrderTestsID & ") " & vbCrLf
+
+                        Dim myDataSet As New HisWSCalcTestRelations
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.thisWSCalcTestsRelations)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "thisWSCalcTestsRelationsDAO.GetExpTestsToExclude", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
 #Region "NOT USED"
         ' ''' <summary>
         ' ''' When a result for a Calculated Test is deleted, delete the link between the informed HistOrderTestID and the HistOrderTestID of all Tests 
