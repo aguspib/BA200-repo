@@ -110,7 +110,7 @@ Namespace Biosystems.Ax00.BL
         ''' Get all different Analyzers having Results in Historic Module
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <returns>GlobalDataTO containing an String list with the list of Analyzers</returns>
+        ''' <returns>GlobalDataTO containing a typed DataSet AnalyzersDS with the list of Analyzers</returns>
         ''' <remarks>
         ''' Created by:  SA 01/09/2014 - BA-1910
         ''' </remarks>
@@ -125,19 +125,6 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myHisAnalyzerWSsDAO As New thisAnalyzerWorkSessionsDAO
                         returnedData = myHisAnalyzerWSsDAO.ReadAllDistinctAnalyzers(dbConnection)
-
-                        Dim myAnalyzersList As New List(Of String)
-                        If (Not returnedData.HasError AndAlso Not returnedData.SetDatos Is Nothing) Then
-                            Dim myDs As AnalyzersDS = DirectCast(returnedData.SetDatos, AnalyzersDS)
-
-                            myAnalyzersList = (From a As AnalyzersDS.tcfgAnalyzersRow In myDs.tcfgAnalyzers _
-                                              Select a.AnalyzerID).ToList
-                        End If
-
-                        returnedData.SetDatos = myAnalyzersList
-                        returnedData.HasError = False
-
-                        myAnalyzersList = Nothing
                     End If
                 End If
 
