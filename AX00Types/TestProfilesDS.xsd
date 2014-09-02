@@ -26,6 +26,7 @@
               <xs:element name="IconPath" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="IconPath" msprop:Generator_ColumnVarNameInTable="columnIconPath" msprop:Generator_ColumnPropNameInTable="IconPathColumn" msprop:Generator_UserColumnName="IconPath" type="xs:string" minOccurs="0" />
               <xs:element name="InUse" msprop:Generator_ColumnVarNameInTable="columnInUse" msprop:Generator_ColumnPropNameInRow="InUse" msprop:Generator_ColumnPropNameInTable="InUseColumn" msprop:Generator_UserColumnName="InUse" type="xs:boolean" minOccurs="0" />
               <xs:element name="CustomPosition" msprop:Generator_ColumnVarNameInTable="columnCustomPosition" msprop:Generator_ColumnPropNameInRow="CustomPosition" msprop:Generator_ColumnPropNameInTable="CustomPositionColumn" msprop:Generator_UserColumnName="CustomPosition" type="xs:int" minOccurs="0" />
+              <xs:element name="Available" msprop:Generator_ColumnVarNameInTable="columnAvailable" msprop:Generator_ColumnPropNameInRow="Available" msprop:Generator_ColumnPropNameInTable="AvailableColumn" msprop:Generator_UserColumnName="Available" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

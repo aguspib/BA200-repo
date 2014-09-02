@@ -301,6 +301,8 @@ Partial Public Class TestProfilesDS
 
         Private columnCustomPosition As Global.System.Data.DataColumn
 
+        Private columnAvailable As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -409,6 +411,14 @@ Partial Public Class TestProfilesDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property AvailableColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAvailable
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -445,9 +455,9 @@ Partial Public Class TestProfilesDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparTestProfilesRow(ByVal TestProfileName As String, ByVal SampleType As String, ByVal TestProfilePosition As Integer, ByVal TS_User As String, ByVal TS_DateTime As Date, ByVal IconPath As String, ByVal InUse As Boolean, ByVal CustomPosition As Integer) As tparTestProfilesRow
+        Public Overloads Function AddtparTestProfilesRow(ByVal TestProfileName As String, ByVal SampleType As String, ByVal TestProfilePosition As Integer, ByVal TS_User As String, ByVal TS_DateTime As Date, ByVal IconPath As String, ByVal InUse As Boolean, ByVal CustomPosition As Integer, ByVal Available As Boolean) As tparTestProfilesRow
             Dim rowtparTestProfilesRow As tparTestProfilesRow = CType(Me.NewRow, tparTestProfilesRow)
-            Dim columnValuesArray() As Object = New Object() {Nothing, TestProfileName, SampleType, TestProfilePosition, TS_User, TS_DateTime, IconPath, InUse, CustomPosition}
+            Dim columnValuesArray() As Object = New Object() {Nothing, TestProfileName, SampleType, TestProfilePosition, TS_User, TS_DateTime, IconPath, InUse, CustomPosition, Available}
             rowtparTestProfilesRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparTestProfilesRow)
             Return rowtparTestProfilesRow
@@ -479,6 +489,7 @@ Partial Public Class TestProfilesDS
             Me.columnIconPath = MyBase.Columns("IconPath")
             Me.columnInUse = MyBase.Columns("InUse")
             Me.columnCustomPosition = MyBase.Columns("CustomPosition")
+            Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -502,6 +513,8 @@ Partial Public Class TestProfilesDS
             MyBase.Columns.Add(Me.columnInUse)
             Me.columnCustomPosition = New Global.System.Data.DataColumn("CustomPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCustomPosition)
+            Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAvailable)
             Me.columnTestProfileID.AutoIncrement = True
         End Sub
 
@@ -785,6 +798,21 @@ Partial Public Class TestProfilesDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Available() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparTestProfiles.AvailableColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Available' in table 'tparTestProfiles' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparTestProfiles.AvailableColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsTestProfileIDNull() As Boolean
             Return Me.IsNull(Me.tabletparTestProfiles.TestProfileIDColumn)
         End Function
@@ -889,6 +917,18 @@ Partial Public Class TestProfilesDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetCustomPositionNull()
             Me(Me.tabletparTestProfiles.CustomPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsAvailableNull() As Boolean
+            Return Me.IsNull(Me.tabletparTestProfiles.AvailableColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetAvailableNull()
+            Me(Me.tabletparTestProfiles.AvailableColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

@@ -362,7 +362,7 @@ Public Class IWSTestSelectionAuxScreen
             Dim myGlobalDataTO As GlobalDataTO
             Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
 
-            Dim customizedTestSelection As Boolean = False 'AG 01/09/2014 - BA-1869
+            Dim customizedTestSelection As Boolean = False 'AG 01/09/2014 - BA-1869 set TRUE to final code / leave FALSE during develop
             'Get the list of available Standard Tests according the selected SampleClass and SampleType
             Dim myTestsDelegate As New TestsDelegate()
             If (SampleClassAttribute = "BLANK") Then
