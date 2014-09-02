@@ -18,15 +18,40 @@ Public Class ISortingTestsAux
     Private ChangesMade As Boolean = False
 #End Region
 
+#Region "Attributes"
+    Private openModeAttribute As String = String.Empty
+    Private ScreenIDAttribute As String = String.Empty
+#End Region
+    'AG 02/09/2014 - BA-1869
+
 #Region "Constructor"
     'Public Sub New(ByRef myMDI As Form)
     Public Sub New()
-        'RH 12/04/2012 myMDI not needed.
-        'MyBase.New()
-        'SetParentMDI(myMDI)
         InitializeComponent()
     End Sub
 #End Region
+
+    'AG 02/09/2014 - BA-1869
+#Region "Screen properties"
+    Public Property openMode() As String
+        Get
+            Return openModeAttribute
+        End Get
+        Set(value As String)
+            openModeAttribute = value
+        End Set
+    End Property
+
+    Public Property screenID() As String
+        Get
+            Return ScreenIDAttribute
+        End Get
+        Set(value As String)
+            ScreenIDAttribute = value
+        End Set
+    End Property
+#End Region
+    'AG 02/09/2014 - BA-1869
 
 #Region "Methods"
     ''' <summary>
@@ -106,32 +131,73 @@ Public Class ISortingTestsAux
         End Try
     End Sub
 
+
     ''' <summary>
     ''' Get all Tests (all Types) sorted in the last saved mode
     ''' </summary>
     ''' <returns>Typed DataSet ReportsTestsSortingDS containing the list of Tests in the last saved test sorting</returns>
     ''' <remarks>
     ''' Created by:  TR
+    ''' AG 02/09/2014 - BA-1869 get data for SORT test report or test selection (in this case get only the desidred the test type or profile)
     ''' </remarks>
-    Public Function GetSortedTestList() As ReportsTestsSortingDS
+    Private Function GetSortedTestList() As ReportsTestsSortingDS
         Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
         Try
             Dim myGlobalDataTO As GlobalDataTO
-            Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
 
-            myGlobalDataTO = myReportsTestsSortingDelegate.GetSortedTestList(Nothing)
-            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                myReportsTestsSortingDS = DirectCast(myGlobalDataTO.SetDatos, ReportsTestsSortingDS)
+            'AG 02/09/2014 - BA-1869
+            'Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
+            'myGlobalDataTO = myReportsTestsSortingDelegate.GetSortedTestList(Nothing)
+            If openMode = String.Empty Then
+                'Test order for reports
+                Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
+                myGlobalDataTO = myReportsTestsSortingDelegate.GetSortedTestList(Nothing)
             Else
-                'Error getting the current sorting of Tests for Reports
-                ShowMessage(Name & ".GetSortedTestList ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
+                'Order for test selection
+                Select Case ScreenIDAttribute
+                    Case "STD"
+                        Dim myDelegate As New TestsDelegate
+                        myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
+                    Case "CALC"
+                        Dim myDelegate As New CalculatedTestsDelegate
+                        myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
+
+                    Case "ISE"
+                        Dim myDelegate As New ISETestsDelegate
+                        myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
+
+                    Case "OFFS"
+                        Dim myDelegate As New OffSystemTestsDelegate
+                        myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
+
+                    Case "Profile"
+                        Dim myDelegate As New TestProfilesDelegate
+                        myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
+
+                    Case Else
+                        'List will appear empty
+                End Select
             End If
+            'AG 02/09/2014 - BA-1869
+
+            If Not myGlobalDataTO Is Nothing Then
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myReportsTestsSortingDS = DirectCast(myGlobalDataTO.SetDatos, ReportsTestsSortingDS)
+                Else
+                    'Error getting the current sorting of Tests for Reports
+                    ShowMessage(Name & ".GetSortedTestList ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
+                End If
+
+            End If
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetSortedTestList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetSortedTestList ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myReportsTestsSortingDS
     End Function
+
+
 
     ''' <summary>
     ''' Load an ImageList with all icons used for the different Test Types
@@ -242,12 +308,25 @@ Public Class ISortingTestsAux
     ''' <remarks>
     ''' Created by:  TR
     ''' Modified by: SA 04/01/2012 - Added code needed to center the screen 
+    ''' AG 02/09/2014 - BA-1869 (when open in TEST SELECTION mode has no parent, use the mdi) for Size and Location
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
-            'Center the screen
-            Dim mySize As Size = Me.Parent.Size
-            Dim myLocation As Point = Me.Parent.Location
+
+            'AG 02/09/2014 - BA-1869: Center the screen
+            'Dim mySize As Size = Me.Parent.Size
+            'Dim myLocation As Point = Me.Parent.Location
+            Dim mySize As Size
+            Dim myLocation As Point
+
+            If openMode = String.Empty Then 'Test sort for REPORTS
+                mySize = Me.Parent.Size
+                myLocation = Me.Parent.Location
+            Else 'Test selection sort (popup,  use the MDI)
+                mySize = IAx00MainMDI.Size
+                myLocation = IAx00MainMDI.Location
+            End If
+            'AG 02/09/2014 - BA-1869
 
             NewScreenLocation = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             Me.Location = NewScreenLocation
@@ -499,13 +578,27 @@ Public Class ISortingTestsAux
 
     ''' <summary>
     ''' Not allow moving the form and mantain the center location in center parent
+    ''' AG 02/09/2014 - BA-1869 (when open in TEST SELECTION mode has no parent, use the mdi) for Size and Location
     ''' </summary>
     Protected Overrides Sub WndProc(ByRef m As Message)
         Try
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
-                Dim myLocation As Point = Me.Parent.Location
-                Dim mySize As Size = Me.Parent.Size
+
+                'AG 02/09/2014 - ba-1869
+                'Dim myLocation As Point = Me.Parent.Location
+                'Dim mySize As Size = Me.Parent.Size
+
+                Dim myLocation As Point
+                Dim mySize As Size
+                If openMode = String.Empty Then 'Test sort for REPORTS
+                    mySize = Me.Parent.Size
+                    myLocation = Me.Parent.Location
+                Else 'Test selection sort (popup,  use the MDI)
+                    mySize = IAx00MainMDI.Size
+                    myLocation = IAx00MainMDI.Location
+                End If
+                'AG 02/09/2014 - BA-1869
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60

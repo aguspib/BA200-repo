@@ -46,6 +46,7 @@
               <xs:element name="TS_User" msprop:Generator_ColumnVarNameInTable="columnTS_User" msprop:Generator_ColumnPropNameInRow="TS_User" msprop:Generator_ColumnPropNameInTable="TS_UserColumn" msprop:Generator_UserColumnName="TS_User" type="xs:string" minOccurs="0" />
               <xs:element name="TS_DateTime" msprop:Generator_ColumnVarNameInTable="columnTS_DateTime" msprop:Generator_ColumnPropNameInRow="TS_DateTime" msprop:Generator_ColumnPropNameInTable="TS_DateTimeColumn" msprop:Generator_UserColumnName="TS_DateTime" type="xs:dateTime" minOccurs="0" />
               <xs:element name="CustomPosition" msprop:Generator_ColumnVarNameInTable="columnCustomPosition" msprop:Generator_ColumnPropNameInRow="CustomPosition" msprop:Generator_ColumnPropNameInTable="CustomPositionColumn" msprop:Generator_UserColumnName="CustomPosition" type="xs:int" minOccurs="0" />
+              <xs:element name="Available" msprop:Generator_ColumnVarNameInTable="columnAvailable" msprop:Generator_ColumnPropNameInRow="Available" msprop:Generator_ColumnPropNameInTable="AvailableColumn" msprop:Generator_UserColumnName="Available" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

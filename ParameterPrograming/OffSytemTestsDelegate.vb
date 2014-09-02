@@ -748,6 +748,48 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
+
+        ''' <summary>
+        ''' Gets all OFFS tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparOffSystemTestsDAO
+                        resultData = myDAO.GetCustomizedSortedTestSelectionList(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OffSystemTestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
 #End Region
 
 #Region "Private Methods"

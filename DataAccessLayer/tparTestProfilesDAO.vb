@@ -161,6 +161,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 02/09/2014 - BA-1869 update Available only when informed
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -189,6 +190,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         cmdText &= " TS_DateTime = '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
+
+                    'AG 02/09/2014 - BA-1869
+                    If Not pTestProfile.tparTestProfiles(0).IsAvailableNull Then
+                        cmdText &= " , Available = " & CInt(IIf(pTestProfile.tparTestProfiles(0).Available, 1, 0))
+                    End If
+                    'AG 02/09/2014 - BA-1869
 
                     cmdText &= " WHERE TestProfileID = " & pTestProfile.tparTestProfiles(0).TestProfileID
 
@@ -725,6 +732,58 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Gets all profile tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT 'profile' AS TestType, TestProfileID AS TestID, CustomPosition AS TestPosition, TestProfileName AS TestName, " & vbCrLf & _
+                                                " 0 AS PreloadedTest, Available FROM tparTestProfiles ORDER BY CustomPosition ASC "
+
+                        Dim myDataSet As New ReportsTestsSortingDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.tcfgReportsTestsSorting)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparTestProfilesDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
         End Function
 
 #End Region
