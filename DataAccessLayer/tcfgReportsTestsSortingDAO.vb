@@ -96,7 +96,7 @@ Public Class tcfgReportsTestsSortingDAO
                                             " WHERE  RTS.TestType = 'STD' " & vbCrLf & _
                                             " UNION " & vbCrLf & _
                                             " SELECT RTS.TestType, RTS.TestID, RTS.TestPosition, CT.CalcTestName AS TestName, " & vbCrLf & _
-                                                   " CT.PreloadedCalculatedTest AS PreloadedTes " & vbCrLf & _
+                                                   " CT.PreloadedCalculatedTest AS PreloadedTest " & vbCrLf & _
                                             " FROM   tcfgReportsTestsSorting RTS INNER JOIN tparCalculatedTests CT ON RTS.TestID = CT.CalcTestID " & vbCrLf & _
                                             " WHERE  RTS.TestType = 'CALC' " & vbCrLf & _
                                             " UNION " & vbCrLf & _
