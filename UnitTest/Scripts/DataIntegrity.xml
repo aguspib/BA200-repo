@@ -2620,6 +2620,118 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column CustomPosition in tparTests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'CustomPosition') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column CustomPosition in tparCalculatedTests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'CustomPosition') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column CustomPosition in tparISETests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'CustomPosition') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column CustomPosition in tparOffSystemTests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'CustomPosition') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column CustomPosition in tparTestProfiles table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'CustomPosition') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column Available in tparTests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'Available') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column Available in tparCalculatedTests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'Available') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column Available in tparISETests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'Available') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column Available in tparOffSystemTests table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'Available') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column Available in tparTestProfiles table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'Available') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field on tparControls table</Label>
