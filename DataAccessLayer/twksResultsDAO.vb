@@ -1682,8 +1682,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM vwksCompleteResults WHERE AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                " AND WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
+                        Dim cmdText As String = " SELECT * FROM vwksCompleteResults R "
+                        cmdText &= " INNER JOIN tcfgReportsTestsSorting TS ON TS.TestType = R.TestType AND TS.TestID = R.TestID "
+                        cmdText &= " WHERE AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                   " AND WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
+                        cmdText &= " ORDER BY TS.TestPosition "
+
 
                         'AG 17/02/2014 - #1505
                         If pOnlineExportClause <> "" Then
@@ -1691,7 +1695,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
                         'AG 17/02/2014 - #1505
 
-                        cmdText &= " ORDER BY ResultDateTime DESC "
+                        'cmdText &= " ORDER BY ResultDateTime DESC "
 
                         Dim lastResultsDS As New ResultsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
