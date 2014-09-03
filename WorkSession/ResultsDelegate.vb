@@ -4388,7 +4388,7 @@ Namespace Biosystems.Ax00.BL
                         Dim myDataSet As New WSRequiredElementsDS
                         Dim myWSReqElemDelegate As New WSRequiredElementsDelegate
 
-                        myGlobalDataTO = myWSReqElemDelegate.GetLISPatientElements(Nothing, myWorkSessionID)
+                        myGlobalDataTO = myWSReqElemDelegate.GetLISPatientElements(dbConnection, myWorkSessionID)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             myDataSet = DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS)
                         End If
