@@ -412,6 +412,10 @@ Partial Public Class TestsDS
 
         Private columnLISValue As Global.System.Data.DataColumn
 
+        Private columnCustomPosition As Global.System.Data.DataColumn
+
+        Private columnAvailable As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -824,6 +828,22 @@ Partial Public Class TestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property CustomPositionColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnCustomPosition
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property AvailableColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAvailable
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -907,9 +927,11 @@ Partial Public Class TestsDS
                     ByVal QCActive As Boolean, _
                     ByVal ActiveControl As Boolean, _
                     ByVal ControlID As Integer, _
-                    ByVal LISValue As String) As tparTestsRow
+                    ByVal LISValue As String, _
+                    ByVal CustomPosition As Integer, _
+                    ByVal Available As Boolean) As tparTestsRow
             Dim rowtparTestsRow As tparTestsRow = CType(Me.NewRow, tparTestsRow)
-            Dim columnValuesArray() As Object = New Object() {TestID, TestName, ShortName, TestPosition, PreloadedTest, MeasureUnit, AnalysisMode, ReagentsNumber, ReactionType, ReplicatesNumber, DecimalsAllowed, TurbidimetryFlag, AbsorbanceFlag, ReadingMode, FirstReadingCycle, SecondReadingCycle, MainWavelength, ReferenceWavelength, BlankMode, BlankReplicates, KineticBlankLimit, ProzoneRatio, ProzoneTime1, ProzoneTime2, InUse, TestVersionNumber, TestVersionDateTime, SpecialTest, TS_User, TS_DateTime, IconPath, NewTest, ExistBlankResult, DeleteResultAnswer, NumberOfControls, SampleType, EnableStatus, Type, CalibratorID, TestCalibratorID, CalibratorName, FactoryCalib, RejectionCriteria, QCActive, ActiveControl, ControlID, LISValue}
+            Dim columnValuesArray() As Object = New Object() {TestID, TestName, ShortName, TestPosition, PreloadedTest, MeasureUnit, AnalysisMode, ReagentsNumber, ReactionType, ReplicatesNumber, DecimalsAllowed, TurbidimetryFlag, AbsorbanceFlag, ReadingMode, FirstReadingCycle, SecondReadingCycle, MainWavelength, ReferenceWavelength, BlankMode, BlankReplicates, KineticBlankLimit, ProzoneRatio, ProzoneTime1, ProzoneTime2, InUse, TestVersionNumber, TestVersionDateTime, SpecialTest, TS_User, TS_DateTime, IconPath, NewTest, ExistBlankResult, DeleteResultAnswer, NumberOfControls, SampleType, EnableStatus, Type, CalibratorID, TestCalibratorID, CalibratorName, FactoryCalib, RejectionCriteria, QCActive, ActiveControl, ControlID, LISValue, CustomPosition, Available}
             rowtparTestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparTestsRow)
             Return rowtparTestsRow
@@ -979,6 +1001,8 @@ Partial Public Class TestsDS
             Me.columnActiveControl = MyBase.Columns("ActiveControl")
             Me.columnControlID = MyBase.Columns("ControlID")
             Me.columnLISValue = MyBase.Columns("LISValue")
+            Me.columnCustomPosition = MyBase.Columns("CustomPosition")
+            Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1078,6 +1102,10 @@ Partial Public Class TestsDS
             MyBase.Columns.Add(Me.columnControlID)
             Me.columnLISValue = New Global.System.Data.DataColumn("LISValue", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnLISValue)
+            Me.columnCustomPosition = New Global.System.Data.DataColumn("CustomPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnCustomPosition)
+            Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAvailable)
             Me.columnTestName.MaxLength = 16
             Me.columnMeasureUnit.MaxLength = 20
             Me.columnAnalysisMode.MaxLength = 15
@@ -2731,6 +2759,36 @@ Partial Public Class TestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property CustomPosition() As Integer
+            Get
+                Try
+                    Return CType(Me(Me.tabletparTests.CustomPositionColumn), Integer)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'CustomPosition' in table 'tparTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Integer)
+                Me(Me.tabletparTests.CustomPositionColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Available() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparTests.AvailableColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Available' in table 'tparTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparTests.AvailableColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparTests.TestIDColumn)
         End Function
@@ -3292,6 +3350,30 @@ Partial Public Class TestsDS
         Public Sub SetLISValueNull()
             Me(Me.tabletparTests.LISValueColumn) = Global.System.Convert.DBNull
         End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsCustomPositionNull() As Boolean
+            Return Me.IsNull(Me.tabletparTests.CustomPositionColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetCustomPositionNull()
+            Me(Me.tabletparTests.CustomPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsAvailableNull() As Boolean
+            Return Me.IsNull(Me.tabletparTests.AvailableColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetAvailableNull()
+            Me(Me.tabletparTests.AvailableColumn) = Global.System.Convert.DBNull
+        End Sub
     End Class
 
     '''<summary>
@@ -3320,7 +3402,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.AnalysisModeColumn) = Value
+                Me(Me.tabletestCalculations.AnalysisModeColumn) = value
             End Set
         End Property
 
@@ -3335,7 +3417,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.ReagentsNumberColumn) = Value
+                Me(Me.tabletestCalculations.ReagentsNumberColumn) = value
             End Set
         End Property
 
@@ -3350,7 +3432,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.ReactionTypeColumn) = Value
+                Me(Me.tabletestCalculations.ReactionTypeColumn) = value
             End Set
         End Property
 
@@ -3365,7 +3447,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Boolean)
-                Me(Me.tabletestCalculations.AbsorbanceFlagColumn) = Value
+                Me(Me.tabletestCalculations.AbsorbanceFlagColumn) = value
             End Set
         End Property
 
@@ -3380,7 +3462,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.ReadingModeColumn) = Value
+                Me(Me.tabletestCalculations.ReadingModeColumn) = value
             End Set
         End Property
 
@@ -3395,7 +3477,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.FirstReadingCycleColumn) = Value
+                Me(Me.tabletestCalculations.FirstReadingCycleColumn) = value
             End Set
         End Property
 
@@ -3410,7 +3492,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.SecondReadingCycleColumn) = Value
+                Me(Me.tabletestCalculations.SecondReadingCycleColumn) = value
             End Set
         End Property
 
@@ -3425,7 +3507,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.MainWavelengthColumn) = Value
+                Me(Me.tabletestCalculations.MainWavelengthColumn) = value
             End Set
         End Property
 
@@ -3441,7 +3523,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.ReferenceWavelengthColumn) = Value
+                Me(Me.tabletestCalculations.ReferenceWavelengthColumn) = value
             End Set
         End Property
 
@@ -3456,7 +3538,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.BlankModeColumn) = Value
+                Me(Me.tabletestCalculations.BlankModeColumn) = value
             End Set
         End Property
 
@@ -3471,7 +3553,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.KineticBlankLimitColumn) = Value
+                Me(Me.tabletestCalculations.KineticBlankLimitColumn) = value
             End Set
         End Property
 
@@ -3486,7 +3568,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.ProzoneRatioColumn) = Value
+                Me(Me.tabletestCalculations.ProzoneRatioColumn) = value
             End Set
         End Property
 
@@ -3501,7 +3583,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.ProzoneTime1Column) = Value
+                Me(Me.tabletestCalculations.ProzoneTime1Column) = value
             End Set
         End Property
 
@@ -3516,7 +3598,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.ProzoneTime2Column) = Value
+                Me(Me.tabletestCalculations.ProzoneTime2Column) = value
             End Set
         End Property
 
@@ -3531,7 +3613,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.TestVersionNumberColumn) = Value
+                Me(Me.tabletestCalculations.TestVersionNumberColumn) = value
             End Set
         End Property
 
@@ -3546,7 +3628,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.ReagentVolumeColumn) = Value
+                Me(Me.tabletestCalculations.ReagentVolumeColumn) = value
             End Set
         End Property
 
@@ -3562,7 +3644,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.IncPostReagentVolumeColumn) = Value
+                Me(Me.tabletestCalculations.IncPostReagentVolumeColumn) = value
             End Set
         End Property
 
@@ -3578,7 +3660,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.RedPostReagentVolumeColumn) = Value
+                Me(Me.tabletestCalculations.RedPostReagentVolumeColumn) = value
             End Set
         End Property
 
@@ -3593,7 +3675,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.SampleVolumeColumn) = Value
+                Me(Me.tabletestCalculations.SampleVolumeColumn) = value
             End Set
         End Property
 
@@ -3609,7 +3691,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.AbsorbanceDilutionFactorColumn) = Value
+                Me(Me.tabletestCalculations.AbsorbanceDilutionFactorColumn) = value
             End Set
         End Property
 
@@ -3624,7 +3706,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Boolean)
-                Me(Me.tabletestCalculations.PredilutionUseFlagColumn) = Value
+                Me(Me.tabletestCalculations.PredilutionUseFlagColumn) = value
             End Set
         End Property
 
@@ -3639,7 +3721,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.PredilutionFactorColumn) = Value
+                Me(Me.tabletestCalculations.PredilutionFactorColumn) = value
             End Set
         End Property
 
@@ -3655,7 +3737,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.BlankAbsorbanceLimitColumn) = Value
+                Me(Me.tabletestCalculations.BlankAbsorbanceLimitColumn) = value
             End Set
         End Property
 
@@ -3671,7 +3753,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.IncPostdilutionFactorColumn) = Value
+                Me(Me.tabletestCalculations.IncPostdilutionFactorColumn) = value
             End Set
         End Property
 
@@ -3687,7 +3769,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.IncPostSampleVolumeColumn) = Value
+                Me(Me.tabletestCalculations.IncPostSampleVolumeColumn) = value
             End Set
         End Property
 
@@ -3703,7 +3785,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.RedPostdilutionFactorColumn) = Value
+                Me(Me.tabletestCalculations.RedPostdilutionFactorColumn) = value
             End Set
         End Property
 
@@ -3719,7 +3801,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.RedPostSampleVolumeColumn) = Value
+                Me(Me.tabletestCalculations.RedPostSampleVolumeColumn) = value
             End Set
         End Property
 
@@ -3734,7 +3816,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.LinearityLimitColumn) = Value
+                Me(Me.tabletestCalculations.LinearityLimitColumn) = value
             End Set
         End Property
 
@@ -3749,7 +3831,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.DetectionLimitColumn) = Value
+                Me(Me.tabletestCalculations.DetectionLimitColumn) = value
             End Set
         End Property
 
@@ -3765,7 +3847,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.SubstrateDepletionValueColumn) = Value
+                Me(Me.tabletestCalculations.SubstrateDepletionValueColumn) = value
             End Set
         End Property
 
@@ -3780,7 +3862,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.SlopeFactorAColumn) = Value
+                Me(Me.tabletestCalculations.SlopeFactorAColumn) = value
             End Set
         End Property
 
@@ -3795,7 +3877,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.SlopeFactorBColumn) = Value
+                Me(Me.tabletestCalculations.SlopeFactorBColumn) = value
             End Set
         End Property
 
@@ -3810,7 +3892,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.FactorUpperLimitColumn) = Value
+                Me(Me.tabletestCalculations.FactorUpperLimitColumn) = value
             End Set
         End Property
 
@@ -3825,7 +3907,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.FactorLowerLimitColumn) = Value
+                Me(Me.tabletestCalculations.FactorLowerLimitColumn) = value
             End Set
         End Property
 
@@ -3840,7 +3922,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletestCalculations.ReagentNumberColumn) = Value
+                Me(Me.tabletestCalculations.ReagentNumberColumn) = value
             End Set
         End Property
 
@@ -3855,7 +3937,7 @@ Partial Public Class TestsDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.ActiveRangeTypeColumn) = Value
+                Me(Me.tabletestCalculations.ActiveRangeTypeColumn) = value
             End Set
         End Property
 
@@ -3870,7 +3952,7 @@ Partial Public Class TestsDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.CalibratorTypeColumn) = Value
+                Me(Me.tabletestCalculations.CalibratorTypeColumn) = value
             End Set
         End Property
 
@@ -3885,7 +3967,7 @@ Partial Public Class TestsDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletestCalculations.CalibrationFactorColumn) = Value
+                Me(Me.tabletestCalculations.CalibrationFactorColumn) = value
             End Set
         End Property
 
@@ -3900,7 +3982,7 @@ Partial Public Class TestsDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletestCalculations.SampleTypeAlternativeColumn) = Value
+                Me(Me.tabletestCalculations.SampleTypeAlternativeColumn) = value
             End Set
         End Property
 

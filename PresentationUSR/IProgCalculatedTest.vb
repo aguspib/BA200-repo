@@ -1750,6 +1750,7 @@ Public Class IProgCalculatedTest
     '''              TR 04/09/2012 - Set to false value of global variable UpdateHistoryRequired once the saving has been executed
     '''              SA 17/09/2012 - Changed call to function Modify in CalculatedTestsDelegate: global variable CloseHistoryRequired 
     '''                              and the corresponding optional parameter have been deleted because they are not needed
+    '''              AG 02/09/2014 - BA-1869 calculated test available TRUE when all his components are available, else FALSE
     ''' </remarks>
     Private Function SaveCalculatedTest() As Boolean
         Dim savingExecuted As Boolean = True
@@ -1778,6 +1779,22 @@ Public Class IProgCalculatedTest
                         calTestFormulaRow.TestType = auxFormula.Tables(0).Rows(i).Item("TestType").ToString
                         calTestFormulaRow.SampleType = auxFormula.Tables(0).Rows(i).Item("SampleType").ToString
                         calTestFormulaRow.TestName = auxFormula.Tables(0).Rows(i).Item("TestName").ToString
+
+                        'AG 02/09/2014 - BA-1869 - If some component not available then the calculated test is also not available
+                        If Not calTestData Is Nothing AndAlso calTestData.tparCalculatedTests.Rows.Count > 0 Then
+                            If Not auxFormula.Tables(0).Rows(i).Item("Available") Is DBNull.Value Then
+                                If calTestData.tparCalculatedTests(0).IsAvailableNull Then
+                                    calTestData.tparCalculatedTests(0).Available = CBool(auxFormula.Tables(0).Rows(i).Item("Available")) 'Initialize value
+                                ElseIf Not CBool(auxFormula.Tables(0).Rows(i).Item("Available")) AndAlso calTestData.tparCalculatedTests(0).Available Then
+                                    calTestData.tparCalculatedTests(0).Available = False
+                                End If
+
+                            Else
+                                'Do nothing: Add method will use the default 1 value / Modify method wont modify Available column
+                            End If
+                        End If
+                        'AG 02/09/2014 - BA-1869
+
                     End If
                     selectedFormulaValue.tparFormulas.Rows.Add(calTestFormulaRow)
                 Next i

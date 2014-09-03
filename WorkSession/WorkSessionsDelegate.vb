@@ -4162,6 +4162,7 @@ Namespace Biosystems.Ax00.BL
         '''                              is saved although New check has not been selected
         '''              SA 01/02/2012 - Added code to delete from DB all Blank Orders that have been removed from the active WorkSession
         '''              SA 29/08/2012 - When the result of a previous Blank is used inform also the field for the previous WorkSession Identifier
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Private Function PrepareBlankOrders(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSResultDS As WorkSessionResultDS, _
                                             Optional ByVal pWorkSessionID As String = "", Optional ByVal pAnalyzerID As String = "") As GlobalDataTO
@@ -4240,6 +4241,9 @@ Namespace Biosystems.Ax00.BL
 
                                     myOrderTestDR.TS_User = loggedUser
                                     myOrderTestDR.TS_DateTime = DateTime.Now
+                                    ' XB 27/08/2014 - BT #1868
+                                    myOrderTestDR.Selected = blankOrderTest.Selected
+
                                     myOrderTestDS.twksOrderTests.AddtwksOrderTestsRow(myOrderTestDR)
                                 Next
 
@@ -4286,6 +4290,8 @@ Namespace Biosystems.Ax00.BL
 
                                     myOrderTestDR.TS_User = loggedUser
                                     myOrderTestDR.TS_DateTime = DateTime.Now
+                                    ' XB 27/08/2014 - BT #1868
+                                    myOrderTestDR.Selected = blankOrderTest.Selected
 
                                     myOrderTestDS.twksOrderTests.AddtwksOrderTestsRow(myOrderTestDR)
                                 Next
@@ -4405,6 +4411,7 @@ Namespace Biosystems.Ax00.BL
         '''                              RequestedSampleTypes are different) have to be also obtained and processed to manage the special case 
         '''                              of adding to an InProcess WS some requests for the same Test with a different SampleType using the
         '''                              same Calibrator
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Private Function PrepareCalibratorOrders(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSResultDS As WorkSessionResultDS, _
                                                  Optional ByVal pWorkSessionID As String = "", _
@@ -4489,6 +4496,9 @@ Namespace Biosystems.Ax00.BL
 
                                     myOrderTestDR.TS_User = loggedUser
                                     myOrderTestDR.TS_DateTime = DateTime.Now
+                                    ' XB 27/08/2014 - BT #1868
+                                    myOrderTestDR.Selected = calibratorOrderTest.Selected
+
                                     myOrderTestDS.twksOrderTests.AddtwksOrderTestsRow(myOrderTestDR)
 
                                     'Verify if the Calibrator corresponds to an Alternative used by another Sample Types
@@ -4524,6 +4534,9 @@ Namespace Biosystems.Ax00.BL
                                                 myOrderTestDR.AnalyzerID = pAnalyzerID
                                                 myOrderTestDR.TS_User = loggedUser
                                                 myOrderTestDR.TS_DateTime = DateTime.Now
+                                                ' XB 27/08/2014 - BT #1868
+                                                myOrderTestDR.Selected = False
+
                                                 myOrderTestDS.twksOrderTests.AddtwksOrderTestsRow(myOrderTestDR)
                                             End If
                                         Next
@@ -4574,6 +4587,9 @@ Namespace Biosystems.Ax00.BL
 
                                     myOrderTestDR.TS_User = loggedUser
                                     myOrderTestDR.TS_DateTime = DateTime.Now
+                                    ' XB 27/08/2014 - BT #1868
+                                    myOrderTestDR.Selected = calibratorOrderTest.Selected
+
                                     myOrderTestDS.twksOrderTests.AddtwksOrderTestsRow(myOrderTestDR)
                                 Next
 
@@ -4645,6 +4661,9 @@ Namespace Biosystems.Ax00.BL
                                                             myOrderTestDR.AnalyzerID = pAnalyzerID
                                                             myOrderTestDR.TS_User = loggedUser
                                                             myOrderTestDR.TS_DateTime = DateTime.Now
+                                                            ' XB 27/08/2014 - BT #1868
+                                                            myOrderTestDR.Selected = calibratorOrderTest.Selected
+
                                                             myOrderTestAlternativDS.twksOrderTests.AddtwksOrderTestsRow(myOrderTestDR)
                                                         Next
 
@@ -4719,6 +4738,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 26/03/2013 - Added changes needed for new LIS implementation: for new Control Order Tests, when filling the OrderTestsDS, 
         '''                              include also LIS fields when they are informed. For Control Order Tests to update, when filling the 
         '''                              OrderTestsDS, include only LISRequest field when it is informed 
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Private Function PrepareControlOrders(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSResultDS As WorkSessionResultDS, _
                                               Optional ByVal pWorkSessionID As String = "", Optional ByVal pAnalyzerID As String = "") As GlobalDataTO
@@ -4789,6 +4809,8 @@ Namespace Biosystems.Ax00.BL
                                     myOrderTestDR.CreationOrder = controlOrderTest.CreationOrder
                                     myOrderTestDR.TS_User = loggedUser
                                     myOrderTestDR.TS_DateTime = DateTime.Now
+                                    ' XB 27/08/2014 - BT #1868
+                                    myOrderTestDR.Selected = controlOrderTest.Selected
 
                                     'SA 26/03/2013 - Set value of field LISRequest when it is informed
                                     If (Not controlOrderTest.IsLISRequestNull) Then myOrderTestDR.LISRequest = controlOrderTest.LISRequest
@@ -4834,6 +4856,8 @@ Namespace Biosystems.Ax00.BL
                                     myOrderTestDR.CreationOrder = controlOrderTest.CreationOrder
                                     myOrderTestDR.TS_User = loggedUser
                                     myOrderTestDR.TS_DateTime = DateTime.Now
+                                    ' XB 27/08/2014 - BT #1868
+                                    myOrderTestDR.Selected = controlOrderTest.Selected
 
                                     'SA 26/03/2013 - Set value of all LIS fields when they are informed
                                     If (Not controlOrderTest.IsLISRequestNull) Then myOrderTestDR.LISRequest = controlOrderTest.LISRequest
@@ -4984,6 +5008,7 @@ Namespace Biosystems.Ax00.BL
         '''                                           can not be modified nor deleted. Done to improve the performance of this function when there are lot of OPEN 
         '''                                           Order Tests requested by LIS and avoid DB time out errors when other process try to access one of the tables
         '''                                           locked by this transaction.
+        '''              XB 27/08/2014 - Add new field Selected - BT #1868
         ''' </remarks>
         Private Function PreparePatientOrders(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSResultDS As WorkSessionResultDS, _
                                               Optional ByVal pWorkSessionID As String = "", Optional ByVal pAnalyzerID As String = "") As GlobalDataTO
@@ -5172,6 +5197,8 @@ Namespace Biosystems.Ax00.BL
                                         myOrderTestDR.AnalyzerID = pAnalyzerID
                                         myOrderTestDR.TS_User = loggedUser
                                         myOrderTestDR.TS_DateTime = DateTime.Now
+                                        ' XB 27/08/2014 - BT #1868
+                                        myOrderTestDR.Selected = lstWSPatientsDS(i).Selected
 
                                         'SA 26/03/2013 - Inform value of LIS fields LISRequest and ExternalQC when they are informed
                                         If (Not lstWSPatientsDS(i).IsLISRequestNull) Then myOrderTestDR.LISRequest = lstWSPatientsDS(i).LISRequest
@@ -5391,6 +5418,9 @@ Namespace Biosystems.Ax00.BL
                                             If (Not lstWSPatientsDS(i).IsLISPatientIDNull) Then myOrderTestDR.LISPatientID = lstWSPatientsDS(i).LISPatientID
                                             If (Not lstWSPatientsDS(i).IsESOrderIDNull) Then myOrderTestDR.ESOrderID = lstWSPatientsDS(i).ESOrderID
                                             If (Not lstWSPatientsDS(i).IsLISOrderIDNull) Then myOrderTestDR.LISOrderID = lstWSPatientsDS(i).LISOrderID
+
+                                            ' XB 27/08/2014 - BT #1868
+                                            myOrderTestDR.Selected = lstWSPatientsDS(i).Selected
 
                                             myOrderTestDR.TS_User = loggedUser
                                             myOrderTestDR.TS_DateTime = DateTime.Now

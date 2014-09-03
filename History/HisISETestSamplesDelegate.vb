@@ -54,8 +54,14 @@ Namespace Biosystems.Ax00.BL
                                             iseTestSampleRow.MeasureUnit = myISETestDataDS.tparISETests.First.Units
                                             iseTestSampleRow.DecimalsAllowed = myISETestDataDS.tparISETests.First.Decimals
                                             iseTestSampleRow.TestLongName = myISETestDataDS.tparISETests.First.TestLongName   ' WE 30/07/2014 - #1865
-                                            iseTestSampleRow.SlopeFactorA2 = myISETestDataDS.tparISETests.First.SlopeFactorA2 ' WE 25/08/2014 - #1865
-                                            iseTestSampleRow.SlopeFactorB2 = myISETestDataDS.tparISETests.First.SlopeFactorB2 ' WE 25/08/2014 - #1865
+
+                                            If (Not myISETestDataDS.tparISETests.First.IsSlopeFactorA2Null) Then    ' WE 25/08/2014 - #1865
+                                                iseTestSampleRow.SlopeFactorA2 = myISETestDataDS.tparISETests.First.SlopeFactorA2
+                                            End If
+                                            If (Not myISETestDataDS.tparISETests.First.IsSlopeFactorB2Null) Then    ' WE 25/08/2014 - #1865
+                                                iseTestSampleRow.SlopeFactorB2 = myISETestDataDS.tparISETests.First.SlopeFactorB2
+                                            End If
+
                                             iseTestSampleRow.EndEdit()
                                         End If
                                     Else
@@ -73,8 +79,14 @@ Namespace Biosystems.Ax00.BL
                                     iseTestSampleRow.MeasureUnit = auxiliaryDS.thisISETestSamples.First.MeasureUnit
                                     iseTestSampleRow.DecimalsAllowed = auxiliaryDS.thisISETestSamples.First.DecimalsAllowed
                                     iseTestSampleRow.TestLongName = auxiliaryDS.thisISETestSamples.First.TestLongName   ' WE 30/07/2014 - #1865
-                                    iseTestSampleRow.SlopeFactorA2 = auxiliaryDS.thisISETestSamples.First.SlopeFactorA2 ' WE 25/08/2014 - #1865
-                                    iseTestSampleRow.SlopeFactorB2 = auxiliaryDS.thisISETestSamples.First.SlopeFactorB2 ' WE 25/08/2014 - #1865
+
+                                    If (Not auxiliaryDS.thisISETestSamples.First.IsSlopeFactorA2Null) Then  ' WE 25/08/2014 - #1865
+                                        iseTestSampleRow.SlopeFactorA2 = auxiliaryDS.thisISETestSamples.First.SlopeFactorA2
+                                    End If
+                                    If (Not auxiliaryDS.thisISETestSamples.First.IsSlopeFactorB2Null) Then  ' WE 25/08/2014 - #1865
+                                        iseTestSampleRow.SlopeFactorB2 = auxiliaryDS.thisISETestSamples.First.SlopeFactorB2
+                                    End If
+
                                     iseTestSampleRow.EndEdit()
                                 End If
                             Else
@@ -105,8 +117,14 @@ Namespace Biosystems.Ax00.BL
                                         lstISETestToUpdate.First.MeasureUnit = iseTestSampleRow.MeasureUnit
                                         lstISETestToUpdate.First.DecimalsAllowed = iseTestSampleRow.DecimalsAllowed
                                         lstISETestToUpdate.First.TestLongName = iseTestSampleRow.TestLongName   ' WE 30/07/2014 - #1865
-                                        lstISETestToUpdate.First.SlopeFactorA2 = iseTestSampleRow.SlopeFactorA2 ' WE 25/08/2014 - #1865
-                                        lstISETestToUpdate.First.SlopeFactorB2 = iseTestSampleRow.SlopeFactorB2 ' WE 25/08/2014 - #1865
+
+                                        If (Not iseTestSampleRow.IsSlopeFactorA2Null) Then
+                                            lstISETestToUpdate.First.SlopeFactorA2 = iseTestSampleRow.SlopeFactorA2 ' WE 25/08/2014 - #1865
+                                        End If
+                                        If (Not iseTestSampleRow.IsSlopeFactorB2Null) Then
+                                            lstISETestToUpdate.First.SlopeFactorB2 = iseTestSampleRow.SlopeFactorB2 ' WE 25/08/2014 - #1865
+                                        End If
+
                                         lstISETestToUpdate.First.EndEdit()
                                     End If
                                 Next

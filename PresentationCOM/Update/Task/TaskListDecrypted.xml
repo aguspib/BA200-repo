@@ -2157,10 +2157,226 @@
   <AppVersion>
     <Version>3.10</Version>
     <StructureScript>
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      SET ANSI_PADDING ON
+      GO
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'u' AND name = 'tcfgGridColsConfiguration') = 0)
+      BEGIN
+      CREATE TABLE [dbo].[tcfgGridColsConfiguration](
+      [ScreenID] [varchar](20) NOT NULL,
+      [GridName] [varchar](20) NOT NULL,
+      [ColumnName] [varchar](20) NOT NULL,
+      [DefaultWidth] [int] NULL,
+      [SavedWidth] [int] NULL,
+      [TS_User] [nvarchar](16) NOT NULL,
+      [TS_DateTime] [datetime] NOT NULL,
+      CONSTRAINT [PK_tcfgGridColsConfiguration] PRIMARY KEY CLUSTERED
+      (
+      [ScreenID] ASC,
+      [GridName] ASC,
+      [ColumnName] ASC
+      )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+      ) ON [PRIMARY]
+
+      SET ANSI_PADDING OFF
+
+      ALTER TABLE [dbo].[tcfgGridColsConfiguration]  WITH CHECK ADD  CONSTRAINT [FK_tfmwScreens_tcfgGridColsConfiguration] FOREIGN KEY([ScreenID])
+      REFERENCES [dbo].[tfmwScreens] ([ScreenID])
+
+      ALTER TABLE [dbo].[tcfgGridColsConfiguration] CHECK CONSTRAINT [FK_tfmwScreens_tcfgGridColsConfiguration]
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'Selected') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].twksOrderTests ADD Selected bit NOT NULL default 0
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparSavedWSOrderTests' AND sc.name = 'Selected') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparSavedWSOrderTests ADD Selected bit NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparCalculatedTests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparCalculatedTests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparISETests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparISETests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparOffSystemTests ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparOffSystemTests ADD Available bit NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'CustomPosition') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTestProfiles ADD CustomPosition INT NOT NULL DEFAULT 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'Available') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTestProfiles ADD Available bit NOT NULL default 1
+      END
+      GO
+      
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vhisWSResults') = 1)
+      DROP VIEW [dbo].vhisWSResults
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisWSResults] AS
+      SELECT  R.HistOrderTestID, R.AnalyzerID, R.WorkSessionID, R.ResultDateTime,
+      (CASE WHEN OT.SampleClass = 'PATIENT' AND OT.SampleID IS NOT NULL THEN OT.SampleID
+      WHEN OT.SampleClass = 'PATIENT' AND P.PatientID IS NOT NULL THEN P.PatientID
+      ELSE NULL END) AS PatientID, P.FirstName, P.LastName, P.Gender, P.DateOfBirth, P.Comments,
+      OT.HistPatientID, OT.SampleClass, OT.StatFlag, OT.SpecimenID, OT.SampleType, OT.TestType,
+      TS.TestID, TS.TestName, TS.TestLongName, TS.TestVersionNumber, TS.TestPosition, TS.DecimalsAllowed, R.CONCValue,
+      (CASE WHEN NOT R.RemarkAlert IS NULL THEN R.RemarkAlert ELSE '' END) AS RemarkAlert,  MD.FixedItemDesc AS MeasureUnit,
+      R.MinRefRange, R.MaxRefRange, R.ExportStatus, R.AlarmList, TS.FormulaText, R.MultiPointNumber, R.ManualResultFlag, R.ManualResult, R.ManualResultText,
+      R.LISMessageID, OT.LISRequest, OT.ExternalQC, OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.LISTestName, OT.LISSampleType, OT.LISUnits
+      FROM    dbo.thisWSResults AS R INNER JOIN dbo.thisWSOrderTests AS OT ON R.HistOrderTestID = OT.HistOrderTestID
+      INNER JOIN dbo.vhisTestSamples AS TS ON OT.HistTestID = TS.HistTestID AND OT.TestType = TS.TestType AND TS.TestVersionNumber = COALESCE (OT.TestVersionNumber, 0)
+      LEFT OUTER JOIN dbo.tcfgMasterData AS MD ON MD.SubTableID = 'TEST_UNITS' AND MD.ItemID = OT.MeasureUnit
+      LEFT OUTER JOIN dbo.thisPatients AS P ON P.HistPatientID = OT.HistPatientID
       GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'
+      GO
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'u' AND name = 'tfmwScreens') = 1)
+      BEGIN
+      IF ((SELECT COUNT(*) FROM dbo.tfmwScreens WHERE ScreenID = 'HIS001') = 0)
+      INSERT INTO dbo.tfmwScreens (ScreenID, Name, Module, ScreenHelpChapter)
+      VALUES ('HIS001', 'Historic Patient Results', 'History', NULL)
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'u' AND name = 'tcfgGridColsConfiguration') = 1)
+      BEGIN
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'ResultDateTime') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'ResultDateTime', 100, 100, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'SpecimenID') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'SpecimenID', 95, 95, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'PatientID') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'PatientID', 95, 95, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'FamilyName') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'LastName', 95, 95, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'GivenName') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'FirstName', 95, 95, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'StatFlagImage') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'StatFlagImage', 16, 16, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'SampleType') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'SampleType', 35, 35, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'TestName') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'TestName', 100, 100, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'RemarkAlert') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'RemarkAlert', 10, 10, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'CONCValueString') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'CONCValueString', 42, 42, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'MeasureUnit') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'MeasureUnit', 42, 42, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'RefRange') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'RefRange', 75, 75, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'ExportImage') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'ExportImage', 16, 16, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'Remarks') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'Remarks', 250, 250, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'AdditionalInfo') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'AdditionalInfo', 150, 150, 'BIOSYSTEMS', GETDATE())
+
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'AnalyzerID') = 0)
+      INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
+      VALUES ('HIS001', 'historyGridView', 'AnalyzerID', 120, 120, 'BIOSYSTEMS', GETDATE())
+      END
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparTests SET CustomPosition = TestPosition
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparCalculatedTests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparCalculatedTests SET CustomPosition = CalcTestID
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparISETests SET CustomPosition = ISETestID
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparOffSystemTests SET CustomPosition = OffSystemTestID
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'CustomPosition') = 1
+      BEGIN
+      UPDATE [Ax00].[dbo].tparTestProfiles SET CustomPosition = TestProfilePosition
+      END
       GO
     </UpdateScript>
   </AppVersion >

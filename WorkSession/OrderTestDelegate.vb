@@ -8648,7 +8648,8 @@ Namespace Biosystems.Ax00.BL
 		'''                               ProcessCalcTests
 		'''              SA  31/01/2012 - Set to Nothing all declared Lists; do not declare variables inside loops 
 		'''              SA  25/04/2013 - For Patient Order Tests requested by an external LIS system, all informed LIS fields were  
-		'''                               informed also in the SelectedTestsDS passed to function AddPatientOrderTests 
+        '''                               informed also in the SelectedTestsDS passed to function AddPatientOrderTests 
+        '''              XB  28/08/2014 - Add behaviour for new field Selected - BT #1868
 		''' </remarks>
 		Private Function LoadAddPatientOrderTests(ByVal pSavedWSOrderTestsDS As SavedWSOrderTestsDS, ByVal pWorkSessionResultDS As WorkSessionResultDS, _
 												  ByVal pAnalizerID As String, Optional ByVal pFromLIMS As Boolean = False) As GlobalDataTO
@@ -8714,7 +8715,7 @@ Namespace Biosystems.Ax00.BL
 								If (Not tempSavedWSOrderTests.IsESPatientIDNull) Then mySelectedTestRow.ESPatientID = tempSavedWSOrderTests.ESPatientID
 								If (Not tempSavedWSOrderTests.IsLISPatientIDNull) Then mySelectedTestRow.LISPatientID = tempSavedWSOrderTests.LISPatientID
 								If (Not tempSavedWSOrderTests.IsESOrderIDNull) Then mySelectedTestRow.ESOrderID = tempSavedWSOrderTests.ESOrderID
-								If (Not tempSavedWSOrderTests.IsLISOrderIDNull) Then mySelectedTestRow.LISOrderID = tempSavedWSOrderTests.LISOrderID
+                                If (Not tempSavedWSOrderTests.IsLISOrderIDNull) Then mySelectedTestRow.LISOrderID = tempSavedWSOrderTests.LISOrderID
 
 								mySelectedTestDS.SelectedTestTable.Rows.Add(mySelectedTestRow)
 							Next
@@ -8807,31 +8808,58 @@ Namespace Biosystems.Ax00.BL
 							currentSampleType = rowPatient.SampleType
 							currentTestID = rowPatient.TestID
 
-							If (rowPatient.TestType = "STD" OrElse rowPatient.TestType = "ISE") Then
-								linqSavedWSOrderTests = (From a In pSavedWSOrderTestsDS.tparSavedWSOrderTests _
-														Where a.SampleClass = "PATIENT" _
-													  AndAlso a.SampleID = currentSampleID _
-													  AndAlso a.SampleType = currentSampleType _
-													  AndAlso a.TestID = currentTestID _
-													   Select a).ToList
+                            ' XB 28/08/2014 -- BT #1868
+                            'If (rowPatient.TestType = "STD" OrElse rowPatient.TestType = "ISE") Then
+                            '    linqSavedWSOrderTests = (From a In pSavedWSOrderTestsDS.tparSavedWSOrderTests _
+                            '                            Where a.SampleClass = "PATIENT" _
+                            '                          AndAlso a.SampleID = currentSampleID _
+                            '                          AndAlso a.SampleType = currentSampleType _
+                            '                          AndAlso a.TestID = currentTestID _
+                            '                           Select a).ToList
 
-								If (linqSavedWSOrderTests.Count > 0) Then
-									rowPatient.BeginEdit()
-									rowPatient.TubeType = linqSavedWSOrderTests(0).TubeType
-									rowPatient.NumReplicates = linqSavedWSOrderTests(0).ReplicatesNumber
-									rowPatient.EndEdit()
-									rowPatient.AcceptChanges()
-								End If
-							End If
+                            '    If (linqSavedWSOrderTests.Count > 0) Then
+                            '        rowPatient.BeginEdit()
+                            '        rowPatient.TubeType = linqSavedWSOrderTests(0).TubeType
+                            '        rowPatient.NumReplicates = linqSavedWSOrderTests(0).ReplicatesNumber
+                            '        rowPatient.EndEdit()
+                            '        rowPatient.AcceptChanges()
+                            '    End If
+                            'End If
 
-							If (rowPatient.SampleIDType = "AUTO") Then
-								'Update the SampleID: date part have the current date
-								rowPatient.BeginEdit()
-								rowPatient.SampleID = "#" & DateTime.Now.ToString("yyyyMMdd") & rowPatient.SampleID.Substring(9)
-								rowPatient.EndEdit()
-								rowPatient.AcceptChanges()
-							End If
-						Next
+                            If (rowPatient.TestType = "STD" OrElse rowPatient.TestType = "ISE" OrElse rowPatient.TestType = "CALC") Then
+                                linqSavedWSOrderTests = (From a In pSavedWSOrderTestsDS.tparSavedWSOrderTests _
+                                                        Where a.SampleClass = "PATIENT" _
+                                                      AndAlso a.SampleID = currentSampleID _
+                                                      AndAlso a.SampleType = currentSampleType _
+                                                      AndAlso a.TestID = currentTestID _
+                                                       Select a).ToList
+
+                                If (linqSavedWSOrderTests.Count > 0) Then
+                                    rowPatient.BeginEdit()
+
+                                    If (rowPatient.TestType = "STD" OrElse rowPatient.TestType = "ISE") Then
+                                        rowPatient.TubeType = linqSavedWSOrderTests(0).TubeType
+                                        rowPatient.NumReplicates = linqSavedWSOrderTests(0).ReplicatesNumber
+                                    End If
+
+                                    If Not (linqSavedWSOrderTests(0).IsSelectedNull) Then
+                                        rowPatient.Selected = linqSavedWSOrderTests(0).Selected
+                                    End If
+
+                                    rowPatient.EndEdit()
+                                    rowPatient.AcceptChanges()
+                                End If
+                            End If
+                            ' XB 28/08/2014 -- BT #1868
+
+                            If (rowPatient.SampleIDType = "AUTO") Then
+                                'Update the SampleID: date part have the current date
+                                rowPatient.BeginEdit()
+                                rowPatient.SampleID = "#" & DateTime.Now.ToString("yyyyMMdd") & rowPatient.SampleID.Substring(9)
+                                rowPatient.EndEdit()
+                                rowPatient.AcceptChanges()
+                            End If
+                        Next
 
 						resultData.SetDatos = pWorkSessionResultDS
 					End If
@@ -8867,7 +8895,8 @@ Namespace Biosystems.Ax00.BL
 		'''              SA  31/01/2012 - Set to Nothing all declared Lists; do not declare variables inside loops 
 		'''              SA  25/04/2013 - For Control Order Tests requested by an external LIS system, all informed LIS fields were  
 		'''                               informed also in the SelectedTestsDS passed to function AddControlOrderTests 
-		'''              TR  17/05/2013 - Inform optional parameter for the SampleClass when calling function AddControlOrderTests
+        '''              TR  17/05/2013 - Inform optional parameter for the SampleClass when calling function AddControlOrderTests
+        '''              XB  28/08/2014 - Add behaviour for new field Selected - BT #1868
 		''' </remarks>
 		Private Function LoadAddSampleClassOrderTests(ByVal pSavedWSOrderTestsDS As SavedWSOrderTestsDS, ByVal pWorkSessionResultDS As WorkSessionResultDS, _
 													  ByVal pAnalizerID As String, ByVal pSampleClass As String, ByVal pSelectedTestDS As SelectedTestsDS) As GlobalDataTO
@@ -8899,8 +8928,8 @@ Namespace Biosystems.Ax00.BL
 							mySelectedTestRow.TestType = requestedOT.TestType
 							mySelectedTestRow.SampleType = requestedOT.SampleType
 							mySelectedTestRow.TestID = requestedOT.TestID
-							mySelectedTestRow.OTStatus = "OPEN"
-							mySelectedTestRow.Selected = True
+                            mySelectedTestRow.OTStatus = "OPEN"
+                            mySelectedTestRow.Selected = True
 
 							If (pSampleClass = "CTRL") Then
 								mySelectedTestRow.ExternalQC = False
@@ -8955,7 +8984,13 @@ Namespace Biosystems.Ax00.BL
 								If (linqSavedWSOrderTests.Count > 0) Then
 									rowControl.BeginEdit()
 									rowControl.NumReplicates = linqSavedWSOrderTests(0).ReplicatesNumber
-									rowControl.TubeType = linqSavedWSOrderTests(0).TubeType
+                                    rowControl.TubeType = linqSavedWSOrderTests(0).TubeType
+
+                                    ' XB 29/08/2014 - BT #1868
+                                    If Not linqSavedWSOrderTests(0).IsSelectedNull Then
+                                        rowControl.Selected = linqSavedWSOrderTests(0).Selected
+                                    End If
+
 									rowControl.EndEdit()
 									rowControl.AcceptChanges()
 								End If
@@ -8980,7 +9015,13 @@ Namespace Biosystems.Ax00.BL
 										rowBlank.BeginEdit()
 										rowBlank.NumReplicates = linqSavedWSOrderTests(0).ReplicatesNumber
 										rowBlank.TubeType = linqSavedWSOrderTests(0).TubeType
-										rowBlank.EndEdit()
+
+                                        ' XB 29/08/2014 - BT #1868
+                                        If Not linqSavedWSOrderTests(0).IsSelectedNull Then
+                                            rowBlank.Selected = linqSavedWSOrderTests(0).Selected
+                                        End If
+
+                                        rowBlank.EndEdit()
 										rowBlank.AcceptChanges()
 									End If
 								End If
@@ -9003,7 +9044,13 @@ Namespace Biosystems.Ax00.BL
 									If (linqSavedWSOrderTests.Count > 0) Then
 										rowBlank.BeginEdit()
 										rowBlank.NumReplicates = linqSavedWSOrderTests(0).ReplicatesNumber
-										rowBlank.EndEdit()
+
+                                        ' XB 29/08/2014 - BT #1868
+                                        If Not linqSavedWSOrderTests(0).IsSelectedNull Then
+                                            rowBlank.Selected = linqSavedWSOrderTests(0).Selected
+                                        End If
+
+                                        rowBlank.EndEdit()
 										rowBlank.AcceptChanges()
 									End If
 								End If

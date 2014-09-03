@@ -15,9 +15,25 @@ Imports LIS.Biosystems.Ax00.LISCommunications
 
 Public Class IHisResults
 
+#Region "Attributes"
+    'SA 01/09/2014
+    'BA-1910 ==> Added new screen attribute to manage the ActiveAnalyzer Property
+    Private AnalyzerIDAttribute As String = String.Empty
+#End Region
+
+#Region "Properties"
+    'SA 01/09/2014
+    'BA-1910 ==> Added new screen property to receive the ID of the connected Analyzer
+    Public WriteOnly Property ActiveAnalyzer() As String
+        Set(ByVal value As String)
+            AnalyzerIDAttribute = value
+        End Set
+    End Property
+#End Region
+
 #Region "Structures"
     'SA 01/08/2014
-    'BT #1861 ==> Added new field specimenID. Removed field sampleClasses, it is not needed.
+    'BA-1861 ==> Added new field specimenID. Removed field sampleClasses, it is not needed.
     Public Structure SearchFilter
         Public analyzerId As String
         Public dateFrom As Date
@@ -44,7 +60,10 @@ Public Class IHisResults
     Private mStatFlags As Dictionary(Of TriState, String)     'Stat Flags:   {StatFlag Code, Multilanguage Text}
     Private mSampleTypes As Dictionary(Of String, String)     'Sample Types: {SampleType Code, Multilanguage Text}
     Private mTestTypes As Dictionary(Of String, String)       'Test Types:   {TestType Code, Multilanguage Text}
-    Private mAnalyzers As List(Of String)                     'AnalyzerIDs
+
+    'SA 01/09/2014
+    'BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties DisplayMember and ValueMember in the ComboBox
+    Private mAnalyzers As AnalyzersDS
 
     'AG 22/10/2012
     'Typed DataSet containing the list of all defined Alarms
@@ -58,7 +77,7 @@ Public Class IHisResults
     Private DeletingHistOrderTests As Boolean = False
 
     'SA 01/08/2014
-    'BT #1861 ==> Global DS to get/save the width of all visible grid columns
+    'BA-1861 ==> Global DS to get/save the width of all visible grid columns
     Private gridColWidthConfigDS As GridColsConfigDS
 #End Region
 
@@ -74,7 +93,10 @@ Public Class IHisResults
         mStatFlags = New Dictionary(Of TriState, String)
         mSampleTypes = New Dictionary(Of String, String)
         mTestTypes = New Dictionary(Of String, String)
-        mAnalyzers = New List(Of String)
+
+        'SA 01/09/2014
+        'BA-1910 ==> Changed from list of Strings to a typed DataSet AnalyzersDS to allow manage properties DisplayMember and ValueMember in the ComboBox
+        mAnalyzers = New AnalyzersDS
 
         'Initialize the global variable for the Delegate Class 
         myHisWSResultsDelegate = New HisWSResultsDelegate
@@ -199,28 +221,35 @@ Public Class IHisResults
     End Sub
 
     ''' <summary>
-    ''' Read the list of Analyzers for which there are Historic Patient Results in DB and load the global Analyzers list
+    ''' Read the list of Analyzers for which there are Historic Results in DB and load the global Analyzers list
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 28/09/2012
     ''' Modified by: IR 04/10/2012 - Let the user select more than one analyzer if available. We must read data from thisWSAnalyzerAlarmsDAO
+    '''              SA 01/09/2014 - BA-1910 ==> Call function GetDistinctAnalyzers in HisAnalyzerWorkSessionsDelegate instead of the function 
+    '''                                          with the same name in AnalyzerDelegate class (which read Analyzers from table thisWSAnalyzerAlarms).
+    '''                                          If the connected Analyzer is not in the list, it is added to the Analyzer ComboBox
     ''' </remarks>
     Private Sub GetAnalyzerList()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myAnalyzerDelegate As New AnalyzersDelegate
+            Dim myHisAnalyzerWSDelegate As New HisAnalyzerWorkSessionsDelegate
 
-            myGlobalDataTO = myAnalyzerDelegate.GetDistinctAnalyzers(Nothing)
+            myGlobalDataTO = myHisAnalyzerWSDelegate.GetDistinctAnalyzers(Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim myAnalyzerData As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
+                mAnalyzers = DirectCast(myGlobalDataTO.SetDatos, AnalyzersDS)
 
-                For Each o As String In myAnalyzerData
-                    mAnalyzers.Add(o.ToString)
-                Next
+                'Search if the connected Analyzer is in the returned list; add it to list in case it has not Historic Results yet
+                If ((mAnalyzers.tcfgAnalyzers.ToList.Where(Function(a) a.AnalyzerID = AnalyzerIDAttribute)).Count = 0) Then
+                    Dim myRow As AnalyzersDS.tcfgAnalyzersRow = mAnalyzers.tcfgAnalyzers.NewtcfgAnalyzersRow()
+                    myRow.AnalyzerID = AnalyzerIDAttribute
+                    mAnalyzers.tcfgAnalyzers.AddtcfgAnalyzersRow(myRow)
+                    mAnalyzers.AcceptChanges()
+                End If
             End If
 
             myGlobalDataTO = Nothing
-            myAnalyzerDelegate = Nothing
+            myHisAnalyzerWSDelegate = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetAnalyzerList ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -392,36 +421,44 @@ Public Class IHisResults
     ''' Modified by: TR 08/05/2013 - Take values from DB
     '''              XB 06/06/2013 - Added kvp.Key for the Sample Type description into the corresponding combo
     '''              SA 01/08/2014 - Added Try/Catch block
+    '''              SA 01/09/2014 - BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
     ''' </remarks>
     Private Sub FillDropDownLists()
         Try
+            'Get the list of Priorities and load the ComboBox
             GetStatFlags()
+            bsStatFlagComboBox.DataSource = mStatFlags.Values.ToList
+
+            'Get the list of Sample Types and load the ComboBox
             GetSampleTypes()
-            GetTestTypes()
-            GetAnalyzerList()
-
-            statFlagComboBox.DataSource = mStatFlags.Values.ToList
-
-            With sampleTypeChkComboBox.Properties.Items
+            With sampleTypesChkComboBox.Properties.Items
                 For Each kvp As KeyValuePair(Of String, String) In mSampleTypes
                     .Add(kvp.Key, kvp.Key + kvp.Value)
                 Next
             End With
+            sampleTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
 
-            With testTypeChkComboBox.Properties.Items
+            'Get the list of Test Types and load the ComboBox
+            GetTestTypes()
+            With testTypesChkComboBox.Properties.Items
                 For Each kvp As KeyValuePair(Of String, String) In mTestTypes
                     .Add(kvp.Key, kvp.Key + kvp.Value)
                 Next
             End With
+            testTypesChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
 
-            analyzerIDComboBox.DataSource = mAnalyzers
+            'Get the list of Analyzers and load the ComboBox
+            GetAnalyzerList()
+            bsAnalyzersComboBox.DataSource = mAnalyzers.tcfgAnalyzers.DefaultView
 
-            sampleTypeChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
-            testTypeChkComboBox.Properties.SelectAllItemCaption = GetText("LBL_SRV_All")
+            'BA-1910 ==> Set field AnalyzerID as Display and Value Member for the Analyzers ComboBox
+            bsAnalyzersComboBox.DisplayMember = "AnalyzerID"
+            bsAnalyzersComboBox.ValueMember = "AnalyzerID"
 
-            analyzerIDComboBox.Enabled = mAnalyzers.Count > 1
-            analyzerIDComboBox.Visible = analyzerIDComboBox.Enabled
-            analyzerIDLabel.Visible = analyzerIDComboBox.Visible
+            'The label and the ComboBox are visible and enabled only when there are several Analyzers loaded in the ComboBox
+            bsAnalyzersComboBox.Enabled = (mAnalyzers.tcfgAnalyzers.Rows.Count > 1)
+            bsAnalyzersComboBox.Visible = bsAnalyzersComboBox.Enabled
+            analyzerIDLabel.Visible = bsAnalyzersComboBox.Enabled
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillDropDownLists ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FillDropDownLists ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -486,8 +523,10 @@ Public Class IHisResults
     '''             AG 14/02/2014 - BT #1505 ==> User can sort grid data also by column ExportStatus
     '''             SA 29/04/2014 - BT #1608 ==> Added a hidden column for field TestLongName (this field has to be shown as Test Name in reports
     '''                                          when it is informed)
-    '''             SA 01/08/2014 - BT #1861 ==> Added new grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
+    '''             SA 01/08/2014 - BA-1861  ==> Added new visible grid columns: SpecimenID (Barcode), Patient Last Name and Patient First Name.  
+    '''                                          Added new hidden grid column: HistPatientID.
     '''                                          Call new function to get the saved width of all visible grid columns and assign the value.
+    '''             SA 25/08/2014 - BA-1916  ==> Added new hidden grid column BackColorGroup, used to set the Row BackColor in grid event RowStyle
     ''' </remarks>
     Private Sub InitializeResultHistoryGrid()
         Try
@@ -673,7 +712,7 @@ Public Class IHisResults
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
-            'BT #1608 - TEST LONG NAME Column (hidden, used when print reports)
+            'BT #1608 - TEST LONG NAME Column (hidden, used to print reports)
             column = historyGridView.Columns.Add()
             With column
                 .FieldName = "TestLongName"
@@ -740,7 +779,7 @@ Public Class IHisResults
                 .OptionsColumn.ShowCaption = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'EXPORTED TO LIS column
@@ -827,19 +866,24 @@ Public Class IHisResults
             'BT #1309 - TEST POSITION Column (hidden, used when print reports)
             column = historyGridView.Columns.Add()
             With column
-                .Caption = "TestPosition"
+                .Caption = String.Empty
                 .FieldName = "TestPosition"
                 .Name = "TestPosition"
                 .Visible = False
                 .Width = 0
-                .OptionsColumn.AllowSize = False
-                .OptionsColumn.ShowCaption = False
-                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
-                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
-            'BT #1861 - BACKCOLOR GROUP Column (hidden, used to set the Row BackColor in grid event RowStyle)
+            'BA-1861 - HISTORIC PATIENT IDENTIFIER Column (hidden)
+            column = historyGridView.Columns.Add()
+            With column
+                .Caption = String.Empty
+                .FieldName = "HistPatientID"
+                .Name = "HistPatientID"
+                .Visible = False
+                .Width = 0
+            End With
+
+            'BA-1916 - BACKCOLOR GROUP Column (hidden, used to set the Row BackColor in grid event RowStyle)
             column = historyGridView.Columns.Add()
             With column
                 .Caption = String.Empty
@@ -847,14 +891,9 @@ Public Class IHisResults
                 .Name = "BackColorGroup"
                 .Visible = False
                 .Width = 0
-                .OptionsColumn.AllowSize = False
-                .OptionsColumn.ShowCaption = False
-                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
-                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
-            'BT #1861 - Get the saved width of all visible grid columns and assign the value
+            'BA-1861 - Get the saved width of all visible grid columns and assign the value
             Dim resultData As New GlobalDataTO
             Dim myColWidthConfigDelegate As New GridColsConfigurationDelegate
 
@@ -876,20 +915,26 @@ Public Class IHisResults
     ''' Initializes the filter search
     ''' </summary>
     ''' <remarks>
-    ''' Created by JB 18/10/2012
+    ''' Created by:  JB 18/10/2012
+    ''' Modified by: SA 01/09/2014 - BA-1910 ==> When the ComboBox of Analyzers contains more than one element, select by default
+    '''                                          the currently connected one  
     ''' </remarks>
     Private Sub InitializeFilterSearch()
         Try
-            dateFromDateTimePick.Checked = True
-            dateFromDateTimePick.Value = Today.AddDays(-1)
+            bsDateFromDateTimePick.Checked = True
+            bsDateFromDateTimePick.Value = Today.AddDays(-1)
 
             dateToDateTimePick.Checked = True
             dateToDateTimePick.Value = Today
 
-            statFlagComboBox.SelectedIndex = 0
+            bsStatFlagComboBox.SelectedIndex = 0
 
-            If (analyzerIDComboBox.Items.Count > 0) Then
-                analyzerIDComboBox.SelectedIndex = 0
+            If (bsAnalyzersComboBox.Items.Count > 0) Then
+                'Get the ID of the Analyzer currently connected, and select it in the ComboBox
+                bsAnalyzersComboBox.SelectedValue = AnalyzerIDAttribute
+            Else
+                'Select the unique element in the list
+                bsAnalyzersComboBox.SelectedIndex = 0
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeFilterSearch ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -950,16 +995,18 @@ Public Class IHisResults
     ''' <returns>SearchFilter structure filled with filters selected in Search Area</returns>
     ''' <remarks>
     ''' Created by:  JB
-    ''' Modified by: SA 01/08/2014 - BT #1861 ==> Inform SpecimenID in the structure with value of the corresponding filter.
-    '''                                           Added Try/Catch block
+    ''' Modified by: SA 01/08/2014 - BA-1861 ==> Inform SpecimenID in the structure with value of the corresponding filter.
+    '''                                          Added Try/Catch block
+    '''              SA 01/09/2014 - BA-1910 ==> To get the selected Analyzer, used SelectedValue instead of SelectedItem, due to the ComboBox is loaded
+    '''                                          in a different way
     ''' </remarks>
     Private Function GetSearchFilter() As SearchFilter
         Dim filter As New SearchFilter
         With filter
-            .analyzerId = analyzerIDComboBox.SelectedItem.ToString
+            .analyzerId = bsAnalyzersComboBox.SelectedValue.ToString
 
-            If (dateFromDateTimePick.Checked) Then
-                .dateFrom = dateFromDateTimePick.Value
+            If (bsDateFromDateTimePick.Checked) Then
+                .dateFrom = bsDateFromDateTimePick.Value
             Else
                 .dateFrom = Nothing
             End If
@@ -974,20 +1021,20 @@ Public Class IHisResults
             .specimenID = bsSpecimenIDTextBox.Text
 
             .statFlag = (From kvp As KeyValuePair(Of TriState, String) In mStatFlags _
-                        Where kvp.Value = statFlagComboBox.SelectedItem.ToString _
+                        Where kvp.Value = bsStatFlagComboBox.SelectedItem.ToString _
                        Select kvp.Key).FirstOrDefault
 
             .sampleTypes = New List(Of String)
-            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In sampleTypeChkComboBox.Properties.Items
+            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In sampleTypesChkComboBox.Properties.Items
                 If (elem.CheckState = CheckState.Checked) Then .sampleTypes.Add(elem.Value.ToString)
             Next
 
             .testTypes = New List(Of String)
-            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In testTypeChkComboBox.Properties.Items
+            For Each elem As DevExpress.XtraEditors.Controls.CheckedListBoxItem In testTypesChkComboBox.Properties.Items
                 If (elem.CheckState = CheckState.Checked) Then .testTypes.Add(elem.Value.ToString)
             Next
 
-            .testName = testNameTextBox.Text
+            .testName = bsTestNameTextBox.Text
         End With
         Return filter
     End Function
@@ -998,14 +1045,14 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB 18/10/2012
     ''' Modified by: AG 13/02/2014 - BT #1505 ==> Added traces in the LOG 
-    '''              SA 01/08/2014 - BT #1861 ==> Changed the call to function GetHistoricalResultsByFilter due to its parameters have been changed
+    '''              SA 01/08/2014 - BA-1861  ==> Changed the call to function GetHistoricalResultsByFilter due to its parameters have been changed
     ''' </remarks>
     Private Sub FindHistoricalResults()
         Dim myGlobalDataTO As New GlobalDataTO
         Dim myHisWSResultsDS As HisWSResultsDS
 
         historyGrid.DataSource = Nothing
-        If (analyzerIDComboBox.Items.Count = 0) Then Exit Sub
+        If (bsAnalyzersComboBox.Items.Count = 0) Then Exit Sub
 
         Try
             UpdateFormBehavior(False)
@@ -1126,22 +1173,31 @@ Public Class IHisResults
     End Function
 
     ''' <summary>
-    ''' Set value of field BackColorGroup for the Result row beign processed: if the Result is for the same PatientID/SpecimenID than the 
+    ''' Set value of field BackColorGroup for the Result row beign processed: if the Result is for the same PatientID/HistPatientID than the 
     ''' previous Result row, the same BackColor is assigned; otherwise, the alternate BackColor value is assigned
     ''' </summary>
     ''' <param name="pRow">Result row in process</param>
     ''' <param name="pPreviousBackColorGroup">BackColorGroup assigned to the previous Result Row in the DataSet</param>
-    ''' <param name="pPreviousSpecimenID">SpecimenID in the previous Result Row in the DataSet</param>
     ''' <param name="pPreviousPatientID">PatientID in the previous Result Row in the DataSet</param>
+    ''' <param name="pPreviousHistPatientID">HistPatientID in the previous Result Row in the DataSet. It is an optional parameter due to if the
+    '''                                      previous Result Row corresponds to an unknown Patient, HistPatientID is NULL in the DataSet</param>
     ''' <remarks>
-    ''' Created by: SA 25/08/2014 - BT #1861
+    ''' Created by: SA 25/08/2014 - BA-1916
     ''' </remarks>
-    Private Sub SetRowBackColorGroup(ByRef pRow As HisWSResultsDS.vhisWSResultsRow, ByVal pPreviousBackColorGroup As Integer, ByVal pPreviousSpecimenID As String, _
-                                     ByVal pPreviousPatientID As String)
+    Private Sub SetRowBackColorGroup(ByRef pRow As HisWSResultsDS.vhisWSResultsRow, ByVal pPreviousBackColorGroup As Integer, _
+                                     ByVal pPreviousPatientID As String, Optional ByVal pPreviousHistPatientID As Integer = 0)
         Try
-            If (pRow.SpecimenID = pPreviousSpecimenID AndAlso pRow.PatientID = pPreviousPatientID) Then
-                pRow.BackColorGroup = pPreviousBackColorGroup
-            Else
+            Dim changeRowBC As Boolean = True
+
+            If (pRow.PatientID = pPreviousPatientID) Then
+                If (pRow.IsHistPatientIDNull AndAlso pPreviousHistPatientID = 0) OrElse _
+                   (Not pRow.IsHistPatientIDNull AndAlso pPreviousHistPatientID <> 0 AndAlso pRow.HistPatientID = pPreviousHistPatientID) Then
+                    pRow.BackColorGroup = pPreviousBackColorGroup
+                    changeRowBC = False
+                End If
+            End If
+
+            If (changeRowBC) Then
                 If (pPreviousBackColorGroup = 1) Then
                     pRow.BackColorGroup = 2
                 Else
@@ -1163,21 +1219,20 @@ Public Class IHisResults
     ''' Modified by: JV 03/01/2014 - BT #1285 ==> Removed Application.DoEvents from the For/Next to avoid flicking on the DataGrid area 
     '''                                           (data, images, etc.) and also on the form
     '''              AG 13/02/2014 - BT #1505 ==> Added traces in the LOG 
-    '''              SA 25/08/2014 - BT #1861 ==> For each processed row, set value of field BackColorGroup: all results for the same PatientID/SpecimenID
-    '''                                           will have the same BackColor, and there will be an alternate color for the different pairs of 
-    '''                                           PatientID/SpecimenID loaded
+    '''              SA 25/08/2014 - BA-1916  ==> For each processed row, set value of field BackColorGroup: all results for the same PatientID/HistPatientID
+    '''                                           will have the same BackColor, and there will be an alternate color for the different PatientID/HistPatientIDs loaded 
     ''' </remarks>
     Private Sub PrepareAndSetDataToGrid(ByVal pHisResultsDataTable As HisWSResultsDS.vhisWSResultsDataTable)
         Dim myGlobalDataTO As New GlobalDataTO
 
         Try
             UpdateFormBehavior(False)
-            Dim StartTime As DateTime = Now 'AG 13/02/2014 - #1505
+            Dim StartTime As DateTime = Now
 
             Dim i As Integer = 0
             Dim myPrevBackColor As Integer = 1
             Dim myPrevPatientID As String = String.Empty
-            Dim myPrevSpecimenID As String = String.Empty
+            Dim myPrevHistPatientID As Integer = 0
 
             For Each row As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable
                 'Mark the row as "not selected"
@@ -1190,21 +1245,21 @@ Public Class IHisResults
                 myGlobalDataTO = DecodeRowTexts(row)
                 If (myGlobalDataTO.HasError) Then Exit For
 
-                'BT #1861 - Set the group BackColor for each grid row 
+                'BA-1861 - Set the group BackColor for each grid row 
                 If (i = 0) Then
-                    SetRowBackColorGroup(row, 1, row.SpecimenID, row.PatientID)
+                    SetRowBackColorGroup(row, 1, row.PatientID, 0)
                 Else
-                    SetRowBackColorGroup(row, myPrevBackColor, myPrevSpecimenID, myPrevPatientID)
+                    SetRowBackColorGroup(row, myPrevBackColor, myPrevPatientID, myPrevHistPatientID)
                 End If
 
                 i += 1
                 myPrevBackColor = row.BackColorGroup
-                myPrevSpecimenID = row.SpecimenID
                 myPrevPatientID = row.PatientID
+                If (Not row.IsHistPatientIDNull) Then myPrevHistPatientID = row.HistPatientID Else myPrevHistPatientID = 0
             Next
 
             CreateLogActivity("PrepareAndSetDataToGrid : " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".PrepareAndSetDataToGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
-            StartTime = Now 'AG 13/02/2014 - #1505
+            StartTime = Now
 
             If (Not myGlobalDataTO.HasError) Then
                 historyGrid.DataSource = pHisResultsDataTable
@@ -1507,7 +1562,7 @@ Public Class IHisResults
             'AG 24/07/2014
 
             PrintButton.Enabled = pStatus AndAlso selectedRows.Count > 0
-            searchGroup.Enabled = pStatus AndAlso analyzerIDComboBox.Items.Count > 0
+            searchGroup.Enabled = pStatus AndAlso bsAnalyzersComboBox.Items.Count > 0
             CompactPrintButton.Enabled = pStatus AndAlso selectedRows.Count > 0
 
             ScreenStatusByUserLevel()
@@ -1561,7 +1616,7 @@ Public Class IHisResults
     ''' </summary>
     ''' <returns>GlobalDataTO containing success/error information</returns>
     ''' <remarks>
-    ''' Created by: SA 25/08/2014 - BT #1861
+    ''' Created by: SA 25/08/2014 - BA-1861
     ''' </remarks>
     Private Function SaveGridColumnsWidth() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1598,8 +1653,8 @@ Public Class IHisResults
     ''' Code executed when the Click Event of Exit Button is raised
     ''' </summary>
     ''' <remarks>
-    ''' Created by:  SA 25/08/2014 - BT #1861 ==> Code moved from the button click event. Added call to function SaveGridColumnsWidth to save the 
-    '''                                           current width of all visible grid columns to be used the next time the screen is loaded 
+    ''' Created by:  SA 25/08/2014 - BA-1861 ==> Code moved from the button click event. Added call to function SaveGridColumnsWidth to save the 
+    '''                                          current width of all visible grid columns to be used the next time the screen is loaded 
     ''' </remarks>
     Private Sub ExitScreen()
         Try
@@ -1672,6 +1727,127 @@ Public Class IHisResults
             UpdateFormBehavior(True)
         End Try
     End Sub
+
+    ''' <summary>
+    ''' When the grid is sorted for a Column different of PatientID, the Back Color of colored rows is changed to White; 
+    ''' otherwise the value previously set for field BackColorGroup of each row is used to set the Row BackColor. When the grid
+    ''' has been sorted by several columns, the intercalated BackColor is applied only if the first column in the grid is PatientID
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 29/08/2014 - BA-1916
+    ''' </remarks>
+    Private Sub ApplyRowStyles(ByVal sender As Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs)
+        Try
+            If (e.RowHandle >= 0) Then
+                Dim applyStyles As Boolean = False
+                Dim myGridView As DevExpress.XtraGrid.Views.Grid.GridView = DirectCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
+                Dim rowBCGroup As Integer = Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup")))
+
+                If (Not myGridView.SortedColumns Is Nothing AndAlso myGridView.SortedColumns.Count > 0) Then
+                    'The intercalated Row Backcolor is applied only if the User has sort the grid for one or more columns and the first sort column is PatientID
+                    Dim mySortedColumnName As String = myGridView.SortedColumns.Item(0).Name.ToString
+                    If (mySortedColumnName = "PatientID") Then
+                        If (rowBCGroup = 1) Then
+                            e.Appearance.BackColor = Color.LightCyan
+                            e.Appearance.BackColor2 = Color.Azure
+                        Else
+                            e.Appearance.BackColor = Color.White
+                            e.Appearance.BackColor2 = Color.White
+                        End If
+                    Else
+                        e.Appearance.BackColor = Color.White
+                        e.Appearance.BackColor2 = Color.White
+                    End If
+                Else
+                    'If SortedColumns has not elements, then the grid is using the sort by default (by PatientID/SpecimenID/ResultDateTime) and the 
+                    'intercalated Row Backcolor has to be applied
+                    If (rowBCGroup = 1) Then
+                        e.Appearance.BackColor = Color.LightCyan
+                        e.Appearance.BackColor2 = Color.Azure
+                    Else
+                        e.Appearance.BackColor = Color.White
+                        e.Appearance.BackColor2 = Color.White
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplyRowStyles ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ApplyRowStyles ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+#End Region
+
+#Region "Private Methods for Printing"
+    ''' <summary>
+    ''' Prints report of Historic Results by Patient in extended or in compact format
+    ''' </summary>
+    ''' <param name="pCompactReport">When TRUE, the Compact Report is printed; when FALSE, the extended Report is printed</param>
+    ''' <remarks>
+    ''' Created by: SA 02/09/2014 - BA-1868  ==> New function to unify the code of both Print Report Buttons (excepting the Report function
+    '''                                          to call, the code is exactly the same). Changes made in the previous code:
+    '''                                          ** Called the new function MarkExcludedExpTests in HisWSCalcTestsRelationsDelegate to check if 
+    '''                                             between the results selected to print there are results of Tests included in the Formula of 
+    '''                                             selected Calculated Tests with PrintExpTests = FALSE. Results to exclude from the report 
+    '''                                             are returned with flag ExpTestToPrint = False
+    ''' </remarks>
+    Private Sub PrintReport(ByVal pCompactReport As Boolean)
+        Try
+            Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            Dim myHisWSResults As New List(Of HisWSResultsDS.vhisWSResultsRow)
+
+            'Get the list of Historic Patient Results selected in the grid
+            Dim myInitialHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+            sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
+
+            'For all Calculated Tests, search all Tests in the Formula and verify which Experimental Tests have to be printed 
+            Dim returnData As GlobalDataTO = Nothing
+            Dim myHisWSCalcTestRelDelegate As New HisWSCalcTestsRelationsDelegate
+
+            returnData = myHisWSCalcTestRelDelegate.MarkExcludedExpTests(Nothing, myInitialHisWSResults, AnalyzerIDAttribute)
+            If (Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing) Then
+                Dim testsWereExcluded As Boolean = DirectCast(returnData.SetDatos, Boolean)
+
+                If (Not testsWereExcluded) Then
+                    myHisWSResults = myInitialHisWSResults
+                Else
+                    'Get only those records marked as not excluded 
+                    myHisWSResults = (From a As HisWSResultsDS.vhisWSResultsRow In myInitialHisWSResults _
+                                     Where a.ExpTestToPrint = True
+                                    Select a).ToList
+                End If
+            End If
+
+            If (myHisWSResults.Count > 0) Then
+                'BT #1309 - Sort data to print by TestPosition field
+                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
+                                                                                    Order By a.TestPosition _
+                                                                                      Select a).ToList
+
+                myHisWSResults.Clear()
+
+                If (Not pCompactReport) Then
+                    XRManager.ShowHistoricResultsByPatientSampleReport(myHisWSResultsSorted)
+                Else
+                    XRManager.ShowHistoricByCompactPatientsSamplesResult(myHisWSResultsSorted)
+                End If
+                myHisWSResultsSorted = Nothing
+            End If
+
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                myLogAcciones.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                "IHisResults.PrintReport", EventLogEntryType.Information, False)
+                StartTime = Now
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+                myHisWSResults = Nothing
+                myInitialHisWSResults = Nothing
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrintReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".PrintReport ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
 #End Region
 
 #Region "Screen Events"
@@ -1704,7 +1880,7 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB
-    ''' Modified by: SA 25/08/2014 - BT #1861 ==> Code moved to new function ExitScreen
+    ''' Modified by: SA 25/08/2014 - BA-1861 ==> Code moved to new function ExitScreen
     ''' </remarks>
     Private Sub ExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles exitButton.Click
         Try
@@ -1721,7 +1897,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB
     ''' Modified by: XB 14/02/2014 - BT #1495 ==> Register Historic screen user actions into the Application Log
-    '''              SA 25/08/2014 - BT #1861 ==> Added Try/Catch block
+    '''              SA 25/08/2014 - BA-1861  ==> Added Try/Catch block
     ''' </remarks>
     Private Sub bsSearchButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles searchButton.Click
         Try
@@ -1742,7 +1918,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB
     ''' Modified by: XB 14/02/2014 - BT #1495 ==> Register Historic screen user actions into the Application Log
-    '''              SA 25/08/2014 - BT #1861 ==> Added Try/Catch block
+    '''              SA 25/08/2014 - BA-1861  ==> Added Try/Catch block
     ''' </remarks>
     Private Sub bsHistoryDelete_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles historyDeleteButton.Click
         Try
@@ -1763,7 +1939,7 @@ Public Class IHisResults
     ''' <remarks>
     ''' Created by:  JB
     ''' Modified by: XB 14/02/2014 - BT #1495 ==> Register Historic screen user actions into the Application Log
-    '''              SA 25/08/2014 - BT #1861 ==> Added Try/Catch block
+    '''              SA 25/08/2014 - BA-1861  ==> Added Try/Catch block
     ''' </remarks>
     Private Sub ExportButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles exportButton.Click
         Try
@@ -1785,34 +1961,11 @@ Public Class IHisResults
     ''' Created by: DL 26/10/2012
     ''' Modified by XB 03/10/2013 - BT #1309 ==> Added TestPosition field to preserve the sorting configured on Reports Tests Sorting screen 
     '''             AG 14/02/2014 - BT #1505 ==> Set to Nothing all declared Lists to release memory
+    '''             SA 02/09/2014 - BA-1868  ==> Code moved to generic function PrintReport
     ''' </remarks>
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintButton.Click
         Try
-            Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)
-
-            myHisWSResults = GetSelectedRows()
-            sampleTypeChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
-
-            If (myHisWSResults.Count > 0) Then
-                'BT #1309 - Sort data to print by TestPosition field
-                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
-                                                                                    Order By a.TestPosition _
-                                                                                      Select a).ToList
-
-                myHisWSResults.Clear()
-                XRManager.ShowHistoricResultsByPatientSampleReport(myHisWSResultsSorted)
-                myHisWSResultsSorted = Nothing
-            End If
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "IHisResults.bsPrintButton_Click", EventLogEntryType.Information, False)
-            StartTime = Now
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            myHisWSResults = Nothing
+            PrintReport(False)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPrintButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1826,33 +1979,11 @@ Public Class IHisResults
     ''' Created by: 
     ''' Modified by: XB 03/10/2013 - BT #1309 ==> Added TestPosition field to preserve the sorting configured on Reports Tests Sorting screen 
     '''              AG 14/02/2014 - BT #1505 ==> Set to Nothing all declared Lists to release memory 
+    '''              SA 02/09/2014 - BA-1868  ==> Code moved to generic function PrintReport
     ''' </remarks>
     Private Sub CompactPrintButton_Click(sender As Object, e As EventArgs) Handles CompactPrintButton.Click
         Try
-            Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)
-
-            myHisWSResults = GetSelectedRows()
-            sampleTypeChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
-
-            If (myHisWSResults.Count > 0) Then
-                'BT #1309 - Sort data to print by TestPosition field
-                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
-                                                                                    Order By a.TestPosition _
-                                                                                      Select a).ToList
-                myHisWSResults.Clear()
-                XRManager.ShowHistoricByCompactPatientsSamplesResult(myHisWSResultsSorted)
-                myHisWSResultsSorted = Nothing
-            End If
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Historic Patient Results Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "IHisResults.CompactPrintButton_Click", EventLogEntryType.Information, False)
-            StartTime = Now
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            myHisWSResults = Nothing
+            PrintReport(True)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CompactPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CompactPrintButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1861,10 +1992,10 @@ Public Class IHisResults
 #End Region
 
 #Region "DateTimePicker Events"
-    Private Sub bsDateFromDateTimePick_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dateFromDateTimePick.ValueChanged
+    Private Sub bsDateFromDateTimePick_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsDateFromDateTimePick.ValueChanged
         Try
-            If (dateFromDateTimePick.Checked) Then
-                dateToDateTimePick.MinDate = dateFromDateTimePick.Value
+            If (bsDateFromDateTimePick.Checked) Then
+                dateToDateTimePick.MinDate = bsDateFromDateTimePick.Value
             Else
                 dateToDateTimePick.MinDate = Today.AddYears(-100)
             End If
@@ -1877,9 +2008,9 @@ Public Class IHisResults
     Private Sub bsDateToDateTimePick_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dateToDateTimePick.ValueChanged
         Try
             If (dateToDateTimePick.Checked) Then
-                dateFromDateTimePick.MaxDate = dateToDateTimePick.Value
+                bsDateFromDateTimePick.MaxDate = dateToDateTimePick.Value
             Else
-                dateFromDateTimePick.MaxDate = Today.AddYears(100)
+                bsDateFromDateTimePick.MaxDate = Today.AddYears(100)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDateToDateTimePick_ValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1889,7 +2020,7 @@ Public Class IHisResults
 #End Region
 
 #Region "CheckComboBox Events"
-    Private Sub sampleTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles sampleTypeChkComboBox.CustomDisplayText
+    Private Sub sampleTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles sampleTypesChkComboBox.CustomDisplayText
         Try
             Dim numChecks As Integer = 0
             Dim text As String = String.Empty
@@ -1912,7 +2043,7 @@ Public Class IHisResults
         End Try
     End Sub
 
-    Private Sub testTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles testTypeChkComboBox.CustomDisplayText
+    Private Sub testTypeChkComboBox_CustomDisplayText(ByVal sender As System.Object, ByVal e As DevExpress.XtraEditors.Controls.CustomDisplayTextEventArgs) Handles testTypesChkComboBox.CustomDisplayText
         Try
             Dim numChecks As Integer = 0
 
@@ -2029,18 +2160,16 @@ Public Class IHisResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  JB 24/10/2012
-    ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory 
+    ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory  
     ''' </remarks>
     Private Sub historyGridView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles historyGridView.Click
         Try
             With historyGridView.CalcHitInfo(historyGrid.PointToClient(MousePosition))
-                If (.Column IsNot Nothing AndAlso .Column.Name = "Selected" AndAlso .InColumn) Then
+                If (.InColumnPanel AndAlso Not .Column Is Nothing AndAlso .Column.Name = "Selected") Then
                     Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
-
                     If (historyGridView.DataRowCount > 0) Then
                         SelectAllRows(selectedRows.Count <> historyGridView.DataRowCount)
                     End If
-
                     selectedRows = Nothing
                 End If
             End With
@@ -2052,24 +2181,14 @@ Public Class IHisResults
     End Sub
 
     ''' <summary>
-    ''' Set the BackColor of each grid Row according value of field BackColorGroup in the DS used as DataSource for the grid
+    ''' Call the function that set the proper back color for all rows loaded in the grid
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 25/08/2014 - BT #1861
+    ''' Created by: SA 29/08/2014 - BA-1916
     ''' </remarks>
     Private Sub historyGridView_RowStyle(ByVal sender As Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs) Handles historyGridView.RowStyle
         Try
-            Dim myGridView As DevExpress.XtraGrid.Views.Grid.GridView = DirectCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
-
-            If (e.RowHandle >= 0) Then
-                If (Convert.ToInt32(myGridView.GetRowCellDisplayText(e.RowHandle, myGridView.Columns("BackColorGroup"))) = 1) Then
-                    e.Appearance.BackColor = Color.LightBlue
-                    e.Appearance.BackColor2 = Color.LightBlue
-                Else
-                    e.Appearance.BackColor = Color.White
-                    e.Appearance.BackColor2 = Color.White
-                End If
-            End If
+            ApplyRowStyles(sender, e)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_RowStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".historyGridView_RowStyle ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")

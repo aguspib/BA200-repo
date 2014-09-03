@@ -325,6 +325,10 @@ Partial Public Class ISETestsDS
 
         Private columnSlopeFactorB2 As Global.System.Data.DataColumn
 
+        Private columnCustomPosition As Global.System.Data.DataColumn
+
+        Private columnAvailable As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -529,6 +533,22 @@ Partial Public Class ISETestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property CustomPositionColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnCustomPosition
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property AvailableColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAvailable
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -586,9 +606,11 @@ Partial Public Class ISETestsDS
                     ByVal LISValue As String, _
                     ByVal TestLongName As String, _
                     ByVal SlopeFactorA2 As Single, _
-                    ByVal SlopeFactorB2 As Single) As tparISETestsRow
+                    ByVal SlopeFactorB2 As Single, _
+                    ByVal CustomPosition As Integer, _
+                    ByVal Available As Boolean) As tparISETestsRow
             Dim rowtparISETestsRow As tparISETestsRow = CType(Me.NewRow, tparISETestsRow)
-            Dim columnValuesArray() As Object = New Object() {ISETestID, ISE_ResultID, Name, ShortName, Units, ISE_Units, InUse, TS_User, TS_DateTime, Enabled, Decimals, SampleType, RejectionCriteria, NumberOfControls, QCActive, ActiveControl, TestPosition, LISValue, TestLongName, SlopeFactorA2, SlopeFactorB2}
+            Dim columnValuesArray() As Object = New Object() {ISETestID, ISE_ResultID, Name, ShortName, Units, ISE_Units, InUse, TS_User, TS_DateTime, Enabled, Decimals, SampleType, RejectionCriteria, NumberOfControls, QCActive, ActiveControl, TestPosition, LISValue, TestLongName, SlopeFactorA2, SlopeFactorB2, CustomPosition, Available}
             rowtparISETestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparISETestsRow)
             Return rowtparISETestsRow
@@ -632,6 +654,8 @@ Partial Public Class ISETestsDS
             Me.columnTestLongName = MyBase.Columns("TestLongName")
             Me.columnSlopeFactorA2 = MyBase.Columns("SlopeFactorA2")
             Me.columnSlopeFactorB2 = MyBase.Columns("SlopeFactorB2")
+            Me.columnCustomPosition = MyBase.Columns("CustomPosition")
+            Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -679,6 +703,10 @@ Partial Public Class ISETestsDS
             MyBase.Columns.Add(Me.columnSlopeFactorA2)
             Me.columnSlopeFactorB2 = New Global.System.Data.DataColumn("SlopeFactorB2", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnSlopeFactorB2)
+            Me.columnCustomPosition = New Global.System.Data.DataColumn("CustomPosition", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnCustomPosition)
+            Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAvailable)
             Me.columnLISValue.DefaultValue = CType("", String)
         End Sub
 
@@ -1141,6 +1169,36 @@ Partial Public Class ISETestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property CustomPosition() As Integer
+            Get
+                Try
+                    Return CType(Me(Me.tabletparISETests.CustomPositionColumn), Integer)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'CustomPosition' in table 'tparISETests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Integer)
+                Me(Me.tabletparISETests.CustomPositionColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Available() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparISETests.AvailableColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Available' in table 'tparISETests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparISETests.AvailableColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsISETestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparISETests.ISETestIDColumn)
         End Function
@@ -1389,6 +1447,30 @@ Partial Public Class ISETestsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetSlopeFactorB2Null()
             Me(Me.tabletparISETests.SlopeFactorB2Column) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsCustomPositionNull() As Boolean
+            Return Me.IsNull(Me.tabletparISETests.CustomPositionColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetCustomPositionNull()
+            Me(Me.tabletparISETests.CustomPositionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsAvailableNull() As Boolean
+            Return Me.IsNull(Me.tabletparISETests.AvailableColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetAvailableNull()
+            Me(Me.tabletparISETests.AvailableColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 
