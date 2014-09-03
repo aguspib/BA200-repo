@@ -2253,29 +2253,6 @@
       END
       GO
 
-      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vhisWSResults') = 1)
-      DROP VIEW [dbo].vhisWSResults
-      GO
-      SET ANSI_NULLS ON
-      GO
-      SET QUOTED_IDENTIFIER ON
-      GO
-      CREATE VIEW [dbo].[vhisWSResults] AS
-      SELECT  R.HistOrderTestID, R.AnalyzerID, R.WorkSessionID, R.ResultDateTime,
-      (CASE WHEN OT.SampleClass = 'PATIENT' AND OT.SampleID IS NOT NULL THEN OT.SampleID
-      WHEN OT.SampleClass = 'PATIENT' AND P.PatientID IS NOT NULL THEN P.PatientID
-      ELSE NULL END) AS PatientID, P.FirstName, P.LastName, P.Gender, P.DateOfBirth, P.Comments,
-      OT.HistPatientID, OT.SampleClass, OT.StatFlag, OT.SpecimenID, OT.SampleType, OT.TestType,
-      TS.TestID, TS.TestName, TS.TestLongName, TS.TestVersionNumber, TS.TestPosition, TS.DecimalsAllowed, R.CONCValue,
-      (CASE WHEN NOT R.RemarkAlert IS NULL THEN R.RemarkAlert ELSE '' END) AS RemarkAlert,  MD.FixedItemDesc AS MeasureUnit,
-      R.MinRefRange, R.MaxRefRange, R.ExportStatus, R.AlarmList, TS.FormulaText, R.MultiPointNumber, R.ManualResultFlag, R.ManualResult, R.ManualResultText,
-      R.LISMessageID, OT.LISRequest, OT.ExternalQC, OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.LISTestName, OT.LISSampleType, OT.LISUnits
-      FROM    dbo.thisWSResults AS R INNER JOIN dbo.thisWSOrderTests AS OT ON R.HistOrderTestID = OT.HistOrderTestID
-      INNER JOIN dbo.vhisTestSamples AS TS ON OT.HistTestID = TS.HistTestID AND OT.TestType = TS.TestType AND TS.TestVersionNumber = COALESCE (OT.TestVersionNumber, 0)
-      LEFT OUTER JOIN dbo.tcfgMasterData AS MD ON MD.SubTableID = 'TEST_UNITS' AND MD.ItemID = OT.MeasureUnit
-      LEFT OUTER JOIN dbo.thisPatients AS P ON P.HistPatientID = OT.HistPatientID
-      GO
-
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparControls' AND sc.name = 'ControlLevel') = 0
       BEGIN
       ALTER TABLE [Ax00].[dbo].tparControls ADD ControlLevel tinyint NOT NULL default 1
@@ -2339,7 +2316,7 @@
       IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vhisTestSamples]'))
       DROP VIEW [dbo].[vhisTestSamples]
       GO
-      ET ANSI_NULLS ON
+      SET ANSI_NULLS ON
       GO
       SET QUOTED_IDENTIFIER ON
       GO
@@ -2366,8 +2343,31 @@
       AS TestLongName
       FROM         thisOffSystemTestSamples TS LEFT OUTER JOIN
       vcfgTestSortingForReports T ON TS .OffSystemTestName = T .TestName AND T .TestType = 'OFFS' ;
-
       GO
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vhisWSResults') = 1)
+      DROP VIEW [dbo].vhisWSResults
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisWSResults] AS
+      SELECT  R.HistOrderTestID, R.AnalyzerID, R.WorkSessionID, R.ResultDateTime,
+      (CASE WHEN OT.SampleClass = 'PATIENT' AND OT.SampleID IS NOT NULL THEN OT.SampleID
+      WHEN OT.SampleClass = 'PATIENT' AND P.PatientID IS NOT NULL THEN P.PatientID
+      ELSE NULL END) AS PatientID, P.FirstName, P.LastName, P.Gender, P.DateOfBirth, P.Comments,
+      OT.HistPatientID, OT.SampleClass, OT.StatFlag, OT.SpecimenID, OT.SampleType, OT.TestType,
+      TS.TestID, TS.TestName, TS.TestLongName, TS.TestVersionNumber, TS.TestPosition, TS.DecimalsAllowed, R.CONCValue,
+      (CASE WHEN NOT R.RemarkAlert IS NULL THEN R.RemarkAlert ELSE '' END) AS RemarkAlert,  MD.FixedItemDesc AS MeasureUnit,
+      R.MinRefRange, R.MaxRefRange, R.ExportStatus, R.AlarmList, TS.FormulaText, R.MultiPointNumber, R.ManualResultFlag, R.ManualResult, R.ManualResultText,
+      R.LISMessageID, OT.LISRequest, OT.ExternalQC, OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.LISTestName, OT.LISSampleType, OT.LISUnits
+      FROM    dbo.thisWSResults AS R INNER JOIN dbo.thisWSOrderTests AS OT ON R.HistOrderTestID = OT.HistOrderTestID
+      INNER JOIN dbo.vhisTestSamples AS TS ON OT.HistTestID = TS.HistTestID AND OT.TestType = TS.TestType AND TS.TestVersionNumber = COALESCE (OT.TestVersionNumber, 0)
+      LEFT OUTER JOIN dbo.tcfgMasterData AS MD ON MD.SubTableID = 'TEST_UNITS' AND MD.ItemID = OT.MeasureUnit
+      LEFT OUTER JOIN dbo.thisPatients AS P ON P.HistPatientID = OT.HistPatientID
+      GO
+
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'
