@@ -63,68 +63,93 @@ Public Class ISortingTestsAux
     ''' </summary>
     ''' <remarks>
     ''' Created by: TR
+    ''' AG 03/09/2014 - BA-1869 default test selection order
     ''' </remarks>
     Private Sub DefaultTestSort()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
+            Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
+            Dim myReportsTestsSortingList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+            Dim myDefaultSortedTestDS As New ReportsTestsSortingDS
 
-            myGlobalDataTO = myReportsTestsSortingDelegate.GetDefaultSortedTestList(Nothing)
-            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                Dim myReportsTestsSortingDS As ReportsTestsSortingDS = DirectCast(myGlobalDataTO.SetDatos, ReportsTestsSortingDS)
+            'AG 03/09/2014 - BA-1869
+            If openMode = String.Empty Then
+                Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
+                myGlobalDataTO = myReportsTestsSortingDelegate.GetDefaultSortedTestList(Nothing)
+                If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                    myReportsTestsSortingDS = DirectCast(myGlobalDataTO.SetDatos, ReportsTestsSortingDS)
 
-                'Get the default sorting for Standard Tests
-                Dim myReportsTestsSortingList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
-                myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
-                                            Where a.TestType = "STD" _
-                                         Order By a.TestPosition, a.PreloadedTest Descending _
-                                           Select a).ToList()
+                    '1st Get the default sorting for Standard Tests
+                    myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.TestType = "STD" _
+                                             Order By a.TestPosition, a.PreloadedTest Descending _
+                                               Select a).ToList()
+                    For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
+                        myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
+                    Next
 
-                Dim myDefaultSortedTestDS As New ReportsTestsSortingDS
-                For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
-                    myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
-                Next
+                    '2on Get the default sorting for Calculated Tests
+                    myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.TestType = "CALC" _
+                                             Order By a.TestName, a.TestPosition _
+                                               Select a).ToList()
+                    For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
+                        myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
+                    Next
 
-                'Get the default sorting for Calculated Tests
-                myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
-                                            Where a.TestType = "CALC" _
-                                         Order By a.TestName, a.TestPosition _
-                                           Select a).ToList()
+                    '3rd Get the default sorting for ISE Tests
+                    myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.TestType = "ISE" _
+                                             Order By a.TestPosition _
+                                               Select a).ToList()
+                    For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
+                        myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
+                    Next
 
-                For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
-                    myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
-                Next
+                    '4th Get the default sorting for OffSystem Tests
+                    myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.TestType = "OFFS" _
+                                             Order By a.TestPosition _
+                                               Select a).ToList()
+                    For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
+                        myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
+                    Next
+                End If
 
-                'Get the default sorting for ISE Tests
-                myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
-                                            Where a.TestType = "ISE" _
-                                         Order By a.TestPosition _
-                                           Select a).ToList()
-
-                For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
-                    myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
-                Next
-
-                'Get the default sorting for OffSystem Tests
-                myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
-                                            Where a.TestType = "OFFS" _
-                                         Order By a.TestPosition _
-                                           Select a).ToList()
-
-                For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
-                    myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
-                Next
-
-                'Load the ListView with the final sorted list
-                FillTestListView(myDefaultSortedTestDS)
-                myReportsTestsSortingList = Nothing
-
-                'TR 13/02/2012 -Set ChangesMade value True.
-                ChangesMade = True
             Else
-                'Error getting the default sorting for Tests
-                ShowMessage(Name & ".DefaultTestSort ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
+                myReportsTestsSortingDS = GetSortedTestList() 'Get all elements and apply the default order
+
+                'Order for test selection default (same as screen)
+                Select Case ScreenIDAttribute
+                    Case "STD"
+                        'Get the default sorting for Standard Tests
+                        myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                 Order By a.PreloadedTest Descending, a.TestID _
+                                                   Select a).ToList()
+                    Case "CALC"
+                        'Get the default sorting for Calculated Tests
+                        myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                 Order By a.TestName Select a).ToList()
+                    Case "ISE", "OFFS", "PROFILE"
+                        'Get the default sorting for ISE, OFFS and profile Tests
+                        myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
+                                                 Order By a.TestID Select a).ToList()
+                End Select
+                If Not myReportsTestsSortingList Is Nothing Then
+                    For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
+                        myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
+                    Next
+                End If
             End If
+            'AG 03/09/2014 - BA-1869
+
+            'Load the ListView with the final sorted list
+            FillTestListView(myDefaultSortedTestDS)
+            myReportsTestsSortingList = Nothing
+
+            'TR 13/02/2012 -Set ChangesMade value True.
+            ChangesMade = True
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DefaultTestSort ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DefaultTestSort ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -170,7 +195,7 @@ Public Class ISortingTestsAux
                         Dim myDelegate As New OffSystemTestsDelegate
                         myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
 
-                    Case "Profile"
+                    Case "PROFILE"
                         Dim myDelegate As New TestProfilesDelegate
                         myGlobalDataTO = myDelegate.GetCustomizedSortedTestSelectionList(Nothing)
 
@@ -204,6 +229,7 @@ Public Class ISortingTestsAux
     ''' </summary>
     ''' <remarks>
     ''' Created by:  TR
+    ''' AG 03/09/2014 - BA-1869 add the tests profiles icon
     ''' </remarks>
     Private Sub FillTestIconList()
         Try
@@ -216,7 +242,7 @@ Public Class ISortingTestsAux
 
                 For Each preMasterRow As PreloadedMasterDataDS.tfmwPreloadedMasterDataRow In myPreMasterDataDS.tfmwPreloadedMasterData.Rows
                     Select Case preMasterRow.ItemID
-                        Case "TESTICON", "USERTEST", "TCALC", "TISE_SYS", "TOFF_SYS"
+                        Case "TESTICON", "USERTEST", "TCALC", "TISE_SYS", "TOFF_SYS", "TPROFILES"
                             If (IO.File.Exists(MyBase.IconsPath & preMasterRow.FixedItemDesc)) Then
                                 TestIconList.Images.Add(preMasterRow.ItemID, Image.FromFile(MyBase.IconsPath & preMasterRow.FixedItemDesc))
                             End If
@@ -238,6 +264,7 @@ Public Class ISortingTestsAux
     ''' <param name="pReportsTestsSortingDS">Typed Dataset ReportsTestsSortingDS containing the current test sorting</param>
     ''' <remarks>
     ''' Created by:  TR
+    ''' AG 03/09/2014 - BA-1869 get also Available column for each item (and profile Icon)
     ''' </remarks>
     Private Sub FillTestListView(ByVal pReportsTestsSortingDS As ReportsTestsSortingDS)
         Try
@@ -263,10 +290,21 @@ Public Class ISortingTestsAux
                     Case "OFFS"
                         IconName = "TOFF_SYS"
                         Exit Select
+
+                        'AG 03/09/2014 - BA-1869
+                    Case "PROFILE"
+                        IconName = "TPROFILES"
+                        Exit Select
+
                 End Select
 
                 TestListView.Items.Add(testRow.TestName, IconName).SubItems.Add(testRow.TestID)
                 TestListView.Items(myRowIndex).SubItems.Add(testRow.TestType)
+
+                'AG 03/09/2014 - BA-1869 - In mode test selection order show also Available
+                If openMode <> String.Empty Then
+                    TestListView.Items(myRowIndex).SubItems.Add(testRow.Available)
+                End If
 
                 myRowIndex += 1
             Next
@@ -509,6 +547,7 @@ Public Class ISortingTestsAux
     ''' </summary>
     ''' <remarks>
     ''' Created by:  TR
+    ''' AG 03/09/2014 - BA-1869 get also Available column for each item
     ''' </remarks>
     Private Sub PrepareTestListView()
         Try
@@ -531,12 +570,28 @@ Public Class ISortingTestsAux
             TestListView.Columns(1).Name = "TestID"
             TestListView.Columns.Add("TestType", 0, HorizontalAlignment.Left)
             TestListView.Columns(2).Name = "TestType"
+
+            'AG 03/09/2014 - BA-1869 - In mode test selection order show also Available
+            If openMode <> String.Empty Then
+                'TestListView.CheckBoxes = True 'AG 03/09/2014 - BA-1869 - It does not work because the check has not an own header in order to check/unchech all
+                TestListView.Columns.Add("Available", 0, HorizontalAlignment.Left)
+                TestListView.Columns(3).Name = "Available"
+            End If
+            'AG 03/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareTestListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Build a DSataSET to update database
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Creation ??
+    ''' AG 03/09/2014 - BA-1869 get also Available column for each item
+    ''' </remarks>
     Private Function ReorderTest() As ReportsTestsSortingDS
         Dim myReportSortingDS As New ReportsTestsSortingDS
 
@@ -546,6 +601,13 @@ Public Class ISortingTestsAux
                 myRepoSortRow = myReportSortingDS.tcfgReportsTestsSorting.NewtcfgReportsTestsSortingRow
                 myRepoSortRow.TestType = TestItem.SubItems(2).Text
                 myRepoSortRow.TestID = CInt(TestItem.SubItems(1).Text)
+
+                'AG 03/09/2014 - BA-1869 - In mode test selection order get also Available
+                If openMode <> String.Empty AndAlso TestItem.SubItems(3).Text.ToString <> String.Empty Then
+                    myRepoSortRow.Available = CBool(TestItem.SubItems(3).Text)
+                End If
+                'AG 03/09/2014 - BA-1869
+
                 myRepoSortRow.TestPosition = TestItem.Index + 1
 
                 myReportSortingDS.tcfgReportsTestsSorting.AddtcfgReportsTestsSortingRow(myRepoSortRow)
@@ -557,13 +619,56 @@ Public Class ISortingTestsAux
         Return myReportSortingDS
     End Function
 
+    ''' <summary>
+    ''' Saves changes in new test orders
+    ''' - Original functionality test order for reports with all test types
+    ''' - Functionality test order and availability for test selection only 1 test type or profiles
+    ''' </summary>
+    ''' <param name="pReportsTestsSortingDS"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created ??
+    ''' AG 03/09/2014 - BA-1869 customize test order for test selection
+    ''' </remarks>
     Private Function SaveChanges(ByVal pReportsTestsSortingDS As ReportsTestsSortingDS) As Boolean
         Dim isSaveOK As Boolean = False
         Try
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
 
-            myGlobalDataTO = myReportsTestsSortingDelegate.UpdateTestPosition(Nothing, pReportsTestsSortingDS)
+            'AG 03/09/2014 - BA-1869
+            'myGlobalDataTO = myReportsTestsSortingDelegate.UpdateTestPosition(Nothing, pReportsTestsSortingDS)
+            If openMode = String.Empty Then
+                'Test order for reports
+                myGlobalDataTO = myReportsTestsSortingDelegate.UpdateTestPosition(Nothing, pReportsTestsSortingDS)
+            Else
+                'Test (or profile) order for test selection
+                Select Case ScreenIDAttribute
+                    Case "STD"
+                        Dim myDelegate As New TestsDelegate
+                        myGlobalDataTO = myDelegate.UpdateCustomPositionAndAvailable(Nothing, pReportsTestsSortingDS)
+                    Case "CALC"
+                        Dim myDelegate As New CalculatedTestsDelegate
+                        myGlobalDataTO = myDelegate.UpdateCustomPositionAndAvailable(Nothing, pReportsTestsSortingDS)
+
+                    Case "ISE"
+                        Dim myDelegate As New ISETestsDelegate
+                        myGlobalDataTO = myDelegate.UpdateCustomPositionAndAvailable(Nothing, pReportsTestsSortingDS)
+
+                    Case "OFFS"
+                        Dim myDelegate As New OffSystemTestsDelegate
+                        myGlobalDataTO = myDelegate.UpdateCustomPositionAndAvailable(Nothing, pReportsTestsSortingDS)
+
+                    Case "PROFILE"
+                        Dim myDelegate As New TestProfilesDelegate
+                        myGlobalDataTO = myDelegate.UpdateCustomPositionAndAvailable(Nothing, pReportsTestsSortingDS)
+
+                    Case Else
+                        'List will appear empty
+                End Select
+            End If
+            'AG 03/09/2014 - BA-1869
+
             If (Not myGlobalDataTO.HasError) Then
                 isSaveOK = True
             Else
