@@ -1251,83 +1251,47 @@ Public Class XRManager
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pAnalyzerID"></param>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="Vertical"></param>
+    ''' <remarks></remarks>
     Public Shared Sub ShowSummaryResultsReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal Vertical As Boolean)
         Try
+            Const MAX_VERTICAL_COLUMNS As Integer = 6
+            Const MAX_HORIZONTAL_COLUMMNS As Integer = 10
+
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
+            Dim xtraReport As XtraReport
+            Dim numColumns As Integer
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+            If Vertical Then
+                numColumns = MAX_VERTICAL_COLUMNS
+            Else
+                numColumns = MAX_HORIZONTAL_COLUMMNS
+            End If
 
-            resultData = myResultsDelegate.GetSummaryResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID)
+            resultData = myResultsDelegate.GetSummaryResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, numColumns)
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                Dim dt As DataTable = DirectCast(resultData.SetDatos, DataTable)
+                Dim dsReport As DataSet = DirectCast(resultData.SetDatos, DataSet)
 
-                Dim Report As New SummaryResultsReport
-
-                Report.SetDataSource(dt)
-
-                'Multilanguage. Get texts from DB.
-                Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_OpenSummary", CurrentLanguage)
-
-                Report.SetHeaderLabel(literalHeaderLabel)
-
-                Dim LabelFont As System.Drawing.Font = New System.Drawing.Font("Verdana", 6.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-                Dim CellFont As System.Drawing.Font = New System.Drawing.Font("Verdana", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-
-                Dim cells(dt.Columns.Count - 1) As XRTableCell
-
-                cells(0) = CreateTableCell(myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_PATIENT", CurrentLanguage))
-                cells(0).Font = LabelFont
-
-                For i As Integer = 1 To dt.Columns.Count - 1
-                    cells(i) = CreateTableCell(dt.Columns(i).ColumnName)
-                    cells(i).Font = LabelFont
-                Next
-
-                Report.AddTableHeaderCells(cells)
-
-                cells(0) = CreateBindedTableCell(dt.Columns(0).ColumnName)
-                cells(0).Font = CellFont
-
-                For i As Integer = 1 To dt.Columns.Count - 1
-                    cells(i) = CreateBindedTableCell(dt.Columns(i).ColumnName, False, TextAlignment.MiddleRight)
-                    cells(i).Font = CellFont
-                Next
-
-                Report.AddTableRowCells(cells)
-
-                Dim WSStartDateTime As String = String.Empty
-
-                'Get WSStartDateTime from DB
-                Dim myWSDelegate As New WorkSessionsDelegate
-
-                resultData = myWSDelegate.GetByWorkSession(Nothing, pWorkSessionID)
-
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    Dim myWSDataDS As WorkSessionsDS = DirectCast(resultData.SetDatos, WorkSessionsDS)
-                    If myWSDataDS.twksWorkSessions.Count > 0 AndAlso Not (myWSDataDS.twksWorkSessions.First.IsStartDateTimeNull) Then
-                        WSStartDateTime = myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(DatePattern) & " " & _
-                                            myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(TimePattern)
-                    End If
-                End If
-
-                Report.XrWSStartDateTimeLabel.Text = WSStartDateTime
+                xtraReport = CreateSummaryResultsReport(pWorkSessionID, dsReport)
 
                 If Vertical Then
-                    ShowPortrait(Report)
+                    ShowPortrait(xtraReport)
                 Else
-                    ShowLandscape(Report)
+                    ShowLandscape(xtraReport)
                 End If
-                'Else
-                'ToDo: Try the error
+
             End If
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowUsersReport", EventLogEntryType.Error, False)
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowSummaryResultsReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -2066,6 +2030,91 @@ Public Class XRManager
 
         End Try
     End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="dsReport"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Shared Function CreateSummaryResultsReport(ByVal pWorkSessionID As String, ByVal dsReport As DataSet) As SummaryResultsReport
+
+        Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        Dim Report As New SummaryResultsReport
+        Dim detailDataMember As String = String.Format("{0}.{1}", dsReport.Tables(0).TableName,
+                dsReport.Tables(0).ChildRelations("Values").RelationName)
+        Dim dataMember As String = dsReport.Tables(0).TableName
+
+        Report.DataSource = dsReport
+        Report.DataMember = dsReport.Tables(0).TableName
+
+        Report.DetailReport.DataSource = dsReport.Tables(0).ChildRelations("Values").ChildTable
+        Report.DetailReport.DataMember = detailDataMember
+
+        'Multilanguage. Get texts from DB.
+        Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_OpenSummary", CurrentLanguage)
+
+        Report.SetHeaderLabel(literalHeaderLabel)
+
+        Dim LabelFont As System.Drawing.Font = New System.Drawing.Font("Verdana", 6.75!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Dim CellFont As System.Drawing.Font = New System.Drawing.Font("Verdana", 6.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+
+        Dim cells(dsReport.Tables(0).Columns.Count - 1) As XRTableCell
+        Dim cellsDetail(dsReport.Tables(1).Columns.Count - 2) As XRTableCell
+
+        cells(0) = CreateTableCell(myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_PATIENT", CurrentLanguage), TextAlignment.MiddleLeft)
+        cells(0).Font = LabelFont
+        cells(0).Weight = 1.2
+        cells(0).Padding = New PaddingInfo(1, 0, 0, 0)
+
+        Dim cellDataMember As String
+        For i As Integer = 1 To dsReport.Tables(0).Columns.Count - 1
+            cellDataMember = String.Format("{0}.{1}", dataMember, dsReport.Tables(0).Columns(i).ColumnName)
+            cells(i) = CreateBindedTableCell(cellDataMember, False, TextAlignment.MiddleRight, 0.8)
+            cells(i).Font = LabelFont
+        Next
+
+        Report.AddTableHeaderCells(cells)
+
+        Dim detailCellDataMember As String
+        For i As Integer = 1 To dsReport.Tables(1).Columns.Count - 1
+
+            detailCellDataMember = String.Format("{0}.{1}", detailDataMember, dsReport.Tables(1).Columns(i).ColumnName)
+            If (i = 1) Then
+                cellsDetail(i - 1) = CreateBindedTableCell(detailCellDataMember, False, TextAlignment.MiddleLeft, 1.2)
+            Else
+                cellsDetail(i - 1) = CreateBindedTableCell(detailCellDataMember, False, TextAlignment.MiddleRight, 0.8)
+            End If
+
+            cellsDetail(i - 1).Font = CellFont
+        Next
+
+        Report.AddTableRowCells(cellsDetail)
+
+        Dim WSStartDateTime As String = String.Empty
+
+        'Get WSStartDateTime from DB
+        Dim myWSDelegate As New WorkSessionsDelegate
+        Dim resultData As GlobalDataTO
+
+        resultData = myWSDelegate.GetByWorkSession(Nothing, pWorkSessionID)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            Dim myWSDataDS As WorkSessionsDS = DirectCast(resultData.SetDatos, WorkSessionsDS)
+            If myWSDataDS.twksWorkSessions.Count > 0 AndAlso Not (myWSDataDS.twksWorkSessions.First.IsStartDateTimeNull) Then
+                WSStartDateTime = myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(DatePattern) & " " & _
+                                    myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(TimePattern)
+            End If
+        End If
+
+        Report.XrWSStartDateTimeLabel.Text = WSStartDateTime
+
+        Return Report
+    End Function
 
 #End Region
 

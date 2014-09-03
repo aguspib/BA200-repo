@@ -1777,6 +1777,79 @@ Public Class IHisResults
     End Sub
 #End Region
 
+#Region "Private Methods for Printing"
+    ''' <summary>
+    ''' Prints report of Historic Results by Patient in extended or in compact format
+    ''' </summary>
+    ''' <param name="pCompactReport">When TRUE, the Compact Report is printed; when FALSE, the extended Report is printed</param>
+    ''' <remarks>
+    ''' Created by: SA 02/09/2014 - BA-1868  ==> New function to unify the code of both Print Report Buttons (excepting the Report function
+    '''                                          to call, the code is exactly the same). Changes made in the previous code:
+    '''                                          ** Called the new function MarkExcludedExpTests in HisWSCalcTestsRelationsDelegate to check if 
+    '''                                             between the results selected to print there are results of Tests included in the Formula of 
+    '''                                             selected Calculated Tests with PrintExpTests = FALSE. Results to exclude from the report 
+    '''                                             are returned with flag ExpTestToPrint = False
+    ''' </remarks>
+    Private Sub PrintReport(ByVal pCompactReport As Boolean)
+        Try
+            Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            Dim myHisWSResults As New List(Of HisWSResultsDS.vhisWSResultsRow)
+
+            'Get the list of Historic Patient Results selected in the grid
+            Dim myInitialHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+            sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
+
+            'For all Calculated Tests, search all Tests in the Formula and verify which Experimental Tests have to be printed 
+            Dim returnData As GlobalDataTO = Nothing
+            Dim myHisWSCalcTestRelDelegate As New HisWSCalcTestsRelationsDelegate
+
+            returnData = myHisWSCalcTestRelDelegate.MarkExcludedExpTests(Nothing, myInitialHisWSResults, AnalyzerIDAttribute)
+            If (Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing) Then
+                Dim testsWereExcluded As Boolean = DirectCast(returnData.SetDatos, Boolean)
+
+                If (Not testsWereExcluded) Then
+                    myHisWSResults = myInitialHisWSResults
+                Else
+                    'Get only those records marked as not excluded 
+                    myHisWSResults = (From a As HisWSResultsDS.vhisWSResultsRow In myInitialHisWSResults _
+                                     Where a.ExpTestToPrint = True
+                                    Select a).ToList
+                End If
+            End If
+
+            If (myHisWSResults.Count > 0) Then
+                'BT #1309 - Sort data to print by TestPosition field
+                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
+                                                                                    Order By a.TestPosition _
+                                                                                      Select a).ToList
+
+                myHisWSResults.Clear()
+
+                If (Not pCompactReport) Then
+                    XRManager.ShowHistoricResultsByPatientSampleReport(myHisWSResultsSorted)
+                Else
+                    XRManager.ShowHistoricByCompactPatientsSamplesResult(myHisWSResultsSorted)
+                End If
+                myHisWSResultsSorted = Nothing
+            End If
+
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+                myLogAcciones.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                                "IHisResults.PrintReport", EventLogEntryType.Information, False)
+                StartTime = Now
+                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+                myHisWSResults = Nothing
+                myInitialHisWSResults = Nothing
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrintReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".PrintReport ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+#End Region
+
 #Region "Screen Events"
     Private Sub IHisResults_KeyDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles MyBase.KeyDown
         Try
@@ -1888,34 +1961,11 @@ Public Class IHisResults
     ''' Created by: DL 26/10/2012
     ''' Modified by XB 03/10/2013 - BT #1309 ==> Added TestPosition field to preserve the sorting configured on Reports Tests Sorting screen 
     '''             AG 14/02/2014 - BT #1505 ==> Set to Nothing all declared Lists to release memory
+    '''             SA 02/09/2014 - BA-1868  ==> Code moved to generic function PrintReport
     ''' </remarks>
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PrintButton.Click
         Try
-            Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)
-
-            myHisWSResults = GetSelectedRows()
-            sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
-
-            If (myHisWSResults.Count > 0) Then
-                'BT #1309 - Sort data to print by TestPosition field
-                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
-                                                                                    Order By a.TestPosition _
-                                                                                      Select a).ToList
-
-                myHisWSResults.Clear()
-                XRManager.ShowHistoricResultsByPatientSampleReport(myHisWSResultsSorted)
-                myHisWSResultsSorted = Nothing
-            End If
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "IHisResults.bsPrintButton_Click", EventLogEntryType.Information, False)
-            StartTime = Now
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            myHisWSResults = Nothing
+            PrintReport(False)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsPrintButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1929,33 +1979,11 @@ Public Class IHisResults
     ''' Created by: 
     ''' Modified by: XB 03/10/2013 - BT #1309 ==> Added TestPosition field to preserve the sorting configured on Reports Tests Sorting screen 
     '''              AG 14/02/2014 - BT #1505 ==> Set to Nothing all declared Lists to release memory 
+    '''              SA 02/09/2014 - BA-1868  ==> Code moved to generic function PrintReport
     ''' </remarks>
     Private Sub CompactPrintButton_Click(sender As Object, e As EventArgs) Handles CompactPrintButton.Click
         Try
-            Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)
-
-            myHisWSResults = GetSelectedRows()
-            sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
-
-            If (myHisWSResults.Count > 0) Then
-                'BT #1309 - Sort data to print by TestPosition field
-                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
-                                                                                    Order By a.TestPosition _
-                                                                                      Select a).ToList
-                myHisWSResults.Clear()
-                XRManager.ShowHistoricByCompactPatientsSamplesResult(myHisWSResultsSorted)
-                myHisWSResultsSorted = Nothing
-            End If
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Historic Patient Results Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "IHisResults.CompactPrintButton_Click", EventLogEntryType.Information, False)
-            StartTime = Now
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            myHisWSResults = Nothing
+            PrintReport(True)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CompactPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CompactPrintButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")

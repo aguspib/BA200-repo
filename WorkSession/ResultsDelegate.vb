@@ -6708,7 +6708,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by: RH 18/01/2012
         ''' </remarks>
         Public Function GetSummaryResultsByPatientSampleForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                   ByVal pWorkSessionID As String) As GlobalDataTO
+                                                   ByVal pWorkSessionID As String, ByVal pNumColumns As Integer) As GlobalDataTO
 
             Dim resultData As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -6730,45 +6730,12 @@ Namespace Biosystems.Ax00.BL
 
                             ExecutionsResultsDS = CType(resultData.SetDatos, ExecutionsDS)
 
-                            Dim OrderTestList As List(Of Integer) = _
-                                    (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                     Where row.OrderToPrint = True AndAlso String.Compare(row.SampleClass, "PATIENT", False) = 0 _
-                                     Order By row.TestPosition _
-                                     Select row.OrderTestID Distinct).ToList()
-
                             Dim myResultsDelegate As New ResultsDelegate
 
-                            For Each OrderTestID As Integer In OrderTestList
-                                'Get all results for current OrderTestID.
-                                resultData = myResultsDelegate.GetResults(dbConnection, OrderTestID)
-                                If (Not resultData.HasError) Then
-                                    For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    Next resultRow
-                                Else
-                                    'ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                                    Exit For
-                                End If
-                            Next OrderTestID
-
-                            'Get Calculated Results
-                            resultData = myResultsDelegate.GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                            'Get all results for current Analyzer & WorkSession
+                            resultData = myResultsDelegate.GetCompleteResults(Nothing, pAnalyzerID, pWorkSessionID)
                             If (Not resultData.HasError) Then
-                                For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                Next
-                                'Else
-                                'ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                            End If
-
-                            'Get ISE & OffSystem tests Results
-                            resultData = myResultsDelegate.GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
-                            If (Not resultData.HasError) Then
-                                For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                Next resultRow
-                                'Else
-                                'ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
+                                AverageResultsDS = CType(resultData.SetDatos, ResultsDS)
                             End If
 
                             Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
@@ -6781,6 +6748,7 @@ Namespace Biosystems.Ax00.BL
                                             If String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0 Then
                                                 resultRow.PatientName = executionRow.PatientName
                                                 resultRow.PatientID = executionRow.PatientID
+                                                resultRow.SpecimenIDList = executionRow.SpecimenIDList
                                             End If
                                         Next resultRow
 
@@ -6789,135 +6757,13 @@ Namespace Biosystems.Ax00.BL
                                 End If
                             Next executionRow
 
-                            Dim TestNames As New List(Of String)
-                            Dim PatientNames As New List(Of String)
-                            Const TestNameFormat As String = "{0} ({1})"
+                            Dim dsReport As DataSet
+                            resultData = Me.CreateSummaryResultsReportDataSet(AverageResultsDS, ExecutionsResultsDS, pNumColumns)
 
-                            'Fill the TestNames List with all the test names
-                            Dim TestsList As List(Of ResultsDS.vwksResultsRow)
-                            Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
-                            Dim TestNameAndSampleClass As String
+                            If (Not resultData.HasError) Then
+                                dsReport = CType(resultData.SetDatos, DataSet)
+                            End If
 
-                            For i As Integer = 0 To TestType.Length - 1
-                                TestsList = (From row In AverageResultsDS.vwksResults _
-                                             Where String.Compare(row.TestType, TestType(i), False) = 0 _
-                                             Select row).ToList()
-
-                                For j As Integer = 0 To TestsList.Count - 1
-                                    TestNameAndSampleClass = String.Format(TestNameFormat, TestsList(j).TestName, TestsList(j).SampleType)
-                                    If Not TestNames.Contains(TestNameAndSampleClass) Then
-                                        TestNames.Add(TestNameAndSampleClass)
-                                    End If
-                                Next
-                            Next
-
-                            'Fill the PatientNames List with all the patient names
-                            PatientNames = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                            Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
-                                            Select row.PatientName Distinct).ToList()
-
-                            'Create the Patient List DataTable structure and content
-                            Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
-                            Dim hasConcentrationError As Boolean
-
-                            Dim dt As New DataTable 'The DataTable to be returned
-
-                            'Patient Name Column
-                            dt.Columns.Add("PatientName", GetType(String))
-
-                            'Test Name Columns
-                            For i As Integer = 0 To TestNames.Count - 1
-                                dt.Columns.Add(TestNames(i), GetType(String))
-                            Next
-
-                            'Fill the Table with data
-                            For i As Integer = 0 To PatientNames.Count - 1
-                                dt.Rows.Add()
-                                dt(i).Item("PatientName") = PatientNames(i)
-
-                                For j As Integer = 0 To TestNames.Count - 1
-                                    SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                   Where String.Compare(row.PatientName, PatientNames(i), False) = 0 _
-                                                   AndAlso String.Compare(String.Format(TestNameFormat, row.TestName, row.SampleType), TestNames(j), False) = 0 _
-                                                   Select row).ToList()
-
-                                    If SamplesList.Count > 0 Then
-                                        TestsList = (From row In AverageResultsDS.vwksResults _
-                                                     Where row.OrderTestID = SamplesList.First.OrderTestID _
-                                                     AndAlso row.AcceptedResultFlag _
-                                                     Select row).ToList()
-
-                                        If TestsList.Count > 0 Then
-                                            If Not TestsList.First.IsCONC_ValueNull Then
-                                                hasConcentrationError = False
-
-                                                If Not TestsList.First.IsCONC_ErrorNull Then
-                                                    hasConcentrationError = Not String.IsNullOrEmpty(TestsList.First.CONC_Error)
-                                                End If
-
-                                                If Not hasConcentrationError Then
-                                                    dt(i).Item(TestNames(j)) = TestsList.First.CONC_Value.ToStringWithDecimals(TestsList.First.DecimalsAllowed)
-                                                Else
-                                                    dt(i).Item(TestNames(j)) = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                End If
-                                            ElseIf Not TestsList.First.IsManualResultTextNull Then 'Off System Test
-                                                dt(i).Item(TestNames(j)) = TestsList.First.ManualResultText
-                                            Else
-                                                dt(i).Item(TestNames(j)) = String.Empty
-                                            End If
-
-                                            'Fill Calculated Test Data
-                                            'Remember: vwksResults Calculated Test relates with Standard Tests in 
-                                            'vwksWSExecutionsResults through the field ControlNum As OrderTestID
-                                            ' dl 18/04/2011
-                                            'TestsList = (From row In AverageResultsDS.vwksResults _
-                                            '             Where row.TestType = "CALC" _
-                                            '             AndAlso row.AcceptedResultFlag = True _
-                                            '             Select row).ToList()
-                                            TestsList = (From row In AverageResultsDS.vwksResults _
-                                                         Where String.Compare(row.TestType, "CALC", False) = 0 _
-                                                         AndAlso String.Compare(row.STDOrderTestID, SamplesList.First.OrderTestID.ToString(), False) = 0 _
-                                                         AndAlso row.AcceptedResultFlag = True _
-                                                         Select row).ToList()
-                                            ' end dl
-
-                                            'Is this Standard Test a part of a Calculated Test?
-                                            If TestsList.Count > 0 Then
-                                                For K As Integer = 0 To TestsList.Count - 1
-                                                    Dim ColumnName As String = String.Format(TestNameFormat, TestsList(K).TestName, TestsList(K).SampleType)
-                                                    If Not TestsList(K).IsCONC_ValueNull Then
-                                                        dt(i).Item(ColumnName) = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
-
-                                                        hasConcentrationError = False
-
-                                                        If Not TestsList(K).IsCONC_ErrorNull Then
-                                                            hasConcentrationError = Not String.IsNullOrEmpty(TestsList(K).CONC_Error)
-                                                        End If
-
-                                                        If Not hasConcentrationError Then
-                                                            dt(i).Item(ColumnName) = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
-                                                        Else
-                                                            dt(i).Item(ColumnName) = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                        End If
-                                                    Else
-                                                        dt(i).Item(ColumnName) = String.Empty
-                                                    End If
-                                                Next
-                                            End If
-                                        End If
-                                    Else
-                                        'TestNames(j) do not apply to PatientNames(i)
-                                        If dt(i).Item(TestNames(j)) Is DBNull.Value Then
-                                            dt(i).Item(TestNames(j)) = "-"
-                                        End If
-                                    End If
-                                Next
-                            Next
-
-                            resultData.SetDatos = dt
-
-                            'Else
-                            'ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
                         End If
                     End If
                 End If
@@ -8342,6 +8188,217 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="resultsDS"></param>
+        ''' <param name="executionsResultsDS"></param>
+        ''' <param name="numColumns"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function CreateSummaryResultsReportDataSet(ByVal resultsDS As ResultsDS, ByVal executionsResultsDS As ExecutionsDS, ByVal numColumns As Integer) As GlobalDataTO
+
+            Dim resultData As GlobalDataTO = Nothing
+
+            Try
+                Dim TestNames As New List(Of String)
+                Const TestNameFormat As String = "{0} ({1})"
+
+                'Fill the TestNames List with all the test names
+                Dim TestsList As List(Of ResultsDS.vwksResultsRow)
+                Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+                Dim TestNameAndSampleClass As String
+
+                For i As Integer = 0 To TestType.Length - 1
+                    TestsList = (From row In resultsDS.vwksResults _
+                                 Where String.Compare(row.TestType, TestType(i), False) = 0 _
+                                 Select row).ToList()
+
+                    For j As Integer = 0 To TestsList.Count - 1
+                        TestNameAndSampleClass = String.Format(TestNameFormat, TestsList(j).ShortName, TestsList(j).SampleType)
+                        If Not TestNames.Contains(TestNameAndSampleClass) Then
+                            TestNames.Add(TestNameAndSampleClass)
+                        End If
+                    Next
+                Next
+
+                'Fill the PatientNames List with all the patient names
+                Dim PatientNames = (From row In executionsResultsDS.vwksWSExecutionsResults _
+                                Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                Select row.PatientID, row.SpecimenIDList, row.PatientName Distinct)
+
+                'Create the Patient List DataTable structure and content
+                Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+                Dim hasConcentrationError As Boolean
+
+                Dim dt As New DataTable 'The DataTable to be returned
+
+                Dim master As New DataTable
+                Dim detail As New DataTable
+                Dim dataset As New DataSet
+
+                Dim groupId As DataColumn = New DataColumn("GroupId", System.Type.GetType("System.Int32"))
+                Dim parentGroupId As DataColumn = New DataColumn("GroupId", System.Type.GetType("System.Int32"))
+                master.Columns.Add(groupId)
+
+                'Group Id Column
+                detail.Columns.Add(parentGroupId)
+                'Patient Name Column
+                detail.Columns.Add("PatientName", GetType(String))
+                dataset.Tables.Add(master)
+                dataset.Tables.Add(detail)
+
+                Dim relation As DataRelation = New DataRelation("Values", groupId, parentGroupId)
+                dataset.Relations.Add(relation)
+
+
+                'Test Name Columns
+                For i As Integer = 0 To numColumns - 1
+                    'If i >= TestNames.Count Then
+                    'Exit For
+                    'End If
+                    master.Columns.Add(String.Format("Test_{0}", i), GetType(String))
+                    detail.Columns.Add(String.Format("Test_{0}", i), GetType(String))
+                Next
+
+
+                Dim data As DataRow
+                Dim group As Integer
+                Dim columnIndex As Integer
+
+                group = CType(Math.Ceiling(TestNames.Count / numColumns), Integer)
+
+                For i As Integer = 1 To group
+                    data = master.NewRow()
+                    For j As Integer = 0 To numColumns - 1
+                        columnIndex = ((i - 1) * numColumns) + j
+                        If columnIndex >= TestNames.Count Then
+                            Exit For
+                        End If
+                        data("GroupId") = i
+                        data(String.Format("Test_{0}", j)) = TestNames(columnIndex)
+                    Next
+                    master.Rows.Add(data)
+                Next
+
+
+                'Fill the Table with data
+                Dim TestName As String = String.Empty
+                Dim concentration As String = String.Empty
+                Dim patientFullName As String = String.Empty
+                Dim patient As String
+
+                For k As Integer = 0 To PatientNames.Count - 1
+
+                    patient = PatientNames(k).PatientID
+                    patientFullName = PatientNames(k).PatientID
+                    If (PatientNames(k).SpecimenIDList <> String.Empty) Then
+                        patientFullName = String.Format("{0} ({1})", patientFullName, PatientNames(k).SpecimenIDList)
+                    End If
+
+                    For block As Integer = 1 To group
+
+                        data = detail.NewRow()
+                        data("GroupId") = block
+                        data("PatientName") = patientFullName
+                        data.SetParentRow(master(block - 1))
+                        For j As Integer = 0 To numColumns - 1
+                            columnIndex = ((block - 1) * numColumns) + j
+                            TestName = master(block - 1).Item(String.Format("Test_{0}", j)).ToString()
+
+                            SamplesList = (From row In executionsResultsDS.vwksWSExecutionsResults _
+                                       Where String.Compare(row.PatientID, patient, False) = 0 _
+                                       AndAlso String.Compare(String.Format(TestNameFormat, row.TestName, row.SampleType), TestName, False) = 0 _
+                                       Select row).ToList()
+
+
+                            If SamplesList.Count > 0 Then
+                                TestsList = (From row In resultsDS.vwksResults _
+                                             Where row.OrderTestID = SamplesList.First.OrderTestID _
+                                             AndAlso row.AcceptedResultFlag _
+                                             Select row).ToList()
+
+                                If TestsList.Count > 0 Then
+
+                                    If Not TestsList.First.IsCONC_ValueNull Then
+                                        hasConcentrationError = False
+
+                                        If Not TestsList.First.IsCONC_ErrorNull Then
+                                            hasConcentrationError = Not String.IsNullOrEmpty(TestsList.First.CONC_Error)
+                                        End If
+
+                                        If Not hasConcentrationError Then
+                                            concentration = TestsList.First.CONC_Value.ToStringWithDecimals(TestsList.First.DecimalsAllowed)
+                                            concentration = String.Format("{0} {1}", concentration, TestsList.First.MeasureUnit)
+                                        Else
+                                            concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                                        End If
+                                    ElseIf Not TestsList.First.IsManualResultTextNull Then 'Off System Test
+                                        concentration = TestsList.First.ManualResultText
+                                        concentration = String.Format("{0} {1}", concentration, TestsList.First.MeasureUnit)
+                                    Else
+                                        concentration = "-"
+                                    End If
+
+                                    TestsList = (From row In resultsDS.vwksResults _
+                                                Where row.TestType = "CALC" _
+                                                AndAlso row.STDOrderTestID = SamplesList.First.OrderTestID.ToString() _
+                                                AndAlso row.AcceptedResultFlag = True _
+                                                Select row).ToList()
+
+
+                                    'Is this Standard Test a part of a Calculated Test?
+                                    If TestsList.Count > 0 Then
+                                        For l As Integer = 0 To TestsList.Count - 1
+                                            Dim ColumnName As String = String.Format(TestNameFormat, TestsList(l).TestName, TestsList(l).SampleType)
+                                            If Not TestsList(l).IsCONC_ValueNull Then
+                                                'bsPatientListDataGridView(ColumnName, i).Value = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
+
+                                                hasConcentrationError = False
+
+                                                If Not TestsList(l).IsCONC_ErrorNull Then
+                                                    hasConcentrationError = Not String.IsNullOrEmpty(TestsList(l).CONC_Error)
+                                                End If
+
+                                                If Not hasConcentrationError Then
+                                                    'bsPatientListDataGridView(ColumnName, i).Value = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
+                                                Else
+                                                    'bsPatientListDataGridView(ColumnName, i).Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                                                    'bsPatientListDataGridView(ColumnName, i).Style.Alignment = DataGridViewContentAlignment.MiddleLeft
+                                                End If
+                                            Else
+                                                'bsPatientListDataGridView(ColumnName, i).Value = Nothing
+                                            End If
+                                        Next
+                                    End If
+
+                                End If
+                            Else
+                                concentration = "-"
+                            End If
+
+                            data.Item(String.Format("Test_{0}", j)) = concentration
+
+                        Next
+                        detail.Rows.Add(data)
+                    Next
+                Next
+
+                resultData = New GlobalDataTO()
+                resultData.SetDatos = dataset
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.CreateSummaryResultsReportDataSet", EventLogEntryType.Error, False)
+            End Try
+
+            Return resultData
+        End Function
 
     End Class
 End Namespace
