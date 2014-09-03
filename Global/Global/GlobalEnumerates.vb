@@ -130,13 +130,17 @@ Namespace Biosystems.Ax00.Global
             ACCESS_CONTROL_ACTIVATION
             BIG_BOTTLE_MIN_VOLUME
             CAL_EXPIR_DATE_DAYNUMBER
+            EXT_SAMPLEID_MAXSIZE 'AG 03/09/2014 - complete enum
+            EXT_SAMPLETYPE_MAXSIZE 'AG 03/09/2014 - complete enum
             INITIAL_KEY
             INTERVAL_ABS_T
+            LAST_TEST_REPORT_POS 'AG 03/09/2014 - complete enum
             MAX_CUMULATED_QCSERIES
             MAX_DAYS_PREVIOUS_BLK_CALIB
             MAX_NEW_TESTS_ALLOWED
             MAX_PATIENT_ORDER_TESTS
             MAX_QCRESULTS_TO_ACCUMULATE
+            SUPERVISOR_CREATED_TEST_COUNT 'AG 03/09/2014 - complete enum
         End Enum
 
         ''' <summary>
