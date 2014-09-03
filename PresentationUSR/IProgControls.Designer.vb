@@ -22,43 +22,46 @@ Partial Class IProgControls
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgControls))
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsControlsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsControlsListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.bsControlGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsDelTest = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsActivationTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsTestControlPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.bsSearchTestsButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsTestListGrid = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.bsControlTestLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsNewLotButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsExpDatePickUpCombo = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.bsLotNumberTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsExpirationDateLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsLotNumberLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSampleTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsControlNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsActivationDateLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsControlDefLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsControlListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsControlsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsControlsListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.bsControlGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsLevelUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsLevelLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsActivationTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsTestControlPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsDelTest = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsSearchTestsButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsTestListGrid = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.bsControlTestLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsNewLotButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsExpDatePickUpCombo = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.bsLotNumberTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsExpirationDateLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsLotNumberLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSampleTypeComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.bsSampleTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsControlNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsActivationDateLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsControlDefLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bsControlListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsControlGroupBox.SuspendLayout()
+        CType(Me.bsLevelUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsTestControlPanel.SuspendLayout()
         CType(Me.bsTestListGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsControlListGroupBox.SuspendLayout()
@@ -144,6 +147,8 @@ Partial Class IProgControls
         '
         'bsControlGroupBox
         '
+        Me.bsControlGroupBox.Controls.Add(Me.bsLevelUpDown)
+        Me.bsControlGroupBox.Controls.Add(Me.bsLevelLabel)
         Me.bsControlGroupBox.Controls.Add(Me.bsActivationTextBox)
         Me.bsControlGroupBox.Controls.Add(Me.bsTestControlPanel)
         Me.bsControlGroupBox.Controls.Add(Me.bsNewLotButton)
@@ -166,14 +171,27 @@ Partial Class IProgControls
         Me.bsControlGroupBox.TabIndex = 14
         Me.bsControlGroupBox.TabStop = False
         '
-        'bsDelTest
+        'bsLevelUpDown
         '
-        Me.bsDelTest.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsDelTest.Location = New System.Drawing.Point(669, 63)
-        Me.bsDelTest.Name = "bsDelTest"
-        Me.bsDelTest.Size = New System.Drawing.Size(32, 32)
-        Me.bsDelTest.TabIndex = 9
-        Me.bsDelTest.UseVisualStyleBackColor = True
+        Me.bsLevelUpDown.ForeColor = System.Drawing.Color.Black
+        Me.bsLevelUpDown.Location = New System.Drawing.Point(580, 58)
+        Me.bsLevelUpDown.Name = "bsLevelUpDown"
+        Me.bsLevelUpDown.Size = New System.Drawing.Size(47, 21)
+        Me.bsLevelUpDown.TabIndex = 4
+        Me.bsLevelUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsLevelLabel
+        '
+        Me.bsLevelLabel.AutoSize = True
+        Me.bsLevelLabel.BackColor = System.Drawing.Color.Transparent
+        Me.bsLevelLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsLevelLabel.ForeColor = System.Drawing.Color.Black
+        Me.bsLevelLabel.Location = New System.Drawing.Point(577, 42)
+        Me.bsLevelLabel.Name = "bsLevelLabel"
+        Me.bsLevelLabel.Size = New System.Drawing.Size(49, 13)
+        Me.bsLevelLabel.TabIndex = 57
+        Me.bsLevelLabel.Text = "*Level:"
+        Me.bsLevelLabel.Title = False
         '
         'bsActivationTextBox
         '
@@ -205,6 +223,15 @@ Partial Class IProgControls
         Me.bsTestControlPanel.Size = New System.Drawing.Size(707, 411)
         Me.bsTestControlPanel.TabIndex = 54
         '
+        'bsDelTest
+        '
+        Me.bsDelTest.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsDelTest.Location = New System.Drawing.Point(669, 63)
+        Me.bsDelTest.Name = "bsDelTest"
+        Me.bsDelTest.Size = New System.Drawing.Size(32, 32)
+        Me.bsDelTest.TabIndex = 9
+        Me.bsDelTest.UseVisualStyleBackColor = True
+        '
         'bsSearchTestsButton
         '
         Me.bsSearchTestsButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
@@ -214,7 +241,7 @@ Partial Class IProgControls
         Me.bsSearchTestsButton.Location = New System.Drawing.Point(5, 33)
         Me.bsSearchTestsButton.Name = "bsSearchTestsButton"
         Me.bsSearchTestsButton.Size = New System.Drawing.Size(90, 21)
-        Me.bsSearchTestsButton.TabIndex = 7
+        Me.bsSearchTestsButton.TabIndex = 8
         Me.bsSearchTestsButton.Text = "*Tests"
         Me.bsSearchTestsButton.UseMnemonic = False
         Me.bsSearchTestsButton.UseVisualStyleBackColor = True
@@ -297,7 +324,7 @@ Partial Class IProgControls
         Me.bsNewLotButton.Location = New System.Drawing.Point(235, 95)
         Me.bsNewLotButton.Name = "bsNewLotButton"
         Me.bsNewLotButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsNewLotButton.TabIndex = 5
+        Me.bsNewLotButton.TabIndex = 6
         Me.bsNewLotButton.UseVisualStyleBackColor = True
         '
         'bsExpDatePickUpCombo
@@ -315,7 +342,7 @@ Partial Class IProgControls
         Me.bsExpDatePickUpCombo.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.bsExpDatePickUpCombo.Name = "bsExpDatePickUpCombo"
         Me.bsExpDatePickUpCombo.Size = New System.Drawing.Size(120, 21)
-        Me.bsExpDatePickUpCombo.TabIndex = 6
+        Me.bsExpDatePickUpCombo.TabIndex = 7
         '
         'bsLotNumberTextBox
         '
@@ -329,7 +356,7 @@ Partial Class IProgControls
         Me.bsLotNumberTextBox.MaxLength = 16
         Me.bsLotNumberTextBox.Name = "bsLotNumberTextBox"
         Me.bsLotNumberTextBox.Size = New System.Drawing.Size(220, 21)
-        Me.bsLotNumberTextBox.TabIndex = 4
+        Me.bsLotNumberTextBox.TabIndex = 5
         Me.bsLotNumberTextBox.WordWrap = False
         '
         'bsExpirationDateLabel
@@ -375,7 +402,7 @@ Partial Class IProgControls
         Me.bsSampleTypeLabel.ForeColor = System.Drawing.Color.Black
         Me.bsSampleTypeLabel.Location = New System.Drawing.Point(343, 40)
         Me.bsSampleTypeLabel.Name = "bsSampleTypeLabel"
-        Me.bsSampleTypeLabel.Size = New System.Drawing.Size(325, 13)
+        Me.bsSampleTypeLabel.Size = New System.Drawing.Size(228, 13)
         Me.bsSampleTypeLabel.TabIndex = 0
         Me.bsSampleTypeLabel.Text = "*Sample Type:"
         Me.bsSampleTypeLabel.Title = False
@@ -497,6 +524,7 @@ Partial Class IProgControls
         Me.Text = " "
         Me.bsControlGroupBox.ResumeLayout(False)
         Me.bsControlGroupBox.PerformLayout()
+        CType(Me.bsLevelUpDown, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsTestControlPanel.ResumeLayout(False)
         CType(Me.bsTestListGrid, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsControlListGroupBox.ResumeLayout(False)
@@ -534,4 +562,6 @@ Partial Class IProgControls
     Friend WithEvents bsControlTestLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsScreenErrorProvider As Biosystems.Ax00.Controls.UserControls.BSErrorProvider
     Friend WithEvents bsActivationTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsLevelUpDown As Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
+    Friend WithEvents bsLevelLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
 End Class

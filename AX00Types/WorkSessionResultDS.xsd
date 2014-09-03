@@ -73,6 +73,7 @@
               <xs:element name="LISOrderID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LISOrderID" msprop:Generator_ColumnVarNameInTable="columnLISOrderID" msprop:Generator_ColumnPropNameInTable="LISOrderIDColumn" msprop:Generator_UserColumnName="LISOrderID" type="xs:string" minOccurs="0" />
               <xs:element name="ESPatientID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="ESPatientID" msprop:Generator_ColumnVarNameInTable="columnESPatientID" msprop:Generator_ColumnPropNameInTable="ESPatientIDColumn" msprop:Generator_UserColumnName="ESPatientID" type="xs:string" minOccurs="0" />
               <xs:element name="LISPatientID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LISPatientID" msprop:Generator_ColumnVarNameInTable="columnLISPatientID" msprop:Generator_ColumnPropNameInTable="LISPatientIDColumn" msprop:Generator_UserColumnName="LISPatientID" type="xs:string" minOccurs="0" />
+              <xs:element name="ControlLevel" msprop:Generator_ColumnVarNameInTable="columnControlLevel" msprop:Generator_ColumnPropNameInRow="ControlLevel" msprop:Generator_ColumnPropNameInTable="ControlLevelColumn" msprop:Generator_UserColumnName="ControlLevel" type="xs:int" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

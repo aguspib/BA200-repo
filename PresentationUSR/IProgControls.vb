@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Types
 'Imports System.Configuration
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Controls.UserControls
 
 Public Class IProgControls
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -108,6 +109,7 @@ Public Class IProgControls
     ''' Modified by: SA 11/05/2011 - Min allowed ExpirationDate will be ActivationDate + 1 day. ActivationDate
     '''                              has to be shown with the date/time format currently active in the OS
     '''              TR 24/07/2013 - Disabel button Add new control lot (bsNewLotButton) to avoid error (bug #1130)
+    '''              XB 01/09/2014 - add Level field - BA #1868
     ''' </remarks>
     Private Sub AddModeScreenStatus()
         Try
@@ -150,6 +152,10 @@ Public Class IProgControls
             bsExpDatePickUpCombo.Enabled = True
             bsExpDatePickUpCombo.MinDate = CDate(bsActivationTextBox.Text).AddDays(1)
             bsExpDatePickUpCombo.Value = Now.AddMonths(3)
+
+            bsLevelUpDown.Enabled = True
+            bsLevelUpDown.Value = 1
+            bsLevelUpDown.BackColor = Color.White
 
             'Initialize global variables
             bsScreenErrorProvider.Clear()
@@ -625,6 +631,7 @@ Public Class IProgControls
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
+    ''' Modified by  XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub EditModeScreenStatus()
         Try
@@ -671,6 +678,9 @@ Public Class IProgControls
             End If
 
             bsDelTest.Enabled = False
+
+            bsLevelUpDown.Enabled = True
+            bsLevelUpDown.BackColor = Color.White
 
             UnselectTestsSampleTypes()
 
@@ -719,6 +729,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL
     ''' Modified by: SA 11/05/2011 - Set ToolTip for New Lot button, it was missing
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -746,6 +757,9 @@ Public Class IProgControls
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+
+            ' XB 01/09/2014 - BA #1868
+            bsLevelLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_UserLevel", currentLanguage) + ":"
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -758,6 +772,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 30/03/2011
     ''' Modified by: SA 11/05/2011 - Removed columns for Previous Control Lot information
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub InitializeControlsList()
         Try
@@ -783,6 +798,8 @@ Public Class IProgControls
             bsControlsListView.Columns.Add("ActivationDate", 0, HorizontalAlignment.Left)
             bsControlsListView.Columns.Add("ExpirationDate", 0, HorizontalAlignment.Left)
             bsControlsListView.Columns.Add("InUse", 0, HorizontalAlignment.Left)
+            ' XB 01/09/2014 - BA #1868
+            bsControlsListView.Columns.Add("Level", 0, HorizontalAlignment.Left)
 
             'Fill ListView with the list of existing Control.
             LoadControlsList()
@@ -793,6 +810,63 @@ Public Class IProgControls
     End Sub
 
     ''' <summary>
+    ''' Setup the limits and step increment of all Numeric UpDown controls 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - BA #1868
+    ''' </remarks>
+    Private Sub SetUpControlsLimits()
+        Try
+            Dim myFieldLimitsDS As New FieldLimitsDS()
+
+            myFieldLimitsDS = GetControlsLimits(FieldLimitsEnum.CONTROLS_NUMBER)
+            If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
+                bsLevelUpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
+                bsLevelUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                bsLevelUpDown.Increment = CType(myFieldLimitsDS.tfmwFieldLimits(0).StepValue, Decimal)
+                bsLevelUpDown.DecimalPlaces = myFieldLimitsDS.tfmwFieldLimits(0).DecimalsAllowed
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetUpControlsLimits", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".SetUpControlsLimits", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Method in charge to get the controls limits value. 
+    ''' </summary>
+    ''' <param name="pLimitsID">Limit to get</param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - BA #1868
+    ''' </remarks>
+    Private Function GetControlsLimits(ByVal pLimitsID As FieldLimitsEnum, Optional ByVal pAnalyzerModel As String = "") As FieldLimitsDS
+        Dim myFieldLimitsDS As New FieldLimitsDS
+        Try
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Dim myFieldLimitsDelegate As New FieldLimitsDelegate()
+            'Load the time Cycles control
+            myGlobalDataTO = myFieldLimitsDelegate.GetList(Nothing, pLimitsID, pAnalyzerModel)
+
+            If Not myGlobalDataTO.HasError Then
+                myFieldLimitsDS = CType(myGlobalDataTO.SetDatos, FieldLimitsDS)
+            Else
+                ShowMessage("Error", myGlobalDataTO.ErrorCode)
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " GetControlsLimits ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+
+        Return myFieldLimitsDS
+
+    End Function
+
+    ''' <summary>
     ''' Set the screen controls to INITIAL MODE
     ''' </summary>
     ''' <remarks>
@@ -800,6 +874,7 @@ Public Class IProgControls
     ''' Modified by: SA 11/05/2011 - Min allowed ExpirationDate will be ActivationDate + 1 day
     '''                              ActivationDate should be shown with the format defined in the OSCultureInfo
     '''                              Use function Now instead of Today, due to the formated hour returns always 
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks> 
     Private Sub InitialModeScreenStatus(Optional ByVal pInitializeListView As Boolean = True)
         Try
@@ -841,6 +916,9 @@ Public Class IProgControls
             bsExpDatePickUpCombo.Value = Now.AddMonths(3)
             bsExpDatePickUpCombo.BackColor = SystemColors.MenuBar
 
+            bsLevelUpDown.Enabled = False
+            bsLevelUpDown.BackColor = SystemColors.MenuBar
+
             DeletedTestsListDS = New SelectedTestsDS
             TestControlsListDS = New TestControlsDS
             bsTestListGrid.DataSource = TestControlsListDS.tparTestControls
@@ -869,6 +947,7 @@ Public Class IProgControls
     ''' <returns>A typed DataSet ControlsDS containing all data of the Controls</returns>
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
+    ''' Modified by: XB 01/09/2014 - inform field ControlLevel with the value of the added NumericUpDown - BA #1868
     ''' </remarks>
     Private Function LoadControlsDS() As ControlsDS
         Dim controlRow As ControlsDS.tparControlsRow
@@ -883,6 +962,8 @@ Public Class IProgControls
             controlRow.LotNumber = bsLotNumberTextBox.Text.Trim
             controlRow.ActivationDate = CDate(bsActivationTextBox.Text)
             controlRow.ExpirationDate = CDate(bsExpDatePickUpCombo.Value)
+            ' XB 01/09/2014 - BA #1868
+            controlRow.ControlLevel = CType(bsLevelUpDown.Value, Integer)
 
             'Gets from the Session the Username of the connected User; get also the current datetime
             Dim currentSession As New ApplicationSessionManager
@@ -903,6 +984,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 30/03/2011
     ''' Modified by: SA 11/05/2011 - Removed columns for Previous Control Lot information
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub LoadControlsList()
         Try
@@ -965,6 +1047,8 @@ Public Class IProgControls
                     bsControlsListView.Items(i).SubItems.Add(controlRow.ActivationDate.ToString)
                     bsControlsListView.Items(i).SubItems.Add(controlRow.ExpirationDate.ToString)
                     bsControlsListView.Items(i).SubItems.Add(controlRow.InUse.ToString)
+                    ' XB 01/09/2014 - BA #1868
+                    bsControlsListView.Items(i).SubItems.Add(controlRow.ControlLevel.ToString)
 
                     'If there is a selected control and it is still in the list, its position is stored to re-select 
                     'the same control once the list is loaded
@@ -1005,6 +1089,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 30/03/2011
     ''' Modified by: SA 11/05/2011 - Removed load of Previous Control Lot values
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Function LoadDataOfControl() As Boolean
         Dim inUse As Boolean = False
@@ -1027,6 +1112,9 @@ Public Class IProgControls
             bsExpDatePickUpCombo.MinDate = CDate(bsActivationTextBox.Text)
             bsExpDatePickUpCombo.Value = CDate(bsControlsListView.SelectedItems(0).SubItems(6).Text)
             inUse = Convert.ToBoolean(bsControlsListView.SelectedItems(0).SubItems(7).Text)
+
+            ' XB 01/09/2014 - BA #1868
+            bsLevelUpDown.Value = CInt(bsControlsListView.SelectedItems(0).SubItems(8).Text)
 
             'Load the list of Tests/SampleTypes linked to the selected Control
             LoadTestControlsGrid()
@@ -1118,6 +1206,7 @@ Public Class IProgControls
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
     ''' Modified by: SA 12/05/2011 - Implementation changed; removed verification of changes in Tests/SampleTypes grid
+    '''              XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks> 
     Public Function ExistPendingChanges() As Boolean
         Try
@@ -1147,7 +1236,8 @@ Public Class IProgControls
                     If (bsControlNameTextbox.Text.Trim <> bsControlsListView.Items(originalSelectedIndex).Text) OrElse _
                        (selectedSample <> bsControlsListView.Items(originalSelectedIndex).SubItems(3).Text.Trim) OrElse _
                        (bsLotNumberTextBox.Text.Trim <> bsControlsListView.Items(originalSelectedIndex).SubItems(4).Text.Trim) OrElse _
-                       (bsExpDatePickUpCombo.Value.ToString("yyyyMMdd") <> Convert.ToDateTime(bsControlsListView.Items(originalSelectedIndex).SubItems(6).Text).ToString("yyyyMMdd")) Then
+                       (bsExpDatePickUpCombo.Value.ToString("yyyyMMdd") <> Convert.ToDateTime(bsControlsListView.Items(originalSelectedIndex).SubItems(6).Text).ToString("yyyyMMdd")) OrElse _
+                       (bsLevelUpDown.Text.Trim <> bsControlsListView.Items(originalSelectedIndex).SubItems(8).Text.Trim) Then
                         ChangesMade = True
                     End If
                 End If
@@ -1456,6 +1546,7 @@ Public Class IProgControls
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
+    ''' Modified by: XB 01/09/2014 - Add Level field - BA #1868
     ''' </remarks>
     Private Sub QueryModeScreenStatus()
         Try
@@ -1494,6 +1585,9 @@ Public Class IProgControls
 
             bsExpDatePickUpCombo.Enabled = False
             bsExpDatePickUpCombo.BackColor = SystemColors.MenuBar
+
+            bsLevelUpDown.Enabled = False
+            bsLevelUpDown.BackColor = SystemColors.MenuBar
 
             'Tests/SampleTypes grid is disabled
             bsTestControlPanel.Visible = True
@@ -1610,6 +1704,7 @@ Public Class IProgControls
     ''' Created by:  DL 30/03/2011 
     ''' Modified by: SA 18/05/2011 - Get limits (min and max allowed values) for Min/Max Concentration fields 
     '''              DL 28/07/2011 - Set the screen location when it is opened
+    '''              XB 01/09/2014 - Call SetUpControlsLimits funcion - BA #1868
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
@@ -1652,6 +1747,8 @@ Public Class IProgControls
 
                 'Configure and load the list of existing Controls
                 InitializeControlsList()
+
+                SetUpControlsLimits()   ' XB 01/09/2014 - BA #1868
 
                 'Configure the grid for Tests/SampleTypes
                 PrepareTestsSamplesGrid()
@@ -2112,6 +2209,7 @@ Public Class IProgControls
     '''                              message: the message should exist in tfmwMessage, the resource should exist
     '''                              in tfmwMultiLanguageResources, the enumerate for the message should exist in
     '''                              GlobalEnumerates.Messages, and then, the GetMessageText function should be called
+    '''              XB 01/09/2014 - add Level field - BA #1868
     ''' </remarks>
     Private Function ValidateSavingConditions() As Boolean
         Dim fieldsOK As Boolean = True
@@ -2143,6 +2241,14 @@ Public Class IProgControls
                 If (setFocusTo = -1) Then setFocusTo = 4
             End If
 
+            ' XB 01/09/2014 - BA #1868
+            If bsLevelUpDown.Text = "" Then
+                bsScreenErrorProvider.SetError(bsLevelUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                If (setFocusTo = -1) Then setFocusTo = 5
+            End If
+
+
+
             'Select the proper field to put the focus
             If (setFocusTo >= 0) Then
                 fieldsOK = False
@@ -2157,6 +2263,8 @@ Public Class IProgControls
                     bsExpDatePickUpCombo.Focus()
                 ElseIf (setFocusTo = 4) Then
                     bsTestListGrid.Focus()
+                ElseIf (setFocusTo = 5) Then
+                    bsLevelUpDown.Focus()   ' XB 01/09/2014 - BA #1868
                 End If
             Else
                 'All mandatory fields are informed, verify the informed Name is unique
@@ -2839,6 +2947,98 @@ Public Class IProgControls
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Activate the Change made variable when some value of the corresponding numericupdown control is change by text (not only by arrows)
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by:  XB 01/09/2014 - BA #1868
+    ''' </remarks>
+    Private Sub TextChange(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLevelUpDown.TextChanged
+        Try
+            If EditionMode Then
+                Dim myNewValue As String = DirectCast(sender, BSNumericUpDown).Text
+                Dim myMaxValue As Single = DirectCast(sender, BSNumericUpDown).Maximum
+                Dim myMinValue As Single = DirectCast(sender, BSNumericUpDown).Minimum
+
+                If myNewValue.Length > 0 AndAlso myNewValue.Length > myMaxValue.ToString.Length Then
+                    If CSng(myNewValue) > CSng(myMaxValue) Then
+                        DirectCast(sender, Biosystems.Ax00.Controls.UserControls.BSNumericUpDown).Text = myMaxValue.ToString
+                    ElseIf CSng(myNewValue) < myMinValue Then
+                        If IsNumeric(Microsoft.VisualBasic.Left(myNewValue, 1)) Then
+                            DirectCast(sender, Biosystems.Ax00.Controls.UserControls.BSNumericUpDown).Text = myMinValue.ToString
+                        End If
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".TextChange", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".TextChange", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    'Private Sub SlopeAUpDown_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles SlopeAUpDown.Validating
+
+    '    Try
+    '        BsErrorProvider1.Clear()
+    '        ValidationError = False
+    '        If Not SlopeAUpDown.Text = "" AndAlso SlopeAUpDown.Value = 0 Then
+    '            BsErrorProvider1.SetError(SlopeAUpDown, GetMessageText(GlobalEnumerates.Messages.ZERO_NOTALLOW.ToString)) 'AG 07/07/2010("ZERO_NOTALLOW"))
+    '            ValidationError = True
+    '            SlopeAUpDown.Select()
+    '        ElseIf Not SlopeAUpDown.Text = "" AndAlso SlopeBUpDown.Text = "" Then
+    '            BsErrorProvider1.SetError(SlopeBUpDown, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString)) 'AG 07/07/2010("REQUIRED_VALUE"))
+    '            ValidationError = True
+    '        End If
+
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "SlopeAUpDown_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".SlopeAUpDown_Validating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
+
+
+    ''' <summary>
+    ''' generic event handler to capture the NumericUpDown content deletion
+    ''' </summary>
+    ''' <remarks>Created by:  XB 01/09/2014 - BA #1868</remarks>
+    Private Sub NumericUpDown_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsLevelUpDown.KeyUp
+        Try
+            Dim miNumericUpDown As NumericUpDown = CType(sender, NumericUpDown)
+
+            If miNumericUpDown.Text <> "" Then
+
+            Else
+                miNumericUpDown.Value = miNumericUpDown.Minimum
+                miNumericUpDown.ResetText()
+            End If
+
+            If EditionMode Then
+                ChangesMade = True
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "NumericUpDown_KeyUp " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".NumericUpDown_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Handle for NumericUpDown controls allowing numbers with decimals. Only numbers and the decimal separator are allowed
+    ''' </summary>
+    ''' <remarks>Created by:  XB 01/09/2014 - BA #1868</remarks>
+    Private Sub IntegerNumericUpDown_KeyPress(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyPressEventArgs) Handles bsLevelUpDown.KeyPress
+        Try
+            If (e.KeyChar = CChar("-") OrElse e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = "'") Then e.Handled = True
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IntegerNumericUpDown_KeyPress", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".IntegerNumericUpDown_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 

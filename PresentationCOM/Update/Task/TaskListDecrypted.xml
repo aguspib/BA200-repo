@@ -2190,6 +2190,7 @@
       END
       GO
 
+
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksOrderTests' AND sc.name = 'Selected') = 0
       BEGIN
       ALTER TABLE [Ax00].[dbo].twksOrderTests ADD Selected bit NOT NULL default 0
@@ -2251,7 +2252,7 @@
       ALTER TABLE [Ax00].[dbo].tparTestProfiles ADD Available bit NOT NULL default 1
       END
       GO
-      
+
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vhisWSResults') = 1)
       DROP VIEW [dbo].vhisWSResults
       GO
@@ -2273,6 +2274,99 @@
       INNER JOIN dbo.vhisTestSamples AS TS ON OT.HistTestID = TS.HistTestID AND OT.TestType = TS.TestType AND TS.TestVersionNumber = COALESCE (OT.TestVersionNumber, 0)
       LEFT OUTER JOIN dbo.tcfgMasterData AS MD ON MD.SubTableID = 'TEST_UNITS' AND MD.ItemID = OT.MeasureUnit
       LEFT OUTER JOIN dbo.thisPatients AS P ON P.HistPatientID = OT.HistPatientID
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparControls' AND sc.name = 'ControlLevel') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparControls ADD ControlLevel tinyint NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestControls' AND sc.name = 'ControlNum') = 1
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].tparTestControls DROP COLUMN ControlNum
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETestSamples' AND sc.name = 'TestLongName') = 0
+      BEGIN
+      ALTER TABLE [dbo].[tparISETestSamples]
+      ADD TestLongName nvarchar(80) NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisISETestSamples' AND sc.name = 'TestLongName') = 0
+      BEGIN
+      ALTER TABLE [dbo].[thisISETestSamples]
+      ADD TestLongName nvarchar(80) NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tqcHistoryTestSamples' AND sc.name = 'TestLongName') = 0
+      BEGIN
+      ALTER TABLE [dbo].[tqcHistoryTestSamples]
+      ADD TestLongName nvarchar(80) NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETestSamples' AND sc.name = 'SlopeFactorA2') = 0
+      BEGIN
+      ALTER TABLE [dbo].[tparISETestSamples]
+      ADD SlopeFactorA2 real NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETestSamples' AND sc.name = 'SlopeFactorB2') = 0
+      BEGIN
+      ALTER TABLE [dbo].[tparISETestSamples]
+      ADD SlopeFactorB2 real NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisISETestSamples' AND sc.name = 'SlopeFactorA2') = 0
+      BEGIN
+      ALTER TABLE [dbo].[thisISETestSamples]
+      ADD SlopeFactorA2 real NULL
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisISETestSamples' AND sc.name = 'SlopeFactorB2') = 0
+      BEGIN
+      ALTER TABLE [dbo].[thisISETestSamples]
+      ADD SlopeFactorB2 real NULL
+      END
+      GO
+
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vhisTestSamples]'))
+      DROP VIEW [dbo].[vhisTestSamples]
+      GO
+      ET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisTestSamples]
+      AS
+      SELECT     'STD' AS TestType, TS .HistTestID, TS .TestID, TS .TestName, TS .TestVersionNumber, TS .DecimalsAllowed, NULL AS FormulaText,
+      (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, TS .TestLongName
+      FROM         thisTestSamples TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .TestName = T .TestName AND T .TestType = 'STD'
+      UNION
+      SELECT     'ISE' AS TestType, TS .HistISETestID AS HistTestID, TS .ISETestID AS TestID, TS .ISETestName AS TestName, 0 AS TestVersionNumber, TS .DecimalsAllowed, NULL
+      AS FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, TS.TestLongName
+      FROM         thisISETestSamples TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .ISETestName = T .TestName AND T .TestType = 'ISE'
+      UNION
+      SELECT     'CALC' AS TestType, TS .HistCalcTestID AS HistTestID, TS .CalcTestID AS TestID, TS .CalcTestLongName AS TestName, 0 AS TestVersionNumber,
+      TS .DecimalsAllowed, TS .FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, NULL
+      AS TestLongName
+      FROM         thisCalculatedTests TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .CalcTestLongName = T .TestName AND T .TestType = 'CALC'
+      UNION
+      SELECT     'OFFS' AS TestType, TS .HistOffSystemTestID AS HistTestID, TS .OffSystemTestID AS TestID, TS .OffSystemTestName AS TestName, 0 AS TestVersionNumber,
+      TS .DecimalsAllowed, NULL AS FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, NULL
+      AS TestLongName
+      FROM         thisOffSystemTestSamples TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .OffSystemTestName = T .TestName AND T .TestType = 'OFFS' ;
+
       GO
     </StructureScript>
     <UpdateScript>
