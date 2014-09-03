@@ -2754,6 +2754,95 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field TestLongName on tparISETestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETestSamples' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field TestLongName on thisISETestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisISETestSamples' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field TestLongName on tqcHistoryTestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tqcHistoryTestSamples' AND sc.name = 'TestLongName') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field SlopeFactorA2 on tparISETestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETestSamples' AND sc.name = 'SlopeFactorA2') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field SlopeFactorB2 on tparISETestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparISETestSamples' AND sc.name = 'SlopeFactorB2') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field SlopeFactorA2 on thisISETestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisISETestSamples' AND sc.name = 'SlopeFactorA2') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New column field SlopeFactorB2 on thisISETestSamples table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'thisISETestSamples' AND sc.name = 'SlopeFactorB2') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
+
+
 </DBIntegrityDS>
 
 
