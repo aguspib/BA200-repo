@@ -1,32 +1,26 @@
 ﻿Option Explicit On
 Option Strict On
 
-'Imports System.Configuration
-'Imports System.Text
-'Imports System.ComponentModel
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-'Imports Biosystems.Ax00.DAL
-'Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
-
-'Imports Biosystems.Ax00.Controls.UserControls
-'Imports Biosystems.Ax00.PresentationCOM
 
 Public Class IResultsSummaryTable
 
 #Region "Declarations"
 
     Private Class PatientInfo
-        Public PatientId As String
-        Public Name As String
-        Public FullId As String
+        Public patientId As String
+        Public identifier As String
+        Public firstName As String
+        Public lastName As String
+        Public barcode As String
     End Class
 
-    Private TestNames As New List(Of String)
-    Private PatientNames As New Dictionary(Of String, PatientInfo)
+    Private TestNames As New Dictionary(Of String, String)
+    Private Patients As New Dictionary(Of String, PatientInfo)
     Private Const TestNameFormat As String = "{0} ({1})"
     Private LanguageID As String
 
@@ -121,80 +115,6 @@ Public Class IResultsSummaryTable
     End Sub
 
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
-        'Dim Printer As DGVPrinter = New DGVPrinter
-        'Printer.Title = Me.Text
-        'Printer.SubTitle = Today.ToShortDateString()
-        'Printer.SubTitleFormatFlags = StringFormatFlags.LineLimit Or StringFormatFlags.NoClip
-        'Printer.PageNumbers = True
-        'Printer.PageNumberInHeader = False
-        'Printer.PorportionalColumns = True
-        'Printer.HeaderCellAlignment = StringAlignment.Near
-        'Printer.Footer = "*Biosystems AX00 Automatic Analyser*"
-        'Printer.FooterSpacing = 15
-
-        'Printer.TitleSpacing = 10
-        'Printer.SubTitleSpacing = 40
-        'Printer.ShowTotalPageNumber = True
-
-        'Printer.printDocument.DocumentName = Printer.Title
-        'Printer.printDocument.PrinterSettings.DefaultPageSettings.Landscape = bsHorizontalRadioButton.Checked
-
-        'Dim SaveFont As Font = bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font
-        'Dim FontSize As Single = 7.0! * (10.0! / (bsPatientListDataGridView.Columns.Count - 1))
-
-        'Dim colWidth As Integer
-
-        'If bsPatientListDataGridView.Columns.Count < 11 Then
-        '    FontSize = 8.25!
-        '    colWidth = 150
-        'Else
-        '    FontSize = 7.0! * (10.0! / (bsPatientListDataGridView.Columns.Count - 1))
-        '    If FontSize < 5.0! Then FontSize = 5.0!
-        '    colWidth = 130
-        'End If
-        'Printer.ColumnWidths.Add(bsPatientListDataGridView.Columns(0).Name, colWidth)
-
-        'Dim NewFont As New Font("Verdana", FontSize)
-
-        'bsPatientListDataGridView.Visible = False
-        'bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font = NewFont
-        'bsPatientListDataGridView.RowsDefaultCellStyle.Font = NewFont
-        'bsPatientListDataGridView.AlternatingRowsDefaultCellStyle.Font = NewFont
-
-        'Dim CountToDiv As Integer
-        'If bsPatientListDataGridView.Columns.Count < 10 Then
-        '    CountToDiv = bsPatientListDataGridView.Columns.Count + 2
-        'Else
-        '    CountToDiv = bsPatientListDataGridView.Columns.Count + 4
-        'End If
-
-        'colWidth = CInt((bsPatientListDataGridView.Width - colWidth + 30) / (CountToDiv))
-
-        'If bsHorizontalRadioButton.Checked Then
-        '    colWidth = CInt(colWidth * 1.4)
-        'End If
-
-        'For i As Integer = 1 To bsPatientListDataGridView.Columns.Count - 1
-        '    Printer.ColumnWidths.Add(bsPatientListDataGridView.Columns(i).Name, colWidth)
-        'Next
-
-        'Printer.PrintDataGridView(bsPatientListDataGridView)
-
-        'bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font = SaveFont
-        'bsPatientListDataGridView.RowsDefaultCellStyle.Font = SaveFont
-        'bsPatientListDataGridView.AlternatingRowsDefaultCellStyle.Font = SaveFont
-
-        'bsPatientListDataGridView.Visible = True
-
-        'If String.IsNullOrEmpty(ActiveAnalyzer) Then
-        '    Throw New Exception("Invalid ActiveAnalyzer value")
-        'End If
-
-        'If String.IsNullOrEmpty(ActiveWorkSession) Then
-        '    Throw New Exception("Invalid ActiveWorkSession value")
-        'End If
-
-        'XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
 
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -333,6 +253,7 @@ Public Class IResultsSummaryTable
             Dim TestsList As List(Of ResultsDS.vwksResultsRow)
             Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
             Dim TestNameAndSampleClass As String
+            Dim TestId As String
 
             For i As Integer = 0 To TestType.Length - 1
                 TestsList = _
@@ -342,8 +263,9 @@ Public Class IResultsSummaryTable
 
                 For j As Integer = 0 To TestsList.Count - 1
                     TestNameAndSampleClass = String.Format(TestNameFormat, TestsList(j).TestName, TestsList(j).SampleType)
-                    If Not TestNames.Contains(TestNameAndSampleClass) Then
-                        TestNames.Add(TestNameAndSampleClass)
+                    TestId = String.Format(TestNameFormat, TestsList(j).TestID, TestsList(j).TestType)
+                    If Not TestNames.ContainsKey(TestId) Then
+                        TestNames.Add(TestId, TestNameAndSampleClass)
                     End If
                 Next
             Next
@@ -363,20 +285,38 @@ Public Class IResultsSummaryTable
     ''' </remarks>
     Private Sub FillPatientsList()
         Try
-            If ExecutionsResultsDS Is Nothing Then Return
+            If AverageResultsDS Is Nothing Then Return
 
-            Dim patients As IList(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults
-                                                                                Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
-                                                                                Select row).ToList()
-            Dim patientFullId As String
+            Dim patientsList As IList(Of ResultsDS.vwksResultsRow) = (From row In AverageResultsDS.vwksResults
+                                                                      Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                                                      Select row).ToList()
 
-            For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In patients
-                patientFullId = row.PatientID
-                If (row.SpecimenIDList <> String.Empty) Then
-                    patientFullId = String.Format("{0} ({1})", patientFullId, row.SpecimenIDList)
-                End If
-                If Not PatientNames.ContainsKey(row.PatientID) Then
-                    PatientNames.Add(row.PatientID, New PatientInfo With {.PatientId = row.PatientID, .Name = row.PatientName, .FullId = patientFullId})
+            Dim patientDelegate As New PatientDelegate
+            Dim resultData As GlobalDataTO = Nothing
+            Dim patientInfo As PatientInfo
+
+            For Each row As ResultsDS.vwksResultsRow In patientsList
+                If Not Patients.ContainsKey(row.PatientID) Then
+
+                    patientInfo = New PatientInfo()
+                    patientInfo.patientId = row.PatientID
+                    patientInfo.barcode = row.SpecimenIDList
+                    patientInfo.identifier = row.PatientID
+
+                    resultData = patientDelegate.GetPatientData(Nothing, row.PatientID)
+
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        Dim dsPatients As New PatientsDS
+                        dsPatients = CType(resultData.SetDatos, PatientsDS)
+
+                        If dsPatients.tparPatients.Count > 0 Then
+                            patientInfo.firstName = dsPatients.tparPatients.First.FirstName
+                            patientInfo.lastName = dsPatients.tparPatients.First.LastName
+                        End If
+                    End If
+
+                    Patients.Add(row.PatientID, patientInfo)
+
                 End If
             Next
 
@@ -400,10 +340,11 @@ Public Class IResultsSummaryTable
         Try
             If AverageResultsDS Is Nothing OrElse ExecutionsResultsDS Is Nothing Then Return
 
-            Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
             Dim TestsList As List(Of ResultsDS.vwksResultsRow)
             Dim hasConcentrationError As Boolean
             Dim patientId As String
+            Dim concentration As String = String.Empty
+            Dim TestId As String
 
             'Get Tests and Patients Names
             FillTestsList()
@@ -418,106 +359,71 @@ Public Class IResultsSummaryTable
             bsPatientListDataGridView.Columns.Add("PatientId", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", LanguageID))
             bsPatientListDataGridView.Columns("PatientId").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             bsPatientListDataGridView.Columns("PatientId").Frozen = True
-
-            'Patient Name Column
-            bsPatientListDataGridView.Columns.Add("PatientName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", LanguageID))
-            bsPatientListDataGridView.Columns("PatientName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            bsPatientListDataGridView.Columns("PatientName").Frozen = True
+            'Patient Barcode Column
+            'bsPatientListDataGridView.Columns.Add("Barcode", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_Barcode", LanguageID))
+            bsPatientListDataGridView.Columns.Add("Barcode", "Barcode")
+            bsPatientListDataGridView.Columns("Barcode").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            bsPatientListDataGridView.Columns("Barcode").Frozen = True
+            'Patient FirstName Column
+            'bsPatientListDataGridView.Columns.Add("FirstName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_FirstName", LanguageID))
+            bsPatientListDataGridView.Columns.Add("FirstName", "FirstName")
+            bsPatientListDataGridView.Columns("FirstName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            bsPatientListDataGridView.Columns("FirstName").Frozen = True
+            'Patient LastName Column
+            'bsPatientListDataGridView.Columns.Add("LastName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_LastName", LanguageID))
+            bsPatientListDataGridView.Columns.Add("LastName", "LastName")
+            bsPatientListDataGridView.Columns("LastName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            bsPatientListDataGridView.Columns("LastName").Frozen = True
 
             'Test Name Columns
             For i As Integer = 0 To TestNames.Count - 1
-                bsPatientListDataGridView.Columns.Add(TestNames(i), TestNames(i))
-                bsPatientListDataGridView.Columns(TestNames(i)).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+                bsPatientListDataGridView.Columns.Add(TestNames.ElementAt(i).Value, TestNames.ElementAt(i).Value)
+                bsPatientListDataGridView.Columns(TestNames.ElementAt(i).Value).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             Next
 
             'Fill the Grid with data
-            For i As Integer = 0 To PatientNames.Count - 1
+            For i As Integer = 0 To Patients.Count - 1
                 bsPatientListDataGridView.Rows.Add()
-                bsPatientListDataGridView("PatientId", i).Value = PatientNames.ElementAt(i).Value.FullId
-                bsPatientListDataGridView("PatientName", i).Value = PatientNames.ElementAt(i).Value.Name
+                bsPatientListDataGridView("PatientId", i).Value = Patients.ElementAt(i).Value.identifier
+                bsPatientListDataGridView("Barcode", i).Value = Patients.ElementAt(i).Value.barcode
+                bsPatientListDataGridView("FirstName", i).Value = Patients.ElementAt(i).Value.firstName
+                bsPatientListDataGridView("LastName", i).Value = Patients.ElementAt(i).Value.lastName
 
-                patientId = PatientNames.ElementAt(i).Key
-
+                patientId = Patients.ElementAt(i).Key
                 For j As Integer = 0 To TestNames.Count - 1
-                    SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                  Where String.Compare(row.PatientID, patientId, False) = 0 _
-                                  AndAlso String.Format(TestNameFormat, row.TestName, row.SampleType) = TestNames(j) _
-                                  Select row).ToList()
-
-                    If SamplesList.Count > 0 Then
-                        TestsList = (From row In AverageResultsDS.vwksResults _
-                                    Where row.OrderTestID = SamplesList.First.OrderTestID _
-                                  AndAlso row.AcceptedResultFlag _
-                                   Select row).ToList()
-
-                        If TestsList.Count > 0 Then
-                            If Not TestsList.First.IsCONC_ValueNull Then
-                                hasConcentrationError = False
-
-                                If Not TestsList.First.IsCONC_ErrorNull Then
-                                    hasConcentrationError = Not String.IsNullOrEmpty(TestsList.First.CONC_Error)
-                                End If
-
-                                If Not hasConcentrationError Then
-                                    bsPatientListDataGridView(TestNames(j), i).Value = TestsList.First.CONC_Value.ToStringWithDecimals(TestsList.First.DecimalsAllowed)
-                                Else
-                                    bsPatientListDataGridView(TestNames(j), i).Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                    bsPatientListDataGridView(TestNames(j), i).Style.Alignment = DataGridViewContentAlignment.MiddleLeft
-                                End If
-                            ElseIf Not TestsList.First.IsManualResultTextNull Then 'Off System Test
-                                bsPatientListDataGridView(TestNames(j), i).Value = TestsList.First.ManualResultText
-                                bsPatientListDataGridView(TestNames(j), i).Style.Alignment = DataGridViewContentAlignment.MiddleLeft
-                            Else
-                                bsPatientListDataGridView(TestNames(j), i).Value = Nothing
-                            End If
-
-                            'Fill Calculated Test Data
-                            'Remember: vwksResults Calculated Test relates with Standard Tests in 
-                            'vwksWSExecutionsResults through the field ControlNum As OrderTestID
-                            ' dl 18/04/2011
-                            'TestsList = (From row In AverageResultsDS.vwksResults _
-                            '             Where row.TestType = "CALC" _
-                            '             AndAlso row.AcceptedResultFlag = True _
-                            '             Select row).ToList()
-                            TestsList = (From row In AverageResultsDS.vwksResults _
-                                         Where row.TestType = "CALC" _
-                                         AndAlso row.STDOrderTestID = SamplesList.First.OrderTestID.ToString() _
-                                         AndAlso row.AcceptedResultFlag = True _
+                    TestId = TestNames.ElementAt(j).Key
+                    TestsList = (From row In AverageResultsDS.vwksResults _
+                                         Where String.Compare(row.PatientID, patientId, False) = 0 _
+                                         AndAlso String.Format(TestNameFormat, row.TestID, row.TestType) = TestId _
+                                         AndAlso row.AcceptedResultFlag _
                                          Select row).ToList()
-                            ' end dl
 
-                            'Is this Standard Test a part of a Calculated Test?
-                            If TestsList.Count > 0 Then
-                                For K As Integer = 0 To TestsList.Count - 1
-                                    Dim ColumnName As String = String.Format(TestNameFormat, TestsList(K).TestName, TestsList(K).SampleType)
-                                    If Not TestsList(K).IsCONC_ValueNull Then
-                                        bsPatientListDataGridView(ColumnName, i).Value = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
+                    If TestsList.Count > 0 Then
 
-                                        hasConcentrationError = False
+                        If Not TestsList.First.IsCONC_ValueNull Then
+                            hasConcentrationError = False
 
-                                        If Not TestsList(K).IsCONC_ErrorNull Then
-                                            hasConcentrationError = Not String.IsNullOrEmpty(TestsList(K).CONC_Error)
-                                        End If
-
-                                        If Not hasConcentrationError Then
-                                            bsPatientListDataGridView(ColumnName, i).Value = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
-                                        Else
-                                            bsPatientListDataGridView(ColumnName, i).Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                            bsPatientListDataGridView(ColumnName, i).Style.Alignment = DataGridViewContentAlignment.MiddleLeft
-                                        End If
-                                    Else
-                                        bsPatientListDataGridView(ColumnName, i).Value = Nothing
-                                    End If
-                                Next
+                            If Not TestsList.First.IsCONC_ErrorNull Then
+                                hasConcentrationError = Not String.IsNullOrEmpty(TestsList.First.CONC_Error)
                             End If
+
+                            If Not hasConcentrationError Then
+                                concentration = TestsList.First.CONC_Value.ToStringWithDecimals(TestsList.First.DecimalsAllowed)
+                                concentration = String.Format("{0} {1}", concentration, TestsList.First.MeasureUnit)
+                            Else
+                                concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                            End If
+                        ElseIf Not TestsList.First.IsManualResultTextNull Then 'Off System Test
+                            concentration = TestsList.First.ManualResultText
+                            concentration = String.Format("{0} {1}", concentration, TestsList.First.MeasureUnit)
+                        Else
+                            concentration = "-"
                         End If
                     Else
-                        'TestNames(j) do not apply to PatientNames(i)
-                        If bsPatientListDataGridView(TestNames(j), i).Value Is Nothing Then
-                            bsPatientListDataGridView(TestNames(j), i).Value = "-"
-                            bsPatientListDataGridView(TestNames(j), i).Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                        End If
+                        concentration = "-"
                     End If
+
+                    bsPatientListDataGridView(TestNames.ElementAt(j).Value, i).Value = concentration
                 Next
             Next
 

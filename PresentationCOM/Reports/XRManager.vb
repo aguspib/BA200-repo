@@ -1264,8 +1264,10 @@ Public Class XRManager
             Const MAX_HORIZONTAL_COLUMMNS As Integer = 10
 
             Dim resultData As GlobalDataTO
+
             Dim myResultsDelegate As New ResultsDelegate
             Dim xtraReport As XtraReport
+            Dim dsReport As DataSet
             Dim numColumns As Integer
 
             If Vertical Then
@@ -1277,16 +1279,24 @@ Public Class XRManager
             resultData = myResultsDelegate.GetSummaryResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, numColumns)
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                Dim dsReport As DataSet = DirectCast(resultData.SetDatos, DataSet)
 
-                xtraReport = CreateSummaryResultsReport(pWorkSessionID, dsReport)
+                Dim dsResults As New ResultsDS
+                dsResults = CType(resultData.SetDatos, ResultsDS)
 
-                If Vertical Then
-                    ShowPortrait(xtraReport)
-                Else
-                    ShowLandscape(xtraReport)
+                resultData = CreateSummaryResultsReportDataSet(dsResults, numColumns)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dsReport = DirectCast(resultData.SetDatos, DataSet)
+
+                    xtraReport = CreateSummaryResultsReport(pWorkSessionID, dsReport)
+
+                    If Vertical Then
+                        ShowPortrait(xtraReport)
+                    Else
+                        ShowLandscape(xtraReport)
+                    End If
+
                 End If
-
             End If
 
         Catch ex As Exception
@@ -2031,6 +2041,235 @@ Public Class XRManager
         End Try
     End Sub
 
+#Region "Summary Results Report"
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="resultsDS"></param>
+    ''' <param name="executionsResultsDS"></param>
+    ''' <param name="numColumns"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Shared Function CreateSummaryResultsReportDataSet(ByVal resultsDS As ResultsDS, ByVal numColumns As Integer) As GlobalDataTO
+
+        Dim resultData As GlobalDataTO = Nothing
+
+        Try
+            Dim TestNames As New Dictionary(Of String, String)
+            Const TestNameFormat As String = "{0} ({1})"
+
+            'Fill the TestNames List with all the test names
+            Dim TestsList As List(Of ResultsDS.vwksResultsRow)
+            Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+            Dim TestNameAndSampleClass As String
+            Dim TestId As String
+
+            For i As Integer = 0 To TestType.Length - 1
+                TestsList = (From row In resultsDS.vwksResults _
+                             Where String.Compare(row.TestType, TestType(i), False) = 0 _
+                             Select row).ToList()
+
+                For j As Integer = 0 To TestsList.Count - 1
+                    TestNameAndSampleClass = String.Format(TestNameFormat, TestsList(j).ShortName, TestsList(j).SampleType)
+                    TestId = String.Format(TestNameFormat, TestsList(j).TestID, TestsList(j).TestType)
+                    If Not TestNames.ContainsKey(TestId) Then
+                        TestNames.Add(TestId, TestNameAndSampleClass)
+                    End If
+                Next
+            Next
+
+            'Fill the PatientNames List with all the patient names
+            'Dim PatientNames = (From row In executionsResultsDS.vwksWSExecutionsResults _
+            '                Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+            '                Select row.PatientID, row.SpecimenIDList, row.PatientName Distinct)
+
+            Dim PatientNames = (From row In resultsDS.vwksResults _
+                            Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                            Select row.PatientID, row.SpecimenIDList, row.PatientName Distinct)
+
+            'Create the Patient List DataTable structure and content
+            'Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+            Dim hasConcentrationError As Boolean
+
+            Dim dt As New DataTable 'The DataTable to be returned
+
+            Dim master As New DataTable
+            Dim detail As New DataTable
+            Dim dataset As New DataSet
+
+            Dim groupId As DataColumn = New DataColumn("GroupId", System.Type.GetType("System.Int32"))
+            Dim parentGroupId As DataColumn = New DataColumn("GroupId", System.Type.GetType("System.Int32"))
+            master.Columns.Add(groupId)
+
+            'Group Id Column
+            detail.Columns.Add(parentGroupId)
+            'Patient Name Column
+            detail.Columns.Add("PatientName", GetType(String))
+            dataset.Tables.Add(master)
+            dataset.Tables.Add(detail)
+
+            Dim relation As DataRelation = New DataRelation("Values", groupId, parentGroupId)
+            dataset.Relations.Add(relation)
+
+
+            'Test Name Columns
+            For i As Integer = 0 To numColumns - 1
+                'If i >= TestNames.Count Then
+                'Exit For
+                'End If
+                master.Columns.Add(String.Format("Test_{0}", i), GetType(String))
+                detail.Columns.Add(String.Format("Test_{0}", i), GetType(String))
+            Next
+
+
+            Dim data As DataRow
+            Dim group As Integer
+            Dim columnIndex As Integer
+
+            group = CType(Math.Ceiling(TestNames.Count / numColumns), Integer)
+
+            For i As Integer = 1 To group
+                data = master.NewRow()
+                For j As Integer = 0 To numColumns - 1
+                    columnIndex = ((i - 1) * numColumns) + j
+                    If columnIndex >= TestNames.Count Then
+                        Exit For
+                    End If
+                    data("GroupId") = i
+                    data(String.Format("Test_{0}", j)) = TestNames.ElementAt(columnIndex).Value
+                Next
+                master.Rows.Add(data)
+            Next
+
+
+            'Fill the Table with data
+            Dim TestName As String
+            Dim concentration As String = String.Empty
+            Dim patientFullName As String = String.Empty
+            Dim patient As String
+
+            For k As Integer = 0 To PatientNames.Count - 1
+
+                patient = PatientNames(k).PatientID
+                patientFullName = PatientNames(k).PatientID
+                If (PatientNames(k).SpecimenIDList <> String.Empty) Then
+                    patientFullName = String.Format("{0} ({1})", patientFullName, PatientNames(k).SpecimenIDList)
+                End If
+
+                For block As Integer = 1 To group
+
+                    data = detail.NewRow()
+                    data("GroupId") = block
+                    data("PatientName") = patientFullName
+                    data.SetParentRow(master(block - 1))
+                    For j As Integer = 0 To numColumns - 1
+                        columnIndex = ((block - 1) * numColumns) + j
+                        'TestName = master(block - 1).Item(String.Format("Test_{0}", j)).ToString()
+                        TestId = TestNames.ElementAt(columnIndex).Key
+
+                        'SamplesList = (From row In executionsResultsDS.vwksWSExecutionsResults _
+                        '           Where String.Compare(row.PatientID, patient, False) = 0 _
+                        '           AndAlso String.Format(TestNameFormat, row.TestID, row.TestType) = TestId _
+                        '           Select row).ToList()
+
+                        'If SamplesList.Count > 0 Then
+                        'TestsList = (From row In resultsDS.vwksResults _
+                        '             Where row.OrderTestID = SamplesList.First.OrderTestID _
+                        '             AndAlso row.AcceptedResultFlag _
+                        '             Select row).ToList()
+                        TestsList = (From row In resultsDS.vwksResults _
+                                     Where String.Compare(row.PatientID, patient, False) = 0 _
+                                     AndAlso String.Format(TestNameFormat, row.TestID, row.TestType) = TestId _
+                                     AndAlso row.AcceptedResultFlag _
+                                     Select row).ToList()
+
+                        If TestsList.Count > 0 Then
+
+                            If Not TestsList.First.IsCONC_ValueNull Then
+                                hasConcentrationError = False
+
+                                If Not TestsList.First.IsCONC_ErrorNull Then
+                                    hasConcentrationError = Not String.IsNullOrEmpty(TestsList.First.CONC_Error)
+                                End If
+
+                                If Not hasConcentrationError Then
+                                    concentration = TestsList.First.CONC_Value.ToStringWithDecimals(TestsList.First.DecimalsAllowed)
+                                    concentration = String.Format("{0} {1}", concentration, TestsList.First.MeasureUnit)
+                                Else
+                                    concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                                End If
+                            ElseIf Not TestsList.First.IsManualResultTextNull Then 'Off System Test
+                                concentration = TestsList.First.ManualResultText
+                                concentration = String.Format("{0} {1}", concentration, TestsList.First.MeasureUnit)
+                            Else
+                                concentration = "-"
+                            End If
+
+
+
+                            'TestsList = (From row In resultsDS.vwksResults _
+                            '            Where row.TestType = "CALC" _
+                            '            AndAlso row.STDOrderTestID = SamplesList.First.OrderTestID.ToString() _
+                            '            AndAlso row.AcceptedResultFlag = True _
+                            '            Select row).ToList()
+
+
+                            ''Is this Standard Test a part of a Calculated Test?
+                            'If TestsList.Count > 0 Then
+                            '    For l As Integer = 0 To TestsList.Count - 1
+                            '        Dim ColumnName As String = String.Format(TestNameFormat, TestsList(l).TestName, TestsList(l).SampleType)
+                            '        If Not TestsList(l).IsCONC_ValueNull Then
+                            '            'bsPatientListDataGridView(ColumnName, i).Value = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
+
+                            '            hasConcentrationError = False
+
+                            '            If Not TestsList(l).IsCONC_ErrorNull Then
+                            '                hasConcentrationError = Not String.IsNullOrEmpty(TestsList(l).CONC_Error)
+                            '            End If
+
+                            '            If Not hasConcentrationError Then
+                            '                'bsPatientListDataGridView(ColumnName, i).Value = TestsList(K).CONC_Value.ToStringWithDecimals(TestsList(K).DecimalsAllowed)
+                            '                concentration = TestsList.First.CONC_Value.ToStringWithDecimals(TestsList(l).DecimalsAllowed)
+                            '                concentration = String.Format("{0} {1}", concentration, TestsList(l).MeasureUnit)
+                            '            Else
+                            '                concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                            '            End If
+                            '        Else
+                            '            'bsPatientListDataGridView(ColumnName, i).Value = Nothing
+                            '            concentration = "-"
+                            '        End If
+                            '    Next
+                            'End If
+
+                            'End If
+                        Else
+                            concentration = "-"
+                        End If
+
+                        data.Item(String.Format("Test_{0}", j)) = concentration
+
+                    Next
+                    detail.Rows.Add(data)
+                Next
+            Next
+
+            resultData = New GlobalDataTO()
+            resultData.SetDatos = dataset
+
+        Catch ex As Exception
+            resultData = New GlobalDataTO()
+            resultData.HasError = True
+            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+            resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+            Dim myLogAcciones As New ApplicationLogManager()
+            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "XRManager.CreateSummaryResultsReportDataSet", EventLogEntryType.Error, False)
+        End Try
+
+        Return resultData
+    End Function
+
     ''' <summary>
     ''' 
     ''' </summary>
@@ -2115,6 +2354,8 @@ Public Class XRManager
 
         Return Report
     End Function
+
+#End Region
 
 #End Region
 
