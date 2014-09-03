@@ -2841,7 +2841,17 @@
     <Result>True</Result>
   </IntegrityValidation>
 
-
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>View vhisTestSamples has been changed to return also the TestLongName</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisTestSamples' AND sc.name = 'TestLongName') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 
 </DBIntegrityDS>
 
