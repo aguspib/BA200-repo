@@ -20,6 +20,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  DL 25/11/2010
         ''' Modified by: SA 03/01/2011
+        ''' AG 01/09/2014 - BA-1869 new column CustomPosition is informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -30,7 +31,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = ""
 
-                    cmdText &= "INSERT INTO tparOffSystemTests([Name], ShortName, Units, ResultType, Decimals, TS_User, TS_DateTime) " & vbCrLf
+                    cmdText &= "INSERT INTO tparOffSystemTests([Name], ShortName, Units, ResultType, Decimals, TS_User, TS_DateTime, CustomPosition ) " & vbCrLf
                     cmdText &= "     VALUES (N'" & pOffSystemTestDS.tparOffSystemTests(0).Name.ToString.Replace("'", "''") & "'" & vbCrLf
                     cmdText &= "           , N'" & pOffSystemTestDS.tparOffSystemTests(0).ShortName.ToString.Replace("'", "''") & "'" & vbCrLf
 
@@ -54,10 +55,14 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (String.IsNullOrEmpty(pOffSystemTestDS.tparOffSystemTests(0).TS_DateTime.ToString)) Then
                         'Get the current DateTime
-                        cmdText &= " , '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                        cmdText &= " , '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
                     Else
-                        cmdText &= " , '" & pOffSystemTestDS.tparOffSystemTests(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                        cmdText &= " , '" & pOffSystemTestDS.tparOffSystemTests(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
+
+                    'AG 01/09/2014 BA-1869
+                    cmdText &= " , " & pOffSystemTestDS.tparOffSystemTests(0).CustomPosition & " ) "
+                    'AG 01/09/2014 BA-1869
 
                     'Finally, get the automatically generated ID for the created OFF-SYSTEM Test
                     cmdText &= " SELECT SCOPE_IDENTITY() "
@@ -294,14 +299,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet offsystemTestsDS with data of the system Tests using
         '''          the specified SampleType</returns>
         ''' <remarks>
         ''' Created by:  DL 25/11/2010
         ''' Modified by: XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
         Public Function ReadBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                         ByVal pSampleType As String) As GlobalDataTO
+                                         ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -314,7 +321,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " SELECT OST.OffSystemTestID, OST.ShortName, OST.Name " & vbCrLf
                         cmdText &= " FROM   tparOffSystemTests OST INNER JOIN tparOffSystemTestSamples OSTS ON OST.OffSystemTestID = OSTS.OffSystemTestID " & vbCrLf
                         cmdText &= " WHERE  OSTS.SampleType = '" & pSampleType.Replace("'", "''") & "' "
-                        'cmdText &= " WHERE  OSTS.SampleType = '" & pSampleType.ToUpper.Replace("'", "''") & "' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND OST.Available = 1 ORDER BY OST.CustomPosition ASC "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim dbCmd As New SqlClient.SqlCommand() With {.Connection = dbConnection, .CommandText = cmdText}
 
@@ -662,6 +674,97 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparOffSystemTests "
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparOffSystemTestsDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Gets all OFFS tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        'Use ShortName as TestName in the same way as method tcfgReportsTestsSortingDAO.GetSortedTestList
+                        Dim cmdText As String = " SELECT 'OFFS' AS TestType, OffSystemTestID AS TestID, CustomPosition AS TestPosition, ShortName AS TestName, " & vbCrLf & _
+                                                " 0 AS PreloadedTest, Available FROM tparOffSystemTests ORDER BY CustomPosition ASC "
+
+                        Dim myDataSet As New ReportsTestsSortingDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.tcfgReportsTestsSorting)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparOffSystemTestsDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
 
 #End Region
 

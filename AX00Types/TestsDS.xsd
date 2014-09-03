@@ -106,6 +106,8 @@
               <xs:element name="ActiveControl" msprop:Generator_ColumnVarNameInTable="columnActiveControl" msprop:Generator_ColumnPropNameInRow="ActiveControl" msprop:Generator_ColumnPropNameInTable="ActiveControlColumn" msprop:Generator_UserColumnName="ActiveControl" type="xs:boolean" minOccurs="0" />
               <xs:element name="ControlID" msprop:Generator_ColumnVarNameInTable="columnControlID" msprop:Generator_ColumnPropNameInRow="ControlID" msprop:Generator_ColumnPropNameInTable="ControlIDColumn" msprop:Generator_UserColumnName="ControlID" type="xs:int" minOccurs="0" />
               <xs:element name="LISValue" msprop:Generator_ColumnVarNameInTable="columnLISValue" msprop:Generator_ColumnPropNameInRow="LISValue" msprop:Generator_ColumnPropNameInTable="LISValueColumn" msprop:Generator_UserColumnName="LISValue" type="xs:string" default="" minOccurs="0" />
+              <xs:element name="CustomPosition" msprop:Generator_ColumnVarNameInTable="columnCustomPosition" msprop:Generator_ColumnPropNameInRow="CustomPosition" msprop:Generator_ColumnPropNameInTable="CustomPositionColumn" msprop:Generator_UserColumnName="CustomPosition" type="xs:int" minOccurs="0" />
+              <xs:element name="Available" msprop:Generator_ColumnVarNameInTable="columnAvailable" msprop:Generator_ColumnPropNameInRow="Available" msprop:Generator_ColumnPropNameInTable="AvailableColumn" msprop:Generator_UserColumnName="Available" type="xs:boolean" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

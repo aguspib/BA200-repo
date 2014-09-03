@@ -27,6 +27,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 16/12/2010 - Added parameter for the DS containing the Reference Ranges. Call function SaveReferenceRanges
         '''                              to save the Reference Ranges for the Calculated Test
         '''              SA 14/01/2011 - Removed validation of duplicated Name or ShortName; it is done from the screen now
+        '''              AG 01/09/2014 - BA-1869 when new CALC test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTest As CalculatedTestsDS, ByVal pFormulaValues As FormulasDS, _
                             ByVal pRefRanges As TestRefRangesDS) As GlobalDataTO
@@ -40,34 +41,46 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Insert the new Calculated Test 
                         Dim calTestToAdd As New tparCalculatedTestsDAO
-                        resultData = calTestToAdd.Create(dbConnection, pCalcTest)
 
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            'Get the generated CalcTestID from the dataset returned 
-                            Dim generatedID As Integer = -1
-                            generatedID = DirectCast(resultData.SetDatos, CalculatedTestsDS).tparCalculatedTests(0).CalcTestID
+                        'AG 01/09/2014 - BA-1869 new calc test customposition value = MAX current value + 1
+                        resultData = calTestToAdd.GetLastCustomPosition(dbConnection)
+                        If Not resultData.HasError Then
+                            If resultData.SetDatos Is Nothing OrElse resultData.SetDatos Is DBNull.Value Then
+                                pCalcTest.tparCalculatedTests(0).CustomPosition = 1
+                            Else
+                                pCalcTest.tparCalculatedTests(0).CustomPosition = DirectCast(resultData.SetDatos, Integer) + 1
+                            End If
+                            'AG 01/09/2014 - BA-1869
 
-                            'Set value of Calculated Test ID in the dataset containing the Formula Values
-                            For i As Integer = 0 To pFormulaValues.tparFormulas.Rows.Count - 1
-                                pFormulaValues.tparFormulas(i).CalcTestID = generatedID
-                            Next i
+                            resultData = calTestToAdd.Create(dbConnection, pCalcTest)
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                'Get the generated CalcTestID from the dataset returned 
+                                Dim generatedID As Integer = -1
+                                generatedID = DirectCast(resultData.SetDatos, CalculatedTestsDS).tparCalculatedTests(0).CalcTestID
 
-                            'Set value of Calculated Test ID in the dataset containing the Reference Ranges
-                            For i As Integer = 0 To pRefRanges.tparTestRefRanges.Rows.Count - 1
-                                pRefRanges.tparTestRefRanges(i).TestID = generatedID
-                            Next
+                                'Set value of Calculated Test ID in the dataset containing the Formula Values
+                                For i As Integer = 0 To pFormulaValues.tparFormulas.Rows.Count - 1
+                                    pFormulaValues.tparFormulas(i).CalcTestID = generatedID
+                                Next i
 
-                            'Insert the Formula Values
-                            Dim testFormulaToAdd As New FormulasDelegate
-                            resultData = testFormulaToAdd.AddFormula(dbConnection, pFormulaValues, True)
+                                'Set value of Calculated Test ID in the dataset containing the Reference Ranges
+                                For i As Integer = 0 To pRefRanges.tparTestRefRanges.Rows.Count - 1
+                                    pRefRanges.tparTestRefRanges(i).TestID = generatedID
+                                Next
 
-                            If (Not resultData.HasError) Then
-                                'Finally, insert the Reference Ranges
-                                If (pRefRanges.tparTestRefRanges.Rows.Count > 0) Then
-                                    resultData = SaveReferenceRanges(dbConnection, pRefRanges)
+                                'Insert the Formula Values
+                                Dim testFormulaToAdd As New FormulasDelegate
+                                resultData = testFormulaToAdd.AddFormula(dbConnection, pFormulaValues, True)
+
+                                If (Not resultData.HasError) Then
+                                    'Finally, insert the Reference Ranges
+                                    If (pRefRanges.tparTestRefRanges.Rows.Count > 0) Then
+                                        resultData = SaveReferenceRanges(dbConnection, pRefRanges)
+                                    End If
                                 End If
                             End If
-                        End If
+
+                        End If 'AG 01/09/2014 - BA-1869
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -505,10 +518,13 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the CalculatedTests using
         '''          the specified SampleType</returns>
-        ''' <remarks></remarks>
-        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        ''' <remarks>
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
+        ''' </remarks>
+        Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -518,7 +534,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.ReadBySampleType(dbConnection, pSampleType)
+                        resultData = myCalculatedTests.ReadBySampleType(dbConnection, pSampleType, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 use new parameter
                     End If
                 End If
             Catch ex As Exception
@@ -1335,6 +1351,47 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return myGlobalDataTO
         End Function
+
+        ''' <summary>
+        ''' Gets all CALC tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparCalculatedTestsDAO
+                        resultData = myDAO.GetCustomizedSortedTestSelectionList(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "CalculatedTestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
 
 #End Region
 

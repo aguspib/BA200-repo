@@ -486,103 +486,20 @@ Public Class bsReception
 
     End Sub
 
-    Private Sub BsImport_Click(sender As Object, e As EventArgs) Handles BsImport.Click
 
 
-    End Sub
-
-    Private Sub bsXmlButton_Click(sender As Object, e As EventArgs) Handles bsXmlButton.Click
-        Try
-            Dim xmlDelg As New xmlMessagesDelegate
-            Dim resultData As New GlobalDataTO
-
-            Dim xmlDoc As XmlDocument = New XmlDocument()
-            xmlDoc.LoadXml(TextBox5.Text)
-
-            ''LIS Patient process
-            Dim myPatientsDS As New PatientsDS
-            resultData = xmlDelg.ProcessLISPatients(xmlDoc, "1", "BA400", "9999")
-            myPatientsDS = TryCast(resultData.SetDatos, PatientsDS)
-
-            ''LIS Order process
-            Dim myOrdersDS As New OrdersDS
-            resultData = xmlDelg.ProcessLISOrders(xmlDoc, myPatientsDS, "1", "BA400", "9999")
-            myOrdersDS = TryCast(resultData.SetDatos, OrdersDS)
-
-            'LIS OrderTest process
-
-
-            Dim myTestMappDS As New AllTestsByTypeDS
-            Dim myConfMappDS As New LISMappingsDS
-
-            Dim testmapDlg As New AllTestByTypeDelegate
-            resultData = testmapDlg.ReadAll(Nothing)
-            myTestMappDS = CType(resultData.SetDatos, AllTestsByTypeDS)
-
-            Dim mappDlg As New LISMappingsDelegate
-            resultData = mappDlg.ReadAll(Nothing)
-            myConfMappDS = CType(resultData.SetDatos, LISMappingsDS)
-
-            Dim myRejectedOTLISInfoDS As New OrderTestsLISInfoDS
-            resultData = xmlDelg.ProcessLISOrderTests(xmlDoc, myPatientsDS, myOrdersDS, myRejectedOTLISInfoDS, myTestMappDS, myConfMappDS, "PED", "PED", _
-                                                      IAx00MainMDI.channelIDForLIS, "A400", "AnalyzerSN", "WorkSessionID", Now)
-
-        Catch ex As Exception
-
-        End Try
-
-    End Sub
-
-    Private Sub BsShortAction_Click(sender As Object, e As EventArgs) Handles BsShortAction.Click
+    Private Sub bsCustomSelection_Click(sender As Object, e As EventArgs) Handles bsCustomSelection.Click
 
         Try
             Dim resultData As New GlobalDataTO
 
-            'Test new table twksWSRotorPositionsInProcess
-            'Dim myDelegate As New WSRotorPositionsInProcessDelegate
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "STD"
+                AuxMe.ShowDialog()
+            End Using
 
-            'resultData = myDelegate.IncrementInProcessTestsNumber(Nothing, "SN0000099999_Ax400", "SS;TT;QQ;RR")
-            ''resultData = myDelegate.DecrementInProcessTestsNumber(Nothing, "SN0000099999_Ax400", "SAMPLES", 2)
-
-            'Dim temp As New List(Of Integer)
-            'temp.Add(1)
-            'temp.Add(2)
-            'temp.Add(3)
-            'resultData = myDelegate.Read(Nothing, "SN0000099999_Ax400", "REAGENTS", temp)
-
-            ''resultData = myDelegate.ResetWS(Nothing, "SN0000099999_Ax400")
-
-
-            'Insert readings
-            'Dim myDS As New twksWSReadingsDS
-            'Dim readRow As twksWSReadingsDS.twksWSReadingsRow
-            'For i As Integer = 3 To 33
-            '    readRow = myDS.twksWSReadings.NewtwksWSReadingsRow
-            '    With readRow
-            '        .AnalyzerID = "SN0000099999_Ax400"
-            '        .WorkSessionID = "2013112501"
-            '        .ExecutionID = 1
-            '        .ReactionComplete = True
-            '        .ReadingNumber = i
-            '        .LedPosition = 1
-            '        .MainCounts = 700000
-            '        .RefCounts = 123000
-            '        .DateTime = Now
-            '        .Pause = False
-            '    End With
-            '    myDS.twksWSReadings.AddtwksWSReadingsRow(readRow)
-            'Next
-            'myDS.twksWSReadings.AcceptChanges()
-            'Dim readingsDlg As New WSReadingsDelegate
-            'resultData = readingsDlg.SaveReadings(Nothing, myDS)
-
-            'Test new functionality warn if critical tests in pause
-            Dim myExDlg As New ExecutionsDelegate
-            resultData = myExDlg.ExistCriticalPauseTests(Nothing, "SN0000099999_Ax400", "A400", "2013112501")
-
-            'AG Temporal create whole rotor inprocess
-            'Dim inProcDelg As New WSRotorPositionsInProcessDelegate
-            'resultData = inProcDelg.AUXCreateWholeRotorInProcess(Nothing, "SN0000099999_Ax400", "REAGENTS")
 
         Catch ex As Exception
 

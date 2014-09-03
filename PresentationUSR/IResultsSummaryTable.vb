@@ -10,6 +10,8 @@ Imports Biosystems.Ax00.Types
 'Imports Biosystems.Ax00.DAL
 'Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.PresentationCOM
+
 'Imports Biosystems.Ax00.Controls.UserControls
 'Imports Biosystems.Ax00.PresentationCOM
 
@@ -17,8 +19,14 @@ Public Class IResultsSummaryTable
 
 #Region "Declarations"
 
+    Private Class PatientInfo
+        Public PatientId As String
+        Public Name As String
+        Public FullId As String
+    End Class
+
     Private TestNames As New List(Of String)
-    Private PatientNames As New List(Of String)
+    Private PatientNames As New Dictionary(Of String, PatientInfo)
     Private Const TestNameFormat As String = "{0} ({1})"
     Private LanguageID As String
 
@@ -113,87 +121,100 @@ Public Class IResultsSummaryTable
     End Sub
 
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
+        'Dim Printer As DGVPrinter = New DGVPrinter
+        'Printer.Title = Me.Text
+        'Printer.SubTitle = Today.ToShortDateString()
+        'Printer.SubTitleFormatFlags = StringFormatFlags.LineLimit Or StringFormatFlags.NoClip
+        'Printer.PageNumbers = True
+        'Printer.PageNumberInHeader = False
+        'Printer.PorportionalColumns = True
+        'Printer.HeaderCellAlignment = StringAlignment.Near
+        'Printer.Footer = "*Biosystems AX00 Automatic Analyser*"
+        'Printer.FooterSpacing = 15
+
+        'Printer.TitleSpacing = 10
+        'Printer.SubTitleSpacing = 40
+        'Printer.ShowTotalPageNumber = True
+
+        'Printer.printDocument.DocumentName = Printer.Title
+        'Printer.printDocument.PrinterSettings.DefaultPageSettings.Landscape = bsHorizontalRadioButton.Checked
+
+        'Dim SaveFont As Font = bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font
+        'Dim FontSize As Single = 7.0! * (10.0! / (bsPatientListDataGridView.Columns.Count - 1))
+
+        'Dim colWidth As Integer
+
+        'If bsPatientListDataGridView.Columns.Count < 11 Then
+        '    FontSize = 8.25!
+        '    colWidth = 150
+        'Else
+        '    FontSize = 7.0! * (10.0! / (bsPatientListDataGridView.Columns.Count - 1))
+        '    If FontSize < 5.0! Then FontSize = 5.0!
+        '    colWidth = 130
+        'End If
+        'Printer.ColumnWidths.Add(bsPatientListDataGridView.Columns(0).Name, colWidth)
+
+        'Dim NewFont As New Font("Verdana", FontSize)
+
+        'bsPatientListDataGridView.Visible = False
+        'bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font = NewFont
+        'bsPatientListDataGridView.RowsDefaultCellStyle.Font = NewFont
+        'bsPatientListDataGridView.AlternatingRowsDefaultCellStyle.Font = NewFont
+
+        'Dim CountToDiv As Integer
+        'If bsPatientListDataGridView.Columns.Count < 10 Then
+        '    CountToDiv = bsPatientListDataGridView.Columns.Count + 2
+        'Else
+        '    CountToDiv = bsPatientListDataGridView.Columns.Count + 4
+        'End If
+
+        'colWidth = CInt((bsPatientListDataGridView.Width - colWidth + 30) / (CountToDiv))
+
+        'If bsHorizontalRadioButton.Checked Then
+        '    colWidth = CInt(colWidth * 1.4)
+        'End If
+
+        'For i As Integer = 1 To bsPatientListDataGridView.Columns.Count - 1
+        '    Printer.ColumnWidths.Add(bsPatientListDataGridView.Columns(i).Name, colWidth)
+        'Next
+
+        'Printer.PrintDataGridView(bsPatientListDataGridView)
+
+        'bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font = SaveFont
+        'bsPatientListDataGridView.RowsDefaultCellStyle.Font = SaveFont
+        'bsPatientListDataGridView.AlternatingRowsDefaultCellStyle.Font = SaveFont
+
+        'bsPatientListDataGridView.Visible = True
+
+        'If String.IsNullOrEmpty(ActiveAnalyzer) Then
+        '    Throw New Exception("Invalid ActiveAnalyzer value")
+        'End If
+
+        'If String.IsNullOrEmpty(ActiveWorkSession) Then
+        '    Throw New Exception("Invalid ActiveWorkSession value")
+        'End If
+
+        'XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
+
         Try
-            'Dim Printer As DGVPrinter = New DGVPrinter
-            'Printer.Title = Me.Text
-            'Printer.SubTitle = Today.ToShortDateString()
-            'Printer.SubTitleFormatFlags = StringFormatFlags.LineLimit Or StringFormatFlags.NoClip
-            'Printer.PageNumbers = True
-            'Printer.PageNumberInHeader = False
-            'Printer.PorportionalColumns = True
-            'Printer.HeaderCellAlignment = StringAlignment.Near
-            'Printer.Footer = "*Biosystems AX00 Automatic Analyser*"
-            'Printer.FooterSpacing = 15
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            'Printer.TitleSpacing = 10
-            'Printer.SubTitleSpacing = 40
-            'Printer.ShowTotalPageNumber = True
+            XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
 
-            'Printer.printDocument.DocumentName = Printer.Title
-            'Printer.printDocument.PrinterSettings.DefaultPageSettings.Landscape = bsHorizontalRadioButton.Checked
-
-            'Dim SaveFont As Font = bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font
-            'Dim FontSize As Single = 7.0! * (10.0! / (bsPatientListDataGridView.Columns.Count - 1))
-
-            'Dim colWidth As Integer
-
-            'If bsPatientListDataGridView.Columns.Count < 11 Then
-            '    FontSize = 8.25!
-            '    colWidth = 150
-            'Else
-            '    FontSize = 7.0! * (10.0! / (bsPatientListDataGridView.Columns.Count - 1))
-            '    If FontSize < 5.0! Then FontSize = 5.0!
-            '    colWidth = 130
-            'End If
-            'Printer.ColumnWidths.Add(bsPatientListDataGridView.Columns(0).Name, colWidth)
-
-            'Dim NewFont As New Font("Verdana", FontSize)
-
-            'bsPatientListDataGridView.Visible = False
-            'bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font = NewFont
-            'bsPatientListDataGridView.RowsDefaultCellStyle.Font = NewFont
-            'bsPatientListDataGridView.AlternatingRowsDefaultCellStyle.Font = NewFont
-
-            'Dim CountToDiv As Integer
-            'If bsPatientListDataGridView.Columns.Count < 10 Then
-            '    CountToDiv = bsPatientListDataGridView.Columns.Count + 2
-            'Else
-            '    CountToDiv = bsPatientListDataGridView.Columns.Count + 4
-            'End If
-
-            'colWidth = CInt((bsPatientListDataGridView.Width - colWidth + 30) / (CountToDiv))
-
-            'If bsHorizontalRadioButton.Checked Then
-            '    colWidth = CInt(colWidth * 1.4)
-            'End If
-
-            'For i As Integer = 1 To bsPatientListDataGridView.Columns.Count - 1
-            '    Printer.ColumnWidths.Add(bsPatientListDataGridView.Columns(i).Name, colWidth)
-            'Next
-
-            'Printer.PrintDataGridView(bsPatientListDataGridView)
-
-            'bsPatientListDataGridView.ColumnHeadersDefaultCellStyle.Font = SaveFont
-            'bsPatientListDataGridView.RowsDefaultCellStyle.Font = SaveFont
-            'bsPatientListDataGridView.AlternatingRowsDefaultCellStyle.Font = SaveFont
-
-            'bsPatientListDataGridView.Visible = True
-
-            'If String.IsNullOrEmpty(ActiveAnalyzer) Then
-            '    Throw New Exception("Invalid ActiveAnalyzer value")
-            'End If
-
-            'If String.IsNullOrEmpty(ActiveWorkSession) Then
-            '    Throw New Exception("Invalid ActiveWorkSession value")
-            'End If
-
-            'XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
+            StartTime = Now
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintReportButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
+
     End Sub
 
     Private Sub bsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsExitButton.Click
@@ -343,9 +364,21 @@ Public Class IResultsSummaryTable
     Private Sub FillPatientsList()
         Try
             If ExecutionsResultsDS Is Nothing Then Return
-            PatientNames = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                           Where row.SampleClass = "PATIENT" _
-                          Select row.PatientName Distinct).ToList()
+
+            Dim patients As IList(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults
+                                                                                Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                                                                Select row).ToList()
+            Dim patientFullId As String
+
+            For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In patients
+                patientFullId = row.PatientID
+                If (row.SpecimenIDList <> String.Empty) Then
+                    patientFullId = String.Format("{0} ({1})", patientFullId, row.SpecimenIDList)
+                End If
+                If Not PatientNames.ContainsKey(row.PatientID) Then
+                    PatientNames.Add(row.PatientID, New PatientInfo With {.PatientId = row.PatientID, .Name = row.PatientName, .FullId = patientFullId})
+                End If
+            Next
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillPatientsList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -370,6 +403,7 @@ Public Class IResultsSummaryTable
             Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
             Dim TestsList As List(Of ResultsDS.vwksResultsRow)
             Dim hasConcentrationError As Boolean
+            Dim patientId As String
 
             'Get Tests and Patients Names
             FillTestsList()
@@ -378,8 +412,14 @@ Public Class IResultsSummaryTable
             bsPatientListDataGridView.Columns.Clear()
             bsPatientListDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.ColumnHeader
 
-            'Patient Name Column
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+            'Patient Id Column
+            bsPatientListDataGridView.Columns.Add("PatientId", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", LanguageID))
+            bsPatientListDataGridView.Columns("PatientId").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
+            bsPatientListDataGridView.Columns("PatientId").Frozen = True
+
+            'Patient Name Column
             bsPatientListDataGridView.Columns.Add("PatientName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_PatientName", LanguageID))
             bsPatientListDataGridView.Columns("PatientName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             bsPatientListDataGridView.Columns("PatientName").Frozen = True
@@ -393,13 +433,16 @@ Public Class IResultsSummaryTable
             'Fill the Grid with data
             For i As Integer = 0 To PatientNames.Count - 1
                 bsPatientListDataGridView.Rows.Add()
-                bsPatientListDataGridView("PatientName", i).Value = PatientNames(i)
+                bsPatientListDataGridView("PatientId", i).Value = PatientNames.ElementAt(i).Value.FullId
+                bsPatientListDataGridView("PatientName", i).Value = PatientNames.ElementAt(i).Value.Name
+
+                patientId = PatientNames.ElementAt(i).Key
 
                 For j As Integer = 0 To TestNames.Count - 1
                     SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                  Where row.PatientName = PatientNames(i) _
-                                AndAlso String.Format(TestNameFormat, row.TestName, row.SampleType) = TestNames(j) _
-                                 Select row).ToList()
+                                  Where String.Compare(row.PatientID, patientId, False) = 0 _
+                                  AndAlso String.Format(TestNameFormat, row.TestName, row.SampleType) = TestNames(j) _
+                                  Select row).ToList()
 
                     If SamplesList.Count > 0 Then
                         TestsList = (From row In AverageResultsDS.vwksResults _

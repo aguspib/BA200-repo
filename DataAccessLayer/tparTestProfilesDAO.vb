@@ -22,6 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 01/09/2014 - BA-1869 new columns CustomPosition, Available are informed!!
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -39,7 +40,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         Dim cmdText As String
                         cmdText = " INSERT INTO tparTestProfiles (TestProfileName, SampleType, TestProfilePosition, InUse, " & _
-                                                                " TS_User, TS_DateTime) " & _
+                                                                " TS_User, TS_DateTime, CustomPosition, Available ) " & _
                                   " VALUES(N'" & pTestProfile.tparTestProfiles(0).TestProfileName.Replace("'", "''") & "', " & _
                                          "  '" & pTestProfile.tparTestProfiles(0).SampleType.ToString & "', " & _
                                                 testProfilePosition & ", 0, "
@@ -52,10 +53,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         If (pTestProfile.tparTestProfiles(0).IsTS_DateTimeNull) Then
-                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' "
                         Else
-                            cmdText &= " '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "') "
+                            cmdText &= " '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                         End If
+
+                        'AG 01/09/2014 - BA-1869
+                        cmdText &= " , " & pTestProfile.tparTestProfiles(0).CustomPosition.ToString & " "
+                        If pTestProfile.tparTestProfiles(0).IsAvailableNull OrElse pTestProfile.tparTestProfiles(0).Available Then
+                            cmdText &= " , 1 )"
+                        Else
+                            cmdText &= " , 0 )"
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
                         cmdText &= " SELECT SCOPE_IDENTITY() "
 
                         Dim dbCmd As New SqlClient.SqlCommand
@@ -150,6 +161,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  
         ''' Modified by: SA 28/10/2010 - Add N preffix for multilanguage of field TS_User
+        ''' AG 02/09/2014 - BA-1869 update Available only when informed
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestProfile As TestProfilesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -178,6 +190,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         cmdText &= " TS_DateTime = '" & pTestProfile.tparTestProfiles(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' "
                     End If
+
+                    'AG 02/09/2014 - BA-1869
+                    If Not pTestProfile.tparTestProfiles(0).IsAvailableNull Then
+                        cmdText &= " , Available = " & CInt(IIf(pTestProfile.tparTestProfiles(0).Available, 1, 0))
+                    End If
+                    'AG 02/09/2014 - BA-1869
 
                     cmdText &= " WHERE TestProfileID = " & pTestProfile.tparTestProfiles(0).TestProfileID
 
@@ -503,6 +521,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestProfilesTestsDS with the list of all Test Profiles defined
         '''          for the specified SampleType plus the list of Tests included in each one</returns>
         ''' <remarks>
@@ -510,8 +529,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 19/10/2010 - Changed the SQL to get also Calculated and ISE Tests included in the returned Profiles
         '''              SA 02/12/2010 - Changed the SQL to get also OffSystem Tests included in the returned Profiles
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetProfilesBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        Public Function GetProfilesBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -522,35 +542,63 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String
                         cmdText = " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, T.TestID, T.TestName, " & _
-                                           " T.TestPosition, TP.TestProfilePosition, 1 AS TestTypePos " & _
+                                           " T.TestPosition, TP.TestProfilePosition, 1 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparTests T ON TPT.TestID = T.TestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'STD' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'STD' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
-                                           " CT.CalcTestID AS TestPosition, TP.TestProfilePosition, 2 AS TestTypePos " & _
+                                           " CT.CalcTestID AS TestPosition, TP.TestProfilePosition, 2 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparCalculatedTests CT ON TPT.TestID = CT.CalcTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'CALC' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'CALC' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, IT.IseTestID AS TestID, IT.[Name] AS TestName, " & _
-                                           " IT.IseTestID AS TestPosition,  TP.TestProfilePosition, 3 AS TestTypePos " & _
+                                           " IT.IseTestID AS TestPosition,  TP.TestProfilePosition, 3 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparISETests IT ON TPT.TestID = IT.IseTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'ISE' " & _
-                                  " UNION " & _
+                                  " AND      TPT.TestType = 'ISE' "
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND TP.Available = 1 "
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        cmdText &= " UNION " & _
                                   " SELECT   TP.TestProfileID, TP.TestProfileName, TPT.TestType, OT.OffSystemTestID AS TestID, OT.[Name] AS TestName, " & _
-                                           " OT.OffSystemTestID AS TestPosition,  TP.TestProfilePosition, 4 AS TestTypePos " & _
+                                           " OT.OffSystemTestID AS TestPosition,  TP.TestProfilePosition, 4 AS TestTypePos, TP.CustomPosition " & _
                                   " FROM     tparTestProfiles TP INNER JOIN tparTestProfileTests TPT ON TP.TestProfileID = TPT.TestProfileID " & _
                                                                " INNER JOIN tparOffSystemTests OT ON TPT.TestID = OT.OffSystemTestID " & _
                                   " WHERE    UPPER(TP.SampleType) = UPPER(N'" & pSampleType & "') " & _
-                                  " AND      TPT.TestType = 'OFFS' " & _
-                                  " ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                                  " AND      TPT.TestType = 'OFFS' "
 
-                        '" WHERE    UPPER(TP.SampleType) = '" & pSampleType.ToUpper & "' " & _
+                        'AG 01/09/2014 - BA-1869
+                        '" ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                        If Not pCustomizedTestSelection Then 'Use the old order by clause
+                            cmdText &= " ORDER BY TP.TestProfilePosition, TestTypePos, TestPosition "
+                        Else 'New order by clause by customized order
+                            cmdText &= " AND TP.Available = 1 "
+                            cmdText &= " ORDER BY TP.CustomPosition ASC "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim dbCmd As New SqlClient.SqlCommand
                         dbCmd.Connection = dbConnection
@@ -647,6 +695,95 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the last Custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetLastCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO()
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobalDataTO = GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(CustomPosition) FROM tparTestProfiles "
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
+                        End Using
+
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.GetLastCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Gets all profile tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT 'profile' AS TestType, TestProfileID AS TestID, CustomPosition AS TestPosition, TestProfileName AS TestName, " & vbCrLf & _
+                                                " 0 AS PreloadedTest, Available FROM tparTestProfiles ORDER BY CustomPosition ASC "
+
+                        Dim myDataSet As New ReportsTestsSortingDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.tcfgReportsTestsSorting)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparTestProfilesDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
         End Function
 
 #End Region

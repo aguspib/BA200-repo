@@ -23,6 +23,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by: TR 02/03/2010
+        ''' AG 01/09/2014 - BA-1869 when new STD test is created the CustomPosition informed = MAX current value + 1
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestDS As TestsDS, Optional pIsPreloadedTest As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -44,8 +45,18 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                     pTestDS.tparTests(0).TestPosition = CType(myGlobalDataTO.SetDatos, Integer)
 
-                                    'Finally, create the new Test
-                                    myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    'AG 01/09/2014 - BA-1869 Get the next Custom Position
+                                    ''Finally, create the new Test
+                                    'myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    myGlobalDataTO = GetNextCustomPosition(dbConnection)
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                        pTestDS.tparTests(0).CustomPosition = CType(myGlobalDataTO.SetDatos, Integer)
+
+                                        'Finally, create the new Test
+                                        myGlobalDataTO = myTestsDAO.Create(dbConnection, pTestDS)
+                                    End If
+                                    'AG 01/09/2014 - BA-1869
+
                                 End If
                             End If
                         End If
@@ -543,11 +554,13 @@ Namespace Biosystems.Ax00.BL
         ''' Get all Standard Tests
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing data of all Standard Tests</returns>
         ''' <remarks>
         ''' Created by: TR 08/02/2010
+        ''' AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pCustomizedTestSelection As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -557,7 +570,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myTestsDAO As New tparTestsDAO()
-                        myGlobalDataTO = myTestsDAO.ReadAll(dbConnection)
+                        myGlobalDataTO = myTestsDAO.ReadAll(dbConnection, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 - Inform pForTestSelectionScreen
                     End If
                 End If
 
@@ -774,6 +787,48 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
+        ''' Get the next custom Position
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an Integer value with the next Custom Position</returns>
+        ''' <remarks>
+        ''' Created by: AG 01/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetNextCustomPosition(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myTestsDAO As New tparTestsDAO()
+
+                        myGlobalDataTO = myTestsDAO.GetLastCustomPosition(dbConnection)
+                        If (Not myGlobalDataTO.HasError) Then
+                            If (myGlobalDataTO.SetDatos Is Nothing OrElse myGlobalDataTO.SetDatos Is DBNull.Value) Then
+                                myGlobalDataTO.SetDatos = 1
+                            Else
+                                myGlobalDataTO.SetDatos = CType(myGlobalDataTO.SetDatos, Integer) + 1
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestsDelegate.GetNextCustomPosition", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
         ''' Get the list of all Standard Tests for the specified Sample Type. When a SampleClass is informed, then 
         ''' only Test/SampleType with Controls or Experimental Calibrators defined are returned 
         ''' </summary>
@@ -781,6 +836,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pSampleTypeCode">Sample Type to filter the Tests</param>
         ''' <param name="pSampleClass">Optional parameter. When informed, get only Test/SampleType for which Controls or Calibrators
         '''                            have been defined</param>
+        ''' <param name="pCustomizedTestSelection">Default FALSE same order as until v3.0.2. When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing basic data of the obtained Standard Tests</returns>
         ''' <remarks>
         ''' Modified by: SA 27/06/2010 - Changed the way of getting the Icon Path for System and User Tests
@@ -790,9 +846,10 @@ Namespace Biosystems.Ax00.BL
         '''                              filtered by SampleType for the informed SampleClass. Removed also optional parameter for TestProfileID
         '''                              due to this function is not called from the screen of Programming Test Profiles anymore. Name changed 
         '''                              to GetBySampleType. Removed the getting of the ICON according the TestType
+        '''              AG 29/08/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen (define 2 last parameters as required)
         ''' </remarks>
         Public Function GetBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleTypeCode As String, _
-                                        Optional ByVal pSampleClass As String = "") As GlobalDataTO
+                                         ByVal pSampleClass As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -802,7 +859,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim testsDAO As New tparTestsDAO
-                        resultData = testsDAO.GetBySampleType(dbConnection, pSampleTypeCode, pSampleClass)
+                        resultData = testsDAO.GetBySampleType(dbConnection, pSampleTypeCode, pSampleClass, pCustomizedTestSelection) 'AG 29/08/2014 BA-1869 - Inform pCustomizedTestSelection
                     End If
                 End If
             Catch ex As Exception
@@ -2678,6 +2735,48 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return myGlobalDataTO
         End Function
+
+
+        ''' <summary>
+        ''' Gets all STD tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparTestsDAO
+                        resultData = myDAO.GetCustomizedSortedTestSelectionList(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "TestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
 
 #End Region
     End Class

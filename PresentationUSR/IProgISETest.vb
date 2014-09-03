@@ -1311,6 +1311,8 @@ Public Class IProgISETest
     ''' <param name="pSampleTypeChanged" > TRUE when change sample type in edition mode, FALSE otherwise</param>
     ''' <remarks>
     ''' Modified by: RH 05/06/2012
+    '''              WE 29/08/2014 - Bug fix that clears error indicator whenever user switches to other SampleType
+    '''                              or ISE Test during edition of SlopeFactor fields.
     ''' </remarks>
     Private Sub QueryISETest(ByVal pSampleTypeChanged As Boolean)
         Dim setScreenToQuery As Boolean = False
@@ -1325,6 +1327,9 @@ Public Class IProgISETest
                 If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = DialogResult.Yes) Then
                     SelectedTestRefRangesDS.Clear()
                     setScreenToQuery = True
+                    ' WE 29/08/2014 - Bug fix that clears error indicator whenever user switches to other SampleType
+                    ' or ISE Test during edition of SlopeFactor fields.
+                    BsErrorProvider1.Clear()
                 Else
                     If (OriginalSelectedIndex <> -1) Then
                         bsISETestListView.SelectedItems.Clear() 'AG 26/10/2010 - Clear selection

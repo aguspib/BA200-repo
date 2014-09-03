@@ -319,7 +319,8 @@ Public Class IWSTestSelectionAuxScreen
     '''                              at least a Test (whatever Test Type) defined for the selected SampleType (currently the 
     '''                              screen is not opened if there are not Standard Tests, and it is wrong)
     '''              RH 12/03/2012 - When an error happens, execute Return to prevent the execution of the following lines
-    '''              SA 19/06/2012 - Get ISE Tests also when SampleClass is CTRL           
+    '''              SA 19/06/2012 - Get ISE Tests also when SampleClass is CTRL
+    '''              AG 29/08/2014 - BA-1869 customize test selection visibility and order (new parameter TRUE for GetList and GetBySampleType methods)
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
@@ -361,17 +362,18 @@ Public Class IWSTestSelectionAuxScreen
             Dim myGlobalDataTO As GlobalDataTO
             Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
 
+            Dim customizedTestSelection As Boolean = True 'AG 01/09/2014 - BA-1869 set TRUE to final code / leave FALSE during develop
             'Get the list of available Standard Tests according the selected SampleClass and SampleType
             Dim myTestsDelegate As New TestsDelegate()
             If (SampleClassAttribute = "BLANK") Then
                 'All Tests have to be loaded, without filtering them by Sample Type
-                myGlobalDataTO = myTestsDelegate.GetList(Nothing)
+                myGlobalDataTO = myTestsDelegate.GetList(Nothing, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
             Else
                 'For CALIBRATORS --> Only Tests using for the SampleType an Experimental Calibrator, or an Alternative one based
                 'in an Experimental, will be loaded
                 'For CONTROLS --> Only Tests having a Control defined for the SampleType will be loaded 
                 'For PATIENTS --> All Tests using the SampleType will be loaded 
-                myGlobalDataTO = myTestsDelegate.GetBySampleType(Nothing, SampleTypeAttribute, SampleClassAttribute)
+                myGlobalDataTO = myTestsDelegate.GetBySampleType(Nothing, SampleTypeAttribute, SampleClassAttribute, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
             End If
 
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -384,7 +386,7 @@ Public Class IWSTestSelectionAuxScreen
                     If (SampleClassAttribute = "PATIENT") Then
                         'Get the data for the TreeView
                         Dim myTestProfileDelegate As New TestProfilesDelegate()
-                        myGlobalDataTO = myTestProfileDelegate.GetProfilesBySampleType(Nothing, SampleTypeAttribute)
+                        myGlobalDataTO = myTestProfileDelegate.GetProfilesBySampleType(Nothing, SampleTypeAttribute, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
 
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             'Set value of global variable testProfileList, needed to fill the TreeView of Test Profiles
@@ -423,7 +425,7 @@ Public Class IWSTestSelectionAuxScreen
             If (Not myGlobalDataTO.HasError) Then
                 If (SampleClassAttribute = "PATIENT") Then
                     Dim myCalcTestDelegate As New CalculatedTestsDelegate
-                    myGlobalDataTO = myCalcTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute)
+                    myGlobalDataTO = myCalcTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, customizedTestSelection) 'AG 29/08/2014 BA-1869 pCustomizedTestSelection
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myCalcTestsDS As CalculatedTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
@@ -455,7 +457,7 @@ Public Class IWSTestSelectionAuxScreen
             If (Not myGlobalDataTO.HasError) Then
                 If (SampleClassAttribute = "PATIENT" OrElse SampleClassAttribute = "CTRL") Then
                     Dim myISETestDelegate As New ISETestsDelegate
-                    myGlobalDataTO = myISETestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, (SampleClassAttribute = "CTRL"))
+                    myGlobalDataTO = myISETestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, (SampleClassAttribute = "CTRL"), customizedTestSelection) 'AG 01/09/2014 BA-1869 pCustomizedTestSelection
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myISETestsDS As ISETestsDS = DirectCast(myGlobalDataTO.SetDatos, ISETestsDS)
@@ -487,7 +489,7 @@ Public Class IWSTestSelectionAuxScreen
             If (Not myGlobalDataTO.HasError) Then
                 If (SampleClassAttribute = "PATIENT") Then
                     Dim myOffSystemTestDelegate As New OffSystemTestsDelegate
-                    myGlobalDataTO = myOffSystemTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute)
+                    myGlobalDataTO = myOffSystemTestDelegate.GetBySampleType(Nothing, SampleTypeAttribute, customizedTestSelection) 'AG 01/09/2014 BA-1869 pCustomizedTestSelection
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         Dim myOffSystemTestsDS As OffSystemTestsDS = DirectCast(myGlobalDataTO.SetDatos, OffSystemTestsDS)
