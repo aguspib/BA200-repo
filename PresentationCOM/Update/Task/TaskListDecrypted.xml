@@ -2222,6 +2222,16 @@
 	    ALTER TABLE [Ax00].[dbo].tparSavedWSOrderTests ADD Selected bit NULL
       END
       GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparControls' AND sc.name = 'ControlLevel') = 0
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tparControls ADD ControlLevel tinyint NOT NULL default 1
+      END
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestControls' AND sc.name = 'ControlNum') = 1
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tparTestControls DROP COLUMN ControlNum
+      END
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'

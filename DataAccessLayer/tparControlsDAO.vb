@@ -21,6 +21,7 @@ Partial Public Class tparControlsDAO
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
     ''' Modified by: SA 12/05/2011 - Changed the SQL: ExpirationDate and ActivationDate cannot be Nulls; removed InUse field
+    '''              XB 01/09/2014 - add ControlLevel field - BA #1868
     ''' </remarks>
     Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pControlDS As ControlsDS) As GlobalDataTO
         Dim resultData As New GlobalDataTO
@@ -31,7 +32,7 @@ Partial Public Class tparControlsDAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
                 Dim cmdText As String = " INSERT INTO tparControls (ControlName, SampleType, LotNumber, ActivationDate, ExpirationDate, " & vbCrLf & _
-                                                                  " TS_User, TS_DateTime) " & vbCrLf & _
+                                                                  " TS_User, TS_DateTime, ControlLevel) " & vbCrLf & _
                                         " VALUES (N'" & pControlDS.tparControls(0).ControlName.ToString.Replace("'", "''") & "', " & vbCrLf & _
                                                   "'" & pControlDS.tparControls(0).SampleType & "', " & vbCrLf & _
                                                  "N'" & pControlDS.tparControls(0).LotNumber.ToString.Replace("'", "''") & "', " & vbCrLf & _
@@ -48,10 +49,12 @@ Partial Public Class tparControlsDAO
 
                 If (String.IsNullOrEmpty(pControlDS.tparControls(0).TS_DateTime.ToString)) Then
                     'Get the current DateTime
-                    cmdText &= "'" & Now.ToString("yyyyMMdd HH:mm:ss") & "')" & vbCrLf
+                    cmdText &= "'" & Now.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 Else
-                    cmdText &= "'" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "')" & vbCrLf
+                    cmdText &= "'" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 End If
+
+                cmdText &= " " & pControlDS.tparControls(0).ControlLevel & ") " & vbCrLf
 
                 'Finally, get the automatically generated ID for the created control
                 cmdText &= " SELECT SCOPE_IDENTITY()"
@@ -326,6 +329,7 @@ Partial Public Class tparControlsDAO
     ''' <remarks>
     ''' Created by:  DL 31/03/2011
     ''' Modified by: SA 12/05/2011 - Changed the SQL: SampleType cannot be Null; removed InUse field.
+    '''              XB 01/09/2014 - add ControlLevel field - BA #1868
     ''' </remarks>
     Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pControlDS As ControlsDS) As GlobalDataTO
         Dim resultData As New GlobalDataTO
@@ -351,10 +355,12 @@ Partial Public Class tparControlsDAO
                 End If
 
                 If (pControlDS.tparControls(0).IsTS_DateTimeNull) Then
-                    cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
+                    cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 Else
-                    cmdText &= " TS_DateTime = '" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
+                    cmdText &= " TS_DateTime = '" & pControlDS.tparControls(0).TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                 End If
+
+                cmdText &= " ControlLevel = " & pControlDS.tparControls(0).ControlLevel.ToString & " " & vbCrLf
 
                 cmdText &= " WHERE ControlID = " & pControlDS.tparControls(0).ControlID & vbCrLf
 

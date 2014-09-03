@@ -1408,7 +1408,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 18/06/2012 - Changed the query to get the Test Name from the proper table depending on the TestType: for 
         '''                              Standard Tests, field TestName in tparTests, but for ISE Tests, field Name in tparISETests 
         '''              TR 12/03/2013 - Changed the query to get also field LISRequest from twksOrderTests table
-        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table - BT #1868
+        '''              XB 28/08/2014 - Get the new field Selected from twksOrderTests table - BA #1868
+        '''              XB 01/09/2014 - Get also the new field ControlLevel from tparControls table - BA #1868
         ''' </remarks>
         Public Function GetControlOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1424,7 +1425,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                       " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
                                                             " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
                                                        " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, OT.OrderTestStatus AS OTStatus, C.ControlID, " & vbCrLf & _
-                                                       " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder " & vbCrLf & _
+                                                       " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder, C.ControlLevel " & vbCrLf & _
                                                 " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                          " INNER JOIN tparControls C ON C.ControlID = OT.ControlID " & vbCrLf & _
                                                 " WHERE OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
@@ -1436,7 +1437,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                          " (CASE WHEN OT.TestType = 'STD' THEN (SELECT TestName FROM tparTests WHERE TestID = OT.TestID) " & vbCrLf & _
                                                " WHEN OT.TestType = 'ISE' THEN (SELECT Name FROM tparISETests WHERE ISETestID = OT.TestID) END) AS TestName, " & vbCrLf & _
                                           " OT.SampleType, OT.ReplicatesNumber AS NumReplicates, 'INPROCESS' AS OTStatus, C.ControlID, " & vbCrLf & _
-                                          " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder " & vbCrLf & _
+                                          " C.ControlName, C.LotNumber, C.ExpirationDate, OT.CreationOrder, C.ControlLevel " & vbCrLf & _
                                    " FROM twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                           " INNER JOIN tparControls C ON C.ControlID = OT.ControlID " & vbCrLf & _
                                    " WHERE OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
