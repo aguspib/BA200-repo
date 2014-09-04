@@ -32,7 +32,6 @@ Partial Class ISortingTestsAux
         Me.DownPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.UpPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.FirstPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.TestListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
         Me.TestSortingLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.CloseButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -50,7 +49,6 @@ Partial Class ISortingTestsAux
         Me.TestSortingGB.Controls.Add(Me.DownPosButton)
         Me.TestSortingGB.Controls.Add(Me.UpPosButton)
         Me.TestSortingGB.Controls.Add(Me.FirstPosButton)
-        Me.TestSortingGB.Controls.Add(Me.TestListView)
         Me.TestSortingGB.Controls.Add(Me.TestSortingLabel)
         Me.TestSortingGB.ForeColor = System.Drawing.Color.Black
         Me.TestSortingGB.Location = New System.Drawing.Point(12, 5)
@@ -94,7 +92,7 @@ Partial Class ISortingTestsAux
         Me.bsTestListGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
         Me.bsTestListGrid.EnterToTab = False
         Me.bsTestListGrid.GridColor = System.Drawing.Color.Silver
-        Me.bsTestListGrid.Location = New System.Drawing.Point(9, 250)
+        Me.bsTestListGrid.Location = New System.Drawing.Point(9, 43)
         Me.bsTestListGrid.MultiSelect = False
         Me.bsTestListGrid.Name = "bsTestListGrid"
         Me.bsTestListGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
@@ -116,7 +114,7 @@ Partial Class ISortingTestsAux
         Me.bsTestListGrid.RowsDefaultCellStyle = DataGridViewCellStyle5
         Me.bsTestListGrid.RowTemplate.Height = 30
         Me.bsTestListGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.bsTestListGrid.Size = New System.Drawing.Size(237, 238)
+        Me.bsTestListGrid.Size = New System.Drawing.Size(237, 443)
         Me.bsTestListGrid.TabIndex = 41
         Me.bsTestListGrid.TabToEnter = False
         '
@@ -164,20 +162,6 @@ Partial Class ISortingTestsAux
         Me.FirstPosButton.Size = New System.Drawing.Size(32, 32)
         Me.FirstPosButton.TabIndex = 3
         Me.FirstPosButton.UseVisualStyleBackColor = True
-        '
-        'TestListView
-        '
-        Me.TestListView.BackColor = System.Drawing.Color.White
-        Me.TestListView.ForeColor = System.Drawing.Color.Black
-        Me.TestListView.FullRowSelect = True
-        Me.TestListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable
-        Me.TestListView.HideSelection = False
-        Me.TestListView.Location = New System.Drawing.Point(9, 43)
-        Me.TestListView.Name = "TestListView"
-        Me.TestListView.Size = New System.Drawing.Size(237, 200)
-        Me.TestListView.TabIndex = 2
-        Me.TestListView.UseCompatibleStateImageBehavior = False
-        Me.TestListView.View = System.Windows.Forms.View.Details
         '
         'TestSortingLabel
         '
@@ -249,7 +233,6 @@ Partial Class ISortingTestsAux
     Friend WithEvents DownPosButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents UpPosButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents FirstPosButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents TestListView As Biosystems.Ax00.Controls.UserControls.BSListView
     Friend WithEvents TestSortingLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsAcceptButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents CloseButton As Biosystems.Ax00.Controls.UserControls.BSButton

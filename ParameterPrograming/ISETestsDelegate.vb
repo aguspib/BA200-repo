@@ -870,6 +870,24 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tparISETestsDAO
                         myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
+
+                        'Get the not Available TestID and look for all CALC test or profiles affected -> Set them also as not available
+                        Dim notAvailableItemList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                        notAvailableItemList = (From a As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.Available = False Select a).ToList
+                        If notAvailableItemList.Count > 0 Then
+                            'Look for other calculated tests that uses it in their formula and set available = False
+                            Dim myCalcTestDlg As New CalculatedTestsDelegate
+                            myGlobalDataTO = myCalcTestDlg.ResetAvailableCascade(dbConnection, notAvailableItemList, "ISE")
+
+                            If Not myGlobalDataTO.HasError Then
+                                Dim myTestProfileDlg As New TestProfilesDelegate
+                                myGlobalDataTO = myTestProfileDlg.ResetAvailableCascade(dbConnection, notAvailableItemList, "ISE")
+                            End If
+
+                        End If
+                        notAvailableItemList = Nothing
+
                     End If
 
                     If (Not myGlobalDataTO.HasError) Then

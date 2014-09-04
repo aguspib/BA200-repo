@@ -17,6 +17,14 @@ Public Class ISortingTestsAux
     Private NewScreenLocation As New Point
 
     Private ChangesMade As Boolean = False
+
+    'AG 04/09/2014 - BA-1869
+    Private HeadImageSide As Integer = 12 'Set here the dimensions of the head images
+    Private HeadRect As Rectangle = Nothing
+    Private checkImage As Image = Nothing
+    Private uncheckImage As Image = Nothing
+    'AG 04/09/2014 - BA-1869
+
 #End Region
 
 #Region "Attributes"
@@ -125,7 +133,7 @@ Public Class ISortingTestsAux
                     Case "STD"
                         'Get the default sorting for Standard Tests
                         myReportsTestsSortingList = (From a In myReportsTestsSortingDS.tcfgReportsTestsSorting _
-                                                 Order By a.PreloadedTest Descending, a.TestID _
+                                                 Order By a.PreloadedTest Descending, a.TestName _
                                                    Select a).ToList()
                     Case "CALC"
                         'Get the default sorting for Calculated Tests
@@ -145,7 +153,7 @@ Public Class ISortingTestsAux
             'AG 03/09/2014 - BA-1869
 
             'Load the ListView with the final sorted list
-            FillTestListView(myDefaultSortedTestDS)
+            'FillTestListView(myDefaultSortedTestDS)'AG 04/09/2014 - BA-1869
             FillTestDataGridView(myDefaultSortedTestDS) 'AG 03/09/2014 - BA-1869
             myReportsTestsSortingList = Nothing
 
@@ -322,7 +330,8 @@ Public Class ISortingTestsAux
 
             'Configure all screen controls (icons, texts in current language, ListView properties)
             PrepareButtons()
-            PrepareTestListView()
+
+            'PrepareTestListView()'AG 04/09/2014 - BA-1869
             PrepareTestListGrid() 'AG 03/09/2014 - BA-1869
 
             GetScreenLabelsAndToolTips()
@@ -330,7 +339,8 @@ Public Class ISortingTestsAux
 
             'Get the list of Tests with the current sorting and fill the ListView
             Dim myReportsTestsSortingDS As ReportsTestsSortingDS = GetSortedTestList()
-            FillTestListView(myReportsTestsSortingDS)
+
+            'FillTestListView(myReportsTestsSortingDS)'AG 04/09/2014 - BA-1869
             FillTestDataGridView(myReportsTestsSortingDS) 'AG 03/09/2014 - BA-1869
 
         Catch ex As Exception
@@ -345,6 +355,7 @@ Public Class ISortingTestsAux
     ''' </summary>
     ''' <remarks>
     ''' Created by:  TR
+    ''' AG 04/09/2014 - BA-1869 new icon check / unchecked for grid header
     ''' </remarks>
     Private Sub PrepareButtons()
         Try
@@ -379,6 +390,21 @@ Public Class ISortingTestsAux
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then CloseButton.Image = Image.FromFile(iconPath & auxIconName)
+
+            'AG 04/09/2014 - BA-1869
+            'CHECK icon in grid header
+            auxIconName = GetIconName("CHECKL")
+            If (auxIconName <> "") Then
+                checkImage = Image.FromFile(iconPath & auxIconName)
+            End If
+
+            'UNCHECK icon in grid header
+            auxIconName = GetIconName("UNCHECKL")
+            If (auxIconName <> "") Then
+                uncheckImage = Image.FromFile(iconPath & auxIconName)
+            End If
+            'AG 04/09/2014 - BA-1869
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -511,19 +537,6 @@ Public Class ISortingTestsAux
         End Try
     End Sub
 
-    Private Sub TestListView_ColumnWidthChanging(ByVal sender As System.Object, ByVal e As System.Windows.Forms.ColumnWidthChangingEventArgs) Handles TestListView.ColumnWidthChanging
-        Try
-            e.Cancel = True
-            If e.ColumnIndex = 0 Then
-                e.NewWidth = 215 '233 
-            Else
-                e.NewWidth = 0
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestListView_ColumnWidthChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".TestListView_ColumnWidthChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
 
     Private Sub FirstPosButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles FirstPosButton.Click
         Try
@@ -618,6 +631,87 @@ Public Class ISortingTestsAux
             ShowMessage(Name & ".AcceptButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+
+    ''' <summary>
+    ''' Click on grid
+    ''' - Available column row -> New value = Not current value
+    ''' - Available column header -> New value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub bsTestListGrid_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles bsTestListGrid.CellMouseClick
+        Try
+            If e.RowIndex >= 0 Then
+                'Click on item
+                If bsTestListGrid.Columns(e.ColumnIndex).Name.ToString = "Available" Then
+                    Dim dgv As BSDataGridView = bsTestListGrid
+                    Dim myField As String = dgv.Columns(e.ColumnIndex).Name
+                    dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) 'Assign new value = Not current
+
+                End If
+            Else
+                'Click on header
+                If bsTestListGrid.Columns(e.ColumnIndex).Name.ToString = "Available" Then
+                    Dim dgv As BSDataGridView = bsTestListGrid
+
+                    'Some not available new value = avaliable ALL // all available new value = available NONE
+                    Dim disabledRows As List(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
+                                                Where a.Cells("Available").Value = False Select a).ToList
+
+
+                    If disabledRows.Count > 0 Then
+                        'Some disable ... set all available
+                        For Each row As DataGridViewRow In disabledRows
+                            row.Cells("Available").Value = True
+                        Next
+
+                    Else
+                        'All enable ... set disable
+                        For Each row As DataGridViewRow In dgv.Rows
+                            If row.Cells("Available").Value Then
+                                row.Cells("Available").Value = False
+                            End If
+                        Next
+                    End If
+                    disabledRows = Nothing
+
+                End If
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestListGrid_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".bsTestListGrid_CellMouseClick ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
+    ''' <summary>
+    ''' Draws the icon header for column Available
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>Created AG 04/09/2014 - BA-1869</remarks>
+    Private Sub bsTestListGrid_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles bsTestListGrid.CellPainting
+
+        If e.RowIndex = -1 Then
+            Dim AvailableIndex As Integer = bsTestListGrid.Columns("Available").Index
+
+
+            If e.ColumnIndex = AvailableIndex Then
+                HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
+                                         e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
+                                         HeadImageSide, HeadImageSide)
+
+                e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
+
+                e.Graphics.DrawImage(checkImage, HeadRect)
+                e.Handled = True
+            End If
+        End If
+    End Sub
+
 #End Region
 
 
@@ -986,212 +1080,213 @@ Public Class ISortingTestsAux
 #End Region
 
 #Region "OLD methods using ListView replaced for DataGridView"
-    ''' <summary>
-    ''' Configure the ListView for the list of Tests
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  TR
-    ''' AG 03/09/2014 - BA-1869 get also Available column for each item
-    ''' </remarks>
-    Private Sub PrepareTestListView()
-        Try
-            TestListView.Items.Clear()
-            TestListView.Alignment = ListViewAlignment.Left
-            TestListView.HeaderStyle = ColumnHeaderStyle.Clickable
-            TestListView.MultiSelect = True
-            TestListView.Scrollable = True
-            TestListView.FullRowSelect = True
-            TestListView.View = View.Details
-            TestListView.HideSelection = False
-            TestListView.SmallImageList = TestIconList
+    ' ''' <summary>
+    ' ''' Configure the ListView for the list of Tests
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by:  TR
+    ' ''' AG 03/09/2014 - BA-1869 get also Available column for each item
+    ' ''' </remarks>
+    'Private Sub PrepareTestListView()
+    '    Try
+    '        TestListView.Items.Clear()
+    '        TestListView.Alignment = ListViewAlignment.Left
+    '        TestListView.HeaderStyle = ColumnHeaderStyle.Clickable
+    '        TestListView.MultiSelect = True
+    '        TestListView.Scrollable = True
+    '        TestListView.FullRowSelect = True
+    '        TestListView.View = View.Details
+    '        TestListView.HideSelection = False
+    '        TestListView.SmallImageList = TestIconList
 
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            TestListView.Columns.Add(myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TestNames", CurrentLanguage), -2, HorizontalAlignment.Left)
+    '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+    '        TestListView.Columns.Add(myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TestNames", CurrentLanguage), -2, HorizontalAlignment.Left)
 
-            TestListView.Columns(0).Width = 215 'TestListView.Width
-            TestListView.Columns(0).Name = "TestName"
-            TestListView.Columns.Add("TestID", 0, HorizontalAlignment.Left)
-            TestListView.Columns(1).Name = "TestID"
-            TestListView.Columns.Add("TestType", 0, HorizontalAlignment.Left)
-            TestListView.Columns(2).Name = "TestType"
+    '        TestListView.Columns(0).Width = 215 'TestListView.Width
+    '        TestListView.Columns(0).Name = "TestName"
+    '        TestListView.Columns.Add("TestID", 0, HorizontalAlignment.Left)
+    '        TestListView.Columns(1).Name = "TestID"
+    '        TestListView.Columns.Add("TestType", 0, HorizontalAlignment.Left)
+    '        TestListView.Columns(2).Name = "TestType"
 
-            'AG 03/09/2014 - BA-1869 - In mode test selection order show also Available
-            If openModeAttribute <> String.Empty Then
-                TestListView.CheckBoxes = True 'AG 03/09/2014 - BA-1869 - It does not work because the check has not an own header in order to check/unchech all
-                TestListView.Columns.Add("Available", 0, HorizontalAlignment.Left)
-                TestListView.Columns(3).Name = "Available"
-            End If
-            'AG 03/09/2014 - BA-1869
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".PrepareTestListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
+    '        'AG 03/09/2014 - BA-1869 - In mode test selection order show also Available
+    '        If openModeAttribute <> String.Empty Then
+    '            TestListView.CheckBoxes = True 'AG 03/09/2014 - BA-1869 - It does not work because the check has not an own header in order to check/unchech all
+    '            TestListView.Columns.Add("Available", 0, HorizontalAlignment.Left)
+    '            TestListView.Columns(3).Name = "Available"
+    '        End If
+    '        'AG 03/09/2014 - BA-1869
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".PrepareTestListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
 
-    ''' <summary>
-    ''' Load in the ListView, the list of sorted Tests received 
-    ''' </summary>
-    ''' <param name="pReportsTestsSortingDS">Typed Dataset ReportsTestsSortingDS containing the current test sorting</param>
-    ''' <remarks>
-    ''' Created by:  TR
-    ''' AG 03/09/2014 - BA-1869 get also Available column for each item (and profile Icon)
-    ''' </remarks>
-    Private Sub FillTestListView(ByVal pReportsTestsSortingDS As ReportsTestsSortingDS)
-        Try
-            Dim IconName As String = String.Empty
-            Dim myRowIndex As Integer = 0
+    ' ''' <summary>
+    ' ''' Load in the ListView, the list of sorted Tests received 
+    ' ''' </summary>
+    ' ''' <param name="pReportsTestsSortingDS">Typed Dataset ReportsTestsSortingDS containing the current test sorting</param>
+    ' ''' <remarks>
+    ' ''' Created by:  TR
+    ' ''' AG 03/09/2014 - BA-1869 get also Available column for each item (and profile Icon)
+    ' ''' </remarks>
+    'Private Sub FillTestListView(ByVal pReportsTestsSortingDS As ReportsTestsSortingDS)
+    '    Try
+    '        Dim IconName As String = String.Empty
+    '        Dim myRowIndex As Integer = 0
 
-            TestListView.Items.Clear()
-            For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pReportsTestsSortingDS.tcfgReportsTestsSorting.Rows
-                Select Case testRow.TestType
-                    Case "STD"
-                        If testRow.PreloadedTest Then
-                            IconName = "TESTICON"
-                        Else
-                            IconName = "USERTEST"
-                        End If
-                        Exit Select
-                    Case "CALC"
-                        IconName = "TCALC"
-                        Exit Select
-                    Case "ISE"
-                        IconName = "TISE_SYS"
-                        Exit Select
-                    Case "OFFS"
-                        IconName = "TOFF_SYS"
-                        Exit Select
+    '        TestListView.Items.Clear()
+    '        For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pReportsTestsSortingDS.tcfgReportsTestsSorting.Rows
+    '            Select Case testRow.TestType
+    '                Case "STD"
+    '                    If testRow.PreloadedTest Then
+    '                        IconName = "TESTICON"
+    '                    Else
+    '                        IconName = "USERTEST"
+    '                    End If
+    '                    Exit Select
+    '                Case "CALC"
+    '                    IconName = "TCALC"
+    '                    Exit Select
+    '                Case "ISE"
+    '                    IconName = "TISE_SYS"
+    '                    Exit Select
+    '                Case "OFFS"
+    '                    IconName = "TOFF_SYS"
+    '                    Exit Select
 
-                        'AG 03/09/2014 - BA-1869
-                    Case "PROFILE"
-                        IconName = "TPROFILES"
-                        Exit Select
+    '                    'AG 03/09/2014 - BA-1869
+    '                Case "PROFILE"
+    '                    IconName = "TPROFILES"
+    '                    Exit Select
 
-                End Select
+    '            End Select
 
-                TestListView.Items.Add(testRow.TestName, IconName).SubItems.Add(testRow.TestID)
-                TestListView.Items(myRowIndex).SubItems.Add(testRow.TestType)
+    '            TestListView.Items.Add(testRow.TestName, IconName).SubItems.Add(testRow.TestID)
+    '            TestListView.Items(myRowIndex).SubItems.Add(testRow.TestType)
 
-                'AG 03/09/2014 - BA-1869 - In mode test selection order show also Available
-                If openModeAttribute <> String.Empty Then
-                    TestListView.Items(myRowIndex).SubItems.Add(testRow.Available)
-                End If
+    '            'AG 03/09/2014 - BA-1869 - In mode test selection order show also Available
+    '            If openModeAttribute <> String.Empty Then
+    '                TestListView.Items(myRowIndex).SubItems.Add(testRow.Available)
+    '            End If
 
-                myRowIndex += 1
-            Next
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".FillTestListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
+    '            myRowIndex += 1
+    '        Next
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FillTestListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".FillTestListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
 
-    ''' <summary>
-    ''' Move the group of selected Tests to the Top or the Bottom of the ListView
-    ''' </summary>
-    ''' <param name="ptListView">ListView containing all Tests</param>
-    ''' <param name="pMoveTop">Flag indicating if Test are moved to Top(True) or to the Bottom (False)</param>
-    ''' <remarks>
-    ''' Created by: TR
-    ''' </remarks>
-    Private Sub MoveTopOrBottomItems(ByVal ptListView As ListView, ByVal pMoveTop As Boolean)
-        Try
-            'If tests are moving to botton, set index to the last element in list
-            'If tests are moving to top, set index to the first element in list
-            Dim myIndex As Integer = 0
-            If (Not pMoveTop) Then myIndex = ptListView.Items.Count - 1
+    ' ''' <summary>
+    ' ''' Move the group of selected Tests to the Top or the Bottom of the ListView
+    ' ''' </summary>
+    ' ''' <param name="ptListView">ListView containing all Tests</param>
+    ' ''' <param name="pMoveTop">Flag indicating if Test are moved to Top(True) or to the Bottom (False)</param>
+    ' ''' <remarks>
+    ' ''' Created by: TR
+    ' ''' </remarks>
+    'Private Sub MoveTopOrBottomItems(ByVal ptListView As ListView, ByVal pMoveTop As Boolean)
+    '    Try
+    '        'If tests are moving to botton, set index to the last element in list
+    '        'If tests are moving to top, set index to the first element in list
+    '        Dim myIndex As Integer = 0
+    '        If (Not pMoveTop) Then myIndex = ptListView.Items.Count - 1
 
-            For Each selectedTestItem As ListViewItem In ptListView.SelectedItems
-                'Define a new ListViewItem
-                Dim lviNewItem As ListViewItem = CType(selectedTestItem.Clone(), ListViewItem)
+    '        For Each selectedTestItem As ListViewItem In ptListView.SelectedItems
+    '            'Define a new ListViewItem
+    '            Dim lviNewItem As ListViewItem = CType(selectedTestItem.Clone(), ListViewItem)
 
-                'Remove the currently selected item from the list
-                selectedTestItem.Remove()
-                If (pMoveTop) Then
-                    'Insert the new item in it's new place
-                    TestListView.Items.Insert(myIndex, lviNewItem)
-                    myIndex += 1
-                Else
-                    TestListView.Items.Insert(myIndex, lviNewItem)
-                    myIndex -= 1
-                End If
+    '            'Remove the currently selected item from the list
+    '            selectedTestItem.Remove()
+    '            If (pMoveTop) Then
+    '                'Insert the new item in it's new place
+    '                TestListView.Items.Insert(myIndex, lviNewItem)
+    '                myIndex += 1
+    '            Else
+    '                TestListView.Items.Insert(myIndex, lviNewItem)
+    '                myIndex -= 1
+    '            End If
 
-                lviNewItem.Selected = True
-                lviNewItem.EnsureVisible()
-            Next
+    '            lviNewItem.Selected = True
+    '            lviNewItem.EnsureVisible()
+    '        Next
 
-            'TR 13/02/2012 -Set ChangesMade value True 
-            ChangesMade = True
+    '        'TR 13/02/2012 -Set ChangesMade value True 
+    '        ChangesMade = True
 
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MoveTopOrBottomItems ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".MoveTopOrBottomItems ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MoveTopOrBottomItems ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".MoveTopOrBottomItems ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
 
-    ''' <summary>
-    ''' Move the group of selected Tests Up or Down in the ListView
-    ''' </summary>
-    ''' <param name="pListView">ListView containing all Tests</param>
-    ''' <param name="pMoveUp">Flag indicating if Test are moved Up (True) or Down (False)</param>
-    ''' <remarks>
-    ''' Created by: TR
-    ''' </remarks>
-    Private Sub MoveItemsInListView(ByRef pListView As ListView, ByVal pMoveUp As Boolean)
-        Try
-            'If tests are moving down, set limittedIndex to the last element in list
-            'If tests are moving up, set limittedIndex to the first element in list
-            Dim limittedIndex As Integer = (pListView.Items.Count - 1)
-            If (pMoveUp) Then limittedIndex = 0
+    ' ''' <summary>
+    ' ''' Move the group of selected Tests Up or Down in the ListView
+    ' ''' </summary>
+    ' ''' <param name="pListView">ListView containing all Tests</param>
+    ' ''' <param name="pMoveUp">Flag indicating if Test are moved Up (True) or Down (False)</param>
+    ' ''' <remarks>
+    ' ''' Created by: TR
+    ' ''' </remarks>
+    'Private Sub MoveItemsInListView(ByRef pListView As ListView, ByVal pMoveUp As Boolean)
+    '    Try
+    '        'If tests are moving down, set limittedIndex to the last element in list
+    '        'If tests are moving up, set limittedIndex to the first element in list
+    '        Dim limittedIndex As Integer = (pListView.Items.Count - 1)
+    '        If (pMoveUp) Then limittedIndex = 0
 
-            'Define a new collection for the indexes of ListView elements to move and field it with the indexes 
-            'of all selected elements
-            Dim IndexesToMove As New List(Of Integer)()
-            For Each SelectedItem As ListViewItem In pListView.SelectedItems
-                'Add the item's index to the collection
-                IndexesToMove.Add(SelectedItem.Index)
+    '        'Define a new collection for the indexes of ListView elements to move and field it with the indexes 
+    '        'of all selected elements
+    '        Dim IndexesToMove As New List(Of Integer)()
+    '        For Each SelectedItem As ListViewItem In pListView.SelectedItems
+    '            'Add the item's index to the collection
+    '            IndexesToMove.Add(SelectedItem.Index)
 
-                'If this item is at the limit we defined
-                If (SelectedItem.Index = limittedIndex) Then
-                    'Do not attempt to move item(s) as we are at the top or bottom of the list
-                    Exit Try
-                End If
-            Next
+    '            'If this item is at the limit we defined
+    '            If (SelectedItem.Index = limittedIndex) Then
+    '                'Do not attempt to move item(s) as we are at the top or bottom of the list
+    '                Exit Try
+    '            End If
+    '        Next
 
-            'If tests are moving down
-            If (Not pMoveUp) Then
-                'Reverse the index list so that we move items from the bottom of the selection first
-                IndexesToMove.Reverse()
-            End If
+    '        'If tests are moving down
+    '        If (Not pMoveUp) Then
+    '            'Reverse the index list so that we move items from the bottom of the selection first
+    '            IndexesToMove.Reverse()
+    '        End If
 
-            'Loop through each index we want to move
-            For Each intIndex As Integer In IndexesToMove
-                'Define a new ListViewItem
-                Dim lviNewItem As ListViewItem = CType(pListView.Items(intIndex).Clone(), ListViewItem)
+    '        'Loop through each index we want to move
+    '        For Each intIndex As Integer In IndexesToMove
+    '            'Define a new ListViewItem
+    '            Dim lviNewItem As ListViewItem = CType(pListView.Items(intIndex).Clone(), ListViewItem)
 
-                'Remove the currently selected item from the list
-                pListView.Items(intIndex).Remove()
+    '            'Remove the currently selected item from the list
+    '            pListView.Items(intIndex).Remove()
 
-                'Insert the new item in the new position
-                If (pMoveUp) Then
-                    pListView.Items.Insert(intIndex - 1, lviNewItem)
-                Else
-                    pListView.Items.Insert(intIndex + 1, lviNewItem)
-                End If
+    '            'Insert the new item in the new position
+    '            If (pMoveUp) Then
+    '                pListView.Items.Insert(intIndex - 1, lviNewItem)
+    '            Else
+    '                pListView.Items.Insert(intIndex + 1, lviNewItem)
+    '            End If
 
-                lviNewItem.Selected = True
-                lviNewItem.EnsureVisible()
-            Next
-            'TR 13/02/2012 -Set ChangesMade value True 
-            ChangesMade = True
+    '            lviNewItem.Selected = True
+    '            lviNewItem.EnsureVisible()
+    '        Next
+    '        'TR 13/02/2012 -Set ChangesMade value True 
+    '        ChangesMade = True
 
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MoveItemsInListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".MoveItemsInListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
-        Finally
-            'Set the focus on the listview
-            pListView.Focus()
-        End Try
-    End Sub
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MoveItemsInListView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Name & ".MoveItemsInListView ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    Finally
+    '        'Set the focus on the listview
+    '        pListView.Focus()
+    '    End Try
+    'End Sub
 
 #End Region
+
 
 End Class
