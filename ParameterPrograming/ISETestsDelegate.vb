@@ -504,7 +504,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 12/06/2012 - Removed DataSets for adding: ISE Tests/SampleType cannot be added nor deleted
         '''              SA 18/06/2012 - Added code to save QC values for the ISE Tests/SampleType also in QC Module when the ISE Test/SampleType
         '''                              already exists in it
-        '''              SA 04/09/2014 - BA-1861 ==> After update the ISETest/SampleType, call new function HIST_Update in ISETestSamplesDelegate to 
+        '''              SA 04/09/2014 - BA-1865 ==> After update the ISETest/SampleType, call new function HIST_Update in ISETestSamplesDelegate to 
         '''                                          verify if the data has to be updated also in Historics Module (when the ISETest/SampleType has
         '''                                          been already exported)
         ''' </remarks>
@@ -531,7 +531,7 @@ Namespace Biosystems.Ax00.BL
                                 resultData = myISESampleType.Modify(dbConnection, pUpdatedISETestSamples)
 
                                 If (Not resultData.HasError) Then
-                                    'BA-1861 - Call the function to verify if the ISETest/SampleType already exists in Historic Module and in that 
+                                    'BA-1865 - Call the function to verify if the ISETest/SampleType already exists in Historic Module and in that 
                                     '          case, update data also in that module
                                     resultData = myISESampleType.HIST_Update(dbConnection, pUpdatedISETestSamples.tparISETestSamples.First.ISETestID, _
                                                                              pUpdatedISETestSamples.tparISETestSamples.First.SampleType)

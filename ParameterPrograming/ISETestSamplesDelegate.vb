@@ -248,7 +248,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pSampleType">Sample Type Code</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 04/09/2014 - BA-1861
+        ''' Created by:  SA 04/09/2014 - BA-1865
         ''' </remarks>
         Public Function HIST_Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing

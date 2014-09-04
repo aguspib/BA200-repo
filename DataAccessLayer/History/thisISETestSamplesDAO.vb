@@ -88,7 +88,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pISETestID">Identifier of the ISE Test in Parameters Programming Module</param>
         ''' <returns>GlobalDataTO containing a typed DataSet HisISETestsDS with data saved for the ISETest (all SampleTypes) in Historics Module</returns>
         ''' <remarks>
-        ''' Created by:  SA 04/09/2014 - BA-1861
+        ''' Created by:  SA 04/09/2014 - BA-1865
         ''' </remarks>
         Public Function ReadByISETestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -183,7 +183,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                                    Historics Module</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 04/09/2014 - BA-1861
+        ''' Created by:  SA 04/09/2014 - BA-1865
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisISETestSamplesDS As HisISETestSamplesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO

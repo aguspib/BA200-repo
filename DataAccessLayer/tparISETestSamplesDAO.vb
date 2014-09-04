@@ -610,7 +610,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pSampleType">Sample Type Code</param>
         ''' <returns>GlobalDataTO containing a typed DataSet HisISETestSamplesDS with data in Parameters Programming for the informed ISETestID/SampleType</returns>
         ''' <remarks>
-        ''' Created by: SA 04/09/2014 - BA-1861
+        ''' Created by: SA 04/09/2014 - BA-1865
         ''' </remarks>
         Public Function HIST_GetISETestSampleData(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
