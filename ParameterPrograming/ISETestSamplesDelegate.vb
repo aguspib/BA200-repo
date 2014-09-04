@@ -237,6 +237,96 @@ Namespace Biosystems.Ax00.BL
         End Function
 #End Region
 
+#Region "HISTORY methods"
+        ''' <summary>
+        ''' When ISE Test data is changed in Parameters Programming Module, if the ISE Test/Sample Type already exists in Historic Module, data is updated  
+        ''' in thisISETestSamples table. If field Name has been changed, it is updated not only for the informed SampleType, but all the Sample Types that
+        ''' exist in Historic Module for the informed ISETestID
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 04/09/2014 - BA-1861
+        ''' </remarks>
+        Public Function HIST_Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim testSampleDefinitionDS As New HisISETestSamplesDS    'DS to return
+
+                        'Get data currently programmed for the informed ISETestID/SampleType 
+                        Dim myDAO As New tparISETestSamplesDAO
+                        resultData = myDAO.HIST_GetISETestSampleData(dbConnection, pISETestID, pSampleType)
+
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            testSampleDefinitionDS = DirectCast(resultData.SetDatos, HisISETestSamplesDS)
+
+                            If (testSampleDefinitionDS.thisISETestSamples.Rows.Count > 0) Then
+                                'Read if the ISETestID already exists in Historic Module (read all existing SampleTypes)
+                                Dim myHistDAO As New thisISETestSamplesDAO
+
+                                resultData = myHistDAO.ReadByISETestID(dbConnection, pISETestID)
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    Dim currentHist As HisISETestSamplesDS = DirectCast(resultData.SetDatos, HisISETestSamplesDS)
+
+                                    For Each row As HisISETestSamplesDS.thisISETestSamplesRow In currentHist.thisISETestSamples.Rows
+                                        If (row.SampleType = pSampleType) Then
+                                            'Get the HistISETestID and inform it in testSampleDefinitionDS
+                                            testSampleDefinitionDS.thisISETestSamples.First.BeginEdit()
+                                            testSampleDefinitionDS.thisISETestSamples.First.HistISETestID = row.HistISETestID
+                                            testSampleDefinitionDS.thisISETestSamples.First.EndEdit()
+                                        Else
+                                            'Check if field Name has been changed
+                                            If (row.ISETestName <> testSampleDefinitionDS.thisISETestSamples.First.ISETestName) Then
+                                                'Update the field Name and move the row to testSampleDefinitionDS
+                                                row.ISETestName = testSampleDefinitionDS.thisISETestSamples.First.ISETestName
+                                                testSampleDefinitionDS.thisISETestSamples.ImportRow(row)
+                                            End If
+                                        End If
+                                    Next
+                                    testSampleDefinitionDS.AcceptChanges()
+
+                                    'Finally, update data in Historic Module for all affected ISETests/SampleTypes
+                                    resultData = myHistDAO.Update(dbConnection, testSampleDefinitionDS)
+                                End If
+                            End If
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestSamplesDelegate.HIST_Update", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
 #Region "TO DELETE - NOT USED"
         ''' <summary>
         ''' Add a new ISETestSample (NOT USED)
