@@ -496,7 +496,7 @@ Public Class bsReception
             'Shown the Positioning Warnings Screen
             Using AuxMe As New ISortingTestsAux()
                 AuxMe.openMode = "TESTSELECTION"
-                AuxMe.screenID = "STD"
+                AuxMe.screenID = "OFFS"
                 AuxMe.ShowDialog()
             End Using
 

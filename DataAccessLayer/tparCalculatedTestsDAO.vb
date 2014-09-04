@@ -4,6 +4,7 @@ Option Explicit On
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
+Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class tparCalculatedTestsDAO
@@ -1104,6 +1105,67 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             End Try
 
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Update (only when informed) columns CustomPosition and Available for CALC tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsSortingDS">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 03/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateCustomPositionAndAvailable(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsSortingDS As ReportsTestsSortingDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As New StringBuilder
+                    For Each testrow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting
+                        'Check there is something to update in this row
+                        If Not (testrow.IsTestPositionNull AndAlso testrow.IsAvailableNull) Then
+                            cmdText.Append(" UPDATE tparCalculatedTests SET ")
+
+                            'Update CustomPosition = TestPosition if informed
+                            If Not testrow.IsTestPositionNull Then
+                                cmdText.Append(" CustomPosition = " & testrow.TestPosition.ToString)
+                            End If
+
+                            'Update Available = Available if informed
+                            If Not testrow.IsAvailableNull Then
+                                'Add coma when required
+                                If Not testrow.IsTestPositionNull Then
+                                    cmdText.Append(" , ")
+                                End If
+
+                                cmdText.Append(" Available = " & CInt(IIf(testrow.Available, 1, 0)))
+                            End If
+
+                            cmdText.Append(" WHERE CalcTestID  = " & testrow.TestID.ToString)
+                            cmdText.Append(vbCrLf)
+                        End If
+                    Next
+
+                    If cmdText.ToString.Length <> 0 Then
+                        Using dbCmd As New SqlCommand(cmdText.ToString, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        End Using
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparCalculatedTestsDAO.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            End Try
             Return resultData
         End Function
 

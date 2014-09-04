@@ -37,8 +37,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 ElseIf (Not pHistoryTestSamplesDS Is Nothing) Then
+                    Dim tstLongName As String = String.Empty
+                    If (pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull) Then
+                        tstLongName = "NULL"
+                    Else
+                        tstLongName = "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"
+                    End If
 
-                    Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
+                    ''Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
 
                     Dim cmdText As String = " INSERT INTO tqcHistoryTestSamples(TestType, TestID, SampleType, CreationDate, TestName, TestShortName, " & vbCrLf & _
                                                                               " PreloadedTest, MeasureUnit, DecimalsAllowed, RejectionCriteria, CalculationMode, " & vbCrLf & _

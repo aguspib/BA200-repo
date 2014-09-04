@@ -338,6 +338,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''          for the informed ISE Test and Sample Type</returns>
         ''' <remarks>
         ''' Created by:  SA 06/06/2012 
+        ''' Modified by: XB 01/09/2014 - Get the new field ControlLevel from tparControls table - BA #1868
         ''' </remarks>
         Public Function ReadByISETestIDAndSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                      Optional ByVal pSampleType As String = "", Optional ByVal pControlID As Integer = 0, _
@@ -352,7 +353,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT TC.TestType, TC.TestID, TC.SampleType, TC.ControlID, TC.MinConcentration, TC.MaxConcentration, " & vbCrLf & _
                                                        " TC.TargetMean, TC.TargetSD, TC.ACtiveControl, C.ControlName, C.LotNumber, C.ExpirationDate, " & vbCrLf & _
-                                                       " IT.Name AS TestName, ITS.ControlReplicates, ITS.Decimals AS DecimalsAllowed " & vbCrLf & _
+                                                       " IT.Name AS TestName, ITS.ControlReplicates, ITS.Decimals AS DecimalsAllowed, C.ControlLevel " & vbCrLf & _
                                                 " FROM   tparTestControls AS TC INNER JOIN tparControls AS C ON TC.ControlID = C.ControlID " & vbCrLf & _
                                                                               " INNER JOIN tparISETests AS IT ON TC.TestID = IT.ISETestID " & vbCrLf & _
                                                                               " INNER JOIN tparISETestSamples AS ITS ON TC.TestID = ITS.ISETestID AND TC.SampleType = ITS.SampleType " & vbCrLf & _
@@ -421,6 +422,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              for the Test/SampleType
         '''              TR 11/10/2011 - Added the ORDER BY field ActiveControl
         '''              SA 06/06/2012 - Changed the query by adding a filter by field TestType = STD
+        '''              XB 01/09/2014 - Get the new field ControlLevel from tparControls table - BA #1868
         ''' </remarks>
         Public Function ReadBySTDTestIDAndSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                      Optional ByVal pSampleType As String = "", Optional ByVal pControlID As Integer = 0, _
@@ -435,7 +437,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT TC.TestID, TC.SampleType, TC.ControlID, TC.MinConcentration, TC.MaxConcentration, " & vbCrLf & _
                                                        " TC.TargetMean, TC.TargetSD, TC.ACtiveControl, C.ControlName, C.LotNumber, C.ExpirationDate, " & vbCrLf & _
-                                                       " T.TestName, TS.ControlReplicates " & vbCrLf & _
+                                                       " T.TestName, TS.ControlReplicates, C.ControlLevel " & vbCrLf & _
                                                 " FROM   tparTestControls AS TC INNER JOIN tparControls AS C ON TC.ControlID = C.ControlID " & vbCrLf & _
                                                                               " INNER JOIN tparTests AS T ON TC.TestID = T.TestID " & vbCrLf & _
                                                                               " INNER JOIN tparTestSamples AS TS ON TC.TestID = TS.TestID AND TC.SampleType = TS.SampleType " & vbCrLf & _

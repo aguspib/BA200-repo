@@ -19,24 +19,32 @@ Partial Class ISortingTestsAux
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ISortingTestsAux))
-        Me.TestSortingGB = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.DefaultSortingButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.LastPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.DownPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.UpPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.FirstPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.TestListView = New Biosystems.Ax00.Controls.UserControls.BSListView
-        Me.TestSortingLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.CloseButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.ScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.BsBorderedPanel1 = New bsBorderedPanel
+        Me.TestSortingGB = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsTestListGrid = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.DefaultSortingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.LastPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.DownPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.UpPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.FirstPosButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.TestListView = New Biosystems.Ax00.Controls.UserControls.BSListView()
+        Me.TestSortingLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.CloseButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.BsBorderedPanel1 = New bsBorderedPanel()
         Me.TestSortingGB.SuspendLayout()
+        CType(Me.bsTestListGrid, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'TestSortingGB
         '
+        Me.TestSortingGB.Controls.Add(Me.bsTestListGrid)
         Me.TestSortingGB.Controls.Add(Me.DefaultSortingButton)
         Me.TestSortingGB.Controls.Add(Me.LastPosButton)
         Me.TestSortingGB.Controls.Add(Me.DownPosButton)
@@ -50,6 +58,67 @@ Partial Class ISortingTestsAux
         Me.TestSortingGB.Size = New System.Drawing.Size(291, 497)
         Me.TestSortingGB.TabIndex = 1
         Me.TestSortingGB.TabStop = False
+        '
+        'bsTestListGrid
+        '
+        Me.bsTestListGrid.AllowUserToAddRows = False
+        Me.bsTestListGrid.AllowUserToDeleteRows = False
+        Me.bsTestListGrid.AllowUserToResizeColumns = False
+        Me.bsTestListGrid.AllowUserToResizeRows = False
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.DodgerBlue
+        Me.bsTestListGrid.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
+        Me.bsTestListGrid.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells
+        Me.bsTestListGrid.BackgroundColor = System.Drawing.Color.White
+        Me.bsTestListGrid.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
+        Me.bsTestListGrid.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None
+        Me.bsTestListGrid.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
+        DataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestListGrid.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
+        Me.bsTestListGrid.ColumnHeadersHeight = 20
+        Me.bsTestListGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Window
+        DataGridViewCellStyle3.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.DodgerBlue
+        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestListGrid.DefaultCellStyle = DataGridViewCellStyle3
+        Me.bsTestListGrid.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically
+        Me.bsTestListGrid.EnterToTab = False
+        Me.bsTestListGrid.GridColor = System.Drawing.Color.Silver
+        Me.bsTestListGrid.Location = New System.Drawing.Point(9, 250)
+        Me.bsTestListGrid.MultiSelect = False
+        Me.bsTestListGrid.Name = "bsTestListGrid"
+        Me.bsTestListGrid.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
+        DataGridViewCellStyle4.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle4.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestListGrid.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
+        Me.bsTestListGrid.RowHeadersVisible = False
+        Me.bsTestListGrid.RowHeadersWidth = 20
+        Me.bsTestListGrid.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
+        DataGridViewCellStyle5.BackColor = System.Drawing.Color.White
+        DataGridViewCellStyle5.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.DodgerBlue
+        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.ActiveCaptionText
+        Me.bsTestListGrid.RowsDefaultCellStyle = DataGridViewCellStyle5
+        Me.bsTestListGrid.RowTemplate.Height = 30
+        Me.bsTestListGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.bsTestListGrid.Size = New System.Drawing.Size(237, 238)
+        Me.bsTestListGrid.TabIndex = 41
+        Me.bsTestListGrid.TabToEnter = False
         '
         'DefaultSortingButton
         '
@@ -105,7 +174,7 @@ Partial Class ISortingTestsAux
         Me.TestListView.HideSelection = False
         Me.TestListView.Location = New System.Drawing.Point(9, 43)
         Me.TestListView.Name = "TestListView"
-        Me.TestListView.Size = New System.Drawing.Size(237, 443)
+        Me.TestListView.Size = New System.Drawing.Size(237, 200)
         Me.TestListView.TabIndex = 2
         Me.TestListView.UseCompatibleStateImageBehavior = False
         Me.TestListView.View = System.Windows.Forms.View.Details
@@ -171,6 +240,7 @@ Partial Class ISortingTestsAux
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.TestSortingGB.ResumeLayout(False)
+        CType(Me.bsTestListGrid, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
@@ -186,5 +256,6 @@ Partial Class ISortingTestsAux
     Friend WithEvents ScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents DefaultSortingButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsBorderedPanel1 As bsBorderedPanel
+    Friend WithEvents bsTestListGrid As Biosystems.Ax00.Controls.UserControls.BSDataGridView
 
 End Class
