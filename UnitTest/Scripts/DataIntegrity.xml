@@ -2852,6 +2852,23 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Some Views has been changed to return the ShortName of Tests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksResultsCTRL' AND sc.name = 'ShortName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksResultsNotCTRL' AND sc.name = 'ShortName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksCalcResults' AND sc.name = 'ShortName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksWSISEOffSystemResults' AND sc.name = 'ShortName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksResults' AND sc.name = 'ShortName') = 1) AND
+         ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksCompleteResults' AND sc.name = 'ShortName') = 1) 
+        SELECT 'True'
+      ELSE
+        SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 
 </DBIntegrityDS>
 
