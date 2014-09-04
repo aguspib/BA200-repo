@@ -639,6 +639,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 27/09/2012 - Changed the SQL to remove from the update all fields that generate a new TestVersion when they are changed
         '''              SA 18/10/2012 - Changed the SQL to remove from the update fields KineticBlankLimit and BlankAbsorbanceLimit
         '''              SA 22/10/2012 - Changed the filter: it should be by HistTestID = row.HistTestID instead of by HistTestID = row.TestID 
+        '''              SA 04/09/2014 - BA-1919 ==> Add N prefix when update field TestLongName to allow save correctly texts with tw-bytes characters
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisTestSamplesDS As HisTestSamplesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -651,14 +652,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     For Each row As HisTestSamplesDS.thisTestSamplesRow In pHisTestSamplesDS.thisTestSamples.Rows
                         cmdText &= " UPDATE thisTestSamples " & vbCrLf & _
-                                                " SET    TestName            = N'" & row.TestName.Replace("'", "''").Trim & "', " & vbCrLf & _
-                                                       " MeasureUnit         = '" & row.MeasureUnit.Trim & "', " & vbCrLf & _
-                                                       " DecimalsAllowed     = " & row.DecimalsAllowed.ToString & ", " & vbCrLf
+                                   " SET    TestName        = N'" & row.TestName.Replace("'", "''").Trim & "', " & vbCrLf & _
+                                          " MeasureUnit     = '" & row.MeasureUnit.Trim & "', " & vbCrLf & _
+                                          " DecimalsAllowed = " & row.DecimalsAllowed.ToString & ", " & vbCrLf
 
                         If (row.IsTestLongNameNull) Then
                             cmdText &= " TestLongName = NULL, " & vbCrLf
                         Else
-                            cmdText &= " TestLongName = '" & row.TestLongName.Replace("'", "''").Trim & "', " & vbCrLf
+                            cmdText &= " TestLongName = N'" & row.TestLongName.Replace("'", "''").Trim & "', " & vbCrLf
                         End If
                         If (row.IsProzoneRatioNull) Then
                             cmdText &= " ProzoneRatio = NULL, " & vbCrLf
