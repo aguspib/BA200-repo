@@ -306,6 +306,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 SelectableElementsTable.Columns.Add("Icon", System.Type.GetType("System.String"))
                 'TR 08/03/2011 -Add Fartory calib column
                 SelectableElementsTable.Columns.Add("FactoryCalib", System.Type.GetType("System.Boolean"))
+                SelectableElementsTable.Columns.Add("Available", System.Type.GetType("System.Boolean")) 'AG 01/09/2014 - BA-1869
 
                 'Initialize the Dataset and add to it the created table
                 SelectableElementsAttribute = New DataSet
@@ -330,6 +331,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 SelectedElementsTable.Columns.Add("Icon", System.Type.GetType("System.String"))
                 'TR 09/03/2011 -Set the Factory Calib Row
                 SelectedElementsTable.Columns.Add("FactoryCalib", System.Type.GetType("System.Boolean"))
+                SelectedElementsTable.Columns.Add("Available", System.Type.GetType("System.Boolean")) 'AG 01/09/2014 - BA-1869
 
                 'Initialize the Dataset and add to it the created table
                 SelectedElementsAttribute = New DataSet
@@ -370,6 +372,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                                     .SubItems.Add(selectableElemRow("SecondaryPos").ToString())
                                     'TR 09/03/2011 -Add Factory Calib 
                                     .SubItems.Add(selectableElemRow("FactoryCalib").ToString())
+                                    .SubItems.Add(selectableElemRow("Available").ToString()) 'AG 01/09/2014 - BA-1869
 
                                 End With
                             End If
@@ -409,6 +412,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                                 .SubItems.Add(selectedElemRow("SecondaryPos").ToString())
                                 'TR 09/03/2011 -Set the Factory Calib. 
                                 .SubItems.Add(selectedElemRow("FactoryCalib").ToString())
+                                .SubItems.Add(selectedElemRow("Available").ToString()) 'AG 01/09/2014 - BA-1869
                             End With
                         Next
                         SelectedElementsAttribute.Tables(0).DefaultView.Sort = "MainPos, SecondaryPos"
@@ -421,10 +425,11 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         ''' <summary>
         ''' Move a Selectable Element to the DataSet of Selected Elements
+        ''' AG 01/09/2014 - BA1869 add pAvailable param
         ''' </summary>
         Private Sub FillSelectedElementsDataSet(ByVal pCode As String, ByVal pDescription As String, ByVal pIcon As String, _
                                                 ByVal pType As String, ByVal pMainPos As Integer, ByVal pSecondaryPos As Integer, _
-                                                                                                    ByVal pFactoryCalib As String)
+                                                                                                    ByVal pFactoryCalib As String, ByVal pAvailable As String)
             Try
                 If (Not SelectedElementsAttribute Is Nothing) Then
                     If (SelectedElementsAttribute.Tables.Count > 0) Then
@@ -442,6 +447,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             mySelectedDR("Icon") = pIcon
                             'TR 09/03/2011-Set value to Factory Calib
                             mySelectedDR("FactoryCalib") = pFactoryCalib
+                            mySelectedDR("Available") = pAvailable 'AG 01/09/2014 - BA-1869
+
 
                             SelectedElementsAttribute.Tables(0).Rows.Add(mySelectedDR)
                         End If
@@ -459,7 +466,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     'Prepare the Selected Elements DataSet and use recursion to move the Element
                     PrepareSelectedElements()
                     'TR 09/03/2011 -Set Factory Calib.
-                    FillSelectedElementsDataSet(pCode, pDescription, pIcon, pType, pMainPos, pSecondaryPos, pFactoryCalib)
+                    FillSelectedElementsDataSet(pCode, pDescription, pIcon, pType, pMainPos, pSecondaryPos, pFactoryCalib, pAvailable) 'AG 01/09/2014 - BA1869 pAvailable
                 End If
             Catch ex As Exception
                 Throw ex
@@ -468,10 +475,11 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         ''' <summary>
         ''' Move a Selected Element to the DataSet of Selectable Elements, 
+        ''' AG 01/09/2014 - BA1869 add pAvailable param
         ''' </summary>
         Private Sub FillSelectableElementsDataSet(ByVal pCode As String, ByVal pDescription As String, ByVal pIcon As String, _
                                                   ByVal pType As String, ByVal pMainPos As Integer, ByVal pSecondaryPos As Integer, _
-                                                                                                        ByVal pFactoryCalib As String)
+                                                                                                        ByVal pFactoryCalib As String, ByVal pAvailable As String)
             Try
                 If (Not SelectableElementsAttribute Is Nothing) Then
                     If (SelectableElementsAttribute.Tables.Count > 0) Then
@@ -489,6 +497,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             mySelectedDR("Icon") = pIcon
                             'TR 09/03/2011-Set value to Factory Calib
                             mySelectedDR("FactoryCalib") = pFactoryCalib
+                            mySelectedDR("Available") = pAvailable 'AG 01/09/2014 - BA-1869
+
                             SelectableElementsAttribute.Tables(0).Rows.Add(mySelectedDR)
                         End If
 
@@ -505,7 +515,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Else
                     'Prepare the Selectable Elements DataSet and use recursion to move the Element
                     PrepareSelectableElements()
-                    FillSelectableElementsDataSet(pCode, pDescription, pIcon, pType, pMainPos, pSecondaryPos, pFactoryCalib)
+                    FillSelectableElementsDataSet(pCode, pDescription, pIcon, pType, pMainPos, pSecondaryPos, pFactoryCalib, pAvailable) 'AG 01/09/2014 - BA-1869 pAvailable
                 End If
             Catch ex As Exception
                 Throw ex
@@ -519,6 +529,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Try
                 'TR 09/03/2011 -Create a varible to keep all test with Factory Calib.
                 Dim myFactoryCalibTestList As String = ""
+                Dim myAvailableTestList As String = "" 'AG 01/09/2014 BA-1869
 
                 If (SelectableElementsListView.SelectedItems.Count > 0) Then
                     For Each mySelectedItem As ListViewItem In SelectableElementsListView.SelectedItems
@@ -529,12 +540,19 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             myFactoryCalibTestList &= mySelectedItem.Text & vbCrLf
                         End If
 
+                        'AG 01/09/2014 - BA-1869
+                        If CBool(mySelectedItem.SubItems(6).Text) Then
+                            myAvailableTestList &= mySelectedItem.Text & vbCrLf
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
                         mySelectedItem.Selected = False
                         'TR 09/03/2011  -Set the FactoryCalib.
+                        'AG 01/09/2014 - BA-1869 Set the Available (SubItems(6))
                         'Move the Element between the DataSets
                         FillSelectedElementsDataSet(mySelectedItem.SubItems(1).Text, mySelectedItem.Text, mySelectedItem.ImageKey.ToString(), _
                                                     mySelectedItem.SubItems(2).Text, Convert.ToInt32(mySelectedItem.SubItems(3).Text), _
-                                                    Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text)
+                                                    Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text, mySelectedItem.SubItems(6).Text)
 
                     Next mySelectedItem
 
@@ -543,6 +561,13 @@ Namespace Biosystems.Ax00.Controls.UserControls
                         MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
                     End If
                     'TR 09/03/2011 -END
+
+                    'AG 01/09/2014 - BA-1869
+                    If myAvailableTestList <> "" Then
+                        'This code is in case you wanted to show a message when user selects a test NOT AVAILABLE (not visible for test selection)
+                        'MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
+                    End If
+                    'AG 01/09/2014 - BA-1869
 
                     'Reload ListView of Selected Elements
                     FillSelectedElementsListView()
@@ -559,6 +584,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Try
                 'TR 09/03/2011 -Create a varible to keep all test with Factory Calib.
                 Dim myFactoryCalibTestList As String = ""
+                Dim myAvailableTestList As String = "" 'AG 01/09/2014 BA-1869
 
                 If (SelectedElementsListView.SelectedItems.Count > 0) Then
                     For Each mySelectedItem As ListViewItem In SelectedElementsListView.SelectedItems
@@ -571,10 +597,17 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             myFactoryCalibTestList &= mySelectedItem.Text & vbCrLf
                         End If
 
+                        'AG 01/09/2014 - BA-1869
+                        If CBool(mySelectedItem.SubItems(6).Text) Then
+                            myAvailableTestList &= mySelectedItem.Text & vbCrLf
+                        End If
+                        'AG 01/09/2014 - BA-1869
+
+                        'AG 01/09/2014 - BA-1869 Set the Available (SubItems(6))
                         'Move the Element between the DataSets
                         FillSelectableElementsDataSet(mySelectedItem.SubItems(1).Text, mySelectedItem.Text, mySelectedItem.ImageKey.ToString, _
                                                       mySelectedItem.SubItems(2).Text, Convert.ToInt32(mySelectedItem.SubItems(3).Text), _
-                                                      Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text)
+                                                      Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text, mySelectedItem.SubItems(6).Text)
                     Next
 
                     'TR 09/03/2011
@@ -582,6 +615,13 @@ Namespace Biosystems.Ax00.Controls.UserControls
                         MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
                     End If
                     'TR 09/03/2011 -END
+
+                    'AG 01/09/2014 - BA-1869
+                    If myAvailableTestList <> "" Then
+                        'This code is in case you wanted to show a message when user selects a test NOT AVAILABLE (not visible for test selection)
+                        'MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
+                    End If
+                    'AG 01/09/2014 - BA-1869
 
                     'Reload ListView of Selectable Elements
                     FillSelectableElementsListView()
@@ -598,6 +638,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Try
                 'TR 09/03/2011 -Create a varible to keep all test with Factory Calib.
                 Dim myFactoryCalibTestList As String = ""
+                Dim myAvailableTestList As String = "" 'AG 01/09/2014 BA-1869
 
                 For Each mySelectedItem As ListViewItem In SelectableElementsListView.Items
                     'Remove the Item from ListView of Selectable Elements 
@@ -608,11 +649,17 @@ Namespace Biosystems.Ax00.Controls.UserControls
                         myFactoryCalibTestList &= mySelectedItem.Text & vbCrLf
                     End If
 
+                    'AG 01/09/2014 - BA-1869
+                    If CBool(mySelectedItem.SubItems(6).Text) Then
+                        myAvailableTestList &= mySelectedItem.Text & vbCrLf
+                    End If
+                    'AG 01/09/2014 - BA-1869
 
+                    'AG 01/09/2014 - BA-1869 Set the Available (SubItems(6))
                     'Move the Element between the DataSets
                     FillSelectedElementsDataSet(mySelectedItem.SubItems(1).Text, mySelectedItem.Text, mySelectedItem.ImageKey.ToString(), _
                                                     mySelectedItem.SubItems(2).Text, Convert.ToInt32(mySelectedItem.SubItems(3).Text), _
-                                                    Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text)
+                                                    Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text, mySelectedItem.SubItems(6).Text)
                 Next
 
                 'TR 09/03/2011 
@@ -620,6 +667,13 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
                 End If
                 'TR 09/03/2011 -END
+
+                'AG 01/09/2014 - BA-1869
+                If myAvailableTestList <> "" Then
+                    'This code is in case you wanted to show a message when user selects a test NOT AVAILABLE (not visible for test selection)
+                    'MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
+                End If
+                'AG 01/09/2014 - BA-1869
 
                 'Reload ListView of Selected Elements
                 FillSelectedElementsListView()
@@ -635,6 +689,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Try
                 'TR 09/03/2011 -Create a varible to keep all test with Factory Calib.
                 Dim myFactoryCalibTestList As String = ""
+                Dim myAvailableTestList As String = "" 'AG 01/09/2014 BA-1869
 
                 For Each mySelectedItem As ListViewItem In SelectedElementsListView.Items
                     'Remove the Item from ListView of Selected Elements 
@@ -644,10 +699,17 @@ Namespace Biosystems.Ax00.Controls.UserControls
                         myFactoryCalibTestList &= mySelectedItem.Text & "." & vbCrLf
                     End If
 
+                    'AG 01/09/2014 - BA-1869
+                    If CBool(mySelectedItem.SubItems(6).Text) Then
+                        myAvailableTestList &= mySelectedItem.Text & "." & vbCrLf
+                    End If
+                    'AG 01/09/2014 - BA-1869
+
+                    'AG 01/09/2014 - BA-1869 Set the Available (SubItems(6))
                     'Move the Element between the DataSets
                     FillSelectableElementsDataSet(mySelectedItem.SubItems(1).Text, mySelectedItem.Text, mySelectedItem.ImageKey.ToString(), _
                                                   mySelectedItem.SubItems(2).Text, Convert.ToInt32(mySelectedItem.SubItems(3).Text), _
-                                                  Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text)
+                                                  Convert.ToInt32(mySelectedItem.SubItems(4).Text), mySelectedItem.SubItems(5).Text, mySelectedItem.SubItems(6).Text)
                 Next
 
                 'TR 09/03/2011
@@ -655,6 +717,13 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
                 End If
                 'TR 09/03/2011 -END
+
+                'AG 01/09/2014 - BA-1869
+                If myAvailableTestList <> "" Then
+                    'This code is in case you wanted to show a message when user selects a test NOT AVAILABLE (not visible for test selection)
+                    'MessageBox.Show(FactoryValuesMessageAttribute & vbCrLf & myFactoryCalibTestList, "Warning")
+                End If
+                'AG 01/09/2014 - BA-1869
 
                 'Reload ListView of Selectable Elements
                 FillSelectableElementsListView()

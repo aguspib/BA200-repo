@@ -623,11 +623,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  JB 19/10/2012
         ''' Modified by: AG 29/10/2012 - Sort returned records by PatientID and ResultDateTime (DESC) 
         '''              JB 07/11/2012 - Fixed search query
-        '''              SA 01/08/2014 - BT #1861 ==> - Added new optional parameter pSpecimenID and the corresponding filter in the SQL when it is informed
-        '''                                           - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
-        '''                                           - Changed the use of parameter pPatientData: when it is informed, the query searches if it is part of 
-        '''                                             fields PatientID, LastName or FirstName
-        '''                                           - Changed the ORDER BY: sort returned data by PatientID, SpecimenID and ResultDateTime
+        '''              SA 01/08/2014 - BA-1861 ==> - Added new optional parameter pSpecimenID and the corresponding filter in the SQL when it is informed
+        '''                                          - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
+        '''                                          - Changed the use of parameter pPatientData: when it is informed, the query searches if it is part of 
+        '''                                            fields PatientID, LastName or FirstName
+        '''                                          - Changed the ORDER BY: sort returned data by PatientID, SpecimenID and ResultDateTime
         ''' </remarks>
         Public Function GetHistoricalResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                      Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _

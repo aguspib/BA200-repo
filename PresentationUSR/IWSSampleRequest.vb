@@ -26,20 +26,30 @@ Public Class IWSSampleRequest
     Private isHeaderControlCheckBoxClicked As Boolean
     Private isHeaderPatientCheckBoxClicked As Boolean
 
-    ' XB 26/08/2014 - BT #1868
+    ' XB 26/08/2014 - BA #1868
     'Private totalBlkCalCheckBoxes As Integer
     Private totalBlankCheckBoxes As Integer
     Private totalCalibCheckBoxes As Integer
 
-    Private totalControlCheckBoxes As Integer
+    ' XB 01/09/2014 - BA #1868
+    'Private totalControlCheckBoxes As Integer
+    Private totalControlLevel1CheckBoxes As Integer
+    Private totalControlLevel2CheckBoxes As Integer
+    Private totalControlLevel3CheckBoxes As Integer
+
     Private totalPatientCheckBoxes As Integer
 
-    ' XB 26/08/2014 - BT #1868
+    ' XB 26/08/2014 - BA #1868
     'Private totalBlkCalCheckedCheckBoxes As Integer
     Private totalBlankCheckedCheckBoxes As Integer
     Private totalCalibCheckedCheckBoxes As Integer
 
-    Private totalControlCheckedCheckBoxes As Integer
+    ' XB 01/09/2014 - BA #1868
+    'Private totalControlCheckedCheckBoxes As Integer
+    Private totalControlLevel1CheckedCheckBoxes As Integer
+    Private totalControlLevel2CheckedCheckBoxes As Integer
+    Private totalControlLevel3CheckedCheckBoxes As Integer
+
     Private totalPatientCheckedCheckBoxes As Integer
 
     'Global variables to control the event SelectValueChange in ComboBox columns in DataGrids, and the SampleID edition in Patients grid
@@ -1720,35 +1730,79 @@ Public Class IWSSampleRequest
     ''' Modified by: DL 09/03/2010
     '''              SA 17/03/2010 - CheckBox for select/unselect all Controls is only for those with Status OPEN      
     '''              TR 12/03/2013 - Add filter a.LISRequest = False  on lsWSOpenDS to disable Delete button on OT Requested by LIS.     
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub CheckAddRemoveControlsRows()
         Try
+            'Check how many OPEN Controls of Level 1 are currently in the grid of Control Order Tests
+            Dim lstWSOpenControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSOpenControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                          Where a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = 1 _
+                          Select a).ToList()
+            totalControlLevel1CheckBoxes = lstWSOpenControlsLevel1DS.Count
+            'Check how many OPEN Controls of Level 2 are currently in the grid of Control Order Tests
+            Dim lstWSOpenControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSOpenControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                          Where a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = 2 _
+                          Select a).ToList()
+            totalControlLevel2CheckBoxes = lstWSOpenControlsLevel2DS.Count
+            'Check how many OPEN Controls of Level 3 are currently in the grid of Control Order Tests
+            Dim lstWSOpenControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSOpenControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                          Where a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = 3 _
+                          Select a).ToList()
+            totalControlLevel3CheckBoxes = lstWSOpenControlsLevel3DS.Count
+
+            'Check how many of the opened Controls of Level 1 are currently selected
+            Dim lstWSSelectedControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSSelectedControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                              Where a.OTStatus = "OPEN" _
+                              AndAlso a.ControlLevel = 1 _
+                              AndAlso a.Selected = True _
+                             Select a).ToList()
+            totalControlLevel1CheckedCheckBoxes = lstWSSelectedControlsLevel1DS.Count
+            'Check how many of the opened Controls of Level 2 are currently selected
+            Dim lstWSSelectedControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSSelectedControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                              Where a.OTStatus = "OPEN" _
+                              AndAlso a.ControlLevel = 2 _
+                              AndAlso a.Selected = True _
+                             Select a).ToList()
+            totalControlLevel2CheckedCheckBoxes = lstWSSelectedControlsLevel2DS.Count
+            'Check how many of the opened Controls of Level 3 are currently selected
+            Dim lstWSSelectedControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+            lstWSSelectedControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                              Where a.OTStatus = "OPEN" _
+                              AndAlso a.ControlLevel = 3 _
+                              AndAlso a.Selected = True _
+                             Select a).ToList()
+            totalControlLevel3CheckedCheckBoxes = lstWSSelectedControlsLevel3DS.Count
+
+
+
+            'Control for Check/Uncheck all Controls (level 1) is enabled only when there is at least a Control of Level 1 with status OPEN
+            bsAllControlsLevel1CheckBox.Enabled = (lstWSOpenControlsLevel1DS.Count > 0)
+            'Control for Check/Uncheck all Controls (level 2) is enabled only when there is at least a Control of Level 1 with status OPEN
+            bsAllControlsLevel2checkBox.Enabled = (lstWSOpenControlsLevel2DS.Count > 0)
+            'Control for Check/Uncheck all Controls (level 3) is enabled only when there is at least a Control of Level 1 with status OPEN
+            bsAllControlsLevel3CheckBox.Enabled = (lstWSOpenControlsLevel3DS.Count > 0)
+
+            '...additionally, it is Checked when all Controls of Level 1 with Status OPEN are selected
+            bsAllControlsLevel1CheckBox.Checked = (lstWSOpenControlsLevel1DS.Count > 0) AndAlso _
+                                         (totalControlLevel1CheckedCheckBoxes = totalControlLevel1CheckBoxes)
+            '...additionally, it is Checked when all Controls of Level 2 with Status OPEN are selected
+            bsAllControlsLevel2CheckBox.Checked = (lstWSOpenControlsLevel2DS.Count > 0) AndAlso _
+                                         (totalControlLevel2CheckedCheckBoxes = totalControlLevel2CheckBoxes)
+            '...additionally, it is Checked when all Controls of Level 3 with Status OPEN are selected
+            bsAllControlsLevel3CheckBox.Checked = (lstWSOpenControlsLevel3DS.Count > 0) AndAlso _
+                                         (totalControlLevel3CheckedCheckBoxes = totalControlLevel3CheckBoxes)
+
+
             'Check how many OPEN Controls are currently in the grid of Control Order Tests
             Dim lstWSOpenDS As List(Of WorkSessionResultDS.ControlsRow)
-            lstWSOpenDS = (From a In myWorkSessionResultDS.Controls _
-                          Where a.OTStatus = "OPEN" _
-                          Select a).ToList()
-            totalControlCheckBoxes = lstWSOpenDS.Count
-
-            'Check how many of the opened Controls are currently selected
-            Dim lstWSSelectedDS As List(Of WorkSessionResultDS.ControlsRow)
-            lstWSSelectedDS = (From a In myWorkSessionResultDS.Controls _
-                              Where a.OTStatus = "OPEN" _
-                            AndAlso a.Selected = True _
-                             Select a).ToList()
-            totalControlCheckedCheckBoxes = lstWSSelectedDS.Count
-
-
-
-            'Control for Check/Uncheck all Controls is enabled only when there is at least a Control with status OPEN
-            bsAllCtrlsCheckBox.Enabled = (lstWSOpenDS.Count > 0)
-
-            '...additionally, it is Checked when all Controls with Status OPEN are selected
-            bsAllCtrlsCheckBox.Checked = (lstWSOpenDS.Count > 0) AndAlso _
-                                         (totalControlCheckedCheckBoxes = totalControlCheckBoxes)
-
-
-            'Check how many OPEN Controls are currently in the grid of Control Order Tests
             lstWSOpenDS = (From a In myWorkSessionResultDS.Controls _
                           Where a.OTStatus = "OPEN" _
                           AndAlso a.LISRequest = False
@@ -1756,8 +1810,12 @@ Public Class IWSSampleRequest
             'Delete button is enabled only if there is at least a Control with status OPEN
             bsDelControlsButton.Enabled = (lstWSOpenDS.Count > 0)
 
-            lstWSOpenDS = Nothing
-            lstWSSelectedDS = Nothing
+            lstWSOpenControlsLevel1DS = Nothing
+            lstWSOpenControlsLevel2DS = Nothing
+            lstWSOpenControlsLevel3DS = Nothing
+            lstWSSelectedControlsLevel1DS = Nothing
+            lstWSSelectedControlsLevel2DS = Nothing
+            lstWSSelectedControlsLevel3DS = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckAddRemoveControlsRows", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckAddRemoveControlsRows", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2108,15 +2166,27 @@ Public Class IWSSampleRequest
             listOfDifElem = (From a In myWorkSessionResultDS.BlankCalibrators _
                             Where a.SampleClass = "CALIB" _
                             AndAlso a.OTStatus = "OPEN" _
-                            Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList()
+                            Select String.Format("{0}|{1}|{2}|{3}", a.TestType, a.TestID, a.SampleType, a.Selected) Distinct).ToList()
 
             For Each difElement As String In listOfDifElem
                 Dim elements As String() = difElement.Split(CChar("|"))
                 myOrderTestsDelegate.SelectAllNeededOrderTests("CALIB", elements(0), CInt(elements(1)), elements(2), myWorkSessionResultDS)
 
-                isHeaderBlkCalCheckBoxClicked = False
-                ChangeBlankCalibratorSelectedColumn()
-                isHeaderBlkCalCheckBoxClicked = True
+                If Not checkedValue Then
+                    Dim lstWSBlankDS As List(Of WorkSessionResultDS.BlankCalibratorsRow)
+                    lstWSBlankDS = (From a In myWorkSessionResultDS.BlankCalibrators _
+                                   Where a.SampleClass = "BLANK" _
+                                 AndAlso a.TestType = elements(0) _
+                                 AndAlso a.TestID = CInt(elements(1)) _
+                                 AndAlso a.SampleType = elements(2) _
+                                 AndAlso (a.IsPreviousOrderTestIDNull OrElse a.PreviousOrderTestID.ToString = "") _
+                                  Select a).ToList()
+
+                    If (lstWSBlankDS.Count = 1) Then
+                        lstWSBlankDS(0).Selected = CType(elements(3), Boolean)
+                        myWorkSessionResultDS.BlankCalibrators.AcceptChanges()
+                    End If
+                End If
             Next
             listOfDifElem = Nothing
 
@@ -2151,20 +2221,31 @@ Public Class IWSSampleRequest
     ''' Modified by: SA 28/04/2010 - Changed the way of calling function SelectAllNeededOrderTests: execute it for 
     '''                              each different TestType, TestID and SampleType instead of for each row in the 
     '''                              grid (due to long time execution when the grid is loaded with lot of rows)
+    '''              XB 01/09/2014 - Add new behaviour for the the Controls selection/unselection by Level - BA #1868
     ''' </remarks>
-    Private Sub ClickAllControlCheckBox()
+    Private Sub ClickAllControlCheckBox(ByVal pControlLevel As Integer)
         Try
             isHeaderControlCheckBoxClicked = True
 
             'Empty the collection of selected rows in the grid of Controls
             bsControlOrdersDataGridView.ClearSelection()
-            Dim checkedValue As Boolean = bsAllCtrlsCheckBox.Checked
+
+            Dim checkedValue As Boolean
+            Select Case pControlLevel
+                Case 1
+                    checkedValue = bsAllControlsLevel1CheckBox.Checked
+                Case 2
+                    checkedValue = bsAllControlsLevel2CheckBox.Checked
+                Case 3
+                    checkedValue = bsAllControlsLevel3CheckBox.Checked
+            End Select
 
             'Get all Controls that can be selected/unselected
             Dim lstWSOpenControlsDS As List(Of WorkSessionResultDS.ControlsRow)
             lstWSOpenControlsDS = (From a In myWorkSessionResultDS.Controls _
                                   Where a.SampleClass = "CTRL" _
                                 AndAlso a.OTStatus = "OPEN" _
+                                AndAlso a.ControlLevel = pControlLevel _
                                  Select a).ToList()
 
             For Each controlRow As WorkSessionResultDS.ControlsRow In lstWSOpenControlsDS
@@ -2173,23 +2254,35 @@ Public Class IWSSampleRequest
             myWorkSessionResultDS.Controls.AcceptChanges()
             lstWSOpenControlsDS = Nothing
 
-            If (checkedValue) Then
-                Dim listOfDifElem As List(Of String)
-                listOfDifElem = (From a In myWorkSessionResultDS.Controls _
-                                Where a.SampleClass = "CTRL" _
-                              AndAlso a.OTStatus = "OPEN" _
-                               Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList()
+            Dim listOfDifElem As List(Of String)
+            listOfDifElem = (From a In myWorkSessionResultDS.Controls _
+                            Where a.SampleClass = "CTRL" _
+                          AndAlso a.OTStatus = "OPEN" _
+                          AndAlso a.ControlLevel = pControlLevel _
+                           Select String.Format("{0}|{1}|{2}", a.TestType, a.TestID, a.SampleType) Distinct).ToList()
 
-                Dim myOrderTestsDelegate As New OrderTestsDelegate
-                For Each difElement As String In listOfDifElem
-                    Dim elements As String() = difElement.Split(CChar("|"))
+            Dim myOrderTestsDelegate As New OrderTestsDelegate
+            For Each difElement As String In listOfDifElem
+                Dim elements As String() = difElement.Split(CChar("|"))
+                If checkedValue Then
                     myOrderTestsDelegate.SelectAllNeededOrderTests("CTRL", elements(0), CInt(elements(1)), elements(2), myWorkSessionResultDS)
-                Next
-                listOfDifElem = Nothing
-            End If
+                Else
+                    'Unselect the Calibrator and Blank if it is possible
+                    UnselectBlkCalibrator(elements(0), elements(2), CInt(elements(1)))
+                End If
+            Next
+            listOfDifElem = Nothing
 
             bsControlOrdersDataGridView.RefreshEdit()
-            totalControlCheckedCheckBoxes = If(checkedValue, totalControlCheckedCheckBoxes, 0)
+
+            Select Case pControlLevel
+                Case 1
+                    totalControlLevel1CheckedCheckBoxes = If(checkedValue, totalControlLevel1CheckedCheckBoxes, 0)
+                Case 2
+                    totalControlLevel2CheckedCheckBoxes = If(checkedValue, totalControlLevel2CheckedCheckBoxes, 0)
+                Case 3
+                    totalControlLevel3CheckedCheckBoxes = If(checkedValue, totalControlLevel3CheckedCheckBoxes, 0)
+            End Select
 
             'Verify if OpenRotor button can be enabled
             OpenRotorButtonEnabled()
@@ -2966,6 +3059,7 @@ Public Class IWSSampleRequest
     ''' Modified by: SA 18/01/2010 - Get multilanguage text for tooltip of new button to opening the auxiliary 
     '''                              screen to add results for requested Off-System Tests
     '''              XB 26/08/2014 - Use Multilanguage resource LBL_Blanks instead of LBL_WSPrep_AllBlanksCalibs - BT #1868
+    '''              XB 01/09/2014 - Use Multilanguage resource LBL_WSPrep_Control instead of LBL_Controls for the 3 control checkboxes - BT #1868
     ''' </remarks>
     Private Sub GetScreenLabels(ByVal pLanguageID As String)
         Try
@@ -2986,8 +3080,11 @@ Public Class IWSSampleRequest
             ' XB 26/08/2014 - BT #1868
             bsAllBlanksCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Blanks", pLanguageID)
             bsAllCalibsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Calibrators", pLanguageID)
+            ' XB 01/09/2014 - BT #1868
+            bsAllControlsLevel1CheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_Control", pLanguageID) + " 1"
+            bsAllControlsLevel2CheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_Control", pLanguageID) + " 2"
+            bsAllControlsLevel3CheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_Control", pLanguageID) + " 3"
 
-            bsAllCtrlsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Controls", pLanguageID)
             bsAllPatientsCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_WSPrep_AllPatients", pLanguageID)
             bsStatCheckbox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Stat", pLanguageID)
             bsSearchTestsButton.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", pLanguageID) 'JB 01/10/2012 - Resource String unification
@@ -3436,6 +3533,7 @@ Public Class IWSSampleRequest
     '''                              can be defined also for ISE Tests)
     '''              JC 13/11/2012 - Modified column width
     '''              SA 23/03/2013 - Set to false grid property AutoGenerateColumns to avoid shown new columns added to the source DS for LIS management
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub InitializeControlGrid(ByVal pTubeTypesList As List(Of PreloadedMasterDataDS.tfmwPreloadedMasterDataRow), _
                                       ByVal pLanguageID As String)
@@ -3641,6 +3739,14 @@ Public Class IWSSampleRequest
             'LIS LISRequest
             columnName = "LISRequest"
             bsControlOrdersDataGridView.Columns.Add("LISRequest", "")
+            bsControlOrdersDataGridView.Columns(columnName).Width = 0
+            bsControlOrdersDataGridView.Columns(columnName).Visible = False
+            bsControlOrdersDataGridView.Columns(columnName).DataPropertyName = columnName
+            bsControlOrdersDataGridView.Columns(columnName).ReadOnly = True
+
+            'ControlLevel column
+            columnName = "ControlLevel"
+            bsControlOrdersDataGridView.Columns.Add("ControlLevel", "")
             bsControlOrdersDataGridView.Columns(columnName).Width = 0
             bsControlOrdersDataGridView.Columns(columnName).Visible = False
             bsControlOrdersDataGridView.Columns(columnName).DataPropertyName = columnName
@@ -5387,7 +5493,8 @@ Public Class IWSSampleRequest
     ''' <remarks>
     ''' Created by:  TR 04/08/2011
     ''' Modified by: TR 01/08/2012 - Added more elements to release
-    ''' AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+    '''              AG 10/02/2014 - #1496 Mark screen closing when ReleaseElement is called
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub ReleaseElements()
         Try
@@ -5458,7 +5565,9 @@ Public Class IWSSampleRequest
             bsAllPatientsCheckBox = Nothing
             bsAllBlanksCheckBox = Nothing
             bsAllCalibsCheckBox = Nothing
-            bsAllCtrlsCheckBox = Nothing
+            bsAllControlsLevel1CheckBox = Nothing
+            bsAllControlsLevel2CheckBox = Nothing
+            bsAllControlsLevel3CheckBox = Nothing
             bsBlkCalibDataGridView = Nothing
             bsControlOrdersDataGridView = Nothing
             bsPatientOrdersDataGridView = Nothing
@@ -5534,36 +5643,104 @@ Public Class IWSSampleRequest
     ''' </summary>
     ''' <remarks>
     ''' Modified by: DL 09/03/2010
+    '''              XB 01/09/2014 - Separate All Controls selection by Level - BA #1868
     ''' </remarks>
     Private Sub RowControlCheckBoxClick(ByVal pRowCheckBox As DataGridViewCheckBoxCell)
         Try
             ChangesMadeAttribute = True
             If (Not pRowCheckBox Is Nothing) Then
-                'Modify the global counter
-                If (CBool(pRowCheckBox.Value) AndAlso totalControlCheckedCheckBoxes < totalControlCheckBoxes) Then
-                    totalControlCheckedCheckBoxes += 1
+                'Modify the global counter for controls of Level 1
+                If (CBool(pRowCheckBox.Value) AndAlso totalControlLevel1CheckedCheckBoxes < totalControlLevel1CheckBoxes) Then
+                    totalControlLevel1CheckedCheckBoxes += 1
 
-                ElseIf (totalControlCheckedCheckBoxes > 0) Then
-                    totalControlCheckedCheckBoxes -= 1
+                ElseIf (totalControlLevel1CheckedCheckBoxes > 0) Then
+                    totalControlLevel1CheckedCheckBoxes -= 1
+                End If
+                'Modify the global counter for controls of Level 2
+                If (CBool(pRowCheckBox.Value) AndAlso totalControlLevel2CheckedCheckBoxes < totalControlLevel2CheckBoxes) Then
+                    totalControlLevel2CheckedCheckBoxes += 1
+
+                ElseIf (totalControlLevel2CheckedCheckBoxes > 0) Then
+                    totalControlLevel2CheckedCheckBoxes -= 1
+                End If
+                'Modify the global counter for controls of Level 3
+                If (CBool(pRowCheckBox.Value) AndAlso totalControlLevel3CheckedCheckBoxes < totalControlLevel3CheckBoxes) Then
+                    totalControlLevel3CheckedCheckBoxes += 1
+
+                ElseIf (totalControlLevel3CheckedCheckBoxes > 0) Then
+                    totalControlLevel3CheckedCheckBoxes -= 1
                 End If
 
-                'Change state of the header CheckBox...
-                If (totalControlCheckedCheckBoxes < totalControlCheckBoxes) Then
-                    bsAllCtrlsCheckBox.Checked = False
+                'Change state of the header CheckBox for controls of level 1...
+                If (totalControlLevel1CheckedCheckBoxes < totalControlLevel1CheckBoxes) Then
+                    bsAllControlsLevel1CheckBox.Checked = False
 
-                ElseIf (totalControlCheckedCheckBoxes = totalControlCheckBoxes) Then
-                    bsAllCtrlsCheckBox.Checked = True
+                ElseIf (totalControlLevel1CheckedCheckBoxes = totalControlLevel1CheckBoxes) Then
+                    bsAllControlsLevel1CheckBox.Checked = True
+                End If
+                'Change state of the header CheckBox for controls of level 2...
+                If (totalControlLevel2CheckedCheckBoxes < totalControlLevel2CheckBoxes) Then
+                    bsAllControlsLevel2CheckBox.Checked = False
+
+                ElseIf (totalControlLevel2CheckedCheckBoxes = totalControlLevel2CheckBoxes) Then
+                    bsAllControlsLevel2CheckBox.Checked = True
+                End If
+                'Change state of the header CheckBox for controls of level 3...
+                If (totalControlLevel3CheckedCheckBoxes < totalControlLevel3CheckBoxes) Then
+                    bsAllControlsLevel3CheckBox.Checked = False
+
+                ElseIf (totalControlLevel3CheckedCheckBoxes = totalControlLevel3CheckBoxes) Then
+                    bsAllControlsLevel3CheckBox.Checked = True
                 End If
             Else
-                'Count the number of selected rows in grid of Controls
-                Dim lstWSSelectedRowsDS As List(Of WorkSessionResultDS.ControlsRow)
-                lstWSSelectedRowsDS = (From a In myWorkSessionResultDS.Controls _
-                                      Where a.Selected = True _
-                                     Select a).ToList()
+                'Check how many OPEN Controls of Level 1 are currently in the grid of Control Order Tests
+                Dim lstWSControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                                          Where a.ControlLevel = 1 _
+                                          Select a).ToList()
+                'Count the number of selected rows in grid of Controls of level 1
+                Dim lstWSSelectedControlsLevel1DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSSelectedControlsLevel1DS = (From a In myWorkSessionResultDS.Controls _
+                                                  Where a.Selected = True _
+                                                  AndAlso a.ControlLevel = 1 _
+                                                 Select a).ToList()
+                'If all rows are selected, then the CheckBox for select/unselect all Controls of Level 1 is checked
+                bsAllControlsLevel1CheckBox.Checked = (lstWSControlsLevel1DS.Count = lstWSSelectedControlsLevel1DS.Count)
 
-                'If all rows are selected, then the CheckBox for select/unselect all Controls is checked
-                bsAllCtrlsCheckBox.Checked = (lstWSSelectedRowsDS.Count = bsControlOrdersDataGridView.Rows.Count)
-                lstWSSelectedRowsDS = Nothing
+                'Check how many OPEN Controls of Level 2 are currently in the grid of Control Order Tests
+                Dim lstWSControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                                          Where a.ControlLevel = 2 _
+                                          Select a).ToList()
+                'Count the number of selected rows in grid of Controls of level 2
+                Dim lstWSSelectedControlsLevel2DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSSelectedControlsLevel2DS = (From a In myWorkSessionResultDS.Controls _
+                                                  Where a.Selected = True _
+                                                  AndAlso a.ControlLevel = 2 _
+                                                 Select a).ToList()
+                'If all rows are selected, then the CheckBox for select/unselect all Controls of Level 2 is checked
+                bsAllControlsLevel2CheckBox.Checked = (lstWSControlsLevel2DS.Count = lstWSSelectedControlsLevel2DS.Count)
+
+                'Check how many OPEN Controls of Level 3 are currently in the grid of Control Order Tests
+                Dim lstWSControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                                          Where a.ControlLevel = 3 _
+                                          Select a).ToList()
+                'Count the number of selected rows in grid of Controls of level 3
+                Dim lstWSSelectedControlsLevel3DS As List(Of WorkSessionResultDS.ControlsRow)
+                lstWSSelectedControlsLevel3DS = (From a In myWorkSessionResultDS.Controls _
+                                                  Where a.Selected = True _
+                                                  AndAlso a.ControlLevel = 3 _
+                                                 Select a).ToList()
+                'If all rows are selected, then the CheckBox for select/unselect all Controls of Level 3 is checked
+                bsAllControlsLevel3CheckBox.Checked = (lstWSControlsLevel3DS.Count = lstWSSelectedControlsLevel3DS.Count)
+
+                lstWSControlsLevel1DS = Nothing
+                lstWSSelectedControlsLevel1DS = Nothing
+                lstWSControlsLevel2DS = Nothing
+                lstWSSelectedControlsLevel2DS = Nothing
+                lstWSControlsLevel3DS = Nothing
+                lstWSSelectedControlsLevel3DS = Nothing
             End If
 
             'Verify if button for Positioning should be enabled
@@ -7723,12 +7900,54 @@ Public Class IWSSampleRequest
         End Try
     End Sub
 
-    Private Sub bsAllCtrlsCheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllCtrlsCheckBox.MouseClick
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: XB 01/09/2014 - Separate All Controls selection by Level - BA #1868 
+    ''' </remarks>
+    Private Sub bsAllControlsLevel1CheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllControlsLevel1CheckBox.MouseClick
         Try
-            ClickAllControlCheckBox()
+            ClickAllControlCheckBox(1)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllCtrlsCheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & "bsAllCtrlsCheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllControlsLevel1CheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllControlsLevel1CheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - Separate All Controls selection by Level - BA #1868 
+    ''' </remarks>
+    Private Sub bsAllControlsLevel2CheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllControlsLevel2CheckBox.MouseClick
+        Try
+            ClickAllControlCheckBox(2)
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllControlsLevel2CheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllControlsLevel2CheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by: XB 01/09/2014 - Separate All Controls selection by Level - BA #1868 
+    ''' </remarks>
+    Private Sub bsAllControlsLevel3CheckBox_MouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsAllControlsLevel3CheckBox.MouseClick
+        Try
+            ClickAllControlCheckBox(3)
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "bsAllControlsLevel3CheckBox_MouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & "bsAllControlsLevel3CheckBox_MouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 

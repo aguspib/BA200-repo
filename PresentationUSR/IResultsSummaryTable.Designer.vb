@@ -23,20 +23,20 @@ Partial Class IResultsSummaryTable
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IResultsSummaryTable))
-        Me.bsPatientGridGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsPatientsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsPatientListDataGridView = New System.Windows.Forms.DataGridView
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsHorizontalRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.bsVerticalRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton
-        Me.bsDetailAreaButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.bsPatientGridGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsPatientsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsPatientListDataGridView = New System.Windows.Forms.DataGridView()
+        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
+        Me.bsHorizontalRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.bsVerticalRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.bsDetailAreaButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsPatientGridGroupBox.SuspendLayout()
         CType(Me.bsPatientListDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsDetailAreaButtonsPanel.SuspendLayout()
@@ -128,7 +128,6 @@ Partial Class IResultsSummaryTable
         Me.bsHorizontalRadioButton.TabIndex = 2
         Me.bsHorizontalRadioButton.Text = "Horizontal Report"
         Me.bsHorizontalRadioButton.UseVisualStyleBackColor = True
-        Me.bsHorizontalRadioButton.Visible = False
         '
         'bsVerticalRadioButton
         '
@@ -143,7 +142,6 @@ Partial Class IResultsSummaryTable
         Me.bsVerticalRadioButton.TabStop = True
         Me.bsVerticalRadioButton.Text = "Vertical Report"
         Me.bsVerticalRadioButton.UseVisualStyleBackColor = True
-        Me.bsVerticalRadioButton.Visible = False
         '
         'bsDetailAreaButtonsPanel
         '
@@ -164,7 +162,6 @@ Partial Class IResultsSummaryTable
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
         Me.bsPrintButton.TabIndex = 3
         Me.bsPrintButton.UseVisualStyleBackColor = True
-        Me.bsPrintButton.Visible = False
         '
         'bsExitButton
         '

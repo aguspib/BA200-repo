@@ -421,8 +421,8 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  JB 19/10/2012
         ''' Modified by: DL 23/10/2012 - Added new optional parameter pWorkSessionID
-        '''              SA 01/08/2014 - BT #1861 ==> - Added new optional parameter pSpecimenID
-        '''                                           - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
+        '''              SA 01/08/2014 - BA-1861 ==> - Added new optional parameter pSpecimenID
+        '''                                          - Removed parameter pSampleClasses: it is not needed due to this function get only Patient Results
         ''' </remarks>
         Public Function GetHistoricalResultsByFilter(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                      Optional ByVal pDateFrom As Date = Nothing, Optional ByVal pDateTo As Date = Nothing, _

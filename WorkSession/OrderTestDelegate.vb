@@ -481,6 +481,9 @@ Namespace Biosystems.Ax00.BL
                                             If (Not selectedTestsRow.IsESOrderIDNull) Then myControlsRow.ESOrderID = selectedTestsRow.ESOrderID
                                             If (Not selectedTestsRow.IsLISOrderIDNull) Then myControlsRow.LISOrderID = selectedTestsRow.LISOrderID
 
+                                            ' XB 01/09/2014 - BA #1868
+                                            myControlsRow.ControlLevel = myTestControlsRow.ControlLevel
+
                                             myControlsDataTable.Rows.Add(myControlsRow)
                                         End If
                                     Next myTestControlsRow

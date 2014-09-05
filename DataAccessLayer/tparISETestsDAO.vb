@@ -5,6 +5,7 @@ Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
 
@@ -339,6 +340,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS with data of the ISE Tests using
         '''          the specified SampleType</returns>
         ''' <remarks>
@@ -347,8 +349,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 21/02/2012 - Changed the function template
         '''              SA 19/06/2012 - Changed the query to get also field NumberOfControls
         '''              XB 01/02/2013 - Upper conversions must be implemented in same environment (f.ex.SQL)  (Bugs tracking #1112)
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function ReadBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String) As GlobalDataTO
+        Public Function ReadBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSampleType As String, ByVal pCustomizedTestSelection As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -361,7 +364,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " FROM   tparISETests ISET INNER JOIN tparISETestSamples ISETS ON ISET.ISETestID = ISETS.ISETestID " & vbCrLf & _
                                                 " WHERE  ISETS.SampleType = UPPER(N'" & pSampleType & "') " & vbCrLf & _
                                                 " AND    ISET.Enabled = 1 " & vbCrLf
-                        ' " WHERE  ISETS.SampleType = '" & pSampleType.ToUpper & "' " & vbCrLf & _
+
+                        'AG 01/09/2014 - BA-1869
+                        If pCustomizedTestSelection Then
+                            cmdText &= " AND ISET.Available = 1 ORDER BY ISET.CustomPosition ASC "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim myISETests As New ISETestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -644,14 +652,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pSampleType">Sample Type Code. Optional parameter; when informed,only ISE Tests using the SampleType
         '''                           are returned</param>
+        ''' <param name="pCustomizedTestSelection">FALSE same order as until 3.0.2 / When TRUE the test are filtered by Available and order by CustomPosition ASC</param>
         ''' <remarks>
         ''' Created by:  RH 14/06/2012
         ''' Modified by: SA 18/06/2012 - Changed the query. Data returned in an ISETestsDS
         '''              RH 19/06/2012 - Added field ITS.Decimals to the query
         '''              SA 22/06/2012 - Get also field NumberOfControls from table tparISETestSamples; added optional parameter
         '''                              to allow filter the ISE Tests by SampleType when it is informed
+        ''' AG 01/09/2014 BA-1869 EUA can customize the test selection visibility and order in test keyboard auxiliary screen
         ''' </remarks>
-        Public Function GetAllWithQCActive(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pSampleType As String = "") As GlobalDataTO
+        Public Function GetAllWithQCActive(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pSampleType As String = "", Optional ByVal pCustomizedTestSelection As Boolean = False) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -669,7 +679,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    MD.SubTableID = '" & MasterDataEnum.TEST_UNITS.ToString() & "' " & vbCrLf
 
                         If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND ITS.SampleType ='" & pSampleType.Trim & "' " & vbCrLf
-                        cmdText &= " ORDER BY ITS.SampleType, TestPosition "
+
+                        'AG 01/09/2014 - BA-1869
+                        'cmdText &= " ORDER BY ITS.SampleType, TestPosition "
+                        If Not pCustomizedTestSelection Then 'Keep the old query with the same order by
+                            cmdText &= " ORDER BY ITS.SampleType, TestPosition "
+                        Else ' Filter also Available = 1 and order by SelectionPosition
+                            cmdText &= " AND IT.Available = 1 ORDER BY ITS.SampleType, IT.CustomPosition "
+                        End If
+                        'AG 01/09/2014 - BA-1869
 
                         Dim myISETestDataDS As New ISETestsDS()
                         Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -797,6 +815,117 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' Gets all ISE tests order by CustomPosition (return columns: TestType, TestID, CustomPosition As TestPosition, PreloadedTest, Available)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <returns>GlobalDataTo with setDatos ReportsTestsSortingDS</returns>
+        ''' <remarks>
+        ''' AG 02/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        'Use ShortName as TestName in the same way as method tcfgReportsTestsSortingDAO.GetSortedTestList
+                        Dim cmdText As String = " SELECT 'ISE' AS TestType, ISETestID AS TestID, CustomPosition AS TestPosition, ShortName AS TestName, " & vbCrLf & _
+                                                " 1 AS PreloadedTest, Available FROM tparISETests ORDER BY CustomPosition ASC "
+
+                        Dim myDataSet As New ReportsTestsSortingDS
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.tcfgReportsTestsSorting)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparISETestsDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update (only when informed) columns CustomPosition and Available for ISE tests
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestsSortingDS">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 03/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateCustomPositionAndAvailable(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestsSortingDS As ReportsTestsSortingDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As New StringBuilder
+                    For Each testrow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting
+                        'Check there is something to update in this row
+                        If Not (testrow.IsTestPositionNull AndAlso testrow.IsAvailableNull) Then
+                            cmdText.Append(" UPDATE tparISETests SET ")
+
+                            'Update CustomPosition = TestPosition if informed
+                            If Not testrow.IsTestPositionNull Then
+                                cmdText.Append(" CustomPosition = " & testrow.TestPosition.ToString)
+                            End If
+
+                            'Update Available = Available if informed
+                            If Not testrow.IsAvailableNull Then
+                                'Add coma when required
+                                If Not testrow.IsTestPositionNull Then
+                                    cmdText.Append(" , ")
+                                End If
+
+                                cmdText.Append(" Available = " & CInt(IIf(testrow.Available, 1, 0)))
+                            End If
+
+                            cmdText.Append(" WHERE ISETestID  = " & testrow.TestID.ToString)
+                            cmdText.Append(vbCrLf)
+                        End If
+                    Next
+
+                    If cmdText.ToString.Length <> 0 Then
+                        Using dbCmd As New SqlCommand(cmdText.ToString, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        End Using
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
 
 #End Region
 

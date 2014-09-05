@@ -1212,6 +1212,8 @@ Partial Public Class HisWSResultsDS
 
         Private columnTestLongName As Global.System.Data.DataColumn
 
+        Private columnExpTestToPrint As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -1776,6 +1778,14 @@ Partial Public Class HisWSResultsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ExpTestToPrintColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnExpTestToPrint
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -1878,9 +1888,10 @@ Partial Public Class HisWSResultsDS
                     ByVal ManualResultFlag As Boolean, _
                     ByVal TestPosition As Integer, _
                     ByVal BackColorGroup As Integer, _
-                    ByVal TestLongName As String) As vhisWSResultsRow
+                    ByVal TestLongName As String, _
+                    ByVal ExpTestToPrint As Boolean) As vhisWSResultsRow
             Dim rowvhisWSResultsRow As vhisWSResultsRow = CType(Me.NewRow, vhisWSResultsRow)
-            Dim columnValuesArray() As Object = New Object() {HistOrderTestID, AnalyzerID, WorkSessionID, ResultDateTime, HistPatientID, PatientID, FirstName, LastName, SampleClass, StatFlag, TestType, SampleType, TestID, TestName, TestVersionNumber, CONCValue, MeasureUnit, MinRefRange, MaxRefRange, ExportStatus, AlarmList, FormulaText, StatFlagImage, ExportImage, GraphImage, RemarkAlert, RefRange, Remarks, AdditionalInfo, ABSValue, ABSWorkReagent, KineticBlankLimit, ABSInitial, ABSMainFilter, BlankAbsorbanceLimit, CalibratorName, LotNumber, NumberOfCalibrators, TheoreticalConcentration, CalibratorFactor, FactorLimits, FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, CONCValueString, MultiPointNumber, Selected, CalibPointUsed, ManualResult, ManualResultText, LISMessageID, LISRequest, ExternalQC, ESOrderID, LISOrderID, ESPatientID, LISPatientID, LISTestName, LISSampleType, LISUnits, SpecimenID, AwosID, ManualResultFlag, TestPosition, BackColorGroup, TestLongName}
+            Dim columnValuesArray() As Object = New Object() {HistOrderTestID, AnalyzerID, WorkSessionID, ResultDateTime, HistPatientID, PatientID, FirstName, LastName, SampleClass, StatFlag, TestType, SampleType, TestID, TestName, TestVersionNumber, CONCValue, MeasureUnit, MinRefRange, MaxRefRange, ExportStatus, AlarmList, FormulaText, StatFlagImage, ExportImage, GraphImage, RemarkAlert, RefRange, Remarks, AdditionalInfo, ABSValue, ABSWorkReagent, KineticBlankLimit, ABSInitial, ABSMainFilter, BlankAbsorbanceLimit, CalibratorName, LotNumber, NumberOfCalibrators, TheoreticalConcentration, CalibratorFactor, FactorLimits, FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, CONCValueString, MultiPointNumber, Selected, CalibPointUsed, ManualResult, ManualResultText, LISMessageID, LISRequest, ExternalQC, ESOrderID, LISOrderID, ESPatientID, LISPatientID, LISTestName, LISSampleType, LISUnits, SpecimenID, AwosID, ManualResultFlag, TestPosition, BackColorGroup, TestLongName, ExpTestToPrint}
             rowvhisWSResultsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowvhisWSResultsRow)
             Return rowvhisWSResultsRow
@@ -1969,6 +1980,7 @@ Partial Public Class HisWSResultsDS
             Me.columnTestPosition = MyBase.Columns("TestPosition")
             Me.columnBackColorGroup = MyBase.Columns("BackColorGroup")
             Me.columnTestLongName = MyBase.Columns("TestLongName")
+            Me.columnExpTestToPrint = MyBase.Columns("ExpTestToPrint")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -2106,6 +2118,8 @@ Partial Public Class HisWSResultsDS
             MyBase.Columns.Add(Me.columnBackColorGroup)
             Me.columnTestLongName = New Global.System.Data.DataColumn("TestLongName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTestLongName)
+            Me.columnExpTestToPrint = New Global.System.Data.DataColumn("ExpTestToPrint", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnExpTestToPrint)
             Me.columnAnalyzerID.MaxLength = 25
             Me.columnWorkSessionID.MaxLength = 10
             Me.columnPatientID.MaxLength = 30
@@ -2117,6 +2131,7 @@ Partial Public Class HisWSResultsDS
             Me.columnExportStatus.MaxLength = 15
             Me.columnAlarmList.MaxLength = 255
             Me.columnFormulaText.MaxLength = 255
+            Me.columnExpTestToPrint.DefaultValue = CType(True, Boolean)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -4847,6 +4862,21 @@ Partial Public Class HisWSResultsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property ExpTestToPrint() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tablevhisWSResults.ExpTestToPrintColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'ExpTestToPrint' in table 'vhisWSResults' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tablevhisWSResults.ExpTestToPrintColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsHistOrderTestIDNull() As Boolean
             Return Me.IsNull(Me.tablevhisWSResults.HistOrderTestIDColumn)
         End Function
@@ -5635,6 +5665,18 @@ Partial Public Class HisWSResultsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetTestLongNameNull()
             Me(Me.tablevhisWSResults.TestLongNameColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsExpTestToPrintNull() As Boolean
+            Return Me.IsNull(Me.tablevhisWSResults.ExpTestToPrintColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetExpTestToPrintNull()
+            Me(Me.tablevhisWSResults.ExpTestToPrintColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 
