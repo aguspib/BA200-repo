@@ -4950,7 +4950,12 @@ Public Class IISEUtilities
         Dim InUse As Boolean = False
         Try
             Dim myISETestDelegate As New ISETestsDelegate
-            myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+
+            ' XB 05/09/2014 - BA-1902
+            'myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+            myGlobal = myISETestDelegate.ExistsISETestID(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
+
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myISETestsDS As ISETestsDS = CType(myGlobal.SetDatos, ISETestsDS)
                 If myISETestsDS.tparISETests.Count > 0 Then
@@ -4974,13 +4979,20 @@ Public Class IISEUtilities
     ''' </summary>
     ''' <param name="pEnabled"></param>
     ''' <returns></returns>
-    ''' <remarks>SGM 17/05/2012</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 17/05/2012
+    ''' Modified by: XB 05/09/2014 - Use ISETestID field instead of ISE Name field - BA-1902
+    ''' </remarks>
     Public Function UpdateLithiumTestEnabled(ByVal pEnabled As Boolean) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             Dim myISETestDelegate As New ISETestsDelegate
 
-            myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+            ' XB 05/09/2014 - BA-1902
+            'myGlobal = myISETestDelegate.ExistsISETestName(Nothing, "Li+", "NAME")
+            myGlobal = myISETestDelegate.ExistsISETestID(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
+
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myISETestsDS As ISETestsDS = CType(myGlobal.SetDatos, ISETestsDS)
                 If myISETestsDS.tparISETests.Count > 0 Then
