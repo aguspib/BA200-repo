@@ -1621,6 +1621,7 @@ Public Class IProgTest
                 EditButton.Enabled = False
                 isCurrentTestInUse = False
                 CopyTestButton.Enabled = False 'TR 10/01/2012 Disable copyTestbutton on multiselection.
+                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
 
                 'AG 09/07/2010
                 For Each mySelectedItem As ListViewItem In TestListView.SelectedItems
@@ -1869,6 +1870,8 @@ Public Class IProgTest
                                 EditButton.Enabled = isEditTestAllowed
 
                                 CopyTestButton.Enabled = True 'TR 09/01/2012 Enable Copy test Button.
+                                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+
                             Else
                                 'TestListView.Enabled = False
                                 TestListView.Enabled = True
@@ -1889,6 +1892,7 @@ Public Class IProgTest
                                 EditButton.Enabled = isEditTestAllowed
 
                                 CopyTestButton.Enabled = True 'TR 09/01/2012 Enable Copy test Button.
+                                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                             End If
 
                         Case "RUNNING", "STANDBY", "SAMPLINGSTOP", "FINISHED", "ABORTED"
@@ -1910,6 +1914,7 @@ Public Class IProgTest
                             EditButton.Enabled = isEditTestAllowed
 
                             CopyTestButton.Enabled = True 'TR 09/01/2012 Enable Copy test Button.
+                            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                     End Select
 
                 Case False
@@ -1933,6 +1938,7 @@ Public Class IProgTest
                         EditButton.Enabled = isEditTestAllowed
 
                         CopyTestButton.Enabled = True 'TR 09/01/2012 Enable Copy test Button.
+                        BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                     End If
             End Select
 
@@ -1952,6 +1958,7 @@ Public Class IProgTest
                 EditButton.Enabled = False
                 'TR 29/03/2012
                 CopyTestButton.Enabled = False
+                BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
                 EditButton.Enabled = False
                 'TR 29/03/2012 -END
 
@@ -1969,6 +1976,7 @@ Public Class IProgTest
                     If myCreatedTest >= MyGlobalBase.GetSessionInfo.MaxTestsNumber Then
                         'disable add button and copy button 
                         CopyTestButton.Enabled = False
+                        BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                         AddButton.Enabled = False
                     End If
                 End If
@@ -6188,6 +6196,7 @@ Public Class IProgTest
                         'RefDetailAddEditEnabling() 'SG 27/06/2010
                         EditButton.Enabled = False   'AG 10/03/10 - Once we are in edition mode disable edition button
                         CopyTestButton.Enabled = False 'TR 09/01/2012 -Disable copyTest button.
+                        BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
 
                         ' DL 26/08/2010
                         If Not SelectedTestDS.tparTests.Item(0).IsSpecialTestNull Then
@@ -8886,6 +8895,12 @@ Public Class IProgTest
             End If
             'TR 09/01/2012 -END.
 
+            'AG 05/09/2014 - BA-1869
+            'auxIconName = GetIconName("CUSTOMSORT")
+            'If (auxIconName <> "") Then
+            '    BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+            'End If
+
             'SAVE SaveButton
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
@@ -9498,6 +9513,7 @@ Public Class IProgTest
             bsScreenToolTips.SetToolTip(AddControls, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ADD_CONTROLS", currentLanguage))
 
             bsScreenToolTips.SetToolTip(DeleteControlButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DELETE_CONTROLS", currentLanguage))
+            'bsScreenToolTips.SetToolTip(BsCustomOrderButton , myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_COPY_TEST", currentLanguage)) 'AG 05/09/2014 - BA-1869
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -10068,6 +10084,7 @@ Public Class IProgTest
             SubstrateDepleUpDown = Nothing
             BsHelpProvider1 = Nothing
             CopyTestButton = Nothing
+            BsCustomOrderButton = Nothing 'AG 05/09/2014 - BA-1869
             SampleTypeCheckList = Nothing
             SampleTypeCboEx = Nothing
             SampleTypeCboAux = Nothing
@@ -11280,6 +11297,7 @@ Public Class IProgTest
                 DeleteButton.Enabled = False
                 '                PrintTestButton.Enabled = False dl 11/05/2012
                 CopyTestButton.Enabled = False 'TR 25/01/2012
+                BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
 
                 'select general tab to start creating new test.
                 TestDetailsTabs.SelectTab("GeneralTab")
@@ -13750,6 +13768,28 @@ Public Class IProgTest
             ShowMessage(Name & ".TextBox_KeyPress", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Open the customize order and availability for profiles tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 05/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "STD"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
 
 #Region "CONTROLS"

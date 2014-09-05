@@ -257,6 +257,7 @@ Partial Class IProgTest
         Me.TubesBySampleTypeDS1 = New Biosystems.Ax00.Types.TubesBySampleTypeDS()
         Me.BsHelpProvider1 = New Biosystems.Ax00.Controls.UserControls.BSHelpProvider()
         Me.CopyTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.SampleTypePlus2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsPanel2.SuspendLayout()
         Me.BsPanel1.SuspendLayout()
@@ -407,13 +408,14 @@ Partial Class IProgTest
         '
         'BsPanel1
         '
+        Me.BsPanel1.Controls.Add(Me.BsCustomOrderButton)
         Me.BsPanel1.Controls.Add(Me.AddButton)
         Me.BsPanel1.Controls.Add(Me.PrintTestButton)
         Me.BsPanel1.Controls.Add(Me.DeleteButton)
         Me.BsPanel1.Controls.Add(Me.EditButton)
-        Me.BsPanel1.Location = New System.Drawing.Point(63, 613)
+        Me.BsPanel1.Location = New System.Drawing.Point(27, 613)
         Me.BsPanel1.Name = "BsPanel1"
-        Me.BsPanel1.Size = New System.Drawing.Size(143, 35)
+        Me.BsPanel1.Size = New System.Drawing.Size(181, 35)
         Me.BsPanel1.TabIndex = 5
         '
         'AddButton
@@ -431,10 +433,10 @@ Partial Class IProgTest
         Me.PrintTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.PrintTestButton.Enabled = False
         Me.PrintTestButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.PrintTestButton.Location = New System.Drawing.Point(111, 0)
+        Me.PrintTestButton.Location = New System.Drawing.Point(148, 0)
         Me.PrintTestButton.Name = "PrintTestButton"
         Me.PrintTestButton.Size = New System.Drawing.Size(32, 32)
-        Me.PrintTestButton.TabIndex = 4
+        Me.PrintTestButton.TabIndex = 5
         Me.PrintTestButton.UseVisualStyleBackColor = True
         Me.PrintTestButton.Visible = False
         '
@@ -3040,8 +3042,18 @@ Partial Class IProgTest
         Me.CopyTestButton.Location = New System.Drawing.Point(212, 613)
         Me.CopyTestButton.Name = "CopyTestButton"
         Me.CopyTestButton.Size = New System.Drawing.Size(32, 32)
-        Me.CopyTestButton.TabIndex = 34
+        Me.CopyTestButton.TabIndex = 6
         Me.CopyTestButton.UseVisualStyleBackColor = True
+        '
+        'BsCustomOrderButton
+        '
+        Me.BsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsCustomOrderButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.BsCustomOrderButton.Location = New System.Drawing.Point(111, 0)
+        Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
+        Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.BsCustomOrderButton.TabIndex = 4
+        Me.BsCustomOrderButton.UseVisualStyleBackColor = True
         '
         'IProgTest
         '
@@ -3363,5 +3375,6 @@ Partial Class IProgTest
     Friend WithEvents SampleTypeCboEx As Biosystems.Ax00.Controls.UserControls.BSComboBoxEx
     Friend WithEvents SampleTypeCboAux As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents AddControlLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents BsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 
 End Class
