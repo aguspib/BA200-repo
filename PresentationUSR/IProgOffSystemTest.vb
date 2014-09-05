@@ -833,7 +833,7 @@ Public Class IProgOffSystemTest
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = False
                 BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
-                '                bsPrintButton.Enabled = False DL 11/05/2012
+                'bsPrintButton.Enabled = False DL 11/05/2012
             End If
 
             'Area of OFF-SYSTEM Test Definition
@@ -1499,7 +1499,7 @@ Public Class IProgOffSystemTest
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
-            BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
+            BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")

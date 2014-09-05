@@ -93,6 +93,7 @@ Public Class IProgCalculatedTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             'bsPrintButton.Enabled = False DL 11/05/2012
 
             'Area of Calculated Test Definition
@@ -410,6 +411,7 @@ Public Class IProgCalculatedTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             'bsPrintButton.Enabled = False DL 11/05/2012
 
             'Area of Caculated Test Definition
@@ -708,6 +710,7 @@ Public Class IProgCalculatedTest
             bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            'bsScreenToolTips.SetToolTip(BsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID)) 'AG 05/09/2014 - BA-1869
 
             'For bsTestRefRanges
             bsTestRefRanges.TextForGenericRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Generic", pLanguageID)
@@ -845,6 +848,7 @@ Public Class IProgCalculatedTest
                 bsNewButton.Enabled = True
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = False
+                BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
                 'bsPrintButton.Enabled = False DL 11/05/2012
             End If
 
@@ -1555,6 +1559,12 @@ Public Class IProgCalculatedTest
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
 
+            'CUSTOM SORT Button 'AG 05/09/2014 - BA-1869
+            'auxIconName = GetIconName("CUSTOMSORT")
+            'If (auxIconName <> "") Then
+            '    BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+            'End If
+
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
@@ -1686,6 +1696,7 @@ Public Class IProgCalculatedTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = True
             bsDeleteButton.Enabled = True
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             'bsPrintButton.Enabled = True  DL 11/05/2012
 
             bsFullNameTextbox.Enabled = False
@@ -1731,6 +1742,7 @@ Public Class IProgCalculatedTest
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1941,6 +1953,7 @@ Public Class IProgCalculatedTest
                     bsNewButton.Enabled = False
                     bsEditButton.Enabled = False
                     bsDeleteButton.Enabled = False
+                    BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
                     'bsPrintButton.Enabled = False   DL 11/05/2012
                     Exit Select
             End Select
@@ -2365,6 +2378,7 @@ Public Class IProgCalculatedTest
 
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = bEnabled
+                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             End If
             ScreenStatusByUserLevel() 'TR 23/04/2012
         Catch ex As Exception
@@ -2458,6 +2472,7 @@ Public Class IProgCalculatedTest
 
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = bEnabled
+                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
@@ -2758,9 +2773,28 @@ Public Class IProgCalculatedTest
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Open the customize order and availability for OFFS tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 05/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "CALC"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+
 #End Region
 
-    Private Sub bsCalTestListView_SelectedIndexChanged(sender As Object, e As EventArgs) Handles bsCalTestListView.SelectedIndexChanged
-
-    End Sub
 End Class
