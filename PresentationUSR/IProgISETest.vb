@@ -1233,6 +1233,10 @@ Public Class IProgISETest
                                                (bsAvailableISETestCheckBox.Checked.ToString <> bsISETestListView.Items(OriginalSelectedIndex).SubItems(6).Text)
                     End If
                 End If
+
+                If (Not pendingToSaveChanges) Then
+                    pendingToSaveChanges = (Not ValidateSavingConditions())
+                End If
             End If
 
         Catch ex As Exception
@@ -3747,13 +3751,35 @@ Public Class IProgISETest
 
     Private Sub QCReplicNumberNumeric_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCReplicNumberNumeric.Validating
         Try
-            BsErrorProvider1.Clear()
 
-            If QCReplicNumberNumeric.Text = "" Then
-                BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
-                QCReplicNumberNumeric.Focus()
+            'myTextBox = CType(sender, TextBox)
+
+            'If (myTextBox.TextLength > 0) Then
+            '    If (bsScreenErrorProvider.GetError(myTextBox) <> "") Then
+            '        bsScreenErrorProvider.SetError(myTextBox, String.Empty)
+            '    End If
+            'End If
+
+            ' Test change Susana 3/9
+            'BsErrorProvider1.Clear()
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If QCReplicNumberNumeric.Text = "" Then
+                    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If QCReplicNumberNumeric.Text <> "" Then
+                    BsErrorProvider1.SetError(QCReplicNumberNumeric, String.Empty)
+                End If
             End If
+            ' Test change Susana 3/9
+
+
+
+            'If QCReplicNumberNumeric.Text = "" Then
+            '    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    'QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
+            '    'QCReplicNumberNumeric.Focus()
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCReplicNumberNumeric_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3763,13 +3789,26 @@ Public Class IProgISETest
 
     Private Sub QCRejectionCriteria_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCRejectionCriteria.Validating
         Try
-            BsErrorProvider1.Clear()
+            'BsErrorProvider1.Clear()
 
-            If QCRejectionCriteria.Text = "" Then
-                BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
-                QCRejectionCriteria.Focus()
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If QCRejectionCriteria.Text = "" Then
+                    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If QCRejectionCriteria.Text <> "" Then
+                    BsErrorProvider1.SetError(QCRejectionCriteria, String.Empty)
+                End If
             End If
+
+
+            'If QCRejectionCriteria.Text = "" Then
+            '    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    ' Test change Susana 3/9
+            '    'QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
+            '    'QCRejectionCriteria.Focus()
+            '    ' Test change Susana 3/9
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCRejectionCriteria_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3779,13 +3818,27 @@ Public Class IProgISETest
 
     Private Sub QCMinNumSeries_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCMinNumSeries.Validating
         Try
-            BsErrorProvider1.Clear()
 
-            If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
-                BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCMinNumSeries.Value = QCMinNumSeries.Minimum
-                QCMinNumSeries.Focus()
+            'BsErrorProvider1.Clear()
+
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
+                    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text <> "" Then
+                    BsErrorProvider1.SetError(QCMinNumSeries, String.Empty)
+                End If
             End If
+
+
+
+            'If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
+            '    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    QCMinNumSeries.Value = QCMinNumSeries.Minimum
+            '    QCMinNumSeries.Focus()
+            'End If
+
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCMinNumSeries_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -4085,7 +4138,12 @@ Public Class IProgISETest
     ''' <param name="e"></param>
     ''' <remarks>WE 27/08/2014 - #1865. Generic event handler method that triggers ChangesMade whenever the value of a control is changed.
     '''                          Only used for new fields for which ChangesMade can not be handled properly by PendingChangesVerification.</remarks>
-    Private Sub ControlValueChanged(sender As Object, e As EventArgs) Handles bsReportNameTextBox.TextChanged, bsDecimalsUpDown.ValueChanged, bsSlopeB2UpDown.ValueChanged, bsSlopeA2UpDown.ValueChanged
+    Private Sub ControlValueChanged(sender As Object, e As EventArgs) Handles bsReportNameTextBox.TextChanged,
+                                                                              bsDecimalsUpDown.ValueChanged,
+                                                                              bsSlopeB2UpDown.ValueChanged,
+                                                                              bsSlopeA2UpDown.ValueChanged,
+                                                                              QCReplicNumberNumeric.ValueChanged,
+                                                                              QCMinNumSeries.ValueChanged
         If EditionMode Then
             ChangesMade = True
         End If
@@ -4297,8 +4355,8 @@ Public Class IProgISETest
     ''' Created by: RH 13/06/2012
     ''' </remarks>    
     Private Sub bsSaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSaveButton.Click
-        If Not SaveChanges(False) Then
-            CancelISETestEdition()
+        If SaveChanges(False) Then
+            '  CancelISETestEdition()
         End If
     End Sub
 
@@ -4455,6 +4513,7 @@ Public Class IProgISETest
 
     End Sub
 #End Region
+
 
 
 

@@ -201,13 +201,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (pISETestSamplesRow.IsSlopeFactorA2Null) Then
                         cmdText &= " SlopeFactorA2 = NULL, "
                     Else
-                        cmdText &= " SlopeFactorA2 = " & pISETestSamplesRow.SlopeFactorA2.ToSQLString() & ", "
+                        cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorA2) & ", "
                     End If
 
                     If (pISETestSamplesRow.IsSlopeFactorB2Null) Then
                         cmdText &= " SlopeFactorB2 = NULL "
                     Else
-                        cmdText &= " SlopeFactorB2 = " & pISETestSamplesRow.SlopeFactorB2.ToSQLString() & " "
+                        cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorB2) & " "
                     End If
                     ' WE 30/07/2014 - #1865 - End
 

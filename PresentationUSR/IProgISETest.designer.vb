@@ -364,6 +364,7 @@ Partial Class IProgISETest
         Me.bsReportNameTextBox.BackColor = System.Drawing.Color.White
         Me.bsReportNameTextBox.DecimalsValues = False
         Me.bsReportNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsReportNameTextBox.ForeColor = System.Drawing.Color.Black
         Me.bsReportNameTextBox.IsNumeric = False
         Me.bsReportNameTextBox.Location = New System.Drawing.Point(10, 139)
         Me.bsReportNameTextBox.Mandatory = False
@@ -648,6 +649,7 @@ Partial Class IProgISETest
         '
         'QCErrorAllowable
         '
+        Me.QCErrorAllowable.ForeColor = System.Drawing.Color.Black
         Me.QCErrorAllowable.Location = New System.Drawing.Point(127, 14)
         Me.QCErrorAllowable.Name = "QCErrorAllowable"
         Me.QCErrorAllowable.Size = New System.Drawing.Size(67, 21)
@@ -776,6 +778,7 @@ Partial Class IProgISETest
         'QCMinNumSeries
         '
         Me.QCMinNumSeries.Enabled = False
+        Me.QCMinNumSeries.ForeColor = System.Drawing.Color.Black
         Me.QCMinNumSeries.Location = New System.Drawing.Point(308, 48)
         Me.QCMinNumSeries.Name = "QCMinNumSeries"
         Me.QCMinNumSeries.Size = New System.Drawing.Size(58, 21)
@@ -870,6 +873,7 @@ Partial Class IProgISETest
         '
         'QCRejectionCriteria
         '
+        Me.QCRejectionCriteria.ForeColor = System.Drawing.Color.Black
         Me.QCRejectionCriteria.Location = New System.Drawing.Point(199, 48)
         Me.QCRejectionCriteria.Name = "QCRejectionCriteria"
         Me.QCRejectionCriteria.Size = New System.Drawing.Size(58, 21)
@@ -878,6 +882,7 @@ Partial Class IProgISETest
         '
         'QCReplicNumberNumeric
         '
+        Me.QCReplicNumberNumeric.ForeColor = System.Drawing.Color.Black
         Me.QCReplicNumberNumeric.Location = New System.Drawing.Point(199, 20)
         Me.QCReplicNumberNumeric.Name = "QCReplicNumberNumeric"
         Me.QCReplicNumberNumeric.Size = New System.Drawing.Size(58, 21)
@@ -982,6 +987,7 @@ Partial Class IProgISETest
         '
         'bsSlopeB2UpDown
         '
+        Me.bsSlopeB2UpDown.ForeColor = System.Drawing.Color.Black
         Me.bsSlopeB2UpDown.Location = New System.Drawing.Point(353, 14)
         Me.bsSlopeB2UpDown.Name = "bsSlopeB2UpDown"
         Me.bsSlopeB2UpDown.Size = New System.Drawing.Size(73, 21)
@@ -990,6 +996,7 @@ Partial Class IProgISETest
         '
         'bsSlopeA2UpDown
         '
+        Me.bsSlopeA2UpDown.ForeColor = System.Drawing.Color.Black
         Me.bsSlopeA2UpDown.Location = New System.Drawing.Point(224, 14)
         Me.bsSlopeA2UpDown.Name = "bsSlopeA2UpDown"
         Me.bsSlopeA2UpDown.Size = New System.Drawing.Size(73, 21)
