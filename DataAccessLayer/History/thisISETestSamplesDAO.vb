@@ -147,7 +147,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT HITS.* FROM thisISETestSamples HITS " & vbCrLf & _
                                                 " WHERE  HITS.ISETestID = " & pISETestID.ToString & vbCrLf & _
-                                                " AND    HITS.SampleType = '" & pSampleType.Trim & "' " & vbCrLf 
+                                                " AND    HITS.SampleType = '" & pSampleType.Trim & "' " & vbCrLf
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
@@ -195,35 +195,37 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = ""
                     For Each row As HisISETestSamplesDS.thisISETestSamplesRow In pHisISETestSamplesDS.thisISETestSamples.Rows
-                        cmdText &= " UPDATE thisISETestSamples " & vbCrLf & _
-                                   " SET    ISETestName     = N'" & row.ISETestName.Replace("'", "''").Trim & "', " & vbCrLf & _
-                                          " MeasureUnit     = '" & row.MeasureUnit.Trim & "', " & vbCrLf & _
-                                          " DecimalsAllowed = " & row.DecimalsAllowed.ToString & ", " & vbCrLf
+                        If (Not row.IsHistISETestIDNull) Then
+                            cmdText &= " UPDATE thisISETestSamples " & vbCrLf & _
+                                       " SET    ISETestName     = N'" & row.ISETestName.Replace("'", "''").Trim & "', " & vbCrLf & _
+                                              " MeasureUnit     = '" & row.MeasureUnit.Trim & "', " & vbCrLf & _
+                                              " DecimalsAllowed = " & row.DecimalsAllowed.ToString & ", " & vbCrLf
 
-                        If (row.IsTestLongNameNull) Then
-                            cmdText &= " TestLongName = NULL, " & vbCrLf
-                        Else
-                            cmdText &= " TestLongName = N'" & row.TestLongName.Replace("'", "''").Trim & "', " & vbCrLf
+                            If (row.IsTestLongNameNull) Then
+                                cmdText &= " TestLongName = NULL, " & vbCrLf
+                            Else
+                                cmdText &= " TestLongName = N'" & row.TestLongName.Replace("'", "''").Trim & "', " & vbCrLf
+                            End If
+
+                            If (row.IsSlopeFactorA2Null) Then
+                                cmdText &= " SlopeFactorA2 = NULL, " & vbCrLf
+                            Else
+                                cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(row.SlopeFactorA2) & ", " & vbCrLf
+                            End If
+                            If (row.IsSlopeFactorB2Null) Then
+                                cmdText &= " SlopeFactorB2 = NULL " & vbCrLf
+                            Else
+                                cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(row.SlopeFactorB2) & vbCrLf
+                            End If
+
+                            cmdText &= " WHERE  HistISETestID = " & row.HistISETestID.ToString & vbCrLf & _
+                                       " AND    SampleType    = '" & row.SampleType & "' " & vbCrLf
+
+                            Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                                resultData.SetDatos = dbCmd.ExecuteScalar()
+                                resultData.HasError = False
+                            End Using
                         End If
-
-                        If (row.IsSlopeFactorA2Null) Then
-                            cmdText &= " SlopeFactorA2 = NULL, " & vbCrLf
-                        Else
-                            cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(row.SlopeFactorA2) & ", " & vbCrLf
-                        End If
-                        If (row.IsSlopeFactorB2Null) Then
-                            cmdText &= " SlopeFactorB2 = NULL " & vbCrLf
-                        Else
-                            cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(row.SlopeFactorB2) & vbCrLf
-                        End If
-
-                        cmdText &= " WHERE  HistISETestID = " & row.HistISETestID.ToString & vbCrLf & _
-                                   " AND    SampleType    = '" & row.SampleType & "' " & vbCrLf
-
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
-                            resultData.SetDatos = dbCmd.ExecuteScalar()
-                            resultData.HasError = False
-                        End Using
                     Next
                 End If
             Catch ex As Exception

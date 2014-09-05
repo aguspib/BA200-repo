@@ -3771,8 +3771,7 @@ Public Class IProgISETest
             '    End If
             'End If
 
-            ' Test change Susana 3/9
-            'BsErrorProvider1.Clear()
+            ' WE 03/09/2014 - #1865
             If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
                 If QCReplicNumberNumeric.Text = "" Then
                     BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
@@ -3782,10 +3781,9 @@ Public Class IProgISETest
                     BsErrorProvider1.SetError(QCReplicNumberNumeric, String.Empty)
                 End If
             End If
-            ' Test change Susana 3/9
+            ' WE 03/09/2014 - #1865 - End
 
-
-
+            'BsErrorProvider1.Clear()
             'If QCReplicNumberNumeric.Text = "" Then
             '    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
             '    'QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
@@ -3800,8 +3798,7 @@ Public Class IProgISETest
 
     Private Sub QCRejectionCriteria_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCRejectionCriteria.Validating
         Try
-            'BsErrorProvider1.Clear()
-
+            ' WE 03/09/2014 - #1865
             If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
                 If QCRejectionCriteria.Text = "" Then
                     BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
@@ -3811,14 +3808,13 @@ Public Class IProgISETest
                     BsErrorProvider1.SetError(QCRejectionCriteria, String.Empty)
                 End If
             End If
+            ' WE 03/09/2014 - #1865 - End
 
-
+            'BsErrorProvider1.Clear()
             'If QCRejectionCriteria.Text = "" Then
             '    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-            '    ' Test change Susana 3/9
-            '    'QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
-            '    'QCRejectionCriteria.Focus()
-            '    ' Test change Susana 3/9
+            '    QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
+            '    QCRejectionCriteria.Focus()
             'End If
 
         Catch ex As Exception
@@ -3829,9 +3825,7 @@ Public Class IProgISETest
 
     Private Sub QCMinNumSeries_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCMinNumSeries.Validating
         Try
-
-            'BsErrorProvider1.Clear()
-
+            ' WE 03/09/2014 - #1865
             If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
                 If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
                     BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
@@ -3841,15 +3835,14 @@ Public Class IProgISETest
                     BsErrorProvider1.SetError(QCMinNumSeries, String.Empty)
                 End If
             End If
+            ' WE 03/09/2014 - #1865 - End
 
-
-
+            'BsErrorProvider1.Clear()
             'If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
             '    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
             '    QCMinNumSeries.Value = QCMinNumSeries.Minimum
             '    QCMinNumSeries.Focus()
             'End If
-
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCMinNumSeries_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -4545,8 +4538,5 @@ Public Class IProgISETest
         End Try
     End Sub
 #End Region
-
-
-
 
 End Class
