@@ -1127,9 +1127,10 @@ Public Class IISEUtilities
     ''' Execute ISE managemenet internal action Instruction
     ''' </summary>
     ''' <remarks>
-    ''' Created by XBC 06/03/2012
-    ''' Modified by XBC 21/01/2013 - RaiseEvent ActivateScreenEvent cause problems (‘Operación no válida a través de subprocesos’) 
+    ''' Created by   XB 06/03/2012
+    ''' Modified by  XB 21/01/2013 - RaiseEvent ActivateScreenEvent cause problems (‘Operación no válida a través de subprocesos’) 
     '''                              if is called from SendISEAction Function. This operation is placed here, like other ones (Bugs tracking #1108)
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub ExecuteISEAction(ByVal pNode As TreeNode)
         Dim myGlobal As New GlobalDataTO
@@ -1187,7 +1188,12 @@ Public Class IISEUtilities
                             myForm.Element1DateTime = Now.Date
                         End If
 
-                        myForm.Element2Name = "Na+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_NaElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        Dim ISETestList As New ISETestsDelegate
+                        'myForm.Element2Name = "Na+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_NaElectrode", currentLanguage)
+                        myForm.Element2Name = ISETestList.GetName(Nothing, ISE_Tests.Na) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element2Selected = True
                         If myISEManager.HasNaInstallDate Then   ' XBC 29/06/2012
                             myForm.Element2DateTime = myISEManager.NaInstallDate
@@ -1195,7 +1201,11 @@ Public Class IISEUtilities
                             myForm.Element2DateTime = Now.Date
                         End If
 
-                        myForm.Element3Name = "K+:"     ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_KElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        'myForm.Element3Name = "K+:"     ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_KElectrode", currentLanguage)
+                        myForm.Element3Name = ISETestList.GetName(Nothing, ISE_Tests.K) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element3Selected = True
                         If myISEManager.HasKInstallDate Then   ' XBC 29/06/2012
                             myForm.Element3DateTime = myISEManager.KInstallDate
@@ -1203,7 +1213,11 @@ Public Class IISEUtilities
                             myForm.Element3DateTime = Now.Date
                         End If
 
-                        myForm.Element4Name = "Cl-:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ClElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        'myForm.Element4Name = "Cl-:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ClElectrode", currentLanguage)
+                        myForm.Element4Name = ISETestList.GetName(Nothing, ISE_Tests.Cl) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element4Selected = True
                         If myISEManager.HasClInstallDate Then   ' XBC 29/06/2012
                             myForm.Element4DateTime = myISEManager.ClInstallDate
@@ -1211,7 +1225,11 @@ Public Class IISEUtilities
                             myForm.Element4DateTime = Now.Date
                         End If
 
-                        myForm.Element5Name = "Li+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LiElectrode", currentLanguage)
+                        ' XB 05/09/2014 - BA-1902
+                        'myForm.Element5Name = "Li+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LiElectrode", currentLanguage)
+                        myForm.Element5Name = ISETestList.GetName(Nothing, ISE_Tests.Li) + ":"
+                        ' XB 05/09/2014 - BA-1902
+
                         myForm.Element5Selected = True
                         If myISEManager.HasLiInstallDate Then   ' XBC 29/06/2012
                             myForm.Element5DateTime = myISEManager.LiInstallDate
@@ -4923,7 +4941,10 @@ Public Class IISEUtilities
     ''' Check if a Li+ Test is in Use
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>SGM 17/05/2012</remarks>
+    ''' <remarks>
+    ''' Created by: SGM 17/05/2012
+    ''' Modified by: XB 05/09/2014 - Use ISETestID field instead of ISE Name field - BA-1902
+    ''' </remarks>
     Public Function LithiumTestInUse() As Boolean
         Dim myGlobal As New GlobalDataTO
         Dim InUse As Boolean = False
