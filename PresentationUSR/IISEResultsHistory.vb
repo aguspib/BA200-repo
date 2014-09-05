@@ -233,26 +233,56 @@ Public Class IISEResultsHistory
         End Try
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pError"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
+    ''' </remarks>
     Private Function DecodeAffectedElectrodes(ByVal pError As ISEErrorTO) As String
         Dim strRes As String = ""
 
+        ' XB 05/09/2014 - BA-1902
+        'If pError.Affected.Contains("Na") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Sodium")
+        'End If
+        'If pError.Affected.Contains("K") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Potassium")
+        'End If
+        'If pError.Affected.Contains("Cl") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Chlorine")
+        'End If
+        'If pError.Affected.Contains("Li") Then
+        '    If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
+        '    strRes &= GetText("LBL_Lithium")
+        'End If
+        'If Not String.IsNullOrEmpty(strRes) Then strRes &= ": "
+
+        Dim ISETestList As New ISETestsDelegate
         If pError.Affected.Contains("Na") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Sodium")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.Na)
         End If
         If pError.Affected.Contains("K") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Potassium")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.K)
         End If
         If pError.Affected.Contains("Cl") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Chlorine")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.Cl)
         End If
         If pError.Affected.Contains("Li") Then
             If Not String.IsNullOrEmpty(strRes) Then strRes &= ", "
-            strRes &= GetText("LBL_Lithium")
+            strRes &= ISETestList.GetName(Nothing, ISE_Tests.Li)
         End If
         If Not String.IsNullOrEmpty(strRes) Then strRes &= ": "
+        ' XB 05/09/2014 - BA-1902
+
 
         Return strRes
     End Function
@@ -414,7 +444,8 @@ Public Class IISEResultsHistory
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 27/07/2012
+    ''' Created by:  JB 27/07/2012
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -432,10 +463,18 @@ Public Class IISEResultsHistory
             bsDateFromLabel.Text = GetText("LBL_Date_From") & ":"
             bsDateToLabel.Text = GetText("LBL_Date_To") & ":"
             bsElectrodesFilterGroup.Text = GetText("LBL_ISE_Electrodes")
-            bsElectrodesFilterNaCheck.Text = GetText("LBL_Sodium")
-            bsElectrodesFilterKCheck.Text = GetText("LBL_Potassium")
-            bsElectrodesFilterClCheck.Text = GetText("LBL_Chlorine")
-            bsElectrodesFilterLiCheck.Text = GetText("LBL_Lithium")
+
+            ' XB 05/09/2014 - BA-1902
+            'bsElectrodesFilterNaCheck.Text = GetText("LBL_Sodium")
+            'bsElectrodesFilterKCheck.Text = GetText("LBL_Potassium")
+            'bsElectrodesFilterClCheck.Text = GetText("LBL_Chlorine")
+            'bsElectrodesFilterLiCheck.Text = GetText("LBL_Lithium")
+            Dim ISETestList As New ISETestsDelegate
+            bsElectrodesFilterNaCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Na)
+            bsElectrodesFilterKCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.K)
+            bsElectrodesFilterClCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+            bsElectrodesFilterLiCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
 
             '
             'Conditioning Tab
@@ -515,8 +554,9 @@ Public Class IISEResultsHistory
     ''' Initializes the grid in the Electrodes Tab
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 27/07/2012
+    ''' Created by:  JB 27/07/2012
     ''' Modified by: JC 12/11/2012 - Modify column width.
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub PrepareElectrodeResultsGrid(ByVal pGrid As BSDataGridView)
         Try
@@ -593,7 +633,13 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsNa: Na+
-            pGrid.Columns.Add("ResultsNa", GetText("LBL_Sodium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsNa", GetText("LBL_Sodium"))
+            Dim ISETestList As New ISETestsDelegate
+            pGrid.Columns.Add("ResultsNa", ISETestList.GetName(Nothing, ISE_Tests.Na))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsNa")
                 .DataPropertyName = "ResultsNa"
                 .DefaultCellStyle.NullValue = Nothing
@@ -604,12 +650,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanNa: Na+
-            pGrid.Columns.Add("MeanNa", GetText("LBL_Sodium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanNa", GetText("LBL_Sodium"))
+            pGrid.Columns.Add("MeanNa", ISETestList.GetName(Nothing, ISE_Tests.Na))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanNa")
                 .DataPropertyName = "MeanNa"
                 .DefaultCellStyle.NullValue = Nothing
@@ -625,7 +676,12 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsK: K+
-            pGrid.Columns.Add("ResultsK", GetText("LBL_Potassium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsK", GetText("LBL_Potassium"))
+            pGrid.Columns.Add("ResultsK", ISETestList.GetName(Nothing, ISE_Tests.K))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsK")
                 .DataPropertyName = "ResultsK"
                 .DefaultCellStyle.NullValue = Nothing
@@ -636,12 +692,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanK: K+
-            pGrid.Columns.Add("MeanK", GetText("LBL_Potassium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanK", GetText("LBL_Potassium"))
+            pGrid.Columns.Add("MeanK", ISETestList.GetName(Nothing, ISE_Tests.K))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanK")
                 .DataPropertyName = "MeanK"
                 .DefaultCellStyle.NullValue = Nothing
@@ -657,7 +718,12 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsCl: Cl-
-            pGrid.Columns.Add("ResultsCl", GetText("LBL_Chlorine"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsCl", GetText("LBL_Chlorine"))
+            pGrid.Columns.Add("ResultsCl", ISETestList.GetName(Nothing, ISE_Tests.Cl))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsCl")
                 .DataPropertyName = "ResultsCl"
                 .DefaultCellStyle.NullValue = Nothing
@@ -668,12 +734,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanCl: Cl-
-            pGrid.Columns.Add("MeanCl", GetText("LBL_Chlorine"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanCl", GetText("LBL_Chlorine"))
+            pGrid.Columns.Add("MeanCl", ISETestList.GetName(Nothing, ISE_Tests.Cl))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanCl")
                 .DataPropertyName = "MeanCl"
                 .DefaultCellStyle.NullValue = Nothing
@@ -689,7 +760,12 @@ Public Class IISEResultsHistory
             End With
 
             'ResultsLi: Li+
-            pGrid.Columns.Add("ResultsLi", GetText("LBL_Lithium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("ResultsLi", GetText("LBL_Lithium"))
+            pGrid.Columns.Add("ResultsLi", ISETestList.GetName(Nothing, ISE_Tests.Li))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("ResultsLi")
                 .DataPropertyName = "ResultsLi"
                 .DefaultCellStyle.NullValue = Nothing
@@ -700,12 +776,17 @@ Public Class IISEResultsHistory
                 .DefaultCellStyle.WrapMode = DataGridViewTriState.True
                 .Resizable = DataGridViewTriState.True
                 .ReadOnly = True
-                .Width = 50
+                .Width = 70
                 .Visible = True
             End With
 
             'MeanLi: Li+
-            pGrid.Columns.Add("MeanLi", GetText("LBL_Lithium"))
+
+            ' XB 05/09/2014 - BA-1902
+            'pGrid.Columns.Add("MeanLi", GetText("LBL_Lithium"))
+            pGrid.Columns.Add("MeanLi", ISETestList.GetName(Nothing, ISE_Tests.Li))
+            ' XB 05/09/2014 - BA-1902
+
             With pGrid.Columns("MeanLi")
                 .DataPropertyName = "MeanLi"
                 .DefaultCellStyle.NullValue = Nothing

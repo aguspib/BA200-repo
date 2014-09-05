@@ -928,6 +928,95 @@ Namespace Biosystems.Ax00.BL
             Return (myGlobalDataTO)
         End Function
 
+        ''' <summary>
+        ''' Get the name of the specified ISE test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test identifier</param>
+        ''' <returns>GlobalDataTO containing a typed string with the name field</returns>
+        ''' <remarks>
+        ''' Created by: XB 05/09/2014 - BA-1902
+        ''' </remarks>
+        Public Function GetName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As String
+            Dim returnValue As String = ""
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        'Get the list of existing ISE Tests
+                        resultData = MyClass.GetList(Nothing)
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            Dim myISETestDS As ISETestsDS
+                            myISETestDS = DirectCast(resultData.SetDatos, ISETestsDS)
+
+                            Dim qISETests As List(Of ISETestsDS.tparISETestsRow)
+
+                            qISETests = (From a In myISETestDS.tparISETests _
+                                         Where a.ISETestID = pTestID _
+                                         Select a).ToList()
+
+                            If qISETests.Count = 1 Then
+                                returnValue = qISETests(0).Name
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.GetName", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return returnValue
+        End Function
+
+
+        ''' <summary>
+        ''' Search ISE Test data for the informed Test ID
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS with data of the informed ISE Test</returns>
+        ''' <remarks>
+        ''' Created by:  XB 05/09/2014 - BA-1902
+        ''' </remarks>
+        Public Function ExistsISETestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparISETestsDAO
+                        resultData = myDAO.Read(dbConnection, pISETestID)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.ExistsISETestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
 #Region "TO DELETE - NOT USED"

@@ -99,23 +99,37 @@ Public Class IISEResultsHistoryGraph
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: JB 31/07/2012
+    ''' Created by:  JB 31/07/2012
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
             Me.bsTitleLabel.Text = GetText("TITLE_ISE_HistoricalCalibGraph")
 
-            bsElectrodeNaCheck.Text = GetText("LBL_Sodium")
-            bsElectrodeKCheck.Text = GetText("LBL_Potassium")
-            bsElectrodeClCheck.Text = GetText("LBL_Chlorine")
-            bsElectrodeLiCheck.Text = GetText("LBL_Lithium")
+            ' XB 05/09/2014 - BA-1902
+            'bsElectrodeNaCheck.Text = GetText("LBL_Sodium")
+            'bsElectrodeKCheck.Text = GetText("LBL_Potassium")
+            'bsElectrodeClCheck.Text = GetText("LBL_Chlorine")
+            'bsElectrodeLiCheck.Text = GetText("LBL_Lithium")
+
+            'bsLegend.Text = GetText("LBL_Legend")
+            'bsElectrodeNaLabel.Text = GetText("LBL_Sodium")
+            'bsElectrodeKLabel.Text = GetText("LBL_Potassium")
+            'bsElectrodeClLabel.Text = GetText("LBL_Chlorine")
+            'bsElectrodeLiLabel.Text = GetText("LBL_Lithium")
+
+            Dim ISETestList As New ISETestsDelegate
+            bsElectrodeNaCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Na)
+            bsElectrodeKCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.K)
+            bsElectrodeClCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+            bsElectrodeLiCheck.Text = ISETestList.GetName(Nothing, ISE_Tests.Li)
 
             bsLegend.Text = GetText("LBL_Legend")
-            bsElectrodeNaLabel.Text = GetText("LBL_Sodium")
-            bsElectrodeKLabel.Text = GetText("LBL_Potassium")
-            bsElectrodeClLabel.Text = GetText("LBL_Chlorine")
-            bsElectrodeLiLabel.Text = GetText("LBL_Lithium")
-
+            bsElectrodeNaLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.Na)
+            bsElectrodeKLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.K)
+            bsElectrodeClLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+            bsElectrodeLiLabel.Text = ISETestList.GetName(Nothing, ISE_Tests.Li)
+            ' XB 05/09/2014 - BA-1902
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -272,7 +286,8 @@ Public Class IISEResultsHistoryGraph
     ''' <param name="pGraph"></param>
     ''' <param name="pData"></param>
     ''' <remarks>
-    ''' Created by: JB 31/07/2012
+    ''' Created by:  JB 31/07/2012
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
     ''' </remarks>
     Private Sub SetDataToGraph(ByVal pGraph As ChartControl, ByVal pData As DataTable)
         Try
@@ -292,29 +307,58 @@ Public Class IISEResultsHistoryGraph
             Dim rows = From r In pData Order By CDate(r("CalibrationDate")) Ascending
 
             For Each row As DataRow In rows 'pData.Rows
+
+                ' XB 05/09/2014 - BA-1902
+                'Na+
+                'pGraph.Series("MeanNa").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanNa")))
+                'pGraph.Series("MeanNa").Points(pGraph.Series("MeanNa").Points.Count - 1).Tag = GetText("LBL_Sodium") & ": " & _
+                '                                                                               row("ResultsNa").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                               CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                ''K+
+                'pGraph.Series("MeanK").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanK")))
+                'pGraph.Series("MeanK").Points(pGraph.Series("MeanK").Points.Count - 1).Tag = GetText("LBL_Potassium") & ": " & _
+                '                                                                             row("ResultsK").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                             CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                ''Cl-
+                'pGraph.Series("MeanCl").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanCl")))
+                'pGraph.Series("MeanCl").Points(pGraph.Series("MeanCl").Points.Count - 1).Tag = GetText("LBL_Chlorine") & ": " & _
+                '                                                                               row("ResultsCl").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                               CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                ''Li+
+                'pGraph.Series("MeanLi").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanLi")))
+                'pGraph.Series("MeanLi").Points(pGraph.Series("MeanLi").Points.Count - 1).Tag = GetText("LBL_Lithium") & ": " & _
+                '                                                                               row("ResultsLi").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
+                '                                                                               CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+
+                Dim ISETestList As New ISETestsDelegate
                 'Na+
                 pGraph.Series("MeanNa").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanNa")))
-                pGraph.Series("MeanNa").Points(pGraph.Series("MeanNa").Points.Count - 1).Tag = GetText("LBL_Sodium") & ": " & _
+                pGraph.Series("MeanNa").Points(pGraph.Series("MeanNa").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.Na) & ": " & _
                                                                                                row("ResultsNa").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                                CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
 
                 'K+
                 pGraph.Series("MeanK").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanK")))
-                pGraph.Series("MeanK").Points(pGraph.Series("MeanK").Points.Count - 1).Tag = GetText("LBL_Potassium") & ": " & _
+                pGraph.Series("MeanK").Points(pGraph.Series("MeanK").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.K) & ": " & _
                                                                                              row("ResultsK").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                              CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
 
                 'Cl-
                 pGraph.Series("MeanCl").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanCl")))
-                pGraph.Series("MeanCl").Points(pGraph.Series("MeanCl").Points.Count - 1).Tag = GetText("LBL_Chlorine") & ": " & _
+                pGraph.Series("MeanCl").Points(pGraph.Series("MeanCl").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.Cl) & ": " & _
                                                                                                row("ResultsCl").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                                CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
 
                 'Li+
                 pGraph.Series("MeanLi").Points.Add(New SeriesPoint(CDate(row("CalibrationDate")), row("MeanLi")))
-                pGraph.Series("MeanLi").Points(pGraph.Series("MeanLi").Points.Count - 1).Tag = GetText("LBL_Lithium") & ": " & _
+                pGraph.Series("MeanLi").Points(pGraph.Series("MeanLi").Points.Count - 1).Tag = ISETestList.GetName(Nothing, ISE_Tests.Li) & ": " & _
                                                                                                row("ResultsLi").ToString.Replace(vbCrLf, "; ") & vbCrLf & _
                                                                                                CDate(row("CalibrationDate")).ToString(myCultureInfo.DateTimeFormat.ShortDatePattern)
+                ' XB 05/09/2014 - BA-1902
+
             Next
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDataToGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

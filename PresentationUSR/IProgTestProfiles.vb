@@ -47,6 +47,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = False
 
             'Area of Test Profile Definition
@@ -273,6 +274,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = False
 
             'Area of Test Profile Definition
@@ -462,6 +464,8 @@ Public Class IProgTestProfiles
             bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            'bsScreenToolTips.SetToolTip(BsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID)) 'AG 05/09/2014 - BA-1869
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -527,6 +531,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = False
 
             'Area of Test Profile Definition
@@ -1002,6 +1007,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = True
 
             'Area of Test Profile Definition
@@ -1145,6 +1151,12 @@ Public Class IProgTestProfiles
                 bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
             End If
 
+            'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
+            'auxIconName = GetIconName("CUSTOMSORT")
+            'If (auxIconName <> "") Then
+            '    BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+            'End If
+
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
@@ -1249,6 +1261,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = True
             bsDeleteButton.Enabled = True
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = True
 
             'Area of Test Profile Definition
@@ -1351,6 +1364,7 @@ Public Class IProgTestProfiles
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             bsPrintButton.Enabled = True
 
             'Area of Test Profile Definition
@@ -1685,6 +1699,7 @@ Public Class IProgTestProfiles
                 Next mySelectedItem
                 MultiSelect()
                 bsEditButton.Enabled = False
+                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                 bsDeleteButton.Enabled = bEnabled
             End If
 
@@ -1777,6 +1792,7 @@ Public Class IProgTestProfiles
                     MultiSelect()
 
                     bsEditButton.Enabled = False
+                    BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                     bsDeleteButton.Enabled = bEnabled
                 End If
             End If
@@ -1975,6 +1991,28 @@ Public Class IProgTestProfiles
             ShowMessage(Name & ".ExitButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Open the customize order and availability for profiles tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "PROFILE"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
 
 End Class

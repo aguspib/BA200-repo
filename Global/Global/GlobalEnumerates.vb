@@ -2844,6 +2844,16 @@ Namespace Biosystems.Ax00.Global
 
 #End Region
 
+#Region "Tests"
+        ' XB 05/09/2014 - BA-1902
+        Public Enum ISE_Tests
+            Na = 1
+            K = 2
+            Cl = 3
+            Li = 4
+        End Enum
+#End Region
+
 #End Region
 
 #Region "SERVICE SOFTWARE"

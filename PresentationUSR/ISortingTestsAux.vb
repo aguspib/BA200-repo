@@ -1011,81 +1011,67 @@ Public Class ISortingTestsAux
         Try
             Dim dgv As BSDataGridView = pGridView
 
-            'Index Offset where the new row will be inserted
-            Dim myIndexOffset As Integer = -1
-            If (Not pMoveUp) Then myIndexOffset = 2
-
             'Get the list of selected positions (indexes)
             Dim selectedIndexesList As New List(Of Integer)
+
             For Each selectedRow As DataGridViewRow In dgv.SelectedRows
                 If Not selectedIndexesList.Contains(selectedRow.Index) Then
                     selectedIndexesList.Add(selectedRow.Index)
                 End If
             Next
+
             'Sort the indexed
             selectedIndexesList.Sort() 'Increasing
             If Not pMoveUp Then
                 selectedIndexesList.Reverse() 'Sort decreasing 
             End If
 
-            'Insert rows to copy the selected items
-            Dim loopItera As Integer = 0
-            Dim NewPos As Integer = 0
+            Dim myOffset As Integer = 0
+            Dim tmpValue As Object
             For Each item As Integer In selectedIndexesList
-                NewPos = item + loopItera + myIndexOffset
+                If pMoveUp Then
+                    myOffset = -1
 
-                If NewPos < 0 Then NewPos = 0
-                If NewPos > dgv.Rows.Count - 1 Then
-                    dgv.Rows.Add()
-                    NewPos = dgv.Rows.Count - 1
-                Else
-                    dgv.Rows.Insert(NewPos, 1)
-                End If
+                    'Do nothing if item already on top
+                    If item > 0 Then
+                        'If previous row selected to nothing, else change values between rows
+                        If Not dgv.Rows(item + myOffset).Selected Then
+                            For i As Integer = 0 To dgv.Columns.Count - 1
+                                tmpValue = dgv(i, item + myOffset).Value
+                                dgv(i, item + myOffset).Value = dgv(i, item).Value
+                                dgv(i, item).Value = tmpValue
+                            Next
 
-                'Copy column values
-                For i As Integer = 0 To dgv.Columns.Count - 1
-                    If pMoveUp Then
-                        dgv(i, NewPos).Value = dgv(i, item + loopItera + 1).Value 'Add 1 because new row has been added
-                    Else
-                        dgv(i, NewPos).Value = dgv(i, item).Value
+                            'Keep the selected items in new positions
+                            dgv.Rows(item + myOffset).Selected = True
+                            dgv.Rows(item).Selected = False
+                        End If
                     End If
-                Next
-                loopItera += 1
+
+                Else 'Move down
+                    myOffset = 1
+
+                    'Do nothing if item already on bottom
+                    If item < dgv.Rows.Count - 1 Then
+                        'If next row selected to nothing, else change values between rows
+                        If Not dgv.Rows(item + myOffset).Selected Then
+                            For i As Integer = 0 To dgv.Columns.Count - 1
+                                tmpValue = dgv(i, item + myOffset).Value
+                                dgv(i, item + myOffset).Value = dgv(i, item).Value
+                                dgv(i, item).Value = tmpValue
+                            Next
+
+                            'Keep the selected items in new positions
+                            dgv.Rows(item + myOffset).Selected = True
+                            dgv.Rows(item).Selected = False
+                        End If
+
+                    End If
+                End If
             Next
 
-            'Delete the selected rows that have been moved
-            For Each selectedTestItem As DataGridViewRow In dgv.SelectedRows
-                If dgv.Rows.Count > 1 Then
-                    dgv.Rows.Remove(selectedTestItem)
-                Else
-                    dgv.Rows.Clear()
-                End If
-            Next
-
-            'Keep the selected items in new positions
-            dgv.ClearSelection()
-            If pMoveUp Then
-                For Each index As Integer In selectedIndexesList
-                    'Original indexes -1 are the selected now
-                    If index - 1 >= 0 Then
-                        dgv.Rows(index - 1).Selected = True
-                    Else
-                        dgv.Rows(0).Selected = True
-                    End If
-                Next
-            Else
-                For Each index As Integer In selectedIndexesList
-                    If index + 1 <= dgv.Rows.Count - 1 Then
-                        dgv.Rows(index + 1).Selected = True
-                    Else
-                        dgv.Rows(dgv.Rows.Count - 1).Selected = True
-                    End If
-                Next
-            End If
             selectedIndexesList = Nothing
-
             ChangesMade = True 'TR 13/02/2012 -Set ChangesMade value True 
-
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".MoveItemsInListInGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
