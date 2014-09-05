@@ -69,6 +69,8 @@ Public Class ISortingTestsAux
     '''    ** Calculated Tests sorted by Calculated Test Name
     '''    ** ISE Tests sorted by ISETestID
     '''    ** OffSystem Tests sorted by OFFSTestID
+    ''' 
+    ''' In mode test selection order all tests become Available too
     ''' </summary>
     ''' <remarks>
     ''' Created by: TR
@@ -146,6 +148,11 @@ Public Class ISortingTestsAux
                 End Select
                 If Not myReportsTestsSortingList Is Nothing Then
                     For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In myReportsTestsSortingList
+                        If Not testRow.Available Then
+                            testRow.BeginEdit()
+                            testRow.Available = True
+                            testRow.EndEdit()
+                        End If
                         myDefaultSortedTestDS.tcfgReportsTestsSorting.ImportRow(testRow)
                     Next
                 End If
@@ -609,8 +616,16 @@ Public Class ISortingTestsAux
                     Me.Close()
                 Else
                     'Normal button click
-                    'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+
+                    'AG 04/09/2014 - BA-1869 Mode: order for test report >> opens monitor // Mode: order for test selection >> closes himself
+                    'IAx00MainMDI.OpenMonitorForm(Me)
+                    If openModeAttribute = String.Empty Then
+                        'Open the WS Monitor form and close this one
+                        IAx00MainMDI.OpenMonitorForm(Me)
+                    Else
+                        Me.Close()
+                    End If
+                    'AG 04/09/2014 - BA-1869
                 End If
             End If
             'TR 14/02/2012 -END.
@@ -643,40 +658,42 @@ Public Class ISortingTestsAux
     ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
     Private Sub bsTestListGrid_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles bsTestListGrid.CellMouseClick
         Try
-            If e.RowIndex >= 0 Then
-                'Click on item
-                If bsTestListGrid.Columns(e.ColumnIndex).Name.ToString = "Available" Then
-                    Dim dgv As BSDataGridView = bsTestListGrid
-                    Dim myField As String = dgv.Columns(e.ColumnIndex).Name
-                    dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) 'Assign new value = Not current
+            If openModeAttribute <> String.Empty Then
+                If e.RowIndex >= 0 Then
+                    'Click on item
+                    If bsTestListGrid.Columns(e.ColumnIndex).Name.ToString = "Available" Then
+                        Dim dgv As BSDataGridView = bsTestListGrid
+                        Dim myField As String = dgv.Columns(e.ColumnIndex).Name
+                        dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) 'Assign new value = Not current
 
-                End If
-            Else
-                'Click on header
-                If bsTestListGrid.Columns(e.ColumnIndex).Name.ToString = "Available" Then
-                    Dim dgv As BSDataGridView = bsTestListGrid
-
-                    'Some not available new value = avaliable ALL // all available new value = available NONE
-                    Dim disabledRows As List(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
-                                                Where a.Cells("Available").Value = False Select a).ToList
-
-
-                    If disabledRows.Count > 0 Then
-                        'Some disable ... set all available
-                        For Each row As DataGridViewRow In disabledRows
-                            row.Cells("Available").Value = True
-                        Next
-
-                    Else
-                        'All enable ... set disable
-                        For Each row As DataGridViewRow In dgv.Rows
-                            If row.Cells("Available").Value Then
-                                row.Cells("Available").Value = False
-                            End If
-                        Next
                     End If
-                    disabledRows = Nothing
+                Else
+                    'Click on header
+                    If bsTestListGrid.Columns(e.ColumnIndex).Name.ToString = "Available" Then
+                        Dim dgv As BSDataGridView = bsTestListGrid
 
+                        'Some not available new value = avaliable ALL // all available new value = available NONE
+                        Dim disabledRows As List(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
+                                                    Where a.Cells("Available").Value = False Select a).ToList
+
+
+                        If disabledRows.Count > 0 Then
+                            'Some disable ... set all available
+                            For Each row As DataGridViewRow In disabledRows
+                                row.Cells("Available").Value = True
+                            Next
+
+                        Else
+                            'All enable ... set disable
+                            For Each row As DataGridViewRow In dgv.Rows
+                                If row.Cells("Available").Value Then
+                                    row.Cells("Available").Value = False
+                                End If
+                            Next
+                        End If
+                        disabledRows = Nothing
+
+                    End If
                 End If
             End If
 
@@ -695,19 +712,21 @@ Public Class ISortingTestsAux
     ''' <remarks>Created AG 04/09/2014 - BA-1869</remarks>
     Private Sub bsTestListGrid_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles bsTestListGrid.CellPainting
 
-        If e.RowIndex = -1 Then
-            Dim AvailableIndex As Integer = bsTestListGrid.Columns("Available").Index
+        If openModeAttribute <> String.Empty Then
+            If e.RowIndex = -1 Then
+                Dim AvailableIndex As Integer = bsTestListGrid.Columns("Available").Index
 
 
-            If e.ColumnIndex = AvailableIndex Then
-                HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                         e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
-                                         HeadImageSide, HeadImageSide)
+                If e.ColumnIndex = AvailableIndex Then
+                    HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
+                                             e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
+                                             HeadImageSide, HeadImageSide)
 
-                e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
+                    e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
 
-                e.Graphics.DrawImage(checkImage, HeadRect)
-                e.Handled = True
+                    e.Graphics.DrawImage(checkImage, HeadRect)
+                    e.Handled = True
+                End If
             End If
         End If
     End Sub
