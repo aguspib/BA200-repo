@@ -77,6 +77,13 @@ Public Class TestISEMonitor
     End Sub
 
   
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pLanguageID"></param>
+    ''' <remarks>
+    ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table  instead of a multilanguage label - BA-1902
+    ''' </remarks>
     Private Sub GetISEMonitorLabels(ByVal pLanguageID As String)
 
         Dim myGlobal As New GlobalDataTO
@@ -106,10 +113,18 @@ Public Class TestISEMonitor
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_InstallDate, MLRD.GetResourceText(dbConnection, "LBL_InstallDate", pLanguageID))
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_TestsCompleted, MLRD.GetResourceText(dbConnection, "LBL_TestsCompleted", pLanguageID))
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Reference, MLRD.GetResourceText(dbConnection, "LBL_Reference", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Sodium, MLRD.GetResourceText(dbConnection, "LBL_Sodium", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Potassium, MLRD.GetResourceText(dbConnection, "LBL_Potassium", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Chlorine, MLRD.GetResourceText(dbConnection, "LBL_Chlorine", pLanguageID))
-                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Lithium, MLRD.GetResourceText(dbConnection, "LBL_Lithium", pLanguageID))
+
+                ' XB 05/09/2014 - BA-1902
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Sodium, MLRD.GetResourceText(dbConnection, "LBL_Sodium", pLanguageID))
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Potassium, MLRD.GetResourceText(dbConnection, "LBL_Potassium", pLanguageID))
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Chlorine, MLRD.GetResourceText(dbConnection, "LBL_Chlorine", pLanguageID))
+                'myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Lithium, MLRD.GetResourceText(dbConnection, "LBL_Lithium", pLanguageID))
+                Dim ISETestList As New ISETestsDelegate
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Sodium, ISETestList.GetName(dbConnection, ISE_Tests.Na)) ' ID sodium = 1
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Potassium, ISETestList.GetName(dbConnection, ISE_Tests.K)) ' ID potassium = 2
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Chlorine, ISETestList.GetName(dbConnection, ISE_Tests.Cl)) ' ID chlorine = 3
+                myLabelsData.Add(BSISEMonitorPanel.LabelElements.EL_Lithium, ISETestList.GetName(dbConnection, ISE_Tests.Li)) ' ID lithium = 4
+                ' XB 05/09/2014 - BA-1902
 
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.CAL_Title, MLRD.GetResourceText(dbConnection, "LBL_ISE_LastCalibrations", pLanguageID))
                 myLabelsData.Add(BSISEMonitorPanel.LabelElements.CAL_LastDate, MLRD.GetResourceText(dbConnection, "LBL_LastDate", pLanguageID))
