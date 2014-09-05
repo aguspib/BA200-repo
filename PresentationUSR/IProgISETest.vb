@@ -440,6 +440,7 @@ Public Class IProgISETest
         Try
             'Area of ISE Test List
             bsEditButton.Enabled = False
+            bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
 
             ' WE 29/07/2014 - #1865 
             bsFullNameTextbox.Enabled = True
@@ -741,6 +742,7 @@ Public Class IProgISETest
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage)) 'AG 05/09/2014 - BA-1869
 
             ' WE 01/08/2014 - #1865
             ' Details tab
@@ -873,7 +875,8 @@ Public Class IProgISETest
                 End If
 
                 bsEditButton.Enabled = False
-                '                bsPrintButton.Enabled = False dl 11/05/2012
+                bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                'bsPrintButton.Enabled = False dl 11/05/2012
             End If
 
             'Area of ISE Test Definition
@@ -1275,6 +1278,10 @@ Public Class IProgISETest
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
 
+            'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
+            'auxIconName = GetIconName("CUSTOMSORT")
+            'If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName, True)
+
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
@@ -1425,7 +1432,8 @@ Public Class IProgISETest
     Private Sub QueryModeScreenStatus()
         Try
             bsEditButton.Enabled = True
-            '            bsPrintButton.Enabled = True dl 11/05/2012
+            bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+            'bsPrintButton.Enabled = True dl 11/05/2012
 
             bsFullNameTextbox.Enabled = False
             bsFullNameTextbox.BackColor = SystemColors.MenuBar
@@ -1488,6 +1496,8 @@ Public Class IProgISETest
 
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
+            bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2030,7 +2040,8 @@ Public Class IProgISETest
 
                 Case "OPERATOR"
                     bsEditButton.Enabled = False
-                    '                    bsPrintButton.Enabled = False dl 11/05/2012
+                    bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                    'bsPrintButton.Enabled = False dl 11/05/2012
                     Exit Select
             End Select
 
@@ -4307,6 +4318,7 @@ Public Class IProgISETest
             Else
                 InitialModeScreenStatus(False)
                 bsEditButton.Enabled = False
+                bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
@@ -4510,7 +4522,27 @@ Public Class IProgISETest
         '// si después del mensaje quieres dejar la celda en su estado original
         '// realizas la siguiente asignación
         e.Cancel = False
+    End Sub
 
+    ''' <summary>
+    ''' Open the customize order and availability for OFFS tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles bsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "ISE"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
 #End Region
 

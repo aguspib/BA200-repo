@@ -112,7 +112,7 @@ Partial Class IProgCalculatedTest
         Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 17
+        Me.bsPrintButton.TabIndex = 18
         Me.bsPrintButton.UseVisualStyleBackColor = True
         Me.bsPrintButton.Visible = False
         '
@@ -477,7 +477,7 @@ Partial Class IProgCalculatedTest
         Me.BsCustomOrderButton.Location = New System.Drawing.Point(175, 613)
         Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
         Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
-        Me.BsCustomOrderButton.TabIndex = 40
+        Me.BsCustomOrderButton.TabIndex = 17
         Me.BsCustomOrderButton.UseVisualStyleBackColor = True
         '
         'IProgCalculatedTest

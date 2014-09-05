@@ -108,6 +108,7 @@ Partial Class IProgISETest
         Me.bsFullNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.bsFullNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SlopeAUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SlopeBUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -319,14 +320,14 @@ Partial Class IProgISETest
         Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 3
+        Me.bsPrintButton.TabIndex = 4
         Me.bsPrintButton.UseVisualStyleBackColor = True
         Me.bsPrintButton.Visible = False
         '
         'bsEditButton
         '
         Me.bsEditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsEditButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsEditButton.Location = New System.Drawing.Point(138, 613)
         Me.bsEditButton.Name = "bsEditButton"
         Me.bsEditButton.Size = New System.Drawing.Size(32, 32)
         Me.bsEditButton.TabIndex = 2
@@ -1164,6 +1165,15 @@ Partial Class IProgISETest
         Me.BsErrorProvider1.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink
         Me.BsErrorProvider1.ContainerControl = Me
         '
+        'bsCustomOrderButton
+        '
+        Me.bsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsCustomOrderButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsCustomOrderButton.Name = "bsCustomOrderButton"
+        Me.bsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.bsCustomOrderButton.TabIndex = 3
+        Me.bsCustomOrderButton.UseVisualStyleBackColor = True
+        '
         'IProgISETest
         '
         Me.AcceptButton = Me.bsExitButton
@@ -1175,6 +1185,7 @@ Partial Class IProgISETest
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.bsCustomOrderButton)
         Me.Controls.Add(Me.bsISETestsListGroupBox)
         Me.Controls.Add(Me.bsExitButton)
         Me.Controls.Add(Me.bsPrintButton)
@@ -1306,4 +1317,5 @@ Partial Class IProgISETest
     Friend WithEvents Separa2 As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsReferenceRangesLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents ReferenceRangesLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class
