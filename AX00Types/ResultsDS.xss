@@ -10,7 +10,7 @@
     <Shape ID="DesignTable:vwksResults" ZOrder="10" X="214" Y="33" Height="1682" Width="155" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="1678" />
     <Shape ID="DesignTable:vwksResultsAlarms" ZOrder="9" X="420" Y="34" Height="143" Width="176" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
     <Shape ID="DesignTable:XtraSamples" ZOrder="8" X="422" Y="202" Height="543" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="539" />
-    <Shape ID="DesignTable:ReportSampleMaster" ZOrder="1" X="635" Y="37" Height="181" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="177" />
+    <Shape ID="DesignTable:ReportSampleMaster" ZOrder="1" X="635" Y="37" Height="220" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="216" />
     <Shape ID="DesignTable:ReportSampleDetails" ZOrder="2" X="640" Y="298" Height="219" Width="188" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="215" />
     <Shape ID="DesignTable:ReportTestMaster" ZOrder="6" X="832" Y="39" Height="67" Width="170" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="63" />
     <Shape ID="DesignTable:ReportTestDetails" ZOrder="5" X="836" Y="173" Height="219" Width="169" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="215" />
@@ -33,7 +33,7 @@
       <RoutePoints>
         <Point>
           <X>725</X>
-          <Y>218</Y>
+          <Y>257</Y>
         </Point>
         <Point>
           <X>725</X>

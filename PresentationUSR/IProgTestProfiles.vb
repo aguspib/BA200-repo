@@ -1152,10 +1152,10 @@ Public Class IProgTestProfiles
             End If
 
             'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
-            'auxIconName = GetIconName("CUSTOMSORT")
-            'If (auxIconName <> "") Then
-            '    BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
-            'End If
+            auxIconName = GetIconName("ADJUSTMENT")
+            If (auxIconName <> "") Then
+                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+            End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")

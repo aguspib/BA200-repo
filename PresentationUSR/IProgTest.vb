@@ -1958,7 +1958,7 @@ Public Class IProgTest
                 EditButton.Enabled = False
                 'TR 29/03/2012
                 CopyTestButton.Enabled = False
-                BsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                 EditButton.Enabled = False
                 'TR 29/03/2012 -END
 
@@ -8896,10 +8896,10 @@ Public Class IProgTest
             'TR 09/01/2012 -END.
 
             'AG 05/09/2014 - BA-1869
-            'auxIconName = GetIconName("CUSTOMSORT")
-            'If (auxIconName <> "") Then
-            '    BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
-            'End If
+            auxIconName = GetIconName("ADJUSTMENT")
+            If (auxIconName <> "") Then
+                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+            End If
 
             'SAVE SaveButton
             auxIconName = GetIconName("SAVE")
@@ -13572,7 +13572,7 @@ Public Class IProgTest
         End Try
     End Sub
 
-    Private Sub CopyTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyTestButton.Click
+    Private Sub CopyTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Try
             'Block all Controls and enable only the Name and Short Name.
             EnableDisableControls(TestDetailsTabs.Controls, False)

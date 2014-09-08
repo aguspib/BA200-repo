@@ -3973,6 +3973,8 @@ Partial Public Class ResultsDS
         
         Private columnComments As Global.System.Data.DataColumn
         
+        Private columnReportDate As Global.System.Data.DataColumn
+        
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub New()
@@ -4073,6 +4075,14 @@ Partial Public Class ResultsDS
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public ReadOnly Property ReportDateColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnReportDate
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"),  _
          Global.System.ComponentModel.Browsable(false)>  _
         Public ReadOnly Property Count() As Integer
@@ -4109,9 +4119,9 @@ Partial Public Class ResultsDS
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
-        Public Overloads Function AddReportSampleMasterRow(ByVal PatientID As String, ByVal FullID As String, ByVal FullName As String, ByVal Gender As String, ByVal FormatedDateOfBirth As String, ByVal AgeWithUnit As String, ByVal PerformedBy As String, ByVal Comments As String) As ReportSampleMasterRow
+        Public Overloads Function AddReportSampleMasterRow(ByVal PatientID As String, ByVal FullID As String, ByVal FullName As String, ByVal Gender As String, ByVal FormatedDateOfBirth As String, ByVal AgeWithUnit As String, ByVal PerformedBy As String, ByVal Comments As String, ByVal ReportDate As Date) As ReportSampleMasterRow
             Dim rowReportSampleMasterRow As ReportSampleMasterRow = CType(Me.NewRow,ReportSampleMasterRow)
-            Dim columnValuesArray() As Object = New Object() {PatientID, FullID, FullName, Gender, FormatedDateOfBirth, AgeWithUnit, PerformedBy, Comments}
+            Dim columnValuesArray() As Object = New Object() {PatientID, FullID, FullName, Gender, FormatedDateOfBirth, AgeWithUnit, PerformedBy, Comments, ReportDate}
             rowReportSampleMasterRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowReportSampleMasterRow)
             Return rowReportSampleMasterRow
@@ -4142,6 +4152,7 @@ Partial Public Class ResultsDS
             Me.columnAgeWithUnit = MyBase.Columns("AgeWithUnit")
             Me.columnPerformedBy = MyBase.Columns("PerformedBy")
             Me.columnComments = MyBase.Columns("Comments")
+            Me.columnReportDate = MyBase.Columns("ReportDate")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -4163,6 +4174,8 @@ Partial Public Class ResultsDS
             MyBase.Columns.Add(Me.columnPerformedBy)
             Me.columnComments = New Global.System.Data.DataColumn("Comments", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnComments)
+            Me.columnReportDate = New Global.System.Data.DataColumn("ReportDate", GetType(Date), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnReportDate)
             Me.columnFullName.Caption = "FirstName"
             Me.columnAgeWithUnit.DefaultValue = CType("",String)
         End Sub
@@ -10634,6 +10647,21 @@ Partial Public Class ResultsDS
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Property ReportDate() As Date
+            Get
+                Try 
+                    Return CType(Me(Me.tableReportSampleMaster.ReportDateColumn),Date)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'ReportDate' in table 'ReportSampleMaster' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tableReportSampleMaster.ReportDateColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Function IsPatientIDNull() As Boolean
             Return Me.IsNull(Me.tableReportSampleMaster.PatientIDColumn)
         End Function
@@ -10726,6 +10754,18 @@ Partial Public Class ResultsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
         Public Sub SetCommentsNull()
             Me(Me.tableReportSampleMaster.CommentsColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Function IsReportDateNull() As Boolean
+            Return Me.IsNull(Me.tableReportSampleMaster.ReportDateColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")>  _
+        Public Sub SetReportDateNull()
+            Me(Me.tableReportSampleMaster.ReportDateColumn) = Global.System.Convert.DBNull
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
