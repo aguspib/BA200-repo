@@ -1554,6 +1554,7 @@ Public Class IResults
             'TR 04/08/2011 -END.
 
             Dim myExport As New ExportDelegate
+            'resultData = myExport.ExportToLISManual(AnalyzerIDField, WorkSessionIDField)
 
             'AG 29/07/2014 - #1887 - Re-send results
             'Export by Patient view uses the OrderToExport field

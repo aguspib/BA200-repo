@@ -78,7 +78,8 @@ Public Class XRManager
                     Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
                     Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
                     'EF 04/06/2014 END
-
+                    'Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Patients_PerformedBy", CurrentLanguage) & ":"   'EF 29/07/2014 #1893 (labels for titles)
+                    Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage) & ":"   'EF 31/07/2014 #1893 (labels for titles)
 
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
@@ -916,6 +917,10 @@ Public Class XRManager
                     Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
                     Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
                     'EF 05/06/2014 END
+                    'Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Patients_PerformedBy", CurrentLanguage) & ":"   'EF 29/07/2014 #1893 (labels for titles)
+                    Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage) & ":"   'EF 31/07/2014 #1893 (labels for titles)
+
+
 
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
@@ -938,8 +943,8 @@ Public Class XRManager
                     '    End If
                     'End If
 
-                    ' EF 03/06/2014 En el informe de Resultados Historicos de Paciente puede haber resultados de varias sesiones (lo ideal es mostrar el rango de fechas OlderWSDate - NewerWSDate) 
-                    ' Report.XrWSStartDateTimeLabel.Text = Now.ToShortDateString & " " & Now.ToShortTimeString  '"01/10/2012" 'WSStartDateTime
+                    ' IV 29/07/2014 #1893 En el informe de Resultados Historicos de Paciente puede haber resultados de varias sesiones (lo ideal es mostrar la fecha de resultado más reciente: NewerWSDate) 
+                    'Report.XrWSStartDateTimeLabel.Text = Now.ToShortDateString & " " & Now.ToShortTimeString  '"01/10/2012" 'WSStartDateTime
 
                     Report.DataSource = ResultsData
                     ShowPortrait(Report)
@@ -1059,6 +1064,9 @@ Public Class XRManager
                     Report.XrLabel_DateBirth.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateOfBirth", CurrentLanguage) & ":"
                     Report.XrLabel_Age.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", CurrentLanguage) & ":"
                     'EF 05/06/2014 END
+                    'Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Patients_PerformedBy", CurrentLanguage) & ":"   'EF 29/07/2014 #1893 (labels for titles)
+                    Report.XrLabel_PerformedBy.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage) & ":"   'EF 31/07/2014 #1893 (labels for titles)
+
                     Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", CurrentLanguage)
                     Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
                     Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)
