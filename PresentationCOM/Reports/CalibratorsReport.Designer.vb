@@ -19,45 +19,45 @@ Partial Public Class CalibratorsReport
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.Detail = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrPanel2 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelConc = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelNum = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelYAxis = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelXAxis = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCurveType = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelSampleType = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelTest = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrPanel1 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrLabelExpirationDateValue = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabel12 = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabel11 = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelExpirationDate = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCalibratorsNum = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelLotNumber = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCalibName = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelName = New DevExpress.XtraReports.UI.XRLabel
-        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand
-        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand
-        Me.XrControlStyle1 = New DevExpress.XtraReports.UI.XRControlStyle
-        Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel
-        Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand
-        Me.CalibratorsDS1 = New Biosystems.Ax00.Types.CalibratorsDS
-        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand
-        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrTableDetails = New DevExpress.XtraReports.UI.XRTable
-        Me.XrTableRowDetails = New DevExpress.XtraReports.UI.XRTableRow
-        Me.XrTableCellTest = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellSampleType = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellNo = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCell4 = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellMeasureUnit = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellCurveType1 = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellCurveType2 = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellXAxis = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrTableCellYAxis = New DevExpress.XtraReports.UI.XRTableCell
-        Me.GroupHeader2 = New DevExpress.XtraReports.UI.GroupHeaderBand
+        Me.Detail = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrPanel2 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelConc = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelNum = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelYAxis = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelXAxis = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCurveType = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelSampleType = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelTest = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrPanel1 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrLabelExpirationDateValue = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabel12 = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabel11 = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelExpirationDate = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCalibratorsNum = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelLotNumber = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCalibName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand()
+        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
+        Me.XrControlStyle1 = New DevExpress.XtraReports.UI.XRControlStyle()
+        Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
+        Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand()
+        Me.CalibratorsDS1 = New Biosystems.Ax00.Types.CalibratorsDS()
+        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
+        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrTableDetails = New DevExpress.XtraReports.UI.XRTable()
+        Me.XrTableRowDetails = New DevExpress.XtraReports.UI.XRTableRow()
+        Me.XrTableCellTest = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellSampleType = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellNo = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCell4 = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellMeasureUnit = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellCurveType1 = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellCurveType2 = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellXAxis = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrTableCellYAxis = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.GroupHeader2 = New DevExpress.XtraReports.UI.GroupHeaderBand()
         CType(Me.CalibratorsDS1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XrTableDetails, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -77,9 +77,9 @@ Partial Public Class CalibratorsReport
         Me.XrPanel2.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
         Me.XrPanel2.BorderWidth = 2
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelUnit, Me.XrLabelConc, Me.XrLabelNum, Me.XrLabelYAxis, Me.XrLabelXAxis, Me.XrLabelCurveType, Me.XrLabelSampleType, Me.XrLabelTest})
-        Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(10.0!, 76.0!)
+        Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 75.99999!)
         Me.XrPanel2.Name = "XrPanel2"
-        Me.XrPanel2.SizeF = New System.Drawing.SizeF(630.0!, 23.12501!)
+        Me.XrPanel2.SizeF = New System.Drawing.SizeF(650.0!, 23.125!)
         Me.XrPanel2.StylePriority.UseBorders = False
         Me.XrPanel2.StylePriority.UseBorderWidth = False
         '
@@ -90,7 +90,7 @@ Partial Public Class CalibratorsReport
         Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(344.6249!, 0.0!)
         Me.XrLabelUnit.Name = "XrLabelUnit"
         Me.XrLabelUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
-        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(54.16666!, 19.99997!)
+        Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(67.0!, 19.99997!)
         Me.XrLabelUnit.StylePriority.UseBorders = False
         Me.XrLabelUnit.StylePriority.UseFont = False
         Me.XrLabelUnit.StylePriority.UsePadding = False
@@ -130,7 +130,7 @@ Partial Public Class CalibratorsReport
         '
         Me.XrLabelYAxis.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelYAxis.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelYAxis.LocationFloat = New DevExpress.Utils.PointFloat(584.0001!, 0.0!)
+        Me.XrLabelYAxis.LocationFloat = New DevExpress.Utils.PointFloat(594.0!, 0.0!)
         Me.XrLabelYAxis.Name = "XrLabelYAxis"
         Me.XrLabelYAxis.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
         Me.XrLabelYAxis.SizeF = New System.Drawing.SizeF(46.0!, 20.0!)
@@ -143,7 +143,7 @@ Partial Public Class CalibratorsReport
         '
         Me.XrLabelXAxis.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelXAxis.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelXAxis.LocationFloat = New DevExpress.Utils.PointFloat(536.0001!, 0.00003178914!)
+        Me.XrLabelXAxis.LocationFloat = New DevExpress.Utils.PointFloat(546.0001!, 0.0!)
         Me.XrLabelXAxis.Name = "XrLabelXAxis"
         Me.XrLabelXAxis.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
         Me.XrLabelXAxis.SizeF = New System.Drawing.SizeF(48.0!, 20.0!)
@@ -156,7 +156,7 @@ Partial Public Class CalibratorsReport
         '
         Me.XrLabelCurveType.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelCurveType.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelCurveType.LocationFloat = New DevExpress.Utils.PointFloat(418.1669!, 0.0!)
+        Me.XrLabelCurveType.LocationFloat = New DevExpress.Utils.PointFloat(429.6252!, 0.0!)
         Me.XrLabelCurveType.Name = "XrLabelCurveType"
         Me.XrLabelCurveType.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
         Me.XrLabelCurveType.SizeF = New System.Drawing.SizeF(100.0!, 20.00001!)
@@ -185,7 +185,7 @@ Partial Public Class CalibratorsReport
         Me.XrLabelTest.LocationFloat = New DevExpress.Utils.PointFloat(0.00000667572!, 0.0!)
         Me.XrLabelTest.Name = "XrLabelTest"
         Me.XrLabelTest.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 2, 2, 100.0!)
-        Me.XrLabelTest.SizeF = New System.Drawing.SizeF(140.0!, 20.00002!)
+        Me.XrLabelTest.SizeF = New System.Drawing.SizeF(139.0!, 20.0!)
         Me.XrLabelTest.StylePriority.UseBorders = False
         Me.XrLabelTest.StylePriority.UseFont = False
         Me.XrLabelTest.StylePriority.UsePadding = False
@@ -196,8 +196,8 @@ Partial Public Class CalibratorsReport
         Me.XrPanel1.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPanel1.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel1.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelExpirationDateValue, Me.XrLabel12, Me.XrLabel11, Me.XrLabelExpirationDate, Me.XrLabelCalibratorsNum, Me.XrLabelLotNumber, Me.XrLabelCalibName, Me.XrLabelName})
         Me.XrPanel1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 16.0!)
         Me.XrPanel1.Name = "XrPanel1"
@@ -332,8 +332,8 @@ Partial Public Class CalibratorsReport
         Me.XrHeaderLabel.BackColor = System.Drawing.Color.LightGray
         Me.XrHeaderLabel.BorderColor = System.Drawing.Color.DarkGray
         Me.XrHeaderLabel.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrHeaderLabel.Font = New System.Drawing.Font("Verdana", 11.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrHeaderLabel.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 6.0!)
         Me.XrHeaderLabel.Name = "XrHeaderLabel"
@@ -382,10 +382,10 @@ Partial Public Class CalibratorsReport
         '
         Me.XrTableDetails.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top
         Me.XrTableDetails.Borders = DevExpress.XtraPrinting.BorderSide.None
-        Me.XrTableDetails.LocationFloat = New DevExpress.Utils.PointFloat(10.0!, 0.0!)
+        Me.XrTableDetails.LocationFloat = New DevExpress.Utils.PointFloat(0.00003051758!, 0.0!)
         Me.XrTableDetails.Name = "XrTableDetails"
         Me.XrTableDetails.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRowDetails})
-        Me.XrTableDetails.SizeF = New System.Drawing.SizeF(630.0!, 22.0!)
+        Me.XrTableDetails.SizeF = New System.Drawing.SizeF(649.9999!, 22.0!)
         Me.XrTableDetails.StylePriority.UseBorders = False
         '
         'XrTableRowDetails
@@ -398,7 +398,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableRowDetails.StylePriority.UsePadding = False
         Me.XrTableRowDetails.StylePriority.UseTextAlignment = False
         Me.XrTableRowDetails.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableRowDetails.Weight = 1.1
+        Me.XrTableRowDetails.Weight = 1.1R
         '
         'XrTableCellTest
         '
@@ -407,7 +407,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellTest.Padding = New DevExpress.XtraPrinting.PaddingInfo(3, 0, 3, 0, 100.0!)
         Me.XrTableCellTest.StylePriority.UsePadding = False
         Me.XrTableCellTest.Text = "XrTableCellTest"
-        Me.XrTableCellTest.Weight = 0.66190476190476188
+        Me.XrTableCellTest.Weight = 0.66190469151451126R
         '
         'XrTableCellSampleType
         '
@@ -416,7 +416,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellSampleType.Padding = New DevExpress.XtraPrinting.PaddingInfo(3, 0, 3, 0, 100.0!)
         Me.XrTableCellSampleType.StylePriority.UsePadding = False
         Me.XrTableCellSampleType.Text = "XrTableCellSampleType"
-        Me.XrTableCellSampleType.Weight = 0.54285714285714293
+        Me.XrTableCellSampleType.Weight = 0.54583271557379442R
         '
         'XrTableCellNo
         '
@@ -427,7 +427,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellNo.StylePriority.UseTextAlignment = False
         Me.XrTableCellNo.Text = "XrTableCellNo"
         Me.XrTableCellNo.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrTableCellNo.Weight = 0.13333333333333336
+        Me.XrTableCellNo.Weight = 0.1333329700288492R
         '
         'XrTableCell4
         '
@@ -438,7 +438,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCell4.StylePriority.UseTextAlignment = False
         Me.XrTableCell4.Text = "XrTableCell4"
         Me.XrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrTableCell4.Weight = 0.30297575451078868
+        Me.XrTableCell4.Weight = 0.29781842937538472R
         '
         'XrTableCellMeasureUnit
         '
@@ -447,7 +447,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellMeasureUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(3, 0, 3, 0, 100.0!)
         Me.XrTableCellMeasureUnit.StylePriority.UsePadding = False
         Me.XrTableCellMeasureUnit.Text = "XrTableCellMeasureUnit"
-        Me.XrTableCellMeasureUnit.Weight = 0.25793645949590766
+        Me.XrTableCellMeasureUnit.Weight = 0.32380952066845131R
         '
         'XrTableCellCurveType1
         '
@@ -458,7 +458,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellCurveType1.StylePriority.UseTextAlignment = False
         Me.XrTableCellCurveType1.Text = "XrTableCellCurveType1"
         Me.XrTableCellCurveType1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrTableCellCurveType1.Weight = 0.30337350936163038
+        Me.XrTableCellCurveType1.Weight = 0.36170644027848103R
         '
         'XrTableCellCurveType2
         '
@@ -467,7 +467,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellCurveType2.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 0, 3, 0, 100.0!)
         Me.XrTableCellCurveType2.StylePriority.UsePadding = False
         Me.XrTableCellCurveType2.Text = "XrTableCellCurveType2"
-        Me.XrTableCellCurveType2.Weight = 0.35337365922473712
+        Me.XrTableCellCurveType2.Weight = 0.33353227528315277R
         '
         'XrTableCellXAxis
         '
@@ -476,7 +476,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellXAxis.Padding = New DevExpress.XtraPrinting.PaddingInfo(3, 0, 3, 0, 100.0!)
         Me.XrTableCellXAxis.StylePriority.UsePadding = False
         Me.XrTableCellXAxis.Text = "XrTableCellXAxis"
-        Me.XrTableCellXAxis.Weight = 0.21711262975420265
+        Me.XrTableCellXAxis.Weight = 0.21215237913623364R
         '
         'XrTableCellYAxis
         '
@@ -485,7 +485,7 @@ Partial Public Class CalibratorsReport
         Me.XrTableCellYAxis.Padding = New DevExpress.XtraPrinting.PaddingInfo(3, 0, 3, 0, 100.0!)
         Me.XrTableCellYAxis.StylePriority.UsePadding = False
         Me.XrTableCellYAxis.Text = "XrTableCellYAxis"
-        Me.XrTableCellYAxis.Weight = 0.22713274955749513
+        Me.XrTableCellYAxis.Weight = 0.2251482351431956R
         '
         'GroupHeader2
         '

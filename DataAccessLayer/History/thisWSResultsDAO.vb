@@ -26,6 +26,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 22/10/2012 - Added columns ABSInitial, ABSWorkReagent and ABSMainFilter
         '''              SA 25/10/2012 - Added column RemarkAlert
         '''              AG 24/04/2013 - Added column LISMessageID
+        '''              SA 08/09/2014 - BA-1919 ==> Added a call to Replace function for fields ManualResultText and UserComments
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisWSResultsDS As HisWSResultsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -72,13 +73,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                             End If
 
                             If (Not myHisWSResultsRow.IsManualResultTextNull AndAlso myHisWSResultsRow.ManualResultText.Trim <> String.Empty) Then
-                                cmdText.Append(", N'" & myHisWSResultsRow.ManualResultText.Trim.Replace("''", "'") & "'")
+                                cmdText.Append(", N'" & myHisWSResultsRow.ManualResultText.Trim.Replace("'", "''") & "'")
                             Else
                                 cmdText.Append(", NULL")
                             End If
 
                             If (Not myHisWSResultsRow.IsUserCommentNull AndAlso myHisWSResultsRow.UserComment.Trim <> String.Empty) Then
-                                cmdText.Append(", N'" & myHisWSResultsRow.UserComment.Trim.Replace("''", "'") & "'")
+                                cmdText.Append(", N'" & myHisWSResultsRow.UserComment.Trim.Replace("'", "''") & "'")
                             Else
                                 cmdText.Append(", NULL")
                             End If
