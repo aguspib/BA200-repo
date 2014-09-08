@@ -48,6 +48,7 @@ Partial Class IProgTest
         Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.TestDescriptionTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.CopyTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.AddButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.PrintTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
@@ -257,7 +258,6 @@ Partial Class IProgTest
         Me.BsNumericUpDown4 = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
         Me.TubesBySampleTypeDS1 = New Biosystems.Ax00.Types.TubesBySampleTypeDS()
         Me.BsHelpProvider1 = New Biosystems.Ax00.Controls.UserControls.BSHelpProvider()
-        Me.CopyTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.SampleTypePlus2, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsPanel2.SuspendLayout()
         Me.BsPanel1.SuspendLayout()
@@ -418,6 +418,15 @@ Partial Class IProgTest
         Me.BsPanel1.Name = "BsPanel1"
         Me.BsPanel1.Size = New System.Drawing.Size(280, 35)
         Me.BsPanel1.TabIndex = 5
+        '
+        'CopyTestButton
+        '
+        Me.CopyTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.CopyTestButton.Location = New System.Drawing.Point(185, 1)
+        Me.CopyTestButton.Name = "CopyTestButton"
+        Me.CopyTestButton.Size = New System.Drawing.Size(32, 32)
+        Me.CopyTestButton.TabIndex = 5
+        Me.CopyTestButton.UseVisualStyleBackColor = True
         '
         'BsCustomOrderButton
         '
@@ -3046,15 +3055,6 @@ Partial Class IProgTest
         '
         Me.TubesBySampleTypeDS1.DataSetName = "TubesBySampleTypeDS"
         Me.TubesBySampleTypeDS1.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
-        '
-        'CopyTestButton
-        '
-        Me.CopyTestButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CopyTestButton.Location = New System.Drawing.Point(185, 1)
-        Me.CopyTestButton.Name = "CopyTestButton"
-        Me.CopyTestButton.Size = New System.Drawing.Size(32, 32)
-        Me.CopyTestButton.TabIndex = 5
-        Me.CopyTestButton.UseVisualStyleBackColor = True
         '
         'IProgTest
         '
