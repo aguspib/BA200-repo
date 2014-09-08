@@ -41,6 +41,7 @@ Public Class IProgOffSystemTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
             '            bsPrintButton.Enabled = False DL 11/05/2012
 
             'Area of Calculated Test Definition
@@ -334,6 +335,7 @@ Public Class IProgOffSystemTest
             bsNewButton.Enabled = True
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
             '            bsPrintButton.Enabled = False DL 11/05/2012
 
             bsFullNameTextbox.Enabled = True
@@ -726,6 +728,7 @@ Public Class IProgOffSystemTest
             bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            'bsScreenToolTips.SetToolTip(BsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID)) 'AG 04/09/2014 - BA1869
 
             'For bsTestRefRanges
             bsTestRefRanges.TextForGenericRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Generic", pLanguageID)
@@ -829,7 +832,8 @@ Public Class IProgOffSystemTest
                 bsNewButton.Enabled = True
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = False
-                '                bsPrintButton.Enabled = False DL 11/05/2012
+                BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
+                'bsPrintButton.Enabled = False DL 11/05/2012
             End If
 
             'Area of OFF-SYSTEM Test Definition
@@ -1321,6 +1325,11 @@ Public Class IProgOffSystemTest
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
 
+            'CUSTOM SORT Button AG 04/09/2014 - BA-1869
+            'auxIconName = GetIconName("CUSTOMSORT")
+            'If (auxIconName <> "") Then
+            '    BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+            'End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
@@ -1357,6 +1366,7 @@ Public Class IProgOffSystemTest
             bsEditButton.Enabled = True
             '            bsPrintButton.Enabled = True DL 11/05/2012
             bsDeleteButton.Enabled = True
+            BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
 
             bsFullNameTextbox.Enabled = False
             bsFullNameTextbox.BackColor = SystemColors.MenuBar
@@ -1489,6 +1499,7 @@ Public Class IProgOffSystemTest
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
             bsDeleteButton.Enabled = False
+            BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1849,6 +1860,7 @@ Public Class IProgOffSystemTest
                     bsNewButton.Enabled = False
                     bsEditButton.Enabled = False
                     bsDeleteButton.Enabled = False
+                    BsCustomOrderButton.Enabled = False 'AG 04/09/2014 - BA-1869
                     'bsPrintButton.Enabled = False DL 11/05/2012
                     Exit Select
             End Select
@@ -2102,6 +2114,7 @@ Public Class IProgOffSystemTest
 
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = bEnabled
+                BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
@@ -2187,6 +2200,7 @@ Public Class IProgOffSystemTest
 
                 bsEditButton.Enabled = False
                 bsDeleteButton.Enabled = bEnabled
+                BsCustomOrderButton.Enabled = True 'AG 04/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
@@ -2486,5 +2500,29 @@ Public Class IProgOffSystemTest
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' Open the customize order and availability for OFFS tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "OFFS"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
+
+
 End Class

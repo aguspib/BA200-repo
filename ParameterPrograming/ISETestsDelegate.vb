@@ -504,6 +504,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 12/06/2012 - Removed DataSets for adding: ISE Tests/SampleType cannot be added nor deleted
         '''              SA 18/06/2012 - Added code to save QC values for the ISE Tests/SampleType also in QC Module when the ISE Test/SampleType
         '''                              already exists in it
+        '''              SA 04/09/2014 - BA-1865 ==> After update the ISETest/SampleType, call new function HIST_Update in ISETestSamplesDelegate to 
+        '''                                          verify if the data has to be updated also in Historics Module (when the ISETest/SampleType has
+        '''                                          been already exported)
         ''' </remarks>
         Public Function SaveISETestNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUpdatedISETests As ISETestsDS, _
                                        ByVal pUpdatedISETestSamples As ISETestSamplesDS, ByVal pNewISERefRanges As TestRefRangesDS, _
@@ -524,7 +527,16 @@ Namespace Biosystems.Ax00.BL
                         'Update SampleType-related data for the ISE Test/SampleType
                         If (Not resultData.HasError) Then
                             Dim myISESampleType As New ISETestSamplesDelegate
-                            If (pUpdatedISETestSamples.tparISETestSamples.Rows.Count > 0) Then resultData = myISESampleType.Modify(dbConnection, pUpdatedISETestSamples)
+                            If (pUpdatedISETestSamples.tparISETestSamples.Rows.Count > 0) Then
+                                resultData = myISESampleType.Modify(dbConnection, pUpdatedISETestSamples)
+
+                                If (Not resultData.HasError) Then
+                                    'BA-1865 - Call the function to verify if the ISETest/SampleType already exists in Historic Module and in that 
+                                    '          case, update data also in that module
+                                    resultData = myISESampleType.HIST_Update(dbConnection, pUpdatedISETestSamples.tparISETestSamples.First.ISETestID, _
+                                                                             pUpdatedISETestSamples.tparISETestSamples.First.SampleType)
+                                End If
+                            End If
                         End If
 
                         'Update Reference Ranges for the ISETest/SampleType
@@ -870,6 +882,24 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tparISETestsDAO
                         myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
+
+                        'Get the not Available TestID and look for all CALC test or profiles affected -> Set them also as not available
+                        Dim notAvailableItemList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                        notAvailableItemList = (From a As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.Available = False Select a).ToList
+                        If notAvailableItemList.Count > 0 Then
+                            'Look for other calculated tests that uses it in their formula and set available = False
+                            Dim myCalcTestDlg As New CalculatedTestsDelegate
+                            myGlobalDataTO = myCalcTestDlg.ResetAvailableCascade(dbConnection, notAvailableItemList, "ISE")
+
+                            If Not myGlobalDataTO.HasError Then
+                                Dim myTestProfileDlg As New TestProfilesDelegate
+                                myGlobalDataTO = myTestProfileDlg.ResetAvailableCascade(dbConnection, notAvailableItemList, "ISE")
+                            End If
+
+                        End If
+                        notAvailableItemList = Nothing
+
                     End If
 
                     If (Not myGlobalDataTO.HasError) Then
@@ -896,6 +926,95 @@ Namespace Biosystems.Ax00.BL
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return (myGlobalDataTO)
+        End Function
+
+        ''' <summary>
+        ''' Get the name of the specified ISE test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test identifier</param>
+        ''' <returns>GlobalDataTO containing a typed string with the name field</returns>
+        ''' <remarks>
+        ''' Created by: XB 05/09/2014 - BA-1902
+        ''' </remarks>
+        Public Function GetName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As String
+            Dim returnValue As String = ""
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        'Get the list of existing ISE Tests
+                        resultData = MyClass.GetList(Nothing)
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            Dim myISETestDS As ISETestsDS
+                            myISETestDS = DirectCast(resultData.SetDatos, ISETestsDS)
+
+                            Dim qISETests As List(Of ISETestsDS.tparISETestsRow)
+
+                            qISETests = (From a In myISETestDS.tparISETests _
+                                         Where a.ISETestID = pTestID _
+                                         Select a).ToList()
+
+                            If qISETests.Count = 1 Then
+                                returnValue = qISETests(0).Name
+                            End If
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.GetName", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return returnValue
+        End Function
+
+
+        ''' <summary>
+        ''' Search ISE Test data for the informed Test ID
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ISETestsDS with data of the informed ISE Test</returns>
+        ''' <remarks>
+        ''' Created by:  XB 05/09/2014 - BA-1902
+        ''' </remarks>
+        Public Function ExistsISETestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparISETestsDAO
+                        resultData = myDAO.Read(dbConnection, pISETestID)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestsDelegate.ExistsISETestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
         End Function
 
 #End Region

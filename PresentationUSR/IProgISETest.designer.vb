@@ -108,6 +108,7 @@ Partial Class IProgISETest
         Me.bsFullNameTextbox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
         Me.bsFullNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.bsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SlopeAUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.SlopeBUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -319,14 +320,14 @@ Partial Class IProgISETest
         Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 3
+        Me.bsPrintButton.TabIndex = 4
         Me.bsPrintButton.UseVisualStyleBackColor = True
         Me.bsPrintButton.Visible = False
         '
         'bsEditButton
         '
         Me.bsEditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsEditButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsEditButton.Location = New System.Drawing.Point(138, 613)
         Me.bsEditButton.Name = "bsEditButton"
         Me.bsEditButton.Size = New System.Drawing.Size(32, 32)
         Me.bsEditButton.TabIndex = 2
@@ -364,6 +365,7 @@ Partial Class IProgISETest
         Me.bsReportNameTextBox.BackColor = System.Drawing.Color.White
         Me.bsReportNameTextBox.DecimalsValues = False
         Me.bsReportNameTextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsReportNameTextBox.ForeColor = System.Drawing.Color.Black
         Me.bsReportNameTextBox.IsNumeric = False
         Me.bsReportNameTextBox.Location = New System.Drawing.Point(10, 139)
         Me.bsReportNameTextBox.Mandatory = False
@@ -390,7 +392,7 @@ Partial Class IProgISETest
         Me.bsDecimalsUpDown.ForeColor = System.Drawing.Color.Black
         Me.bsDecimalsUpDown.Location = New System.Drawing.Point(594, 139)
         Me.bsDecimalsUpDown.Name = "bsDecimalsUpDown"
-        Me.bsDecimalsUpDown.Size = New System.Drawing.Size(100, 21)
+        Me.bsDecimalsUpDown.Size = New System.Drawing.Size(86, 21)
         Me.bsDecimalsUpDown.TabIndex = 10
         Me.bsDecimalsUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -648,6 +650,7 @@ Partial Class IProgISETest
         '
         'QCErrorAllowable
         '
+        Me.QCErrorAllowable.ForeColor = System.Drawing.Color.Black
         Me.QCErrorAllowable.Location = New System.Drawing.Point(127, 14)
         Me.QCErrorAllowable.Name = "QCErrorAllowable"
         Me.QCErrorAllowable.Size = New System.Drawing.Size(67, 21)
@@ -776,7 +779,8 @@ Partial Class IProgISETest
         'QCMinNumSeries
         '
         Me.QCMinNumSeries.Enabled = False
-        Me.QCMinNumSeries.Location = New System.Drawing.Point(308, 48)
+        Me.QCMinNumSeries.ForeColor = System.Drawing.Color.Black
+        Me.QCMinNumSeries.Location = New System.Drawing.Point(299, 48)
         Me.QCMinNumSeries.Name = "QCMinNumSeries"
         Me.QCMinNumSeries.Size = New System.Drawing.Size(58, 21)
         Me.QCMinNumSeries.TabIndex = 3
@@ -787,7 +791,7 @@ Partial Class IProgISETest
         Me.MinimumNumSeries.BackColor = System.Drawing.Color.Transparent
         Me.MinimumNumSeries.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.MinimumNumSeries.ForeColor = System.Drawing.Color.Black
-        Me.MinimumNumSeries.Location = New System.Drawing.Point(125, 52)
+        Me.MinimumNumSeries.Location = New System.Drawing.Point(116, 52)
         Me.MinimumNumSeries.Name = "MinimumNumSeries"
         Me.MinimumNumSeries.Size = New System.Drawing.Size(185, 13)
         Me.MinimumNumSeries.TabIndex = 2
@@ -870,6 +874,7 @@ Partial Class IProgISETest
         '
         'QCRejectionCriteria
         '
+        Me.QCRejectionCriteria.ForeColor = System.Drawing.Color.Black
         Me.QCRejectionCriteria.Location = New System.Drawing.Point(199, 48)
         Me.QCRejectionCriteria.Name = "QCRejectionCriteria"
         Me.QCRejectionCriteria.Size = New System.Drawing.Size(58, 21)
@@ -878,6 +883,7 @@ Partial Class IProgISETest
         '
         'QCReplicNumberNumeric
         '
+        Me.QCReplicNumberNumeric.ForeColor = System.Drawing.Color.Black
         Me.QCReplicNumberNumeric.Location = New System.Drawing.Point(199, 20)
         Me.QCReplicNumberNumeric.Name = "QCReplicNumberNumeric"
         Me.QCReplicNumberNumeric.Size = New System.Drawing.Size(58, 21)
@@ -982,6 +988,7 @@ Partial Class IProgISETest
         '
         'bsSlopeB2UpDown
         '
+        Me.bsSlopeB2UpDown.ForeColor = System.Drawing.Color.Black
         Me.bsSlopeB2UpDown.Location = New System.Drawing.Point(353, 14)
         Me.bsSlopeB2UpDown.Name = "bsSlopeB2UpDown"
         Me.bsSlopeB2UpDown.Size = New System.Drawing.Size(73, 21)
@@ -990,6 +997,7 @@ Partial Class IProgISETest
         '
         'bsSlopeA2UpDown
         '
+        Me.bsSlopeA2UpDown.ForeColor = System.Drawing.Color.Black
         Me.bsSlopeA2UpDown.Location = New System.Drawing.Point(224, 14)
         Me.bsSlopeA2UpDown.Name = "bsSlopeA2UpDown"
         Me.bsSlopeA2UpDown.Size = New System.Drawing.Size(73, 21)
@@ -1157,6 +1165,15 @@ Partial Class IProgISETest
         Me.BsErrorProvider1.BlinkStyle = System.Windows.Forms.ErrorBlinkStyle.NeverBlink
         Me.BsErrorProvider1.ContainerControl = Me
         '
+        'bsCustomOrderButton
+        '
+        Me.bsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.bsCustomOrderButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsCustomOrderButton.Name = "bsCustomOrderButton"
+        Me.bsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.bsCustomOrderButton.TabIndex = 3
+        Me.bsCustomOrderButton.UseVisualStyleBackColor = True
+        '
         'IProgISETest
         '
         Me.AcceptButton = Me.bsExitButton
@@ -1168,6 +1185,7 @@ Partial Class IProgISETest
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.bsCustomOrderButton)
         Me.Controls.Add(Me.bsISETestsListGroupBox)
         Me.Controls.Add(Me.bsExitButton)
         Me.Controls.Add(Me.bsPrintButton)
@@ -1299,4 +1317,5 @@ Partial Class IProgISETest
     Friend WithEvents Separa2 As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsReferenceRangesLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents ReferenceRangesLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

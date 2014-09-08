@@ -440,6 +440,7 @@ Public Class IProgISETest
         Try
             'Area of ISE Test List
             bsEditButton.Enabled = False
+            bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
 
             ' WE 29/07/2014 - #1865 
             bsFullNameTextbox.Enabled = True
@@ -741,6 +742,7 @@ Public Class IProgISETest
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage)) 'AG 05/09/2014 - BA-1869
 
             ' WE 01/08/2014 - #1865
             ' Details tab
@@ -873,7 +875,8 @@ Public Class IProgISETest
                 End If
 
                 bsEditButton.Enabled = False
-                '                bsPrintButton.Enabled = False dl 11/05/2012
+                bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                'bsPrintButton.Enabled = False dl 11/05/2012
             End If
 
             'Area of ISE Test Definition
@@ -1233,6 +1236,10 @@ Public Class IProgISETest
                                                (bsAvailableISETestCheckBox.Checked.ToString <> bsISETestListView.Items(OriginalSelectedIndex).SubItems(6).Text)
                     End If
                 End If
+
+                If (Not pendingToSaveChanges) Then
+                    pendingToSaveChanges = (Not ValidateSavingConditions())
+                End If
             End If
 
         Catch ex As Exception
@@ -1270,6 +1277,10 @@ Public Class IProgISETest
             If Not String.Equals(auxIconName, String.Empty) Then bsPrintButton.Image = Image.FromFile(iconPath & auxIconName, True)
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
+
+            'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
+            'auxIconName = GetIconName("CUSTOMSORT")
+            'If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName, True)
 
 
             'SAVE Button
@@ -1421,7 +1432,8 @@ Public Class IProgISETest
     Private Sub QueryModeScreenStatus()
         Try
             bsEditButton.Enabled = True
-            '            bsPrintButton.Enabled = True dl 11/05/2012
+            bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+            'bsPrintButton.Enabled = True dl 11/05/2012
 
             bsFullNameTextbox.Enabled = False
             bsFullNameTextbox.BackColor = SystemColors.MenuBar
@@ -1484,6 +1496,8 @@ Public Class IProgISETest
 
             'Disable all buttons that cannot be used in Read Only Mode
             bsEditButton.Enabled = False
+            bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReadOnlyModeScreenStatus " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadOnlyModeScreenStatus", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2026,7 +2040,8 @@ Public Class IProgISETest
 
                 Case "OPERATOR"
                     bsEditButton.Enabled = False
-                    '                    bsPrintButton.Enabled = False dl 11/05/2012
+                    bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                    'bsPrintButton.Enabled = False dl 11/05/2012
                     Exit Select
             End Select
 
@@ -3747,13 +3762,33 @@ Public Class IProgISETest
 
     Private Sub QCReplicNumberNumeric_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCReplicNumberNumeric.Validating
         Try
-            BsErrorProvider1.Clear()
 
-            If QCReplicNumberNumeric.Text = "" Then
-                BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
-                QCReplicNumberNumeric.Focus()
+            'myTextBox = CType(sender, TextBox)
+
+            'If (myTextBox.TextLength > 0) Then
+            '    If (bsScreenErrorProvider.GetError(myTextBox) <> "") Then
+            '        bsScreenErrorProvider.SetError(myTextBox, String.Empty)
+            '    End If
+            'End If
+
+            ' WE 03/09/2014 - #1865
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If QCReplicNumberNumeric.Text = "" Then
+                    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If QCReplicNumberNumeric.Text <> "" Then
+                    BsErrorProvider1.SetError(QCReplicNumberNumeric, String.Empty)
+                End If
             End If
+            ' WE 03/09/2014 - #1865 - End
+
+            'BsErrorProvider1.Clear()
+            'If QCReplicNumberNumeric.Text = "" Then
+            '    BsErrorProvider1.SetError(QCReplicNumberNumeric, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    'QCReplicNumberNumeric.Value = QCReplicNumberNumeric.Minimum
+            '    'QCReplicNumberNumeric.Focus()
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCReplicNumberNumeric_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3763,13 +3798,24 @@ Public Class IProgISETest
 
     Private Sub QCRejectionCriteria_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCRejectionCriteria.Validating
         Try
-            BsErrorProvider1.Clear()
-
-            If QCRejectionCriteria.Text = "" Then
-                BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
-                QCRejectionCriteria.Focus()
+            ' WE 03/09/2014 - #1865
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If QCRejectionCriteria.Text = "" Then
+                    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If QCRejectionCriteria.Text <> "" Then
+                    BsErrorProvider1.SetError(QCRejectionCriteria, String.Empty)
+                End If
             End If
+            ' WE 03/09/2014 - #1865 - End
+
+            'BsErrorProvider1.Clear()
+            'If QCRejectionCriteria.Text = "" Then
+            '    BsErrorProvider1.SetError(QCRejectionCriteria, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    QCRejectionCriteria.Value = QCRejectionCriteria.Minimum
+            '    QCRejectionCriteria.Focus()
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCRejectionCriteria_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3779,13 +3825,24 @@ Public Class IProgISETest
 
     Private Sub QCMinNumSeries_Validating(ByVal sender As System.Object, ByVal e As System.ComponentModel.CancelEventArgs) Handles QCMinNumSeries.Validating
         Try
-            BsErrorProvider1.Clear()
-
-            If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
-                BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
-                QCMinNumSeries.Value = QCMinNumSeries.Minimum
-                QCMinNumSeries.Focus()
+            ' WE 03/09/2014 - #1865
+            If BsErrorProvider1.GetError(CType(sender, BSNumericUpDown)) = String.Empty Then
+                If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
+                    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+                End If
+            Else
+                If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text <> "" Then
+                    BsErrorProvider1.SetError(QCMinNumSeries, String.Empty)
+                End If
             End If
+            ' WE 03/09/2014 - #1865 - End
+
+            'BsErrorProvider1.Clear()
+            'If StaticRadioButton.Checked AndAlso QCMinNumSeries.Text = "" Then
+            '    BsErrorProvider1.SetError(QCMinNumSeries, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
+            '    QCMinNumSeries.Value = QCMinNumSeries.Minimum
+            '    QCMinNumSeries.Focus()
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", " QCMinNumSeries_Validating " & Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -4085,7 +4142,12 @@ Public Class IProgISETest
     ''' <param name="e"></param>
     ''' <remarks>WE 27/08/2014 - #1865. Generic event handler method that triggers ChangesMade whenever the value of a control is changed.
     '''                          Only used for new fields for which ChangesMade can not be handled properly by PendingChangesVerification.</remarks>
-    Private Sub ControlValueChanged(sender As Object, e As EventArgs) Handles bsReportNameTextBox.TextChanged, bsDecimalsUpDown.ValueChanged, bsSlopeB2UpDown.ValueChanged, bsSlopeA2UpDown.ValueChanged
+    Private Sub ControlValueChanged(sender As Object, e As EventArgs) Handles bsReportNameTextBox.TextChanged,
+                                                                              bsDecimalsUpDown.ValueChanged,
+                                                                              bsSlopeB2UpDown.ValueChanged,
+                                                                              bsSlopeA2UpDown.ValueChanged,
+                                                                              QCReplicNumberNumeric.ValueChanged,
+                                                                              QCMinNumSeries.ValueChanged
         If EditionMode Then
             ChangesMade = True
         End If
@@ -4249,6 +4311,7 @@ Public Class IProgISETest
             Else
                 InitialModeScreenStatus(False)
                 bsEditButton.Enabled = False
+                bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
             End If
 
             ScreenStatusByUserLevel() 'TR 23/04/2012
@@ -4297,8 +4360,8 @@ Public Class IProgISETest
     ''' Created by: RH 13/06/2012
     ''' </remarks>    
     Private Sub bsSaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSaveButton.Click
-        If Not SaveChanges(False) Then
-            CancelISETestEdition()
+        If SaveChanges(False) Then
+            '  CancelISETestEdition()
         End If
     End Sub
 
@@ -4452,10 +4515,28 @@ Public Class IProgISETest
         '// si después del mensaje quieres dejar la celda en su estado original
         '// realizas la siguiente asignación
         e.Cancel = False
+    End Sub
 
+    ''' <summary>
+    ''' Open the customize order and availability for OFFS tests selection
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>AG 04/09/2014 - BA-1869</remarks>
+    Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles bsCustomOrderButton.Click
+        Try
+            'Shown the Positioning Warnings Screen
+            Using AuxMe As New ISortingTestsAux()
+                AuxMe.openMode = "TESTSELECTION"
+                AuxMe.screenID = "ISE"
+                AuxMe.ShowDialog()
+            End Using
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsCustomOrderButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".BsCustomOrderButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
     End Sub
 #End Region
-
-
 
 End Class

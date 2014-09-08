@@ -151,7 +151,7 @@ Namespace Biosystems.Ax00.BL
 
                         For Each calculatedTest As CalculatedTestsDS.tparCalculatedTestsRow In pCalcTests.tparCalculatedTests.Rows
                             'Search if the Calculated Test is included in the Formula of another Calculated Test
-                            resultData = GetRelatedCalculatedTest(dbConnection, calculatedTest.CalcTestID)
+                            resultData = GetRelatedCalculatedTest(dbConnection, calculatedTest.CalcTestID, "CALC") 'AG 04/09/2014 - BA-1869 add new parameter TESTType
                             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                                 myTempCalcTestDS = DirectCast(resultData.SetDatos, CalculatedTestsDS)
 
@@ -640,11 +640,13 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTestID">Identifier of the Calculated Test to search in formulas</param>
+        ''' <param name="pTestType">Type type</param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with the list of related Calculated Tests</returns>
         ''' <remarks>
         ''' Created by:  TR 25/11/2010
+        ''' AG 04/09/2014 - BA-1869 add parameter testtype
         ''' </remarks>
-        Public Function GetRelatedCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+        Public Function GetRelatedCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, ByVal pTestType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -654,7 +656,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.GetRelatedCalculatedTest(dbConnection, pCalcTestID)
+                        resultData = myCalculatedTests.GetRelatedCalculatedTest(dbConnection, pCalcTestID, pTestType)
                     End If
                 End If
             Catch ex As Exception
@@ -1413,6 +1415,24 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tparCalculatedTestsDAO
                         myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
+
+                        'Get the not Available TestID and look for all CALC test or profiles affected -> Set them also as not available
+                        Dim notAvailableItemList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                        notAvailableItemList = (From a As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting _
+                                                Where a.Available = False Select a).ToList
+                        If notAvailableItemList.Count > 0 Then
+                            'Look for other calculated tests that uses it in their formula and set available = False
+                            'Dim myCalcTestDlg As New CalculatedTestsDelegate
+                            myGlobalDataTO = Me.ResetAvailableCascade(dbConnection, notAvailableItemList, "CALC")
+
+                            If Not myGlobalDataTO.HasError Then
+                                Dim myTestProfileDlg As New TestProfilesDelegate
+                                myGlobalDataTO = myTestProfileDlg.ResetAvailableCascade(dbConnection, notAvailableItemList, "CALC")
+                            End If
+
+                        End If
+                        notAvailableItemList = Nothing
+
                     End If
 
                     If (Not myGlobalDataTO.HasError) Then
@@ -1435,6 +1455,94 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return (myGlobalDataTO)
+        End Function
+
+
+        ''' <summary>
+        ''' Search if the TestID set as NOT available form part of a calculated tests and set all of them also as not available
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pNotAvailableCalcTestID">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
+        ''' <param name="pTestType"></param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 04/09/2014 - BA-1869 - NOT TESTED!!!!
+        ''' </remarks>
+        Public Function ResetAvailableCascade(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNotAvailableCalcTestID As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow), ByVal pTestType As String) _
+                                           As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparCalculatedTestsDAO
+
+                        Dim affectedCalcTestsDS As New CalculatedTestsDS
+                        Dim auxList As New List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                        Dim auxDS As New ReportsTestsSortingDS
+                        Dim auxRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow
+
+                        For Each row As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pNotAvailableCalcTestID
+                            auxList.Clear()
+                            auxDS.Clear()
+
+                            'Get all calculated tests affected
+                            myGlobalDataTO = myDAO.GetRelatedCalculatedTest(dbConnection, row.TestID, pTestType)
+                            If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                                affectedCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                                'CalcTest programming screen protection: Calculated tests whose formula contains another calc test cannot form part of another calc test
+                                For Each calculatedRow As CalculatedTestsDS.tparCalculatedTestsRow In affectedCalcTestsDS.tparCalculatedTests.Rows
+                                    'Build DS a new ReportsTestsSortingDS with the affected TestID + Available = False
+                                    auxRow = CType(auxDS.tcfgReportsTestsSorting.NewRow, ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                                    auxRow.Available = False
+                                    auxRow.TestID = calculatedRow.CalcTestID
+                                    auxDS.tcfgReportsTestsSorting.AddtcfgReportsTestsSortingRow(auxRow)
+
+                                    auxList.Add(auxRow) 'Add to list
+                                Next
+
+                                'Finally call myDAO.UpdateCustomPositionAndAvailable
+                                myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, auxDS)
+
+                                If auxList.Count > 0 AndAlso pTestType <> "CALC" Then
+                                    'Finally these calc tests may form part of another calculated test
+                                    myGlobalDataTO = Me.ResetAvailableCascade(dbConnection, auxList, "CALC")
+                                End If
+
+                            End If
+                        Next
+                        auxList = Nothing
+
+                    End If
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'When the Database Connection was opened locally, then the Commit is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                    Else
+                        'When the Database Connection was opened locally, then the Rollback is executed
+                        If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ResetAvailableCascade", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

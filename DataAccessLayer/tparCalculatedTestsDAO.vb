@@ -806,12 +806,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Get all Calculated Tests in which Formula the informed Calculated Test is included
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pCalcTestID">Identifier of the Calculated Test to search in formulas</param>
+        ''' <param name="pTestID">Identifier of the Calculated Test to search in formulas</param>
+        ''' <param name="pTestType"></param>
         ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with the list of related Calculated Tests</returns>
         ''' <remarks>
         ''' Created by:  TR 25/11/2010
+        ''' AG 04/09/2014 - BA-1869 add parameter testtype
         ''' </remarks>
-        Public Function GetRelatedCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+        Public Function GetRelatedCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pTestType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -820,11 +822,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AG 04/09/2014 - ba-1869
+                        'Dim cmdText As String = " SELECT * FROM tparCalculatedTests " & vbCrLf & _
+                        '                        " WHERE  CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf & _
+                        '                                              " WHERE  ValueType = 'TEST' " & vbCrLf & _
+                        '                                              " AND    TestType  = 'CALC' " & vbCrLf & _
+                        '                                              " AND    [Value] = '" & pTestID.ToString & "') " & vbCrLf
+
                         Dim cmdText As String = " SELECT * FROM tparCalculatedTests " & vbCrLf & _
-                                                " WHERE  CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf & _
-                                                                      " WHERE  ValueType = 'TEST' " & vbCrLf & _
-                                                                      " AND    TestType  = 'CALC' " & vbCrLf & _
-                                                                      " AND    [Value] = '" & pCalcTestID.ToString & "') " & vbCrLf
+                        " WHERE  CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf & _
+                                              " WHERE  ValueType = 'TEST' " & vbCrLf
+
+                        cmdText &= " AND    TestType  = '" & pTestType & "' " & vbCrLf & _
+                                   " AND    [Value] = '" & pTestID.ToString & "') " & vbCrLf
+                        'AG 04/09/2014 - BA-1869
 
                         Dim myCalculatedTests As New CalculatedTestsDS
                         Using dbCmd As New SqlCommand(cmdText, dbConnection)

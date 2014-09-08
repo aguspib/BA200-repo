@@ -201,13 +201,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (pISETestSamplesRow.IsSlopeFactorA2Null) Then
                         cmdText &= " SlopeFactorA2 = NULL, "
                     Else
-                        cmdText &= " SlopeFactorA2 = " & pISETestSamplesRow.SlopeFactorA2.ToSQLString() & ", "
+                        cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorA2) & ", "
                     End If
 
                     If (pISETestSamplesRow.IsSlopeFactorB2Null) Then
                         cmdText &= " SlopeFactorB2 = NULL "
                     Else
-                        cmdText &= " SlopeFactorB2 = " & pISETestSamplesRow.SlopeFactorB2.ToSQLString() & " "
+                        cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorB2) & " "
                     End If
                     ' WE 30/07/2014 - #1865 - End
 
@@ -600,6 +600,59 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 #End Region
 
-    End Class
+#Region "HISTORY methods"
+        ''' <summary>
+        ''' Get the current programming for the specified ISETestID/SampleType and fill a typed DataSet HistISETestSamplesDS needed to update 
+        ''' data in Historic Module.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet HisISETestSamplesDS with data in Parameters Programming for the informed ISETestID/SampleType</returns>
+        ''' <remarks>
+        ''' Created by: SA 04/09/2014 - BA-1865
+        ''' </remarks>
+        Public Function HIST_GetISETestSampleData(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT T.ISETestID, TS.SampleType, T.Name AS ISETestName, TS.TestLongName, T.Units AS MeasureUnit, " & vbCrLf & _
+                                                       " TS.Decimals AS DecimalsAllowed, TS.SlopeFactorA2, TS.SlopeFactorB2 " & vbCrLf & _
+                                                " FROM   tparISETests T INNER JOIN tparISETestSamples TS ON T.ISETestID = TS.ISETestID " & vbCrLf & _
+                                                " WHERE  T.ISETestID = " & pISETestID.ToString & vbCrLf & _
+                                                " AND    TS.SampleType = '" & pSampleType & "' "
+
+                        Dim myDataSet As New HisISETestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.thisISETestSamples)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.HIST_GetISETestSampleData", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
+    End Class
 End Namespace

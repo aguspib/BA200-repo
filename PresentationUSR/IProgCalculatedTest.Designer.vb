@@ -55,6 +55,7 @@ Partial Class IProgCalculatedTest
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsCalcTestListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsCustomOrderButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsCalTestDefGroupBox.SuspendLayout()
         Me.CalculatedTestTabControl.SuspendLayout()
         Me.FormulaTabPage.SuspendLayout()
@@ -80,7 +81,7 @@ Partial Class IProgCalculatedTest
         'bsNewButton
         '
         Me.bsNewButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsNewButton.Location = New System.Drawing.Point(101, 613)
+        Me.bsNewButton.Location = New System.Drawing.Point(64, 613)
         Me.bsNewButton.Name = "bsNewButton"
         Me.bsNewButton.Size = New System.Drawing.Size(32, 32)
         Me.bsNewButton.TabIndex = 14
@@ -89,7 +90,7 @@ Partial Class IProgCalculatedTest
         'bsEditButton
         '
         Me.bsEditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsEditButton.Location = New System.Drawing.Point(138, 613)
+        Me.bsEditButton.Location = New System.Drawing.Point(101, 613)
         Me.bsEditButton.Name = "bsEditButton"
         Me.bsEditButton.Size = New System.Drawing.Size(32, 32)
         Me.bsEditButton.TabIndex = 15
@@ -98,7 +99,7 @@ Partial Class IProgCalculatedTest
         'bsDeleteButton
         '
         Me.bsDeleteButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsDeleteButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsDeleteButton.Location = New System.Drawing.Point(138, 613)
         Me.bsDeleteButton.Name = "bsDeleteButton"
         Me.bsDeleteButton.Size = New System.Drawing.Size(32, 32)
         Me.bsDeleteButton.TabIndex = 16
@@ -111,7 +112,7 @@ Partial Class IProgCalculatedTest
         Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
-        Me.bsPrintButton.TabIndex = 17
+        Me.bsPrintButton.TabIndex = 18
         Me.bsPrintButton.UseVisualStyleBackColor = True
         Me.bsPrintButton.Visible = False
         '
@@ -470,6 +471,15 @@ Partial Class IProgCalculatedTest
         Me.bsCalcTestListGroupBox.TabIndex = 39
         Me.bsCalcTestListGroupBox.TabStop = False
         '
+        'BsCustomOrderButton
+        '
+        Me.BsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.BsCustomOrderButton.Location = New System.Drawing.Point(175, 613)
+        Me.BsCustomOrderButton.Name = "BsCustomOrderButton"
+        Me.BsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
+        Me.BsCustomOrderButton.TabIndex = 17
+        Me.BsCustomOrderButton.UseVisualStyleBackColor = True
+        '
         'IProgCalculatedTest
         '
         Me.AcceptButton = Me.bsExitButton
@@ -480,6 +490,7 @@ Partial Class IProgCalculatedTest
         Me.Appearance.Options.UseFont = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.BsCustomOrderButton)
         Me.Controls.Add(Me.bsCalcTestListGroupBox)
         Me.Controls.Add(Me.bsExitButton)
         Me.Controls.Add(Me.bsNewButton)
@@ -546,4 +557,5 @@ Partial Class IProgCalculatedTest
     Friend WithEvents bsRefRangesPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsFormulaPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents bsTestRefRanges As BSReferenceRanges
+    Friend WithEvents BsCustomOrderButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

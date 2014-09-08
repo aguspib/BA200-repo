@@ -690,7 +690,10 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <summary>
         ''' Get texts in the current application language for all screen controls and tooltips
         ''' </summary>
-        ''' <remarks>Created by: SGM 07/02/2012</remarks>
+        ''' <remarks>
+        ''' Created by: SGM 07/02/2012
+        ''' Modified by: XB 05/09/2014 - Take the ISE test names from the Name field on tparISETests table instead of fixed texts - BA-1902
+        ''' </remarks>
         Private Sub LoadScreenLabels(ByVal pLabelsData As Dictionary(Of LabelElements, String))
             Try
                 If pLabelsData IsNot Nothing Then
@@ -735,19 +738,42 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     'If pLabelsData.ContainsKey(LabelElements.EL_Reference) Then
                     Me.ELReferenceLabel.Text = "Ref:"
                     'End If
-                    'If pLabelsData.ContainsKey(LabelElements.EL_Sodium) Then
-                    Me.ELSodiumLabel.Text = "Na+:"
-                    'End If
-                    'If pLabelsData.ContainsKey(LabelElements.EL_Potassium) Then
-                    Me.ELPotassiumLabel.Text = "K+:"
-                    'End If
-                    'If pLabelsData.ContainsKey(LabelElements.EL_Chlorine) Then
-                    Me.ELChlorineLabel.Text = "Cl-:"
-                    'End If
-                    'If pLabelsData.ContainsKey(LabelElements.EL_Lithium) Then
-                    Me.ELLithiumLabel.Text = "Li+:"
-                    'End If
 
+                    ' XB 05/09/2014 - BA-1902
+                    ''If pLabelsData.ContainsKey(LabelElements.EL_Sodium) Then
+                    'Me.ELSodiumLabel.Text = "Na+:"
+                    ''End If
+                    ''If pLabelsData.ContainsKey(LabelElements.EL_Potassium) Then
+                    'Me.ELPotassiumLabel.Text = "K+:"
+                    ''End If
+                    ''If pLabelsData.ContainsKey(LabelElements.EL_Chlorine) Then
+                    'Me.ELChlorineLabel.Text = "Cl-:"
+                    ''End If
+                    ''If pLabelsData.ContainsKey(LabelElements.EL_Lithium) Then
+                    'Me.ELLithiumLabel.Text = "Li+:"
+                    ''End If
+
+                    If pLabelsData.ContainsKey(LabelElements.EL_Sodium) Then
+                        Me.ELSodiumLabel.Text = pLabelsData(LabelElements.EL_Sodium) + ":"
+                    Else
+                        Me.ELSodiumLabel.Text = "Na+:"
+                    End If
+                    If pLabelsData.ContainsKey(LabelElements.EL_Potassium) Then
+                        Me.ELPotassiumLabel.Text = pLabelsData(LabelElements.EL_Potassium) + ":"
+                    Else
+                        Me.ELPotassiumLabel.Text = "K+:"
+                    End If
+                    If pLabelsData.ContainsKey(LabelElements.EL_Chlorine) Then
+                        Me.ELChlorineLabel.Text = pLabelsData(LabelElements.EL_Chlorine) + ":"
+                    Else
+                        Me.ELChlorineLabel.Text = "Cl-:"
+                    End If
+                    If pLabelsData.ContainsKey(LabelElements.EL_Lithium) Then
+                        Me.ELLithiumLabel.Text = pLabelsData(LabelElements.EL_Lithium) + ":"
+                    Else
+                        Me.ELLithiumLabel.Text = "Li+:"
+                    End If
+                    ' XB 05/09/2014 - BA-1902
 
                     If pLabelsData.ContainsKey(LabelElements.CAL_Title) Then
                         Me.CALTitleLabel.Text = pLabelsData(LabelElements.CAL_Title)
