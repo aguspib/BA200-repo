@@ -392,7 +392,7 @@ Partial Class IProgISETest
         Me.bsDecimalsUpDown.ForeColor = System.Drawing.Color.Black
         Me.bsDecimalsUpDown.Location = New System.Drawing.Point(594, 139)
         Me.bsDecimalsUpDown.Name = "bsDecimalsUpDown"
-        Me.bsDecimalsUpDown.Size = New System.Drawing.Size(100, 21)
+        Me.bsDecimalsUpDown.Size = New System.Drawing.Size(86, 21)
         Me.bsDecimalsUpDown.TabIndex = 10
         Me.bsDecimalsUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
@@ -780,7 +780,7 @@ Partial Class IProgISETest
         '
         Me.QCMinNumSeries.Enabled = False
         Me.QCMinNumSeries.ForeColor = System.Drawing.Color.Black
-        Me.QCMinNumSeries.Location = New System.Drawing.Point(308, 48)
+        Me.QCMinNumSeries.Location = New System.Drawing.Point(299, 48)
         Me.QCMinNumSeries.Name = "QCMinNumSeries"
         Me.QCMinNumSeries.Size = New System.Drawing.Size(58, 21)
         Me.QCMinNumSeries.TabIndex = 3
@@ -791,7 +791,7 @@ Partial Class IProgISETest
         Me.MinimumNumSeries.BackColor = System.Drawing.Color.Transparent
         Me.MinimumNumSeries.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.MinimumNumSeries.ForeColor = System.Drawing.Color.Black
-        Me.MinimumNumSeries.Location = New System.Drawing.Point(125, 52)
+        Me.MinimumNumSeries.Location = New System.Drawing.Point(116, 52)
         Me.MinimumNumSeries.Name = "MinimumNumSeries"
         Me.MinimumNumSeries.Size = New System.Drawing.Size(185, 13)
         Me.MinimumNumSeries.TabIndex = 2
