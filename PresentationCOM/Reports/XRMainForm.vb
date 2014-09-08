@@ -95,6 +95,7 @@ Public Class XRMainForm
 
                 'PrintControl1.PrintingSystem.Watermark.Text = "Biosystems"
                 'PrintControl1.ShowPageMargins = False
+                PrintControl1.ShowPageMargins = True  'EF 29/08/2014 - BA-1917 -- Activar seleccion de margenes vista previa del informe
 
                 Me.PreviewBar3.Visible = False
 
@@ -316,4 +317,7 @@ Public Class XRMainForm
 
 #End Region
 
+    Private Sub PrintControl1_Load(sender As Object, e As EventArgs) Handles PrintControl1.Load
+
+    End Sub
 End Class

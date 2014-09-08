@@ -248,6 +248,8 @@ Public Class XRManager
             axTraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(PageHeaderBand)).Band)
             axTraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(PageFooterBand)).Band)
 
+            axTraReport.Margins = mtPortrait.Margins 'EF 04/09/2014 - BA-1917: Traspaso de márgenes programados en el Template al Informe actual
+
             Dim reportPrintTool As ReportPrintTool = New ReportPrintTool(axTraReport)
             Try
                 reportPrintTool.AutoShowParametersPanel = False
@@ -1973,6 +1975,7 @@ Public Class XRManager
             aXtraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(PageHeaderBand)).Band)
             aXtraReport.Bands.Add(mtPortrait.Bands.GetBandByType(GetType(PageFooterBand)).Band)
 
+            aXtraReport.Margins = mtPortrait.Margins 'EF 29/08/2014 - BA-1917: Traspaso de márgenes programados en el Template al Informe actual
 
             'aXtraReport.ShowPreviewDialog()
 
@@ -2025,6 +2028,8 @@ Public Class XRManager
             aXtraReport.Bands.Add(mtLandscape.Bands("TopMargin").Band)
             aXtraReport.Bands.Add(mtLandscape.Bands("PageHeader").Band)
             aXtraReport.Bands.Add(mtLandscape.Bands("PageFooter").Band)
+
+            aXtraReport.Margins = mtPortrait.Margins 'EF 04/09/2014 - BA-1917: Traspaso de márgenes programados en el Template al Informe actual
 
             Using MyXRForm As New XRMainForm
                 MyXRForm.Report = aXtraReport
