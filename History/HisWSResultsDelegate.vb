@@ -171,6 +171,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by: DL 24/04/2013
         ''' AG 25/04/2013 before call clear in my DAO call clear method in historic order tests delegate
+        ''' Modified AG 24/07/2014 - RQ00086 v3.1.0 (allow re-sent patient results from history)
         ''' </remarks>
         Public Function ClearIdentifiersForLIS(ByVal pDBConnection As SqlClient.SqlConnection,
                                                ByVal pLISMessageID As String) As GlobalDataTO
@@ -183,8 +184,10 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myHistOTDlg As New HisWSOrderTestsDelegate
-                        resultData = myHistOTDlg.ClearIdentifiersForLIS(Nothing, pLISMessageID)
+                        'AG 24/07/2014 - RQ00086
+                        'Dim myHistOTDlg As New HisWSOrderTestsDelegate
+                        'resultData = myHistOTDlg.ClearIdentifiersForLIS(Nothing, pLISMessageID)
+                        'AG 24/07/2014 - RQ00086
 
                         If Not resultData.HasError Then
                             Dim myDao As New thisWSResultsDAO
@@ -748,6 +751,7 @@ Namespace Biosystems.Ax00.BL
                                 Dim FullAge As String
                                 Dim FullPerformedBy As String
                                 Dim FullComments As String
+                                Dim ReportDate As DateTime = DateTime.Now 'IT 30/07/2014 #BA-1893
                                 Dim LinqPat As HisPatientDS.thisPatientsRow
 
                                 Dim ABSValue As String
@@ -813,7 +817,7 @@ Namespace Biosystems.Ax00.BL
                                             'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, LinqPat.FormatedDateOfBirth)
                                             'FullAge = String.Format("{0}: {1}", literalAge, LinqPat.AgeWithUnit)
                                             'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, String.Empty) ' LinqPat.PerformedBy. NO IN V1
-                                            'FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)
+                                            FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)   'EF 31/07/2014 #1893 (Comments info)
 
                                             FullID = String.Format("{0}", myPatientID)
                                             If (LinqPat.FirstName <> "-" And LinqPat.FirstName <> "") Or (LinqPat.LastName <> "-" And LinqPat.LastName <> "") Then FullName = String.Format("{0}, {1}", LinqPat.LastName, LinqPat.FirstName) Else FullName = ""
@@ -821,12 +825,22 @@ Namespace Biosystems.Ax00.BL
                                             FullBirthDate = String.Format("{0}", LinqPat.FormatedDateOfBirth)
                                             FullAge = String.Format("{0}", LinqPat.AgeWithUnit)
                                             ' FullPerformedBy = String.Format("{0}", String.Empty)
-                                            ' FullComments = String.Format("{0}", LinqPat.Comments)
+                                            FullComments = String.Format("{0}", LinqPat.Comments)  'EF 31/07/2014 #1893 (Comments info)
                                             'EF 03/06/2014 #1650  END
 
+                                            'IT 30/07/2014 #BA-1893 INI
+                                            Dim resultsRow As HisWSResultsDS.vhisWSResultsRow
+                                            resultsRow = (From detail In pHisWSResults _
+                                                   Where String.Compare(detail.SampleClass, "PATIENT", False) = 0 _
+                                                   AndAlso String.Compare(detail.PatientID, myPatientID, False) = 0 _
+                                                   Order By detail.ResultDateTime Descending).First
+
+                                            ReportDate = resultsRow.ResultDateTime
 
                                             ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow _
-                                                    (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments)
+                                                    (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments, ReportDate)
+                                            'IT 30/07/2014 #BA-1893 END
+
                                         End If
                                     Next sampleRow
                                 Next i
@@ -871,9 +885,11 @@ Namespace Biosystems.Ax00.BL
                                         ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
                                                                                                          ReferenceRanges, Unit, ResultDate, Remarks)
                                     Next detail
+
                                 Next SampleID
 
                                 resultData.SetDatos = ResultsForReportDS
+
                             End If
                         End If
                     End If

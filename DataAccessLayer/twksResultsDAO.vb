@@ -577,17 +577,29 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += ")"
                     End With
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                    If (resultData.AffectedRecords = 1) Then
-                        resultData.HasError = False
-                    Else
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    End If
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    'If (resultData.AffectedRecords = 1) Then
+                    '    resultData.HasError = False
+                    'Else
+                    '    resultData.HasError = True
+                    '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                    'End If
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        If (resultData.AffectedRecords = 1) Then
+                            resultData.HasError = False
+                        Else
+                            resultData.HasError = True
+                        End If
+                    End Using
+                    'AG 25/07/2014 RQ00086
+
                 End If
             Catch ex As Exception
                 resultData.HasError = True
@@ -1152,17 +1164,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "  AND MultiPointNumber = " & .MultiPointNumber
                     End With
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                    If (resultData.AffectedRecords = 1) Then
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
-                    Else
-                        resultData.HasError = False
-                        'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    End If
+                    End Using
+                    'AG 25/07/2014 RQ00086
+
                 End If
             Catch ex As Exception
                 resultData.HasError = True
@@ -1589,14 +1602,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pOrderForReportFlag"></param>
         ''' <returns>GlobalDataTO indicating if an error has occurred or not. If succeed, returns an ResultsDS 
         '''          dataset with the results (view vwksCalcResults)</returns>
         ''' <remarks>
         ''' Created by:  RH 25/08/2010
         ''' Modified by: AG 01/12/2010 - Filter query by WorkSessionID instead of AnalyzerID
+        ''' Modified by AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results
         ''' </remarks>
         Public Function GetCalculatedTestResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                 ByVal pWorkSessionID As String) As GlobalDataTO
+                                                 ByVal pWorkSessionID As String, ByVal pOrderForReportFlag As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1605,8 +1620,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = String.Format(" SELECT * FROM vwksCalcResults " & _
-                                                              " WHERE  WorkSessionID = '{0}' ", pWorkSessionID.Trim)
+
+                        Dim cmdText As String = String.Empty
+                        If Not pOrderForReportFlag Then
+                            cmdText = String.Format(" SELECT * FROM vwksCalcResults " & _
+                                                    " WHERE  WorkSessionID = '{0}' ", pWorkSessionID.Trim)
+                        Else
+                            'AG 01/08/2014 - #1897 new query appliying test order for reports
+                            cmdText = String.Format(" SELECT CR.*, TS.TestPosition FROM vwksCalcResults CR INNER JOIN " & _
+                                                    " tcfgReportsTestsSorting TS ON CR.TestType = TS.TestType AND CR.TestID = TS.TestID  " & _
+                                                    " WHERE  WorkSessionID = N'{0}' ", pWorkSessionID.Trim) & _
+                                                    " ORDER BY TS.TestPosition "
+                        End If
 
                         Dim resultsDataDS As New ResultsDS
                         Using myCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1632,6 +1657,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
 
         ''' <summary>
         ''' Get all the Results for the specified Worksession and analyzer
@@ -1951,13 +1977,15 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pOrderForReportFlag"></param>
         ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS with all ISE and OFF-SYSTEM Tests for the WorkSession</returns>
         ''' <remarks>
         ''' Created by: AG 01/12/2010 - (copied and adapted from GetCalculatedTestResults)
         '''                             Filter query by WorkSessionId instead of AnalyzerID
+        ''' Modified by AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results
         ''' </remarks>
         Public Function GetISEOFFSTestResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                              ByVal pWorkSessionID As String) As GlobalDataTO
+                                              ByVal pWorkSessionID As String, ByVal pOrderForReportFlag As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1966,8 +1994,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = String.Format(" SELECT * FROM vwksWSISEOffSystemResults " & _
-                                                              " WHERE  WorkSessionID = '{0}' ", pWorkSessionID.Trim)
+                        Dim cmdText As String = String.Empty
+                        If Not pOrderForReportFlag Then
+                            cmdText = String.Format(" SELECT * FROM vwksWSISEOffSystemResults " & _
+                                                    " WHERE  WorkSessionID = '{0}' ", pWorkSessionID.Trim)
+
+                        Else
+                            'AG 01/08/2014 - #1897 new query appliying test order for reports
+                            cmdText = String.Format(" SELECT IOR.*, TS.TestPosition FROM vwksWSISEOffSystemResults IOR INNER JOIN " & _
+                                                    " tcfgReportsTestsSorting TS ON IOR.TestType = TS.TestType AND IOR.TestID = TS.TestID  " & _
+                                                    " WHERE  WorkSessionID = N'{0}' ", pWorkSessionID.Trim) & _
+                                                    " ORDER BY TS.TestPosition "
+                        End If
 
                         Dim resultsDataDS As New ResultsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -2103,6 +2141,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' CREATED BY: TR 09/07/2012
         ''' Modified by XB+JC+TR 02/10/2103 - Preserve the sorting configured on Reports Tests Sorting screen #1309 Bugs tracking
+        ''' Modified by AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results
         ''' </remarks>
         Public Function GetResultsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -2113,9 +2152,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        '  XB+TR 02/10/2103
-                        ' Dim cmdText As String = " SELECT * FROM vwksResults WHERE OrderTestID IN(" & pOrderTestID & ") "
-                        Dim cmdText As String = " SELECT * FROM vwksResults R INNER JOIN tcfgReportsTestsSorting TS ON TS.TestType = R.TestType AND TS.TestID = R.TestID "
+                        'AG 01/08/2014 #1897 also return TS.TestPosition
+                        Dim cmdText As String = " SELECT *, TS.TestPosition FROM vwksResults R INNER JOIN tcfgReportsTestsSorting TS ON TS.TestType = R.TestType AND TS.TestID = R.TestID "
                         cmdText &= " WHERE OrderTestID IN(" & pOrderTestID & ")"
                         cmdText &= " ORDER BY TS.TestPosition "
                         '  XB+TR 02/10/2103
@@ -2787,21 +2825,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += " AND MultiPointNumber = " & pMultiItemNumber
                     End If
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                    'RH 24/04/2012
-                    'From Templates for DAO: When DELETE/UPDATE, do not return and error if AffectedRecords = 0
-                    '(it is not an error try to delete or update a value that does not exists).
-                    'If (resultData.AffectedRecords >= 1) Then
-                    '    resultData.HasError = False
-                    'Else
-                    '    resultData.HasError = True
-                    '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    'End If
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014 RQ00086
 
                 End If
 
@@ -2920,21 +2954,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText += " Printed = " & CStr(IIf(pNewValue, 1, 0))
                     cmdText += " WHERE OrderTestID = " & pOrderTestID
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
-                    'RH 24/04/2012
-                    'From Templates for DAO: When DELETE/UPDATE, do not return and error if AffectedRecords = 0
-                    '(it is not an error try to delete or update a value that does not exists).
-                    'If (resultData.AffectedRecords >= 1) Then
-                    '    resultData.HasError = False
-                    'Else
-                    '    resultData.HasError = True
-                    '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    'End If
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014 RQ00086
 
                 End If
 
@@ -2988,17 +3018,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "   AND MultiPointNumber = " & pRow.MultiPointNumber
                     End With
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                    If (resultData.AffectedRecords = 1) Then
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
-                    Else
-                        resultData.HasError = False
-                        'resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    End If
+                    End Using
+                    'AG 25/07/2014 RQ00086
+
+
                 End If
             Catch ex As Exception
                 resultData.HasError = True
@@ -3090,12 +3122,17 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     Next
 
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
-
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014 RQ00086
 
                 End If
 
@@ -3151,12 +3188,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " WHERE LISMessageID = '" & pLISMessageID & "' "
                     cmdText &= " AND ExportStatus = 'SENDING' "
 
-                    Dim dbCmd As New SqlCommand
-                    dbCmd.Connection = pDBConnection
-                    dbCmd.CommandText = cmdText
+                    'AG 25/07/2014 RQ00086 - improve memory usage
+                    'Dim dbCmd As New SqlCommand
+                    'dbCmd.Connection = pDBConnection
+                    'dbCmd.CommandText = cmdText
+                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
-                    resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                    'AG 25/07/2014 RQ00086
                 End If
 
             Catch ex As Exception

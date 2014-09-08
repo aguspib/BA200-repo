@@ -175,6 +175,7 @@
               <xs:element name="ExternalQC" msprop:Generator_ColumnVarNameInTable="columnExternalQC" msprop:Generator_ColumnPropNameInRow="ExternalQC" msprop:Generator_ColumnPropNameInTable="ExternalQCColumn" msprop:Generator_UserColumnName="ExternalQC" type="xs:boolean" minOccurs="0" />
               <xs:element name="SpecimenIDList" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="SpecimenIDList" msprop:Generator_ColumnVarNameInTable="columnSpecimenIDList" msprop:Generator_ColumnPropNameInTable="SpecimenIDListColumn" msprop:Generator_UserColumnName="SpecimenIDList" type="xs:string" minOccurs="0" />
               <xs:element name="TestLongName" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="TestLongName" msprop:Generator_ColumnVarNameInTable="columnTestLongName" msprop:Generator_ColumnPropNameInTable="TestLongNameColumn" msprop:Generator_UserColumnName="TestLongName" type="xs:string" minOccurs="0" />
+              <xs:element name="TestPosition" msprop:Generator_ColumnVarNameInTable="columnTestPosition" msprop:Generator_ColumnPropNameInRow="TestPosition" msprop:Generator_ColumnPropNameInTable="TestPositionColumn" msprop:Generator_UserColumnName="TestPosition" type="xs:int" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -232,6 +233,7 @@
               <xs:element name="AgeWithUnit" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AgeWithUnit" msprop:Generator_ColumnVarNameInTable="columnAgeWithUnit" msprop:Generator_ColumnPropNameInTable="AgeWithUnitColumn" msprop:Generator_UserColumnName="AgeWithUnit" type="xs:string" default="" minOccurs="0" />
               <xs:element name="PerformedBy" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="PerformedBy" msprop:Generator_ColumnVarNameInTable="columnPerformedBy" msprop:Generator_ColumnPropNameInTable="PerformedByColumn" msprop:Generator_UserColumnName="PerformedBy" type="xs:string" minOccurs="0" />
               <xs:element name="Comments" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="Comments" msprop:Generator_ColumnVarNameInTable="columnComments" msprop:Generator_ColumnPropNameInTable="CommentsColumn" msprop:Generator_UserColumnName="Comments" type="xs:string" minOccurs="0" />
+              <xs:element name="ReportDate" msprop:Generator_ColumnVarNameInTable="columnReportDate" msprop:Generator_ColumnPropNameInRow="ReportDate" msprop:Generator_ColumnPropNameInTable="ReportDateColumn" msprop:Generator_UserColumnName="ReportDate" type="xs:dateTime" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
