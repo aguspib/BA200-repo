@@ -41,7 +41,7 @@ Partial Public Class MasterTemplateLS
         '
         Me.XrPageInfo1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrPageInfo1.Format = "{0:dd/MM/yyyy HH:mm}"
-        Me.XrPageInfo1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 65.00002!)
+        Me.XrPageInfo1.LocationFloat = New DevExpress.Utils.PointFloat(10.0!, 60.0!)
         Me.XrPageInfo1.Name = "XrPageInfo1"
         Me.XrPageInfo1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrPageInfo1.PageInfo = DevExpress.XtraPrinting.PageInfo.DateTime
@@ -54,7 +54,7 @@ Partial Public Class MasterTemplateLS
         'XrPageInfo
         '
         Me.XrPageInfo.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrPageInfo.LocationFloat = New DevExpress.Utils.PointFloat(943.0001!, 65.00002!)
+        Me.XrPageInfo.LocationFloat = New DevExpress.Utils.PointFloat(943.0001!, 60.0!)
         Me.XrPageInfo.Name = "XrPageInfo"
         Me.XrPageInfo.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrPageInfo.SizeF = New System.Drawing.SizeF(100.0!, 15.0!)
@@ -107,7 +107,7 @@ Partial Public Class MasterTemplateLS
         Me.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FormattingRuleSheet.AddRange(New DevExpress.XtraReports.UI.FormattingRule() {Me.FormattingRule1})
         Me.Landscape = True
-        Me.Margins = New System.Drawing.Printing.Margins(63, 63, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 59, 25)
         Me.PageHeight = 827
         Me.PageWidth = 1169
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4

@@ -504,6 +504,9 @@
     <EmbeddedResource Include="ISE\IISECalibHistory.resx">
       <DependentUpon>IISECalibHistory.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reports\AutomaticPatientsReport.resx">
+      <DependentUpon>AutomaticPatientsReport.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\HistoricResultsByPatientSampleReport.resx">
       <DependentUpon>HistoricResultsByPatientSampleReport.vb</DependentUpon>
     </EmbeddedResource>

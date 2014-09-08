@@ -60,7 +60,7 @@ Partial Public Class AutomaticPatientsReport
         '
         'TopMargin
         '
-        Me.TopMargin.HeightF = 59.0!
+        Me.TopMargin.HeightF = 96.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.TopMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -376,7 +376,7 @@ Partial Public Class AutomaticPatientsReport
         Me.DataMember = "ReportSampleDetails"
         Me.DataSource = Me.ResultsDS1
         Me.Font = New System.Drawing.Font("Times New Roman", 9.75!, System.Drawing.FontStyle.Italic)
-        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 96, 25)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
