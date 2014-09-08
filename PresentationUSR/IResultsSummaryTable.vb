@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
+Imports Biosystems.Ax00.Global.TO
 
 Public Class IResultsSummaryTable
 
@@ -19,7 +20,7 @@ Public Class IResultsSummaryTable
         Public barcode As String
     End Class
 
-    Private TestNames As New Dictionary(Of String, String)
+    Private TestNames As New List(Of OrderTestTO)
     Private Patients As New Dictionary(Of String, PatientInfo)
     Private Const TestNameFormat As String = "{0} ({1})"
     Private LanguageID As String
@@ -248,27 +249,27 @@ Public Class IResultsSummaryTable
         Try
             If AverageResultsDS Is Nothing Then Return
 
-            TestNames.Clear()
-
             Dim TestsList As List(Of ResultsDS.vwksResultsRow)
             Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
-            Dim TestNameAndSampleClass As String
-            Dim TestId As String
 
-            For i As Integer = 0 To TestType.Length - 1
-                TestsList = _
-                    (From row In AverageResultsDS.vwksResults _
-                         Where row.TestType = TestType(i) _
-                         Select row).ToList()
+            TestNames.Clear()
 
-                For j As Integer = 0 To TestsList.Count - 1
-                    TestNameAndSampleClass = String.Format(TestNameFormat, TestsList(j).TestName, TestsList(j).SampleType)
-                    TestId = String.Format(TestNameFormat, TestsList(j).TestID, TestsList(j).TestType)
-                    If Not TestNames.ContainsKey(TestId) Then
-                        TestNames.Add(TestId, TestNameAndSampleClass)
-                    End If
-                Next
+            TestsList = (From row In AverageResultsDS.vwksResults _
+             Where TestType.Contains(row.TestType) _
+             Select row).ToList()
+
+            For j As Integer = 0 To TestsList.Count - 1
+                If (TestNames.Where(Function(t) t.TestId = TestsList(j).TestID And t.TestType = TestsList(j).TestType And t.SampleType = TestsList(j).SampleType).Count = 0) Then
+                    TestNames.Add(New OrderTestTO With {.TestId = TestsList(j).TestID,
+                                                        .TestType = TestsList(j).TestType,
+                                                        .SampleType = TestsList(j).SampleType,
+                                                        .TestPosition = TestsList(j).TestPosition,
+                                                        .TestName = TestsList(j).TestName,
+                                                        .ShortName = TestsList(j).ShortName})
+                End If
             Next
+
+            TestNames = TestNames.OrderBy(Function(t) t.SampleType).ThenBy(Function(t) t.TestPosition).ToList()
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".FillTestsList ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -289,6 +290,7 @@ Public Class IResultsSummaryTable
 
             Dim patientsList As IList(Of ResultsDS.vwksResultsRow) = (From row In AverageResultsDS.vwksResults
                                                                       Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                                                      Order By row.ResultDateTime _
                                                                       Select row).ToList()
 
             Dim patientDelegate As New PatientDelegate
@@ -344,7 +346,7 @@ Public Class IResultsSummaryTable
             Dim hasConcentrationError As Boolean
             Dim patientId As String
             Dim concentration As String = String.Empty
-            Dim TestId As String
+            Dim columnName As String
 
             'Get Tests and Patients Names
             FillTestsList()
@@ -360,25 +362,23 @@ Public Class IResultsSummaryTable
             bsPatientListDataGridView.Columns("PatientId").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             bsPatientListDataGridView.Columns("PatientId").Frozen = True
             'Patient Barcode Column
-            'bsPatientListDataGridView.Columns.Add("Barcode", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_Barcode", LanguageID))
-            bsPatientListDataGridView.Columns.Add("Barcode", "Barcode")
+            bsPatientListDataGridView.Columns.Add("Barcode", myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_BARCODE", LanguageID))
             bsPatientListDataGridView.Columns("Barcode").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             bsPatientListDataGridView.Columns("Barcode").Frozen = True
             'Patient FirstName Column
-            'bsPatientListDataGridView.Columns.Add("FirstName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_FirstName", LanguageID))
-            bsPatientListDataGridView.Columns.Add("FirstName", "FirstName")
+            bsPatientListDataGridView.Columns.Add("FirstName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_FirstName", LanguageID))
             bsPatientListDataGridView.Columns("FirstName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             bsPatientListDataGridView.Columns("FirstName").Frozen = True
             'Patient LastName Column
-            'bsPatientListDataGridView.Columns.Add("LastName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Summary_LastName", LanguageID))
-            bsPatientListDataGridView.Columns.Add("LastName", "LastName")
+            bsPatientListDataGridView.Columns.Add("LastName", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LastName", LanguageID))
             bsPatientListDataGridView.Columns("LastName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
             bsPatientListDataGridView.Columns("LastName").Frozen = True
 
             'Test Name Columns
             For i As Integer = 0 To TestNames.Count - 1
-                bsPatientListDataGridView.Columns.Add(TestNames.ElementAt(i).Value, TestNames.ElementAt(i).Value)
-                bsPatientListDataGridView.Columns(TestNames.ElementAt(i).Value).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+                columnName = String.Format("{0} ({1})", TestNames.ElementAt(i).TestName, TestNames.ElementAt(i).SampleType)
+                bsPatientListDataGridView.Columns.Add(TestNames.ElementAt(i).TestName, columnName)
+                bsPatientListDataGridView.Columns(TestNames.ElementAt(i).TestName).DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
             Next
 
             'Fill the Grid with data
@@ -391,12 +391,13 @@ Public Class IResultsSummaryTable
 
                 patientId = Patients.ElementAt(i).Key
                 For j As Integer = 0 To TestNames.Count - 1
-                    TestId = TestNames.ElementAt(j).Key
                     TestsList = (From row In AverageResultsDS.vwksResults _
-                                         Where String.Compare(row.PatientID, patientId, False) = 0 _
-                                         AndAlso String.Format(TestNameFormat, row.TestID, row.TestType) = TestId _
-                                         AndAlso row.AcceptedResultFlag _
-                                         Select row).ToList()
+                                     Where String.Compare(row.PatientID, patientId, False) = 0 _
+                                     AndAlso row.TestID = TestNames.ElementAt(j).TestId _
+                                     AndAlso row.SampleType = TestNames.ElementAt(j).SampleType _
+                                     AndAlso row.TestType = TestNames.ElementAt(j).TestType _
+                                     AndAlso row.AcceptedResultFlag _
+                                     Select row).ToList()
 
                     If TestsList.Count > 0 Then
 
@@ -423,7 +424,7 @@ Public Class IResultsSummaryTable
                         concentration = "-"
                     End If
 
-                    bsPatientListDataGridView(TestNames.ElementAt(j).Value, i).Value = concentration
+                    bsPatientListDataGridView(TestNames.ElementAt(j).TestName, i).Value = concentration
                 Next
             Next
 

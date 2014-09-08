@@ -591,6 +591,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 13/01/2014 - BT #1407 ==> Removed code changes made for BT #1444 due to field PatientID is still missing for Calculated Tests.  To solve all cases 
         '''                                           views vwksCalcResults and vwksCompleteResults were modified to return the field for all Test Types
         '''              AG 17/02/2014 - #1505 filter query by list of orders / ordertests depending which is informed (used in automatic upload to LIS)
+        '''              AG 04/04/2014 - #1884 Fill column SpecimenID for the Summary Results Report 
         ''' </remarks>
         Public Function GetCompleteResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, Optional ByVal pUploadResultsFlag As Boolean = False, _
@@ -645,6 +646,15 @@ Namespace Biosystems.Ax00.BL
 
                         Dim mytwksResultDAO As New twksResultsDAO()
                         resultData = mytwksResultDAO.GetCompleteResults(dbConnection, pAnalyzerID, pWorkSessionID, filterClause)
+
+                        'IT 04/09/2014 - #1884
+                        Dim AverageResultsDS As New ResultsDS
+                        If (Not resultData.HasError) Then
+                            AverageResultsDS = CType(resultData.SetDatos, ResultsDS)
+                        End If
+                        resultData = FillSpecimenIDListForReport(dbConnection, pWorkSessionID, AverageResultsDS)
+                        'IT 04/09/2014 - #1884
+
                         'AG 17/02/2014 - #1505
 
                         'AG 28/06/2013 - CANCELLED because the GetCompleteResults view does not return neither PatientID neither SampleID
@@ -6720,43 +6730,31 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim myExecutionDelegate As New ExecutionsDelegate
+                        Dim AverageResultsDS As New ResultsDS
 
-                        resultData = myExecutionDelegate.GetWSExecutionsResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                        Dim orderCalcDelg As New OrderCalculatedTestsDelegate
+                        Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
+                        resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
+                        End If
 
+                        Dim myResultsDelegate As New ResultsDelegate
+                        'Get all results for current Analyzer & WorkSession
+                        resultData = myResultsDelegate.GetCompleteResults(Nothing, pAnalyzerID, pWorkSessionID)
                         If (Not resultData.HasError) Then
-                            Dim AverageResultsDS As New ResultsDS
-                            Dim ExecutionsResultsDS As ExecutionsDS
+                            AverageResultsDS = CType(resultData.SetDatos, ResultsDS)
 
-                            ExecutionsResultsDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                            Dim myResultsDelegate As New ResultsDelegate
-
-                            'Get all results for current Analyzer & WorkSession
-                            resultData = myResultsDelegate.GetCompleteResults(Nothing, pAnalyzerID, pWorkSessionID)
-                            If (Not resultData.HasError) Then
-                                AverageResultsDS = CType(resultData.SetDatos, ResultsDS)
-                            End If
-
-                            Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
-
-                            'Fill Average PatientID and Name fields
-                            For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults.Rows
-                                If String.Compare(executionRow.SampleClass, "PATIENT", False) = 0 Then
-                                    If Not IsOrderProcessed.ContainsKey(executionRow.OrderID) Then
-                                        For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                            If String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0 Then
-                                                resultRow.PatientName = executionRow.PatientName
-                                                resultRow.PatientID = executionRow.PatientID
-                                                resultRow.SpecimenIDList = executionRow.SpecimenIDList
-                                            End If
-                                        Next resultRow
-
-                                        IsOrderProcessed(executionRow.OrderID) = True
-                                    End If
+                            'IT 04/04/2014 (INI) - #1884 Exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                            For Each row As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+                                If ((row.TestType = "CALC") And (toExcludeFromReport.Contains(row.OrderTestID))) Then
+                                    row.Delete()
                                 End If
-                            Next executionRow
+                            Next
 
+                            'Confirm changes done in the entry DataSet 
+                            AverageResultsDS.vwksResults.AcceptChanges()
+                            'IT 04/04/2014 (FIN) - #1884
                         End If
                     End If
                 End If

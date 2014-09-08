@@ -1670,6 +1670,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by: AG 25/06/2012
         ''' AG 17/02/2014 - #1505 new parameter pOnlineExportClause
+        ''' IT 05/09/2014 - #1884 Added join table tcfgReportsTestsSorting to the query
         ''' </remarks>
         Public Function GetCompleteResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                    Optional pOnlineExportClause As String = "") As GlobalDataTO
@@ -1686,7 +1687,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " INNER JOIN tcfgReportsTestsSorting TS ON TS.TestType = R.TestType AND TS.TestID = R.TestID "
                         cmdText &= " WHERE AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                    " AND WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
-                        cmdText &= " ORDER BY TS.TestPosition "
 
 
                         'AG 17/02/2014 - #1505
@@ -1695,7 +1695,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
                         'AG 17/02/2014 - #1505
 
-                        'cmdText &= " ORDER BY ResultDateTime DESC "
+                        cmdText &= " ORDER BY ResultDateTime DESC"
 
                         Dim lastResultsDS As New ResultsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
