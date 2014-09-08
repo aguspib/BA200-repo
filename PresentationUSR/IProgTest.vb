@@ -13572,7 +13572,7 @@ Public Class IProgTest
         End Try
     End Sub
 
-    Private Sub CopyTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CopyTestButton.Click
+    Private Sub CopyTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         Try
             'Block all Controls and enable only the Name and Short Name.
             EnableDisableControls(TestDetailsTabs.Controls, False)

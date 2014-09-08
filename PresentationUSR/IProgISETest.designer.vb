@@ -317,7 +317,7 @@ Partial Class IProgISETest
         '
         Me.bsPrintButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsPrintButton.Enabled = False
-        Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
+        Me.bsPrintButton.Location = New System.Drawing.Point(249, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
         Me.bsPrintButton.TabIndex = 4
@@ -327,7 +327,7 @@ Partial Class IProgISETest
         'bsEditButton
         '
         Me.bsEditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsEditButton.Location = New System.Drawing.Point(138, 613)
+        Me.bsEditButton.Location = New System.Drawing.Point(175, 613)
         Me.bsEditButton.Name = "bsEditButton"
         Me.bsEditButton.Size = New System.Drawing.Size(32, 32)
         Me.bsEditButton.TabIndex = 2
@@ -1168,7 +1168,7 @@ Partial Class IProgISETest
         'bsCustomOrderButton
         '
         Me.bsCustomOrderButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsCustomOrderButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsCustomOrderButton.Location = New System.Drawing.Point(212, 613)
         Me.bsCustomOrderButton.Name = "bsCustomOrderButton"
         Me.bsCustomOrderButton.Size = New System.Drawing.Size(32, 32)
         Me.bsCustomOrderButton.TabIndex = 3

@@ -81,7 +81,7 @@ Partial Class IProgControls
         'bsNewButton
         '
         Me.bsNewButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsNewButton.Location = New System.Drawing.Point(101, 613)
+        Me.bsNewButton.Location = New System.Drawing.Point(138, 613)
         Me.bsNewButton.Name = "bsNewButton"
         Me.bsNewButton.Size = New System.Drawing.Size(32, 32)
         Me.bsNewButton.TabIndex = 12
@@ -90,7 +90,7 @@ Partial Class IProgControls
         'bsEditButton
         '
         Me.bsEditButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsEditButton.Location = New System.Drawing.Point(138, 613)
+        Me.bsEditButton.Location = New System.Drawing.Point(175, 613)
         Me.bsEditButton.Name = "bsEditButton"
         Me.bsEditButton.Size = New System.Drawing.Size(32, 32)
         Me.bsEditButton.TabIndex = 13
@@ -99,7 +99,7 @@ Partial Class IProgControls
         'bsDeleteButton
         '
         Me.bsDeleteButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsDeleteButton.Location = New System.Drawing.Point(175, 613)
+        Me.bsDeleteButton.Location = New System.Drawing.Point(212, 613)
         Me.bsDeleteButton.Name = "bsDeleteButton"
         Me.bsDeleteButton.Size = New System.Drawing.Size(32, 32)
         Me.bsDeleteButton.TabIndex = 14
@@ -109,7 +109,7 @@ Partial Class IProgControls
         '
         Me.bsPrintButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.bsPrintButton.Enabled = False
-        Me.bsPrintButton.Location = New System.Drawing.Point(212, 613)
+        Me.bsPrintButton.Location = New System.Drawing.Point(249, 613)
         Me.bsPrintButton.Name = "bsPrintButton"
         Me.bsPrintButton.Size = New System.Drawing.Size(32, 32)
         Me.bsPrintButton.TabIndex = 15
