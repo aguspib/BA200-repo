@@ -5155,7 +5155,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pISEResult"></param>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 25/07/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 25/07/2012
+        ''' Modified by XB 08/09/2014 - Use ISE new FormatAffected method in ISEManager layer instead of the old method in ISEErrorTO - BA-1902
+        ''' </remarks>
         Public Function ActivateAnalyzerISEAlarms(ByVal pISEResult As ISEResultTO) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
@@ -5238,7 +5241,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Dim myResultAlarm As Integer = -1
                                 If E.ResultErrorCode <> ISEErrorTO.ISEResultErrorCodes.None Then
                                     myResultAlarm = CInt(E.ResultErrorCode)
-                                    Dim myAffected As String = ISEErrorTO.FormatAffected(E.Affected)
+
+                                    ' XB 08/09/2014 - BA-1902
+                                    'Dim myAffected As String = ISEErrorTO.FormatAffected(E.Affected)
+                                    Dim myAffected As String = ISEManager.FormatAffected(E.Affected)
+                                    ' XB 08/09/2014 - BA-1902
+
                                     myAdditionalInfo &= GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR & myAlarmOrigin & ":R" & myResultAlarm.ToString & ": (" + myAffected + ")"
                                 End If
 

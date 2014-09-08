@@ -2041,6 +2041,7 @@ Public Class IISEUtilities
     ''' Created by:  XB 24/01/2012
     ''' Modified by: XB 27/09/2013 - BT #1294 ==> Set the value by default to ISE Washing solution position tube
     '''              XB 28/04/2014 - Disable screen when saving consumptions
+    '''              XB 08/09/2014 - Use ISE new FormatAffected method in ISEManager layer instead of the old method in ISEErrorTO - BA-1902
     ''' </remarks>
     Private Sub PrepareTestedMode(Optional ByVal pResponse As RESPONSE_TYPES = RESPONSE_TYPES.OK)
         Try
@@ -2695,7 +2696,11 @@ Public Class IISEUtilities
                                                 'End If
                                             Else
                                                 Dim myDesc = MyClass.myISEManager.GetISEErrorDescription(E, False, isCalibration)
-                                                myText = myText & vbCrLf & myDesc & " (" & ISEErrorTO.FormatAffected(E.Affected) & ")"
+
+                                                ' XB 08/09/2014 - BA-1902
+                                                'myText = myText & vbCrLf & myDesc & " (" & ISEErrorTO.FormatAffected(E.Affected) & ")"
+                                                myText = myText & vbCrLf & myDesc & " (" & ISEManager.FormatAffected(E.Affected) & ")"
+                                                ' XB 08/09/2014 - BA-1902
                                             End If
                                         Next
                                     End If
