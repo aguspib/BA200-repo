@@ -742,7 +742,7 @@ Public Class IProgISETest
             bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage)) 'AG 05/09/2014 - BA-1869
+            'bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage)) 'AG 05/09/2014 - BA-1869
 
             ' WE 01/08/2014 - #1865
             ' Details tab
@@ -1279,8 +1279,8 @@ Public Class IProgISETest
             bsPrintButton.Visible = False
 
             'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
-            'auxIconName = GetIconName("CUSTOMSORT")
-            'If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            auxIconName = GetIconName("ADJUSTMENT")
+            If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName, True)
 
 
             'SAVE Button
@@ -2040,7 +2040,7 @@ Public Class IProgISETest
 
                 Case "OPERATOR"
                     bsEditButton.Enabled = False
-                    bsCustomOrderButton.Enabled = False 'AG 05/09/2014 - BA-1869
+                    bsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
                     'bsPrintButton.Enabled = False dl 11/05/2012
                     Exit Select
             End Select
