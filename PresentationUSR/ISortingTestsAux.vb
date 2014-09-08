@@ -285,7 +285,13 @@ Public Class ISortingTestsAux
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'For Labels.....
-            TestSortingLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Sorting_Reports", CurrentLanguage)
+            'AG 08/09/2014 - BA-1869
+            'TestSortingLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Sorting_Reports", CurrentLanguage)
+            If openModeAttribute = String.Empty Then
+                TestSortingLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Sorting_Reports", CurrentLanguage)
+            Else
+                TestSortingLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TEST_SORTING_SELECTION", CurrentLanguage)
+            End If
 
             'For Button Tooltips...
             ScreenToolTips.SetToolTip(UpPosButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Move_Up", CurrentLanguage))
@@ -743,6 +749,8 @@ Public Class ISortingTestsAux
     ''' </remarks>
     Private Sub PrepareTestListGrid()
         Try
+            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
             bsTestListGrid.Columns.Clear()
 
             Dim witdhToLess As Integer = 0
@@ -753,6 +761,7 @@ Public Class ISortingTestsAux
                     .HeaderText = ""
                     .Width = 24
                     witdhToLess += .Width
+                    .ToolTipText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AVAILABILITY", CurrentLanguage)
                 End With
                 bsTestListGrid.Columns.Add(availableColumn)
             End If
@@ -767,7 +776,6 @@ Public Class ISortingTestsAux
             End With
             bsTestListGrid.Columns.Add(iconColumn)
 
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             Dim multiLanguageID As String = "LBL_TestNames"
             If openModeAttribute <> String.Empty AndAlso ScreenIDAttribute = "PROFILE" Then
                 multiLanguageID = "LBL_Profiles_ListName"
