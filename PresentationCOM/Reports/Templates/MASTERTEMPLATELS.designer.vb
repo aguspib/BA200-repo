@@ -107,7 +107,7 @@ Partial Public Class MasterTemplateLS
         Me.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.FormattingRuleSheet.AddRange(New DevExpress.XtraReports.UI.FormattingRule() {Me.FormattingRule1})
         Me.Landscape = True
-        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(50, 50, 59, 25)
         Me.PageHeight = 827
         Me.PageWidth = 1169
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
