@@ -95,7 +95,7 @@ Partial Public Class MASTERTEMPLATE
         Me.DesignerOptions.ShowDesignerHints = False
         Me.DesignerOptions.ShowExportWarnings = False
         Me.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.Margins = New System.Drawing.Printing.Margins(59, 59, 59, 25)
+        Me.Margins = New System.Drawing.Printing.Margins(50, 50, 59, 25)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4

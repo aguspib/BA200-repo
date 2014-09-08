@@ -22,7 +22,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR 19/06/2012 
         ''' Modified by: AG 24/04/2013 - Added new fields: LISRequest, ExternalQC, SpecimenID, AwosID, ESOrderID, ESPatientID, LISOrderID, 
         '''                              LISPatientID, LISTestName, LISSampleType, LISUnits
-        '''              SA 04/09/2014 - BA-1919 ==> When insert LIS fields, use the N prefix to save correctly texts containing two-bytes characters
+        '''              SA 04/09/2014 - BA-1919 ==> When insert LIS fields, use the N prefix to save correctly texts containing two-bytes characters.
+        '''                                          Use also the Replace function to save correctly texts containing single quotes
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisWSOrderTestsDS As HisWSOrderTestsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -101,62 +102,62 @@ Namespace Biosystems.Ax00.DAL.DAO
                             End If
 
                             If (Not hisWSOrderTestRow.IsSpecimenIDNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.SpecimenID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.SpecimenID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsAwosIDNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.AwosID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.AwosID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsESOrderIDNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.ESOrderID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.ESOrderID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsESPatientIDNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.ESPatientID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.ESPatientID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISOrderIDNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISOrderID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISOrderID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISPatientIDNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISPatientID.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISPatientID.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISTestNameNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISTestName.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISTestName.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISSampleTypeNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISSampleType.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISSampleType.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL ")
                             End If
 
                             If (Not hisWSOrderTestRow.IsLISUnitsNull) Then
-                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISUnits.Trim & "' ")
+                                cmdText.AppendLine(", N'" & hisWSOrderTestRow.LISUnits.Replace("'", "''").Trim & "' ")
                             Else
                                 cmdText.AppendLine(", NULL")
                             End If
                             cmdText.Append(")")
                             'AG 24/04/2013
 
-                            cmdText.AppendFormat("{0}SELECT SCOPE_IDENTITY()", vbCrLf)
+                            cmdText.AppendFormat("{0} SELECT SCOPE_IDENTITY()", vbCrLf)
 
                             dbCmd.CommandText = cmdText.ToString()
                             HistOrderTestID = CInt(dbCmd.ExecuteScalar())

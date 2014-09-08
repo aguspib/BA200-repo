@@ -1497,6 +1497,7 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myDAO.GetRelatedCalculatedTest(dbConnection, row.TestID, pTestType)
                             If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                                 affectedCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                                Dim myTestProfileDlg As New TestProfilesDelegate
 
                                 'CalcTest programming screen protection: Calculated tests whose formula contains another calc test cannot form part of another calc test
                                 For Each calculatedRow As CalculatedTestsDS.tparCalculatedTestsRow In affectedCalcTestsDS.tparCalculatedTests.Rows
@@ -1512,9 +1513,17 @@ Namespace Biosystems.Ax00.BL
                                 'Finally call myDAO.UpdateCustomPositionAndAvailable
                                 myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, auxDS)
 
-                                If auxList.Count > 0 AndAlso pTestType <> "CALC" Then
-                                    'Finally these calc tests may form part of another calculated test
-                                    myGlobalDataTO = Me.ResetAvailableCascade(dbConnection, auxList, "CALC")
+                                If Not myGlobalDataTO.HasError AndAlso auxList.Count > 0 Then
+                                    If pTestType <> "CALC" Then
+                                        'Finally these calc tests may form part of another calculated test
+                                        myGlobalDataTO = Me.ResetAvailableCascade(dbConnection, auxList, "CALC")
+                                    End If
+
+                                    'Set as not available those profiles using these calculated tests
+                                    If Not myGlobalDataTO.HasError Then
+                                        myGlobalDataTO = myTestProfileDlg.ResetAvailableCascade(dbConnection, auxList, "CALC")
+                                    End If
+
                                 End If
 
                             End If
