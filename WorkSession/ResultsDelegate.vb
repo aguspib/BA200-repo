@@ -6118,6 +6118,7 @@ Namespace Biosystems.Ax00.BL
         '''             AG 28/06/2013 - Patch for the test types without executions
         '''             SA 30/04/2014 - BT #1608 ==> When the header for Test is filled, if field TestLongName is informed, use it as Test Name
         '''                                          instead of field TestName
+        '''             AG 10/09/2014 - BA-1894 and BA-1897 integrate also in reports by TEST the same functionality existing by PATIENT (v3.0.2.2)
         ''' </remarks>
         Public Function GetResultsByTestForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                   ByVal pWorkSessionID As String) As GlobalDataTO
@@ -6138,6 +6139,26 @@ Namespace Biosystems.Ax00.BL
                                                                  Order By row.TestPosition _
                                                                    Select row.OrderTestID Distinct).ToList()
 
+                            'AG 10/09/2014 - #1894 Get all orderTests that form part of a calculated test that has to be excluded from patients final report
+                            Dim orderCalcDelg As New OrderCalculatedTestsDelegate
+                            Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
+                            resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
+
+                                'Remove these orderTest from OrderTestList of STD tests
+                                If toExcludeFromReport.Count > 0 Then
+                                    Dim positionToDelete As Integer = 0
+                                    For Each item As Integer In toExcludeFromReport
+                                        If OrderTestList.Contains(item) Then
+                                            positionToDelete = OrderTestList.IndexOf(item)
+                                            OrderTestList.RemoveAt(positionToDelete)
+                                        End If
+                                    Next
+                                End If
+                            End If
+                            'AG 10/09/2014
+
                             'TR 09/07/2012
                             Dim AverageResultsDS As New ResultsDS
                             resultData = GetResultsForReports(dbConnection, OrderTestList)
@@ -6145,20 +6166,29 @@ Namespace Biosystems.Ax00.BL
                                 AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
 
                                 'Get Calculated Results
-                                resultData = GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                                'AG 10/09/2014 #1897 add new optional parameter to TRUE / add only order tests not existing in to exclude list
+                                resultData = GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                        'AG 10/09/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                                        If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+                                            AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                        End If
                                     Next
                                 End If
+
                             End If
 
                             If (Not resultData.HasError) Then
-                                'Get ISE & OffSystem tests Results
-                                resultData = GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                                'Get ISE & OffSystem Tests Results
+                                'AG 10/09/2014 #1897 add new optional parameter to TRUE / add only order tests not existing in to exclude list
+                                resultData = GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                    For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
+                                        'AG 10/09/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+                                        If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+                                            AverageResultsDS.vwksResults.ImportRow(resultRow)
+                                        End If
                                     Next resultRow
                                 End If
 
@@ -6168,6 +6198,20 @@ Namespace Biosystems.Ax00.BL
                                     AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
                                 End If
                                 'AG 28/06/2013
+
+                                'AG 10/09/2014 #1897 Finally sort the dataset using the TestPosition column
+                                Dim sortedReportList As New List(Of ResultsDS.vwksResultsRow)
+                                Dim sortedResultsToPrintDS As New ResultsDS
+                                sortedReportList = (From a As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults _
+                                              Select a Order By a.TestPosition Ascending).ToList
+
+                                For Each reportRow As ResultsDS.vwksResultsRow In sortedReportList
+                                    sortedResultsToPrintDS.vwksResults.ImportRow(reportRow)
+                                Next
+                                sortedResultsToPrintDS.vwksResults.AcceptChanges()
+                                AverageResultsDS = sortedResultsToPrintDS
+                                sortedReportList = Nothing
+                                'AG 10/09/2014 #1897
 
                                 Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
 
