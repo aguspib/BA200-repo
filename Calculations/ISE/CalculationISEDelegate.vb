@@ -10,8 +10,8 @@ Namespace Biosystems.Ax00.Calculations
     Public Class CalculationISEDelegate
 
         ''' <summary>
-        ''' Apply the correction calculation to the recived concentration. 
-        ''' calculation formula ==> Y= SlopeA * x + SlopeB.
+        ''' Apply the preloaded correction calculation to the recived concentration. 
+        ''' calculation formula ==> Y= SlopeA1 * x + SlopeB1.
         ''' </summary>
         ''' <param name="pSampleType"></param>
         ''' <param name="pElectrodeID"></param>
@@ -22,114 +22,94 @@ Namespace Biosystems.Ax00.Calculations
         ''' MODIFIED BY: TR 13/04/2012 - On the sample type validation instead of validating the SER and URI, we only validate if SampleType is
         '''                              diferent then URI, because the Samples type are PLM, SER, URI. (by now)
         '''              XB 04/06/2013 - change URI sample type comparisons in order to prepare the code in front of DB changes
+        '''              AG 15/09/2014 - BA-1918 apply new preloaded ISE correction factors (for URI - Li and for PLM)
+        '''                              Rewrite the code and rename method from CalculateConcentrationCorrection to CalculatePreloadedConcentrationCorrection
+        '''                              to differentiate from the optional user defined correction
         ''' </remarks>
-        Public Function CalculateConcentrationCorrection(ByVal pSampleType As String, ByVal pElectrodeID As String, _
+        Public Function CalculatePreloadedConcentrationCorrection(ByVal pSampleType As String, ByVal pElectrodeID As String, _
                                                          ByVal pConcValue As Single) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Try
-                Dim mySlopeA As Single = 0
+                Dim mySlopeA As Single = 1
                 Dim mySlopeB As Single = 0
 
+                Dim myParamA As GlobalEnumerates.SwParameters = GlobalEnumerates.SwParameters.APP_NAME_FOR_LIS 'Initiate with a wrong value
+                Dim myParamB As GlobalEnumerates.SwParameters = GlobalEnumerates.SwParameters.APP_NAME_FOR_LIS 'Initiate with a wrong value
+
                 'Get Slopes values.
+                'AG 15/09/2014 - BA-1918 different slope factors for SER, PLM, URI
                 Select Case pElectrodeID
                     Case "Li"
-                        'If Not String.Equals(pSampleType, "URI") Then  ' XB 04/06/2013
-                        If Not pSampleType.Contains("URI") Then         ' XB 04/06/2013
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_SER_Li)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        If pSampleType.Contains("SER") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_SER_Li
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_Li
 
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_Li)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        Else
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_URI_Li
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_Li
                         End If
 
                     Case "Na"
-                        'If Not String.Equals(pSampleType, "URI") Then  ' XB 04/06/2013
-                        If Not pSampleType.Contains("URI") Then         ' XB 04/06/2013
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_SER_Na)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        If pSampleType.Contains("SER") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_SER_Na
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_Na
 
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_Na)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        ElseIf pSampleType.Contains("PLM") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_PLM_Na
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_PLM_Na
 
-                        Else
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_URI_Na)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
-
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_Na)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
-
+                        Else 'URI
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_URI_Na
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_Na
                         End If
 
                     Case "K"
-                        'If pSampleType <> "URI" Then               ' XB 04/06/2013
-                        If Not pSampleType.Contains("URI") Then     ' XB 04/06/2013
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_SER_K)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        If pSampleType.Contains("SER") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_SER_K
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_K
 
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_K)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        ElseIf pSampleType.Contains("PLM") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_PLM_K
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_PLM_K
 
-                        Else
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_URI_K)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
-
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_K)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
-
+                        Else 'URI
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_URI_K
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_K
                         End If
+
                     Case "Cl"
-                        'If pSampleType <> "URI" Then               ' XB 04/06/2013
-                        If Not pSampleType.Contains("URI") Then     ' XB 04/06/2013
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_SER_Cl)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        If pSampleType.Contains("SER") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_SER_Cl
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_Cl
 
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_SER_Cl)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        ElseIf pSampleType.Contains("PLM") Then
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_PLM_Cl
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_PLM_Cl
 
-                        Else
-                            'Get Slope value 
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_SLOPE_URI_Cl)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
-
-                            'Get Intercept value
-                            myGlobalDataTO = GetSlopeValues(GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_Cl)
-                            If myGlobalDataTO.HasError Then Exit Select
-                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
-
+                        Else 'URI
+                            myParamA = GlobalEnumerates.SwParameters.ISE_SLOPE_URI_Cl
+                            myParamB = GlobalEnumerates.SwParameters.ISE_INTERCEPT_URI_Cl
                         End If
+
                 End Select
 
-                Dim myNewConcValue As Single = 0
+                'Get Slope values
+                If myParamA <> GlobalEnumerates.SwParameters.APP_NAME_FOR_LIS AndAlso myParamB <> GlobalEnumerates.SwParameters.APP_NAME_FOR_LIS Then
+                    myGlobalDataTO = GetSlopeValues(myParamA)
+                    If Not myGlobalDataTO.HasError Then
+                        mySlopeA = DirectCast(myGlobalDataTO.SetDatos, Single)
 
-                'NOTE: EF & AG 09/11/2012 Urine ISE results (require dilutions) but Sw do NOT apply the predilution factor to the concentration result (as we do in biochemical)
-                '                    the own ISE module knows it is an urine sample and apply automatically the correct factor
-                '                    Sw has to apply only the slope correction
+                        'Get Intercept value
+                        myGlobalDataTO = GetSlopeValues(myParamB)
+                        If Not myGlobalDataTO.HasError Then
+                            mySlopeB = DirectCast(myGlobalDataTO.SetDatos, Single)
+                        End If
+                    End If
+                End If
+                'AG 15/09/2014 - BA-1918
 
+                'Dim myNewConcValue As Single = 0
+                Dim myNewConcValue As Single = pConcValue
 
                 'Formula Y= SlopeA * x + SlopeB
                 'Validate if not error.
@@ -145,7 +125,7 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculateConcentrationCorrection", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculatePreloadedConcentrationCorrection", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -183,6 +163,61 @@ Namespace Biosystems.Ax00.Calculations
             Return myGlobalDataTO
         End Function
 
+
+        ''' <summary>
+        ''' Apply the user defined correction calculation to the recived concentration. 
+        ''' calculation formula ==> Y= SlopeA2 * x + SlopeB2
+        ''' </summary>
+        ''' <param name="pSampleType"></param>
+        ''' <param name="pISETestID"></param>
+        ''' <param name="pConcValue"></param>
+        ''' <returns>GlobaldataTO with single as data </returns>
+        ''' <remarks>
+        ''' CREATED BY:  AG 15/09/2014 - BA-1918
+        ''' </remarks>
+        Public Function CalculateUserDefinedConcentrationCorrection(ByVal pSampleType As String, ByVal pISETestID As Integer, _
+                                                         ByVal pConcValue As Single) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+
+                Dim mySlopeA As Single = 1
+                Dim mySlopeB As Single = 0
+                Dim userSlopeDefined As Boolean = False
+
+                'Read tparISETestSamples by pSampleType , pISETestID
+                'If results found update mySlopeA, mySlopeB variables
+                Dim testSamplesDlg As New ISETestSamplesDelegate
+                myGlobalDataTO = testSamplesDlg.GetListByISETestID(Nothing, pISETestID, pSampleType)
+                If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                    Dim auxDS As New ISETestSamplesDS
+                    auxDS = DirectCast(myGlobalDataTO.SetDatos, ISETestSamplesDS)
+                    If auxDS.tparISETestSamples.Rows.Count > 0 AndAlso Not auxDS.tparISETestSamples(0).IsSlopeFactorA2Null AndAlso Not auxDS.tparISETestSamples(0).IsSlopeFactorB2Null Then
+                        mySlopeA = auxDS.tparISETestSamples(0).SlopeFactorA2
+                        mySlopeB = auxDS.tparISETestSamples(0).SlopeFactorB2
+                        UserSlopeDefined = True
+                    End If
+                End If
+
+                Dim myNewConcValue As Single = pConcValue
+
+                'Formula Y= SlopeA * x + SlopeB
+                'Validate if not error.
+                If Not myGlobalDataTO.HasError AndAlso UserSlopeDefined Then
+                    myNewConcValue = (mySlopeA * pConcValue) + mySlopeB
+                End If
+
+                myGlobalDataTO.SetDatos = myNewConcValue
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculateUserDefinedConcentrationCorrection", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
 
     End Class
 End Namespace

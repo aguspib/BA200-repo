@@ -2731,7 +2731,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-  
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field on tparControls table</Label>
@@ -2754,7 +2753,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field TestLongName on tparISETestSamples table</Label>
@@ -2766,8 +2764,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field TestLongName on thisISETestSamples table</Label>
@@ -2779,8 +2775,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field TestLongName on tqcHistoryTestSamples table</Label>
@@ -2792,7 +2786,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field SlopeFactorA2 on tparISETestSamples table</Label>
@@ -2804,7 +2797,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field SlopeFactorB2 on tparISETestSamples table</Label>
@@ -2816,7 +2808,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field SlopeFactorA2 on thisISETestSamples table</Label>
@@ -2828,7 +2819,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New column field SlopeFactorB2 on thisISETestSamples table</Label>
@@ -2840,7 +2830,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>View vhisTestSamples has been changed to return also the TestLongName</Label>
@@ -2852,7 +2841,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-  
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>Some Views has been changed to return the ShortName of Tests</Label>
@@ -2869,7 +2857,6 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
   <IntegrityValidation>
     <Version>3.10</Version>
     <Label>DataType of column ManualResultText in thisWSResults has been changed from VARCHAR to NVARCHAR</Label>
@@ -2881,6 +2868,18 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Preloaded parameters for ISE results corrections</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwParameters WHERE ParameterName LIKE '%ISE_SLOPE%' OR ParameterName LIKE '%ISE_INTERCEPT%' ) = 22)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
 </DBIntegrityDS>
 
 

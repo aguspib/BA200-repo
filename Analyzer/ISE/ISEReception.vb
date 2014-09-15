@@ -450,28 +450,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         'Set the Concentration value depenting on the ISE_ResultID
                                         Select Case (execRow.ISE_ResultID)
                                             Case "Na"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "K"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "Cl"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "Li"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
@@ -480,6 +480,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             Case Else
                                                 Exit Select
                                         End Select
+
+                                        'AG 15/09/2014 - BA-1918 apply the user defined slope (if any)
+                                        If Not myGlobalDataTO.HasError Then
+                                            myGlobalDataTO = myCalculationISEDelegate.CalculateUserDefinedConcentrationCorrection(execRow.SampleType, execRow.TestID, execRow.CONC_Value)
+                                            If Not myGlobalDataTO.HasError Then
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                            End If
+                                        End If
+                                        'AG 15/09/2014 - BA-1918
 
                                         'Get all received ISE Alarms and move them to a typed DataSet WSExecutionAlarmsDS
                                         qAlarmResult = (From a In pISEResult.Errors _
@@ -2783,7 +2792,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         'Set the concentration value depenting on the ISE ResultID
                                         Select Case (execRow.ISE_ResultID)
                                             Case "Na"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Na", pISEResult.ConcentrationValues.Na)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
@@ -2791,21 +2800,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                 Exit Select
 
                                             Case "K"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "K", pISEResult.ConcentrationValues.K)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "Cl"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Cl", pISEResult.ConcentrationValues.Cl)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
                                                 Exit Select
 
                                             Case "Li"
-                                                myGlobalDataTO = myCalculationISEDelegate.CalculateConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
+                                                myGlobalDataTO = myCalculationISEDelegate.CalculatePreloadedConcentrationCorrection(execRow.SampleType, "Li", pISEResult.ConcentrationValues.Li)
                                                 If (myGlobalDataTO.HasError) Then Exit For
 
                                                 execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
@@ -2814,6 +2823,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             Case Else
                                                 Exit Select
                                         End Select
+
+                                        'AG 15/09/2014 - BA-1918 apply the user defined slope (if any)
+                                        If Not myGlobalDataTO.HasError Then
+                                            myGlobalDataTO = myCalculationISEDelegate.CalculateUserDefinedConcentrationCorrection(execRow.SampleType, execRow.TestID, execRow.CONC_Value)
+                                            If Not myGlobalDataTO.HasError Then
+                                                execRow.CONC_Value = DirectCast(myGlobalDataTO.SetDatos, Single)
+                                            End If
+                                        End If
+                                        'AG 15/09/2014 - BA-1918
 
                                         'Manage all received Alarms
                                         qAlarmResult = (From a In pISEResult.Errors _

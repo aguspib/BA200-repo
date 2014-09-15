@@ -689,6 +689,8 @@ Namespace Biosystems.Ax00.Global
             ISE_INTERCEPT_SER_K
             ISE_SLOPE_SER_Cl
             ISE_INTERCEPT_SER_Cl
+            ISE_SLOPE_URI_Li 'AG 15/09/2014 - BA-1918 new preloaded ISE slope factors for URI
+            ISE_INTERCEPT_URI_Li 'AG 15/09/2014 - BA-1918 new preloaded ISE slope factors for URI
             ISE_SLOPE_URI_Na
             ISE_INTERCEPT_URI_Na
             ISE_SLOPE_URI_K
@@ -696,6 +698,15 @@ Namespace Biosystems.Ax00.Global
             ISE_SLOPE_URI_Cl
             ISE_INTERCEPT_URI_Cl
             'TR 14/03/2012 -END.
+
+            'AG 15/09/2014 - BA-1918 new preloaded ISE slope factors for PLM
+            ISE_SLOPE_PLM_Na
+            ISE_INTERCEPT_PLM_Na
+            ISE_SLOPE_PLM_K
+            ISE_INTERCEPT_PLM_K
+            ISE_SLOPE_PLM_Cl
+            ISE_INTERCEPT_PLM_Cl
+            'AG 15/09/2014 - BA-1918
 
             ISE_SECURITY_MODE 'SG 28/06/2012 Determines which kind of validation has to be performed 
             ISE_CMD_TIMEOUT 'SGM 02/07/2012 Time for wait Action 34 (ISE Instruction Start)
