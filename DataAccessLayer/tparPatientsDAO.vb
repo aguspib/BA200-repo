@@ -505,7 +505,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pSelectedPatients">List of selected Patient IDs. Optional parameter; when it is not informed, it means all 
         '''                                 existing Patients have to be included in the report</param>
         ''' <remarks>
-        ''' Created by: RH 02/12/2011
+        ''' Created by:  RH 02/12/2011
+        ''' Modified by: SA 15/09/2014 - BA-1921 ==> For each PatientID added to the list of Patients to search using the IN Clause, call function
+        '''                                          Replace to avoid exception when the PatientID contains single quotes
         ''' </remarks>
         Public Function GetPatientsForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAppLang As String, _
                                              Optional ByVal pSelectedPatients As List(Of String) = Nothing) As GlobalDataTO
@@ -522,7 +524,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (Not pSelectedPatients Is Nothing AndAlso pSelectedPatients.Count > 0) Then
                             Dim patientsList As New StringBuilder()
                             For Each p As String In pSelectedPatients
-                                patientsList.AppendFormat("N'{0}', ", p)
+                                patientsList.AppendFormat("N'{0}', ", p.Trim.Replace("'", "''"))
                             Next
 
                             mySelectedPatients = String.Format(" WHERE P.PatientID IN ({0})", patientsList.ToString().Substring(0, patientsList.Length - 2))

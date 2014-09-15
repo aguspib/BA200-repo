@@ -73,6 +73,7 @@ Namespace Biosystems.Ax00.BL
         '''          ** FALSE: if there are not changes in the entry list</returns>
         ''' <remarks>
         ''' Created by:  SA 02/09/2014 - BA-1868
+        ''' Modified by: SA 09/09/2014 - BA-1868 ==> Changes to solve errors found in the unit test
         ''' </remarks>
         Public Function MarkExcludedExpTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisResultsDataTable As List(Of HisWSResultsDS.vhisWSResultsRow), _
                                              ByVal pAnalyzerID As String) As GlobalDataTO
@@ -85,6 +86,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'Get the list of all selected Calculated Tests
                         Dim lstCalculatedOT As List(Of Integer) = (From a In pHisResultsDataTable _
                                                                  Where a.TestType = "CALC" _
                                                                 Select a.HistOrderTestID).ToList
@@ -103,48 +105,59 @@ Namespace Biosystems.Ax00.BL
                                                                                                                     Where a.PrintExpTests = True _
                                                                                                                    Select a).ToList()
 
-                                'Get the list of HistOrderTestIDs of Experimental Tests that have to be EXCLUDED from reports
-                                Dim lstExpToExclude As List(Of HisWSCalcTestRelations.thisWSCalcTestsRelationsRow) = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
-                                                                                                                      Where a.PrintExpTests = False _
-                                                                                                                     Select a).ToList()
+                                Dim lstSearch As List(Of HisWSCalcTestRelations.thisWSCalcTestsRelationsRow)
+                                For Each row As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstExpToPrint
+                                    'Verify if the Experimental Test to Print is in the formula of a Calculated Tests that is part of another Calculated Test with PrintExpTests = False
+                                    'Note to understand this case:
+                                    ' ** ALBUMIN/GLOBULIN has PrintExpTests = False, which means that component tests ALBUMIN and GLOBULIN will not be printed
+                                    ' ** GLOBULIN (=PROTEIN TOTAL - ALBUMIN) has PrintExpTests = True, which means that component tests ALBUMIN and PROTEIN TOTAL should be printed;
+                                    '    but, due to the GLOBULIN will be not printed, then ALBUMIN and PROTEIN TOTAL will not be printed either
+                                    lstSearch = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
+                                                Where a.AnalyzerID = row.AnalyzerID _
+                                              AndAlso a.WorkSessionID = row.WorkSessionID _
+                                              AndAlso a.HistOrderTestID = row.HistOrderTestIDCALC _
+                                              AndAlso a.PrintExpTests = False
+                                               Select a).ToList()
 
-                                If (lstExpToPrint.Count > 0) Then
-                                    Dim lstSearch As List(Of HisWSCalcTestRelations.thisWSCalcTestsRelationsRow)
-                                    For Each row As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstExpToExclude
-                                        'Verify that the HistOrderTestID does not exist in the list of Experimental Tests that have to be printed 
-                                        '(some Tests can be shared between different Calculated Tests)
-                                        lstSearch = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstExpToPrint _
-                                                    Where a.AnalyzerID = row.AnalyzerID _
-                                                  AndAlso a.WorkSessionID = row.WorkSessionID _
-                                                  AndAlso a.HistOrderTestID = row.HistOrderTestID _
-                                                   Select a).ToList()
-
-                                        'Remove the Experimental Tests from the list of tests ToExclude (due to it has to be printed for another Calculated Test)
-                                        If (lstSearch.Count > 0) Then row.Deleted = True
-                                    Next
-                                    lstSearch = Nothing
-                                End If
-
-                                'Finally, remove from pHisResultsDataTable all Tests included in the list of tests ToExclude that are not marked with Deleted = True
-                                Dim lstFinalSearch As List(Of HisWSResultsDS.vhisWSResultsRow)
-                                For Each row As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstExpToExclude
-                                    If (Not row.Deleted) Then
-                                        lstFinalSearch = (From a As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable _
-                                                         Where a.AnalyzerID = row.AnalyzerID _
-                                                       AndAlso a.WorkSessionID = row.WorkSessionID _
-                                                       AndAlso a.HistOrderTestID = row.HistOrderTestID _
-                                                        Select a).ToList
-
-                                        If (lstFinalSearch.Count > 0) Then
-                                            lstFinalSearch.First.ExpTestToPrint = False
-                                            testsWereExcluded = True
-                                        End If
-                                    End If
+                                    'If the Calculated Test has not to be printed, then the component Test has not to be printed
+                                    If (lstSearch.Count > 0) Then row.PrintExpTests = False
                                 Next
 
-                                lstExpToPrint = Nothing
-                                lstExpToExclude = Nothing
-                                lstFinalSearch = Nothing
+                                'For each Order Test selected to print, calculate the correct value for flag ExpTestToPrint
+                                For Each row As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable
+                                    'Verify if the Test is included in a selected Calculated Test
+                                    lstSearch = (From b As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
+                                                Where b.AnalyzerID = row.AnalyzerID _
+                                              AndAlso b.WorkSessionID = row.WorkSessionID _
+                                              AndAlso b.HistOrderTestID = row.HistOrderTestID _
+                                               Select b).ToList()
+
+                                    If (lstSearch.Count = 0) Then
+                                        'The selected Test is not included in the formula of a selected Calculated Test ==> it will be printed
+                                        row.ExpTestToPrint = True
+
+                                    ElseIf (lstSearch.Count = 1) Then
+                                        'The selected Test is included in the formula of a selected Calculated Test (only one) ==> it will be printed or not 
+                                        'according value of the PrintExpTests flag for the Calculated Test
+                                        row.ExpTestToPrint = lstSearch.First.PrintExpTests
+
+                                    Else
+                                        'The selected Test is included in the formula of several selected Calculated Tests ==> it will be printed if flag PrintExpTests is True
+                                        'for at least one of the Calculated Tests
+                                        If ((From c As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstSearch Where c.PrintExpTests = True).ToList.Count = 0) Then
+                                            'All Calculated Tests have PrintExpTests = False; the component Test will not be printed
+                                            row.ExpTestToPrint = False
+                                        Else
+                                            'At least one of the Calculated Tests has PrintExpTests = True: the component Test will be printed
+                                            row.ExpTestToPrint = True
+                                        End If
+                                    End If
+
+                                    'If at least one of the selected Order Tests was marked with ExpTestsToPrint = False, the function will return TRUE
+                                    If (Not testsWereExcluded And Not row.ExpTestToPrint) Then testsWereExcluded = True
+                                Next
+                                lstSearch = Nothing
+
                             End If
                         End If
                         lstCalculatedOT = Nothing

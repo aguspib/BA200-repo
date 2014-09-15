@@ -7978,6 +7978,39 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return resultData
         End Function
+
+
+        ''' <summary>
+        ''' Returns an formated string displaying the results with the corresponding ISE test names
+        ''' </summary>
+        ''' <param name="pAffected"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by: XB 08/09/2014 - Use ISE Test Name field instead of fixed texts - BA-1902
+        ''' </remarks>
+        Public Shared Function FormatAffected(ByVal pAffected As String) As String
+            Dim res As String = ""
+            Try
+                'Cl-, K+, Na+, Li+
+                Dim ISETestList As New ISETestsDelegate
+
+                Dim Li As String = ISETestList.GetName(Nothing, ISE_Tests.Li)
+                Dim Na As String = ISETestList.GetName(Nothing, ISE_Tests.Na)
+                Dim K As String = ISETestList.GetName(Nothing, ISE_Tests.K)
+                Dim Cl As String = ISETestList.GetName(Nothing, ISE_Tests.Cl)
+
+                If pAffected.Contains("Cl") Then res &= Cl & ", "
+                If pAffected.Contains("K") Then res &= K & ", "
+                If pAffected.Contains("Na") Then res &= Na & ", "
+                If pAffected.Contains("Li") Then res &= Li & ", "
+
+                If res.EndsWith(", ") Then res = res.Substring(0, res.Length - 2)
+
+            Catch ex As Exception
+                res = ""
+            End Try
+            Return res
+        End Function
 #End Region
 
 
