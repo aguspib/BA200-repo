@@ -37,8 +37,8 @@ Public Class XRManager
     End Class
 
     Public Class PatientInfo
-        Public firstName As String = "-"
-        Public lastName As String = "-"
+        Public firstName As String = String.Empty
+        Public lastName As String = String.Empty
     End Class
 
 #End Region
