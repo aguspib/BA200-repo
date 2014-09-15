@@ -30,8 +30,9 @@ Public Class SummaryResultsReport
         Dim Margin As Single = 20.0!
         Dim Height As Single = 20.0!
 
-        XrTableHeader.SizeF = New System.Drawing.SizeF(Width, Height)
-        XrTableDetails.SizeF = New System.Drawing.SizeF(Width, Height)
+        'XrTableHeader.SizeF = New System.Drawing.SizeF(120.0F * 7, Height)
+        'XrTableDetails.SizeF = New System.Drawing.SizeF(120.0F * 7, Height)
+
         XrWSStartDateTimeLabel.LocationF = New System.Drawing.PointF(PageWidth - (XrWSStartDateTimeLabel.WidthF + Margins.Right + Margins.Left), Height)
     End Sub
 

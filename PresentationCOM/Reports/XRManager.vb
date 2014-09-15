@@ -26,6 +26,21 @@ Public Class XRManager
     Private Shared ReadOnly DatePattern As String = SystemInfoManager.OSDateFormat
     Private Shared ReadOnly TimePattern As String = SystemInfoManager.OSShortTimeFormat
 
+    Public Class Sample
+        Public patientId As String
+        Public sampleType As String
+        Public identifier As String
+        Public barcode As String
+        Public patient As PatientInfo
+        Public minResultDateTime As DateTime
+        Public minOrderTestId As Integer
+    End Class
+
+    Public Class PatientInfo
+        Public firstName As String = String.Empty
+        Public lastName As String = String.Empty
+    End Class
+
 #End Region
 
 
@@ -1280,7 +1295,7 @@ Public Class XRManager
             Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
             Dim xtraReport As XtraReport
             Dim dsReport As DataSet = Nothing
-            Dim numColumns As Integer
+            Dim numColumns As Integer = 0
 
             If Vertical Then
                 numColumns = MAX_VERTICAL_COLUMNS
@@ -1288,7 +1303,7 @@ Public Class XRManager
                 numColumns = MAX_HORIZONTAL_COLUMMNS
             End If
 
-            resultData = myResultsDelegate.GetSummaryResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, numColumns)
+            resultData = myResultsDelegate.GetSummaryResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID)
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim dsResults As New ResultsDS
@@ -2067,7 +2082,8 @@ Public Class XRManager
         Dim dataset As New DataSet
         Const TestNameFormat As String = "{0} ({1})"
 
-        Dim TestNames As IList(Of OrderTestTO)
+        Dim TestNames As List(Of OrderTestTO)
+        Dim PatientNames As New List(Of Sample)
 
         'Fill the TestNames List with all the test names
         Dim TestsList As List(Of ResultsDS.vwksResultsRow)
@@ -2076,10 +2092,7 @@ Public Class XRManager
         TestNames = GetSummaryResultsReportHeaderColumns(resultsDS)
 
         'Fill the PatientNames List with all the patient names
-        Dim PatientNames = (From row In resultsDS.vwksResults _
-                        Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
-                        Order By row.ResultDateTime _
-                        Select row.PatientID, row.SpecimenIDList Distinct)
+        PatientNames = GetSummaryResultsReportPatientList(resultsDS)
 
         'Create the Patient List DataTable structure and content
         Dim hasConcentrationError As Boolean
@@ -2103,6 +2116,10 @@ Public Class XRManager
 
         Dim relation As DataRelation = New DataRelation("Values", groupId, parentGroupId)
         dataset.Relations.Add(relation)
+
+        If (numColumns = 0) Then
+            numColumns = TestNames.Count
+        End If
 
         'Test Name Columns
         For i As Integer = 0 To numColumns - 1
@@ -2134,13 +2151,15 @@ Public Class XRManager
         Dim concentration As String = String.Empty
         Dim patientFullName As String = String.Empty
         Dim patient As String
+        Dim sampleTypeCode As String
 
         For k As Integer = 0 To PatientNames.Count - 1
 
             patient = PatientNames(k).PatientID
             patientFullName = PatientNames(k).PatientID
-            If (PatientNames(k).SpecimenIDList <> String.Empty) Then
-                patientFullName = String.Format("{0} ({1})", patientFullName, PatientNames(k).SpecimenIDList)
+            sampleTypeCode = PatientNames(k).SampleType
+            If (PatientNames(k).barcode <> String.Empty) Then
+                patientFullName = String.Format("{0} ({1})", patientFullName, PatientNames(k).barcode)
             End If
 
             For block As Integer = 1 To group
@@ -2157,6 +2176,7 @@ Public Class XRManager
 
                     TestsList = (From row In resultsDS.vwksResults _
                                  Where String.Compare(row.PatientID, patient, False) = 0 _
+                                 AndAlso row.SampleType = sampleTypeCode _
                                  AndAlso row.TestID = TestNames.ElementAt(columnIndex).TestId _
                                  AndAlso row.SampleType = TestNames.ElementAt(columnIndex).SampleType _
                                  AndAlso row.TestType = TestNames.ElementAt(columnIndex).TestType _
@@ -2236,6 +2256,9 @@ Public Class XRManager
         Dim cells(dsReport.Tables(0).Columns.Count - 1) As XRTableCell
         Dim cellsDetail(dsReport.Tables(1).Columns.Count - 2) As XRTableCell
 
+        Report.XrTableHeader.SizeF = New System.Drawing.SizeF(128 + (85.5F * dsReport.Tables(0).Columns.Count - 1), 23)
+        Report.XrTableDetails.SizeF = New System.Drawing.SizeF(128 + (85.5F * dsReport.Tables(0).Columns.Count - 1), 23)
+
         cells(0) = CreateTableCell(myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_PATIENT", CurrentLanguage), TextAlignment.MiddleLeft)
         cells(0).Font = LabelFont
         cells(0).Weight = 1.2
@@ -2244,7 +2267,7 @@ Public Class XRManager
         Dim cellDataMember As String
         For i As Integer = 1 To dsReport.Tables(0).Columns.Count - 1
             cellDataMember = String.Format("{0}.{1}", dataMember, dsReport.Tables(0).Columns(i).ColumnName)
-            cells(i) = CreateBindedTableCell(cellDataMember, False, TextAlignment.MiddleRight, 0.8)
+            cells(i) = CreateBindedTableCell(cellDataMember, False, TextAlignment.MiddleRight, 1.0)
             cells(i).Font = LabelFont
         Next
 
@@ -2257,7 +2280,7 @@ Public Class XRManager
             If (i = 1) Then
                 cellsDetail(i - 1) = CreateBindedTableCell(detailCellDataMember, False, TextAlignment.MiddleLeft, 1.2)
             Else
-                cellsDetail(i - 1) = CreateBindedTableCell(detailCellDataMember, False, TextAlignment.MiddleRight, 0.8)
+                cellsDetail(i - 1) = CreateBindedTableCell(detailCellDataMember, False, TextAlignment.MiddleRight, 1.0)
             End If
 
             cellsDetail(i - 1).Font = CellFont
@@ -2293,7 +2316,7 @@ Public Class XRManager
     ''' <remarks>
     ''' Created by: IT 04/09/2014
     ''' </remarks>
-    Private Shared Function GetSummaryResultsReportHeaderColumns(ByVal resultsDS As ResultsDS) As IList(Of OrderTestTO)
+    Public Shared Function GetSummaryResultsReportHeaderColumns(ByVal resultsDS As ResultsDS) As List(Of OrderTestTO)
 
         Dim TestsList As List(Of ResultsDS.vwksResultsRow)
         Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
@@ -2309,6 +2332,7 @@ Public Class XRManager
                                                     .TestType = TestsList(j).TestType,
                                                     .SampleType = TestsList(j).SampleType,
                                                     .TestPosition = TestsList(j).TestPosition,
+                                                    .TestName = TestsList(j).TestName,
                                                     .ShortName = TestsList(j).ShortName})
             End If
         Next
@@ -2316,6 +2340,70 @@ Public Class XRManager
         TestNames = TestNames.OrderBy(Function(t) t.SampleType).ThenBy(Function(t) t.TestPosition).ToList()
 
         Return TestNames
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="resultsDS"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Shared Function GetSummaryResultsReportPatientList(ByVal resultsDS As ResultsDS) As List(Of Sample)
+
+        Dim Samples As New List(Of Sample)
+        Dim patientResults As IList(Of ResultsDS.vwksResultsRow) = (From row In resultsDS.vwksResults
+                                                                      Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                                                      Order By row.ResultDateTime _
+                                                                      Select row Distinct).ToList()
+
+        Dim patientDelegate As New PatientDelegate
+        Dim resultData As GlobalDataTO = Nothing
+        Dim patientInfo As PatientInfo
+        Dim sample As Sample
+
+        For Each row As ResultsDS.vwksResultsRow In patientResults
+            If (Samples.Where(Function(s) s.patientId = row.PatientID And s.sampleType.Equals(row.SampleType)).Count = 0) Then
+
+                Dim minDate As DateTime = (From d In resultsDS.vwksResults
+                      Where d.PatientID = row.PatientID
+                      Select d.ResultDateTime).Min()
+
+                Dim minValue As Integer = (From d In resultsDS.vwksResults
+                                      Where d.PatientID = row.PatientID
+                                      Select d.OrderTestID).Min()
+
+                sample = New Sample()
+                sample.patientId = row.PatientID
+                sample.barcode = row.SpecimenIDList
+                sample.identifier = row.PatientID
+                sample.sampleType = row.SampleType
+                sample.minResultDateTime = minDate
+                sample.minOrderTestId = minValue
+
+                resultData = patientDelegate.GetPatientData(Nothing, row.PatientID)
+                patientInfo = New PatientInfo()
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+
+                    Dim dsPatients As New PatientsDS
+                    dsPatients = CType(resultData.SetDatos, PatientsDS)
+
+                    If dsPatients.tparPatients.Count > 0 Then
+                        patientInfo.firstName = dsPatients.tparPatients.First.FirstName
+                        patientInfo.lastName = dsPatients.tparPatients.First.LastName
+                    End If
+                End If
+
+                sample.patient = patientInfo
+                Samples.Add(sample)
+
+            End If
+        Next
+
+        Samples = Samples.OrderBy(Function(s) s.minOrderTestId).ThenBy(Function(s) s.patientId).ToList()
+
+        Return Samples
+
     End Function
 
 #End Region

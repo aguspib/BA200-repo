@@ -167,6 +167,12 @@
     <Compile Include="Reports\AutomaticPatientsReport.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Reports\SummaryResultsReport.Designer.vb">
+      <DependentUpon>SummaryResultsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\SummaryResultsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Reports\HistoricResultsByPatientSampleReport.Designer.vb">
       <DependentUpon>HistoricResultsByPatientSampleReport.vb</DependentUpon>
     </Compile>
@@ -283,12 +289,6 @@
       <DependentUpon>ResultsCalibCurveReport.vb</DependentUpon>
     </Compile>
     <Compile Include="Reports\ResultsCalibCurveReport.vb">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Reports\SummaryResultsReport.Designer.vb">
-      <DependentUpon>SummaryResultsReport.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Reports\SummaryResultsReport.vb">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Reports\ResultsByTestReport.Designer.vb">
@@ -507,6 +507,9 @@
     <EmbeddedResource Include="Reports\AutomaticPatientsReport.resx">
       <DependentUpon>AutomaticPatientsReport.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Reports\SummaryResultsReport.resx">
+      <DependentUpon>SummaryResultsReport.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Reports\HistoricResultsByPatientSampleReport.resx">
       <DependentUpon>HistoricResultsByPatientSampleReport.vb</DependentUpon>
     </EmbeddedResource>
@@ -599,9 +602,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\ResultsCalibCurveReport.resx">
       <DependentUpon>ResultsCalibCurveReport.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Reports\SummaryResultsReport.resx">
-      <DependentUpon>SummaryResultsReport.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\ResultsByTestReport.resx">
       <DependentUpon>ResultsByTestReport.vb</DependentUpon>

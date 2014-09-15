@@ -6788,7 +6788,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by: RH 18/01/2012
         ''' </remarks>
         Public Function GetSummaryResultsByPatientSampleForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                   ByVal pWorkSessionID As String, ByVal pNumColumns As Integer) As GlobalDataTO
+                                                   ByVal pWorkSessionID As String) As GlobalDataTO
 
             Dim resultData As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing

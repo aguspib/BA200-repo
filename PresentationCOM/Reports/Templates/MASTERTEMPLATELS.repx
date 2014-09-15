@@ -4,7 +4,7 @@
 ///   <TypeName>DevExpress.XtraReports.UI.XtraReport</TypeName>
 ///   <Localization>es-ES</Localization>
 ///   <References>
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\s2ivorrn01\PresentationCOM.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\qx5xpqbl01\PresentationCOM.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\Microsoft.VisualBasic\v4.0_10.0.0.0__b03f5f7f11d50a3a\Microsoft.VisualBasic.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System\v4.0_4.0.0.0__b77a5c561934e089\System.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Configuration\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Configuration.dll" />
@@ -45,11 +45,11 @@
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.DirectoryServices.Protocols\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.DirectoryServices.Protocols.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\Microsoft.Build.Tasks.v4.0\v4.0_4.0.0.0__b03f5f7f11d50a3a\Microsoft.Build.Tasks.v4.0.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.ServiceProcess\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.ServiceProcess.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\ktozpf6r01\AX00Global.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\gzvwjvqu01\AX00Types.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\zs56dfea01\AX00Global.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\1mdsdx1g01\AX00Types.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Data.DataSetExtensions\v4.0_4.0.0.0__b77a5c561934e089\System.Data.DataSetExtensions.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\lui7delz01\ICSharpCode.SharpZipLib.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\-jtgmpwr01\BSControl_Library.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\pqhrj0uy01\ICSharpCode.SharpZipLib.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\go7bwepc01\BSControl_Library.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\System.Messaging\v4.0_4.0.0.0__b03f5f7f11d50a3a\System.Messaging.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\WindowsFormsIntegration\v4.0_4.0.0.0__31bf3856ad364e35\WindowsFormsIntegration.dll" />
 ///     <Reference Path="C:\Windows\Microsoft.Net\assembly\GAC_MSIL\PresentationFramework\v4.0_4.0.0.0__31bf3856ad364e35\PresentationFramework.dll" />
@@ -67,10 +67,10 @@
 ///     <Reference Path="C:\Program Files (x86)\Perpetuum Software\Net ModelKit Suite\Bin\PerpetuumSoft.Framework.Export.dll" />
 ///     <Reference Path="C:\Program Files (x86)\Perpetuum Software\Net ModelKit Suite\Bin\PerpetuumSoft.Writers.Flash.dll" />
 ///     <Reference Path="C:\Program Files (x86)\Perpetuum Software\Net ModelKit Suite\Bin\PerpetuumSoft.Writers.Svg.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\j1fcpjsg01\Analyzer.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\kdnzbx_201\Calculations.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\ihngocus01\WorkSession.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\bccoyfjv01\DataAccessLayer.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\wl26nqjk01\Analyzer.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\pbdruy9y01\Calculations.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\zqp4ucx401\WorkSession.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\rme6i6au01\DataAccessLayer.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\Microsoft.SqlServer.Smo\10.0.0.0__89845dcd8080cc91\Microsoft.SqlServer.Smo.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\Microsoft.SqlServer.Management.Sdk.Sfc\10.0.0.0__89845dcd8080cc91\Microsoft.SqlServer.Management.Sdk.Sfc.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\Microsoft.SqlServer.ConnectionInfo\10.0.0.0__89845dcd8080cc91\Microsoft.SqlServer.ConnectionInfo.dll" />
@@ -85,13 +85,13 @@
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\Microsoft.SqlServer.RegSvrEnum\10.0.0.0__89845dcd8080cc91\Microsoft.SqlServer.RegSvrEnum.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\Microsoft.SqlServer.SqlWmiManagement\10.0.0.0__89845dcd8080cc91\Microsoft.SqlServer.SqlWmiManagement.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\Microsoft.SqlServer.WmiEnum\10.0.0.0__89845dcd8080cc91\Microsoft.SqlServer.WmiEnum.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\-1xkrvnf01\ParameterPrograming.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\m4uiorxq01\Framework.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\b-zu-rvy01\History.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\kwykqu-s01\ConfigurationSetup.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\1m8p7sol01\InfoAnalyzer.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\nfbnig4e01\Interop.CommunicationsAx00.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\rnanfutf01\FwScriptsManagement.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\ogv1oaoi01\ParameterPrograming.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\t80t_8di01\Framework.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\yxqo24qr01\History.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\4hgmjzn901\ConfigurationSetup.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\9exyybuw01\InfoAnalyzer.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\fsmkbmce01\Interop.CommunicationsAx00.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\1sia_rlf01\FwScriptsManagement.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\DevExpress.XtraBars.v10.2\10.2.4.0__b88d1754d700e49a\DevExpress.XtraBars.v10.2.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\DevExpress.XtraReports.v10.2.Extensions\10.2.4.0__b88d1754d700e49a\DevExpress.XtraReports.v10.2.Extensions.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\DevExpress.XtraCharts.v10.2.Extensions\10.2.4.0__b88d1754d700e49a\DevExpress.XtraCharts.v10.2.Extensions.dll" />
@@ -102,7 +102,7 @@
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\DevExpress.XtraNavBar.v10.2\10.2.4.0__b88d1754d700e49a\DevExpress.XtraNavBar.v10.2.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\DevExpress.XtraVerticalGrid.v10.2\10.2.4.0__b88d1754d700e49a\DevExpress.XtraVerticalGrid.v10.2.dll" />
 ///     <Reference Path="C:\Windows\assembly\GAC_MSIL\DevExpress.CodeParser.v10.2\10.2.4.0__b88d1754d700e49a\DevExpress.CodeParser.v10.2.dll" />
-///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\uijkmxfv01\UpdateVersion.dll" />
+///     <Reference Path="C:\Users\ivan toro\AppData\Local\Microsoft\VisualStudio\11.0\ProjectAssemblies\gikefyjs01\UpdateVersion.dll" />
 ///   </References>
 /// </XRTypeInfo>
 namespace XtraReportSerialization {
@@ -182,7 +182,7 @@ namespace XtraReportSerialization {
             // 
             this.XrPageInfo1.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.XrPageInfo1.Format = "{0:dd/MM/yyyy HH:mm}";
-            this.XrPageInfo1.LocationFloat = new DevExpress.Utils.PointFloat(0F, 65.00002F);
+            this.XrPageInfo1.LocationFloat = new DevExpress.Utils.PointFloat(10F, 60F);
             this.XrPageInfo1.Name = "XrPageInfo1";
             this.XrPageInfo1.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.XrPageInfo1.PageInfo = DevExpress.XtraPrinting.PageInfo.DateTime;
@@ -195,7 +195,7 @@ namespace XtraReportSerialization {
             // XrPageInfo
             // 
             this.XrPageInfo.Font = new System.Drawing.Font("Verdana", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.XrPageInfo.LocationFloat = new DevExpress.Utils.PointFloat(943.0001F, 65.00002F);
+            this.XrPageInfo.LocationFloat = new DevExpress.Utils.PointFloat(943.0001F, 60F);
             this.XrPageInfo.Name = "XrPageInfo";
             this.XrPageInfo.Padding = new DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100F);
             this.XrPageInfo.SizeF = new System.Drawing.SizeF(100F, 15F);
@@ -227,7 +227,7 @@ namespace XtraReportSerialization {
             this.FormattingRuleSheet.AddRange(new DevExpress.XtraReports.UI.FormattingRule[] {
                         this.FormattingRule1});
             this.Landscape = true;
-            this.Margins = new System.Drawing.Printing.Margins(63, 63, 59, 25);
+            this.Margins = new System.Drawing.Printing.Margins(50, 50, 59, 25);
             this.Name = "MasterTemplateLS";
             this.PageHeight = 827;
             this.PageWidth = 1169;
