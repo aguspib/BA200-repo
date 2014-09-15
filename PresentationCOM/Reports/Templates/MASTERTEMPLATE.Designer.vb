@@ -67,7 +67,7 @@ Partial Public Class MASTERTEMPLATE
         '
         Me.XrReportDate1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrReportDate1.Format = "{0:dd/MM/yyyy HH:mm}"
-        Me.XrReportDate1.LocationFloat = New DevExpress.Utils.PointFloat(10.0!, 80.0!)
+        Me.XrReportDate1.LocationFloat = New DevExpress.Utils.PointFloat(10.0!, 0.0!)
         Me.XrReportDate1.Name = "XrReportDate1"
         Me.XrReportDate1.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrReportDate1.PageInfo = DevExpress.XtraPrinting.PageInfo.DateTime
