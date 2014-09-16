@@ -2142,7 +2142,7 @@ Public Class XRManager
                     Exit For
                 End If
                 data("GroupId") = i
-                data(String.Format("Test_{0}", j)) = String.Format(TestNameFormat, TestNames.ElementAt(columnIndex).ShortName, TestNames.ElementAt(columnIndex).SampleType)
+                data(String.Format("Test_{0}", j)) = String.Format(TestNameFormat, TestNames.ElementAt(columnIndex).ShortName, TestNames.ElementAt(columnIndex).SampleType.Name)
             Next
             master.Rows.Add(data)
         Next
@@ -2178,7 +2178,7 @@ Public Class XRManager
                                  Where String.Compare(row.PatientID, patient, False) = 0 _
                                  AndAlso row.SampleType = sampleTypeCode _
                                  AndAlso row.TestID = TestNames.ElementAt(columnIndex).TestId _
-                                 AndAlso row.SampleType = TestNames.ElementAt(columnIndex).SampleType _
+                                 AndAlso row.SampleType = TestNames.ElementAt(columnIndex).SampleType.Name _
                                  AndAlso row.TestType = TestNames.ElementAt(columnIndex).TestType _
                                  AndAlso row.AcceptedResultFlag _
                                  Select row).ToList()
@@ -2321,23 +2321,36 @@ Public Class XRManager
         Dim TestsList As List(Of ResultsDS.vwksResultsRow)
         Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
         Dim TestNames As New List(Of OrderTestTO)
+        Dim resultData As GlobalDataTO = Nothing
+        Dim i As Integer = 0
 
         TestsList = (From row In resultsDS.vwksResults _
                      Where TestType.Contains(row.TestType) _
                      Select row).ToList()
 
-        For j As Integer = 0 To TestsList.Count - 1
-            If (TestNames.Where(Function(t) t.TestId = TestsList(j).TestID And t.TestType = TestsList(j).TestType And t.SampleType = TestsList(j).SampleType).Count = 0) Then
-                TestNames.Add(New OrderTestTO With {.TestId = TestsList(j).TestID,
-                                                    .TestType = TestsList(j).TestType,
-                                                    .SampleType = TestsList(j).SampleType,
-                                                    .TestPosition = TestsList(j).TestPosition,
-                                                    .TestName = TestsList(j).TestName,
-                                                    .ShortName = TestsList(j).ShortName})
-            End If
-        Next
+        Dim SampleTypes() As String = Nothing
+        Dim myMasterDataDelegate As New MasterDataDelegate
 
-        TestNames = TestNames.OrderBy(Function(t) t.SampleType).ThenBy(Function(t) t.TestPosition).ToList()
+        resultData = myMasterDataDelegate.GetSampleTypes(Nothing)
+        If Not resultData.HasError Then
+            SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
+
+            For Each sortedSampleType In SampleTypes
+                i += 1
+                For Each tests In TestsList.Where(Function(t) t.SampleType = sortedSampleType)
+                    If (TestNames.Where(Function(t) t.TestId = tests.TestID And t.TestType = tests.TestType And t.SampleType.Name = sortedSampleType).Count = 0) Then
+                        TestNames.Add(New OrderTestTO With {.TestId = tests.TestID,
+                                                            .TestType = tests.TestType,
+                                                            .SampleType = New SampleTypeTO With {.Name = sortedSampleType, .Position = i},
+                                                            .TestPosition = tests.TestPosition,
+                                                            .TestName = tests.TestName,
+                                                            .ShortName = tests.ShortName})
+                    End If
+                Next
+            Next
+        End If
+
+        TestNames = TestNames.OrderBy(Function(t) t.SampleType.Position).ThenBy(Function(t) t.TestPosition).ToList()
 
         Return TestNames
     End Function
