@@ -5,7 +5,7 @@
 #Region "Attributes"
         Private TestIdAttribute As Integer
         Private TestTypeAttribute As String
-        Private SampleTypeAttribute As String
+        Private SampleTypeAttribute As SampleTypeTO
         Private TestPositionAttribute As Integer
         Private TestNameAttribute As String
         Private ShortNameAttribute As String
@@ -31,11 +31,11 @@
             End Set
         End Property
 
-        Public Property SampleType() As String
+        Public Property SampleType() As SampleTypeTO
             Get
                 Return SampleTypeAttribute
             End Get
-            Set(ByVal value As String)
+            Set(ByVal value As SampleTypeTO)
                 SampleTypeAttribute = value
             End Set
         End Property
