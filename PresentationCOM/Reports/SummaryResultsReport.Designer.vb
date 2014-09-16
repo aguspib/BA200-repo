@@ -24,16 +24,16 @@ Partial Public Class SummaryResultsReport
         Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
         Me.XrControlStyle1 = New DevExpress.XtraReports.UI.XRControlStyle()
         Me.GroupHeader1 = New DevExpress.XtraReports.UI.GroupHeaderBand()
-        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
-        Me.DetailChild = New DevExpress.XtraReports.UI.DetailBand()
-        Me.GroupHeader2 = New DevExpress.XtraReports.UI.GroupHeaderBand()
-        Me.XrWSStartDateTimeLabel = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrTableHeader = New DevExpress.XtraReports.UI.XRTable()
         Me.XrTableRowHeader = New DevExpress.XtraReports.UI.XRTableRow()
         Me.XrTableHeaderCell = New DevExpress.XtraReports.UI.XRTableCell()
-        Me.XrTableCell = New DevExpress.XtraReports.UI.XRTableCell()
-        Me.XrTableRowDetails = New DevExpress.XtraReports.UI.XRTableRow()
+        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
+        Me.DetailChild = New DevExpress.XtraReports.UI.DetailBand()
         Me.XrTableDetails = New DevExpress.XtraReports.UI.XRTable()
+        Me.XrTableRowDetails = New DevExpress.XtraReports.UI.XRTableRow()
+        Me.XrTableCell = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.GroupHeader2 = New DevExpress.XtraReports.UI.GroupHeaderBand()
+        Me.XrWSStartDateTimeLabel = New DevExpress.XtraReports.UI.XRLabel()
         CType(Me.XrTableHeader, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XrTableDetails, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -78,43 +78,6 @@ Partial Public Class SummaryResultsReport
         Me.GroupHeader1.RepeatEveryPage = True
         Me.GroupHeader1.StylePriority.UseFont = False
         '
-        'DetailReport
-        '
-        Me.DetailReport.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.DetailChild})
-        Me.DetailReport.Level = 0
-        Me.DetailReport.Name = "DetailReport"
-        Me.DetailReport.PageBreak = DevExpress.XtraReports.UI.PageBreak.AfterBand
-        '
-        'DetailChild
-        '
-        Me.DetailChild.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTableDetails})
-        Me.DetailChild.HeightF = 22.0!
-        Me.DetailChild.KeepTogether = True
-        Me.DetailChild.MultiColumn.ColumnCount = 6
-        Me.DetailChild.MultiColumn.Mode = DevExpress.XtraReports.UI.MultiColumnMode.UseColumnWidth
-        Me.DetailChild.Name = "DetailChild"
-        '
-        'GroupHeader2
-        '
-        Me.GroupHeader2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrWSStartDateTimeLabel})
-        Me.GroupHeader2.HeightF = 24.0!
-        Me.GroupHeader2.Level = 1
-        Me.GroupHeader2.Name = "GroupHeader2"
-        '
-        'XrWSStartDateTimeLabel
-        '
-        Me.XrWSStartDateTimeLabel.Borders = DevExpress.XtraPrinting.BorderSide.None
-        Me.XrWSStartDateTimeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.XrWSStartDateTimeLabel.LocationFloat = New DevExpress.Utils.PointFloat(501.0!, 0.0!)
-        Me.XrWSStartDateTimeLabel.Name = "XrWSStartDateTimeLabel"
-        Me.XrWSStartDateTimeLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(171.2499!, 20.0!)
-        Me.XrWSStartDateTimeLabel.StylePriority.UseBorders = False
-        Me.XrWSStartDateTimeLabel.StylePriority.UseFont = False
-        Me.XrWSStartDateTimeLabel.StylePriority.UseTextAlignment = False
-        Me.XrWSStartDateTimeLabel.Text = "WSStartDateTime"
-        Me.XrWSStartDateTimeLabel.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        '
         'XrTableHeader
         '
         Me.XrTableHeader.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top
@@ -141,11 +104,29 @@ Partial Public Class SummaryResultsReport
         Me.XrTableHeaderCell.Text = "XrTableHeaderCell"
         Me.XrTableHeaderCell.Weight = 3.514285423642113R
         '
-        'XrTableCell
+        'DetailReport
         '
-        Me.XrTableCell.Name = "XrTableCell"
-        Me.XrTableCell.Text = "XrTableCell"
-        Me.XrTableCell.Weight = 3.5142857142857142R
+        Me.DetailReport.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.DetailChild})
+        Me.DetailReport.Level = 0
+        Me.DetailReport.Name = "DetailReport"
+        Me.DetailReport.PageBreak = DevExpress.XtraReports.UI.PageBreak.AfterBand
+        '
+        'DetailChild
+        '
+        Me.DetailChild.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTableDetails})
+        Me.DetailChild.HeightF = 22.0!
+        Me.DetailChild.KeepTogether = True
+        Me.DetailChild.Name = "DetailChild"
+        '
+        'XrTableDetails
+        '
+        Me.XrTableDetails.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top
+        Me.XrTableDetails.Borders = DevExpress.XtraPrinting.BorderSide.None
+        Me.XrTableDetails.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
+        Me.XrTableDetails.Name = "XrTableDetails"
+        Me.XrTableDetails.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRowDetails})
+        Me.XrTableDetails.SizeF = New System.Drawing.SizeF(673.0!, 22.0!)
+        Me.XrTableDetails.StylePriority.UseBorders = False
         '
         'XrTableRowDetails
         '
@@ -159,17 +140,34 @@ Partial Public Class SummaryResultsReport
         Me.XrTableRowDetails.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableRowDetails.Weight = 1.1R
         '
-        'XrTableDetails
+        'XrTableCell
         '
-        Me.XrTableDetails.AnchorVertical = DevExpress.XtraReports.UI.VerticalAnchorStyles.Top
-        Me.XrTableDetails.Borders = DevExpress.XtraPrinting.BorderSide.None
-        Me.XrTableDetails.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
-        Me.XrTableDetails.Name = "XrTableDetails"
-        Me.XrTableDetails.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRowDetails})
-        Me.XrTableDetails.SizeF = New System.Drawing.SizeF(673.0!, 22.0!)
-        Me.XrTableDetails.StylePriority.UseBorders = False
+        Me.XrTableCell.Name = "XrTableCell"
+        Me.XrTableCell.Text = "XrTableCell"
+        Me.XrTableCell.Weight = 3.5142857142857142R
         '
-        'SummaryResultsReport2
+        'GroupHeader2
+        '
+        Me.GroupHeader2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrWSStartDateTimeLabel})
+        Me.GroupHeader2.HeightF = 24.0!
+        Me.GroupHeader2.Level = 1
+        Me.GroupHeader2.Name = "GroupHeader2"
+        '
+        'XrWSStartDateTimeLabel
+        '
+        Me.XrWSStartDateTimeLabel.Borders = DevExpress.XtraPrinting.BorderSide.None
+        Me.XrWSStartDateTimeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.XrWSStartDateTimeLabel.LocationFloat = New DevExpress.Utils.PointFloat(501.0!, 0.0!)
+        Me.XrWSStartDateTimeLabel.Name = "XrWSStartDateTimeLabel"
+        Me.XrWSStartDateTimeLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
+        Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(171.2499!, 20.0!)
+        Me.XrWSStartDateTimeLabel.StylePriority.UseBorders = False
+        Me.XrWSStartDateTimeLabel.StylePriority.UseFont = False
+        Me.XrWSStartDateTimeLabel.StylePriority.UseTextAlignment = False
+        Me.XrWSStartDateTimeLabel.Text = "WSStartDateTime"
+        Me.XrWSStartDateTimeLabel.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
+        '
+        'SummaryResultsReport
         '
         Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport, Me.GroupHeader2})
         Me.Margins = New System.Drawing.Printing.Margins(63, 81, 96, 25)
