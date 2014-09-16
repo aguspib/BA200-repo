@@ -150,6 +150,8 @@ Partial Class IResults
     '''                                           ** If PatientID = PatientName, only PatientID is shown 
     '''                                           ** If First Character of PatientName is "-" and Last Character of PatientName is "-", remove both  
     '''                                           ** If PatientName is empty, only PatientID is shown
+    '''              AG 16/09/2014 - BA-1940 1 patient with N specimenID will appear 1 row and all specimens separated by coma
+    '''                                      (tooltip = all specimed separated by coma and finally patientID between brackets)
     ''' </remarks>
     Private Sub UpdateSamplesListDataGrid()
         Try
@@ -167,8 +169,28 @@ Partial Class IResults
             Dim hyphenIndex As Integer = -1
             Dim myPatientName As String = String.Empty
 
-            Dim addedPatients As New List(Of String) 'AG 21/06/2012 - 
+            Dim addedPatients As New List(Of String) 'AG 21/06/2012 -
+
+            'AG 16/09/2014 - BA-1940 declare new variables
+            Dim patientIDSpecimensDict As New Dictionary(Of String, List(Of String)) 'Dictionary (key PatientID) = list of all specimenID for this PatientID
+            Dim firstSpecimenInDict As New List(Of String) 'List used when new dict key is created, it contains the key's 1st specimenID
+
+            Dim patientIDRowIndexDict As New Dictionary(Of String, Integer) 'Dictionary (key PatientID) = row position in grid
+            Dim patientIDToolTipInfoDict As New Dictionary(Of String, String) 'used for tooltip: Dictionary (key PatientID) = (PATIENID) - First Name Last Name
+            Dim auxPatientToolTipInfo As String = String.Empty
+
+            Dim updateRow As Boolean = False 'Update an existing item in grid list
+            'AG 16/09/2014 - BA-1940
+
             For i As Integer = 0 To 1
+                'AG 16/09/2014 - BA-1940 clear lists and dictionary when changes the priority
+                addedPatients.Clear()
+                patientIDSpecimensDict.Clear()
+                firstSpecimenInDict.Clear()
+                patientIDRowIndexDict.Clear()
+                patientIDToolTipInfoDict.Clear()
+                'AG 16/09/2014 - BA-1940
+
                 SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where row.SampleClass = "PATIENT" _
                                AndAlso row.StatFlag = StatFlag(i) _
@@ -177,15 +199,19 @@ Partial Class IResults
 
                 For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
                     existsRow = False
-                    'AG 21/06/2012
-                    'For k As Integer = 0 To RowIndex 'dgv.Rows.Count - 1
-                    '    If dgv("PatientID", k).Value.Equals(sampleRow.PatientID) Then
-                    '        existsRow = True
-                    '        Exit For
-                    '    End If
-                    'Next
+                    updateRow = False 'AG 16/09/2014 - BA-1940
+                    auxPatientToolTipInfo = String.Empty 'AG 16/09/2014 - BA-1940
+
                     If addedPatients.Contains(sampleRow.PatientID) Then
                         existsRow = True
+
+                        'AG 16/09/2014 - BA-1940 - Evaluate if is a new specimenID for the patienID, in this case update row
+                        If Not sampleRow.IsSpecimenIDListNull Then
+                            If patientIDSpecimensDict.ContainsKey(sampleRow.PatientID) AndAlso Not patientIDSpecimensDict(sampleRow.PatientID).Contains(sampleRow.SpecimenIDList) Then
+                                updateRow = True
+                            End If
+                        End If
+                        'AG 16/09/2014 - BA-1940
                     End If
 
                     'If not exist create row
@@ -194,32 +220,6 @@ Partial Class IResults
                         If RowIndex = dgv.Rows.Count Then dgv.Rows.Add()
 
                         dgv("STAT", RowIndex).Value = SampleIconList.Images(i)
-
-                        'dgv("PatientName", RowIndex).Value = sampleRow.PatientName
-
-                        'AG 29/08/2013 - Reverse order: if exists show barcode and then patientID as tooltip
-                        'dgv("PatientID", RowIndex).Value = sampleRow.PatientID
-
-                        ''AG 14/06/2013
-                        ''dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        'If Not sampleRow.IsSpecimenIDListNull Then
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.SpecimenIDList
-                        'Else
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        'End If
-                        'AG 14/06/2013
-
-                        'dgv("PatientID", RowIndex).Tag = sampleRow.PatientID 'Inform the patient in the tag (used for load the results in grid)
-                        'If sampleRow.IsSpecimenIDListNull Then
-                        '    'Case NOT exists BARCODE
-                        '    dgv("PatientID", RowIndex).Value = sampleRow.PatientID
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientName
-                        'Else
-                        '    'Case exists BARCODE
-                        '    dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
-                        '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
-                        'End If
-                        ''AG 29/08/2013
 
                         'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
                         '           fields and shown only the PatientID
@@ -240,26 +240,57 @@ Partial Class IResults
                         If (Not sampleRow.IsSpecimenIDListNull) Then
                             dgv("PatientID", RowIndex).Value = sampleRow.SpecimenIDList
 
-                            'When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
-                            'code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
-                            '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
-                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
-                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1}) - {2}", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim, myPatientName.Trim)
-                            Else
-                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1})", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim)
-                            End If
+                            'AG 16/09/2014 - BA-1940 - inform the tooltip without patienID / patientName, it will be added after loop completion
+                            ''When the Barcode is informed, the ToolTip will be "BC (PatientID) - FirstName LastName" or, using the variables defined in  
+                            ''code: "SpecimenIDList (auxString) - PatientName", but with following exceptions (BT #1667):
+                            ''** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "SpecimenIDList (auxString)"
+                            'If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            '    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1}) - {2}", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim, myPatientName.Trim)
+                            'Else
+                            '    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} ({1})", sampleRow.SpecimenIDList.Trim, sampleRow.PatientID.Trim)
+                            'End If
+
+                            dgv("PatientID", RowIndex).ToolTipText = sampleRow.SpecimenIDList.Trim
+                            'AG 16/09/2014 - BA-1940
                         Else
                             dgv("PatientID", RowIndex).Value = sampleRow.PatientID
 
+                            'AG 16/09/2014 - BA-1940 - in case PatientID do not inform here the tooltip, it will be informed after loop completion
                             'When the Barcode is NOT informed, the ToolTip will be "PatientID - FirstName LastName" or, using the variables defined in  
                             'code: "auxString - PatientName", but with following exceptions (BT #1667):
                             '** If PatientName = "" OR auxString = PatientName, then the ToolTip will be "auxString"
-                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
-                                dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
-                            Else
-                                dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
-                            End If
+                            'If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                            '    dgv("PatientID", RowIndex).ToolTipText = String.Format("{0} - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
+                            'Else
+                            '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
+                            'End If
+                            'AG 16/09/2014 - BA-1940
+
                         End If
+
+                        'AG 16/09/2014 - BA-1640 
+                        'Create a new key in dictionary patientIDSpecimensDict with his first value
+                        If Not patientIDSpecimensDict.ContainsKey(sampleRow.PatientID) Then
+                            firstSpecimenInDict.Clear()
+                            firstSpecimenInDict.Add(dgv("PatientID", RowIndex).Value)
+                            patientIDSpecimensDict.Add(sampleRow.PatientID, firstSpecimenInDict)
+                        End If
+
+                        'Create a new key in dictionary patientIDRowIndex with the row position
+                        If Not patientIDRowIndexDict.ContainsKey(sampleRow.PatientID) Then
+                            patientIDRowIndexDict.Add(sampleRow.PatientID, RowIndex)
+                        End If
+
+                        'Create a new key in dictionary patientIDToolTipInfoDict with the add info for tooltipo
+                        If Not patientIDToolTipInfoDict.ContainsKey(sampleRow.PatientID) Then
+                            If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
+                                auxPatientToolTipInfo = String.Format("({0}) - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
+                            Else
+                                auxPatientToolTipInfo = String.Format("({0})", sampleRow.PatientID.Trim)
+                            End If
+                            patientIDToolTipInfoDict.Add(sampleRow.PatientID, auxPatientToolTipInfo)
+                        End If
+                        'AG 16/09/2014 - BA-1640
 
                         dgv("OrderID", RowIndex).Value = sampleRow.OrderID
 
@@ -274,6 +305,16 @@ Partial Class IResults
 
                         addedPatients.Add(sampleRow.PatientID)
                         If sampleRow.PatientID = SamplesListViewText Then dgv.Rows(RowIndex).Selected = True
+
+                        'AG 16/09/2014 - BA-1940 update the specimenID list
+                    ElseIf updateRow Then
+                        'Get the row in grid
+                        If patientIDRowIndexDict.ContainsKey(sampleRow.PatientID) Then
+                            dgv("PatientID", patientIDRowIndexDict(sampleRow.PatientID)).Value &= ", " & sampleRow.SpecimenIDList
+                            dgv("PatientID", patientIDRowIndexDict(sampleRow.PatientID)).ToolTipText &= ", " & sampleRow.SpecimenIDList
+                        End If
+                        'AG 16/09/2014 - BA-1940
+
                     End If
 
                     'Update Report Print available and HIS export icons
@@ -303,8 +344,23 @@ Partial Class IResults
                         dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
                     End If
                 Next sampleRow
+
+                'AG 16/09/2014 - BA-1940 finally complete the tooltip in list with (PatID) - pat name
+                For Each key As String In patientIDToolTipInfoDict.Keys
+                    dgv("PatientID", patientIDRowIndexDict(key)).ToolTipText &= " " & patientIDToolTipInfoDict(key)
+                Next
+                'AG 16/09/2014 - BA-1940
+
             Next i
             Debug.Print("IResults.UpdateSamplesListDataGrid (Update patient list): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
+
+            'AG 16/09/2014 - BA-1940 - release memory
+            addedPatients = Nothing
+            firstSpecimenInDict = Nothing
+            patientIDSpecimensDict = Nothing
+            patientIDRowIndexDict = Nothing
+            patientIDToolTipInfoDict = Nothing
+            'AG 16/09/2014 - BA-1940
 
             Application.DoEvents()
             ProcessEvent = True
