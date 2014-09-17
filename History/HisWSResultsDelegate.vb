@@ -805,7 +805,7 @@ Namespace Biosystems.Ax00.BL
                                                 End If
                                             End If
 
-                                            'EF 03/06/2014 #1650  v3.0.1 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado, anular campos Performedby, Comments)
+                                            'EF 03/06/2014 #1650  v3.0.1 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado, anular campos Performedby)
                                             'FullID = String.Format("{0}: {1}", literalPatientID, myPatientID)
                                             'FullName = String.Format("{1} {2}", literalFullName, LinqPat.FirstName, LinqPat.LastName)
                                             'FullGender = String.Format("{0}: {1}", literalGender, myGender) 'LinqPat.Gender)
@@ -814,7 +814,9 @@ Namespace Biosystems.Ax00.BL
                                             'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, String.Empty) ' LinqPat.PerformedBy. NO IN V1
                                             FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)   'EF 31/07/2014 #1893 (Comments info)
 
+                                           
                                             FullID = String.Format("{0}", myPatientID)
+
                                             If (LinqPat.FirstName <> "-" And LinqPat.FirstName <> "") Or (LinqPat.LastName <> "-" And LinqPat.LastName <> "") Then FullName = String.Format("{0}, {1}", LinqPat.LastName, LinqPat.FirstName) Else FullName = ""
                                             FullGender = String.Format("{0}", myGender)
                                             FullBirthDate = String.Format("{0}", LinqPat.FormatedDateOfBirth)
@@ -832,6 +834,10 @@ Namespace Biosystems.Ax00.BL
 
                                             ReportDate = resultsRow.ResultDateTime
 
+                                            ''EF 09/09/2014 BA-1937: El campo PatientID que se imprime es: 'PatientID + (Barcode)' or 'SampleID' (que puede coincidir con Barcode o no)
+                                            If Not sampleRow.IsSpecimenIDNull And CStr(sampleRow.SpecimenID) <> CStr(FullID) Then
+                                                FullID &= " (" & sampleRow.SpecimenID & ")"
+                                            End If
                                             ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow _
                                                     (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments, ReportDate)
                                             'IT 30/07/2014 #BA-1893 END
@@ -877,6 +883,7 @@ Namespace Biosystems.Ax00.BL
                                         'EF 04/03/2014 END
                                         ResultDate = detail.ResultDateTime.ToString(DatePattern) & " " & detail.ResultDateTime.ToString(TimePattern)
 
+                                    
                                         ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
                                                                                                          ReferenceRanges, Unit, ResultDate, Remarks)
                                     Next detail

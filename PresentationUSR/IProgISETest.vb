@@ -1558,6 +1558,7 @@ Public Class IProgISETest
     ''' Modified by: SA 10/11/2010 - When SAVE function return an error, shown it. Change to function that
     '''                              return a Boolean value indicating if the Save was executed without errors 
     '''              SA 12/01/2011 - Changes due to new implementation of Reference Ranges Control 
+    '''              SA 17/09/2014 - BA-1926 ==> When field ReportName is empty, set NULL value for it in the DataSet
     ''' </remarks>
     Private Function SaveISETestChanges() As Boolean
         Dim changesSaved As Boolean = False
@@ -1673,7 +1674,11 @@ Public Class IProgISETest
                             .QCActive = QCActiveCheckBox.Checked
 
                             ' WE 31/07/2014 - #1865
-                            .TestLongName = bsReportNameTextBox.Text.Trim
+                            If (Not String.IsNullOrEmpty(bsReportNameTextBox.Text)) Then
+                                .TestLongName = bsReportNameTextBox.Text.Trim
+                            Else
+                                .SetTestLongNameNull()
+                            End If
 
                             .Decimals = CByte(bsDecimalsUpDown.Value)
 

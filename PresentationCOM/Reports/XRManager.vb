@@ -1027,7 +1027,12 @@ Public Class XRManager
                         '                              myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(TimePattern))
                         '    End If
                         'End If
-                        automaticReport.XrWSStartDateTimeLabel.Text = Now.ToShortDateString & " " & Now.ToShortTimeString
+
+                        Dim reportDatetime As DateTime
+                        reportDatetime = (From detail In ResultsData.ReportSampleMaster _
+                                                 Select detail.ReportDate).Max()
+
+                        automaticReport.XrWSStartDateTimeLabel.Text = reportDatetime.ToShortDateString & " " & reportDatetime.ToShortTimeString
                         automaticReport.DataSource = Nothing
                         automaticReport.DataMember = ""
 
