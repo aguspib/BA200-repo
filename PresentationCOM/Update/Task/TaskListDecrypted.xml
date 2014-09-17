@@ -2651,6 +2651,58 @@
       END
       
       GO
+      
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vwksWSISEOffSystemResults]'))
+      DROP VIEW [dbo].[vwksWSISEOffSystemResults]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vwksWSISEOffSystemResults]
+      AS
+      SELECT     PartialWSEResult.OrderTestID, PartialWSEResult.RerunNumber, PartialWSEResult.MultiPointNumber, PartialWSEResult.ValidationStatus, 
+                            PartialWSEResult.AcceptedResultFlag, PartialWSEResult.TestVersion, PartialWSEResult.ManualResultFlag, PartialWSEResult.UserComment, 
+                            PartialWSEResult.ExportStatus, PartialWSEResult.ExportDateTime, PartialWSEResult.Printed, PartialWSEResult.ABSValue, PartialWSEResult.ABS_Error, 
+                            PartialWSEResult.SubstrateDepletion, PartialWSEResult.ABS_Initial, PartialWSEResult.ABS_MainFilter, PartialWSEResult.ABS_WorkReagent, 
+                            PartialWSEResult.CalibratorFactor, PartialWSEResult.CalibrationError, PartialWSEResult.CalibratorBlankAbsUsed, PartialWSEResult.CurveResultsID, 
+                            PartialWSEResult.CurveGrowthType, PartialWSEResult.CurveType, PartialWSEResult.CurveAxisXType, PartialWSEResult.CurveAxisYType, 
+                            PartialWSEResult.RelativeErrorCurve, PartialWSEResult.CONC_VALUE, PartialWSEResult.ManualResultText, PartialWSEResult.CONC_Error, 
+                            PartialWSEResult.ResultDateTime, PartialWSEResult.TS_User, PartialWSEResult.TS_DateTime, PartialWSEResult.SampleType, PartialWSEResult.AnalyzerID, 
+                            PartialWSEResult.TestType, PartialWSEResult.TestID, PartialWSEResult.OrderID, PartialWSEResult.TheoricalConcentration, PartialWSEResult.ControlNum, 
+                            PartialWSEResult.WorkSessionID, PartialWSEResult.StatFlag, PartialWSEResult.SampleClass, PartialWSEResult.OrderTestStatus, 
+                            (CASE PartialWSEResult.TestType WHEN 'ISE' THEN IT.Name ELSE OST.Name END) AS TestName, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN
+                                (SELECT     cfg.FixedItemDesc
+                                  FROM          tcfgMasterData cfg
+                                  WHERE      cfg.SubTableID = 'TEST_UNITS' AND cfg.ItemID = IT.Units) ELSE
+                                (SELECT     cfg.FixedItemDesc
+                                  FROM          tcfgMasterData cfg
+                                  WHERE      cfg.SubTableID = 'TEST_UNITS' AND cfg.ItemID = OST.Units) END) AS MeasureUnit, 
+                            (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.Decimals ELSE OST.Decimals END) AS DecimalsAllowed, 
+                            (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.ActiveRangeType ELSE OSTS.ActiveRangeType END) AS ActiveRangeType, PartialWSEResult.Collapsed, 
+                            PartialWSEResult.PatientName, PartialWSEResult.PatientID, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN IT.ShortName ELSE OST.ShortName END) 
+                            AS ShortName, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.TestLongName ELSE OST.Name END) AS TestLongName
+      FROM         (SELECT     R.OrderTestID, R.RerunNumber, R.MultiPointNumber, R.ValidationStatus, R.AcceptedResultFlag, R.TestVersion, R.ManualResultFlag, R.UserComment, 
+                                                    R.ExportStatus, R.ExportDateTime, R.Printed, R.ABSValue, R.ABS_Error, R.SubstrateDepletion, R.ABS_Initial, R.ABS_MainFilter, R.ABS_WorkReagent, 
+                                                    R.CalibratorFactor, R.CalibrationError, R.CalibratorBlankAbsUsed, R.CurveResultsID, R.CurveGrowthType, R.CurveType, R.CurveAxisXType, 
+                                                    R.CurveAxisYType, R.RelativeErrorCurve, (CASE OT.TestType WHEN 'ISE' THEN R.CONC_Value ELSE R.ManualResult END) AS CONC_VALUE, 
+                                                    R.ManualResultText, R.CONC_Error, R.ResultDateTime, R.TS_User, R.TS_DateTime, R.Collapsed, OT.SampleType, OT.AnalyzerID, OT.TestType, 
+                                                    OT.TestID, OT.OrderID, OT.OrderTestStatus, 0 AS TheoricalConcentration, 0 AS ControlNum, WSOT.WorkSessionID, O.StatFlag, O.SampleClass, 
+                                                    (CASE WHEN O.PatientID IS NOT NULL THEN P.FirstName + ' ' + P.LastName ELSE O.SampleID END) AS PatientName, ISNULL(O.PatientID, O.SampleID) 
+                                                    AS PatientID
+                             FROM          dbo.twksResults AS R INNER JOIN
+                                                    dbo.twksOrderTests AS OT ON R.OrderTestID = OT.OrderTestID INNER JOIN
+                                                    dbo.twksWSOrderTests AS WSOT ON OT.OrderTestID = WSOT.OrderTestID INNER JOIN
+                                                    dbo.twksOrders AS O ON OT.OrderID = O.OrderID LEFT OUTER JOIN
+                                                    dbo.tparPatients AS P ON O.PatientID = P.PatientID
+                             WHERE      (O.SampleClass = 'PATIENT') AND (OT.TestType = 'ISE') OR
+                                                    (OT.TestType = 'OFFS')) AS PartialWSEResult LEFT OUTER JOIN
+                            dbo.tparISETests AS IT ON PartialWSEResult.TestID = IT.ISETestID LEFT OUTER JOIN
+                            dbo.tparISETestSamples AS ITS ON IT.ISETestID = ITS.ISETestID AND PartialWSEResult.SampleType = ITS.SampleType LEFT OUTER JOIN
+                            dbo.tparOffSystemTests AS OST ON PartialWSEResult.TestID = OST.OffSystemTestID LEFT OUTER JOIN
+                            dbo.tparOffSystemTestSamples AS OSTS ON OST.OffSystemTestID = OSTS.OffSystemTestID AND PartialWSEResult.SampleType = OSTS.SampleType
+
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'
