@@ -778,17 +778,14 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Search if the TestID set as NOT available form part of a PROFILES and set all of them also as not available
+        ''' Update profile Available value depending his components: All Available -- profile available // Some NOT available -- profile not available
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pNotAvailableTestProfileID">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
-        ''' <param name="pTestType"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: AG 04/09/2014 - BA-1869 - NOT TESTED!!!!
+        ''' Created by: AG 17/09/2014 - BA-1869
         ''' </remarks>
-        Public Function ResetAvailableCascade(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNotAvailableTestProfileID As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow), ByVal pTestType As String) _
-                                           As GlobalDataTO
+        Public Function UpdateAvailableCascadeByComponents(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -798,35 +795,10 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New TparTestProfilesDAO
-                        Dim myProfTestDlg As New TestProfileTestsDelegate
-
-                        Dim affectedProfilesDS As New TestProfileTestsDS
-                        Dim auxDS As New ReportsTestsSortingDS
-                        Dim auxRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow
-
-                        For Each row As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pNotAvailableTestProfileID
-                            auxDS.Clear()
-
-                            'Search the profiles that contains the TestID
-                            myGlobalDataTO = myProfTestDlg.ReadByTestID(dbConnection, row.TestID, , pTestType)
-
-                            If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                                affectedProfilesDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
-
-                                'CalcTest programming screen protection: Calculated tests whose formula contains another calc test cannot form part of another calc test
-                                For Each profileRow As TestProfileTestsDS.tparTestProfileTestsRow In affectedProfilesDS.tparTestProfileTests.Rows
-                                    'Build DS a new ReportsTestsSortingDS with the affected TestID + Available = False
-                                    auxRow = CType(auxDS.tcfgReportsTestsSorting.NewRow, ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
-                                    auxRow.Available = False
-                                    auxRow.TestID = profileRow.TestProfileID
-                                    auxDS.tcfgReportsTestsSorting.AddtcfgReportsTestsSortingRow(auxRow)
-                                Next
-
-                                'Finally call myDAO.UpdateCustomPositionAndAvailable
-                                myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, auxDS)
-                            End If
-
-                        Next
+                        myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, False)
+                        If Not myGlobalDataTO.HasError Then
+                            myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, True)
+                        End If
 
                     End If
 
@@ -849,7 +821,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestProfilesDelegate.ResetAvailableCascade", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "TestProfilesDelegate.UpdateAvailableCascadeByComponents", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

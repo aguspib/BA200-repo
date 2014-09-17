@@ -1416,22 +1416,20 @@ Namespace Biosystems.Ax00.BL
                         Dim myDAO As New tparCalculatedTestsDAO
                         myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, pTestsSortingDS)
 
-                        'Get the not Available TestID and look for all CALC test or profiles affected -> Set them also as not available
-                        Dim notAvailableItemList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
-                        notAvailableItemList = (From a As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting _
+                        'Update CALCTEST available in cascade depending their components (all components available -> CalcTest available // else CalcTest NOT available
+                        Dim calcTestConfiguredAsNotAvailableList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+                        calcTestConfiguredAsNotAvailableList = (From a As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pTestsSortingDS.tcfgReportsTestsSorting _
                                                 Where a.Available = False Select a).ToList
-                        If notAvailableItemList.Count > 0 Then
-                            'Look for other calculated tests that uses it in their formula and set available = False
-                            'Dim myCalcTestDlg As New CalculatedTestsDelegate
-                            myGlobalDataTO = Me.ResetAvailableCascade(dbConnection, notAvailableItemList, "CALC")
-
-                            If Not myGlobalDataTO.HasError Then
-                                Dim myTestProfileDlg As New TestProfilesDelegate
-                                myGlobalDataTO = myTestProfileDlg.ResetAvailableCascade(dbConnection, notAvailableItemList, "CALC")
-                            End If
-
+                        If Not myGlobalDataTO.HasError Then
+                            myGlobalDataTO = Me.UpdateAvailableCascadeByComponents(dbConnection, calcTestConfiguredAsNotAvailableList)
                         End If
-                        notAvailableItemList = Nothing
+                        calcTestConfiguredAsNotAvailableList = Nothing
+
+                        'Update PROFILE available in cascade depending their components (all components available -> Profile available // else Profile NOT available
+                        If Not myGlobalDataTO.HasError Then
+                            Dim myTestProfileDlg As New TestProfilesDelegate
+                            myGlobalDataTO = myTestProfileDlg.UpdateAvailableCascadeByComponents(dbConnection)
+                        End If
 
                     End If
 
@@ -1463,17 +1461,16 @@ Namespace Biosystems.Ax00.BL
 
 
         ''' <summary>
-        ''' Search if the TestID set as NOT available form part of a calculated tests and set all of them also as not available
+        ''' Update calcTest Available value depending his components: All Available -- calcTest available (*) // Some NOT available -- calcTest not available
+        ''' (* Exception those calcTest that user has configured as not Available - included in parameter pExceptions)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pNotAvailableCalcTestID">Typed DataSet ReportsTestsSortingDS containing all tests to update</param>
-        ''' <param name="pTestType"></param>
+        ''' <param name="pExceptions"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: AG 04/09/2014 - BA-1869 - NOT TESTED!!!!
+        ''' Created by: AG 17/09/2014 - BA-1869
         ''' </remarks>
-        Public Function ResetAvailableCascade(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNotAvailableCalcTestID As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow), ByVal pTestType As String) _
-                                           As GlobalDataTO
+        Public Function UpdateAvailableCascadeByComponents(ByVal pDBConnection As SqlClient.SqlConnection, Optional pExceptions As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow) = Nothing) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1483,52 +1480,22 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tparCalculatedTestsDAO
+                        myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, False)
+                        If Not myGlobalDataTO.HasError Then
 
-                        Dim affectedCalcTestsDS As New CalculatedTestsDS
-                        Dim auxList As New List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
-                        Dim auxDS As New ReportsTestsSortingDS
-                        Dim auxRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow
-
-                        For Each row As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pNotAvailableCalcTestID
-                            auxList.Clear()
-                            auxDS.Clear()
-
-                            'Get all calculated tests affected
-                            myGlobalDataTO = myDAO.GetRelatedCalculatedTest(dbConnection, row.TestID, pTestType)
-                            If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                                affectedCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
-                                Dim myTestProfileDlg As New TestProfilesDelegate
-
-                                'CalcTest programming screen protection: Calculated tests whose formula contains another calc test cannot form part of another calc test
-                                For Each calculatedRow As CalculatedTestsDS.tparCalculatedTestsRow In affectedCalcTestsDS.tparCalculatedTests.Rows
-                                    'Build DS a new ReportsTestsSortingDS with the affected TestID + Available = False
-                                    auxRow = CType(auxDS.tcfgReportsTestsSorting.NewRow, ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
-                                    auxRow.Available = False
-                                    auxRow.TestID = calculatedRow.CalcTestID
-                                    auxDS.tcfgReportsTestsSorting.AddtcfgReportsTestsSortingRow(auxRow)
-
-                                    auxList.Add(auxRow) 'Add to list
+                            'Exceptions treatment
+                            Dim exceptCalcTestID As String = String.Empty
+                            If Not pExceptions Is Nothing AndAlso pExceptions.Count > 0 Then
+                                For Each row As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pExceptions
+                                    If exceptCalcTestID = String.Empty Then
+                                        exceptCalcTestID = row.TestID.ToString
+                                    Else
+                                        exceptCalcTestID &= ", " & row.TestID.ToString
+                                    End If
                                 Next
-
-                                'Finally call myDAO.UpdateCustomPositionAndAvailable
-                                myGlobalDataTO = myDAO.UpdateCustomPositionAndAvailable(dbConnection, auxDS)
-
-                                If Not myGlobalDataTO.HasError AndAlso auxList.Count > 0 Then
-                                    If pTestType <> "CALC" Then
-                                        'Finally these calc tests may form part of another calculated test
-                                        myGlobalDataTO = Me.ResetAvailableCascade(dbConnection, auxList, "CALC")
-                                    End If
-
-                                    'Set as not available those profiles using these calculated tests
-                                    If Not myGlobalDataTO.HasError Then
-                                        myGlobalDataTO = myTestProfileDlg.ResetAvailableCascade(dbConnection, auxList, "CALC")
-                                    End If
-
-                                End If
-
                             End If
-                        Next
-                        auxList = Nothing
+                            myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, True, exceptCalcTestID)
+                        End If
 
                     End If
 
@@ -1551,7 +1518,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.ResetAvailableCascade", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.UpdateAvailableCascadeByComponents", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
