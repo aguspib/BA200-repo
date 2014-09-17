@@ -1481,6 +1481,14 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New tparCalculatedTestsDAO
                         myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, False)
+
+                        'Special code AVAILABLE = FALSE: CALCTEST have 1 recursive level so we need call twice this method
+                        'For example:
+                        '1st STEP UREA-UV not avaiable affects ... BUN but not affects BUN/CREATININE because when query was executed the BUN was available
+                        If Not myGlobalDataTO.HasError Then
+                            myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, False)
+                        End If
+
                         If Not myGlobalDataTO.HasError Then
 
                             'Exceptions treatment
@@ -1495,6 +1503,14 @@ Namespace Biosystems.Ax00.BL
                                 Next
                             End If
                             myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, True, exceptCalcTestID)
+
+                            'Special code AVAILABLE = TRUE: CALCTEST have 1 recursive level so we need call twice this method
+                            'For example:
+                            '1st STEP ALBUMIN not avaiable affects ... GLOBULIN & ALBUMIN/GLOBULIN
+                            '2on STEP ALBUMIN avaiable affects ... GLOBULIN but ALBUMIN/GLOBULIN continues not available because when query was executed the GLOBULIN was not available
+                            If Not myGlobalDataTO.HasError Then
+                                myGlobalDataTO = myDAO.UpdateAvailableCascadeByComponents(dbConnection, True, exceptCalcTestID)
+                            End If
                         End If
 
                     End If
