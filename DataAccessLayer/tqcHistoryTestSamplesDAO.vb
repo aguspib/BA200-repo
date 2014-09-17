@@ -44,7 +44,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         tstLongName = "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"
                     End If
 
-                    ''Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
+                    'Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
 
                     Dim cmdText As String = " INSERT INTO tqcHistoryTestSamples(TestType, TestID, SampleType, CreationDate, TestName, TestShortName, " & vbCrLf & _
                                                                               " PreloadedTest, MeasureUnit, DecimalsAllowed, RejectionCriteria, CalculationMode, " & vbCrLf & _
@@ -345,6 +345,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 15/06/2012 - Filter the query also for field TestType
         '''              WE 31/07/2014 - TestLongName added (#1865) to support new screen field Report Name (NULL allowed) in IProgISETest.
         '''                            - Update DecimalsAllowed if TestType = ISE (#1865).
+        '''              WE 17/09/2014 - Simplified IIf(..) because it leads to NULL reference exception.
         ''' </remarks>
         Public Function UpdateByTestIDAndSampleTypeNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistoryTestSamplesDS As HistoryTestSamplesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -356,7 +357,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 ElseIf (Not pHistoryTestSamplesDS Is Nothing) Then
-                    Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
+                    Dim tstLongName As String = String.Empty
+                    If (pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull) Then
+                        tstLongName = "NULL"
+                    Else
+                        tstLongName = "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"
+                    End If
+
+                    'Dim tstLongName As String = CStr(IIf(pHistoryTestSamplesDS.tqcHistoryTestSamples(0).IsTestLongNameNull, "NULL", "N'" & pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestLongName.Replace("'", "''") & "'"))
+
                     Dim cmdText As String = ""
 
                     If pHistoryTestSamplesDS.tqcHistoryTestSamples(0).TestType = "ISE" Then
