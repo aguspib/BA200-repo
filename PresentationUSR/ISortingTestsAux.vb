@@ -1306,6 +1306,10 @@ Public Class ISortingTestsAux
 
 #Region "Permission Level"
 
+    ''' <summary>
+    ''' Implement the read only mode
+    ''' </summary>
+    ''' <remarks>Created IT 18/09/2014 - BA-1946</remarks>
     Sub ReadOnlyMode()
         If (openMode = "TESTSELECTION") Then
             FirstPosButton.Enabled = False
@@ -1319,27 +1323,45 @@ Public Class ISortingTestsAux
         End If
     End Sub
 
-
+    ''' <summary>
+    ''' User permission level business for this screen
+    ''' </summary>
+    ''' <param name="level"></param>
+    ''' <remarks>Created IT 18/09/2014 - BA-1946
+    ''' Modified AG 18/09/2014 - BA-1869 when exists WS filter also by testtype</remarks>
     Sub ValidatePermissionLevel(ByVal level As Integer) Implements IPermissionLevel.ValidatePermissionLevel
 
         Try
+            Select Case level
+                Case USER_LEVEL.lBIOSYSTEMS, USER_LEVEL.lADMINISTRATOR, USER_LEVEL.lSUPERVISOR
+                    'AG 18/09/2014 - BA-1869 If exists worksession screen in read only mode depending the tests types
+                    If (IAx00MainMDI.ActiveStatus <> "EMPTY") Then
+                        'Std, ISE, CALC or OFFS read only if current WS contains tests for this test type
+                        'Profiles read only if current WS is not empty
 
-            If (IAx00MainMDI.ActiveStatus <> "EMPTY") Then
-                ReadOnlyMode()
-            Else
-                Select Case level
+                        Dim readOnlyFlag As Boolean = True
+                        If openModeAttribute <> String.Empty AndAlso ScreenIDAttribute <> "PROFILE" Then
 
-                    Case USER_LEVEL.lADMINISTRATOR
-                        Exit Select
+                            'Look for tests in current WS filtering by test type. If any normal mode
+                            Dim myDlg As New OrderTestsDelegate
+                            Dim myGlobalDataTo As GlobalDataTO = myDlg.GetOrderTestsByWorkSession(Nothing, IAx00MainMDI.ActiveWorkSession, ScreenIDAttribute)
+                            If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
+                                If DirectCast(myGlobalDataTo.SetDatos, OrderTestsDS).twksOrderTests.Rows.Count = 0 Then
+                                    readOnlyFlag = False
+                                End If
+                            End If
+                        End If
+                        If readOnlyFlag Then ReadOnlyMode()
+                    End If
+                    'AG 18/09/2014 - BA-1869 
 
-                    Case USER_LEVEL.lBIOSYSTEMS
-                        Exit Select
+                    Exit Select
 
-                    Case USER_LEVEL.lOPERATOR
-                        ReadOnlyMode()
-                        Exit Select
-                End Select
-            End If
+                Case USER_LEVEL.lOPERATOR
+                    ReadOnlyMode()
+                    Exit Select
+            End Select
+
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidatePermissionLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
