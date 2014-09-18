@@ -9,7 +9,7 @@
         Private TestPositionAttribute As Integer
         Private TestNameAttribute As String
         Private ShortNameAttribute As String
-
+        Private TestLongNameAttribute As String
 #End Region
 
 #Region "Properties"
@@ -64,6 +64,16 @@
             End Get
             Set(ByVal value As String)
                 ShortNameAttribute = value
+            End Set
+        End Property
+
+        ' XB 18/09/2014 - BA-1884
+        Public Property TestLongName As String
+            Get
+                Return TestLongNameAttribute
+            End Get
+            Set(value As String)
+                TestLongNameAttribute = value
             End Set
         End Property
 

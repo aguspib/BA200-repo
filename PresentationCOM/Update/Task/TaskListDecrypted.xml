@@ -2703,6 +2703,51 @@
                             dbo.tparOffSystemTestSamples AS OSTS ON OST.OffSystemTestID = OSTS.OffSystemTestID AND PartialWSEResult.SampleType = OSTS.SampleType
 
       GO
+      
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vwksCompleteResults]'))
+      DROP VIEW [dbo].[vwksCompleteResults]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vwksCompleteResults]
+      AS
+      SELECT DISTINCT 
+                            OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime, 
+                            Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed, 
+                            CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User, 
+                            TS_DateTime, AnalyzerID, WorkSessionID, BlankAbsorbanceLimit, KineticBlankLimit, CalibratorLotNumber, SampleType, TheoricalConcentration, MeasureUnit, 
+                            FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, ControlName, ControlLotNumber, MinConcentration, MaxConcentration, TestType, Collapsed, TestName, 
+                            OrderTestStatus, PostDilutionType, TestID, ActiveRangeType, OrderID, ManualResult, ManualResultText, StatFlag, CalibratorName, AnalysisMode, CurveSlope, 
+                            CurveOffset, CurveCorrelation, CalibratorID, SampleClass, NumberOfCalibrators, NULL AS STDOrderTestID, NULL AS PatientName, ISNULL(PatientID, SampleID) 
+                            AS PatientID, NULL AS ControlNum, TestLongName, ShortName
+      FROM         dbo.vwksResults
+      UNION ALL
+      SELECT DISTINCT 
+                            OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime, 
+                            Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed, 
+                            CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User, 
+                            TS_DateTime, AnalyzerID, WorkSessionID, NULL AS BlankAbsorbanceLimit, NULL AS KineticBlankLimit, NULL AS CalibratorLotNumber, SampleType, 
+                            TheoricalConcentration, MeasureUnit, NULL AS FactorLowerLimit, NULL AS FactorUpperLimit, DecimalsAllowed, NULL AS ControlName, NULL 
+                            AS ControlLotNumber, NULL AS MinConcentration, NULL AS MaxConcentration, TestType, Collapsed, TestName, NULL AS OrderTestStatus, NULL AS PostDilutionType, 
+                            TestID, ActiveRangeType, OrderID, NULL AS ManualResult, NULL AS ManualResultText, StatFlag, NULL AS CalibratorName, NULL AS AnalysisMode, NULL 
+                            AS CurveSlope, NULL AS CurveOffset, NULL AS CurveCorrelation, NULL AS CalibratorID, SampleClass, NULL AS NumberOfCalibrators, STDOrderTestID, NULL 
+                            AS PatientName, PatientID, NULL AS ControlNum, NULL AS TestLongName, ShortName
+      FROM         dbo.vwksCalcResults
+      UNION ALL
+      SELECT DISTINCT 
+                            OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime, 
+                            Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed, 
+                            CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User, 
+                            TS_DateTime, AnalyzerID, WorkSessionID, NULL AS BlankAbsorbanceLimit, NULL AS KineticBlankLimit, NULL AS CalibratorLotNumber, SampleType, 
+                            TheoricalConcentration, MeasureUnit, NULL AS FactorLowerLimit, NULL AS FactorUpperLimit, DecimalsAllowed, NULL AS ControlName, NULL 
+                            AS ControlLotNumber, NULL AS MinConcentration, NULL AS MaxConcentration, TestType, Collapsed, TestName, OrderTestStatus, NULL AS PostDilutionType, TestID, 
+                            ActiveRangeType, OrderID, NULL AS ManualResult, ManualResultText, StatFlag, NULL AS CalibratorName, NULL AS AnalysisMode, NULL AS CurveSlope, NULL 
+                            AS CurveOffset, NULL AS CurveCorrelation, NULL AS CalibratorID, SampleClass, NULL AS NumberOfCalibrators, NULL AS STDOrderTestID, PatientName, PatientID, 
+                            ControlNum, TestLongName, ShortName
+      FROM         vwksWSISEOffSystemResults;
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'
