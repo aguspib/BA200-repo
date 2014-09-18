@@ -2081,7 +2081,8 @@ Public Class XRManager
     ''' <param name="numColumns"></param>
     ''' <returns></returns>
     ''' <remarks>
-    ''' Created by: IT 04/09/2014
+    ''' Created by:  IT 04/09/2014
+    ''' Modified by: XB 18/09/2014 - Use the TestLongName field as the name of every test in case User define them - BA-1884
     ''' </remarks>
     Private Shared Function CreateSummaryResultsReportDataSet(ByVal resultsDS As ResultsDS, ByVal numColumns As Integer) As DataSet
         Dim dataset As New DataSet
@@ -2147,7 +2148,13 @@ Public Class XRManager
                     Exit For
                 End If
                 data("GroupId") = i
-                data(String.Format("Test_{0}", j)) = String.Format(TestNameFormat, TestNames.ElementAt(columnIndex).ShortName, TestNames.ElementAt(columnIndex).SampleType.Name)
+
+                ' XB 18/09/2014 - BA-1884
+                If TestNames.ElementAt(columnIndex).TestLongName.Length > 0 Then
+                    data(String.Format("Test_{0}", j)) = String.Format(TestNameFormat, TestNames.ElementAt(columnIndex).TestLongName, TestNames.ElementAt(columnIndex).SampleType.Name)
+                Else
+                    data(String.Format("Test_{0}", j)) = String.Format(TestNameFormat, TestNames.ElementAt(columnIndex).ShortName, TestNames.ElementAt(columnIndex).SampleType.Name)
+                End If
             Next
             master.Rows.Add(data)
         Next
@@ -2319,7 +2326,8 @@ Public Class XRManager
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>
-    ''' Created by: IT 04/09/2014
+    ''' Created by:  IT 04/09/2014
+    ''' Modified by: XB 18/09/2014 - Use the TestLongName field as the name of every test in case User define them - BA-1884
     ''' </remarks>
     Public Shared Function GetSummaryResultsReportHeaderColumns(ByVal resultsDS As ResultsDS) As List(Of OrderTestTO)
 
@@ -2349,7 +2357,8 @@ Public Class XRManager
                                                             .SampleType = New SampleTypeTO With {.Name = sortedSampleType, .Position = i},
                                                             .TestPosition = tests.TestPosition,
                                                             .TestName = tests.TestName,
-                                                            .ShortName = tests.ShortName})
+                                                            .ShortName = tests.ShortName,
+                                                            .TestLongName = tests.TestLongName})
                     End If
                 Next
             Next

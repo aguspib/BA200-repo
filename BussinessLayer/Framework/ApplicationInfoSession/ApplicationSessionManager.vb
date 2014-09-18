@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports System.Security.Cryptography
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 
 Namespace Biosystems.Ax00.BL.Framework
@@ -71,6 +72,7 @@ Namespace Biosystems.Ax00.BL.Framework
         Private Function FillApplicationInfoSessionTO(ByVal pUserName As String, ByVal pUserLevel As String, ByVal pIconsPath As String, _
                                                       ByVal pLanguageID As String) As ApplicationInfoSessionTO
             Dim myApplicationInfoSession As New ApplicationInfoSessionTO()
+            Dim myGlobalDataTO As GlobalDataTO
             Try
                 myApplicationInfoSession.ApplicationName = "BA400"
                 myApplicationInfoSession.ApplicationLanguage = pLanguageID
@@ -90,8 +92,8 @@ Namespace Biosystems.Ax00.BL.Framework
                 If pUserLevel = "SUPERVISOR" Then
                     'TR 29/03/2012 Get user Max Test Number.
                     Dim myUserDataDAO As New tcfgUserDataDAO
-                    Dim myGlobalDataTO As GlobalDataTO
                     myGlobalDataTO = myUserDataDAO.ReadUserIDPassword(Nothing, pUserName)
+
                     If Not myGlobalDataTO.HasError Then
                         Dim myUserDataDS As New UserDataDS
                         myUserDataDS = DirectCast(myGlobalDataTO.SetDatos, UserDataDS)
@@ -104,6 +106,15 @@ Namespace Biosystems.Ax00.BL.Framework
                 End If
                 'TR 29/03/2012 -END.
 
+                'IT 18/09/2014 #BA-1946 - INI
+                If (pUserLevel <> String.Empty) Then
+                    Dim usersLevel As New UsersLevelDelegate
+                    myGlobalDataTO = usersLevel.GetUserNumericLevel(Nothing, pUserLevel)
+                    If Not myGlobalDataTO.HasError Then
+                        myApplicationInfoSession.UserLevelEnum = CType(CType(myGlobalDataTO.SetDatos, Integer), USER_LEVEL)
+                    End If
+                End If
+                'IT 18/09/2014 #BA-1946 - FIN
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()

@@ -1885,9 +1885,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  AG 08/05/2013
         ''' Modified by: SA 09/05/2013 - Added parameters to inform TestType and TestID and filter the query also by these values 
+        ''' Modified by: AG 18/09/2014 - BA-1869 change pTestID to an optional parameter
         ''' </remarks>
         Public Function GetOrderTestsByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pTestType As String, _
-                                                   ByVal pTestID As Integer) As GlobalDataTO
+                                                   Optional ByVal pTestID As Integer = -1) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1899,8 +1900,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT OT.OrderTestID " & vbCrLf & _
                                                 " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    OT.TestType        = '" & pTestType.Trim & "' " & vbCrLf & _
-                                                " AND    OT.TestID          = " & pTestID
+                                                " AND    OT.TestType        = '" & pTestType.Trim & "' " & vbCrLf
+
+                        'AG 18/09/2014 - BA-1869 add TestID clause only when informed
+                        If pTestID > 0 Then
+                            cmdText &= " AND    OT.TestID          = " & pTestID
+                        End If
 
                         Dim myDataSet As New OrderTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1912,7 +1917,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.SetDatos = myDataSet
                         resultData.HasError = False
                     End If
-                End If
+                    End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True

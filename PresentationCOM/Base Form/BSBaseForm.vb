@@ -61,6 +61,7 @@ Public Class BSBaseForm
 #End Region
 
 #Region "Attributes"
+
     Private IconsPathAttribute As String
     Private LIMSImportFilePathAttribute As String
     Private LIMSImportMemoPathAttribute As String
@@ -71,6 +72,9 @@ Public Class BSBaseForm
 
     Private applicationMaxMemoryUsageAttribute As Single = 900 'AG 24/02/2014 - BT #1520
     Private SQLMaxMemoryUsageAttribute As Single = 1000        'AG 24/02/2014 - BT #1520
+
+    Private _currentUserNumericalLevel As USER_LEVEL
+
 #End Region
 
 #Region "Constructor" 'SG 03/12/10
@@ -1141,6 +1145,16 @@ Public Class BSBaseForm
     ''' Created by: TR
     ''' </remarks>
     Private Sub BSBaseForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        If Me.GetType().GetInterfaces().Contains(GetType(Global.IPermissionLevel)) Then
+
+            Dim formType As Type = sender.GetType()
+            Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
+            Dim myGlobalBase As New GlobalBase
+            form.ValidatePermissionLevel(myGlobalBase.GetSessionInfo.UserLevelEnum)
+
+        End If
+
         'Validate if the screen is in design mode to avoid parameters error
         If (Not Me.DesignMode) Then
 

@@ -2890,6 +2890,17 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>View vwksCompleteResults has been changed to return also the TestLongName for ISE Tests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vwksCompleteResults' AND sc.name = 'TestLongName') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
 
 

@@ -5,6 +5,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Controls.UserControls
 
 Public Class ISortingTestsAux
+    Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+    Implements IPermissionLevel
 
 #Region "Declaration"
     'Global variable for the current application Language
@@ -784,7 +786,7 @@ Public Class ISortingTestsAux
             bsTestListGrid.Columns.Add("TestName", myMultiLangResourcesDelegate.GetResourceText(Nothing, multiLanguageID, CurrentLanguage))
 
             bsTestListGrid.Columns("TestName").Width = 215 - witdhToLess
-            'bsTestListGrid.Columns("TestName").SortMode = DataGridViewColumnSortMode.Automatic
+            bsTestListGrid.Columns("TestName").SortMode = DataGridViewColumnSortMode.Programmatic  'AG 18/09/2014 - do not sort clicking in header!!!!
 
             bsTestListGrid.Columns.Add("TestID", "")
             bsTestListGrid.Columns("TestID").Visible = False
@@ -1301,5 +1303,73 @@ Public Class ISortingTestsAux
 
 #End Region
 
+
+#Region "Permission Level"
+
+    ''' <summary>
+    ''' Implement the read only mode
+    ''' </summary>
+    ''' <remarks>Created IT 18/09/2014 - BA-1946</remarks>
+    Sub ReadOnlyMode()
+        If (openMode = "TESTSELECTION") Then
+            FirstPosButton.Enabled = False
+            UpPosButton.Enabled = False
+            DownPosButton.Enabled = False
+            LastPosButton.Enabled = False
+            DefaultSortingButton.Enabled = False
+            bsAcceptButton.Enabled = False
+
+            RemoveHandler bsTestListGrid.CellMouseClick, AddressOf bsTestListGrid_CellMouseClick
+        End If
+    End Sub
+
+    ''' <summary>
+    ''' User permission level business for this screen
+    ''' </summary>
+    ''' <param name="level"></param>
+    ''' <remarks>Created IT 18/09/2014 - BA-1946
+    ''' Modified AG 18/09/2014 - BA-1869 when exists WS filter also by testtype</remarks>
+    Sub ValidatePermissionLevel(ByVal level As Integer) Implements IPermissionLevel.ValidatePermissionLevel
+
+        Try
+            Select Case level
+                Case USER_LEVEL.lBIOSYSTEMS, USER_LEVEL.lADMINISTRATOR, USER_LEVEL.lSUPERVISOR
+                    'AG 18/09/2014 - BA-1869 If exists worksession screen in read only mode depending the tests types
+                    If (IAx00MainMDI.ActiveStatus <> "EMPTY") Then
+                        'Std, ISE, CALC or OFFS read only if current WS contains tests for this test type
+                        'Profiles read only if current WS is not empty
+
+                        Dim readOnlyFlag As Boolean = True
+                        If openModeAttribute <> String.Empty AndAlso ScreenIDAttribute <> "PROFILE" Then
+
+                            'Look for tests in current WS filtering by test type. If any normal mode
+                            Dim myDlg As New OrderTestsDelegate
+                            Dim myGlobalDataTo As GlobalDataTO = myDlg.GetOrderTestsByWorkSession(Nothing, IAx00MainMDI.ActiveWorkSession, ScreenIDAttribute)
+                            If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
+                                If DirectCast(myGlobalDataTo.SetDatos, OrderTestsDS).twksOrderTests.Rows.Count = 0 Then
+                                    readOnlyFlag = False
+                                End If
+                            End If
+                        End If
+                        If readOnlyFlag Then ReadOnlyMode()
+                    End If
+                    'AG 18/09/2014 - BA-1869 
+
+                    Exit Select
+
+                Case USER_LEVEL.lOPERATOR
+                    ReadOnlyMode()
+                    Exit Select
+            End Select
+
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidatePermissionLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ValidatePermissionLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
+#End Region
 
 End Class

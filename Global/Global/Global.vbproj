@@ -131,6 +131,7 @@
     <Compile Include="FwScripts\FwScriptTO.vb" />
     <Compile Include="PerformanceCounters\AXPerformanceCounters.vb" />
     <Compile Include="PerformanceCounters\SystemCounter.vb" />
+    <Compile Include="Security\IPermissionLevel.vb" />
     <Compile Include="TO\AllowedLIMSValuesTO.vb" />
     <Compile Include="TO\SampleTypeTO.vb" />
     <Compile Include="TO\OrderTestTO.vb" />
