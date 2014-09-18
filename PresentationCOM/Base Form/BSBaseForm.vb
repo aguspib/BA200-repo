@@ -61,6 +61,7 @@ Public Class BSBaseForm
 #End Region
 
 #Region "Attributes"
+
     Private IconsPathAttribute As String
     Private LIMSImportFilePathAttribute As String
     Private LIMSImportMemoPathAttribute As String
@@ -71,6 +72,9 @@ Public Class BSBaseForm
 
     Private applicationMaxMemoryUsageAttribute As Single = 900 'AG 24/02/2014 - BT #1520
     Private SQLMaxMemoryUsageAttribute As Single = 1000        'AG 24/02/2014 - BT #1520
+
+    Private _currentUserNumericalLevel As USER_LEVEL
+
 #End Region
 
 #Region "Constructor" 'SG 03/12/10
@@ -210,6 +214,13 @@ Public Class BSBaseForm
         Set(value As Single)
             SQLMaxMemoryUsageAttribute = value
         End Set
+    End Property
+
+    Public ReadOnly Property CurrentUserNumericalLevel As USER_LEVEL
+        Get
+            GetUserNumericalLevel()
+            Return _currentUserNumericalLevel
+        End Get
     End Property
 
 #End Region
@@ -1124,6 +1135,34 @@ Public Class BSBaseForm
         'Debug.Print("Shown screen ... ScreenChildShownInProcess=FALSE")
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks></remarks>
+    Protected Friend Sub GetUserNumericalLevel()
+
+        Dim myGlobal As New GlobalDataTO
+        Dim myGlobalbase As New GlobalBase
+
+        Try
+
+            If (_currentUserNumericalLevel = Nothing) Then
+                If (myGlobalbase.GetSessionInfo.UserLevel <> String.Empty) Then
+                    Dim usersLevel As New UsersLevelDelegate
+                    myGlobal = usersLevel.GetUserNumericLevel(Nothing, myGlobalbase.GetSessionInfo.UserLevel)
+                    If Not myGlobal.HasError Then
+                        _currentUserNumericalLevel = CType(CType(myGlobal.SetDatos, Integer), USER_LEVEL)
+                    End If
+                End If
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message, Me.Name & ".GetHWElementsName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".GetHWElementsName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
+    End Sub
+
 #End Region
 
 #Region "Events"
@@ -1141,6 +1180,15 @@ Public Class BSBaseForm
     ''' Created by: TR
     ''' </remarks>
     Private Sub BSBaseForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+
+        If Me.GetType().GetInterfaces().Contains(GetType(Global.IPermissionLevel)) Then
+
+            Dim formType As Type = sender.GetType()
+            Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
+            form.ValidatePermissionLevel(Me.CurrentUserNumericalLevel)
+
+        End If
+
         'Validate if the screen is in design mode to avoid parameters error
         If (Not Me.DesignMode) Then
 

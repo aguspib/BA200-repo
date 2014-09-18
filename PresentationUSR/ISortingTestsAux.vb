@@ -5,6 +5,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Controls.UserControls
 
 Public Class ISortingTestsAux
+    Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+    Implements IPermissionLevel
 
 #Region "Declaration"
     'Global variable for the current application Language
@@ -1301,5 +1303,51 @@ Public Class ISortingTestsAux
 
 #End Region
 
+
+#Region "Permission Level"
+
+    Sub ReadOnlyMode()
+        If (openMode = "TESTSELECTION") Then
+            FirstPosButton.Enabled = False
+            UpPosButton.Enabled = False
+            DownPosButton.Enabled = False
+            LastPosButton.Enabled = False
+            DefaultSortingButton.Enabled = False
+            bsAcceptButton.Enabled = False
+
+            RemoveHandler bsTestListGrid.CellMouseClick, AddressOf bsTestListGrid_CellMouseClick
+        End If
+    End Sub
+
+
+    Sub ValidatePermissionLevel(ByVal level As Integer) Implements IPermissionLevel.ValidatePermissionLevel
+
+        Try
+
+            If (IAx00MainMDI.ActiveStatus <> "EMPTY") Then
+                ReadOnlyMode()
+            Else
+                Select Case level
+
+                    Case USER_LEVEL.lADMINISTRATOR
+                        Exit Select
+
+                    Case USER_LEVEL.lBIOSYSTEMS
+                        Exit Select
+
+                    Case USER_LEVEL.lOPERATOR
+                        ReadOnlyMode()
+                        Exit Select
+                End Select
+            End If
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ValidatePermissionLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ValidatePermissionLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+    End Sub
+
+#End Region
 
 End Class
