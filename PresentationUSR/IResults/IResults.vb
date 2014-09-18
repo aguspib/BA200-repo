@@ -171,7 +171,9 @@ Public Class IResults
     Private UpdateSubHeaders As Boolean = False
     Private XtraSamplesCollapsed As Boolean = False
     Private mdiAnalyzerCopy As AnalyzerManager 'AG 19/01/2012
-    'Private mdiESWrapperCopy As ESWrapper 'AG 11/03/2013
+
+    'BA-1927
+    Private mdiESWrapperCopy As ESWrapper 'AG 11/03/2013
 
     Private Shared OpenForms As Integer = 0 'RH 11/04/2012
     Private copyRefreshDS As UIRefreshDS = Nothing 'AG 21/06/2012
@@ -221,7 +223,7 @@ Public Class IResults
         End Set
     End Property
 
-    ' XB 26/02/2014 - task #1529
+    'XB 26/02/2014 - task #1529
     Public Property SampleClass As String
         Get
             Return SampleClassField
@@ -364,9 +366,10 @@ Public Class IResults
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 19/01/2012 - Use the same AnalyzerManager as the MDI
             End If
 
-            'If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
-            '    mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 11/03/2013 - Use the same ESWrapper as the MDI
-            'End If
+            'BA-1927
+            If (Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing) Then
+                mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 11/03/2013 - Use the same ESWrapper as the MDI
+            End If
 
             InitializeScreen()
 
@@ -411,104 +414,8 @@ Public Class IResults
 
     Private Sub bsTestDetailsTabs_Selected(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles bsTestDetailsTabControl.Selected
         Try
-            'Select Case UCase(bsTestDetailsTabControl.SelectedTab.Text)
-            '    Case "SAMPLES"
-            '        ExportButton.Visible = True
-            '        bsSamplesResultsTabControl.Visible = True
-            '        bsSamplesPanel.Visible = True
-
-            '        bsTestPanel.Visible = False
-            '        bsResultsTabControl.Visible = False
-
-
-            '    Case "TESTS"
-
-            '        If UCase(bsResultsTabControl.SelectedTab.Text) = "CONTROLS" Or UCase(bsResultsTabControl.SelectedTab.Text) = "SAMPLES" Then
-            '            ExportButton.Visible = True
-            '        Else
-            '            ExportButton.Visible = False
-            '        End If
-
-            '        bsSamplesResultsTabControl.Visible = False
-            '        bsSamplesPanel.Visible = False
-
-            '        bsTestPanel.Visible = True
-            '        bsResultsTabControl.Visible = True
-
-            'End Select
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            Select Case bsTestDetailsTabControl.SelectedTab.Name
-                Case bsSamplesTab.Name
-                    ExportButton.Visible = True
-                    bsSamplesResultsTabControl.Visible = True
-                    bsSamplesPanel.Visible = True
-
-                    bsTestPanel.Visible = False
-                    bsResultsTabControl.Visible = False
-
-
-                Case bsTestsTabTage.Name
-                    If String.Compare(bsResultsTabControl.SelectedTab.Name, bsControlsTabPage.Name, False) = 0 OrElse _
-                            String.Compare(bsResultsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
-                        ExportButton.Visible = True
-                    Else
-                        ExportButton.Visible = False
-                    End If
-
-                    bsSamplesResultsTabControl.Visible = False
-                    bsSamplesPanel.Visible = False
-
-                    bsTestPanel.Visible = True
-                    bsResultsTabControl.Visible = True
-
-                    'JV #1502 21/02/2014 - los dos botones se esconden por estar pendiente pasar el test. Quitar las dos lineas siguientes si ok.
-                    PrintTestBlankButton.Visible = False
-                    PrintTestCtrlButton.Visible = False
-
-            End Select
-
-            ' JC 14-05-2013   Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" and Sample Class is Patient
-            Me.SendManRepButton.Enabled = Not (MyClass.LISWorkingModeReruns = "LIS" AndAlso _
-                                                        (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name _
-                                                         OrElse bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name))
-
-            If Not ProcessEvent Then Return
-
-            If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
-                'UpdateExperimentalsDataGrid()
-                ''AG 24/11/2010
-                'If UpdatePatientList Then
-                '    UpdateSamplesListDataGrid()
-                '    UpdatePatientList = False 'RH 13/12/2010
-                'End If
-                ''AG 24/11/2010
-
-                'RH 13/12/2010 Change the order of the instructions
-                'First update the sample list, and then update the experimental grid.
-                'That is the proper way to avoid calling UpdateExperimentalsDataGrid() twice
-                If UpdatePatientList Then
-                    UpdateSamplesListDataGrid()
-                    UpdatePatientList = False
-                End If
-                Application.DoEvents()
-                UpdateExperimentalsDataGrid()
-            Else
-                UpdateCurrentResultsGrid()
-            End If
-
-
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
-                                            " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
-                                            "IResults.bsTestDetailsTabs_Selected", EventLogEntryType.Information, False)
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
+            'BA-1927: code moved to a function
+            TestDetailsTabSelectedEvent()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTestDetailsTabs_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -517,65 +424,8 @@ Public Class IResults
 
     Private Sub bsResultsTabControl_Selected(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TabControlEventArgs) Handles bsResultsTabControl.Selected
         Try
-            'Select Case UCase(bsResultsTabControl.SelectedTab.Text)
-            '    Case "CONTROLS"
-            '        ExportButton.Visible = False
-
-            '    Case "SAMPLES"
-            '        ExportButton.Visible = True
-
-            '    Case "PATIENTS"
-            '        ExportButton.Visible = True
-
-            '    Case Else
-            '        ExportButton.Visible = False
-
-            'End Select
-
-            'Select Case bsResultsTabControl.SelectedIndex
-            '    Case 0 ' "BLANKS"
-            '        ExportButton.Visible = False
-
-            '    Case 1 ' "CALIB"
-            '        ExportButton.Visible = False
-
-            '    Case 2 ' "CONTROLS"
-            '        ExportButton.Visible = False
-
-            '        'Case "SAMPLES"
-            '        '    ExportButton.Visible = True
-
-            '    Case 3 '"PATIENTS"
-            '        ExportButton.Visible = True
-
-            '    Case Else
-            '        ExportButton.Visible = False
-
-            'End Select
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            'RH 94/06/2012
-            ExportButton.Visible = (String.Compare(bsResultsTabControl.SelectedTab.Name, XtraSamplesTabPage.Name, False) = 0)
-            ' JC 14-05-2013   Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" and Sample Class is Patient
-            Me.SendManRepButton.Enabled = Not (MyClass.LISWorkingModeReruns = "LIS" AndAlso _
-                                                        (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name _
-                                                         OrElse bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name))
-
-            If Not ProcessEvent Then Return
-
-            UpdateCurrentResultsGrid()
-
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
-                                            & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
-                                            "IResults.bsResultsTabControl_Selected", EventLogEntryType.Information, False)
-            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-
+            'BA-1927: code moved to a function
+            ResultsTabControlSelectedEvent()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsResultsTabControl_Selected ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1510,135 +1360,113 @@ Public Class IResults
 
     End Sub
 
-
-
-
     ''' <summary>
-    ''' Manually LIS export
+    ''' Manage the process of manual export of results to LIS 
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>
-    ''' Created by DL 22/03/2011
-    ''' Modified by SG 10/04/2013 - Call method ExportToLISManualNEW with parameters pIncludeSent = TRUE
-    ''' AG 13/02/2014 - #1505 (results screen export only the still not sent results)
-    ''' AG 17/02/2014 - #1505 use merge instead of loops
+    ''' Created by: SA 18/09/2014 - BA-1927 ==> Code moved from event ExportButton.Click
+    '''                                         Count the number of results to Export before start the process
     ''' </remarks>
-    Private Sub ExportButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExportButton.Click
-
+    Private Sub ExportResultsToLIS()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
         Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
         Try
+            'BT #1499 - Use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not shown message here) 
+            Dim pCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
+            pCounters.GetAllCounters()
+            pCounters = Nothing
 
-            'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not shown message here!!!) ' XB 18/02/2014 BT #1499
-            Dim PCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
-            PCounters.GetAllCounters()
-            PCounters = Nothing
-            ' XB 18/02/2014 BT #1499
+            'Disable all screen buttons, and disable also all buttons and menus in the MainMDI
+            IAx00MainMDI.EnableButtonAndMenus(False)
 
-            Dim resultData As New GlobalDataTO
-
-            'TR 04/08/2011 -Enable menu bar.
-            'IAx00MainMDI.EnableMenusBar(False)
-            IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
-            ExitButton.Enabled = False
+            PrintReportButton.Enabled = False
+            PrintCompactReportButton.Enabled = False
+            SummaryButton.Enabled = False
+            PrintSampleButton.Enabled = False
+            PrintTestButton.Enabled = False
             bsXlsresults.Enabled = False
             OffSystemResultsButton.Enabled = False
             SendManRepButton.Enabled = False
-            PrintTestButton.Enabled = False
-            PrintSampleButton.Enabled = False
-            SummaryButton.Enabled = False
-            PrintReportButton.Enabled = False
-            'TR 04/08/2011 -END.
+            ExitButton.Enabled = False
 
-            Dim myExport As New ExportDelegate
-            'resultData = myExport.ExportToLISManual(AnalyzerIDField, WorkSessionIDField)
+            'AG 29/07/2014 
+            'BA-1887: Get value of parameter for the maximum number of results that can be exported in a group (default value = 100)
+            Dim resultData As New GlobalDataTO
+            Dim swParamDlg As New SwParametersDelegate
+            Dim maxResultsToExport As Integer = 100
 
-            'AG 29/07/2014 - #1887 - Re-send results
-            'Export by Patient view uses the OrderToExport field
-            'Export by Test view uses ??? - PENDING CONFIRM
-            'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
-            If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
-                'PATIENTs view re-send process
-                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'Include the already exported results
-            Else
-                'TESTs view re-send process
-                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'From test view user export only the still not sent results!!! (SPECIFICATION: NO changes in export from tests view)
+            resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                Dim myDS As ParametersDS = DirectCast(resultData.SetDatos, ParametersDS)
+
+                If (myDS.tfmwSwParameters.Rows.Count > 0) AndAlso (Not myDS.tfmwSwParameters(0).IsValueNumericNull) Then
+                    maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
+                End If
             End If
-            'AG 29/07/2014
 
-            'AG 18/03/2013 - upload results to LIS
-            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                Dim exportResults As New ExecutionsDS
-                exportResults = CType(resultData.SetDatos, ExecutionsDS)
+            'When the current screen view is by Patient, Patient results that have been already exported to LIS will be exported again;
+            'When the current screen view is by Test, only Patient and Control results with ExportStatus <> SENT will be exported to LIS
+            Dim includeExportedResults As Boolean = (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name)
 
-                'AG 29/07/2014 #1887 Max number of results to export each time 100
-                Dim maxResultsToExport As Integer = 100 'Default value
-                Dim swParamDlg As New SwParametersDelegate
-                resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
-                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                    Dim myDS As New ParametersDS
-                    myDS = DirectCast(resultData.SetDatos, ParametersDS)
-                    If myDS.tfmwSwParameters.Rows.Count > 0 Then
-                        If Not myDS.tfmwSwParameters(0).IsValueNumericNull Then
-                            maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
-                        End If
+            'BA-1927: Count the number of results to Export to check if it is greater than the maximum allowed
+            Dim stopProcess As Boolean = False
+            Dim myResultsDelegate As New ResultsDelegate
+
+            resultData = myResultsDelegate.CountTotalResultsToExportToLIS(Nothing, AnalyzerIDField, WorkSessionIDField, includeExportedResults)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                If (CInt(resultData.SetDatos) > maxResultsToExport OrElse CInt(resultData.SetDatos) = 0) Then
+                    'Show the warning message and stop the process 
+                    stopProcess = True
+                    ShowMessage(Me.Name, GlobalEnumerates.Messages.MAX_RESULTS_FOR_LISEXPORT, , Me)
+                End If
+            Else
+                'If an error has happened, stop the export process
+                stopProcess = True
+            End If
+
+            If (Not stopProcess) Then
+                'AG 29/07/2014 - BA-1887 (if current screen view is Patient, includeExportedResults = True, which means that Patient Results already exported will be re-sent)
+                Dim myExport As New ExportDelegate
+                resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, includeExportedResults)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    Dim exportResults As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+                    'AG 17/02/2014 - BT #1505
+                    If (exportResults.twksWSExecutions.Rows.Count > 0) Then
+                        'Pass the list of Results to be exported to LIS to the MainMDI
+                        IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
+
+                        'AG 17/02/2014 - BT #1505: improvement, copy DS using Merge instead of loops
+                        Dim myResultsAlarmsDS As New ResultsDS
+                        myResultsAlarmsDS.vwksResultsAlarms.Merge(AverageResultsDS.vwksResultsAlarms)
+                        myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
+
+                        'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        CreateLogActivity("Current Results manual upload", Me.Name & ".ExportResultsToLIS ", EventLogEntryType.Information, False)
+
+                        IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, myResultsAlarmsDS, Nothing)
                     End If
                 End If
-
-                If exportResults.twksWSExecutions.Rows.Count > maxResultsToExport Then
-                    'Show message and leave method - MESSAGE NOT IN DATABASE (same as in historical results!!!)
-                    MessageBox.Show(Me, "Please, export to LIS in groups of " & maxResultsToExport & " results (maximum)", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information)
-                    Return
-                End If
-                'AG 29/07/2014
-
-                If exportResults.twksWSExecutions.Rows.Count > 0 Then 'AG 17/02/2014 - #1505
-                    'Inform the new results to be updated into MDI property
-                    IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
-
-                    'Call assynchronously to a synchronous process using another thread but not wait
-                    'AG + SG 05/04/2013
-                    'Do not use the same AverageResultsDS as 2 different parameters because the Dataset always are treated as ByRef
-                    'and the system loss information
-                    'Solution: create a new variable only with alarms information
-
-                    'IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, AverageResultsDS, Nothing)
-                    Dim myResultsAlarmsDS As New ResultsDS
-
-                    'AG 17/02/2017 - #1505 improvement, copy DS using Merge instead of loops
-                    'For Each row As ResultsDS.vwksResultsAlarmsRow In AverageResultsDS.vwksResultsAlarms
-                    '    myResultsAlarmsDS.vwksResultsAlarms.ImportRow(row)
-                    'Next
-                    'myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
-
-                    myResultsAlarmsDS.vwksResultsAlarms.Merge(AverageResultsDS.vwksResultsAlarms)
-                    myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
-                    'AG 17/02/2014 - #1505
-
-                    CreateLogActivity("Current Results manual upload", Me.Name & ".ExportButton_Click ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                    IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, myResultsAlarmsDS, Nothing)
-                    'AG + SG 05/04/2013
-                End If 'AG 17/02/2014 - #1505
             End If
-            'AG 18/03/2013
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExportButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExportResultsToLIS", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ExportResultsToLIS", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
-
-
-
-            'DL 30/09/2011. Improvement + BUGS. ID: 162
             UpdateScreenGlobalDSWithAffectedResults()
 
-            If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
-                UpdateSamplesListDataGrid()
-            Else
+            'BA-1927: The list of Patients have to be refreshed also when the Export to LIS has been executed from Tests View 
+            '         to update CheckBox ExportToLIS for all Patients which results have been exported 
+            UpdateSamplesListDataGrid()
+            If (bsTestDetailsTabControl.SelectedTab.Name = bsTestsTabTage.Name) Then
+                'If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
+                '    UpdateSamplesListDataGrid()
+                'Else
                 Select Case bsResultsTabControl.SelectedTab.Name
                     Case bsBlanksTabPage.Name
                         'UpdateBlanksDataGrid()
@@ -1651,43 +1479,279 @@ Public Class IResults
                 End Select
                 Application.DoEvents()
             End If
-            'END DL 24/09/2011
 
-            'TR 04/08/2011 -Enable menu bar.
-            'IAx00MainMDI.EnableMenusBar(True)
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
-            ExitButton.Enabled = True
+            'Enable screen buttons, and enable also all buttons and menus in the MainMDI
+            IAx00MainMDI.EnableButtonAndMenus(True)
+            PrintReportButton.Enabled = True
+            PrintCompactReportButton.Enabled = True
+            SummaryButton.Enabled = True
+            PrintSampleButton.Enabled = True
+            PrintTestButton.Enabled = True
             bsXlsresults.Enabled = True
-            'OffSystemResultsButton.Enabled = True
-            'TR 11/07/2012 -Use function that activate offSystems results button.
             OffSystemResultsButton.Enabled = OffSystemResultsButtonEnabled()
 
-            'AG 19/03/2012
-            'SendManRepButton.Enabled = True
-            SendManRepButton.Enabled = IIf(WSStatusField = "ABORTED", False, True)
-
-            PrintTestButton.Enabled = True
-            PrintSampleButton.Enabled = True
-            SummaryButton.Enabled = True
-            PrintReportButton.Enabled = True
-            'TR 04/08/2011 -END.
+            'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+            SendManRepButton.Enabled = SendManRepButtonEnabled()
+            ExitButton.Enabled = True
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                            "IResults.ExportButton_Click", EventLogEntryType.Information, False)
+                                            "IResults.ExportResultsToLIS", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'for refreshing data when ack from lis
-            ExperimentalSampleIndex = -1 'SGM 16/03/2013
-
+            ExperimentalSampleIndex = -1 'SG 16/03/2013
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' Control the availability of button for Send Manual Repetition. The button has to be disabled in following conditions:
+    ''' (1) If the status of the active Work Session is ABORTED
+    ''' (2) In Patients View, if setting LIS Working Mode for Reruns has been set to LIS ONLY
+    ''' (3) In Tests View, if the active Tab is Patients and setting LIS Working Mode for Reruns has been set to LIS ONLY
+    ''' </summary>
+    ''' <returns>True is the button can be enabled; otherwise False</returns>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927
+    ''' </remarks>
+    Private Function SendManRepButtonEnabled() As Boolean
+        Dim buttonEnabled As Boolean = True
+
+        Try
+            If (WSStatusField = "ABORTED") Then
+                '(1) If the Work Session is ABORTED, the button is not available
+                buttonEnabled = False
+            Else
+                If (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name) Then
+                    '(2) In Patients View, the button availability depends on value of setting LIS Rerun Mode
+                    buttonEnabled = (MyClass.LISWorkingModeReruns <> "LIS")
+                Else
+                    '(3) Tests View
+                    If (bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name) Then
+                        'For PATIENTS, the button availability depends on value of setting LIS Rerun Mode
+                        buttonEnabled = (MyClass.LISWorkingModeReruns <> "LIS")
+                    Else
+                        'For BLANKS, CALIBRATORS and CONTROLS, the button is always available
+                        buttonEnabled = True
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SendManRepButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".SendManRepButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return buttonEnabled
+    End Function
+
+    ''' <summary>
+    ''' Control the availability of button for Export Results to LIS. 
+    ''' </summary>
+    ''' <returns>True is the button can be enabled; otherwise False</returns>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927
+    ''' </remarks>
+    Private Function ExportButtonEnabled() As Boolean
+        Dim buttonEnabled As Boolean = True
+        Try
+            If (Not mdiAnalyzerCopy Is Nothing AndAlso Not mdiESWrapperCopy Is Nothing) Then
+                Dim myESBusinessDlg As New ESBusiness
+
+                Dim runningFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
+                Dim connectingFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
+
+                buttonEnabled = myESBusinessDlg.AllowLISAction(Nothing, LISActions.HostQuery, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
+            Else
+                buttonEnabled = False
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExportButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ExportButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return buttonEnabled
+    End Function
+
+    ''' <summary>
+    ''' Manually LIS export
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  DL 22/03/2011
+    ''' Modified by: SG 10/04/2013 - Call method ExportToLISManualNEW with parameters pIncludeSent = TRUE
+    '''              AG 13/02/2014 - BT #1505 ==> Results screen export only the still not sent results
+    '''              AG 17/02/2014 - BT #1505 ==> Use merge instead of loops
+    '''              SA 19/08/2014 - BA-1927  ==> Code moved to new function ExportResultsToLIS
+    ''' </remarks>
+    Private Sub ExportButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ExportButton.Click
+        Try
+            ExportResultsToLIS()
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ExportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+
+        ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        'Dim StartTime As DateTime = Now
+        'Dim myLogAcciones As New ApplicationLogManager()
+        ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        'Try
+
+        '    'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not shown message here!!!) ' XB 18/02/2014 BT #1499
+        '    Dim PCounters As New AXPerformanceCounters(applicationMaxMemoryUsage, SQLMaxMemoryUsage)
+        '    PCounters.GetAllCounters()
+        '    PCounters = Nothing
+        '    ' XB 18/02/2014 BT #1499
+
+        '    Dim resultData As New GlobalDataTO
+
+        '    'TR 04/08/2011 -Enable menu bar.
+        '    'IAx00MainMDI.EnableMenusBar(False)
+        '    IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+        '    ExitButton.Enabled = False
+        '    bsXlsresults.Enabled = False
+        '    OffSystemResultsButton.Enabled = False
+        '    SendManRepButton.Enabled = False
+        '    PrintTestButton.Enabled = False
+        '    PrintSampleButton.Enabled = False
+        '    SummaryButton.Enabled = False
+        '    PrintReportButton.Enabled = False
+        '    'TR 04/08/2011 -END.
+
+        '    Dim myExport As New ExportDelegate
+        '    'resultData = myExport.ExportToLISManual(AnalyzerIDField, WorkSessionIDField)
+
+        '    'AG 29/07/2014 - #1887 - Re-send results
+        '    'Export by Patient view uses the OrderToExport field
+        '    'Export by Test view uses ??? - PENDING CONFIRM
+        '    'resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'AG 13/02/2014 - #1505 (results screen export only the still not sent results)
+        '    If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
+        '        'PATIENTs view re-send process
+        '        resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True, True) 'Include the already exported results
+        '    Else
+        '        'TESTs view re-send process
+        '        resultData = myExport.ExportToLISManualNEW(AnalyzerIDField, WorkSessionIDField, True) 'From test view user export only the still not sent results!!! (SPECIFICATION: NO changes in export from tests view)
+        '    End If
+        '    'AG 29/07/2014
+
+        '    'AG 18/03/2013 - upload results to LIS
+        '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '        Dim exportResults As New ExecutionsDS
+        '        exportResults = CType(resultData.SetDatos, ExecutionsDS)
+
+        '        'AG 29/07/2014 #1887 Max number of results to export each time 100
+        '        Dim maxResultsToExport As Integer = 100 'Default value
+        '        Dim swParamDlg As New SwParametersDelegate
+        '        resultData = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
+        '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '            Dim myDS As New ParametersDS
+        '            myDS = DirectCast(resultData.SetDatos, ParametersDS)
+        '            If myDS.tfmwSwParameters.Rows.Count > 0 Then
+        '                If Not myDS.tfmwSwParameters(0).IsValueNumericNull Then
+        '                    maxResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
+        '                End If
+        '            End If
+        '        End If
+
+        '        If exportResults.twksWSExecutions.Rows.Count > maxResultsToExport Then
+        '            'Show message and leave method - MESSAGE NOT IN DATABASE (same as in historical results!!!)
+        '            MessageBox.Show(Me, "Please, export to LIS in groups of " & maxResultsToExport & " results (maximum)", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information)
+        '            Return
+        '        End If
+        '        'AG 29/07/2014
+
+        '        If exportResults.twksWSExecutions.Rows.Count > 0 Then 'AG 17/02/2014 - #1505
+        '            'Inform the new results to be updated into MDI property
+        '            IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
+
+        '            'Call assynchronously to a synchronous process using another thread but not wait
+        '            'AG + SG 05/04/2013
+        '            'Do not use the same AverageResultsDS as 2 different parameters because the Dataset always are treated as ByRef
+        '            'and the system loss information
+        '            'Solution: create a new variable only with alarms information
+
+        '            'IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, AverageResultsDS, Nothing)
+        '            Dim myResultsAlarmsDS As New ResultsDS
+
+        '            'AG 17/02/2017 - #1505 improvement, copy DS using Merge instead of loops
+        '            'For Each row As ResultsDS.vwksResultsAlarmsRow In AverageResultsDS.vwksResultsAlarms
+        '            '    myResultsAlarmsDS.vwksResultsAlarms.ImportRow(row)
+        '            'Next
+        '            'myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
+
+        '            myResultsAlarmsDS.vwksResultsAlarms.Merge(AverageResultsDS.vwksResultsAlarms)
+        '            myResultsAlarmsDS.vwksResultsAlarms.AcceptChanges()
+        '            'AG 17/02/2014 - #1505
+
+        '            CreateLogActivity("Current Results manual upload", Me.Name & ".ExportButton_Click ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
+        '            IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, myResultsAlarmsDS, Nothing)
+        '            'AG + SG 05/04/2013
+        '        End If 'AG 17/02/2014 - #1505
+        '    End If
+        '    'AG 18/03/2013
+
+        'Catch ex As Exception
+        '    CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " ExportButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        '    ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+
+        'Finally
+
+
+
+        '    'DL 30/09/2011. Improvement + BUGS. ID: 162
+        '    UpdateScreenGlobalDSWithAffectedResults()
+
+        '    UpdateSamplesListDataGrid()
+        '    If (bsTestDetailsTabControl.SelectedTab.Name = bsTestsTabTage.Name) Then
+
+        '        'If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
+        '        '    UpdateSamplesListDataGrid()
+        '        'Else
+        '        Select Case bsResultsTabControl.SelectedTab.Name
+        '            Case bsBlanksTabPage.Name
+        '                'UpdateBlanksDataGrid()
+        '            Case bsCalibratorsTabPage.Name
+        '                'UpdateCalibratorsDataGrid()
+        '            Case bsControlsTabPage.Name
+        '                UpdateControlsDataGrid()
+        '            Case XtraSamplesTabPage.Name
+        '                UpdateSamplesXtraGrid()
+        '        End Select
+        '        Application.DoEvents()
+        '    End If
+        '    'END DL 24/09/2011
+
+        '    'TR 04/08/2011 -Enable menu bar.
+        '    'IAx00MainMDI.EnableMenusBar(True)
+        '    IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
+        '    ExitButton.Enabled = True
+        '    bsXlsresults.Enabled = True
+        '    'OffSystemResultsButton.Enabled = True
+        '    'TR 11/07/2012 -Use function that activate offSystems results button.
+        '    OffSystemResultsButton.Enabled = OffSystemResultsButtonEnabled()
+
+        '    'AG 19/03/2012
+        '    'SendManRepButton.Enabled = True
+        '    SendManRepButton.Enabled = IIf(WSStatusField = "ABORTED", False, True)
+
+        '    PrintTestButton.Enabled = True
+        '    PrintSampleButton.Enabled = True
+        '    SummaryButton.Enabled = True
+        '    PrintReportButton.Enabled = True
+        '    'TR 04/08/2011 -END.
+
+        '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        '    myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        '                                    "IResults.ExportButton_Click", EventLogEntryType.Information, False)
+        '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+        '    'for refreshing data when ack from lis
+        '    ExperimentalSampleIndex = -1 'SGM 16/03/2013
+
+        'End Try
 
     End Sub
 
     Private Sub OffSystemResultsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OffSystemResultsButton.Click
         Try
             OpenOffSystemResultsScreen()
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OffSystemResultsButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2105,8 +2169,6 @@ Public Class IResults
         Debug.Print("IResults.LoadExecutionsResults: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
     End Sub
 
-
-
     ''' <summary>
     ''' Gets the list of Order Tests Results from the Executions
     ''' </summary>
@@ -2364,7 +2426,6 @@ Public Class IResults
     ''' <remarks>CREATED BY: TR 06/6/2012</remarks>
     Private Sub GetPanicRangeValuesAverage()
         Try
-
             For Each resultRow As ResultsDS.vwksResultsAlarmsRow In AverageResultsDS.vwksResultsAlarms.Rows
                 Select Case resultRow.AlarmID
                     Case "CONC_REMARK9", "CONC_REMARK10"
@@ -2495,7 +2556,6 @@ Public Class IResults
         Return myResult
     End Function
 
-
     ''' <summary>
     ''' Initializes all the controls
     ''' </summary>
@@ -2585,7 +2645,6 @@ Public Class IResults
     ''' </remarks>
     Private Sub InitializeUserSelectionStep1()
         Try
-
             If Not SampleClass Is Nothing Then
                 Select Case SampleClass
                     Case "PATIENT"
@@ -2599,7 +2658,6 @@ Public Class IResults
 
                     Case "CTRL"
                         TestsListViewText = SampleOrTestName
-
                 End Select
             End If
 
@@ -2617,60 +2675,170 @@ Public Class IResults
     ''' </remarks>
     Private Sub InitializeUserSelectionStep2()
         Try
-
-            If Not SampleClass Is Nothing Then
+            If (Not SampleClass Is Nothing) Then
                 Select Case SampleClass
                     Case "PATIENT"
                         bsTestDetailsTabControl.SelectedTab = bsSamplesTab
 
-                        ExportButton.Visible = True
                         bsSamplesResultsTabControl.Visible = True
                         bsSamplesPanel.Visible = True
+                        ExportButton.Visible = True
 
                         bsTestPanel.Visible = False
                         bsResultsTabControl.Visible = False
 
                     Case "BLANK"
                         bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
-                        bsResultsTabControl.SelectedTab = bsBlanksTabPage
 
+                        bsTestPanel.Visible = True
+                        bsResultsTabControl.Visible = True
+                        bsResultsTabControl.SelectedTab = bsBlanksTabPage
                         ExportButton.Visible = False
 
                         bsSamplesResultsTabControl.Visible = False
                         bsSamplesPanel.Visible = False
-
-                        bsTestPanel.Visible = True
-                        bsResultsTabControl.Visible = True
 
                     Case "CALIB"
                         bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
-                        bsResultsTabControl.SelectedTab = bsCalibratorsTabPage
 
+                        bsTestPanel.Visible = True
+                        bsResultsTabControl.Visible = True
+                        bsResultsTabControl.SelectedTab = bsCalibratorsTabPage
                         ExportButton.Visible = False
 
                         bsSamplesResultsTabControl.Visible = False
                         bsSamplesPanel.Visible = False
 
+                    Case "CTRL"
+                        bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
+
                         bsTestPanel.Visible = True
                         bsResultsTabControl.Visible = True
 
-                    Case "CTRL"
-                        bsTestDetailsTabControl.SelectedTab = bsTestsTabTage
                         bsResultsTabControl.SelectedTab = bsControlsTabPage
-
                         ExportButton.Visible = True
 
                         bsSamplesResultsTabControl.Visible = False
                         bsSamplesPanel.Visible = False
-
-                        bsTestPanel.Visible = True
-                        bsResultsTabControl.Visible = True
-
                 End Select
             End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " InitializeUserSelectionStep2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Control the availability of screen controls (panels, tab and buttons) according the view selected: by Patient or by Test
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927 ==> Code moved from event bsTestDetailsTabControl.Selected
+    '''                                         Changed the way of set the visibility of ExportButton (there was an error in the previous code)
+    '''                                         Availability of SendManRepButton has been modified just to make it more clear (new function is called)
+    ''' </remarks>
+    Private Sub TestDetailsTabSelectedEvent()
+        Try
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            Select Case (bsTestDetailsTabControl.SelectedTab.Name)
+                Case bsSamplesTab.Name
+                    'View by PATIENT
+                    bsSamplesResultsTabControl.Visible = True
+                    bsSamplesPanel.Visible = True
+
+                    bsTestPanel.Visible = False
+                    bsResultsTabControl.Visible = False
+
+                    'BA-1927: The ExportButton will be always visible in Patients View
+                    ExportButton.Visible = True
+
+                Case bsTestsTabTage.Name
+                    'View by TEST
+                    bsSamplesResultsTabControl.Visible = False
+                    bsSamplesPanel.Visible = False
+
+                    bsTestPanel.Visible = True
+                    bsResultsTabControl.Visible = True
+
+                    'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients
+                    '         The previous comparation by Name was wrong (bsResultsTabControl.SelectedTab.Name = "XtraSamplesTabPage",
+                    '         while bsSamplesTab.Name = "bsSamplesTab")
+                    ExportButton.Visible = (bsResultsTabControl.SelectedTab.Name = bsControlsTabPage.Name OrElse _
+                                            bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name)
+                    ExportButton.Enabled = ExportButtonEnabled()
+
+                    'BT #1502 - This two buttons are hide because the test of the new reports have not been executed
+                    PrintTestBlankButton.Visible = False
+                    PrintTestCtrlButton.Visible = False
+            End Select
+
+            'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+            SendManRepButton.Enabled = SendManRepButtonEnabled()
+
+            If (Not ProcessEvent) Then Return
+            If (bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name) Then
+                'RH 13/12/2010 
+                'Change the order of the instructions: first update the Samples list, and then update the experimental grid.
+                'That is the proper way to avoid calling UpdateExperimentalsDataGrid() twice
+                If (UpdatePatientList) Then
+                    UpdateSamplesListDataGrid()
+                    UpdatePatientList = False
+                End If
+                Application.DoEvents()
+                UpdateExperimentalsDataGrid()
+            Else
+                UpdateCurrentResultsGrid()
+            End If
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+                                            " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
+                                            "IResults.TestDetailsTabSelectedEvent", EventLogEntryType.Information, False)
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestDetailsTabSelectedEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Control the availability of screen buttons in view by Test according the tab of SampleClass selected 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927 ==> Code moved from event bsResultsTabControl.Selected
+    '''                                         Changed the way of set the visibility of ExportButton (there was an error in the previous code)
+    '''                                         Availability of SendManRepButton has been modified just to make it more clear (new function is called)
+    ''' </remarks>
+    Private Sub ResultsTabControlSelectedEvent()
+        Try
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients
+            '         The previous comparation was incomplete due to for Controls the button remained hidden
+            ExportButton.Visible = (bsResultsTabControl.SelectedTab.Name = bsControlsTabPage.Name OrElse _
+                                    bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name)
+            ExportButton.Enabled = ExportButtonEnabled()
+
+            'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+            SendManRepButton.Enabled = SendManRepButtonEnabled()
+
+            If (Not ProcessEvent) Then Return
+            UpdateCurrentResultsGrid()
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
+                                            & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
+                                            "IResults.ResultsTabControlSelectedEvent", EventLogEntryType.Information, False)
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResultsTabControlSelectedEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3236,7 +3404,6 @@ Public Class IResults
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemResultsButtonEnabled", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OffSystemResultsButtonEnabled", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         End Try
         Return (numOffSystems > 0)
     End Function
@@ -3460,72 +3627,62 @@ Public Class IResults
         Return finalResultOK
     End Function
 
-
-
     ''' <summary>
-    ''' The manual repetition icon will be only available for the standard tests and the last rerun
-    ''' and user can add repetitions to the worksession only when the orderTest becomes CLOSED
-    '''
+    ''' The manual Repetition icon will be available in following conditions: 
+    ''' ** For STD and ISE Tests 
+    ''' ** For the last Rerun and only when the status of the OrderTest is CLOSED (all Reruns are finished)
+    ''' ** For PATIENT Results, only if value of setting LIS RERUN WORKING MODE is different of LIS ONLY
     ''' </summary>
-    ''' <param name="pRow"></param>
-    ''' <param name="MaxRerunNumber"></param>
+    ''' <param name="pRow">Row of typed DataSet ResultsDS.vwksResultsRow</param>
+    ''' <param name="pMaxRerunNumber">Number of the last Rerun requested for the OrderTest</param>
     ''' <param name="pRepetitionCriteriaSent"></param>
-    ''' <returns></returns>
-    ''' <remarks>Created by AG 15/08/2010
-    ''' Modified by AG 31/08/2010 - Dont use Count ... get the RerunNumber of pRow and search and compare the OrderTestID max rerun number
-    ''' AG 08/03/2011 -
-    '''             RH 23/04/2012 - Pass MaxRerunNumber instead. 
-    ''' Modified by: SG 17/04/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS"
-    ''' Modified by: JC 14/05/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" if SampleClass is PATIENT
+    ''' <returns>True if a manual Repetition is allowed; otherwise, False</returns>
+    ''' <remarks>
+    ''' Created by:  AG 15/08/2010
+    ''' Modified by: AG 31/08/2010 - Do not use Count ... get the RerunNumber of pRow and search and compare the OrderTestID max rerun number
+    '''              AG 08/03/2011 -
+    '''              RH 23/04/2012 - Pass pMaxRerunNumber instead
+    '''              SG 17/04/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS"
+    '''              JC 14/05/2013 - Lock Manual Repetitions in case of Working Mode for Reruns = "LIS" but only if SampleClass is PATIENT
     ''' </remarks>
-    Private Function AllowManualRepetitions(ByVal pRow As ResultsDS.vwksResultsRow, ByVal MaxRerunNumber As Integer, _
+    Private Function AllowManualRepetitions(ByVal pRow As ResultsDS.vwksResultsRow, ByVal pMaxRerunNumber As Integer, _
                                             ByVal pSampleClass As String, ByRef pRepetitionCriteriaSent As String) As Boolean
         Dim manualRepAllowed As Boolean = False
 
         Try
-            'SGM 17/04/2013
-            If MyClass.LISWorkingModeReruns = "LIS" AndAlso pSampleClass = "PATIENTS" Then
-                Return False
-            End If
-            'end SGM 17/04/2013
+            'SG 17/04/2013 / JC 14/05/2013
+            If (MyClass.LISWorkingModeReruns = "LIS" AndAlso pSampleClass = "PATIENTS") Then Return False
 
-            '1st condition: Only for standard and ISE TESTs
-            If String.Compare(pRow.TestType, "STD", False) = 0 OrElse String.Compare(pRow.TestType, "ISE", False) = 0 Then
-
-                '2on condition: Average belongs to the max orderTest rerun number
-                'AG 31/08/2010
-                If pRow.RerunNumber = MaxRerunNumber Then
-
-                    '3th condition: All reruns are finished ... ordertest is closed
-                    If pRow.OrderTestStatus = "CLOSED" Then
+            '1st condition: Manual Repetitions are allowed only for STANDARD and ISE Tests
+            If (pRow.TestType = "STD" OrElse pRow.TestType = "ISE") Then
+                '2nd condition: Average belongs to the max orderTest rerun number (the last requested)
+                If (pRow.RerunNumber = pMaxRerunNumber) Then
+                    '3rd condition: All reruns are finished ... the OrderTest is CLOSED
+                    If (pRow.OrderTestStatus = "CLOSED") Then
                         manualRepAllowed = True
                     End If
+                End If
 
-                End If 'If pRow.RerunNumber = maxOrderTestRerun Then
+                If (Not manualRepAllowed) Then
+                    Dim myRow As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                                                                    Where row.OrderTestID = pRow.OrderTestID _
+                                                                                  AndAlso row.RerunNumber = pRow.RerunNumber _
+                                                                                  AndAlso row.MultiItemNumber = pRow.MultiPointNumber _
+                                                                                   Select row).ToList()
 
-                If Not manualRepAllowed Then
-                    Dim myRow As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
-                    myRow = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                             Where row.OrderTestID = pRow.OrderTestID _
-                             AndAlso row.RerunNumber = pRow.RerunNumber _
-                             AndAlso row.MultiItemNumber = pRow.MultiPointNumber _
-                             Select row).ToList()
-
-                    If myRow.Count > 0 Then
-                        If Not myRow(0).IsSentNewRerunPostdilutionNull Then
+                    If (myRow.Count > 0) Then
+                        If (Not myRow(0).IsSentNewRerunPostdilutionNull) Then
                             pRepetitionCriteriaSent = myRow(0).SentNewRerunPostdilution
                         End If
                     End If
+                    myRow = Nothing
                 End If
-            End If 'If pRow.TestType = "STD" Then
-
+            End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " AllowManualRepetitions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
             manualRepAllowed = False
-
         End Try
-
         Return manualRepAllowed
     End Function
 

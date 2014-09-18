@@ -1268,6 +1268,7 @@ Namespace Biosystems.Ax00.Global
             MANUAL_DELETE_FOR_STATS
             MASTER_DATA_MISSING
             MAX_PATIENT_ORDERTESTS
+            MAX_RESULTS_FOR_LISEXPORT
             MIN_MUST_BE_LOWER_THAN_MAX
             MINEQUALSMAX
             MINGREATHERMAX

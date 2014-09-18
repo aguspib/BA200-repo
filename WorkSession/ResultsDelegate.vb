@@ -7637,7 +7637,48 @@ Namespace Biosystems.Ax00.BL
         End Sub
 #End Region
 
-#Region "METHODS FOR EXPORT RESULTS TO LIMS"
+#Region "METHODS FOR EXPORT RESULTS TO LIS"
+        ''' <summary>
+        ''' Count the total number of results selected to be Exported to LIS
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pIncludeExportedResults">When TRUE, it indicates that results that have been already sent to LIS (ExportStatus = SENT) will be sent to LIS again
+        '''                                       (apply only for Patient results). When FALSE, it means that all Patient and/or Control results that have not been still 
+        '''                                       sent to LIS will be sent to LIS</param>
+        ''' <returns>GlobalDataTO containing an integer value with the total number of results selected to be sent to LIS</returns>
+        ''' <remarks>
+        ''' Created by: SA 18/09/2014 - BA-1927
+        ''' </remarks>
+        Public Function CountTotalResultsToExportToLIS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                       ByVal pIncludeExportedResults As Boolean) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myResultsDAO As New twksResultsDAO
+                        resultData = myResultsDAO.CountTotalResultsToExportToLIS(dbConnection, pAnalyzerID, pWorkSessionID, pIncludeExportedResults)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.CountTotalResultsToExportToLIS", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
         ''' <summary>
         ''' Get Results info by Export to LIS
         ''' </summary>

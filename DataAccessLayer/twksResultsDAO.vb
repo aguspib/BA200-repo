@@ -1231,6 +1231,77 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
+        ''' Count the total number of results selected to be Exported to LIS
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pIncludeExportedResults">When TRUE, it indicates that results that have been already sent to LIS (ExportStatus = SENT) will be sent to LIS again
+        '''                                       (apply only for Patient results). When FALSE, it means that all Patient and/or Control results that have not been still 
+        '''                                       sent to LIS will be sent to LIS</param>
+        ''' <returns>GlobalDataTO containing an integer value with the total number of results selected to be sent to LIS</returns>
+        ''' <remarks>
+        ''' Created by: SA 18/09/2014 - BA-1927
+        ''' </remarks>
+        Public Function CountTotalResultsToExportToLIS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                       ByVal pIncludeExportedResults As Boolean) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT COUNT(*) AS TotalNumber " & vbCrLf & _
+                                                " FROM twksResults R INNER JOIN twksOrderTests OT ON R.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                                   " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                                " WHERE  R.AnalyzerID         = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                " AND    R.WorkSessionID      = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                " AND    R.ValidationStatus   = 'OK' " & vbCrLf & _
+                                                " AND    R.AcceptedResultFlag = 1 " & vbCrLf & _
+                                                " AND    OT.OrderTestStatus   = 'CLOSED' " & vbCrLf & _
+                                                " AND    O.OrderToExport      = 1 " & vbCrLf
+
+                        If (pIncludeExportedResults) Then
+                            'Count only Patient Results; the ExportStatus is not used as filter
+                            cmdText &= " AND O.SampleClass = 'PATIENT' "
+                        Else
+                            'Count Control and Patient Results with ExportStatus <> SENT
+                            cmdText &= " AND O.SampleClass IN ('PATIENT', 'CTRL') " & vbCrLf & _
+                                       " AND R.ExportStatus <> 'SENT' "
+                        End If
+
+                        Dim myTotalNumber As Integer = 0
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Dim dbDataReader As SqlClient.SqlDataReader = dbCmd.ExecuteReader()
+
+                            If (dbDataReader.HasRows) Then
+                                dbDataReader.Read()
+                                If (Not dbDataReader.IsDBNull(0)) Then
+                                    myTotalNumber = CInt(dbDataReader.Item("TotalNumber"))
+                                End If
+                            End If
+                            dbDataReader.Close()
+                        End Using
+
+                        resultData.SetDatos = myTotalNumber
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksResultsDAO.CountTotalResultsToExportToLIS", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
         ''' Delete all Calibrator Results that exist for the informed TestID/SampleType for the specified TestVersion
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
@@ -1643,7 +1714,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.SetDatos = resultsDataDS
                         resultData.HasError = False
                     End If
-                    End If
+                End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
