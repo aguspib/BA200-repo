@@ -784,7 +784,7 @@ Public Class ISortingTestsAux
             bsTestListGrid.Columns.Add("TestName", myMultiLangResourcesDelegate.GetResourceText(Nothing, multiLanguageID, CurrentLanguage))
 
             bsTestListGrid.Columns("TestName").Width = 215 - witdhToLess
-            'bsTestListGrid.Columns("TestName").SortMode = DataGridViewColumnSortMode.Automatic
+            bsTestListGrid.Columns("TestName").SortMode = DataGridViewColumnSortMode.Programmatic  'AG 18/09/2014 - do not sort clicking in header!!!!
 
             bsTestListGrid.Columns.Add("TestID", "")
             bsTestListGrid.Columns("TestID").Visible = False
