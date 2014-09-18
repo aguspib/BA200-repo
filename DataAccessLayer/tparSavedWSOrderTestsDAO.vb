@@ -691,6 +691,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''               TR 14/03/2013 - Changed the SQL by adding an INNER JOIN with table tparSavedWS to get value of field SavedWSName
         '''               SA 09/05/2013 - Changed the SQL to get also value of new field DeletedTestFlag
         '''               XB 28/08/2014 - Add new field Selected - BT #1868
+        '''               AG 17/09/2014 - BA-1869 saved WS will skip those tests configured as not available
         ''' </remarks>
         Public Function ReadBySavedWSID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSavedWSID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -701,17 +702,36 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AG 17/09/2014 - BA-1869 - Rewrite query adding LEFT OUTER JOIN clauses
+                        'Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.Selected, " & vbCrLf & _
+                        '                               " OT.ReplicatesNumber, OT.ControlID, OT.CreationOrder, OT.TestName, OT.FormulaText, OT.AwosID, OT.SpecimenID, " & vbCrLf & _
+                        '                               " OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.CalcTestIDs, OT.CalcTestNames, SW.SavedWSName, " & vbCrLf & _
+                        '                               " (CASE WHEN OT.ExternalQC IS NULL THEN 0 ELSE OT.ExternalQC END) AS ExternalQC,  " & vbCrLf & _
+                        '                               " (CASE WHEN OT.DeletedTestFlag IS NULL THEN 0 ELSE OT.DeletedTestFlag END) AS DeletedTestFlag, " & vbCrLf & _
+                        '                               " (CASE WHEN OT.SampleID IS NULL THEN NULL  " & vbCrLf & _
+                        '                                     "WHEN SUBSTRING(OT.SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
+                        '                                     "WHEN OT.SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
+                        '                                     "ELSE 'MAN' END) AS PatienTIDType " & vbCrLf & _
+                        '                        " FROM   tparSavedWSOrderTests OT INNER JOIN tparSavedWS SW ON OT.SavedWSID = SW.SavedWSID  " & vbCrLf & _
+                        '                        " WHERE  OT.SavedWSID =" & pSavedWSID
+
                         Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.Selected, " & vbCrLf & _
-                                                       " OT.ReplicatesNumber, OT.ControlID, OT.CreationOrder, OT.TestName, OT.FormulaText, OT.AwosID, OT.SpecimenID, " & vbCrLf & _
-                                                       " OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.CalcTestIDs, OT.CalcTestNames, SW.SavedWSName, " & vbCrLf & _
-                                                       " (CASE WHEN OT.ExternalQC IS NULL THEN 0 ELSE OT.ExternalQC END) AS ExternalQC,  " & vbCrLf & _
-                                                       " (CASE WHEN OT.DeletedTestFlag IS NULL THEN 0 ELSE OT.DeletedTestFlag END) AS DeletedTestFlag, " & vbCrLf & _
-                                                       " (CASE WHEN OT.SampleID IS NULL THEN NULL  " & vbCrLf & _
-                                                             "WHEN SUBSTRING(OT.SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
-                                                             "WHEN OT.SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
-                                                             "ELSE 'MAN' END) AS PatienTIDType " & vbCrLf & _
-                                                " FROM   tparSavedWSOrderTests OT INNER JOIN tparSavedWS SW ON OT.SavedWSID = SW.SavedWSID  " & vbCrLf & _
-                                                " WHERE  OT.SavedWSID =" & pSavedWSID
+                               " OT.ReplicatesNumber, OT.ControlID, OT.CreationOrder, OT.TestName, OT.FormulaText, OT.AwosID, OT.SpecimenID, " & vbCrLf & _
+                               " OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.CalcTestIDs, OT.CalcTestNames, SW.SavedWSName, " & vbCrLf & _
+                               " (CASE WHEN OT.ExternalQC IS NULL THEN 0 ELSE OT.ExternalQC END) AS ExternalQC,  " & vbCrLf & _
+                               " (CASE WHEN OT.DeletedTestFlag IS NULL THEN 0 ELSE OT.DeletedTestFlag END) AS DeletedTestFlag, " & vbCrLf & _
+                               " (CASE WHEN OT.SampleID IS NULL THEN NULL  " & vbCrLf & _
+                                     "WHEN SUBSTRING(OT.SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
+                                     "WHEN OT.SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
+                                     "ELSE 'MAN' END) AS PatienTIDType " & vbCrLf & _
+                        " FROM   tparSavedWSOrderTests OT INNER JOIN tparSavedWS SW ON OT.SavedWSID = SW.SavedWSID  " & vbCrLf & _
+                        " LEFT OUTER JOIN tparTests T ON OT.TestType = 'STD' AND OT.TestID = T.TestID " & vbCrLf & _
+                        " LEFT OUTER JOIN tparCalculatedTests  CT ON OT.TestType = 'CALC' AND OT.TestID = CT.CalcTestID  " & vbCrLf & _
+                        " LEFT OUTER JOIN tparISETests IT ON OT.TestType = 'ISE' AND OT.TestID = IT.ISETestID " & vbCrLf & _
+                        " LEFT OUTER JOIN tparOffSystemTests OFT ON OT.TestType = 'OFFS' AND OT.TestID = OFT.OffSystemTestID " & vbCrLf & _
+                        " WHERE  OT.SavedWSID =" & pSavedWSID & vbCrLf & _
+                        " AND (CASE OT.TestType WHEN  'STD' THEN T.Available WHEN 'CALC' THEN CT.Available WHEN 'ISE' THEN IT.Available WHEN 'OFFS' THEN OFT.Available END) = 1 "
+                        'AG 17/09/2014 - BA-1869
 
                         Dim SavedWSOrderTestsDS As New SavedWSOrderTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

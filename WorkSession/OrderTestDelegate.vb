@@ -3650,9 +3650,10 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  AG 08/05/2013
         ''' Modified by: SA 09/05/2013 - Added parameters to inform TestType and TestID and filter the query also by these values 
+        ''' Modified by: AG 18/09/2014 - BA-1869 change pTestID to an optional parameter
         ''' </remarks>
         Public Function GetOrderTestsByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pTestType As String, _
-                                                   ByVal pTestID As Integer) As GlobalDataTO
+                                                   Optional ByVal pTestID As Integer = -1) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 

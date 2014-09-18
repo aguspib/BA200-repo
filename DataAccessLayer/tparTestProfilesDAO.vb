@@ -848,6 +848,57 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
+
+        ''' <summary>
+        ''' Update profile Available value depending his components: All Available -- profile available // Some NOT available -- profile not available
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 17/09/2014 - BA-1869
+        ''' </remarks>
+        Public Function UpdateAvailableCascadeByComponents(ByVal pDBConnection As SqlClient.SqlConnection, pAvailableValue As Boolean) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As New StringBuilder
+                    If Not pAvailableValue Then
+                        'Update to Available = 0 when some component not available
+                        cmdText.Append(" UPDATE tparTestProfiles  SET Available = 0 WHERE TestProfileID IN ")
+                    Else
+                        'Update to Available = 1 when all components available
+                        cmdText.Append(" UPDATE tparTestProfiles  SET Available = 1 WHERE TestProfileID NOT IN ")
+                    End If
+
+                    cmdText.Append(" (SELECT DISTINCT PT.testprofileID FROM tparTestProfileTests  PT ")
+                    cmdText.Append(" LEFT OUTER JOIN tparTests T ON PT.TestType = 'STD' AND PT.TestID = T.TestID ")
+                    cmdText.Append(" LEFT OUTER JOIN tparCalculatedTests  CT ON PT.TestType = 'CALC' AND PT.TestID = CT.CalcTestID  ")
+                    cmdText.Append(" LEFT OUTER JOIN tparISETests IT ON PT.TestType = 'ISE' AND PT.TestID = IT.ISETestID  ")
+                    cmdText.Append(" LEFT OUTER JOIN tparOffSystemTests OFT ON PT.TestType = 'OFFS' AND PT.TestID = OFT.OffSystemTestID  ")
+                    cmdText.Append(" WHERE (CASE PT.TestType WHEN 'STD' THEN T.Available WHEN 'CALC' THEN CT.Available WHEN 'ISE' THEN IT.Available WHEN 'OFFS' THEN OFT.Available END) = 0) ")
+
+                    If cmdText.ToString.Length <> 0 Then
+                        Using dbCmd As New SqlCommand(cmdText.ToString, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        End Using
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestProfilesDAO.UpdateAvailableCascadeByComponents", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+
 #End Region
 
     End Class
