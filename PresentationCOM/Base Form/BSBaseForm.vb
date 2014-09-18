@@ -216,13 +216,6 @@ Public Class BSBaseForm
         End Set
     End Property
 
-    Public ReadOnly Property CurrentUserNumericalLevel As USER_LEVEL
-        Get
-            GetUserNumericalLevel()
-            Return _currentUserNumericalLevel
-        End Get
-    End Property
-
 #End Region
 
 #Region "Public Methods"
@@ -1135,34 +1128,6 @@ Public Class BSBaseForm
         'Debug.Print("Shown screen ... ScreenChildShownInProcess=FALSE")
     End Sub
 
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks></remarks>
-    Protected Friend Sub GetUserNumericalLevel()
-
-        Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
-
-        Try
-
-            If (_currentUserNumericalLevel = Nothing) Then
-                If (myGlobalbase.GetSessionInfo.UserLevel <> String.Empty) Then
-                    Dim usersLevel As New UsersLevelDelegate
-                    myGlobal = usersLevel.GetUserNumericLevel(Nothing, myGlobalbase.GetSessionInfo.UserLevel)
-                    If Not myGlobal.HasError Then
-                        _currentUserNumericalLevel = CType(CType(myGlobal.SetDatos, Integer), USER_LEVEL)
-                    End If
-                End If
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetHWElementsName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetHWElementsName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-
-    End Sub
-
 #End Region
 
 #Region "Events"
@@ -1185,7 +1150,8 @@ Public Class BSBaseForm
 
             Dim formType As Type = sender.GetType()
             Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
-            form.ValidatePermissionLevel(Me.CurrentUserNumericalLevel)
+            Dim myGlobalBase As New GlobalBase
+            form.ValidatePermissionLevel(myGlobalBase.GetSessionInfo.UserLevelEnum)
 
         End If
 
