@@ -1405,69 +1405,50 @@ Public Class IHisResults
     '''                                           is lower than the allowed limit. Added traces in the Application Log. Set to Nothing all declared lists 
     '''                                           to release memory
     '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Allow re-sent patient results from history
+    '''              SA 19/09/2014 - BA-1927 ==> Use multilanguage to shown the message of maximum number of results to be exported to LIS exceeded
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
 
         Try
             Dim StartTime As DateTime = Now
-
             Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
             If (selectedRows.Count = 0) Then Exit Sub
 
             'BT #1505 - Evaluate if the number of Historic Patient Results selected to Export to LIS is lower than the allowed limit
             Dim maxHistResultsToExport As Integer = 100 'Default value..
-
             Dim swParamDlg As New SwParametersDelegate
+
             myGlobalDataTO = swParamDlg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_RESULTSTOEXPORT_HIST.ToString, Nothing)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim myDS As ParametersDS = DirectCast(myGlobalDataTO.SetDatos, ParametersDS)
-
-                If (myDS.tfmwSwParameters.Rows.Count = 0) Then
-                    'Do nothing, in v300 initial database contains this parameter
-                Else
+                If (myDS.tfmwSwParameters.Rows.Count > 0) Then
                     If (Not myDS.tfmwSwParameters(0).IsValueNumericNull) Then maxHistResultsToExport = CInt(myDS.tfmwSwParameters(0).ValueNumeric)
                 End If
             End If
 
-            'Show export confirmation message ??
-            'If (ShowMessage(Name & ".ExportSelectedRowsFromGrid ", GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) <> Windows.Forms.DialogResult.Yes) Then Exit Sub
-
-            'AG 24/07/2014 - #1886 - RQ00086
-            ''BEGIN DL 24/04/2013 - The results SENT or SENDING could not be uploaded again from Historical results screen 
-            'Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows
-            '                                              Where row.ExportStatus <> "SENT" AndAlso row.ExportStatus <> "SENDING" _
-            '                                             Select row.HistOrderTestID Distinct).ToList
-
-            'Convert dataset to LIST of historic order test integers
+            'Convert dataset to LIST of Historic OrderTests 
             Dim histOrderTestIDList As List(Of Integer) = (From row In selectedRows Select row.HistOrderTestID Distinct).ToList
-            'AG 24/07/2014
 
-            'AG 14/02/2014 - #1505 If number of results to export > limit --> show warning!! No export
-            If histOrderTestIDList.Count > maxHistResultsToExport Then
-                'Upload only the maxHistResults - (CANCELLED, instead of this show a message)
-                'histOrderTestIDList = histOrderTestIDList.GetRange(0, maxHistResultsToExport)
-
-                'Show message and leave method
-                MessageBox.Show(Me, "Please, export to LIS in groups of " & maxHistResultsToExport & " results (maximum)", My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Information)
+            'BT #1505 - If number of results to export > limit, a warning message is shown and the export process is stopped
+            If (histOrderTestIDList.Count > maxHistResultsToExport) Then
+                ShowMessage(Me.Name, GlobalEnumerates.Messages.MAX_RESULTS_FOR_LISEXPORT.ToString, , Me)
                 Return
             End If
-            'AG 14/02/2014 - #1505
 
             Dim myExportDelegate As New ExportDelegate
             myGlobalDataTO = myExportDelegate.ExportToLISManualFromHIST(histOrderTestIDList)
+
             CreateLogActivity("ExportToLISManualFromHIST: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
-            StartTime = Now 'AG 13/02/2014 - #1505
+            StartTime = Now
 
             'For testing LIS History Upload
-            If Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos IsNot Nothing Then
+            If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos IsNot Nothing) Then
                 'Get the results exported (ExecutionsDS) from GlobalDataToReturned
-                Dim myExportedExecutionsDS As ExecutionsDS = TryCast(myGlobalDataTO.SetDatos, ExecutionsDS)
-                Dim myHisWSResultsDS As HisWSResultsDS = New HisWSResultsDS
+                Dim myExportedExecutionsDS As ExecutionsDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
 
-                'AG 24/07/2014 - #1886 - RQ00086 v310 Export all selected results again (not only those not SENT)
-                'AG 14/02/2014 - #1505 do not create DS using selectedRows, add only those results to export!!!
-                'Create a new HisWSResultsDS (data table vhisWSResults) using the list of selected rows
+                'BA-1886 - Export all selected results (not only those with status NOTSENT)
+                Dim myHisWSResultsDS As HisWSResultsDS = New HisWSResultsDS
                 For Each HisWSResultsRow As HisWSResultsDS.vhisWSResultsRow In selectedRows
                     myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
                 Next
@@ -1476,37 +1457,29 @@ Public Class IHisResults
                 '        myHisWSResultsDS.vhisWSResults.ImportRow(HisWSResultsRow)
                 '    End If
                 'Next
-                'AG 24/07/2014
                 myHisWSResultsDS.AcceptChanges()
 
-                'AG 13/02/2014 - #1505
                 CreateLogActivity("Prepare myHisWSResultsDS (loop): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False)
-                'CreateLogActivity("Historical Results manual upload", Me.Name & ".ExportSelectedRowsFromGrid ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2) 'Comment this line AG 13/02/2014
                 StartTime = Now
-                'AG 13/02/2014 - #1505
-
-                ' 'Inform the new results to be updated into MDI property
-                If myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
+                
+                'Inform the new results to be updated into MDI property
+                If (myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                     IAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
                     IAx00MainMDI.InvokeUploadResultsLIS(True, Nothing, Nothing, myHisWSResultsDS)
                 End If 'AG 21/02/2014 - #1505
 
                 CreateLogActivity("Historical Results manual upload (end): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
-
             End If
-            'DL 24/04/2013. END
-
+            
             If (myGlobalDataTO.HasError) Then
                 'If an error has happened when expoting, shown it
                 ShowMessage(Me.Name & ".ExportSelectedRowsFromGrid ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
             FindHistoricalResults()
 
-            'AG 14/02/2014 - BT #1505 - relesea memory
+            'Set lists to Nothing to release memory
             selectedRows = Nothing
             histOrderTestIDList = Nothing
-            'AG 14/02/2014 - BT #1505
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExportSelectedRowsFromGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExportSelectedRowsFromGrid ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

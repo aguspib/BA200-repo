@@ -74,6 +74,8 @@ Namespace Biosystems.Ax00.Calculations
         '''                              of all Order Tests of another Calculated Tests in which Formula the Calculated Test in process is included
         '''              AG 25/02/2014 - BT #1521 ==> Set all Linqs to Nothing
         '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
+        '''              SA 19/09/2014 - BA-1927 ==> When calling function UpdateOrderToExport in OrdersDelegate, pass the local DB Connection instead 
+        '''                                          of the received as parameter (to avoid timeouts)
         ''' </remarks> 
         Public Function ExecuteCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                               ByVal pManualRecalculation As Boolean) As GlobalDataTO
@@ -229,7 +231,7 @@ Namespace Biosystems.Ax00.Calculations
 
                                                                 'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
                                                                 Dim orders_dlg As New OrdersDelegate
-                                                                resultData = orders_dlg.UpdateOrderToExport(pDBConnection, True, , resultRow.OrderTestID)
+                                                                resultData = orders_dlg.UpdateOrderToExport(dbConnection, True, , resultRow.OrderTestID)
                                                             Else
                                                                 'Error recalculating the Export Status
                                                                 Exit For
