@@ -2750,7 +2750,7 @@
       GO
     </StructureScript>
     <UpdateScript>
-      UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.10'
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.14'
       GO
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'u' AND name = 'tfmwScreens') = 1)
       BEGIN

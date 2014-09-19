@@ -10,11 +10,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         Inherits DAOBase
 
         ''' <summary>
-        ''' Gets the list of all calibrators that in local DB don't match with Factory DB
+        ''' Gets the list of all ise tests that in local DB don't match with Factory DB
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>
-        ''' All the results are the calibrators that can be removed or ignored
+        ''' All the results are the ise tests that can be removed or ignored
         ''' </returns>
         ''' <remarks>
         ''' Created by: DL - 29/01/2013
@@ -86,7 +86,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
         ''' <summary>
-        ''' Get differents in tparcalibrators between local and temporal Db
+        ''' Get differents in tparISETests between local and temporal Db
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <returns>True if find element otherwise it returns False</returns>
@@ -170,12 +170,13 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
         ''' <summary>
-        ''' Get differents in tparcalibrators between local and temporal Db
+        ''' Get differents in tparISETests between local and temporal Db
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <returns>True if find element otherwise it returns False</returns>
         ''' <remarks>
         ''' Created by:  DL 29/01/2013
+        ''' Modified by: XB 19/09/2014 - Add new fields TestLongName, SlopeFactorA2 and SlopeFactorB2 - BA-1865
         ''' </remarks>
         Public Shared Function GetISETestSamplesDistinctInClient(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim dataToReturn As GlobalDataTO = Nothing
@@ -202,6 +203,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "      ,CalculationMode" & vbCrLf
                         cmdText &= "      ,NumberOfSeries" & vbCrLf
                         cmdText &= "      ,TotalAllowedError" & vbCrLf
+                        cmdText &= "      ,TestLongName" & vbCrLf
+                        cmdText &= "      ,SlopeFactorA2" & vbCrLf
+                        cmdText &= "      ,SlopeFactorB2" & vbCrLf
                         cmdText &= "  FROM " & GlobalBase.TemporalDBName & ".dbo.tparISETestSamples" & vbCrLf
                         cmdText &= "Except" & vbCrLf
                         cmdText &= "SELECT ISETestID" & vbCrLf
@@ -218,6 +222,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "      ,CalculationMode" & vbCrLf
                         cmdText &= "      ,NumberOfSeries" & vbCrLf
                         cmdText &= "      ,TotalAllowedError" & vbCrLf
+                        cmdText &= "      ,TestLongName" & vbCrLf
+                        cmdText &= "      ,SlopeFactorA2" & vbCrLf
+                        cmdText &= "      ,SlopeFactorB2" & vbCrLf
                         cmdText &= "  FROM tparISETests"
 
                         Dim myISETests As New ISETestsDS
