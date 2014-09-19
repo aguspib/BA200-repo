@@ -10,7 +10,7 @@ Imports DevExpress.XtraEditors.Repository
 Imports DevExpress.XtraEditors
 Imports DevExpress.XtraEditors.Controls
 Imports Biosystems.Ax00.PresentationCOM
-
+Imports Biosystems.Ax00.CommunicationsSwFw
 Imports LIS.Biosystems.Ax00.LISCommunications
 
 Public Class IHisResults
@@ -79,6 +79,10 @@ Public Class IHisResults
     'SA 01/08/2014
     'BA-1861 ==> Global DS to get/save the width of all visible grid columns
     Private gridColWidthConfigDS As GridColsConfigDS
+
+    'BA-1927: added to verify if it is possible to execute the Export process
+    Private mdiAnalyzerCopy As AnalyzerManager
+    Private mdiESWrapperCopy As ESWrapper
 #End Region
 
 #Region "Constructor"
@@ -949,9 +953,20 @@ Public Class IHisResults
     ''' Created by:  JB 18/10/2012
     ''' Modified by: AG 22/10/2012 - Added code to get the Alarms descriptions
     '''              SG 31/05/2013 - Added code to set the screen status according Level of the current User
+    '''              SA 19/09/2014 - BA-1927 ==> Get a copy of the AnalyzerManager and the ESWrapper to check the status of the LIS Connection  
+    '''                                          before execute the Export to LIS process
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
+            'BA-1927: added to verify if it is possible to execute the Export process
+            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
+                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+            End If
+
+            If (Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing) Then
+                mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper)
+            End If
+
             GetScreenLabels()
             PrepareButtons()
             FillDropDownLists()
@@ -1395,6 +1410,33 @@ Public Class IHisResults
 
 #Region "Private Methods for exporting to LIS selected Historic Patient Results"
     ''' <summary>
+    ''' Check the status of the LIS Connection (before execute the process of Export Results to LIS). 
+    ''' </summary>
+    ''' <returns>True is the Export Results to LIS can be executed; otherwise False</returns>
+    ''' <remarks>
+    ''' Created by: SA 18/09/2014 - BA-1927
+    ''' </remarks>
+    Private Function VerifyExportToLISAllowed() As Boolean
+        Dim connectEnabled As Boolean = True
+        Try
+            If (Not mdiAnalyzerCopy Is Nothing AndAlso Not mdiESWrapperCopy Is Nothing) Then
+                Dim myESBusinessDlg As New ESBusiness
+
+                Dim runningFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
+                Dim connectingFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
+
+                connectEnabled = myESBusinessDlg.AllowLISAction(Nothing, LISActions.HostQuery, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
+            Else
+                connectEnabled = False
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".VerifyExportToLISAllowed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".VerifyExportToLISAllowed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+        Return connectEnabled
+    End Function
+
+    ''' <summary>
     ''' Export all selected rows in the grid
     ''' </summary>
     ''' <remarks>
@@ -1405,12 +1447,16 @@ Public Class IHisResults
     '''                                           is lower than the allowed limit. Added traces in the Application Log. Set to Nothing all declared lists 
     '''                                           to release memory
     '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Allow re-sent patient results from history
-    '''              SA 19/09/2014 - BA-1927 ==> Use multilanguage to shown the message of maximum number of results to be exported to LIS exceeded
+    '''              SA 19/09/2014 - BA-1927 ==> * Use multilanguage to shown the message of maximum number of results to be exported to LIS exceeded
+    '''                                          * Before start the process, verify if LIS Connection is enabled. If it is not available, stop the process
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
 
         Try
+            'If LIS Connection is not available, do nothing
+            If (Not VerifyExportToLISAllowed()) Then Return
+
             Dim StartTime As DateTime = Now
             Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
             If (selectedRows.Count = 0) Then Exit Sub
@@ -1461,7 +1507,7 @@ Public Class IHisResults
 
                 CreateLogActivity("Prepare myHisWSResultsDS (loop): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False)
                 StartTime = Now
-                
+
                 'Inform the new results to be updated into MDI property
                 If (myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                     IAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
@@ -1470,7 +1516,7 @@ Public Class IHisResults
 
                 CreateLogActivity("Historical Results manual upload (end): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
             End If
-            
+
             If (myGlobalDataTO.HasError) Then
                 'If an error has happened when expoting, shown it
                 ShowMessage(Me.Name & ".ExportSelectedRowsFromGrid ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
