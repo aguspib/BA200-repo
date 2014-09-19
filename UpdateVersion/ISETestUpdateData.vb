@@ -275,8 +275,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pDataInLocalDB"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by: DL 07/02/2013
+        ''' Created by:   DL 07/02/2013
         ''' Modified by: SGM 14/02/2013 Bug #1134
+        '''               XB 19/09/2014 - Preserve the now editable by User field Test ISE Name - BA-1865
         ''' </remarks>
         Protected Overrides Function DoUpdateFactoryDefinedElement(pDBConnection As SqlClient.SqlConnection, pDataInFactoryDB As Object, pDataInLocalDB As Object) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -316,20 +317,37 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     updatedRefRangesDS = myFactoryRefRanges
                 End If
 
-                'preserve "Enabled" field's value for Lithium
-                'SGM 14/02/2013 Bug #1134
+                ' XB 19/09/2014 - BA-1865
+                ''preserve "Enabled" field's value for Lithium
+                ''SGM 14/02/2013 Bug #1134
+                'Dim LiEnabled As Boolean
+                'If myIseTestClient.tparISETests.First.ISETestID = 4 Then
+                '    LiEnabled = myIseTestClient.tparISETests.First.Enabled
+                '    myIseTestFactory.BeginInit()
+                '    Dim myRow As ISETestsDS.tparISETestsRow = CType(myIseTestFactory.tparISETests.Rows(0), ISETestsDS.tparISETestsRow)
+                '    myRow.Enabled = LiEnabled
+                '    myIseTestFactory.EndInit()
+                '    myIseTestFactory.AcceptChanges()
+
+                'End If
+                ''end  SGM 14/02/2013 Bug #1134
+
+                'preserve field's value defined by User
                 Dim LiEnabled As Boolean
+                Dim TestName As String
+                myIseTestFactory.BeginInit()
+                Dim myRow As ISETestsDS.tparISETestsRow = CType(myIseTestFactory.tparISETests.Rows(0), ISETestsDS.tparISETestsRow)
+                'preserve "Name" field's value
+                TestName = myIseTestClient.tparISETests.First.Name
+                myRow.Name = TestName
                 If myIseTestClient.tparISETests.First.ISETestID = 4 Then
+                    'preserve "Enabled" field's value for Lithium
                     LiEnabled = myIseTestClient.tparISETests.First.Enabled
-                    myIseTestFactory.BeginInit()
-                    Dim myRow As ISETestsDS.tparISETestsRow = CType(myIseTestFactory.tparISETests.Rows(0), ISETestsDS.tparISETestsRow)
                     myRow.Enabled = LiEnabled
-                    myIseTestFactory.EndInit()
-                    myIseTestFactory.AcceptChanges()
-
                 End If
-                'end  SGM 14/02/2013 Bug #1134
-
+                myIseTestFactory.EndInit()
+                myIseTestFactory.AcceptChanges()
+                ' XB 19/09/2014 - BA-1865
 
                 Dim myISETestsDelegate As New ISETestsDelegate()
                 myGlobalDataTO = myISETestsDelegate.SaveISETestNEW(pDBConnection,
