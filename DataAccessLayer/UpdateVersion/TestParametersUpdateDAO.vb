@@ -38,7 +38,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "               " & GlobalBase.TemporalDBName & ".[dbo].tparTestSamples ON tparTests.TestID = tparTestSamples.TestID INNER JOIN " & vbCrLf
                         cmdText &= "               " & GlobalBase.TemporalDBName & ".[dbo].tparTestReagentsVolumes ON tparTestSamples.TestID = tparTestReagentsVolumes.TestID AND " & vbCrLf
                         cmdText &= "               tparTestSamples.SampleType = tparTestReagentsVolumes.SampleType INNER JOIN" & vbCrLf
-                        cmdText &= "        Ax00TEM.[dbo].tparReagents ON tparTestReagentsVolumes.ReagentID =  tparReagents.ReagentID" & vbCrLf
+                        cmdText &= "               " & GlobalBase.TemporalDBName & ".[dbo].tparReagents ON tparTestReagentsVolumes.ReagentID =  tparReagents.ReagentID" & vbCrLf
                         cmdText &= "EXCEPT " & vbCrLf
                         cmdText &= "SELECT  tparTests.TestID, tparTests.TestName, tparTests.ShortName, tparTests.PreloadedTest, tparTests.AnalysisMode, tparTestSamples.SampleType, tparTests.MeasureUnit,  " & vbCrLf
                         cmdText &= "        tparTests.DecimalsAllowed, tparTests.ReplicatesNumber, tparTests.ReactionType, tparTests.ReadingMode, tparTests.MainWavelength, " & vbCrLf
