@@ -78,6 +78,29 @@ Namespace Biosystems.Ax00.Global.TO
         End Sub
 #End Region
 
+#Region "Public Methods"
+
+        Public Function GetSpecimenIdListForReports() As String
+            Dim specimentList As String = String.Empty
+
+            If (specimenIDList.Count = 1) And (specimenIDList.ElementAt(0) = patientID) Then
+                Return String.Empty
+            End If
+
+            If (specimenIDList.Count > 0) Then
+                specimentList = " ("
+                For Each speciment As String In specimenIDList
+                    specimentList += String.Format("{0}, ", speciment)
+                Next
+                specimentList = specimentList.Substring(0, specimentList.Length - 2)
+                specimentList += ") "
+            End If
+
+            Return specimentList
+        End Function
+
+#End Region
+
 #Region "Constructor"
         Public Sub New()
             patientIDAttribute = String.Empty
