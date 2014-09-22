@@ -7371,7 +7371,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 01/09/2011 - Changed the function template
         '''              AG 22/05/2012 - when new executions are added, if the WSStatus is closed it becomes PENDING
         '''              TR 28/06/2013 - Add parameter POFFSOrderTest Validate if ordertest belong to and off system test to avoid the ToSendFlag and openOTFlag Filter.
-        '''              AG 31/07/2014 #1887 - Set OrderToExport = TRUE after 1 order test status is set to CLOSED
+        '''              AG 31/07/2014 - BA-1887 ==> Set OrderToExport = TRUE after 1 order test status is set to CLOSED
+        '''              SA 19/09/2014 - BA-1927 ==> When calling function UpdateOrderToExport in OrdersDelegate, pass the local DB Connection instead 
+        '''                                          of the received as parameter (to avoid timeouts)
         ''' </remarks>
         Public Function UpdateStatusByOrderTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                                   ByVal pNewStatusValue As String, Optional pOFFSOrderTest As Boolean = False) As GlobalDataTO
@@ -7405,7 +7407,7 @@ Namespace Biosystems.Ax00.BL
                                 If (pNewStatusValue = "CLOSED") Then
                                     'AG 31/07/2014 #1887 - Set OrderToExport = TRUE after 1 order test status is set to CLOSED
                                     Dim myOrdersDelegate As New OrdersDelegate
-                                    dataToReturn = myOrdersDelegate.UpdateOrderToExport(pDBConnection, True, , pOrderTestID)
+                                    dataToReturn = myOrdersDelegate.UpdateOrderToExport(dbConnection, True, , pOrderTestID)
                                     'AG 31/07/2014 #1887
 
                                     'Verify if all the Order Tests of the same Order are already CLOSED to set also to CLOSED the Status of the Order 
