@@ -313,7 +313,6 @@ Partial Class IResults
             'AG 22/09/2014 - BA-1940 declare new variables
             Dim patientIDSpecimensList As New List(Of PatientSpecimenTO)
             Dim linqRes As List(Of PatientSpecimenTO)
-            Dim firstSpecimenInDict As New List(Of String) 'List used when new dict key is created, it contains the key's 1st specimenID
             Dim auxPatientToolTipInfo As String = String.Empty
             Dim updateRow As Boolean = False 'Update an existing item in grid list
             'AG 22/09/2014 - BA-1940
@@ -322,7 +321,6 @@ Partial Class IResults
                 'AG 22/09/2014 - BA-1940 clear lists and dictionary when changes the priority
                 addedPatients.Clear()
                 patientIDSpecimensList.Clear()
-                firstSpecimenInDict.Clear()
                 'AG 22/09/2014 - BA-1940
 
                 SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
@@ -409,12 +407,9 @@ Partial Class IResults
                         'Create new entry in TO list with: patientID, 1st specimen, row index in grid, tool tip ending string
                         linqRes = (From a As PatientSpecimenTO In patientIDSpecimensList Where a.patientID = sampleRow.PatientID Select a).ToList
                         If linqRes.Count = 0 Then
-                            firstSpecimenInDict.Clear()
-                            firstSpecimenInDict.Add(dgv("PatientID", RowIndex).Value)
-
                             Dim newItem As New PatientSpecimenTO
                             newItem.patientID = sampleRow.PatientID
-                            newItem.specimenIDList = firstSpecimenInDict
+                            newItem.UpdateSpecimenList(dgv("PatientID", RowIndex).Value)
                             newItem.RowIndex = RowIndex
                             If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
                                 auxPatientToolTipInfo = String.Format("({0}) - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
@@ -443,40 +438,42 @@ Partial Class IResults
                         'AG 22/09/2014 - BA-1940 update the specimenID list
                     ElseIf updateRow Then
                         'Get the row in grid
-                        dgv("PatientID", linqRes(0).RowIndex).Value &= ", " & sampleRow.SpecimenIDList
-                        dgv("PatientID", linqRes(0).RowIndex).ToolTipText &= ", " & sampleRow.SpecimenIDList
+                        If linqRes.Count > 0 Then
+                            dgv("PatientID", linqRes(0).RowIndex).Value &= ", " & sampleRow.SpecimenIDList
+                            dgv("PatientID", linqRes(0).RowIndex).ToolTipText &= ", " & sampleRow.SpecimenIDList
 
-                        linqRes(0).UpdateSpecimenList(sampleRow.SpecimenIDList) 'Add specimen to the TO list
+                            linqRes(0).UpdateSpecimenList(sampleRow.SpecimenIDList) 'Add specimen to the TO list
+                        End If
                         'AG 22/09/2014 - BA-1940
 
-                    End If
-
-                    'Update Report Print available and HIS export icons
-                    If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
-                        'Print available
-                        If sampleRow.PrintAvailable Then
-                            'DL 09/11/2010
-                            dgv("Print", RowIndex).Value = PrintImage
-                            dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
-                        Else
-                            dgv("Print", RowIndex).Value = NoImage
-                            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
                         End If
 
-                        'HIS sent
-                        If sampleRow.HIS_Sent Then
-                            dgv("HISExport", RowIndex).Value = OKImage
-                            dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
+                        'Update Report Print available and HIS export icons
+                        If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
+                            'Print available
+                            If sampleRow.PrintAvailable Then
+                                'DL 09/11/2010
+                                dgv("Print", RowIndex).Value = PrintImage
+                                dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
+                            Else
+                                dgv("Print", RowIndex).Value = NoImage
+                                dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
+                            End If
+
+                            'HIS sent
+                            If sampleRow.HIS_Sent Then
+                                dgv("HISExport", RowIndex).Value = OKImage
+                                dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
+                            Else
+                                dgv("HISExport", RowIndex).Value = NoImage
+                                dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
+                            End If
                         Else
+                            dgv("Print", RowIndex).Value = NoImage
+                            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
                             dgv("HISExport", RowIndex).Value = NoImage
                             dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
                         End If
-                    Else
-                        dgv("Print", RowIndex).Value = NoImage
-                        dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
-                        dgv("HISExport", RowIndex).Value = NoImage
-                        dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
-                    End If
                 Next sampleRow
 
                 'AG 22/09/2014 - BA-1940 finally complete the tooltip in list with (PatID) - pat name
@@ -490,7 +487,6 @@ Partial Class IResults
 
             'AG 22/09/2014 - BA-1940 - release memory
             addedPatients = Nothing
-            firstSpecimenInDict = Nothing
             patientIDSpecimensList = Nothing
             linqRes = Nothing
             'AG 22/09/2014 - BA-1940
