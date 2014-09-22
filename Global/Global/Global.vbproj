@@ -133,6 +133,7 @@
     <Compile Include="PerformanceCounters\SystemCounter.vb" />
     <Compile Include="Security\IPermissionLevel.vb" />
     <Compile Include="TO\AllowedLIMSValuesTO.vb" />
+    <Compile Include="TO\PatientSpecimenTO.vb" />
     <Compile Include="TO\SampleTypeTO.vb" />
     <Compile Include="TO\OrderTestTO.vb" />
     <Compile Include="TO\FWUpdateRequestTO.vb" />

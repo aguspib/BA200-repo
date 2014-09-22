@@ -239,6 +239,8 @@ Partial Class IResults
     '''                              Now the the method runs 8 - 10 times faster
     '''              SA 21/01/2011 - For OFF-SYSTEM Tests with qualitative results, shown value of field ManualResultText
     '''                              in the grid column for the result (CONC Value)
+    '''              AG 22/09/2014 - BA-1940 show specimen in the grid (test name column ... specimen (TEST NAME) )
+    '''                              Same format as in the results by test (patients)
     ''' </remarks>
     Private Sub UpdateExperimentalsDataGrid()
         Dim dgv As BSDataGridView = bsExperimentalsDataGridView
@@ -397,13 +399,17 @@ Partial Class IResults
                         SetRepPostDilutionImage(dgv, "NewRep", MaxRows, sentRepetitionCriteria, False)
                     End If
 
-                    'AG 03/03/2011
-                    'dgv("TestName", i).Value = resultRow.TestName
-                    'dgv("TestName", i).Value = IIf(resultRow.RerunNumber = 1, resultRow.TestName, resultRow.TestName & " (" & resultRow.RerunNumber.ToString & ")")
                     'RH 20/10/2011 String.Format() is a method optimized for Strings concatenations
                     dgv("TestName", MaxRows).Value = IIf(resultRow.RerunNumber = 1, resultRow.TestName, String.Format("{0} ({1})", resultRow.TestName, resultRow.RerunNumber))
                     dgv("Rerun", MaxRows).Value = resultRow.RerunNumber
-                    'dgv("ExportStatus", i).Value = resultRow.ExportStatus
+
+                    'AG 22/09/2014 - BA-1940 show specimen in the grid (sample type column)
+                    dgv("TestName", MaxRows).ToolTipText = String.Empty
+                    If Not resultRow.IsSpecimenIDListNull Then
+                        dgv("TestName", MaxRows).ToolTipText = resultRow.SpecimenIDList & " (" & dgv("TestName", MaxRows).Value & ")"
+                    End If
+                    'AG 22/09/2014
+
 
                     'DL 30/09/2011
                     If Not resultRow.IsExportStatusNull Then
@@ -700,6 +706,7 @@ Partial Class IResults
                             dgv.Rows(k).Tag = SampleList(j)
 
                             dgv("TestName", k).Value = dgv("TestName", MaxRows).Value
+                            dgv("TestName", k).ToolTipText = dgv("TestName", MaxRows).ToolTipText 'AG 22/09/2014 - BA-1940 show specimen in the grid (testname column)
                             dgv("Rerun", k).Value = dgv("Rerun", MaxRows).Value
                             dgv("SampleType", k).Value = dgv("SampleType", MaxRows).Value
                             dgv("Unit", k).Value = dgv("Unit", MaxRows).Value
