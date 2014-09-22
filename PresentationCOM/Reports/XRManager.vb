@@ -1312,17 +1312,20 @@ Public Class XRManager
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim dsResults As New ResultsDS
-
                 dsResults = CType(resultData.SetDatos, ResultsDS)
-                dsReport = CreateSummaryResultsReportDataSet(dsResults, numColumns)
 
-                If (Not dsReport Is Nothing) Then
-                    xtraReport = CreateSummaryResultsReport(pWorkSessionID, dsReport)
+                'IT 22/09/2014 - #BA-1884 (Validate if there are results to open report screen)
+                If dsResults.vwksResults.Count > 0 Then
+                    dsReport = CreateSummaryResultsReportDataSet(dsResults, numColumns)
 
-                    If Vertical Then
-                        ShowPortrait(xtraReport)
-                    Else
-                        ShowLandscape(xtraReport)
+                    If (Not dsReport Is Nothing) Then
+                        xtraReport = CreateSummaryResultsReport(pWorkSessionID, dsReport)
+
+                        If Vertical Then
+                            ShowPortrait(xtraReport)
+                        Else
+                            ShowLandscape(xtraReport)
+                        End If
                     End If
                 End If
             End If
