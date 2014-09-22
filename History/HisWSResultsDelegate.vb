@@ -739,7 +739,7 @@ Namespace Biosystems.Ax00.BL
                                 Dim PatientIDList As New List(Of String)
                                 Dim SamplesList As List(Of HisWSResultsDS.vhisWSResultsRow)
                                 Dim StatFlag() As Boolean = {True, False}
-                                Dim FullID As String
+                                Dim FullID As String = String.Empty
                                 Dim FullName As String
                                 Dim FullGender As String
                                 Dim FullBirthDate As String
@@ -858,6 +858,8 @@ Namespace Biosystems.Ax00.BL
                                                    Select detail).ToList
 
                                     For Each detail As HisWSResultsDS.vhisWSResultsRow In DetailsList
+
+                                        FullID = String.Format("{0}", SampleID)
                                         'BT #1608 - Check if fields TestName and TestLongName are informed. Always that field TestLongName is informed 
                                         '           it has to be used as Test Name in the Report
                                         myTestName = IIf(detail.IsTestNameNull, String.Empty, detail.TestName).ToString
@@ -883,8 +885,12 @@ Namespace Biosystems.Ax00.BL
                                         'EF 04/03/2014 END
                                         ResultDate = detail.ResultDateTime.ToString(DatePattern) & " " & detail.ResultDateTime.ToString(TimePattern)
 
-                                    
-                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
+                                        ''EF 09/09/2014 BA-1937: El campo PatientID que se imprime es: 'PatientID + (Barcode)' or 'SampleID' (que puede coincidir con Barcode o no)
+                                        If Not detail.IsSpecimenIDNull And CStr(detail.SpecimenID) <> CStr(SampleID) Then
+                                            FullID &= " (" & detail.SpecimenID & ")"
+                                        End If
+
+                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(SampleID, FullID, TestName, SampleType, String.Empty, String.Empty, CONC_Value, _
                                                                                                          ReferenceRanges, Unit, ResultDate, Remarks)
                                     Next detail
 

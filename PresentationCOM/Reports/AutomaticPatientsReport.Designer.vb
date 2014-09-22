@@ -332,7 +332,7 @@ Partial Public Class AutomaticPatientsReport
         'XrTableCell2
         '
         Me.XrTableCell2.CanGrow = False
-        Me.XrTableCell2.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportSampleDetails.PatientID")})
+        Me.XrTableCell2.DataBindings.AddRange(New DevExpress.XtraReports.UI.XRBinding() {New DevExpress.XtraReports.UI.XRBinding("Text", Nothing, "ReportSampleDetails.FullID")})
         Me.XrTableCell2.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.XrTableCell2.Name = "XrTableCell2"
         Me.XrTableCell2.StylePriority.UseFont = False
