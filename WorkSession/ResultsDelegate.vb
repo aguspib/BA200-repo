@@ -5446,7 +5446,7 @@ Namespace Biosystems.Ax00.BL
                                                         'AG 03/10/2013
 
                                                         'Insert Details row
-                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, SampleType, _
+                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, SampleType, _
                                                                                                                          ReplicateNumber, ABSValue, CONC_Value, _
                                                                                                                          ReferenceRanges, Unit, ResultDate, _
                                                                                                                          Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
@@ -5519,7 +5519,7 @@ Namespace Biosystems.Ax00.BL
                                                                 'AG 03/10/2013
 
                                                                 'Insert Details row
-                                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, _
+                                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, _
                                                                                                                                  SampleType, ReplicateNumber, _
                                                                                                                                  ABSValue, CONC_Value, _
                                                                                                                                  ReferenceRanges, Unit, _
@@ -6024,7 +6024,7 @@ Namespace Biosystems.Ax00.BL
                                                         'AG 03/10/2013
 
                                                         'Insert Details row
-                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, SampleType, _
+                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, SampleType, _
                                                                                                                          ReplicateNumber, ABSValue, CONC_Value, _
                                                                                                                          ReferenceRanges, Unit, ResultDate, _
                                                                                                                          Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
@@ -6089,7 +6089,7 @@ Namespace Biosystems.Ax00.BL
                                                                 'AG 03/10/2013
 
                                                                 'Insert Details row
-                                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(DetailPatientID, TestName, _
+                                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, _
                                                                                                                                  SampleType, ReplicateNumber, _
                                                                                                                                  ABSValue, CONC_Value, _
                                                                                                                                  ReferenceRanges, Unit, _

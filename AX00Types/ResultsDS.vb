@@ -15,9 +15,9 @@
 
         'RH 05/01/2012
         'RH 16/05/2012 New field Remarks
-        Public Overloads Function AddReportSampleDetailsRow(ByVal PatientID As String, ByVal TestName As String, ByVal SampleType As String, ByVal ReplicateNumber As String, ByVal ABSValue As String, ByVal CONC_Value As String, ByVal ReferenceRanges As String, ByVal Unit As String, ByVal ResultDate As String, ByVal Remarks As String) As ReportSampleDetailsRow
+        Public Overloads Function AddReportSampleDetailsRow(ByVal PatientID As String, ByVal FullID As String, ByVal TestName As String, ByVal SampleType As String, ByVal ReplicateNumber As String, ByVal ABSValue As String, ByVal CONC_Value As String, ByVal ReferenceRanges As String, ByVal Unit As String, ByVal ResultDate As String, ByVal Remarks As String) As ReportSampleDetailsRow
             Dim rowReportSampleDetailsRow As ReportSampleDetailsRow = CType(Me.NewRow, ReportSampleDetailsRow)
-            Dim columnValuesArray() As Object = New Object() {PatientID, TestName, SampleType, ReplicateNumber, ABSValue, CONC_Value, ReferenceRanges, Unit, ResultDate, Remarks}
+            Dim columnValuesArray() As Object = New Object() {PatientID, FullID, TestName, SampleType, ReplicateNumber, ABSValue, CONC_Value, ReferenceRanges, Unit, ResultDate, Remarks}
 
             rowReportSampleDetailsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowReportSampleDetailsRow)
