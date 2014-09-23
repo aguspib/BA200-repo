@@ -1,10 +1,14 @@
-Imports Biosystems.Ax00.Types
+Option Strict On
+Option Explicit On
+
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraCharts
+
 Imports System.Drawing
+Imports DevExpress.XtraCharts
+Imports DevExpress.XtraReports.UI
 
 Public Class QCCumulatedResultsByTestReport
     Private mTestSampleData As HistoryTestSamplesDS.tqcHistoryTestSamplesRow
@@ -14,18 +18,24 @@ Public Class QCCumulatedResultsByTestReport
     Private mLabelSD As String = ""
     Private mResultsDS As CumulatedResultsDS
 
-    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, _
-                                               ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
-                                               ByVal pQCCummulatedResultsDS As CumulatedResultsDS, _
-                                               ByVal pLocalDecimalAllow As Integer, _
-                                               ByVal pDateRangeText As String)
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On
+    ''' </remarks>
+    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
+                                               ByVal pQCCummulatedResultsDS As CumulatedResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String)
         mTestSampleData = pTestSampleRow
         mDateRangeText = pDateRangeText
         mControlsDS = pQCCumulatedSummaryDS
         mResultsDS = pQCCummulatedResultsDS
 
-        'Adding the SubReports
-        For Each elem As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In From c In mControlsDS.QCCumulatedSummaryTable.Rows Where c.Selected
+        'Get all selected Controls
+        Dim lstSelectedControls As List(Of QCCumulatedSummaryDS.QCCumulatedSummaryTableRow) = (From c As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In mControlsDS.QCCumulatedSummaryTable _
+                                                                                              Where c.Selected = True _
+                                                                                             Select c).ToList()
+        'Add the SubReports
+        For Each elem As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In lstSelectedControls
             Dim mQCRep As New QCCumulatedResultsByTestControlReport
             mQCRep.ControlLotID.Value = elem.QCControlLotID
             mQCRep.SetControlsAndResultsDatasource(mControlsDS, mResultsDS, pLocalDecimalAllow, pTestSampleRow.RejectionCriteria)
@@ -38,8 +48,15 @@ Public Class QCCumulatedResultsByTestReport
             mSubReport.LeftF = 0
             Me.Detail1.HeightF += mSubReport.HeightF
         Next
+
+        lstSelectedControls = Nothing
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> If ReportName is informed (field TestLongName is not Null nor empty), use it as Test Name in the report
+    ''' </remarks>
     Private Sub QCCummulatedResultsByTestReport_BeforePrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles Me.BeforePrint
         If Me.DesignMode Then Exit Sub
 
@@ -55,10 +72,13 @@ Public Class QCCumulatedResultsByTestReport
         XrLabelDateRange.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateRange", CurrentLanguage)
         XrLabelControls.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_Controls_List", CurrentLanguage)
 
-        'The TestSample data
-        XrTestName.Text = mTestSampleData.TestName
+        'BA-1608 - If ReportName is informed (field TestLongName is not Null nor empty), use it as Test Name in the report
+        Dim myTestName As String = mTestSampleData.TestName
+        If (Not mTestSampleData.IsTestLongNameNull AndAlso mTestSampleData.TestLongName <> String.Empty) Then myTestName = mTestSampleData.TestLongName
+        XrTestName.Text = myTestName
+
+        'Rest of the TestSample data
         XrSample.Text = mTestSampleData.SampleType
         XrDateRange.Text = mDateRangeText
     End Sub
-
 End Class
