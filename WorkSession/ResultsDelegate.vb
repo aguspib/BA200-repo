@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Text
+Imports Biosystems.Ax00.Global.TO 'AG 22/09/2014 - BA-1940
 
 Namespace Biosystems.Ax00.BL
     Public Class ResultsDelegate
@@ -4980,6 +4981,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
         '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
         '''              Modified by AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results (when results of different test type are mixed)
+        '''              AG 22/09/2014 - BA-1940 in report header show all patient's different barcodes
         ''' </remarks>
         Public Function GetResultsByPatientSampleForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                            ByVal pWorkSessionID As String, Optional ByVal GetReplicates As Boolean = True, _
@@ -5214,6 +5216,7 @@ Namespace Biosystems.Ax00.BL
                                         Dim ResultsForReportDS As New ResultsDS
                                         Dim PatientIDList As New List(Of String)
                                         Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+                                        Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 22/09/2014 - BA-1940
                                         Dim StatFlag() As Boolean = {True, False}
                                         Dim existsRow As Boolean = False
                                         Dim FullID As String
@@ -5248,12 +5251,20 @@ Namespace Biosystems.Ax00.BL
                                                         Pat.FormatedDateOfBirth = Pat.DateOfBirth.ToString(DatePattern)
                                                     End If
 
-                                                    'DL 17/06/2013
+                                                    'AG 22/09/2014 - BA-1940 'DL 17/06/2013
                                                     Dim patIDforReport As String = sampleRow.PatientID
-
-                                                    If Not sampleRow.IsSpecimenIDListNull Then
-                                                        patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
+                                                    'If Not sampleRow.IsSpecimenIDListNull Then
+                                                    '    patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
+                                                    'End If
+                                                    BarcodesByPatient = (From item In SamplesList Where Not item.IsSpecimenIDListNull And item.PatientID = sampleRow.PatientID Select item).ToList
+                                                    If BarcodesByPatient.Count > 0 Then
+                                                        Dim patBarCodeTO As New PatientSpecimenTO
+                                                        For Each item As ExecutionsDS.vwksWSExecutionsResultsRow In BarcodesByPatient
+                                                            patBarCodeTO.UpdateSpecimenList(item.SpecimenIDList)
+                                                        Next
+                                                        patIDforReport &= patBarCodeTO.GetSpecimenIdListForReports
                                                     End If
+                                                    'AG 22/09/2014 - BA-1940
 
                                                     'EF 30/05/2014 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado)
                                                     'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport
@@ -5284,6 +5295,8 @@ Namespace Biosystems.Ax00.BL
 
                                         Next i
                                         linqSpecimenFromResults = Nothing 'AG 28/06/2013
+                                        SamplesList = Nothing 'AG 22/09/2014 - BA-1940
+                                        BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
 
                                         'Fill ReportDetails table
                                         Dim DetailPatientID As String
@@ -5571,6 +5584,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
         '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
         '''              AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results (when results of different test type are mixed)
+        '''              AG 23/09/2014 - BA-1940 in report header show all patient's different barcodes
         ''' </remarks>
         Public Function GetResultsByPatientSampleForReportByOrderList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                            ByVal pWorkSessionID As String, ByVal pOrderList As List(Of String), _
@@ -5791,6 +5805,7 @@ Namespace Biosystems.Ax00.BL
                                         Dim ResultsForReportDS As New ResultsDS
                                         Dim PatientIDList As New List(Of String)
                                         Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+                                        Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 23/09/2014 - BA-1940
                                         Dim StatFlag() As Boolean = {True, False}
                                         Dim existsRow As Boolean = False
                                         Dim FullID As String
@@ -5825,12 +5840,20 @@ Namespace Biosystems.Ax00.BL
                                                         Pat.FormatedDateOfBirth = Pat.DateOfBirth.ToString(DatePattern)
                                                     End If
 
-                                                    'DL 17/06/2013
+                                                    'AG 23/09/2014 - BA-1940 'DL 17/06/2013
                                                     Dim patIDforReport As String = sampleRow.PatientID
-
-                                                    If Not sampleRow.IsSpecimenIDListNull Then
-                                                        patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
+                                                    'If Not sampleRow.IsSpecimenIDListNull Then
+                                                    '    patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
+                                                    'End If
+                                                    BarcodesByPatient = (From item In SamplesList Where Not item.IsSpecimenIDListNull And item.PatientID = sampleRow.PatientID Select item).ToList
+                                                    If BarcodesByPatient.Count > 0 Then
+                                                        Dim patBarCodeTO As New PatientSpecimenTO
+                                                        For Each item As ExecutionsDS.vwksWSExecutionsResultsRow In BarcodesByPatient
+                                                            patBarCodeTO.UpdateSpecimenList(item.SpecimenIDList)
+                                                        Next
+                                                        patIDforReport &= patBarCodeTO.GetSpecimenIdListForReports
                                                     End If
+                                                    'AG 23/09/2014 - BA-1940
 
                                                     ' XB 10/07/2014 - kill repeated lables - #1673
                                                     'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport)
@@ -5862,6 +5885,8 @@ Namespace Biosystems.Ax00.BL
 
                                         Next i
                                         linqSpecimenFromResults = Nothing 'AG 28/06/2013
+                                        SamplesList = Nothing 'AG 23/09/2014 - BA-1940
+                                        BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
 
                                         'Fill ReportDetails table
                                         Dim DetailPatientID As String
