@@ -80,6 +80,11 @@ Namespace Biosystems.Ax00.Global.TO
 
 #Region "Public Methods"
 
+        ''' <summary>
+        ''' Build a string of existing specimentId for a specific patient
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by IT 23/09/2014 #BA-1937</remarks>
         Public Function GetSpecimenIdListForReports() As String
             Dim specimentList As String = String.Empty
 
@@ -88,12 +93,15 @@ Namespace Biosystems.Ax00.Global.TO
             End If
 
             If (specimenIDList.Count > 0) Then
-                specimentList = " ("
                 For Each speciment As String In specimenIDList
-                    specimentList += String.Format("{0}, ", speciment)
+                    If (speciment <> patientID) Then
+                        specimentList += String.Format("{0}, ", speciment)
+                    End If
                 Next
-                specimentList = specimentList.Substring(0, specimentList.Length - 2)
-                specimentList += ") "
+
+                If (specimentList <> String.Empty) Then
+                    specimentList = String.Format(" ({0}) ", specimentList.Substring(0, specimentList.Length - 2))
+                End If
             End If
 
             Return specimentList
