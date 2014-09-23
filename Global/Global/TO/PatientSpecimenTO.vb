@@ -80,23 +80,31 @@ Namespace Biosystems.Ax00.Global.TO
 
 #Region "Public Methods"
 
+        ''' <summary>
+        ''' Build a string of existing specimenId for a specific patient
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by IT 23/09/2014 #BA-1937</remarks>
         Public Function GetSpecimenIdListForReports() As String
-            Dim specimentList As String = String.Empty
+            Dim specimenList As String = String.Empty
 
             If (specimenIDList.Count = 1) And (specimenIDList.ElementAt(0) = patientID) Then
                 Return String.Empty
             End If
 
             If (specimenIDList.Count > 0) Then
-                specimentList = " ("
-                For Each speciment As String In specimenIDList
-                    specimentList += String.Format("{0}, ", speciment)
+                For Each specimen As String In specimenIDList
+                    If (specimen <> patientID) Then
+                        specimenList += String.Format("{0}, ", specimen)
+                    End If
                 Next
-                specimentList = specimentList.Substring(0, specimentList.Length - 2)
-                specimentList += ") "
+
+                If (specimenList <> String.Empty) Then
+                    specimenList = String.Format(" ({0}) ", specimenList.Substring(0, specimenList.Length - 2))
+                End If
             End If
 
-            Return specimentList
+            Return specimenList
         End Function
 
 #End Region
