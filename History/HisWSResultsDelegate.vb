@@ -1,4 +1,4 @@
-﻿Option Strict On
+﻿'Option Strict On
 Option Explicit On
 
 Imports Biosystems.Ax00.Global
@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports System.Text
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global.TO
 
 Namespace Biosystems.Ax00.BL
     Public Class HisWSResultsDelegate
@@ -703,7 +704,7 @@ Namespace Biosystems.Ax00.BL
                         Dim literalAge As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
                         Dim literalPerformedBy As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
                         Dim literalComments As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)   'EF 03/06/2014 #1650  (cargar texto LBL_FLags)
-                        
+
                         'Get Historic Patient data
                         Dim myHistPatientsDelegate As New HisPatientsDelegate
                         Dim SelectedPatients As List(Of String) = (From row In pHisWSResults _
@@ -744,7 +745,7 @@ Namespace Biosystems.Ax00.BL
                                 Dim FullGender As String
                                 Dim FullBirthDate As String
                                 Dim FullAge As String
-                                Dim FullPerformedBy As String
+                                Dim FullPerformedBy As String = String.Empty
                                 Dim FullComments As String
                                 Dim ReportDate As DateTime = DateTime.Now 'IT 30/07/2014 #BA-1893
                                 Dim LinqPat As HisPatientDS.thisPatientsRow
@@ -814,7 +815,7 @@ Namespace Biosystems.Ax00.BL
                                             'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, String.Empty) ' LinqPat.PerformedBy. NO IN V1
                                             FullComments = String.Format("{0}: {1}", literalComments, LinqPat.Comments)   'EF 31/07/2014 #1893 (Comments info)
 
-                                           
+
                                             FullID = String.Format("{0}", myPatientID)
 
                                             If (LinqPat.FirstName <> "-" And LinqPat.FirstName <> "") Or (LinqPat.LastName <> "-" And LinqPat.LastName <> "") Then FullName = String.Format("{0}, {1}", LinqPat.LastName, LinqPat.FirstName) Else FullName = ""
@@ -834,10 +835,14 @@ Namespace Biosystems.Ax00.BL
 
                                             ReportDate = resultsRow.ResultDateTime
 
-                                            ''EF 09/09/2014 BA-1937: El campo PatientID que se imprime es: 'PatientID + (Barcode)' or 'SampleID' (que puede coincidir con Barcode o no)
-                                            If Not sampleRow.IsSpecimenIDNull And CStr(sampleRow.SpecimenID) <> CStr(FullID) Then
-                                                FullID &= " (" & sampleRow.SpecimenID & ")"
+                                            'IT 23/09/2014 #BA-1937 INI
+                                            resultData = GetSpecimentIdList(myPatientID, pHisWSResults)
+                                            If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                                                Dim patientSpecimen = DirectCast(resultData.SetDatos, PatientSpecimenTO)
+                                                FullID &= patientSpecimen.GetSpecimenIdListForReports()
                                             End If
+                                            'IT 23/09/2014 #BA-1937 END
+
                                             ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow _
                                                     (myPatientID, FullID, FullName, FullGender, FullBirthDate, FullAge, FullPerformedBy, FullComments, ReportDate)
                                             'IT 30/07/2014 #BA-1893 END
@@ -1296,7 +1301,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim mythisWSResultsDAO As New thisWSResultsDAO()
-                        resultData = mythisWSResultsDAO.GetResultsToExportFromHIST(dbConnection, pHistOrderTestId)
+                        resultData = mythisWSResultsDAO.GetResultsToExportFromHIST(dbConnection, pHistOrderTestID)
                     End If
                 End If
 
@@ -1527,6 +1532,52 @@ Namespace Biosystems.Ax00.BL
 
             Return resultData
         End Function
+#End Region
+
+#Region "Private Methods"
+        ''' <summary>
+        ''' Generate a list of speciment from a list of results
+        ''' </summary>
+        ''' <param name="patientId"></param>
+        ''' <param name="hisWSResults"></param>
+        ''' <returns></returns>
+        ''' <remarks>Created by IT 23/09/2014 #BA-1937</remarks>
+        Public Function GetSpecimentIdList(ByVal patientId As String, _
+                                            ByVal hisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow)) As GlobalDataTO
+            Dim resultData As New GlobalDataTO()
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim patient As PatientSpecimenTO = Nothing
+
+            Try
+
+                patient = New PatientSpecimenTO()
+                patient.patientID = patientId
+
+                Dim results = (From row In hisWSResults _
+                                           Where String.Compare(row.SampleClass, "PATIENT", False) = 0 _
+                                           AndAlso String.Compare(row.PatientID, patientId, False) = 0 _
+                                           Select row).ToList
+
+                For Each row As HisWSResultsDS.vhisWSResultsRow In results
+                    patient.UpdateSpecimenList(row.SpecimenID)
+                Next
+
+                resultData.SetDatos = patient
+                resultData.HasError = False
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetSpecimentIdList", EventLogEntryType.Error, False)
+            Finally
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
 #Region "NOT USED"
