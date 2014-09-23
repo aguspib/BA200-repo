@@ -4973,6 +4973,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
         ''' <param name="GetReplicates"></param>
         ''' <param name="pCompact"></param>
+        ''' <param name="pOrderList">Informed for autoprint</param>
         ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS (ReportMaster and ReportDetails tables)</returns>
         ''' <remarks>
         ''' Created by:  RH 03/01/2012
@@ -4982,10 +4983,14 @@ Namespace Biosystems.Ax00.BL
         '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
         '''              Modified by AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results (when results of different test type are mixed)
         '''              AG 22/09/2014 - BA-1940 in report header show all patient's different barcodes
+        '''              AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
+        '''                              (methods GetResultsByPatientSampleForReport and GetResultsByPatientSampleForReportByOrderList)
+        '''                              In order to perfom this merge we use KDiff3 utility
         ''' </remarks>
         Public Function GetResultsByPatientSampleForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                            ByVal pWorkSessionID As String, Optional ByVal GetReplicates As Boolean = True, _
-                                                           Optional ByVal pCompact As Boolean = False) As GlobalDataTO
+                                                           Optional ByVal pCompact As Boolean = False, _
+                                                           Optional ByVal pOrderList As List(Of String) = Nothing) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -4996,7 +5001,18 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myExecutionDelegate As New ExecutionsDelegate
 
-                        resultData = myExecutionDelegate.GetWSExecutionsResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                        'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
+                        'resultData = myExecutionDelegate.GetWSExecutionsResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                        Dim autoPrintMode As Boolean = False
+                        If Not pOrderList Is Nothing Then autoPrintMode = True
+
+                        If Not autoPrintMode Then
+                            resultData = myExecutionDelegate.GetWSExecutionsResults(dbConnection, pAnalyzerID, pWorkSessionID)
+                        Else
+                            resultData = myExecutionDelegate.GetWSExecutionsResultsByOrderIDList(dbConnection, pAnalyzerID, pWorkSessionID, pOrderList)
+                        End If
+                        'AG 23/09/2014 - BA-1940
+
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim ExecutionsResultsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
@@ -5182,6 +5198,10 @@ Namespace Biosystems.Ax00.BL
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     Dim PatientsData As PatientsDS = DirectCast(resultData.SetDatos, PatientsDS)
 
+                                    'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
+                                    '   NOTE: Next code #1226 was only in the method for manual print. But it seems it has to exists also in auto print
+                                    '   That's why next code aply for always (if some problem found we ought to execute it only If not autoPrintMode Then ... End If
+
                                     'JV 31/10/13 #1226 Obtain the OK orders selected by the user
                                     Dim myDel As New OrderTestsDelegate
                                     Dim myGDT As GlobalDataTO
@@ -5190,6 +5210,7 @@ Namespace Biosystems.Ax00.BL
                                         Dim OT As OrdersDS = DirectCast(myGDT.SetDatos, OrdersDS)
                                         Dim SelectedOK As List(Of String) = Enumerable.Cast(Of String)(From row In OT.twksOrders Select row.PatientID Distinct).ToList()
                                         SelectedPatients = (From p In SelectedPatients Where SelectedOK.Contains(p) Select p).ToList()
+                                        SelectedOK = Nothing 'AG 23/09/2014 - BA-1940
                                     End If
                                     myDel = Nothing
                                     myGDT = Nothing
@@ -5216,7 +5237,7 @@ Namespace Biosystems.Ax00.BL
                                         Dim ResultsForReportDS As New ResultsDS
                                         Dim PatientIDList As New List(Of String)
                                         Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
-                                        Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 22/09/2014 - BA-1940
+                                        Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 23/09/2014 - BA-1940
                                         Dim StatFlag() As Boolean = {True, False}
                                         Dim existsRow As Boolean = False
                                         Dim FullID As String
@@ -5239,7 +5260,13 @@ Namespace Biosystems.Ax00.BL
                                                          Select row).ToList()
 
                                             For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
+                                                'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
+                                                '   NOTE: Next If condition #1226 was only in the method for manual print. But it seems it has to exists also in auto print
+                                                '   That's why next code aply for always (if some problem found we ought to execute different conditions depending the variable autoPrintMode value
+
                                                 If (SelectedPatients.Contains(sampleRow.PatientID) AndAlso Not PatientIDList.Contains(sampleRow.PatientID)) Then 'If (Not PatientIDList.Contains(sampleRow.PatientID)) Then 'JV 31/10/13 #1226
+                                                    'AG 23/09/2014 - BA-1940 
+
                                                     PatientIDList.Add(sampleRow.PatientID)
 
                                                     Pat = (From row As PatientsDS.tparPatientsRow In PatientsData.tparPatients _
@@ -5251,7 +5278,7 @@ Namespace Biosystems.Ax00.BL
                                                         Pat.FormatedDateOfBirth = Pat.DateOfBirth.ToString(DatePattern)
                                                     End If
 
-                                                    'AG 22/09/2014 - BA-1940 'DL 17/06/2013
+                                                    'AG 23/09/2014 - BA-1940 'DL 17/06/2013
                                                     Dim patIDforReport As String = sampleRow.PatientID
                                                     'If Not sampleRow.IsSpecimenIDListNull Then
                                                     '    patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
@@ -5264,9 +5291,9 @@ Namespace Biosystems.Ax00.BL
                                                         Next
                                                         patIDforReport &= patBarCodeTO.GetSpecimenIdListForReports
                                                     End If
-                                                    'AG 22/09/2014 - BA-1940
+                                                    'AG 23/09/2014 - BA-1940
 
-                                                    'EF 30/05/2014 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado)
+                                                    'EF 30/05/2014 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado) + XB 10/07/2014 - kill repeated lables - #1673
                                                     'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport
                                                     ''FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
                                                     'FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
@@ -5295,7 +5322,7 @@ Namespace Biosystems.Ax00.BL
 
                                         Next i
                                         linqSpecimenFromResults = Nothing 'AG 28/06/2013
-                                        SamplesList = Nothing 'AG 22/09/2014 - BA-1940
+                                        SamplesList = Nothing 'AG 23/09/2014 - BA-1940
                                         BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
 
                                         'Fill ReportDetails table
@@ -5547,6 +5574,7 @@ Namespace Biosystems.Ax00.BL
                                         resultData.SetDatos = ResultsForReportDS
                                     End If
                                 End If
+                                SelectedPatients = Nothing 'AG 23/09/2014 - BA-1940 
 
                             End If 'AG 10/09/2014 -BA-1894 , BA-1897 - Protection End If
 
@@ -5567,587 +5595,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' 25/09/2013 - CF v2.1.1 - Original code from GetResultsByPatientSampleForReport function. 
-        ''' Get Results info by Patient Sample for Report using a List of orderIds as a filter. 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pOrderList">List of orders to filter the results by</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS (ReportMaster and ReportDetails tables)</returns>
-        ''' <remarks>
-        ''' Created by:  RH 03/01/2012
-        ''' Modified by: RH 19/03/2012 Label PatientID in Multilanguage
-        '''              AG 27/05/2013 - Add new samples types LIQ and SER
-        '''              CF 25/09/2013 - Copied the GetResultsByPatientSampleForReport function and added the orderList param. 
-        '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
-        '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
-        '''              AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results (when results of different test type are mixed)
-        '''              AG 23/09/2014 - BA-1940 in report header show all patient's different barcodes
-        ''' </remarks>
-        Public Function GetResultsByPatientSampleForReportByOrderList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                           ByVal pWorkSessionID As String, ByVal pOrderList As List(Of String), _
-                                                           Optional ByVal GetReplicates As Boolean = True, Optional ByVal pCompact As Boolean = False) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myExecutionDelegate As New ExecutionsDelegate
-
-                        resultData = myExecutionDelegate.GetWSExecutionsResultsByOrderIDList(dbConnection, pAnalyzerID, pWorkSessionID, pOrderList)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim ExecutionsResultsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                            'Get the list of different OrderTestIDs in the group of Executions
-                            Dim OrderTestList As List(Of Integer) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                                    Where row.OrderToPrint = True AndAlso row.SampleClass = "PATIENT" _
-                                                                 Order By row.TestPosition _
-                                                                   Select row.OrderTestID Distinct).ToList()
-
-                            'AG 29/07/2014 - #1894 Get all orderTests that form part of a calculated test that has to be excluded from patients final report
-                            Dim orderCalcDelg As New OrderCalculatedTestsDelegate
-                            Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
-                            resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
-
-                                'Remove these orderTest from OrderTestList of STD tests
-                                If toExcludeFromReport.Count > 0 Then
-                                    Dim positionToDelete As Integer = 0
-                                    For Each item As Integer In toExcludeFromReport
-                                        If OrderTestList.Contains(item) Then
-                                            positionToDelete = OrderTestList.IndexOf(item)
-                                            OrderTestList.RemoveAt(positionToDelete)
-                                        End If
-                                    Next
-                                End If
-                            End If
-                            'AG 29/07/2014
-
-                            'Get the Patient Results for the list of OrderTestIDs
-                            Dim AverageResultsDS As New ResultsDS
-                            Dim myResultsDelegate As New ResultsDelegate
-
-                            resultData = GetResultsForReports(dbConnection, OrderTestList)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
-                            End If
-
-                            'Get Calculated Results
-                            'AG 01/08/2014 #1897 add new optional parameter to TRUE
-                            resultData = myResultsDelegate.GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
-                                    'AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    End If
-                                    'AG 29/07/2014
-                                Next
-                            End If
-
-                            'Get ISE & OffSystem Tests Results
-                            'AG 01/08/2014 #1897 add new optional parameter to TRUE
-                            resultData = myResultsDelegate.GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                    'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
-                                    'AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    End If
-                                    'AG 29/07/2014
-                                Next resultRow
-                            End If
-
-                            'AG 03/10/2013 - final report compact has to show barcode, we need inform the avg results field
-                            If pCompact Then
-                                resultData = FillSpecimenIDListForReport(dbConnection, pWorkSessionID, AverageResultsDS)
-                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                    AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
-                                End If
-                            End If
-                            'AG 03/10/2013
-
-                            'AG 01/08/2014 #1897 Finally sort the dataset using the TestPosition column
-                            'Protection: If no results (for example all tests OUT) exit function returning the espected DS but empty
-                            If AverageResultsDS.vwksResults.Rows.Count = 0 Then
-                                'Returned data empty
-                                resultData.SetDatos = New ResultsDS
-                            Else
-
-                                'AverageResultsDS.vwksResults.DefaultView.Sort = "TestPosition" 'This code does not work!!
-                                Dim sortedReportList As New List(Of ResultsDS.vwksResultsRow)
-                                Dim sortedResultsToPrintDS As New ResultsDS
-                                sortedReportList = (From a As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults _
-                                              Select a Order By a.TestPosition Ascending).ToList
-
-                                For Each reportRow As ResultsDS.vwksResultsRow In sortedReportList
-                                    sortedResultsToPrintDS.vwksResults.ImportRow(reportRow)
-                                Next
-                                sortedResultsToPrintDS.vwksResults.AcceptChanges()
-                                AverageResultsDS = sortedResultsToPrintDS
-                                sortedReportList = Nothing
-                                'AG 01/08/2014 #1897
-
-                                'Read Reference Range Limits
-                                Dim MinimunValue As Nullable(Of Single) = Nothing
-                                Dim MaximunValue As Nullable(Of Single) = Nothing
-
-                                Dim myOrderTestsDelegate As New OrderTestsDelegate
-                                For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                    If (Not resultRow.IsActiveRangeTypeNull) Then
-                                        Dim mySampleType As String = String.Empty
-                                        If (resultRow.TestType <> "CALC") Then mySampleType = resultRow.SampleType
-
-                                        'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
-                                        resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, resultRow.OrderTestID, resultRow.TestType, _
-                                                                                                    resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
-
-                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                            Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                                            If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-                                                MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
-                                                MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
-                                            End If
-                                        End If
-
-                                        If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
-                                            If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
-                                                resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                                resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                            End If
-                                        End If
-                                    End If
-                                Next resultRow
-
-                                'Fill Average PatientID and Name fields
-                                Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
-                                For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults.Rows
-                                    If (executionRow.SampleClass = "PATIENT") Then
-                                        If (Not IsOrderProcessed.ContainsKey(executionRow.OrderID)) Then
-                                            For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                                If (resultRow.OrderID = executionRow.OrderID) Then
-                                                    resultRow.PatientName = executionRow.PatientName
-                                                    resultRow.PatientID = executionRow.PatientID
-                                                End If
-                                            Next resultRow
-
-                                            IsOrderProcessed(executionRow.OrderID) = True
-                                        End If
-                                    End If
-                                Next executionRow
-
-                                Dim currentLanguageGlobal As New GlobalBase
-                                Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-                                Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-                                Dim literalPatientID As String
-                                literalPatientID = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
-
-                                'DL 17/06/2013
-                                Dim literalPatientName As String
-                                literalPatientName = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Summary_PatientName", CurrentLanguage)
-                                'DL 17/06/2013
-
-                                Dim literalGender As String
-                                literalGender = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Gender", CurrentLanguage)
-
-                                Dim literalBirthDate As String
-                                literalBirthDate = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_DateOfBirth", CurrentLanguage)
-
-                                Dim literalAge As String
-                                literalAge = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
-
-                                Dim literalPerformedBy As String
-                                literalPerformedBy = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
-
-                                Dim literalComments As String
-                                literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)  'EF 03/06/2014 (cargar texto LBL_FLags)
-
-                                'RH 15/05/2012 Get Patient data
-                                Dim myPatientsDelegate As New PatientDelegate
-                                Dim SelectedPatients As List(Of String) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                                          Where row.SampleClass = "PATIENT" _
-                                                                        AndAlso row.OrderToPrint = True _
-                                                                        AndAlso row.RerunNumber = 1 _
-                                                                         Select row.PatientID Distinct).ToList()
-
-                                resultData = myPatientsDelegate.GetPatientsForReport(dbConnection, CurrentLanguage, SelectedPatients)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    Dim PatientsData As PatientsDS = DirectCast(resultData.SetDatos, PatientsDS)
-
-                                    'RH 24/05/2012 Create info for not registered patients
-                                    For Each PatientID As String In SelectedPatients
-                                        If (From row In PatientsData.tparPatients Where String.Compare(row.PatientID, PatientID, False) = 0 Select row).Count = 0 Then
-                                            Dim newRow As PatientsDS.tparPatientsRow
-
-                                            newRow = PatientsData.tparPatients.NewtparPatientsRow()
-                                            newRow.PatientID = PatientID
-                                            PatientsData.tparPatients.AddtparPatientsRow(newRow)
-                                        End If
-                                    Next
-
-                                    Dim AgeUnitsListDS As New PreloadedMasterDataDS
-                                    Dim preloadedMasterConfig As New PreloadedMasterDataDelegate
-
-                                    resultData = preloadedMasterConfig.GetList(dbConnection, PreloadedMasterDataEnum.AGE_UNITS)
-                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        AgeUnitsListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
-
-                                        Dim ResultsForReportDS As New ResultsDS
-                                        Dim PatientIDList As New List(Of String)
-                                        Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
-                                        Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 23/09/2014 - BA-1940
-                                        Dim StatFlag() As Boolean = {True, False}
-                                        Dim existsRow As Boolean = False
-                                        Dim FullID As String
-                                        Dim FullName As String
-                                        Dim FullGender As String
-                                        Dim FullBirthDate As String
-                                        Dim FullAge As String
-                                        Dim FullPerformedBy As String
-                                        Dim FullComments As String
-                                        Dim Pat As PatientsDS.tparPatientsRow
-
-                                        Dim linqSpecimenFromResults As List(Of ResultsDS.vwksResultsRow) 'AG 28/06/2013
-                                        'Fill ReportMaster table
-                                        For i As Integer = 0 To 1
-                                            SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                          Where row.SampleClass = "PATIENT" _
-                                                        AndAlso row.OrderToPrint = True _
-                                                        AndAlso row.StatFlag = StatFlag(i) _
-                                                        AndAlso row.RerunNumber = 1 _
-                                                         Select row).ToList()
-
-                                            For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
-                                                If (Not PatientIDList.Contains(sampleRow.PatientID)) Then
-                                                    PatientIDList.Add(sampleRow.PatientID)
-
-                                                    Pat = (From row As PatientsDS.tparPatientsRow In PatientsData.tparPatients _
-                                                          Where row.PatientID = sampleRow.PatientID _
-                                                         Select row).First()
-
-                                                    If (Not Pat.IsDateOfBirthNull) Then
-                                                        Pat.AgeWithUnit = Utilities.GetAgeUnits(Pat.DateOfBirth, AgeUnitsListDS)
-                                                        Pat.FormatedDateOfBirth = Pat.DateOfBirth.ToString(DatePattern)
-                                                    End If
-
-                                                    'AG 23/09/2014 - BA-1940 'DL 17/06/2013
-                                                    Dim patIDforReport As String = sampleRow.PatientID
-                                                    'If Not sampleRow.IsSpecimenIDListNull Then
-                                                    '    patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
-                                                    'End If
-                                                    BarcodesByPatient = (From item In SamplesList Where Not item.IsSpecimenIDListNull And item.PatientID = sampleRow.PatientID Select item).ToList
-                                                    If BarcodesByPatient.Count > 0 Then
-                                                        Dim patBarCodeTO As New PatientSpecimenTO
-                                                        For Each item As ExecutionsDS.vwksWSExecutionsResultsRow In BarcodesByPatient
-                                                            patBarCodeTO.UpdateSpecimenList(item.SpecimenIDList)
-                                                        Next
-                                                        patIDforReport &= patBarCodeTO.GetSpecimenIdListForReports
-                                                    End If
-                                                    'AG 23/09/2014 - BA-1940
-
-                                                    ' XB 10/07/2014 - kill repeated lables - #1673
-                                                    'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport)
-
-                                                    ''FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
-                                                    'FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
-                                                    ''DL 17/06/2013
-                                                    'FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
-                                                    'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
-                                                    'FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
-                                                    'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
-                                                    'FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
-
-                                                    FullID = String.Format("{0}", patIDforReport)
-                                                    If (Pat.LastName <> "-" And Pat.LastName <> "") Or (Pat.FirstName <> "-" And Pat.FirstName <> "") Then FullName = String.Format("{0}, {1}", Pat.LastName, Pat.FirstName) Else FullName = ""
-                                                    FullGender = String.Format("{0}", Pat.Gender)
-                                                    FullBirthDate = String.Format("{0}", Pat.FormatedDateOfBirth)
-                                                    FullAge = String.Format("{0}", Pat.AgeWithUnit)
-                                                    FullPerformedBy = String.Format("{0}", Pat.PerformedBy)
-                                                    FullComments = String.Format("{0}", Pat.Comments)
-                                                    ' XB 10/07/2014 - #1673
-
-                                                    ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
-                                                                                                                   FullName, FullGender, _
-                                                                                                                   FullBirthDate, FullAge, _
-                                                                                                                   FullPerformedBy, FullComments, DateTime.Now) 'IT 30/07/2014 #BA-1893
-                                                End If
-                                            Next sampleRow
-
-                                        Next i
-                                        linqSpecimenFromResults = Nothing 'AG 28/06/2013
-                                        SamplesList = Nothing 'AG 23/09/2014 - BA-1940
-                                        BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
-
-                                        'Fill ReportDetails table
-                                        Dim DetailPatientID As String
-                                        Dim TestName As String
-                                        Dim SampleType As String
-                                        Dim ReplicateNumber As String
-                                        Dim ABSValue As String
-                                        Dim CONC_Value As String
-                                        Dim ReferenceRanges As String
-                                        Dim Unit As String
-                                        Dim ResultDate As String
-                                        Dim Flags As String  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
-
-                                        Dim tmpOrderTestId As Integer
-                                        Dim IsAverageDone As Dictionary(Of String, Boolean)
-                                        Dim AverageList As List(Of ResultsDS.vwksResultsRow)
-
-                                        Dim myOrderTestID As Integer
-                                        Dim maxTheoreticalConc As Single
-                                        Dim Filter As String
-
-                                        For Each SampleID As String In PatientIDList
-                                            tmpOrderTestId = -1
-                                            IsAverageDone = New Dictionary(Of String, Boolean)
-                                            AverageList = New List(Of ResultsDS.vwksResultsRow)
-                                            'Filter = String.Empty
-
-                                            For Each row As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                                If (row.PatientID = SampleID) Then
-                                                    If (String.Compare(row.TestType, "STD", False) = 0) Then
-                                                        myOrderTestID = row.OrderTestID
-                                                        maxTheoreticalConc = (From resultRow In AverageResultsDS.vwksResults _
-                                                                             Where resultRow.OrderTestID = myOrderTestID _
-                                                                            Select resultRow.TheoricalConcentration).Max
-
-                                                        If (row.TheoricalConcentration = maxTheoreticalConc) Then
-                                                            AverageList.Add(row)
-                                                        End If
-
-                                                        'AG 01/12/2010
-                                                    ElseIf (row.TestType = "ISE" OrElse row.TestType = "OFFS") Then
-                                                        AverageList.Add(row)
-                                                        'End AG 01/12/2010
-
-                                                    Else 'CALC
-                                                        AverageList.Add(row)
-                                                    End If
-                                                End If
-                                            Next row
-
-                                            'TR 27/05/2013 -Get a list of sample types separated by commas
-                                            Dim SampleTypes() As String
-                                            Dim myMasterDataDelegate As New MasterDataDelegate
-
-                                            resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
-                                            If Not resultData.HasError Then
-                                                SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
-                                            End If
-
-                                            'RH 18/05/2012 Sort by SampleType
-                                            'Dim SampleTypes() As String = {"SER", "URI", "PLM", "WBL", "CSF", "LIQ", "SEM"}
-                                            For Each sortedSampleType In SampleTypes
-                                                Dim NewAverageList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageList _
-                                                                                                          Where String.Compare(row.SampleType, sortedSampleType, False) = 0 _
-                                                                                                         Select row).ToList()
-
-                                                For Each resultRow As ResultsDS.vwksResultsRow In NewAverageList
-                                                    Filter = String.Format("{0}{1}", resultRow.OrderTestID, resultRow.RerunNumber)
-
-                                                    'Insert only Accepted Results
-                                                    If (resultRow.AcceptedResultFlag AndAlso Not IsAverageDone.ContainsKey(Filter)) Then
-                                                        IsAverageDone(Filter) = True
-                                                        DetailPatientID = resultRow.PatientID
-
-                                                        'AG 29/04/2014 - #1608
-                                                        'TestName = resultRow.TestName
-                                                        If Not resultRow.IsTestLongNameNull Then TestName = resultRow.TestLongName Else TestName = resultRow.TestName
-
-                                                        SampleType = resultRow.SampleType
-                                                        ReplicateNumber = String.Empty
-
-                                                        If (Not resultRow.IsABSValueNull) Then
-                                                            ABSValue = resultRow.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT)
-                                                        Else
-                                                            ABSValue = String.Empty
-                                                        End If
-
-                                                        If (Not resultRow.IsCONC_ValueNull) Then
-                                                            Dim hasConcentrationError As Boolean = False
-
-                                                            If (Not resultRow.IsCONC_ErrorNull) Then
-                                                                hasConcentrationError = Not String.IsNullOrEmpty(resultRow.CONC_Error)
-                                                            End If
-
-                                                            If (Not hasConcentrationError) Then
-                                                                CONC_Value = resultRow.CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                                            Else
-                                                                CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                            End If
-                                                        Else
-                                                            If (Not resultRow.IsManualResultTextNull) Then
-                                                                CONC_Value = resultRow.ManualResultText
-                                                            Else
-                                                                CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                            End If
-                                                        End If
-
-                                                        Unit = resultRow.MeasureUnit
-
-                                                        If (Not String.IsNullOrEmpty(resultRow.NormalLowerLimit) AndAlso _
-                                                            Not String.IsNullOrEmpty(resultRow.NormalUpperLimit)) Then
-                                                            ReferenceRanges = String.Format("{0} - {1}", resultRow.NormalLowerLimit, resultRow.NormalUpperLimit)
-                                                        Else
-                                                            ReferenceRanges = String.Empty
-                                                        End If
-
-                                                        'AG 15/09/2010 - Special case when Absorbance has error
-                                                        If (Not resultRow.IsABS_ErrorNull) Then
-                                                            If (Not String.IsNullOrEmpty(resultRow.ABS_Error)) Then
-                                                                ABSValue = GlobalConstants.ABSORBANCE_ERROR
-                                                                CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
-                                                            End If
-                                                        End If
-                                                        'END AG 15/09/2010
-
-                                                        'EF 03/06/2014 - Provisional v3.0.1 (PENDIENTE hacer un metodo único que devuelva el valor del FLAG a todos los reports, pantallas, etc y reutilizar!!)
-                                                        'RH 16/05/2012
-                                                        Flags = String.Empty
-                                                        '    'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
-                                                        If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
-                                                            (IsNumeric(CONC_Value))) Then
-                                                            If (Not resultRow.IsNormalLowerLimitNull AndAlso Not resultRow.IsNormalUpperLimitNull) Then
-                                                                If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) Then
-                                                                    Flags = GlobalConstants.LOW '"L"
-                                                                ElseIf (CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit)) Then
-                                                                    Flags = GlobalConstants.HIGH '"H"
-                                                                End If
-                                                            End If
-                                                        End If
-                                                        'RH 16/05/2012 - END
-                                                        'If there are Panic Ranges informed, then verify if the result is out of the limits of the PANIC RANGE
-                                                        If IsNumeric(CONC_Value) And (Not resultRow.IsPanicLowerLimitNull AndAlso Not resultRow.IsPanicUpperLimitNull) Then
-                                                            If (CSng(CONC_Value) < CSng(resultRow.PanicLowerLimit)) Then
-                                                                Flags = GlobalConstants.PANIC_LOW  'PL
-                                                            ElseIf (CSng(resultRow.PanicUpperLimit) < CSng(CONC_Value)) Then
-                                                                Flags = GlobalConstants.PANIC_HIGH 'PH 
-                                                            End If
-                                                        End If
-                                                        'EF 03/06/2014 END
-
-                                                        ResultDate = resultRow.ResultDateTime.ToString(DatePattern) & " " & _
-                                                                     resultRow.ResultDateTime.ToString(TimePattern)
-
-                                                        'AG 03/10/2013 - compact report shows the barcode here because there is not header
-                                                        If pCompact Then
-                                                            If Not resultRow.IsSpecimenIDListNull Then
-                                                                DetailPatientID &= " (" & resultRow.SpecimenIDList & ")"
-                                                            End If
-                                                        End If
-                                                        'AG 03/10/2013
-
-                                                        'Insert Details row
-                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, SampleType, _
-                                                                                                                         ReplicateNumber, ABSValue, CONC_Value, _
-                                                                                                                         ReferenceRanges, Unit, ResultDate, _
-                                                                                                                         Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
-
-                                                        tmpOrderTestId = resultRow.OrderTestID
-                                                        Dim myRerunNumber As Integer = resultRow.RerunNumber 'AG 04/08/2010
-
-                                                        Dim SampleList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                                                                                             Where row.OrderTestID = tmpOrderTestId _
-                                                                                                                           AndAlso row.RerunNumber = myRerunNumber _
-                                                                                                                            Select row).ToList()
-
-                                                        If (GetReplicates AndAlso (SampleList.Count > 0)) Then
-                                                            Flags = String.Empty  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
-                                                            TestName = String.Empty
-                                                            SampleType = String.Empty
-                                                            ReferenceRanges = String.Empty
-
-                                                            For j As Integer = 0 To SampleList.Count - 1
-                                                                DetailPatientID = SampleList(j).PatientID
-                                                                ReplicateNumber = SampleList(j).ReplicateNumber.ToString()
-                                                                Unit = resultRow.MeasureUnit
-
-                                                                'AG 02/08/2010
-                                                                Dim hasConcentrationError As Boolean = False
-                                                                If (Not SampleList(j).IsCONC_ErrorNull) Then 'RH 14/09/2010
-                                                                    hasConcentrationError = Not String.IsNullOrEmpty(SampleList(j).CONC_Error)
-                                                                End If
-
-                                                                If (Not hasConcentrationError) Then
-                                                                    If (Not SampleList(j).IsCONC_ValueNull) Then
-                                                                        CONC_Value = SampleList(j).CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                                                    ElseIf (Not resultRow.IsManualResultTextNull) Then
-                                                                        'Take the Manual Result text from the average result
-                                                                        CONC_Value = resultRow.ManualResultText
-                                                                    Else
-                                                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                                    End If
-                                                                Else
-                                                                    CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
-                                                                End If
-                                                                'END AG 02/08/2010
-
-                                                                'AG 15/09/2010 - Special case when Absorbance has error
-                                                                If (Not SampleList(j).IsABS_ErrorNull) Then
-                                                                    If (Not String.IsNullOrEmpty(SampleList(j).ABS_Error)) Then
-                                                                        ABSValue = GlobalConstants.ABSORBANCE_ERROR
-                                                                        CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
-                                                                    End If
-                                                                End If
-                                                                'END AG 15/09/2010
-
-                                                                ResultDate = SampleList(j).ResultDate.ToString(DatePattern) & " " & _
-                                                                             SampleList(j).ResultDate.ToString(TimePattern)
-
-                                                                'AG 03/10/2013 - compact report shows the barcode here because there is not header
-                                                                If pCompact Then
-                                                                    If Not SampleList(j).IsSpecimenIDListNull Then
-                                                                        DetailPatientID &= " (" & SampleList(j).SpecimenIDList & ")"
-                                                                    End If
-                                                                End If
-                                                                'AG 03/10/2013
-
-                                                                'Insert Details row
-                                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, _
-                                                                                                                                 SampleType, ReplicateNumber, _
-                                                                                                                                 ABSValue, CONC_Value, _
-                                                                                                                                 ReferenceRanges, Unit, _
-                                                                                                                                 ResultDate, Flags) 'EF 03/06/2014 (cambio nombre variable 'remarks' a Flags)
-                                                            Next
-                                                        End If
-                                                    End If
-                                                Next
-                                            Next
-                                        Next
-
-                                        resultData.SetDatos = ResultsForReportDS
-                                    End If
-                                End If
-
-                            End If 'AG 10/09/2014 -BA-1894 , BA-1897 - Protection End If
-
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByPatientSampleForReportByOrderList", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
 
         ''' <summary>
         ''' Get Results info by Test for Report
@@ -7662,6 +7109,1196 @@ Namespace Biosystems.Ax00.BL
         End Sub
 #End Region
 
+#Region "OLD METHODS FOR RESULTS REPORTS - COMMENTED"
+
+        ' ''' <summary>
+        ' ''' Get Results info by Patient Sample for Report
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ' ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ' ''' <param name="GetReplicates"></param>
+        ' ''' <param name="pCompact"></param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS (ReportMaster and ReportDetails tables)</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  RH 03/01/2012
+        ' ''' Modified by: RH 19/03/2012 Label PatientID in Multilanguage
+        ' '''              AG 27/05/2013 - Add new samples types LIQ and SER
+        ' '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
+        ' '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ' '''              Modified by AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results (when results of different test type are mixed)
+        ' '''              AG 22/09/2014 - BA-1940 in report header show all patient's different barcodes
+        ' '''              AG 23/09/2014 - BA-1940 comment old code and implement a unique method compatible manual and auto firal report (GetResultsByPatientSampleForReportByOrderList)
+        ' ''' </remarks>
+        'Public Function GetResultsByPatientSampleForReport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        '                                                   ByVal pWorkSessionID As String, Optional ByVal GetReplicates As Boolean = True, _
+        '                                                   Optional ByVal pCompact As Boolean = False) As GlobalDataTO
+        '    Dim resultData As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim myExecutionDelegate As New ExecutionsDelegate
+
+        '                resultData = myExecutionDelegate.GetWSExecutionsResults(dbConnection, pAnalyzerID, pWorkSessionID)
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    Dim ExecutionsResultsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+        '                    'Get the list of different OrderTestIDs in the group of Executions
+        '                    Dim OrderTestList As List(Of Integer) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                            Where row.OrderToPrint = True AndAlso row.SampleClass = "PATIENT" _
+        '                                                         Order By row.TestPosition _
+        '                                                           Select row.OrderTestID Distinct).ToList()
+
+        '                    'AG 29/07/2014 - #1894 Get all orderTests that form part of a calculated test that has to be excluded from patients final report
+        '                    Dim orderCalcDelg As New OrderCalculatedTestsDelegate
+        '                    Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
+        '                    resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
+        '                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                        toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
+
+        '                        'Remove these orderTest from OrderTestList of STD tests
+        '                        If toExcludeFromReport.Count > 0 Then
+        '                            Dim positionToDelete As Integer = 0
+        '                            For Each item As Integer In toExcludeFromReport
+        '                                If OrderTestList.Contains(item) Then
+        '                                    positionToDelete = OrderTestList.IndexOf(item)
+        '                                    OrderTestList.RemoveAt(positionToDelete)
+        '                                End If
+        '                            Next
+        '                        End If
+        '                    End If
+        '                    'AG 29/07/2014
+
+        '                    'Get the Patient Results for the list of OrderTestIDs
+        '                    Dim AverageResultsDS As New ResultsDS
+        '                    Dim myResultsDelegate As New ResultsDelegate
+
+        '                    resultData = GetResultsForReports(dbConnection, OrderTestList)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
+        '                    End If
+
+        '                    'Get Calculated Results
+        '                    'AG 01/08/2014 #1897 add new optional parameter to TRUE
+        '                    resultData = myResultsDelegate.GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
+        '                            'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+        '                            'AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+        '                                AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            End If
+        '                            'AG 29/07/2014
+        '                        Next
+        '                    End If
+
+        '                    'Get ISE & OffSystem Tests Results
+        '                    'AG 01/08/2014 #1897 add new optional parameter to TRUE
+        '                    resultData = myResultsDelegate.GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
+        '                            'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+        '                            'AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+        '                                AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            End If
+        '                            'AG 29/07/2014
+        '                        Next resultRow
+        '                    End If
+
+        '                    'AG 03/10/2013 - final report compact has to show barcode, we need inform the avg results field
+        '                    If pCompact Then
+        '                        resultData = FillSpecimenIDListForReport(dbConnection, pWorkSessionID, AverageResultsDS)
+        '                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                            AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
+        '                        End If
+        '                    End If
+        '                    'AG 03/10/2013
+
+        '                    'AG 01/08/2014 #1897 Finally sort the dataset using the TestPosition column
+        '                    'Protection: If no results (for example all tests OUT) exit function returning the espected DS but empty
+        '                    If AverageResultsDS.vwksResults.Rows.Count = 0 Then
+        '                        'Returned data empty
+        '                        resultData.SetDatos = New ResultsDS
+        '                    Else
+
+        '                        'AverageResultsDS.vwksResults.DefaultView.Sort = "TestPosition" 'This code does not work!!
+        '                        Dim sortedReportList As New List(Of ResultsDS.vwksResultsRow)
+        '                        Dim sortedResultsToPrintDS As New ResultsDS
+        '                        sortedReportList = (From a As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults _
+        '                                      Select a Order By a.TestPosition Ascending).ToList
+
+        '                        For Each reportRow As ResultsDS.vwksResultsRow In sortedReportList
+        '                            sortedResultsToPrintDS.vwksResults.ImportRow(reportRow)
+        '                        Next
+        '                        sortedResultsToPrintDS.vwksResults.AcceptChanges()
+        '                        AverageResultsDS = sortedResultsToPrintDS
+        '                        sortedReportList = Nothing
+        '                        'AG 01/08/2014 #1897
+
+        '                        'Read Reference Range Limits
+        '                        Dim MinimunValue As Nullable(Of Single) = Nothing
+        '                        Dim MaximunValue As Nullable(Of Single) = Nothing
+
+        '                        Dim myOrderTestsDelegate As New OrderTestsDelegate
+        '                        For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+        '                            If (Not resultRow.IsActiveRangeTypeNull) Then
+        '                                Dim mySampleType As String = String.Empty
+        '                                If (resultRow.TestType <> "CALC") Then mySampleType = resultRow.SampleType
+
+        '                                'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
+        '                                resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, resultRow.OrderTestID, resultRow.TestType, _
+        '                                                                                            resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
+
+        '                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                    Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+        '                                    If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+        '                                        MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
+        '                                        MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
+        '                                    End If
+        '                                End If
+
+        '                                If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
+        '                                    If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
+        '                                        resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                        resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                    End If
+        '                                End If
+        '                            End If
+        '                        Next resultRow
+
+        '                        'Fill Average PatientID and Name fields
+        '                        Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
+        '                        For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults.Rows
+        '                            If (executionRow.SampleClass = "PATIENT") Then
+        '                                If (Not IsOrderProcessed.ContainsKey(executionRow.OrderID)) Then
+        '                                    For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+        '                                        If (resultRow.OrderID = executionRow.OrderID) Then
+        '                                            resultRow.PatientName = executionRow.PatientName
+        '                                            resultRow.PatientID = executionRow.PatientID
+        '                                        End If
+        '                                    Next resultRow
+
+        '                                    IsOrderProcessed(executionRow.OrderID) = True
+        '                                End If
+        '                            End If
+        '                        Next executionRow
+
+        '                        Dim currentLanguageGlobal As New GlobalBase
+        '                        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        '                        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        '                        Dim literalPatientID As String
+        '                        literalPatientID = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
+
+        '                        'DL 17/06/2013
+        '                        Dim literalPatientName As String
+        '                        literalPatientName = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Summary_PatientName", CurrentLanguage)
+        '                        'DL 17/06/2013
+
+        '                        Dim literalGender As String
+        '                        literalGender = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Gender", CurrentLanguage)
+
+        '                        Dim literalBirthDate As String
+        '                        literalBirthDate = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_DateOfBirth", CurrentLanguage)
+
+        '                        Dim literalAge As String
+        '                        literalAge = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
+
+        '                        Dim literalPerformedBy As String
+        '                        literalPerformedBy = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
+
+        '                        Dim literalComments As String
+        '                        literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)  'EF 03/06/2014 (cargar texto LBL_FLags)
+
+        '                        'RH 15/05/2012 Get Patient data
+        '                        Dim myPatientsDelegate As New PatientDelegate
+        '                        Dim SelectedPatients As List(Of String) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                                  Where row.SampleClass = "PATIENT" _
+        '                                                                AndAlso row.OrderToPrint = True _
+        '                                                                AndAlso row.RerunNumber = 1 _
+        '                                                                Select row.PatientID Distinct).ToList()
+
+
+        '                        resultData = myPatientsDelegate.GetPatientsForReport(dbConnection, CurrentLanguage, SelectedPatients)
+        '                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                            Dim PatientsData As PatientsDS = DirectCast(resultData.SetDatos, PatientsDS)
+
+        '                            'JV 31/10/13 #1226 Obtain the OK orders selected by the user
+        '                            Dim myDel As New OrderTestsDelegate
+        '                            Dim myGDT As GlobalDataTO
+        '                            myGDT = myDel.GetOrdersOKByUser(Nothing, pAnalyzerID, pWorkSessionID)
+        '                            If (Not myGDT.HasError AndAlso Not myGDT.SetDatos Is Nothing) Then
+        '                                Dim OT As OrdersDS = DirectCast(myGDT.SetDatos, OrdersDS)
+        '                                Dim SelectedOK As List(Of String) = Enumerable.Cast(Of String)(From row In OT.twksOrders Select row.PatientID Distinct).ToList()
+        '                                SelectedPatients = (From p In SelectedPatients Where SelectedOK.Contains(p) Select p).ToList()
+        '                            End If
+        '                            myDel = Nothing
+        '                            myGDT = Nothing
+        '                            'JV 31/10/13 #1226
+
+        '                            'RH 24/05/2012 Create info for not registered patients
+        '                            For Each PatientID As String In SelectedPatients
+        '                                If (From row In PatientsData.tparPatients Where String.Compare(row.PatientID, PatientID, False) = 0 Select row).Count = 0 Then
+        '                                    Dim newRow As PatientsDS.tparPatientsRow
+
+        '                                    newRow = PatientsData.tparPatients.NewtparPatientsRow()
+        '                                    newRow.PatientID = PatientID
+        '                                    PatientsData.tparPatients.AddtparPatientsRow(newRow)
+        '                                End If
+        '                            Next
+
+        '                            Dim AgeUnitsListDS As New PreloadedMasterDataDS
+        '                            Dim preloadedMasterConfig As New PreloadedMasterDataDelegate
+
+        '                            resultData = preloadedMasterConfig.GetList(dbConnection, PreloadedMasterDataEnum.AGE_UNITS)
+        '                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                AgeUnitsListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+        '                                Dim ResultsForReportDS As New ResultsDS
+        '                                Dim PatientIDList As New List(Of String)
+        '                                Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+        '                                Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 22/09/2014 - BA-1940
+        '                                Dim StatFlag() As Boolean = {True, False}
+        '                                Dim existsRow As Boolean = False
+        '                                Dim FullID As String
+        '                                Dim FullName As String
+        '                                Dim FullGender As String
+        '                                Dim FullBirthDate As String
+        '                                Dim FullAge As String
+        '                                Dim FullPerformedBy As String
+        '                                Dim FullComments As String
+        '                                Dim Pat As PatientsDS.tparPatientsRow
+
+        '                                Dim linqSpecimenFromResults As List(Of ResultsDS.vwksResultsRow) 'AG 28/06/2013
+        '                                'Fill ReportMaster table
+        '                                For i As Integer = 0 To 1
+        '                                    SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                  Where row.SampleClass = "PATIENT" _
+        '                                                AndAlso row.OrderToPrint = True _
+        '                                                AndAlso row.StatFlag = StatFlag(i) _
+        '                                                AndAlso row.RerunNumber = 1 _
+        '                                                 Select row).ToList()
+
+        '                                    For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
+        '                                        If (SelectedPatients.Contains(sampleRow.PatientID) AndAlso Not PatientIDList.Contains(sampleRow.PatientID)) Then 'If (Not PatientIDList.Contains(sampleRow.PatientID)) Then 'JV 31/10/13 #1226
+        '                                            PatientIDList.Add(sampleRow.PatientID)
+
+        '                                            Pat = (From row As PatientsDS.tparPatientsRow In PatientsData.tparPatients _
+        '                                                  Where row.PatientID = sampleRow.PatientID _
+        '                                                 Select row).First()
+
+        '                                            If (Not Pat.IsDateOfBirthNull) Then
+        '                                                Pat.AgeWithUnit = Utilities.GetAgeUnits(Pat.DateOfBirth, AgeUnitsListDS)
+        '                                                Pat.FormatedDateOfBirth = Pat.DateOfBirth.ToString(DatePattern)
+        '                                            End If
+
+        '                                            'AG 22/09/2014 - BA-1940 'DL 17/06/2013
+        '                                            Dim patIDforReport As String = sampleRow.PatientID
+        '                                            'If Not sampleRow.IsSpecimenIDListNull Then
+        '                                            '    patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
+        '                                            'End If
+        '                                            BarcodesByPatient = (From item In SamplesList Where Not item.IsSpecimenIDListNull And item.PatientID = sampleRow.PatientID Select item).ToList
+        '                                            If BarcodesByPatient.Count > 0 Then
+        '                                                Dim patBarCodeTO As New PatientSpecimenTO
+        '                                                For Each item As ExecutionsDS.vwksWSExecutionsResultsRow In BarcodesByPatient
+        '                                                    patBarCodeTO.UpdateSpecimenList(item.SpecimenIDList)
+        '                                                Next
+        '                                                patIDforReport &= patBarCodeTO.GetSpecimenIdListForReports
+        '                                            End If
+        '                                            'AG 22/09/2014 - BA-1940
+
+        '                                            'EF 30/05/2014 (Separar el título del valor, Cambiar orden de campos Nombre Paciente y mostrar solo si está asignado)
+        '                                            'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport
+        '                                            ''FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
+        '                                            'FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
+        '                                            ''DL 17/06/2013
+        '                                            'FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
+        '                                            'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
+        '                                            'FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
+        '                                            'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
+        '                                            'FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
+
+        '                                            FullID = String.Format("{0}", patIDforReport)
+        '                                            If (Pat.LastName <> "-" And Pat.LastName <> "") Or (Pat.FirstName <> "-" And Pat.FirstName <> "") Then FullName = String.Format("{0}, {1}", Pat.LastName, Pat.FirstName) Else FullName = ""
+        '                                            FullGender = String.Format("{0}", Pat.Gender)
+        '                                            FullBirthDate = String.Format("{0}", Pat.FormatedDateOfBirth)
+        '                                            FullAge = String.Format("{0}", Pat.AgeWithUnit)
+        '                                            FullPerformedBy = String.Format("{0}", Pat.PerformedBy)
+        '                                            FullComments = String.Format("{0}", Pat.Comments)
+        '                                            'EF 30/05/2014 End
+
+        '                                            ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
+        '                                                                                                           FullName, FullGender, _
+        '                                                                                                           FullBirthDate, FullAge, _
+        '                                                                                                           FullPerformedBy, FullComments, DateTime.Now) 'IT 30/07/2014 #BA-1893
+        '                                        End If
+        '                                    Next sampleRow
+
+        '                                Next i
+        '                                linqSpecimenFromResults = Nothing 'AG 28/06/2013
+        '                                SamplesList = Nothing 'AG 22/09/2014 - BA-1940
+        '                                BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
+
+        '                                'Fill ReportDetails table
+        '                                Dim DetailPatientID As String
+        '                                Dim TestName As String
+        '                                Dim SampleType As String
+        '                                Dim ReplicateNumber As String
+        '                                Dim ABSValue As String
+        '                                Dim CONC_Value As String
+        '                                Dim ReferenceRanges As String
+        '                                Dim Unit As String
+        '                                Dim ResultDate As String
+        '                                Dim Flags As String  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+
+        '                                Dim tmpOrderTestId As Integer
+        '                                Dim IsAverageDone As Dictionary(Of String, Boolean)
+        '                                Dim AverageList As List(Of ResultsDS.vwksResultsRow)
+
+        '                                Dim myOrderTestID As Integer
+        '                                Dim maxTheoreticalConc As Single
+        '                                Dim Filter As String
+
+        '                                For Each SampleID As String In PatientIDList
+        '                                    tmpOrderTestId = -1
+        '                                    IsAverageDone = New Dictionary(Of String, Boolean)
+        '                                    AverageList = New List(Of ResultsDS.vwksResultsRow)
+        '                                    'Filter = String.Empty
+
+        '                                    For Each row As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+        '                                        If (row.PatientID = SampleID) Then
+        '                                            If (String.Compare(row.TestType, "STD", False) = 0) Then
+        '                                                myOrderTestID = row.OrderTestID
+        '                                                maxTheoreticalConc = (From resultRow In AverageResultsDS.vwksResults _
+        '                                                                     Where resultRow.OrderTestID = myOrderTestID _
+        '                                                                    Select resultRow.TheoricalConcentration).Max
+
+        '                                                If (row.TheoricalConcentration = maxTheoreticalConc) Then
+        '                                                    AverageList.Add(row)
+        '                                                End If
+
+        '                                                'AG 01/12/2010
+        '                                            ElseIf (row.TestType = "ISE" OrElse row.TestType = "OFFS") Then
+        '                                                AverageList.Add(row)
+        '                                                'End AG 01/12/2010
+
+        '                                            Else 'CALC
+        '                                                AverageList.Add(row)
+        '                                            End If
+        '                                        End If
+        '                                    Next row
+
+        '                                    'TR 27/05/2013 -Get a list of sample types separated by commas
+        '                                    Dim SampleTypes() As String
+        '                                    Dim myMasterDataDelegate As New MasterDataDelegate
+
+        '                                    resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+        '                                    If Not resultData.HasError Then
+        '                                        SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
+        '                                    End If
+
+        '                                    'RH 18/05/2012 Sort by SampleType
+        '                                    'Dim SampleTypes() As String = {"SER", "URI", "PLM", "WBL", "CSF", "LIQ", "SEM"}
+        '                                    For Each sortedSampleType In SampleTypes
+        '                                        Dim NewAverageList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageList _
+        '                                                                                                  Where String.Compare(row.SampleType, sortedSampleType, False) = 0 _
+        '                                                                                                 Select row).ToList()
+
+        '                                        For Each resultRow As ResultsDS.vwksResultsRow In NewAverageList
+        '                                            Filter = String.Format("{0}{1}", resultRow.OrderTestID, resultRow.RerunNumber)
+
+        '                                            'Insert only Accepted Results
+        '                                            If (resultRow.AcceptedResultFlag AndAlso Not IsAverageDone.ContainsKey(Filter)) Then
+        '                                                IsAverageDone(Filter) = True
+        '                                                DetailPatientID = resultRow.PatientID
+
+        '                                                'AG 29/04/2014 - #1608
+        '                                                'TestName = resultRow.TestName
+        '                                                If Not resultRow.IsTestLongNameNull Then TestName = resultRow.TestLongName Else TestName = resultRow.TestName
+
+        '                                                SampleType = resultRow.SampleType
+        '                                                ReplicateNumber = String.Empty
+
+        '                                                If (Not resultRow.IsABSValueNull) Then
+        '                                                    ABSValue = resultRow.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT)
+        '                                                Else
+        '                                                    ABSValue = String.Empty
+        '                                                End If
+
+        '                                                If (Not resultRow.IsCONC_ValueNull) Then
+        '                                                    Dim hasConcentrationError As Boolean = False
+
+        '                                                    If (Not resultRow.IsCONC_ErrorNull) Then
+        '                                                        hasConcentrationError = Not String.IsNullOrEmpty(resultRow.CONC_Error)
+        '                                                    End If
+
+        '                                                    If (Not hasConcentrationError) Then
+        '                                                        CONC_Value = resultRow.CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                                    Else
+        '                                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                    End If
+        '                                                Else
+        '                                                    If (Not resultRow.IsManualResultTextNull) Then
+        '                                                        CONC_Value = resultRow.ManualResultText
+        '                                                    Else
+        '                                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                    End If
+        '                                                End If
+
+        '                                                Unit = resultRow.MeasureUnit
+
+        '                                                If (Not String.IsNullOrEmpty(resultRow.NormalLowerLimit) AndAlso _
+        '                                                    Not String.IsNullOrEmpty(resultRow.NormalUpperLimit)) Then
+        '                                                    ReferenceRanges = String.Format("{0} - {1}", resultRow.NormalLowerLimit, resultRow.NormalUpperLimit)
+        '                                                Else
+        '                                                    ReferenceRanges = String.Empty
+        '                                                End If
+
+        '                                                'AG 15/09/2010 - Special case when Absorbance has error
+        '                                                If (Not resultRow.IsABS_ErrorNull) Then
+        '                                                    If (Not String.IsNullOrEmpty(resultRow.ABS_Error)) Then
+        '                                                        ABSValue = GlobalConstants.ABSORBANCE_ERROR
+        '                                                        CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
+        '                                                    End If
+        '                                                End If
+        '                                                'END AG 15/09/2010
+
+        '                                                'EF 03/06/2014 - Provisional v3.0.1 (PENDIENTE hacer un metodo único que devuelva el valor del FLAG a todos los reports, pantallas, etc y reutilizar!!)
+        '                                                'RH 16/05/2012
+        '                                                Flags = String.Empty
+        '                                                '    'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
+        '                                                If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
+        '                                                    (IsNumeric(CONC_Value))) Then
+        '                                                    If (Not resultRow.IsNormalLowerLimitNull AndAlso Not resultRow.IsNormalUpperLimitNull) Then
+        '                                                        If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) Then
+        '                                                            Flags = GlobalConstants.LOW '"L"
+        '                                                        ElseIf (CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit)) Then
+        '                                                            Flags = GlobalConstants.HIGH '"H"
+        '                                                        End If
+        '                                                    End If
+        '                                                End If
+        '                                                'RH 16/05/2012 - END
+        '                                                'If there are Panic Ranges informed, then verify if the result is out of the limits of the PANIC RANGE
+        '                                                If IsNumeric(CONC_Value) And (Not resultRow.IsPanicLowerLimitNull AndAlso Not resultRow.IsPanicUpperLimitNull) Then
+        '                                                    If (CSng(CONC_Value) < CSng(resultRow.PanicLowerLimit)) Then
+        '                                                        Flags = GlobalConstants.PANIC_LOW  'PL
+        '                                                    ElseIf (CSng(resultRow.PanicUpperLimit) < CSng(CONC_Value)) Then
+        '                                                        Flags = GlobalConstants.PANIC_HIGH 'PH 
+        '                                                    End If
+        '                                                End If
+        '                                                'EF 03/06/2014 END
+
+        '                                                ResultDate = resultRow.ResultDateTime.ToString(DatePattern) & " " & _
+        '                                                             resultRow.ResultDateTime.ToString(TimePattern)
+
+        '                                                'AG 03/10/2013 - compact report shows the barcode here because there is not header
+        '                                                If pCompact Then
+        '                                                    If Not resultRow.IsSpecimenIDListNull Then
+        '                                                        DetailPatientID &= " (" & resultRow.SpecimenIDList & ")"
+        '                                                    End If
+        '                                                End If
+        '                                                'AG 03/10/2013
+
+        '                                                'Insert Details row
+        '                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, SampleType, _
+        '                                                                                                                 ReplicateNumber, ABSValue, CONC_Value, _
+        '                                                                                                                 ReferenceRanges, Unit, ResultDate, _
+        '                                                                                                                 Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+
+        '                                                tmpOrderTestId = resultRow.OrderTestID
+        '                                                Dim myRerunNumber As Integer = resultRow.RerunNumber 'AG 04/08/2010
+
+        '                                                Dim SampleList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                                                                                     Where row.OrderTestID = tmpOrderTestId _
+        '                                                                                                                   AndAlso row.RerunNumber = myRerunNumber _
+        '                                                                                                                    Select row).ToList()
+
+        '                                                If (GetReplicates AndAlso (SampleList.Count > 0)) Then
+        '                                                    Flags = String.Empty  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+        '                                                    TestName = String.Empty
+        '                                                    SampleType = String.Empty
+        '                                                    ReferenceRanges = String.Empty
+
+        '                                                    For j As Integer = 0 To SampleList.Count - 1
+        '                                                        DetailPatientID = SampleList(j).PatientID
+        '                                                        ReplicateNumber = SampleList(j).ReplicateNumber.ToString()
+        '                                                        Unit = resultRow.MeasureUnit
+
+        '                                                        'AG 02/08/2010
+        '                                                        Dim hasConcentrationError As Boolean = False
+        '                                                        If (Not SampleList(j).IsCONC_ErrorNull) Then 'RH 14/09/2010
+        '                                                            hasConcentrationError = Not String.IsNullOrEmpty(SampleList(j).CONC_Error)
+        '                                                        End If
+
+        '                                                        If (Not hasConcentrationError) Then
+        '                                                            If (Not SampleList(j).IsCONC_ValueNull) Then
+        '                                                                CONC_Value = SampleList(j).CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                                            ElseIf (Not resultRow.IsManualResultTextNull) Then
+        '                                                                'Take the Manual Result text from the average result
+        '                                                                CONC_Value = resultRow.ManualResultText
+        '                                                            Else
+        '                                                                CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                            End If
+        '                                                        Else
+        '                                                            CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                        End If
+        '                                                        'END AG 02/08/2010
+
+        '                                                        'JV 17/12/2013 #1184 - INI
+        '                                                        If (Not SampleList(j).IsABS_ValueNull) Then
+        '                                                            ABSValue = SampleList(j).ABS_Value.ToString(GlobalConstants.ABSORBANCE_FORMAT)
+        '                                                        Else
+        '                                                            ABSValue = String.Empty
+        '                                                        End If
+        '                                                        'JV 17/12/2013 #1184 - END
+
+        '                                                        'AG 15/09/2010 - Special case when Absorbance has error
+        '                                                        If (Not SampleList(j).IsABS_ErrorNull) Then
+        '                                                            If (Not String.IsNullOrEmpty(SampleList(j).ABS_Error)) Then
+        '                                                                ABSValue = GlobalConstants.ABSORBANCE_ERROR
+        '                                                                CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
+        '                                                            End If
+        '                                                        End If
+        '                                                        'END AG 15/09/2010
+
+        '                                                        ResultDate = SampleList(j).ResultDate.ToString(DatePattern) & " " & _
+        '                                                                     SampleList(j).ResultDate.ToString(TimePattern)
+
+        '                                                        'AG 03/10/2013 - compact report shows the barcode here because there is not header
+        '                                                        If pCompact Then
+        '                                                            If Not SampleList(j).IsSpecimenIDListNull Then
+        '                                                                DetailPatientID &= " (" & SampleList(j).SpecimenIDList & ")"
+        '                                                            End If
+        '                                                        End If
+        '                                                        'AG 03/10/2013
+
+        '                                                        'Insert Details row
+        '                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, _
+        '                                                                                                                         SampleType, ReplicateNumber, _
+        '                                                                                                                         ABSValue, CONC_Value, _
+        '                                                                                                                         ReferenceRanges, Unit, _
+        '                                                                                                                         ResultDate, Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+        '                                                    Next
+        '                                                End If
+        '                                            End If
+        '                                        Next
+        '                                    Next
+        '                                Next
+
+        '                                resultData.SetDatos = ResultsForReportDS
+        '                            End If
+        '                        End If
+
+        '                    End If 'AG 10/09/2014 -BA-1894 , BA-1897 - Protection End If
+
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        resultData = New GlobalDataTO()
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+
+        ' ''' <summary>
+        ' ''' 25/09/2013 - CF v2.1.1 - Original code from GetResultsByPatientSampleForReport function. 
+        ' ''' Get Results info by Patient Sample for Report using a List of orderIds as a filter. 
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ' ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ' ''' <param name="pOrderList">List of orders to filter the results by</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS (ReportMaster and ReportDetails tables)</returns>
+        ' ''' <remarks>
+        ' ''' Created by:  RH 03/01/2012
+        ' ''' Modified by: RH 19/03/2012 Label PatientID in Multilanguage
+        ' '''              AG 27/05/2013 - Add new samples types LIQ and SER
+        ' '''              CF 25/09/2013 - Copied the GetResultsByPatientSampleForReport function and added the orderList param. 
+        ' '''              AG 03/10/2013 - new parameter compact that will fill the field FullID without multilanguage resources
+        ' '''              AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ' '''              AG 01/08/2014 #1897 fix issue Test order for patient report (final and compact) from current WS results (when results of different test type are mixed)
+        ' '''              AG 23/09/2014 - BA-1940 in report header show all patient's different barcodes
+        ' '''              AG 23/09/2014 - BA-1940 comment old code and implement a unique method compatible manual and auto firal report (GetResultsByPatientSampleForReportByOrderList)
+        ' ''' </remarks>
+        'Public Function GetResultsByPatientSampleForReportByOrderList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        '                                                   ByVal pWorkSessionID As String, ByVal pOrderList As List(Of String), _
+        '                                                   Optional ByVal GetReplicates As Boolean = True, Optional ByVal pCompact As Boolean = False) As GlobalDataTO
+        '    Dim resultData As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+        '                Dim myExecutionDelegate As New ExecutionsDelegate
+
+        '                resultData = myExecutionDelegate.GetWSExecutionsResultsByOrderIDList(dbConnection, pAnalyzerID, pWorkSessionID, pOrderList)
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    Dim ExecutionsResultsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+        '                    'Get the list of different OrderTestIDs in the group of Executions
+        '                    Dim OrderTestList As List(Of Integer) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                            Where row.OrderToPrint = True AndAlso row.SampleClass = "PATIENT" _
+        '                                                         Order By row.TestPosition _
+        '                                                           Select row.OrderTestID Distinct).ToList()
+
+        '                    'AG 29/07/2014 - #1894 Get all orderTests that form part of a calculated test that has to be excluded from patients final report
+        '                    Dim orderCalcDelg As New OrderCalculatedTestsDelegate
+        '                    Dim toExcludeFromReport As New List(Of Integer) 'Order tests that form part of a calculated test programmed to not print the partial tests
+        '                    resultData = orderCalcDelg.GetOrderTestsToExcludeInPatientsReport(dbConnection)
+        '                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                        toExcludeFromReport = DirectCast(resultData.SetDatos, List(Of Integer))
+
+        '                        'Remove these orderTest from OrderTestList of STD tests
+        '                        If toExcludeFromReport.Count > 0 Then
+        '                            Dim positionToDelete As Integer = 0
+        '                            For Each item As Integer In toExcludeFromReport
+        '                                If OrderTestList.Contains(item) Then
+        '                                    positionToDelete = OrderTestList.IndexOf(item)
+        '                                    OrderTestList.RemoveAt(positionToDelete)
+        '                                End If
+        '                            Next
+        '                        End If
+        '                    End If
+        '                    'AG 29/07/2014
+
+        '                    'Get the Patient Results for the list of OrderTestIDs
+        '                    Dim AverageResultsDS As New ResultsDS
+        '                    Dim myResultsDelegate As New ResultsDelegate
+
+        '                    resultData = GetResultsForReports(dbConnection, OrderTestList)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
+        '                    End If
+
+        '                    'Get Calculated Results
+        '                    'AG 01/08/2014 #1897 add new optional parameter to TRUE
+        '                    resultData = myResultsDelegate.GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
+        '                            'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+        '                            'AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+        '                                AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            End If
+        '                            'AG 29/07/2014
+        '                        Next
+        '                    End If
+
+        '                    'Get ISE & OffSystem Tests Results
+        '                    'AG 01/08/2014 #1897 add new optional parameter to TRUE
+        '                    resultData = myResultsDelegate.GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID, True)
+        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                        For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
+        '                            'AG 29/07/2014 - #1894 exclude CALC tests that form part of another calculated test programmed to not print the partial tests
+        '                            'AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            If Not toExcludeFromReport.Contains(resultRow.OrderTestID) Then
+        '                                AverageResultsDS.vwksResults.ImportRow(resultRow)
+        '                            End If
+        '                            'AG 29/07/2014
+        '                        Next resultRow
+        '                    End If
+
+        '                    'AG 03/10/2013 - final report compact has to show barcode, we need inform the avg results field
+        '                    If pCompact Then
+        '                        resultData = FillSpecimenIDListForReport(dbConnection, pWorkSessionID, AverageResultsDS)
+        '                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                            AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
+        '                        End If
+        '                    End If
+        '                    'AG 03/10/2013
+
+        '                    'AG 01/08/2014 #1897 Finally sort the dataset using the TestPosition column
+        '                    'Protection: If no results (for example all tests OUT) exit function returning the espected DS but empty
+        '                    If AverageResultsDS.vwksResults.Rows.Count = 0 Then
+        '                        'Returned data empty
+        '                        resultData.SetDatos = New ResultsDS
+        '                    Else
+
+        '                        'AverageResultsDS.vwksResults.DefaultView.Sort = "TestPosition" 'This code does not work!!
+        '                        Dim sortedReportList As New List(Of ResultsDS.vwksResultsRow)
+        '                        Dim sortedResultsToPrintDS As New ResultsDS
+        '                        sortedReportList = (From a As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults _
+        '                                      Select a Order By a.TestPosition Ascending).ToList
+
+        '                        For Each reportRow As ResultsDS.vwksResultsRow In sortedReportList
+        '                            sortedResultsToPrintDS.vwksResults.ImportRow(reportRow)
+        '                        Next
+        '                        sortedResultsToPrintDS.vwksResults.AcceptChanges()
+        '                        AverageResultsDS = sortedResultsToPrintDS
+        '                        sortedReportList = Nothing
+        '                        'AG 01/08/2014 #1897
+
+        '                        'Read Reference Range Limits
+        '                        Dim MinimunValue As Nullable(Of Single) = Nothing
+        '                        Dim MaximunValue As Nullable(Of Single) = Nothing
+
+        '                        Dim myOrderTestsDelegate As New OrderTestsDelegate
+        '                        For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+        '                            If (Not resultRow.IsActiveRangeTypeNull) Then
+        '                                Dim mySampleType As String = String.Empty
+        '                                If (resultRow.TestType <> "CALC") Then mySampleType = resultRow.SampleType
+
+        '                                'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
+        '                                resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, resultRow.OrderTestID, resultRow.TestType, _
+        '                                                                                            resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
+
+        '                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                    Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+        '                                    If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+        '                                        MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
+        '                                        MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
+        '                                    End If
+        '                                End If
+
+        '                                If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
+        '                                    If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
+        '                                        resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                        resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                    End If
+        '                                End If
+        '                            End If
+        '                        Next resultRow
+
+        '                        'Fill Average PatientID and Name fields
+        '                        Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
+        '                        For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults.Rows
+        '                            If (executionRow.SampleClass = "PATIENT") Then
+        '                                If (Not IsOrderProcessed.ContainsKey(executionRow.OrderID)) Then
+        '                                    For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+        '                                        If (resultRow.OrderID = executionRow.OrderID) Then
+        '                                            resultRow.PatientName = executionRow.PatientName
+        '                                            resultRow.PatientID = executionRow.PatientID
+        '                                        End If
+        '                                    Next resultRow
+
+        '                                    IsOrderProcessed(executionRow.OrderID) = True
+        '                                End If
+        '                            End If
+        '                        Next executionRow
+
+        '                        Dim currentLanguageGlobal As New GlobalBase
+        '                        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        '                        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        '                        Dim literalPatientID As String
+        '                        literalPatientID = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
+
+        '                        'DL 17/06/2013
+        '                        Dim literalPatientName As String
+        '                        literalPatientName = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Summary_PatientName", CurrentLanguage)
+        '                        'DL 17/06/2013
+
+        '                        Dim literalGender As String
+        '                        literalGender = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Gender", CurrentLanguage)
+
+        '                        Dim literalBirthDate As String
+        '                        literalBirthDate = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_DateOfBirth", CurrentLanguage)
+
+        '                        Dim literalAge As String
+        '                        literalAge = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Age", CurrentLanguage)
+
+        '                        Dim literalPerformedBy As String
+        '                        literalPerformedBy = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Patients_PerformedBy", CurrentLanguage)
+
+        '                        Dim literalComments As String
+        '                        literalComments = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Flags", CurrentLanguage)  'EF 03/06/2014 (cargar texto LBL_FLags)
+
+        '                        'RH 15/05/2012 Get Patient data
+        '                        Dim myPatientsDelegate As New PatientDelegate
+        '                        Dim SelectedPatients As List(Of String) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                                  Where row.SampleClass = "PATIENT" _
+        '                                                                AndAlso row.OrderToPrint = True _
+        '                                                                AndAlso row.RerunNumber = 1 _
+        '                                                                 Select row.PatientID Distinct).ToList()
+
+        '                        resultData = myPatientsDelegate.GetPatientsForReport(dbConnection, CurrentLanguage, SelectedPatients)
+        '                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                            Dim PatientsData As PatientsDS = DirectCast(resultData.SetDatos, PatientsDS)
+
+        '                            'RH 24/05/2012 Create info for not registered patients
+        '                            For Each PatientID As String In SelectedPatients
+        '                                If (From row In PatientsData.tparPatients Where String.Compare(row.PatientID, PatientID, False) = 0 Select row).Count = 0 Then
+        '                                    Dim newRow As PatientsDS.tparPatientsRow
+
+        '                                    newRow = PatientsData.tparPatients.NewtparPatientsRow()
+        '                                    newRow.PatientID = PatientID
+        '                                    PatientsData.tparPatients.AddtparPatientsRow(newRow)
+        '                                End If
+        '                            Next
+
+        '                            Dim AgeUnitsListDS As New PreloadedMasterDataDS
+        '                            Dim preloadedMasterConfig As New PreloadedMasterDataDelegate
+
+        '                            resultData = preloadedMasterConfig.GetList(dbConnection, PreloadedMasterDataEnum.AGE_UNITS)
+        '                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                AgeUnitsListDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+
+        '                                Dim ResultsForReportDS As New ResultsDS
+        '                                Dim PatientIDList As New List(Of String)
+        '                                Dim SamplesList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+        '                                Dim BarcodesByPatient As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) 'AG 23/09/2014 - BA-1940
+        '                                Dim StatFlag() As Boolean = {True, False}
+        '                                Dim existsRow As Boolean = False
+        '                                Dim FullID As String
+        '                                Dim FullName As String
+        '                                Dim FullGender As String
+        '                                Dim FullBirthDate As String
+        '                                Dim FullAge As String
+        '                                Dim FullPerformedBy As String
+        '                                Dim FullComments As String
+        '                                Dim Pat As PatientsDS.tparPatientsRow
+
+        '                                Dim linqSpecimenFromResults As List(Of ResultsDS.vwksResultsRow) 'AG 28/06/2013
+        '                                'Fill ReportMaster table
+        '                                For i As Integer = 0 To 1
+        '                                    SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                  Where row.SampleClass = "PATIENT" _
+        '                                                AndAlso row.OrderToPrint = True _
+        '                                                AndAlso row.StatFlag = StatFlag(i) _
+        '                                                AndAlso row.RerunNumber = 1 _
+        '                                                 Select row).ToList()
+
+        '                                    For Each sampleRow As ExecutionsDS.vwksWSExecutionsResultsRow In SamplesList
+        '                                        If (Not PatientIDList.Contains(sampleRow.PatientID)) Then
+        '                                            PatientIDList.Add(sampleRow.PatientID)
+
+        '                                            Pat = (From row As PatientsDS.tparPatientsRow In PatientsData.tparPatients _
+        '                                                  Where row.PatientID = sampleRow.PatientID _
+        '                                                 Select row).First()
+
+        '                                            If (Not Pat.IsDateOfBirthNull) Then
+        '                                                Pat.AgeWithUnit = Utilities.GetAgeUnits(Pat.DateOfBirth, AgeUnitsListDS)
+        '                                                Pat.FormatedDateOfBirth = Pat.DateOfBirth.ToString(DatePattern)
+        '                                            End If
+
+        '                                            'AG 23/09/2014 - BA-1940 'DL 17/06/2013
+        '                                            Dim patIDforReport As String = sampleRow.PatientID
+        '                                            'If Not sampleRow.IsSpecimenIDListNull Then
+        '                                            '    patIDforReport &= " (" & sampleRow.SpecimenIDList & ")"
+        '                                            'End If
+        '                                            BarcodesByPatient = (From item In SamplesList Where Not item.IsSpecimenIDListNull And item.PatientID = sampleRow.PatientID Select item).ToList
+        '                                            If BarcodesByPatient.Count > 0 Then
+        '                                                Dim patBarCodeTO As New PatientSpecimenTO
+        '                                                For Each item As ExecutionsDS.vwksWSExecutionsResultsRow In BarcodesByPatient
+        '                                                    patBarCodeTO.UpdateSpecimenList(item.SpecimenIDList)
+        '                                                Next
+        '                                                patIDforReport &= patBarCodeTO.GetSpecimenIdListForReports
+        '                                            End If
+        '                                            'AG 23/09/2014 - BA-1940
+
+        '                                            ' XB 10/07/2014 - kill repeated lables - #1673
+        '                                            'FullID = String.Format("{0}: {1}", literalPatientID, patIDforReport)
+
+        '                                            ''FullName = String.Format("{0} {1}", Pat.FirstName, Pat.LastName)
+        '                                            'FullName = String.Format("{0}: {1} {2}", literalPatientName, Pat.FirstName, Pat.LastName)
+        '                                            ''DL 17/06/2013
+        '                                            'FullGender = String.Format("{0}: {1}", literalGender, Pat.Gender)
+        '                                            'FullBirthDate = String.Format("{0}: {1}", literalBirthDate, Pat.FormatedDateOfBirth)
+        '                                            'FullAge = String.Format("{0}: {1}", literalAge, Pat.AgeWithUnit)
+        '                                            'FullPerformedBy = String.Format("{0}: {1}", literalPerformedBy, Pat.PerformedBy)
+        '                                            'FullComments = String.Format("{0}: {1}", literalComments, Pat.Comments)
+
+        '                                            FullID = String.Format("{0}", patIDforReport)
+        '                                            If (Pat.LastName <> "-" And Pat.LastName <> "") Or (Pat.FirstName <> "-" And Pat.FirstName <> "") Then FullName = String.Format("{0}, {1}", Pat.LastName, Pat.FirstName) Else FullName = ""
+        '                                            FullGender = String.Format("{0}", Pat.Gender)
+        '                                            FullBirthDate = String.Format("{0}", Pat.FormatedDateOfBirth)
+        '                                            FullAge = String.Format("{0}", Pat.AgeWithUnit)
+        '                                            FullPerformedBy = String.Format("{0}", Pat.PerformedBy)
+        '                                            FullComments = String.Format("{0}", Pat.Comments)
+        '                                            ' XB 10/07/2014 - #1673
+
+        '                                            ResultsForReportDS.ReportSampleMaster.AddReportSampleMasterRow(sampleRow.PatientID, FullID, _
+        '                                                                                                           FullName, FullGender, _
+        '                                                                                                           FullBirthDate, FullAge, _
+        '                                                                                                           FullPerformedBy, FullComments, DateTime.Now) 'IT 30/07/2014 #BA-1893
+        '                                        End If
+        '                                    Next sampleRow
+
+        '                                Next i
+        '                                linqSpecimenFromResults = Nothing 'AG 28/06/2013
+        '                                SamplesList = Nothing 'AG 23/09/2014 - BA-1940
+        '                                BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
+
+        '                                'Fill ReportDetails table
+        '                                Dim DetailPatientID As String
+        '                                Dim TestName As String
+        '                                Dim SampleType As String
+        '                                Dim ReplicateNumber As String
+        '                                Dim ABSValue As String
+        '                                Dim CONC_Value As String
+        '                                Dim ReferenceRanges As String
+        '                                Dim Unit As String
+        '                                Dim ResultDate As String
+        '                                Dim Flags As String  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+
+        '                                Dim tmpOrderTestId As Integer
+        '                                Dim IsAverageDone As Dictionary(Of String, Boolean)
+        '                                Dim AverageList As List(Of ResultsDS.vwksResultsRow)
+
+        '                                Dim myOrderTestID As Integer
+        '                                Dim maxTheoreticalConc As Single
+        '                                Dim Filter As String
+
+        '                                For Each SampleID As String In PatientIDList
+        '                                    tmpOrderTestId = -1
+        '                                    IsAverageDone = New Dictionary(Of String, Boolean)
+        '                                    AverageList = New List(Of ResultsDS.vwksResultsRow)
+        '                                    'Filter = String.Empty
+
+        '                                    For Each row As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
+        '                                        If (row.PatientID = SampleID) Then
+        '                                            If (String.Compare(row.TestType, "STD", False) = 0) Then
+        '                                                myOrderTestID = row.OrderTestID
+        '                                                maxTheoreticalConc = (From resultRow In AverageResultsDS.vwksResults _
+        '                                                                     Where resultRow.OrderTestID = myOrderTestID _
+        '                                                                    Select resultRow.TheoricalConcentration).Max
+
+        '                                                If (row.TheoricalConcentration = maxTheoreticalConc) Then
+        '                                                    AverageList.Add(row)
+        '                                                End If
+
+        '                                                'AG 01/12/2010
+        '                                            ElseIf (row.TestType = "ISE" OrElse row.TestType = "OFFS") Then
+        '                                                AverageList.Add(row)
+        '                                                'End AG 01/12/2010
+
+        '                                            Else 'CALC
+        '                                                AverageList.Add(row)
+        '                                            End If
+        '                                        End If
+        '                                    Next row
+
+        '                                    'TR 27/05/2013 -Get a list of sample types separated by commas
+        '                                    Dim SampleTypes() As String
+        '                                    Dim myMasterDataDelegate As New MasterDataDelegate
+
+        '                                    resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
+        '                                    If Not resultData.HasError Then
+        '                                        SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
+        '                                    End If
+
+        '                                    'RH 18/05/2012 Sort by SampleType
+        '                                    'Dim SampleTypes() As String = {"SER", "URI", "PLM", "WBL", "CSF", "LIQ", "SEM"}
+        '                                    For Each sortedSampleType In SampleTypes
+        '                                        Dim NewAverageList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageList _
+        '                                                                                                  Where String.Compare(row.SampleType, sortedSampleType, False) = 0 _
+        '                                                                                                 Select row).ToList()
+
+        '                                        For Each resultRow As ResultsDS.vwksResultsRow In NewAverageList
+        '                                            Filter = String.Format("{0}{1}", resultRow.OrderTestID, resultRow.RerunNumber)
+
+        '                                            'Insert only Accepted Results
+        '                                            If (resultRow.AcceptedResultFlag AndAlso Not IsAverageDone.ContainsKey(Filter)) Then
+        '                                                IsAverageDone(Filter) = True
+        '                                                DetailPatientID = resultRow.PatientID
+
+        '                                                'AG 29/04/2014 - #1608
+        '                                                'TestName = resultRow.TestName
+        '                                                If Not resultRow.IsTestLongNameNull Then TestName = resultRow.TestLongName Else TestName = resultRow.TestName
+
+        '                                                SampleType = resultRow.SampleType
+        '                                                ReplicateNumber = String.Empty
+
+        '                                                If (Not resultRow.IsABSValueNull) Then
+        '                                                    ABSValue = resultRow.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT)
+        '                                                Else
+        '                                                    ABSValue = String.Empty
+        '                                                End If
+
+        '                                                If (Not resultRow.IsCONC_ValueNull) Then
+        '                                                    Dim hasConcentrationError As Boolean = False
+
+        '                                                    If (Not resultRow.IsCONC_ErrorNull) Then
+        '                                                        hasConcentrationError = Not String.IsNullOrEmpty(resultRow.CONC_Error)
+        '                                                    End If
+
+        '                                                    If (Not hasConcentrationError) Then
+        '                                                        CONC_Value = resultRow.CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                                    Else
+        '                                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                    End If
+        '                                                Else
+        '                                                    If (Not resultRow.IsManualResultTextNull) Then
+        '                                                        CONC_Value = resultRow.ManualResultText
+        '                                                    Else
+        '                                                        CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                    End If
+        '                                                End If
+
+        '                                                Unit = resultRow.MeasureUnit
+
+        '                                                If (Not String.IsNullOrEmpty(resultRow.NormalLowerLimit) AndAlso _
+        '                                                    Not String.IsNullOrEmpty(resultRow.NormalUpperLimit)) Then
+        '                                                    ReferenceRanges = String.Format("{0} - {1}", resultRow.NormalLowerLimit, resultRow.NormalUpperLimit)
+        '                                                Else
+        '                                                    ReferenceRanges = String.Empty
+        '                                                End If
+
+        '                                                'AG 15/09/2010 - Special case when Absorbance has error
+        '                                                If (Not resultRow.IsABS_ErrorNull) Then
+        '                                                    If (Not String.IsNullOrEmpty(resultRow.ABS_Error)) Then
+        '                                                        ABSValue = GlobalConstants.ABSORBANCE_ERROR
+        '                                                        CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
+        '                                                    End If
+        '                                                End If
+        '                                                'END AG 15/09/2010
+
+        '                                                'EF 03/06/2014 - Provisional v3.0.1 (PENDIENTE hacer un metodo único que devuelva el valor del FLAG a todos los reports, pantallas, etc y reutilizar!!)
+        '                                                'RH 16/05/2012
+        '                                                Flags = String.Empty
+        '                                                '    'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
+        '                                                If ((Not resultRow.IsActiveRangeTypeNull AndAlso Not String.Compare(resultRow.ActiveRangeType, String.Empty, False) = 0) AndAlso _
+        '                                                    (IsNumeric(CONC_Value))) Then
+        '                                                    If (Not resultRow.IsNormalLowerLimitNull AndAlso Not resultRow.IsNormalUpperLimitNull) Then
+        '                                                        If (CSng(CONC_Value) < CSng(resultRow.NormalLowerLimit)) Then
+        '                                                            Flags = GlobalConstants.LOW '"L"
+        '                                                        ElseIf (CSng(CONC_Value) > CSng(resultRow.NormalUpperLimit)) Then
+        '                                                            Flags = GlobalConstants.HIGH '"H"
+        '                                                        End If
+        '                                                    End If
+        '                                                End If
+        '                                                'RH 16/05/2012 - END
+        '                                                'If there are Panic Ranges informed, then verify if the result is out of the limits of the PANIC RANGE
+        '                                                If IsNumeric(CONC_Value) And (Not resultRow.IsPanicLowerLimitNull AndAlso Not resultRow.IsPanicUpperLimitNull) Then
+        '                                                    If (CSng(CONC_Value) < CSng(resultRow.PanicLowerLimit)) Then
+        '                                                        Flags = GlobalConstants.PANIC_LOW  'PL
+        '                                                    ElseIf (CSng(resultRow.PanicUpperLimit) < CSng(CONC_Value)) Then
+        '                                                        Flags = GlobalConstants.PANIC_HIGH 'PH 
+        '                                                    End If
+        '                                                End If
+        '                                                'EF 03/06/2014 END
+
+        '                                                ResultDate = resultRow.ResultDateTime.ToString(DatePattern) & " " & _
+        '                                                             resultRow.ResultDateTime.ToString(TimePattern)
+
+        '                                                'AG 03/10/2013 - compact report shows the barcode here because there is not header
+        '                                                If pCompact Then
+        '                                                    If Not resultRow.IsSpecimenIDListNull Then
+        '                                                        DetailPatientID &= " (" & resultRow.SpecimenIDList & ")"
+        '                                                    End If
+        '                                                End If
+        '                                                'AG 03/10/2013
+
+        '                                                'Insert Details row
+        '                                                ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, SampleType, _
+        '                                                                                                                 ReplicateNumber, ABSValue, CONC_Value, _
+        '                                                                                                                 ReferenceRanges, Unit, ResultDate, _
+        '                                                                                                                 Flags)  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+
+        '                                                tmpOrderTestId = resultRow.OrderTestID
+        '                                                Dim myRerunNumber As Integer = resultRow.RerunNumber 'AG 04/08/2010
+
+        '                                                Dim SampleList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
+        '                                                                                                                     Where row.OrderTestID = tmpOrderTestId _
+        '                                                                                                                   AndAlso row.RerunNumber = myRerunNumber _
+        '                                                                                                                    Select row).ToList()
+
+        '                                                If (GetReplicates AndAlso (SampleList.Count > 0)) Then
+        '                                                    Flags = String.Empty  'EF 03/06/2014 (cambio nombre variable 'remarks' a FLAGS)
+        '                                                    TestName = String.Empty
+        '                                                    SampleType = String.Empty
+        '                                                    ReferenceRanges = String.Empty
+
+        '                                                    For j As Integer = 0 To SampleList.Count - 1
+        '                                                        DetailPatientID = SampleList(j).PatientID
+        '                                                        ReplicateNumber = SampleList(j).ReplicateNumber.ToString()
+        '                                                        Unit = resultRow.MeasureUnit
+
+        '                                                        'AG 02/08/2010
+        '                                                        Dim hasConcentrationError As Boolean = False
+        '                                                        If (Not SampleList(j).IsCONC_ErrorNull) Then 'RH 14/09/2010
+        '                                                            hasConcentrationError = Not String.IsNullOrEmpty(SampleList(j).CONC_Error)
+        '                                                        End If
+
+        '                                                        If (Not hasConcentrationError) Then
+        '                                                            If (Not SampleList(j).IsCONC_ValueNull) Then
+        '                                                                CONC_Value = SampleList(j).CONC_Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+        '                                                            ElseIf (Not resultRow.IsManualResultTextNull) Then
+        '                                                                'Take the Manual Result text from the average result
+        '                                                                CONC_Value = resultRow.ManualResultText
+        '                                                            Else
+        '                                                                CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                            End If
+        '                                                        Else
+        '                                                            CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+        '                                                        End If
+        '                                                        'END AG 02/08/2010
+
+        '                                                        'AG 15/09/2010 - Special case when Absorbance has error
+        '                                                        If (Not SampleList(j).IsABS_ErrorNull) Then
+        '                                                            If (Not String.IsNullOrEmpty(SampleList(j).ABS_Error)) Then
+        '                                                                ABSValue = GlobalConstants.ABSORBANCE_ERROR
+        '                                                                CONC_Value = GlobalConstants.CONC_DUE_ABS_ERROR
+        '                                                            End If
+        '                                                        End If
+        '                                                        'END AG 15/09/2010
+
+        '                                                        ResultDate = SampleList(j).ResultDate.ToString(DatePattern) & " " & _
+        '                                                                     SampleList(j).ResultDate.ToString(TimePattern)
+
+        '                                                        'AG 03/10/2013 - compact report shows the barcode here because there is not header
+        '                                                        If pCompact Then
+        '                                                            If Not SampleList(j).IsSpecimenIDListNull Then
+        '                                                                DetailPatientID &= " (" & SampleList(j).SpecimenIDList & ")"
+        '                                                            End If
+        '                                                        End If
+        '                                                        'AG 03/10/2013
+
+        '                                                        'Insert Details row
+        '                                                        ResultsForReportDS.ReportSampleDetails.AddReportSampleDetailsRow(resultRow.PatientID, DetailPatientID, TestName, _
+        '                                                                                                                         SampleType, ReplicateNumber, _
+        '                                                                                                                         ABSValue, CONC_Value, _
+        '                                                                                                                         ReferenceRanges, Unit, _
+        '                                                                                                                         ResultDate, Flags) 'EF 03/06/2014 (cambio nombre variable 'remarks' a Flags)
+        '                                                    Next
+        '                                                End If
+        '                                            End If
+        '                                        Next
+        '                                    Next
+        '                                Next
+
+        '                                resultData.SetDatos = ResultsForReportDS
+        '                            End If
+        '                        End If
+
+        '                    End If 'AG 10/09/2014 -BA-1894 , BA-1897 - Protection End If
+
+        '                End If
+        '            End If
+        '        End If
+        '    Catch ex As Exception
+        '        resultData = New GlobalDataTO()
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByPatientSampleForReportByOrderList", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
+
+#End Region
+
 #Region "METHODS FOR EXPORT RESULTS TO LIS"
         ''' <summary>
         ''' Count the total number of results selected to be Exported to LIS
@@ -8186,7 +8823,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-#End Region
 
         ''' <summary>
         ''' Get all validated and accepted results ExportStatus by OrderID
@@ -8314,6 +8950,8 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return myGlobalDataTO
         End Function
+
+#End Region
 
     End Class
 End Namespace

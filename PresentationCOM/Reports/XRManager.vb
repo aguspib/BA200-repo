@@ -49,11 +49,13 @@ Public Class XRManager
     ''' <summary>
     ''' 25/09/2013 - CF - v2.1.1
     ''' This function silently prints the PatientsFinalReport filtered by a List of OrderIDs
+    ''' NOT COMPACTED REPORT!!!
     ''' </summary>
     ''' <param name="pAnalyzerID"></param>
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="pOrderList">List of orders to filter by. </param>
     ''' <remarks>
+    ''' Modified AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
     ''' </remarks>
     Public Shared Sub PrintPatientsFinalReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pOrderList As List(Of String))
         Try
@@ -65,13 +67,16 @@ Public Class XRManager
             Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            If (pOrderList Is Nothing) Then
-                resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False)
-            Else
-                resultData = myResultsDelegate.GetResultsByPatientSampleForReportByOrderList(Nothing, pAnalyzerID, pWorkSessionID, pOrderList, False)
-            End If
+            'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
+            'If (pOrderList Is Nothing) Then
+            '    resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False)
+            'Else
+            '    resultData = myResultsDelegate.GetResultsByPatientSampleForReportByOrderList(Nothing, pAnalyzerID, pWorkSessionID, pOrderList, False)
+            'End If
 
-
+            'No replicates, no compact
+            resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False, False, pOrderList)
+            'AG 23/09/2014 - BA-1940
 
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim ResultsData As ResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
@@ -130,7 +135,7 @@ Public Class XRManager
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowPatientsFinalReport", EventLogEntryType.Error, False)
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintPatientsFinalReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -142,6 +147,7 @@ Public Class XRManager
     ''' in the configuration screen. If selected, it can print at the end of each session, or after 
     ''' individual patient results are calculated. 
     ''' This function will automatically generate a report and print it without any user interaction. 
+    ''' COMPACTED REPORT!!!
     ''' </summary>
     ''' <param name="pAnalyzerID">Analyzer ID parameter. </param>
     ''' <param name="pWorkSessionID">Worksession ID paramter</param>
@@ -150,6 +156,7 @@ Public Class XRManager
     ''' <remarks>TODO: make sure that the data comes from the correct place
     ''' AG 03/10/2013 - New optional parameter set to TRUE into methods GetResultsByPatientSampleForReport and GetResultsByPatientSampleForReportByOrderList
     ''' AG 07/10/2013 - Modify: For the compact report do not fill the header "Remarks", leave ""
+    ''' AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
     ''' </remarks>
     Public Shared Sub PrintCompactPatientsReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pOrderList As List(Of String), Optional ByVal SilentPrint As Boolean = True)
         Try
@@ -159,11 +166,16 @@ Public Class XRManager
             Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            If (pOrderList Is Nothing) Then
-                resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False, True)
-            Else
-                resultData = myResultsDelegate.GetResultsByPatientSampleForReportByOrderList(Nothing, pAnalyzerID, pWorkSessionID, pOrderList, False, True)
-            End If
+            'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
+            'If (pOrderList Is Nothing) Then
+            '    resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False, True)
+            'Else
+            '    resultData = myResultsDelegate.GetResultsByPatientSampleForReportByOrderList(Nothing, pAnalyzerID, pWorkSessionID, pOrderList, False, True)
+            'End If
+
+            'No replicates but compacted!!!
+            resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False, True, pOrderList)
+            'AG 23/09/2014 - BA-1940 
 
             'If there's on data to print, we'll get out of this sub.
             If resultData.HasError OrElse resultData.SetDatos Is Nothing Then
@@ -225,7 +237,7 @@ Public Class XRManager
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintAutomaticPatientsReport", EventLogEntryType.Error, False)
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
