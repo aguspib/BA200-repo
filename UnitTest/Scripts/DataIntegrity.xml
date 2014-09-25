@@ -2901,6 +2901,18 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Count ALL new images (sort tests button)</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND ItemID = 'ORDER_TESTS' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+
 </DBIntegrityDS>
 
 

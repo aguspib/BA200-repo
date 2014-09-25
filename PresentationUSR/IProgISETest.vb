@@ -1279,7 +1279,7 @@ Public Class IProgISETest
             bsPrintButton.Visible = False
 
             'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
-            auxIconName = GetIconName("ADJUSTMENT")
+            auxIconName = GetIconName("ORDER_TESTS")
             If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName, True)
 
 

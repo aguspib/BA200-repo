@@ -1326,7 +1326,7 @@ Public Class IProgOffSystemTest
             bsPrintButton.Visible = False
 
             'CUSTOM SORT Button AG 04/09/2014 - BA-1869
-            auxIconName = GetIconName("ADJUSTMENT")
+            auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
                 BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
             End If
