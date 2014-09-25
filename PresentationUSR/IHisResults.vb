@@ -531,6 +531,8 @@ Public Class IHisResults
     '''                                          Added new hidden grid column: HistPatientID.
     '''                                          Call new function to get the saved width of all visible grid columns and assign the value.
     '''             SA 25/08/2014 - BA-1916  ==> Added new hidden grid column BackColorGroup, used to set the Row BackColor in grid event RowStyle
+    '''             SA 23/09/2014 - BA-1861  ==> Changed multilanguage resource used for PatientID column: use LBL_PatientSample, the same used in
+    '''                                          WS Samples Request Screen
     ''' </remarks>
     Private Sub InitializeResultHistoryGrid()
         Try
@@ -627,10 +629,10 @@ Public Class IHisResults
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
-            'PATIENT ID/SAMPLE ID Column
+            'PATIENT/SAMPLE Column
             column = historyGridView.Columns.Add()
             With column
-                .Caption = GetText("LBL_PatientID")
+                .Caption = GetText("LBL_PatientSample")
                 .FieldName = "PatientID"
                 .Name = "PatientID"
                 .Visible = True

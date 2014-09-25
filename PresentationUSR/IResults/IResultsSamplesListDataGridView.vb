@@ -399,6 +399,7 @@ Partial Class IResults
                             'Else
                             '    dgv("PatientID", RowIndex).ToolTipText = sampleRow.PatientID
                             'End If
+                            dgv("PatientID", RowIndex).ToolTipText = String.Empty 'AG 23/09/2014 - BA-1940 - Initiate a clear value
                             'AG 22/09/2014 - BA-1940
 
                         End If

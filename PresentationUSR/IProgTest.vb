@@ -8896,7 +8896,7 @@ Public Class IProgTest
             'TR 09/01/2012 -END.
 
             'AG 05/09/2014 - BA-1869
-            auxIconName = GetIconName("ADJUSTMENT")
+            auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
                 BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
             End If

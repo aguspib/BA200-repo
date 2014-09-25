@@ -2827,6 +2827,8 @@
 		<row><td>opticcentering_spa.xps</td><td>ServiceSw_InfoDocs</td><td>OPTICC~1.XPS|OpticCentering_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\OpticCentering_SPA.xps</td><td>1</td><td/></row>
 		<row><td>orangecircle.png</td><td>ServiceSw_Images</td><td>ORANGE~1.PNG|OrangeCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OrangeCircle.png</td><td>1</td><td/></row>
 		<row><td>orangecircle.png1</td><td>UserSw_Images</td><td>ORANGE~1.PNG|OrangeCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\OrangeCircle.png</td><td>1</td><td/></row>
+		<row><td>ordertests.png</td><td>ServiceSw_Images</td><td>ORDERT~1.PNG|OrderTests.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OrderTests.png</td><td>1</td><td/></row>
+		<row><td>ordertests.png1</td><td>UserSw_Images</td><td>ORDERT~1.PNG|OrderTests.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\OrderTests.png</td><td>1</td><td/></row>
 		<row><td>panel.png</td><td>ServiceSw_Images_Embedded</td><td>Panel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\Panel.png</td><td>1</td><td/></row>
 		<row><td>panel.png1</td><td>UserSw_Images_Embedded</td><td>Panel.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\Panel.png</td><td>1</td><td/></row>
 		<row><td>parameterprograming.dll</td><td>ParameterPrograming.dll</td><td>PARAME~1.DLL|ParameterPrograming.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\ParameterPrograming.dll</td><td>1</td><td/></row>

@@ -2903,6 +2903,17 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.10</Version>
+    <Label>Count ALL new images (sort tests button)</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND ItemID = 'ORDER_TESTS' ) = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
     <Label>View vhisWSBlankCalibResults has been changed to return also the TestVersionNumber field</Label>
     <Script>
       IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.type = 'V' AND so.name = 'vhisWSBlankCalibResults' AND sc.name = 'TestVersionNumber') = 1)

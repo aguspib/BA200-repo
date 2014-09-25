@@ -1,3 +1,6 @@
+Option Explicit On
+Option Strict On
+
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -7,6 +10,8 @@ Imports DevExpress.XtraCharts
 Imports System.Drawing
 
 Public Class QCIndividualResultsByTestReport
+
+#Region "Declarations"
     Private mTestSampleData As HistoryTestSamplesDS.tqcHistoryTestSamplesRow
     Private mDateRangeText As String
     Private mIncludeGraph As Boolean
@@ -14,19 +19,28 @@ Public Class QCIndividualResultsByTestReport
     Private mLabelMEAN As String = ""
     Private mLabelSD As String = ""
     Private mResultsDS As QCResultsDS
+#End Region
 
-
-    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, _
-                                               ByVal pControlsDS As OpenQCResultsDS, _
-                                               ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, _
-                                               ByVal pDateRangeText As String, ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
+#Region "Public Methods"
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On
+    ''' </remarks>
+    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pControlsDS As OpenQCResultsDS, _
+                                               ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String, _
+                                               ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
         mTestSampleData = pTestSampleRow
         mDateRangeText = pDateRangeText
         mControlsDS = pControlsDS
         mResultsDS = pResultsDS
 
-        'Adding the SubReports
-        For Each elem As OpenQCResultsDS.tOpenResultsRow In From c In pControlsDS.tOpenResults.Rows Where c.Selected
+        'Get all selected Controls
+        Dim lstSelectedControls As List(Of OpenQCResultsDS.tOpenResultsRow) = (From c As OpenQCResultsDS.tOpenResultsRow In pControlsDS.tOpenResults _
+                                                                              Where c.Selected = True _
+                                                                             Select c).ToList()
+        'Add the SubReports
+        For Each elem As OpenQCResultsDS.tOpenResultsRow In lstSelectedControls
             Dim mQCRep As New QCIndividualResultsByTestControlReport
             mQCRep.ControlLotID.Value = elem.QCControlLotID
             mQCRep.SetControlsAndResultsDatasource(pControlsDS, pResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
@@ -42,10 +56,18 @@ Public Class QCIndividualResultsByTestReport
 
         'Show/Hide the graph
         mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.YOUDEN_GRAPH)
+        lstSelectedControls = Nothing
     End Sub
+#End Region
 
-
+#Region "Private Methods"
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> If ReportName is informed (field TestLongName is not Null nor empty), use it as Test Name in the report
+    ''' </remarks>
     Private Sub QCIndividualResultsByTestReport_BeforePrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles Me.BeforePrint
+
         If Me.DesignMode Then Exit Sub
 
         'Multilanguage support
@@ -61,8 +83,12 @@ Public Class QCIndividualResultsByTestReport
         XrLabelDateRange.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateRange", CurrentLanguage)
         XrLabelControls.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_Controls_List", CurrentLanguage)
 
-        'The TestSample data
-        XrTestName.Text = mTestSampleData.TestName
+        'BA-1608 - If ReportName is informed (field TestLongName is not Null nor empty), use it as Test Name in the report
+        Dim myTestName As String = mTestSampleData.TestName
+        If (Not mTestSampleData.IsTestLongNameNull AndAlso mTestSampleData.TestLongName <> String.Empty) Then myTestName = mTestSampleData.TestLongName
+        XrTestName.Text = myTestName
+
+        'Rest of the TestSample data
         XrSample.Text = mTestSampleData.SampleType
         XrMode.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_QC_CALC_MODES_" & mTestSampleData.CalculationMode, CurrentLanguage)
         XrDateRange.Text = mDateRangeText
@@ -74,12 +100,14 @@ Public Class QCIndividualResultsByTestReport
             'Header: Control Level1 Name (Lot) + Control Level2 Name (Lot)
             XrGraphHeaderLabel.Text = ""
             For Each ctrl In From elem In mControlsDS.tOpenResults Where elem.Selected
-                If Not String.IsNullOrEmpty(XrGraphHeaderLabel.Text) Then XrGraphHeaderLabel.Text &= " + "
+                If (Not String.IsNullOrEmpty(XrGraphHeaderLabel.Text)) Then XrGraphHeaderLabel.Text &= " + "
                 XrGraphHeaderLabel.Text &= ctrl.ControlName & " (" & ctrl.LotNumber & ")"
             Next
             PrepareYoudenGraph()
         End If
+
     End Sub
+#End Region
 
 #Region "Youden Graph"
     ''' <summary>
@@ -397,6 +425,11 @@ Public Class QCIndividualResultsByTestReport
         End Try
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On (ConvertToSingle)
+    ''' </remarks>
     Private Sub PrepareYoudenGraph()
         'Multilanguage support
         Dim currentLanguageGlobal As New GlobalBase
@@ -492,7 +525,7 @@ Public Class QCIndividualResultsByTestReport
 
                         'Create cross lines with the Control Mean
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
-                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
+                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, Convert.ToSingle(mySelectecControlLotList.First().Mean), Color.Gray)
                     End If
 
                 ElseIf (numOfSelectedCtrls = 2) Then
@@ -516,10 +549,10 @@ Public Class QCIndividualResultsByTestReport
                                                Not a.Excluded _
                                          Select a.VisibleResultValue).ToList()
 
-                        Dim MinValue As Single = Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MinValue As Single = Convert.ToSingle(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3))
                         If (MinValue > XResultValues.Min) Then MinValue = XResultValues.Min
 
-                        Dim MaxValue As Single = Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MaxValue As Single = Convert.ToSingle(Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3))
                         If (MaxValue < XResultValues.Max) Then MaxValue = XResultValues.Max
 
                         myDiagram.AxisX.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
@@ -537,10 +570,10 @@ Public Class QCIndividualResultsByTestReport
                                                                       Not a.Excluded _
                                                                 Select a.VisibleResultValue).ToList()
 
-                        MinValue = Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3)
+                        MinValue = Convert.ToSingle(Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MinValue > YResultValues.Min) Then MinValue = YResultValues.Min
 
-                        MaxValue = Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3)
+                        MaxValue = Convert.ToSingle(Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MaxValue < YResultValues.Max) Then MaxValue = YResultValues.Max
 
                         myDiagram.AxisY.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
@@ -553,7 +586,7 @@ Public Class QCIndividualResultsByTestReport
 
                         'Create cross lines with the Mean of selected Controls
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
-                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.Last().Mean, Color.Gray)
+                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, Convert.ToSingle(mySelectecControlLotList.Last().Mean), Color.Gray)
 
                         'Create the graph squares
                         CreateSquares(mySelectecControlLotList.First().Mean, mySelectecControlLotList.First().SD, _
@@ -592,6 +625,11 @@ Public Class QCIndividualResultsByTestReport
         End Try
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On (ConvertToInt32)
+    ''' </remarks>
     Private Sub XrYoudenGraph_CustomDrawSeriesPoint(ByVal sender As System.Object, ByVal e As DevExpress.XtraCharts.CustomDrawSeriesPointEventArgs) Handles XrYoudenGraph.CustomDrawSeriesPoint
         Try
             Dim myArgumentValue As String = e.SeriesPoint.Argument.ToString
@@ -602,7 +640,7 @@ Public Class QCIndividualResultsByTestReport
                 e.SeriesDrawOptions.Color = Color.Black
                 With CType(e.SeriesDrawOptions, PointDrawOptions).Marker
                     'Validate if the n on the tag property is the last to change the icon
-                    If (e.Series.Points(e.Series.Points.Count - 1).Tag = DirectCast(myPoint.Tag, Integer)) Then
+                    If (Convert.ToInt32(e.Series.Points(e.Series.Points.Count - 1).Tag) = DirectCast(myPoint.Tag, Integer)) Then
                         '.FillStyle.FillMode = FillMode.Solid
                         .Kind = MarkerKind.Star
                         .Size = 14
