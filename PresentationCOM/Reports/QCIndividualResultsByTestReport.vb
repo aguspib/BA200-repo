@@ -25,7 +25,7 @@ Public Class QCIndividualResultsByTestReport
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by: 
-    ''' Modified by: SA 23/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On
     '''                                          ** Added changes to remove all Excluded Results from the entry pResultsDS
     '''                                          ** Added changes to verify for each Selected Control if there are not Excluded Results for it
     '''                                          ** Changed from Sub to Function that returns a Boolean value: TRUE if the Report can be generated, 

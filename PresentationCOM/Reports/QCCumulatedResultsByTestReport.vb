@@ -21,36 +21,46 @@ Public Class QCCumulatedResultsByTestReport
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by: 
-    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On
+    '''                                          ** Changed from Sub to Function that returns a Boolean value: TRUE if the Report can be generated, 
+    '''                                             and FALSE if the Report cannot be generated (if none of the linked Controls are Selected)
     ''' </remarks>
-    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
-                                               ByVal pQCCummulatedResultsDS As CumulatedResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String)
-        mTestSampleData = pTestSampleRow
-        mDateRangeText = pDateRangeText
-        mControlsDS = pQCCumulatedSummaryDS
-        mResultsDS = pQCCummulatedResultsDS
+    Public Function SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
+                                                    ByVal pQCCummulatedResultsDS As CumulatedResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String) As Boolean
+
+        Dim generateReport As Boolean = False
 
         'Get all selected Controls
-        Dim lstSelectedControls As List(Of QCCumulatedSummaryDS.QCCumulatedSummaryTableRow) = (From c As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In mControlsDS.QCCumulatedSummaryTable _
-                                                                                              Where c.Selected = True _
+        Dim lstSelectedControls As List(Of QCCumulatedSummaryDS.QCCumulatedSummaryTableRow) = (From c As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In pQCCumulatedSummaryDS.QCCumulatedSummaryTable _
+                                                                                          Where Not c.IsSelectedNull AndAlso c.Selected = True _
                                                                                              Select c).ToList()
-        'Add the SubReports
-        For Each elem As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In lstSelectedControls
-            Dim mQCRep As New QCCumulatedResultsByTestControlReport
-            mQCRep.ControlLotID.Value = elem.QCControlLotID
-            mQCRep.SetControlsAndResultsDatasource(mControlsDS, mResultsDS, pLocalDecimalAllow, pTestSampleRow.RejectionCriteria)
+        If (lstSelectedControls.Count > 0) Then
+            generateReport = True
 
-            Dim mSubReport As New XRSubreport()
-            mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
-            mSubReport.ReportSource = mQCRep
-            Me.Detail1.Controls.Add(mSubReport)
-            mSubReport.TopF = Me.Detail1.HeightF
-            mSubReport.LeftF = 0
-            Me.Detail1.HeightF += mSubReport.HeightF
-        Next
+            mTestSampleData = pTestSampleRow
+            mDateRangeText = pDateRangeText
+            mControlsDS = pQCCumulatedSummaryDS
+            mResultsDS = pQCCummulatedResultsDS
 
+            'Add the SubReports
+            For Each elem As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow In lstSelectedControls
+                Dim mQCRep As New QCCumulatedResultsByTestControlReport
+                mQCRep.ControlLotID.Value = elem.QCControlLotID
+                mQCRep.SetControlsAndResultsDatasource(mControlsDS, mResultsDS, pLocalDecimalAllow, pTestSampleRow.RejectionCriteria)
+
+                Dim mSubReport As New XRSubreport()
+                mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
+                mSubReport.ReportSource = mQCRep
+                Me.Detail1.Controls.Add(mSubReport)
+                mSubReport.TopF = Me.Detail1.HeightF
+                mSubReport.LeftF = 0
+                Me.Detail1.HeightF += mSubReport.HeightF
+            Next
+        End If
         lstSelectedControls = Nothing
-    End Sub
+
+        Return generateReport
+    End Function
 
     ''' <summary></summary>
     ''' <remarks>

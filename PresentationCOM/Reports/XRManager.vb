@@ -1622,13 +1622,14 @@ Public Class XRManager
     ''' The Controls data and processed results are the same used in GUI, the report filters and processes to show it
     ''' 
     ''' Created by:  JB 17/07/2012
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> Generate the Report only when function SetControlsAndResultsDatasource returns True (which means 
+    '''                                          there are Control Results to print)
     ''' </remarks>
     Public Shared Sub ShowQCAccumulatedResultsByTestReport(ByVal pQCTestSampleID As Integer, ByVal pDateFrom As Date, ByVal pDateTo As Date, _
-                                                           ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
-                                                           ByVal pQCCummulatedResultsDS As CumulatedResultsDS, _
+                                                           ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, ByVal pQCCummulatedResultsDS As CumulatedResultsDS, _
                                                            ByVal pLocalDecimalAllow As Integer)
         Try
-            Dim report As New QCCumulatedResultsByTestReport()
+
 
             Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
 
@@ -1641,12 +1642,18 @@ Public Class XRManager
                 Dim myHistoryTestSampleDS As HistoryTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
                 If (myHistoryTestSampleDS.tqcHistoryTestSamples.Count > 0) Then
                     testSampleRow = myHistoryTestSampleDS.tqcHistoryTestSamples(0)
+
+                    'BA-1608 - Generate the Report only when function SetControlsAndResultsDatasource returns True
+                    Dim report As New QCCumulatedResultsByTestReport()
+                    If (report.SetControlsAndResultsDatasource(testSampleRow, pQCCumulatedSummaryDS, pQCCummulatedResultsDS, pLocalDecimalAllow, pDateFrom.ToString(DatePattern) & " - " & pDateTo.ToString(DatePattern))) Then
+                        ShowPortrait(report)
+                    End If
                 End If
             End If
 
-            report.SetControlsAndResultsDatasource(testSampleRow, pQCCumulatedSummaryDS, pQCCummulatedResultsDS, pLocalDecimalAllow, pDateFrom.ToString(DatePattern) & " - " & pDateTo.ToString(DatePattern))
 
-            ShowPortrait(report)
+
+
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
