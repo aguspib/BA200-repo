@@ -25,39 +25,69 @@ Public Class QCIndividualResultsByTestReport
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by: 
-    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On
+    '''                                          ** Added changes to remove all Excluded Results from the entry pResultsDS
+    '''                                          ** Added changes to verify for each Selected Control if there are not Excluded Results for it
+    '''                                          ** Changed from Sub to Function that returns a Boolean value: TRUE if the Report can be generated, 
+    '''                                             and FALSE if the Report cannot be generated (if none of the linked Controls are Selected, or if 
+    '''                                             all results for the selected Controls are marked as Excluded)
     ''' </remarks>
-    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pControlsDS As OpenQCResultsDS, _
-                                               ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String, _
-                                               ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
-        mTestSampleData = pTestSampleRow
-        mDateRangeText = pDateRangeText
-        mControlsDS = pControlsDS
-        mResultsDS = pResultsDS
+    Public Function SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pControlsDS As OpenQCResultsDS, _
+                                                    ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String, _
+                                                    ByVal pGraphType As REPORT_QC_GRAPH_TYPE) As Boolean
+        Dim generateReport As Boolean = False
 
         'Get all selected Controls
         Dim lstSelectedControls As List(Of OpenQCResultsDS.tOpenResultsRow) = (From c As OpenQCResultsDS.tOpenResultsRow In pControlsDS.tOpenResults _
                                                                               Where c.Selected = True _
                                                                              Select c).ToList()
-        'Add the SubReports
-        For Each elem As OpenQCResultsDS.tOpenResultsRow In lstSelectedControls
-            Dim mQCRep As New QCIndividualResultsByTestControlReport
-            mQCRep.ControlLotID.Value = elem.QCControlLotID
-            mQCRep.SetControlsAndResultsDatasource(pControlsDS, pResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
 
-            Dim mSubReport As New XRSubreport()
-            mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
-            mSubReport.ReportSource = mQCRep
-            Me.Detail1.Controls.Add(mSubReport)
-            mSubReport.TopF = Me.Detail1.HeightF
-            mSubReport.LeftF = 0
-            Me.Detail1.HeightF += mSubReport.HeightF
-        Next
+        If (lstSelectedControls.Count > 0) Then
+            'BA-1608 - Get all Results marked as Excluded and remove them from the DataSet
+            Dim myLocalResultsDS As QCResultsDS = DirectCast(pResultsDS.Copy(), QCResultsDS)
+            Dim myRow() As QCResultsDS.tqcResultsRow = DirectCast(myLocalResultsDS.tqcResults.Select("Excluded = True"), QCResultsDS.tqcResultsRow())
+            For i As Integer = 0 To UBound(myRow)
+                myLocalResultsDS.tqcResults.Rows.Remove(myRow(i))
+            Next
+            myLocalResultsDS.AcceptChanges()
 
-        'Show/Hide the graph
-        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.YOUDEN_GRAPH)
+            If (myLocalResultsDS.tqcResults.Rows.Count > 0) Then
+                'Add the SubReports
+                For Each elem As OpenQCResultsDS.tOpenResultsRow In lstSelectedControls
+                    'BA-1608 - Verify if there are not Excluded Results for the Control - If all Results have been excluded, the Control is just ignored
+                    If (myLocalResultsDS.tqcResults.ToList.Where(Function(a) a.QCControlLotID = elem.QCControlLotID).Count > 0) Then
+                        'The Report will be generated only when there are Results to print for at least one of the selected Controls
+                        generateReport = True
+
+                        Dim mQCRep As New QCIndividualResultsByTestControlReport
+                        mQCRep.ControlLotID.Value = elem.QCControlLotID
+                        mQCRep.SetControlsAndResultsDatasource(pControlsDS, myLocalResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
+                        'mQCRep.SetControlsAndResultsDatasource(pControlsDS, pResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
+
+                        Dim mSubReport As New XRSubreport()
+                        mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
+                        mSubReport.ReportSource = mQCRep
+                        Me.Detail1.Controls.Add(mSubReport)
+                        mSubReport.TopF = Me.Detail1.HeightF
+                        mSubReport.LeftF = 0
+                        Me.Detail1.HeightF += mSubReport.HeightF
+                    End If
+                Next
+
+                'BA-1608 - Inform the global variables used for LJ and Youden Reports
+                If (generateReport) Then
+                    mTestSampleData = pTestSampleRow
+                    mDateRangeText = pDateRangeText
+                    mControlsDS = pControlsDS
+                    mResultsDS = myLocalResultsDS
+                    mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.YOUDEN_GRAPH)
+                End If
+            End If
+        End If
         lstSelectedControls = Nothing
-    End Sub
+
+        Return generateReport
+    End Function
 #End Region
 
 #Region "Private Methods"
@@ -428,7 +458,8 @@ Public Class QCIndividualResultsByTestReport
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by: 
-    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On (ConvertToSingle)
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On (ConvertToSingle)
+    '''                                          ** Before drawn the graph, verify the selected Controls have at least a not exclude result
     ''' </remarks>
     Private Sub PrepareYoudenGraph()
         'Multilanguage support
@@ -448,10 +479,37 @@ Public Class QCIndividualResultsByTestReport
 
         Try
             'Get the list of selected Controls
-            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a In mControlsDS.tOpenResults _
-                                                                                        Where Not a.IsSelectedNull AndAlso a.Selected _
-                                                                                        Select a).ToList()
+            'Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a In mControlsDS.tOpenResults _
+            '                                                                            Where Not a.IsSelectedNull AndAlso a.Selected _
+            '                                                                            Select a).ToList()
+            'Dim numOfSelectedCtrls As Integer = mySelectecControlLotList.Count
+
+            'Get the list of selected Controls
+            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a As OpenQCResultsDS.tOpenResultsRow In mControlsDS.tOpenResults _
+                                                                                   Where Not a.IsSelectedNull AndAlso a.Selected = True _
+                                                                                      Select a).ToList()
             Dim numOfSelectedCtrls As Integer = mySelectecControlLotList.Count
+
+            'BA-1608 - Verify for each selected Control that it has at least a not excluded result to plot and unselect Controls that not fulfill this conditions
+            '          If the number of selected Controls changes, get again the selected Controls (the ones that remain selected)
+            If (numOfSelectedCtrls > 0) Then
+                Dim validResults As Boolean = False
+                For Each selControl As OpenQCResultsDS.tOpenResultsRow In mySelectecControlLotList
+                    'Verify if the Control has at least a not excluded result to plot; otherwise, set Selected = False for it
+                    validResults = (mResultsDS.tqcResults.ToList.Where(Function(a) a.QCControlLotID = selControl.QCControlLotID AndAlso a.Excluded = False).Count > 0)
+                    If (Not validResults) Then selControl.Selected = False
+                Next
+
+
+                If (mControlsDS.tOpenResults.ToList.Where(Function(b) Not b.IsSelectedNull AndAlso b.Selected = True).Count <> numOfSelectedCtrls) Then
+                    'The number of selected Controls has changed, get the group of Controls that remains selected (if any) and count them
+                    mySelectecControlLotList = (From a As OpenQCResultsDS.tOpenResultsRow In mControlsDS.tOpenResults _
+                                           Where Not a.IsSelectedNull AndAlso a.Selected = True _
+                                              Select a).ToList()
+                    numOfSelectedCtrls = mySelectecControlLotList.Count
+                End If
+            End If
+
             If (numOfSelectedCtrls > 0) Then
                 If (numOfSelectedCtrls > 2) Then
                     'If there are more than two Control/Lots selected, the last one is unselected

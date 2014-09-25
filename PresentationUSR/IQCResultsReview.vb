@@ -2337,9 +2337,9 @@ Public Class IQCResultsReview
 
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
         Try
-            If bsTestSampleListView.SelectedItems.Count = 1 AndAlso _
-               bsResultControlLotGridView.DataSource IsNot Nothing AndAlso _
-               bsResultsDetailsGridView.DataSource IsNot Nothing Then
+            If (bsTestSampleListView.SelectedItems.Count = 1 AndAlso _
+                bsResultControlLotGridView.DataSource IsNot Nothing AndAlso _
+                bsResultsDetailsGridView.DataSource IsNot Nothing) Then
                 Dim testSampleId As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)
                 Dim decAllow As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
 

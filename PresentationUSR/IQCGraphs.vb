@@ -718,6 +718,9 @@ Public Class IQCGraphs
     '''                                           reloaded after drawn the Youden Graph, which use a not automatic Range) 
     '''              SA 20/06/2014 - BT #1668 ==> When two Controls are drawn, value of property ArgumentScaleType has to be set to Qualitative
     '''                                           to prevent the values in X-Axis are scaled with decimals (Series are always integer)  
+    '''              SA 25/09/2014 - BA-1608  ==> In the Linq used to get the list of selected Controls, condition a.n=0 is wrong; it should be
+    '''                                           a.n > 0 (it is an old error, but its unique efect was that values in Y-Axis were normalized, 
+    '''                                           although only one Control was plotted)
     ''' </remarks>
     Private Sub LoadLeveyJenningsGraph()
         Try
@@ -740,7 +743,7 @@ Public Class IQCGraphs
             'Get the list of selected Controls
             Dim mySelectedCtrlLots As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a As OpenQCResultsDS.tOpenResultsRow In OpenQCResultsDSAttribute.tOpenResults _
                                                                                  Where (Not a.IsSelectedNull AndAlso a.Selected) _
-                                                                               AndAlso (Not a.IsCalcMeanNull OrElse (Not a.IsMeanNull AndAlso a.n = 0)) _
+                                                                               AndAlso (Not a.IsCalcMeanNull OrElse (Not a.IsMeanNull AndAlso a.n > 0)) _
                                                                                 Select a).ToList
             Dim numSelectedWithMean As Integer = mySelectedCtrlLots.Count
             bsPrintButton.Enabled = (numSelectedWithMean > 0)
@@ -1337,6 +1340,7 @@ Public Class IQCGraphs
     ''' Modified by: SA 23/12/2011 - If there are more than two Control/Lots selected, unselect the last one to allow drawing
     '''                              the plot
     '''              SA 26/01/2012 - Use field containing "ControlName (LotNumber)" as identifier of each serie added to the plot
+    '''              SA 25/09/2014 - BA-1608 ==> Before drawn the graph, verify the selected Controls have at least a not exclude result
     ''' </remarks>
     Private Sub LoadYoudenGraph()
         Try
@@ -1351,10 +1355,31 @@ Public Class IQCGraphs
             bsQCResultChartControl.Legend.Visible = False
 
             'Get the list of selected Controls
-            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a In OpenQCResultsDSAttribute.tOpenResults _
+            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a As OpenQCResultsDS.tOpenResultsRow In OpenQCResultsDSAttribute.tOpenResults _
                                                                                    Where Not a.IsSelectedNull AndAlso a.Selected = True _
                                                                                       Select a).ToList()
             Dim numOfSelectedCtrls As Integer = mySelectecControlLotList.Count
+
+            'BA-1608 - Verify for each selected Control that it has at least a not excluded result to plot and unselect Controls that not fulfill this conditions
+            '          If the number of selected Controls changes, get again the selected Controls (the ones that remain selected)
+            If (numOfSelectedCtrls > 0) Then
+                Dim validResults As Boolean = False
+                For Each selControl As OpenQCResultsDS.tOpenResultsRow In mySelectecControlLotList
+                    'Verify if the Control has at least a not excluded result to plot; otherwise, set Selected = False for it
+                    validResults = (QCResultsByControlDSAttribute.tqcResults.ToList.Where(Function(a) a.QCControlLotID = selControl.QCControlLotID AndAlso a.Excluded = False).Count > 0)
+                    If (Not validResults) Then selControl.Selected = False
+                Next
+
+
+                If (OpenQCResultsDSAttribute.tOpenResults.ToList.Where(Function(b) Not b.IsSelectedNull AndAlso b.Selected = True).Count <> numOfSelectedCtrls) Then
+                    'The number of selected Controls has changed, get the group of Controls that remains selected (if any) and count them
+                    mySelectecControlLotList = (From a As OpenQCResultsDS.tOpenResultsRow In OpenQCResultsDSAttribute.tOpenResults _
+                                           Where Not a.IsSelectedNull AndAlso a.Selected = True _
+                                              Select a).ToList()
+                    numOfSelectedCtrls = mySelectecControlLotList.Count
+                End If
+            End If
+
             If (numOfSelectedCtrls > 0) Then
                 If (numOfSelectedCtrls > 2) Then
                     'If there are more than two Control/Lots selected, the last one is unselected
