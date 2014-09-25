@@ -2748,6 +2748,34 @@
                             ControlNum, TestLongName, ShortName
       FROM         vwksWSISEOffSystemResults;
       GO
+            
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vhisWSBlankCalibResults]'))
+      DROP VIEW [dbo].[vhisWSBlankCalibResults]
+      GO
+      USE [Ax00]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisWSBlankCalibResults]
+      AS
+      SELECT DISTINCT 
+                            hres.HistOrderTestID, hres.AnalyzerID, hres.ResultDateTime, hres.ABSValue, hres.ABSWorkReagent, hres.KineticBlankLimit, hres.ABSInitial, hres.ABSMainFilter, 
+                            hres.BlankAbsorbanceLimit, hres.AlarmList, hres.CalibratorFactor, hres.FactorLowerLimit, hres.FactorUpperLimit, hot.SampleClass, hot.SampleType, hts.TestName, 
+                            tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, htc.CalibratorNum, 
+                            hres.WorkSessionID, hts.CalibPointUsed, hts.DecimalsAllowed, hres.RemarkAlert, htc.TestVersionNumber
+      FROM         dbo.thisWSResults AS hres INNER JOIN
+                            dbo.thisWSOrderTests AS hot ON hres.HistOrderTestID = hot.HistOrderTestID AND hres.AnalyzerID = hot.AnalyzerID AND 
+                            hres.WorkSessionID = hot.WorkSessionID INNER JOIN
+                            dbo.thisTestSamples AS hts ON hot.HistTestID = hts.HistTestID AND hot.TestVersionNumber = hts.TestVersionNumber AND 
+                            hot.SampleType = hts.SampleType LEFT OUTER JOIN
+                            dbo.thisCalibrators AS hca ON hot.HistCalibratorID = hca.HistCalibratorID LEFT OUTER JOIN
+                            dbo.thisTestCalibratorsValues AS htc ON hot.HistCalibratorID = htc.HistCalibratorID AND hot.SampleType = htc.SampleType AND 
+                            hot.TestVersionNumber = htc.TestVersionNumber AND hot.HistTestID = htc.HistTestID AND hres.MultiPointNumber = htc.CalibratorNum LEFT OUTER JOIN
+                            dbo.tcfgMasterData AS tcfg ON tcfg.SubTableID = 'TEST_UNITS' AND tcfg.ItemID = hts.MeasureUnit
+      WHERE     (hot.SampleClass <> 'PATIENT')
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.14'

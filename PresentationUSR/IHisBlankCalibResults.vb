@@ -625,8 +625,10 @@ Public Class IHisBlankCalibResults
     ''' Initialize calibrator grid
     ''' </summary>
     ''' <remarks>AG 22/10/2012
-    ''' AG 29/10/2012 (AG + EF meeting): Merge by TestName. Sort columns Date, Test, Type, CalibName, Remark Alert
-    '''                                  Date - Test - Type - Calib Name - Lot - ...</remarks>
+    ''' Modified by: AG 29/10/2012 (AG + EF meeting): Merge by TestName. Sort columns Date, Test, Type, CalibName, Remark Alert
+    '''                                  Date - Test - Type - Calib Name - Lot - ...
+    '''              XB 25/09/2014 - Add TestVersion column to can filter by it when select the calibrator chart result from Historics - BA-1863
+    ''' </remarks>
     Private Sub InitializeCalibResultsGrid()
         Try
             'Prepare calibrator Grid
@@ -645,14 +647,14 @@ Public Class IHisBlankCalibResults
             Dim GraphColumn As New DevExpress.XtraGrid.Columns.GridColumn()
             Dim RemarksColumn As New DevExpress.XtraGrid.Columns.GridColumn()
             Dim AnalyzerIDColumn As New DevExpress.XtraGrid.Columns.GridColumn()
-
+            Dim TestVersionColumn As New DevExpress.XtraGrid.Columns.GridColumn()   ' XB 25/09/2014 - BA-1863
 
             With CalibratorGridView
                 .Columns.AddRange(New DevExpress.XtraGrid.Columns.GridColumn() _
                                   {DateColumn, CalibratorNameColumn, LotNumberColumn, NumberOfCalibratorsColumn, _
                                    TestNameColumn, SampleTypeColumn, RemarksAlertColumn, AbsColumn, _
                                    TheoricalConcColumn, UnitColumn, CalibratorFactorColumn, CalibratorLimitsColumn, _
-                                   GraphColumn, RemarksColumn, AnalyzerIDColumn})
+                                   GraphColumn, RemarksColumn, AnalyzerIDColumn, TestVersionColumn})
 
                 .OptionsView.AllowCellMerge = True 'AG 29/10/2012
                 .OptionsView.GroupDrawMode = DevExpress.XtraGrid.Views.Grid.GroupDrawMode.Default
@@ -902,6 +904,23 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False 'AG 29/10/2012
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
             End With
+
+            ' XB 25/09/2014 - BA-1863
+            'Test Version column
+            With TestVersionColumn
+                .Caption = "Test Version"
+                .FieldName = "TestVersionNumber"
+                .DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric
+                .Name = "TestVersionNumber"
+                .Visible = False
+                .Width = 100
+                .OptionsColumn.AllowSize = True
+                .OptionsColumn.ShowCaption = True
+                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
+                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+            End With
+            ' XB 25/09/2014 - BA-1863
 
             'Additional Info
             'Not in v1
@@ -1309,7 +1328,7 @@ Public Class IHisBlankCalibResults
     ''' <param name="pRow"></param>
     ''' <remarks>
     ''' Created by:  AG 23/10/2012
-    ''' Modified by: XB 30/07/2014 - Remove call to function HisWSExecutionsDelegate.GetExecutionResultsForCalibCurve. Instead, add required rows to the local ExecutionsDS - BT #1863
+    ''' Modified by: XB 30/07/2014 - Remove call to function HisWSExecutionsDelegate.GetExecutionResultsForCalibCurve. Instead, add required rows to the local ExecutionsDS - BA-1863
     ''' </remarks>
     Private Sub OpenCalibCurveScreen(ByVal pRow As HisWSResultsDS.vhisWSResultsRow)
         Try
@@ -1345,7 +1364,7 @@ Public Class IHisBlankCalibResults
                 Dim exeResults As New ExecutionsDS
                 If Not resultData.HasError Then
 
-                    ' XB 30/07/2014 - BT #1863
+                    ' XB 30/07/2014 - BA-1863
                     'Dim dlgate2 As New HisWSExecutionsDelegate
                     'resultData = dlgate2.GetExecutionResultsForCalibCurve(Nothing, histOrderTestID, analyzerID, worksessionID)
 
@@ -1378,7 +1397,7 @@ Public Class IHisBlankCalibResults
                     myExecutionRow.AlarmList = avgResults.vwksResults.First.AlarmList
                     myExecutionRow.InUse = True
                     exeResults.vwksWSExecutionsResults.AddvwksWSExecutionsResultsRow(myExecutionRow)
-                    ' XB 30/07/2014 - BT #1863
+                    ' XB 30/07/2014 - BA-1863
                 End If
 
                 'Open the calib curve screen
@@ -1412,7 +1431,8 @@ Public Class IHisBlankCalibResults
                                 .SelectedTestName = TestList(0).TestName
                                 .SelectedSampleType = TestList(0).SampleType
                                 .SelectedFullTestName = TestList(0).TestName
-                                .SelectedOrderTestID = TestList(0).OrderTestID  ' XB 30/07/2014 - BT #1863 
+                                .SelectedOrderTestID = TestList(0).OrderTestID  ' XB 30/07/2014 - BA-1863 
+                                .SelectedTestVersionNumber = pRow.TestVersionNumber  ' XB 25/09/2014 - BA-1863
 
                                 'Add the analyzsis mode
                                 Dim analysisMode As String = String.Empty
