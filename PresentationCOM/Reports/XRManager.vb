@@ -1067,7 +1067,6 @@ Public Class XRManager
         End Try
     End Sub
 
-
     Public Shared Sub ShowPatientsFinalReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String)
         Try
             Dim resultData As GlobalDataTO
@@ -1629,12 +1628,9 @@ Public Class XRManager
                                                            ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, ByVal pQCCummulatedResultsDS As CumulatedResultsDS, _
                                                            ByVal pLocalDecimalAllow As Integer)
         Try
-
-
-            Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
-
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myHistoryTestSamplesDelegate As New HistoryTestSamplesDelegate
+            Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
 
             'Get the information from the History Tests/Sample Types table
             myGlobalDataTO = myHistoryTestSamplesDelegate.Read(Nothing, pQCTestSampleID)
@@ -1650,11 +1646,6 @@ Public Class XRManager
                     End If
                 End If
             End If
-
-
-
-
-
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
             myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowQCAccumulatedResultsByTestReport", EventLogEntryType.Error, False)

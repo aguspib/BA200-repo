@@ -1670,7 +1670,7 @@ Public Class IResultsCalibCurve
             Dim TheoreticalConcList As List(Of Single) = _
                   (From row In AverageResults.vwksResults _
                    Where row.OrderTestID = myOrderTestID _
-                   And row.TestVersion = myTestVersion _
+                 AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
                    Select row.TheoricalConcentration Distinct).ToList()
             ' XB 30/07/2014 - BA-1863
 

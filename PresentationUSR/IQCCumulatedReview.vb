@@ -158,7 +158,6 @@ Public Class IQCCumulatedReview
             Dim myQCHistoryTestSampleDelegate As New HistoryTestSamplesDelegate
 
             'Get all Tests/Sample Types in tqcHistoryTestSample table
-            'myGlobalDataTO = myQCHistoryTestSampleDelegate.ReadAll(Nothing, False)
             myGlobalDataTO = myQCHistoryTestSampleDelegate.ReadAllNEW(Nothing, AnalyzerIDAttribute, False)
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim myQCHistoryTestSampleDS As HistoryTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
@@ -295,7 +294,6 @@ Public Class IQCCumulatedReview
             Dim myCumulateResultsDelegate As New CumulatedResultsDelegate
 
             'Before getting all the cumulated series, get the date and time of the oldest Cumulated Serie for the Test/SampleType
-            'myGlobalDataTO = myCumulateResultsDelegate.GetMinCumDateTime(Nothing, pQCTestSampleID)
             myGlobalDataTO = myCumulateResultsDelegate.GetMinCumDateTimeNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute)
             If (Not myGlobalDataTO.HasError) Then
                 If (Not pSearchButton AndAlso Not myGlobalDataTO.SetDatos Is DBNull.Value) Then
@@ -303,7 +301,7 @@ Public Class IQCCumulatedReview
                     bsDateFromDateTimePick.Value = DirectCast(myGlobalDataTO.SetDatos, DateTime)
                 End If
 
-                'TR 02/07/2012 -Set the max cum date time 
+                'TR 02/07/2012 - Set the maximum value for DateTo DateTimePicker
                 myGlobalDataTO = myCumulateResultsDelegate.GetMaxCumDateTime(Nothing, pQCTestSampleID, AnalyzerIDAttribute)
                 If (Not myGlobalDataTO.HasError) Then
                     If (Not pSearchButton AndAlso Not myGlobalDataTO.SetDatos Is DBNull.Value) Then
@@ -316,10 +314,7 @@ Public Class IQCCumulatedReview
                 bsDateFromDateTimePick.MaxDate = bsDateToDateTimePick.Value
                 bsDateToDateTimePick.MinDate = bsDateFromDateTimePick.Value
 
-                'TR 02/07/2012 -END
-
                 'Get all Cumulated Series for all Controls/Lots linked to the selected Test/SampleType in the specified range of dates
-                'myGlobalDataTO = myCumulateResultsDelegate.GetCumulatedSeries(Nothing, pQCTestSampleID, bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value)
                 myGlobalDataTO = myCumulateResultsDelegate.GetCumulatedSeriesNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute, _
                                                                                  bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -335,8 +330,6 @@ Public Class IQCCumulatedReview
                     Next
 
                     'Get statistics values for all Controls/Lots having Cumulated Series for the selected Test/SampleType in the specified range of dates
-                    'myGlobalDataTO = myCumulateResultsDelegate.GetControlsLotsWithCumulatedSeries(Nothing, pQCTestSampleID, bsDateFromDateTimePick.Value, _
-                    '                                                                              bsDateToDateTimePick.Value, LocalCumulateResultsDS)
                     myGlobalDataTO = myCumulateResultsDelegate.GetControlsLotsWithCumulatedSeriesNEW(Nothing, pQCTestSampleID, AnalyzerIDAttribute, _
                                                                                                      bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value, _
                                                                                                      LocalCumulateResultsDS)
@@ -383,12 +376,10 @@ Public Class IQCCumulatedReview
 
                                 If (Not myButtonDisabled) Then
                                     'Verify if the link between the Test/SampleType and the Control still exists in the application (table tparTestControls)
-                                    'myGlobalDataTO = myTestControlsDelegate.VerifyLinkByQCModuleIDs(Nothing, pQCTestSampleID, _
-                                    '                                                                Convert.ToInt32(bsResultControlLotGridView.Rows(i).Cells("QCControlLotID").Value))
                                     myGlobalDataTO = myTestControlsDelegate.VerifyLinkByQCModuleIDsNEW(Nothing, pQCTestSampleID, _
                                                                                                        Convert.ToInt32(bsResultControlLotGridView.Rows(i).Cells("QCControlLotID").Value))
                                     If (myGlobalDataTO.HasError) Then Exit For
-                                    'If (CurrentUserLevel.ToUpper() <> "OPERATOR") Then
+
                                     If (CurrentUserLevel <> "OPERATOR") Then
                                         myButtonDisabled = Not DirectCast(myGlobalDataTO.SetDatos, Boolean)
                                     Else
@@ -1137,6 +1128,47 @@ Public Class IQCCumulatedReview
     End Sub
 
     ''' <summary>
+    ''' Set elements to Nothing to release memory when the screen is closed
+    ''' </summary>
+    ''' <remarks></remarks>
+    Private Sub ReleaseElements()
+        Try
+            bsTestSampleListView = Nothing
+            bsTestSampleGroupBox = Nothing
+            bsTestSampleTypeLabel = Nothing
+            bsCalculationCriteriaGroupBox = Nothing
+            bsDateFromDateTimePick = Nothing
+            bsDateFromLabel = Nothing
+            bsCumulatedResultsLabel = Nothing
+            bsDateToDateTimePick = Nothing
+            bsDateToLabel = Nothing
+            bsSearchButton = Nothing
+            bsExitButton = Nothing
+            bsCumulatedSeriesLabel = Nothing
+            bsScreenErrorProvider = Nothing
+            bsPrintButton = Nothing
+            bsResultControlLotGridView = Nothing
+            bsCumulatedXtraTab = Nothing
+            ValuesXtraTab = Nothing
+            bsResultsDetailsGridView = Nothing
+            GraphXtraTab = Nothing
+            bsDeleteCumulateSeries = Nothing
+            bsMeanChartControl = Nothing
+            bsLegendGB = Nothing
+            bsFirstCtrlLotPictureBox = Nothing
+            bsFirstCtrlLotLabel = Nothing
+            bsSecondCtrlLotLabel = Nothing
+            bsSecondCtrlLotPictureBox = Nothing
+            bsThirdCtrlLotLabel = Nothing
+            bsThirdCtrlLotPictureBox = Nothing
+            bsScreenToolTips = Nothing
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' Update Min/Max Concentration values for the specified QCTestSampleID and QCControlLotID in table tqcHistoryTestControlLots
     ''' in QC Module, and for the correspondent TestID/SampleType in table tparTestControls
     ''' </summary>
@@ -1152,7 +1184,6 @@ Public Class IQCCumulatedReview
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myHistTestControlsDelegate As New HistoryTestControlLotsDelegate
 
-            'myGlobalDataTO = myHistTestControlsDelegate.SaveLastCumulatedAsTarget(Nothing, pQCTestSampleID, pQCControlLotID, pMinValue, pMaxValue)
             myGlobalDataTO = myHistTestControlsDelegate.SaveLastCumulatedAsTargetNEW(Nothing, pQCTestSampleID, pQCControlLotID, AnalyzerIDAttribute, pMinValue, pMaxValue)
             If (myGlobalDataTO.HasError) Then
                 'Error updating the Target Min/Max values for the Test/SampleType and Control/Lot; show it
@@ -1207,48 +1238,6 @@ Public Class IQCCumulatedReview
         End Try
         Return myResult
     End Function
-
-    Private Sub ReleaseElements()
-
-        Try
-            '--- Detach variable defined using WithEvents ---
-            bsTestSampleListView = Nothing
-            bsTestSampleGroupBox = Nothing
-            bsTestSampleTypeLabel = Nothing
-            bsCalculationCriteriaGroupBox = Nothing
-            bsDateFromDateTimePick = Nothing
-            bsDateFromLabel = Nothing
-            bsCumulatedResultsLabel = Nothing
-            bsDateToDateTimePick = Nothing
-            bsDateToLabel = Nothing
-            bsSearchButton = Nothing
-            bsExitButton = Nothing
-            bsCumulatedSeriesLabel = Nothing
-            bsScreenErrorProvider = Nothing
-            bsPrintButton = Nothing
-            bsResultControlLotGridView = Nothing
-            bsCumulatedXtraTab = Nothing
-            ValuesXtraTab = Nothing
-            bsResultsDetailsGridView = Nothing
-            GraphXtraTab = Nothing
-            bsDeleteCumulateSeries = Nothing
-            bsMeanChartControl = Nothing
-            bsLegendGB = Nothing
-            bsFirstCtrlLotPictureBox = Nothing
-            bsFirstCtrlLotLabel = Nothing
-            bsSecondCtrlLotLabel = Nothing
-            bsSecondCtrlLotPictureBox = Nothing
-            bsThirdCtrlLotLabel = Nothing
-            bsThirdCtrlLotPictureBox = Nothing
-            bsScreenToolTips = Nothing
-            '-----------------------------------------------
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-
-    End Sub
-
 #End Region
 
 #Region "Events"
@@ -1345,16 +1334,18 @@ Public Class IQCCumulatedReview
 
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
         Try
-            If bsTestSampleListView.SelectedItems.Count = 1 AndAlso _
-               bsResultControlLotGridView.DataSource IsNot Nothing AndAlso _
-               bsResultsDetailsGridView.DataSource IsNot Nothing Then
+            If (bsTestSampleListView.SelectedItems.Count = 1) AndAlso (Not bsResultControlLotGridView.DataSource Is Nothing) AndAlso _
+               (Not bsResultsDetailsGridView.DataSource Is Nothing) Then
                 Dim testSampleId As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)
                 Dim decAllow As Integer = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
 
+                Cursor = Cursors.WaitCursor
                 XRManager.ShowQCAccumulatedResultsByTestReport(testSampleId, bsDateFromDateTimePick.Value, bsDateToDateTimePick.Value, _
                                                                LocalQCCumulateResultsDS, LocalCumulateResultsDS, decAllow)
+                Cursor = Cursors.Default
             End If
         Catch ex As Exception
+            Cursor = Cursors.Default
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsPrintButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -1582,8 +1573,5 @@ Public Class IQCCumulatedReview
         End Try
     End Sub
 #End Region
-
-
-
 End Class
 

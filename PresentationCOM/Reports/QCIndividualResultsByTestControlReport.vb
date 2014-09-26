@@ -24,7 +24,7 @@ Public Class QCIndividualResultsByTestControlReport
                      AndAlso ctrl.Selected).FirstOrDefault
 
         mLocalDecimalAllow = pLocalDecimalAllow
-        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.LEVEY_JENNINGS_GRAPH)
+        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.LEVEY_JENNINGS_GRAPH) AndAlso (Not mControlsRow.IsMeanNull)
         mRejectionCriteria = pRejectionCriteria
 
         Me.DataSource = pResultsDS
@@ -59,8 +59,11 @@ Public Class QCIndividualResultsByTestControlReport
         'Generic Control Data
         XrControlName.Text = mControlsRow.ControlName
         XrLotNumber.Text = mControlsRow.LotNumber
-        XrMean.Text = mControlsRow.Mean.ToString("F" & mLocalDecimalAllow.ToString())
         XrUnit.Text = mControlsRow.MeasureUnit
+
+        'BA-1608 - Verify if field Mean is Null before format it to avoid errors when Statistic Mode is used
+        XrMean.Text = String.Empty
+        If (Not mControlsRow.IsMeanNull) Then XrMean.Text = mControlsRow.Mean.ToString("F" & mLocalDecimalAllow.ToString())
 
         XrSD.Text = String.Empty
         If (Not mControlsRow.IsSDNull) Then XrSD.Text = mControlsRow.SD.ToString("F" & (mLocalDecimalAllow + 1).ToString())
@@ -85,6 +88,9 @@ Public Class QCIndividualResultsByTestControlReport
         Else
             XrCellIncludedInMean.Text = String.Empty
         End If
+
+        'BA-1608 - The Result Value has to be shown with the number of decimals defined for the Test/Sample Type
+        XrCellVisibleResultValue.Text = CDbl(GetCurrentColumnValue("VisibleResultValue")).ToString("F" & mLocalDecimalAllow.ToString())
 
         XrCellABSError.Text = CDbl(GetCurrentColumnValue("ABSError")).ToString("F" & mLocalDecimalAllow.ToString())
         XrCellRELErrorPercent.Text = CDbl(GetCurrentColumnValue("RELErrorPercent")).ToString("F2")

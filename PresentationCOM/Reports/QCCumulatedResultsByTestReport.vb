@@ -27,7 +27,6 @@ Public Class QCCumulatedResultsByTestReport
     ''' </remarks>
     Public Function SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
                                                     ByVal pQCCummulatedResultsDS As CumulatedResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String) As Boolean
-
         Dim generateReport As Boolean = False
 
         'Get all selected Controls
