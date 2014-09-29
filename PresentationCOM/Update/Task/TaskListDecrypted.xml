@@ -2774,7 +2774,7 @@
                             dbo.thisTestCalibratorsValues AS htc ON hot.HistCalibratorID = htc.HistCalibratorID AND hot.SampleType = htc.SampleType AND 
                             hot.TestVersionNumber = htc.TestVersionNumber AND hot.HistTestID = htc.HistTestID AND hres.MultiPointNumber = htc.CalibratorNum LEFT OUTER JOIN
                             dbo.tcfgMasterData AS tcfg ON tcfg.SubTableID = 'TEST_UNITS' AND tcfg.ItemID = hts.MeasureUnit
-      WHERE     (hot.SampleClass <> 'PATIENT')
+      WHERE     (hot.SampleClass &lt;&gt; 'PATIENT')
       GO
     </StructureScript>
     <UpdateScript>
@@ -2800,11 +2800,11 @@
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'PatientID', 95, 95, 'BIOSYSTEMS', GETDATE())
 
-      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'FamilyName') = 0)
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'LastName') = 0)
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'LastName', 95, 95, 'BIOSYSTEMS', GETDATE())
 
-      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'GivenName') = 0)
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'FirstName') = 0)
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'FirstName', 95, 95, 'BIOSYSTEMS', GETDATE())
 

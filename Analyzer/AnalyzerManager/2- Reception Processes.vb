@@ -1905,68 +1905,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'NOTE: Is required implement similar business for SAMPLES or not? By now do not implement it
                     End If
 
-                    '(OK) Using myLevelControl if volume is lower than a security volume then change STATUS to "FEW" in order to indicate few volume (twksWSRotorContentByPosition table)
-                    '(OK)If volume is lower than a critical volume then set STATUS to "DEPLETED" (twksWSRotorContentByPosition table)
-
-                    ''TR 28/09/2012 - Validate if BottleStatus is LOCKED to set it as new Position Status
-                    'Dim limitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
-                    'If (myBottleStatus = "LOCKED") Then
-                    '    newPositionStatus = myBottleStatus
-
-                    '    'TR 02/10/2012 - Add the Alarm of Bottle blocked due to an invalid refill was detected only if the previous Position Status was not LOCKED
-                    '    If (initialRotorPositionStatus <> "LOCKED") Then
-                    '        Dim myExecution As Integer = 0
-                    '        Dim addInfoInvalidRefill As String = String.Empty
-
-                    '        myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, ActiveWorkSession, ActiveAnalyzer)
-                    '        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    '            Dim lockedBottleExecDS As ExecutionsDS = DirectCast(myGlobal.SetDatos, ExecutionsDS)
-
-                    '            If (lockedBottleExecDS.twksWSExecutions.Rows.Count > 0) AndAlso (Not lockedBottleExecDS.twksWSExecutions(0).IsExecutionIDNull) Then
-                    '                myExecution = lockedBottleExecDS.twksWSExecutions(0).ExecutionID
-                    '            End If
-                    '            'lockedExecutionsDS.Clear() 'AG 07/02/2012 this line can not be here because the LP case neededs it!! (AG 02/02/2012 - clear the dataset. The executions that must be informed to be locked are calculated later)
-                    '        End If
-
-                    '        myGlobal = exec_delg.EncodeAdditionalInfo(dbConnection, ActiveAnalyzer, ActiveWorkSession, myExecution, myBottlePos, _
-                    '                                                  GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, reagentNumberWithNoVolume)
-                    '        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                    '            addInfoInvalidRefill = CType(myGlobal.SetDatos, String)
-                    '        End If
-
-                    '        PrepareLocalAlarmList(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN, True, alarmList, alarmStatusList, addInfoInvalidRefill, alarmAdditionalInfoList, False) 'Inform about the bottle locked. 
-                    '        'AG + TR 01/10/2012 -END
-                    '    End If
-                    'Else
-                    '    If myRotorName = "REAGENTS" Then 'For reagents
-                    '        'Read the parameter REAGENT_BOTTLE_STEP_LIMIT in tfmwFieldLimits
-                    '        limitList = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
-                    '                     Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.REAGENT_LEVELCONTROL_LIMIT.ToString _
-                    '                     Select a).ToList
-
-                    '        If limitList.Count > 0 Then
-                    '            If myLevelControl = 0 Then
-                    '                newPositionStatus = "DEPLETED" 'AG 22/02/2012
-
-                    '            ElseIf myLevelControl < CInt(limitList(0).MinValue) Then
-                    '                'AG 22/02/2012 - commented until calculation real volume formula is confirmed
-                    '                'newPositionStatus = "DEPLETED"
-                    '                newPositionStatus = "FEW"
-
-                    '            ElseIf myLevelControl < CInt(limitList(0).MaxValue) Then
-                    '                newPositionStatus = "FEW"
-                    '            Else 'ElseIf myPrepID > 0 Then 'AG 27/02/2012 (do not use myPrepID >0 because the washings returns myPrepID = 0) 
-                    '                newPositionStatus = "INUSE"
-                    '            End If
-                    '        End If
-
-                    '        'Else
-                    '        'NOTE: Is required implement similar business for SAMPLES or not? By now, NOT NECESSARY FOR SAMPLES ROTOR
-                    '    End If
-                    '    limitList = Nothing 'AG 02/08/2012 - free memory
-
-                    'End If
-
                     If (Not myGlobal.HasError AndAlso (newPositionStatus <> String.Empty OrElse changesInPosition)) Then 'AG 05/12/2011 - Add changesInPosition (by now december 2011 only for REAGENTS ROTOR)
                         myGlobal = rcp_del.UpdateByRotorTypeAndCellNumber(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myRotorName, _
                                                                           myBottlePos, newPositionStatus, realVolume, testLeft, False, False)
@@ -2423,47 +2361,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If lockedExecutionsDS.twksWSExecutions.Rows.Count > 0 Then
                         Dim alarmPrepLockedDS As New WSAnalyzerAlarmsDS  'AG 19/04/2011 - New DS with all preparation locked due this instruction
                         Dim i As Integer = 2 'AG 16/02/2012 - The prep_locked_warn starts with AlarmItem = 2 not 1 '1
-
-                        'AG 18/06/2012 - Alarms tab show only one record "Some replicate has been locked due to volume missing"
-                        'For Each item As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions.Rows
-                        '    Dim alarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow
-                        '    alarmRow = alarmPrepLockedDS.twksWSAnalyzerAlarms.NewtwksWSAnalyzerAlarmsRow
-                        '    With alarmRow
-                        '        .AlarmID = GlobalEnumerates.Alarms.PREP_LOCKED_WARN.ToString
-                        '        .AnalyzerID = AnalyzerIDAttribute
-                        '        .AlarmDateTime = Now
-                        '        If WorkSessionIDAttribute <> "" Then
-                        '            .WorkSessionID = WorkSessionIDAttribute
-                        '        Else
-                        '            .SetWorkSessionIDNull()
-                        '        End If
-                        '        .AlarmStatus = True
-                        '        .AlarmItem = i
-
-                        '        'Create DATA with information of the locked execution (sample class, sampleid, test name, replicates,...)
-                        '        myGlobal = exec_delg.EncodeAdditionalInfo(dbConnection, item.AnalyzerID, item.WorkSessionID, _
-                        '                                                  item.ExecutionID, myBottlePos, _
-                        '                                                  GlobalEnumerates.Alarms.NONE, reagentNumberWithNoVolume)
-
-                        '        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                        '            .AdditionalInfo = CType(myGlobal.SetDatos, String)
-                        '        Else
-                        '            .SetAdditionalInfoNull()
-                        '        End If
-
-                        '        .EndEdit()
-                        '    End With
-                        '    alarmPrepLockedDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow(alarmRow)
-                        '    i = i + 1
-
-                        '    'AG 24/01/2012 - Prepare UIRefresh DS for WS status
-                        '    uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS, item.ExecutionID, 0, Nothing, False)
-
-                        '    'AG 26/01/2012 - Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
-                        '    uiRefreshMyGlobal = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmRow.AlarmID.ToString, True)
-
-                        'Next
-
                         Dim distinctOTlocked As List(Of Integer) = (From a As ExecutionsDS.twksWSExecutionsRow In lockedExecutionsDS.twksWSExecutions _
                                                                   Select a.OrderTestID Distinct).ToList
                         Dim firstExecutionLockedByOT As List(Of ExecutionsDS.twksWSExecutionsRow)
@@ -2642,9 +2539,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
                 'AG 08/06/2012
 
-                '   End If 'AG 29/06/2012 - Running Cycles lost - Solution!
-                'End If'AG 29/06/2012 - Running Cycles lost - Solution!
-
                 'Debug.Print("AnalyzerManager.ProcessArmStatusRecived (" & myInst.ToString & "):" & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 11/06/2012 - time estimation
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity("Treat ARM STATUS Received (" & myInst.ToString & "): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Information, False)
@@ -2658,19 +2552,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(String.Format("Message: {0} InnerException: {1}", ex.Message, ex.InnerException.Message), "AnalyzerManager.ProcessArmStatusRecived", EventLogEntryType.Error, False)
             End Try
-
-            'AG 29/06/2012 - Running Cycles lost - Solution!
-            ''We have used Exit Try so we have to sure the connection becomes properly closed here
-            'If (Not dbConnection Is Nothing) Then
-            '    If (Not myGlobal.HasError) Then
-            '        'When the Database Connection was opened locally, then the Commit is executed
-            '        DAOBase.CommitTransaction(dbConnection)
-            '    Else
-            '        'When the Database Connection was opened locally, then the Rollback is executed
-            '        DAOBase.RollbackTransaction(dbConnection)
-            '    End If
-            '    dbConnection.Close()
-            'End If
 
             Return myGlobal
         End Function
