@@ -2580,7 +2580,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Send action in queue
         ''' </summary>
         ''' <remarks>
-        ''' Created by XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+        ''' Created by  XB 28/10/2011 - timeout limit repetitions for Start Tasks
+        ''' Modified by XB 29/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
         ''' </remarks>
         Private Function SendStartTaskinQueue() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2597,7 +2598,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 MyClass.ClearStartTaskQueueToSend()
 
-                myGlobal = ManageAnalyzer(queuedAction, True, Nothing, queuedSwAdditionalParameters, queuedFwScriptID, queuedFwParams)
+                ' XB 29/09/2014 - BA-1872
+                Dim myISECMD As Biosystems.Ax00.Global.ISECommandTO = Nothing
+                If queuedAction = AnalyzerManagerSwActionList.ISE_CMD AndAlso Not queuedSwAdditionalParameters Is Nothing Then
+                    myISECMD = CType(queuedSwAdditionalParameters, Biosystems.Ax00.Global.ISECommandTO)
+                End If
+                If Not myISECMD Is Nothing AndAlso _
+                   myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION Then
+                    ' Special case for ISE save consumptions
+                    myGlobal = MyClass.ISE_Manager.SaveConsumptions()
+                    ' XB 29/09/2014 - BA-1872
+                Else
+                    myGlobal = ManageAnalyzer(queuedAction, True, Nothing, queuedSwAdditionalParameters, queuedFwScriptID, queuedFwParams)
+                End If
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
