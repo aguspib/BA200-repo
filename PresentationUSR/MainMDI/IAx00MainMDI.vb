@@ -10038,7 +10038,7 @@ Partial Public Class IAx00MainMDI
                                 Next
 
                                 'AG 30/09/2014 - BA-1440 - Message has to be shown using the presentation Thread
-                                If showMsg Then
+                                If Not pAutoExportFlag AndAlso showMsg Then
                                     myLogAcciones.CreateLogActivity("Show message to user when there are results that CANNOT be sent (invalid LIS mapping) ", Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Information, False)
                                     Me.UIThread(Function() ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me))
                                 End If
