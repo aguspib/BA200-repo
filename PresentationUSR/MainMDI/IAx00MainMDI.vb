@@ -9841,7 +9841,8 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>
     ''' Created by:  AG 19/03/2013
     ''' Modified by: AG 27/03/2013 - Do not upload results if LIS communications are disabled
-    ''' AG 17/02/2014 - #1505 use merge instead of loops</remarks>
+    ''' AG 17/02/2014 - #1505 use merge instead of loops
+    ''' AG 29/09/2014 - BA-1440 OPTION REJECTED because is complex (historic part)</remarks>
     Private Sub SynchronousLISManagerUploadResults(ByVal pHistoricalFlag As Boolean, Optional ByVal pCurrentResults As ResultsDS = Nothing, Optional ByVal pCurrentResultAlarms As ResultsDS = Nothing, Optional ByVal pHistoricalResults As HisWSResultsDS = Nothing)
         Try
 
@@ -9914,6 +9915,18 @@ Partial Public Class IAx00MainMDI
                                     confMappingDS = CType(resultData.SetDatos, LISMappingsDS)
                                 End If
                             End If
+
+                            'AG 29/09/2014 - BA-1440 part2 Exclude tests with incomplete mapping. Correction REJECTED at this point!! (historical business is complex and the error is a not habitual scenario)
+                            'New method in ESBusiness that evaluates mapping and exclude results with LIS mapping incomplete (SampleType, TestName required, MeasureUnit optional)
+                            'Fix issue here improves system requirements because the validation is done before start the process
+                            'Dim myBusiness As New ESBusiness
+                            'resultData = myBusiness.ExcludeNotMappedResults(pHistoricalFlag, inCourseUploadToLisDS, testMappingDS, confMappingDS)
+                            'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            '    inCourseUploadToLisDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                            'End If
+                            '
+                            'If inCourseUploadToLisDS.twksWSExecutions.Rows.Count > 0 Then
+                            'AG 29/09/2014
 
                             'Get current WS results and result alarms
                             If Not resultData.HasError AndAlso Not pHistoricalFlag AndAlso (pCurrentResults Is Nothing OrElse pCurrentResultAlarms Is Nothing) Then
@@ -9999,6 +10012,8 @@ Partial Public Class IAx00MainMDI
                                                             confMappingDS, pCurrentResults, pCurrentResultAlarms, pHistoricalResults)
                                 Next
                             End If
+
+                            'End If 'AG 29/09/2014 - BA-1440
                         End If 'AG 17/02/2014 - #1505
 
                     Else 'Clear class DataSets

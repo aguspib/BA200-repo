@@ -1049,6 +1049,142 @@ Namespace Biosystems.Ax00.LISCommunications
         End Function
 
 
+        ''' <summary>
+        ''' Filter the results to upload removing those results with incomplete LIS mapping values
+        ''' Test Name required
+        ''' Sample Type required
+        ''' Units optional
+        ''' 
+        ''' Business copied from ESxmlTranslator.CreateServiceNode (the code that gets and evaluates LIS mapping values)
+        ''' </summary>
+        ''' <param name="pIsHistorical"></param>
+        ''' <param name="pToUpload"></param>
+        ''' <param name="pTestsMappingDS"></param>
+        ''' <param name="pConfigMappingDS"></param>
+        ''' <returns>GlobalDataTo with data as ExecutionsDS (all mapping values are valid)</returns>
+        ''' <remarks>AG 29/09/2014 - Creation - Method incomplete, the current WS results is finished but not the historical results part</remarks>
+        Public Function ExcludeNotMappedResults(ByVal pIsHistorical As Boolean, ByVal pToUpload As ExecutionsDS, ByVal pTestsMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                'No connection is required
+
+                If Not pIsHistorical Then
+                    'Current WS results
+
+                    Dim removeFlag As Boolean = False
+
+                    'Loop in reverser order because is easier remove rows
+                    For index As Integer = pToUpload.twksWSExecutions.Rows.Count - 1 To 0 Step -1
+                        'Evaluate if the required mapping values are OK else remove row
+                        removeFlag = False
+
+                        resultData = ValidateLISMapping(pToUpload.twksWSExecutions(index), pTestsMappingDS, pConfigMappingDS)
+                        If resultData.HasError Then
+                            removeFlag = True
+                        End If
+
+                        'Remove incomplete LIS mapping results
+                        If removeFlag Then
+                            pToUpload.twksWSExecutions(index).Delete()
+                            pToUpload.twksWSExecutions.AcceptChanges()
+                        End If
+
+                    Next
+
+                Else
+                    'Historical
+                    'If not manual order --> See historical results dataset fields LISSampleType and LISTestName cannot be neither NULL neither ""
+                    'If manual order --> Same business as current WS results
+
+                    'PENDING FINISH THE BUSINESS ... READ CODE!!!
+
+                    'Dim lnqResults As List(Of ExecutionsDS.twksWSExecutionsRow)
+
+                    ''Historic results requested by LIS
+                    'lnqResults = (From a As ExecutionsDS.twksWSExecutionsRow In pToUpload.twksWSExecutions _
+                    '              Where Not a.IsLISRequestNull AndAlso a.LISRequest Select a).ToList
+
+                    'If lnqResults.Count > 0 Then
+                    '    'Search the lnqResults contains into Historical results and discard results with invalid LISSampleType and LISTestName values
+                    'End If
+
+                    ''Historic results not requested by LIS
+                    'lnqResults = (From a As ExecutionsDS.twksWSExecutionsRow In pToUpload.twksWSExecutions _
+                    '              Where a.IsLISRequestNull OrElse Not a.LISRequest Select a).ToList
+
+                    'If lnqResults.Count > 0 Then
+                    '    'Use method ValidateLISMapping and remove all results to upload without valid LIS values
+                    'End If
+
+                End If
+
+                resultData.SetDatos = pToUpload
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.ExcludeNotMappedResults", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Evaluate if the result to upload has informed all the required LIS mapping with valid values
+        ''' Test Name required
+        ''' Sample Type required
+        ''' Units optional
+        ''' 
+        ''' Business copied from ESxmlTranslator.CreateServiceNode (the code that gets and evaluates LIS mapping values)
+        ''' </summary>
+        ''' <param name="pToUploadRow"></param>
+        ''' <param name="pTestsMappingDS"></param>
+        ''' <param name="pConfigMappingDS"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function ValidateLISMapping(ByVal pToUploadRow As ExecutionsDS.twksWSExecutionsRow, ByVal pTestsMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS) As GlobalDataTO
+            Dim resultData As GlobalDataTO
+            Try
+                Dim removeFlag As Boolean = False
+                Dim myLISMappingDelegate As New LISMappingsDelegate
+                Dim myAllTestMappingDelegate As New AllTestByTypeDelegate
+
+                'Test Name
+                resultData = myAllTestMappingDelegate.GetLISTestID(pTestsMappingDS, pToUploadRow.TestID, pToUploadRow.TestType)
+                If resultData.HasError Then
+                    removeFlag = True
+                End If
+
+
+                'Sample type
+                If Not removeFlag Then
+                    resultData = myLISMappingDelegate.GetLISSampleType(pConfigMappingDS, pToUploadRow.SampleType)
+                    If resultData.HasError Then
+                        removeFlag = True
+                    End If
+                End If
+
+                'Units (not!! this field is optional)
+
+                resultData.SetDatos = removeFlag
+
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.ValidateLISMapping", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
     End Class

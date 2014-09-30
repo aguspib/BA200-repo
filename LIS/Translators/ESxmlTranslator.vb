@@ -2012,6 +2012,7 @@ Namespace Biosystems.Ax00.LISCommunications
         '''                              LIS_UPLOAD_UNSOLICITED_QC_RES.
         '''              SG 25/04/2013 - Assigned current Mapping names to history data in case of Manual orders
         '''              SA 09/01/2014 - BT #1407 ==> Added to code to avoid export twice results of Calculated Tests (patch copied from function GetUploadLISOrdersResults)
+        '''              AG 29/09/2014 - BA-1440 part1 - Inform the LISMappingError flag calling CreateServiceNode
         ''' </remarks>
         Private Function GetUploadManualOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pManualResults As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                       ByVal pHistoricalFlag As Boolean, ByVal pTestMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS, _
@@ -2156,7 +2157,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                 resultData = MyClass.CreateServiceNode(xmlDoc, pTestMappingDS, pConfigMappingDS, TestSampleClass.patient, myResulDataTime, _
                                                                        myAlarmResults, myResult, myHisResult, myReferenceRanges, mySpecimenID, myPatientID, _
-                                                                       myOrderID, True, Nothing, "") 'AG 24/04/2013 - Add AwosID as an empty string
+                                                                       myOrderID, True, Nothing, "", exeRow.LISMappingError) 'AG 24/04/2013 - Add AwosID as an empty string
 
                                 If (resultData.HasError) Then
                                     Exit Try
@@ -2239,7 +2240,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             'Create Service Node
                             resultData = MyClass.CreateServiceNode(xmlDoc, pTestMappingDS, pConfigMappingDS, TestSampleClass.QC, myResulDataTime, _
                                                                    myAlarmResults, myResult, myHisResult, myReferenceRanges, mySpecimenID, myPatientID, _
-                                                                   myOrderID, True, myControlsDS, "") 'AG 24/04/2013 - Add AwosID as an empty string
+                                                                   myOrderID, True, myControlsDS, "", exeRow.LISMappingError) 'AG 24/04/2013 - Add AwosID as an empty string
 
                             If (resultData.HasError) Then
                                 Exit Try
@@ -2293,6 +2294,7 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' Modified by SG 25/04/2013 - Assign saved Mapping names to history data in case of LIS orders. Obtain data from 'thisWSOrderTests'
         ''' Modified by SG 27/06/2013 - In case of Calc Tests, upload unique result for OrderTEstID
         ''' Modified by SG 25/07/2013 - In case of the executions have not AwosID, they are discarded
+        ''' AG 29/09/2014 - BA-1440 part1 - Inform the LISMappingError flag calling CreateServiceNode
         ''' </remarks>
         Private Function GetUploadLISOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISResults As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                    ByVal pHistoricalFlag As Boolean, ByVal pTestMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS, _
@@ -2480,7 +2482,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                                    myESPatientID, _
                                                                                    myESOrderID, _
                                                                                    False, _
-                                                                                   Nothing, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID) 'AG 24/04/2013 - add awosid
+                                                                                   Nothing, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID, item.LISMappingError) 'AG 24/04/2013 - add awosid
 
                                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                 Dim myServiceNode As XmlNode = CType(resultData.SetDatos, XmlNode)
@@ -2609,7 +2611,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                                myPatientID, _
                                                                                myOrderID, _
                                                                                False, _
-                                                                               myControlsDS, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID) 'AG 24/04/2013 - add awosid)
+                                                                               myControlsDS, otLisInfoDS.twksOrderTestsLISInfo(0).AwosID, item.LISMappingError) 'AG 24/04/2013 - add awosid)
 
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                             Dim myServiceNode As XmlNode = CType(resultData.SetDatos, XmlNode)
@@ -2690,7 +2692,8 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' <param name="pCiPatientList">ByRef parameter: List of Patient XML Nodes</param>
         ''' <returns>All ByRef parameters plus a GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:  SA 14/01/2014 
+        ''' Created by:  SA 14/01/2014
+        ''' AG 29/09/2014 - BA-1440 part1 - Inform the LISMappingError flag calling CreateServiceNode
         ''' </remarks>
         Private Function GetMIXEDOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLISResults As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                                ByVal pTestMappingDS As AllTestsByTypeDS, ByVal pConfigMappingDS As LISMappingsDS, ByVal pResultsDS As ResultsDS, _
@@ -2853,7 +2856,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                         'Create XML node 'SERVICE'
                                         resultData = MyClass.CreateServiceNode(xmlDoc, pTestMappingDS, pConfigMappingDS, myRole, myResulDataTime, _
                                                                                myAlarmResults, myResult, myHisResult, myReferenceRanges, mySpecimenID, _
-                                                                               myESPatientID, myESOrderID, False, Nothing, myAwosID)
+                                                                               myESPatientID, myESOrderID, False, Nothing, myAwosID, item.LISMappingError)
 
                                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                             myServiceNode = CType(resultData.SetDatos, XmlNode)
@@ -4527,7 +4530,13 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' <param name="pResultsRow">Results data row</param>
         ''' <param name="pHisResultsRow">History Results data row</param>
         ''' <param name="pRefRanges">Related reference ranges</param>
+        ''' <param name="pSpecimenID"></param>
+        ''' <param name="pPatientID"></param>
+        ''' <param name="pOrderID"></param>
         ''' <param name="pIsManual">Automatic(false) or Manual(true)</param>
+        ''' <param name="pControlsDS"></param>
+        ''' <param name="pAwosID"></param>
+        ''' <param name="pLISMappingError"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by  SG 06/03/2013
@@ -4535,7 +4544,8 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' Modified by AG 24/04/2013 - Add parameter AwosID and inform it in Service id tag when different than ""
         ''' Modified by AG 03/05/2013 - Historical results could contain CONCValue = NULL
         ''' Modified by DL 16/05/2013 - Modify system decimal separator by "."
-        '''             AG 27/05/2013 - RefRanges father is Result instead of QualifyingElement
+        ''' AG 27/05/2013 - RefRanges father is Result instead of QualifyingElement
+        ''' AG 29/09/2014 - BA-1440 part1 - Inform the new byref parameter pLISMappingError
         ''' </remarks>
         Private Function CreateServiceNode(ByRef XmlDoc As XmlDocument, _
                                            ByVal pTestMappingDS As AllTestsByTypeDS, _
@@ -4551,7 +4561,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                            ByVal pOrderID As String, _
                                            ByVal pIsManual As Boolean, _
                                            ByVal pControlsDS As ControlsDS, _
-                                           ByVal pAwosID As String) As GlobalDataTO
+                                           ByVal pAwosID As String, ByRef pLISMappingError As Boolean) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
             Dim myResultRow As ResultsDS.vwksResultsRow = Nothing
@@ -4559,7 +4569,7 @@ Namespace Biosystems.Ax00.LISCommunications
             Dim myLogAcciones As New ApplicationLogManager()
 
             Try
-
+                pLISMappingError = False 'AG 29/09/2014 - BA-1440 initial value, not mapping errors
                 If pResultsRow IsNot Nothing Then
                     'ws
                     myResultRow = pResultsRow
@@ -4679,6 +4689,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                     'in case of mapping is missing, set to 'NOTSENT'
                     If itMustSetToNotSent Then
+                        pLISMappingError = True 'AG 29/09/2014 - BA-1440 inform LISMapping error!!!
                         Dim myNotSentHisResultsDS As New ResultsDS
                         Dim myRow As ResultsDS.vwksResultsRow = myNotSentHisResultsDS.vwksResults.NewvwksResultsRow()
                         With myRow
