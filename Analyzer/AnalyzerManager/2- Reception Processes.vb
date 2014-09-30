@@ -43,6 +43,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 06/02/2014 - Fix issues numbers #1484
         ''' XB 03/04/2014 - Fix a malfunction when INFO;Q:3 was sent meanwhile a ISE operation was working or Abort process was not finished - task #1557
         ''' AG 15/04/2014 - #1594 paused in v300
+        ''' XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
         ''' </remarks>
         Private Function ProcessStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
@@ -152,16 +153,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVER_PROCESS_FINISHED, 1, True) 'Inform the recover instruction has finished
 
                     End If
-
-
-                    'SGM 7/06/2012 ISE Start Timeout Managing
-                    If myActionValue = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
-                        'If MyClass.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
-                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
-                        MyClass.ISE_Manager.StopInstructionStartedTimer()
-                        'End If
-                    End If
-                    'SGM 7/06/2012
 
                     ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -299,6 +290,45 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
 
+                ' XB 26/09/2014 - BA-1872
+                'errorValue = 61
+                If errorValue <> 61 Then
+                    If MyClass.ISECMDLost Then
+                        MyClass.ISECMDLost = False
+
+                        If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                            MyClass.sendingRepetitions = True
+                            MyClass.numRepetitionsTimeout += 1
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                ' PDT !!!
+                                Debug.Print(" SEND MESSAGE ERROR !!!")
+                                myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                waitingStartTaskTimer.Enabled = False
+                                MyClass.sendingRepetitions = False
+
+                                RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                            Else
+                                ' Instruction has not started by Fw, so is need to send it again
+                                Debug.Print("Repeat Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]")
+                                myLogAcciones.CreateLogActivity("Repeat Start Task Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                myGlobal = MyClass.SendStartTaskinQueue()
+                            End If
+                        End If
+
+                    End If
+
+                    If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
+                        'MyClass.ISE_Manager.StopInstructionStartedTimer()
+
+                        MyClass.sendingRepetitions = False
+                        MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                        MyClass.ClearStartTaskQueueToSend()
+                    End If
+                End If
+                ' XB 26/09/2014 - BA-1872
+
                 'AG 23/11/2011 - Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
                 Dim ISEAvailableValue As Integer = 0
                 myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
@@ -397,6 +427,27 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'SGM 02/07/2012
                             If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
+
+                                ' XB 26/09/2014 - BA-1872
+                                MyClass.sendingRepetitions = True
+                                MyClass.numRepetitionsTimeout += 1
+                                Dim myLogAcciones As New ApplicationLogManager()
+                                If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                    ' PDT !!!
+                                    Debug.Print(" SEND MESSAGE ERROR !!!")
+                                    myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                    waitingStartTaskTimer.Enabled = False
+                                    MyClass.sendingRepetitions = False
+
+                                    RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                Else
+                                    ' Instruction has not started by Fw, so is need to send it again
+                                    Debug.Print("Repeat Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]")
+                                    myLogAcciones.CreateLogActivity("Repeat Start Task Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                    myGlobal = MyClass.SendStartTaskinQueue()
+                                End If
+                                ' XB 26/09/2014 - BA-1872
+
                                 If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
                                     myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
 
