@@ -1054,6 +1054,7 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' <param name="pResultsDS">Informed when historicalflag FALSE</param>
         ''' <param name="pResultAlarmsDS">Informed when historicalflag FALSE</param>
         ''' <param name="pHistDataDS">Only informed when called from historical results. Contains the current data in screen with the selected filters</param>
+        ''' <returns>GlobalDataTo (data = integer that counts the results not sent)</returns>
         ''' <remarks>
         ''' Creation AG 22/02/2013
         ''' AG 27/02/2013 - use new parameter 'ByVal pToUploadDS As ExecutionsDS' instead of 'ByVal pAwosToUploadResultList As List(Of String)'
@@ -1063,6 +1064,7 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' SG 11/04/2013 - Create an auxiliary ResultsDS and inform all affected results - Call method UpdateLISMessageID
         ''' Modified by: DL 25/04/2013 Create an auxiliary HisWSResultsDS and inform all affected results and Call method UpdateLISMessageID in Hisresultsdelegate
         ''' AG 29/09/2014 - BA-1440 part1 - After send message to LIS: mark results in message as SENDING and MsgID informed // results not included in message (not mapped) as NOTSENT and MsgID = ""
+        '''                 BA-1440 return the number of results NOTSENT
         ''' </remarks>
         Public Function UploadOrdersResults(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pToUploadDS As ExecutionsDS, _
@@ -1138,6 +1140,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             If myExportStatus = "NOTSENT" Then
                                 msgId = String.Empty
                             End If
+                            Dim countNotSentResults As Integer = 0 'AG 30/09/2014 - BA-1440
 
 
                             'Updates the relationship between xml messageID and his results (order test, rerun)
@@ -1172,6 +1175,10 @@ Namespace Biosystems.Ax00.LISCommunications
                                     myResultsSendingDS.twksResults.AddtwksResultsRow(myRow)
                                 Next
                                 myResultsSendingDS.AcceptChanges()
+
+                                'AG 30/09/2014 - BA-1440 count the results not sent
+                                countNotSentResults = (From a As ResultsDS.twksResultsRow In myResultsSendingDS.twksResults Where a.ExportStatus = "NOTSENT" Select a).Count
+
                                 Dim myResultsDelegate As New ResultsDelegate
                                 resultData = myResultsDelegate.UpdateLISMessageID(Nothing, myResultsSendingDS)
 
@@ -1204,11 +1211,17 @@ Namespace Biosystems.Ax00.LISCommunications
                                     myHISWSResultsDS.thisWSResults.AddthisWSResultsRow(myHisResultRow)
                                 Next
                                 myResultsSendingDS.AcceptChanges()
+
+                                'AG 30/09/2014 - BA-1440 count the results not sent
+                                countNotSentResults = (From a As HisWSResultsDS.thisWSResultsRow In myHISWSResultsDS.thisWSResults Where a.ExportStatus = "NOTSENT" Select a).Count
+
                                 Dim myHisResultsDelegate As New HisWSResultsDelegate
                                 resultData = myHisResultsDelegate.UpdateLISMessageID(Nothing, myHISWSResultsDS)
                                 'DL 25/04/2013. END
                             End If
                             'end SGM 10/04/2013
+
+                            resultData.SetDatos = countNotSentResults 'AG 30/09/2014 - BA-1440
 
                         End If
                     End If

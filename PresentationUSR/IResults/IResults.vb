@@ -3043,6 +3043,7 @@ Public Class IResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 20/01/2011
+    ''' AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub OpenOffSystemResultsScreen()
         Try
@@ -3071,7 +3072,7 @@ Public Class IResults
                             If myResultsDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                                 CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".OpenOffSystemResultsScreen ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
                                 IAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
-                                IAx00MainMDI.InvokeUploadResultsLIS(False)
+                                IAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
 
                                 'Clear the executions
                                 myResultsDelegate.ClearLastExportedResults()
@@ -5738,7 +5739,7 @@ Public Class IResults
     '''                                         * Call new function ActivateDeactivateAllButtons to deactivate/activate buttons when the process starts/finishes
     '''                                         * Refresh the list of Patients also when the Export to LIS has been executed from Tests View to update CheckBox 
     '''                                           ExportToLIS for all Patients which results have been exported 
-    '''                                         
+    ''' AG 30/09/2014 - BA-1440 inform that is a manual exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub ExportResultsToLIS()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -5817,7 +5818,7 @@ Public Class IResults
                         'AG 02/01/2014 - BT #1433 (v211 patch2)
                         CreateLogActivity("Current Results manual upload", Me.Name & ".ExportResultsToLIS ", EventLogEntryType.Information, False)
 
-                        IAx00MainMDI.InvokeUploadResultsLIS(False, AverageResultsDS, myResultsAlarmsDS, Nothing)
+                        IAx00MainMDI.InvokeUploadResultsLIS(False, False, AverageResultsDS, myResultsAlarmsDS, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                     End If
                 End If
             End If

@@ -2880,6 +2880,19 @@
       UPDATE [Ax00].[dbo].tparTestProfiles SET CustomPosition = TestProfilePosition
       END
       GO
+      
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'MAX_RESULTS_FOR_LISEXPORT') = 0) 
+      BEGIN
+      INSERT INTO tfmwMessages (MessageID, MessageType, ResourceID)
+      VALUES ('MAX_RESULTS_FOR_LISEXPORT', 'Information', 'MSG_MAX_RESULTS_FOR_LISEXPORT') 
+      END
+      GO
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'RESULTS_CANNOT_BE_SENT') = 0) 
+      BEGIN
+      INSERT INTO tfmwMessages (MessageID, MessageType, ResourceID)
+      VALUES ('RESULTS_CANNOT_BE_SENT', 'Information', 'MSG_RESULTS_CANNOT_BE_SENT') 
+      END
+      GO
     </UpdateScript>
   </AppVersion >
 </TaskListDS>
