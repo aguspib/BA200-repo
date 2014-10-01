@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -117,41 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="GridView1.GenerateMember" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>False</value>
-  </metadata>
-  <metadata name="bsErrorProvider1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>18, 13</value>
-  </metadata>
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>25</value>
-  </metadata>
-  <metadata name="ToolTipController1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>361, 15</value>
-  </metadata>
-  <metadata name="bsProgTestToolTips.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>203, 15</value>
-  </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="STATImage.InitialImage" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAAIAAA
-        ACABeE03MAAAAoxJREFUOE+FlG9IU1EYxo+CoAuMSX8ohNIPLqoPxSozwmCskMws5miShJUOQ5RwhGNg
-        EGKMEQ3EgkVFUURYghQaNO1DggaOCX0YBF0liWm2ThHGbE6fznuvu/t3pQ8Pu+fc+/x4z/s+ZwzAunpZ
-        zPQDjJWStN6nSnNTGPVBy1b7l57KwPfH56WFh/XSTFdFYPLUJqvW9yTNzVBLmS/y/CIwfU/RpztYDXiw
-        0HsGH23Fbi1P1sb4MWYVEAmf7wIhDzDmAEbbgRHx+6wR886DgREDM2f60hakUFNJ56/BVq5Chq8CL5qB
-        J/VArxk/20r4lInZM31pC9KHEzrrj/tWCeMuBSKqgO804DmKpY4dCNflSW8P5Py/IlLossHNvVUKRFSx
-        2m3ESksh5qoZAkbWqeXJ2pgwFRiDdfp+cUQ+59hDR0GksRCztg0InSvi4p1PVG3M9KUt3u9j5rC3Rlp6
-        dx0I9iH6xgXRL1n0vDJ6A9GnTQg7yyX6NtWbBhJVuP+8dnAatTwlEvVpSEyNGk5HfWTDYk8lD1k2psVA
-        faAQitD1/x1cG3XCSNN6YFEaLvqF2yZEXXsh2Yr6yZMN0rHSr91mvwyiClIBfSdlAG5WyI2n6Yme+QfK
-        kldHBY0dUfqzPHBFqSYVIEYvT861C+jYjlhTPsKWXIk8WaDJ43l27q3l8nGokgxA/NpOxFr1MiRWn4NI
-        DePiFqjBVEEiZMbZ9t3+6C0BSGRnDbDctlkFrNQxLJ5lmK5ifn8FU2OggkhT1QXu312HOfUCzhIZEG/O
-        R7whVwYkxGsZXRPtqZFEGM0zF7b55y9t4d8adJz6INKcKk6iasSx1s8Rif7MXhmYcWh/UsPl6Ro8lBy7
-        IrB/xYxPB0ewQYkAAAAASUVORK5CYII=
-</value>
-  </data>
-  <metadata name="AlarmsDS1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>514, 15</value>
+  <metadata name="ResultsDS1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 17</value>
   </metadata>
 </root>

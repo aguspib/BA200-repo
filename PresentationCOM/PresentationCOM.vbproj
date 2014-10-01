@@ -167,6 +167,18 @@
     <Compile Include="Reports\AutomaticPatientsReport.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Reports\ControlsCompactReport.Designer.vb">
+      <DependentUpon>ControlsCompactReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\ControlsCompactReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Reports\BlanksAndCalibratorsReport.Designer.vb">
+      <DependentUpon>BlanksAndCalibratorsReport.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Reports\BlanksAndCalibratorsReport.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Reports\SummaryResultsReport.Designer.vb">
       <DependentUpon>SummaryResultsReport.vb</DependentUpon>
     </Compile>
@@ -492,6 +504,9 @@
     <Content Include="Images\LEG_BINPROCESS.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\PrintControls.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\OrderTests.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -509,6 +524,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\AutomaticPatientsReport.resx">
       <DependentUpon>AutomaticPatientsReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\ControlsCompactReport.resx">
+      <DependentUpon>ControlsCompactReport.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Reports\BlanksAndCalibratorsReport.resx">
+      <DependentUpon>BlanksAndCalibratorsReport.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Reports\SummaryResultsReport.resx">
       <DependentUpon>SummaryResultsReport.vb</DependentUpon>

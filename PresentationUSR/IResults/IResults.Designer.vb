@@ -892,7 +892,6 @@ Partial Class IResults
         Me.PrintTestCtrlButton.Name = "PrintTestCtrlButton"
         Me.PrintTestCtrlButton.Size = New System.Drawing.Size(32, 32)
         Me.PrintTestCtrlButton.TabIndex = 8
-        Me.PrintTestCtrlButton.Text = "CT"
         Me.PrintTestCtrlButton.UseVisualStyleBackColor = True
         '
         'PrintTestButton
