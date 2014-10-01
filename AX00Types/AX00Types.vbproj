@@ -425,6 +425,14 @@
     <Compile Include="QCSummaryByTestSampleDS.vb">
       <DependentUpon>QCSummaryByTestSampleDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="ReportsDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="ReportsDS.vb">
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
+    </Compile>
     <Compile Include="ReportsTestsSortingDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1819,6 +1827,17 @@
     </None>
     <None Include="QCResultsForWestgardDS.xss">
       <DependentUpon>QCResultsForWestgardDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportsDS.xsc">
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
+    </None>
+    <None Include="ReportsDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ReportsDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="ReportsDS.xss">
+      <DependentUpon>ReportsDS.xsd</DependentUpon>
     </None>
     <None Include="ReportsTestsSortingDS.xsc">
       <DependentUpon>ReportsTestsSortingDS.xsd</DependentUpon>

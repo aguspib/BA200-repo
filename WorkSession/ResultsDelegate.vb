@@ -913,6 +913,63 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
+        ''' Get the result filtering by sample class and fill reference range interval
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerId"></param>
+        ''' <param name="pWorkSessionId"></param>
+        ''' <param name="pClassList"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetResultsBySampleClass(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerId As String, ByVal pWorkSessionId As String, ByVal ParamArray pClassList() As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim filterClause As String = String.Empty
+                        Dim InFilter As String = String.Empty
+
+                        For Each className As String In pClassList
+                            InFilter += String.Format("'{0}', ", className)
+                        Next
+
+                        If (InFilter <> String.Empty) Then
+                            InFilter = InFilter.Substring(0, InFilter.Length - 2)
+                            filterClause = String.Format("SampleClass IN ({0})", InFilter)
+                        End If
+
+                        Dim mytwksResultDAO As New twksResultsDAO()
+                        resultData = mytwksResultDAO.GetCompleteResults(dbConnection, pAnalyzerId, pWorkSessionId, filterClause)
+
+                        Dim resultsDS As New ResultsDS
+                        If (Not resultData.HasError) Then
+                            resultsDS = CType(resultData.SetDatos, ResultsDS)
+                        End If
+
+                        FillReferenceRangeInterval(dbConnection, resultsDS)
+
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByClass", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
         ''' Get all the Result Alarms (Blank or Calibrator Order Test)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
@@ -1406,7 +1463,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Add/update a Result for an OrderTest/RerunNumber/MultipointNumber
         ''' </summary>
@@ -1681,7 +1737,6 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
-
         ''' <summary>
         ''' Updates fields ManualResultFlag, ManualResult and ManualResultText for the specified OrderTestID/MultiItemNumber/RerunNumber
         ''' </summary>
@@ -1907,7 +1962,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Fill the column SpecimenIDList in the results DS using the required elements information
         ''' </summary>
@@ -1990,8 +2044,49 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Fill the reference range interval values of the results
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pResultsDS"></param>
+        ''' <remarks></remarks>
+        Public Sub FillReferenceRangeInterval(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pResultsDS As ResultsDS)
 
+            Dim resultData As GlobalDataTO = Nothing
 
+            'Read Reference Range Limits
+            Dim MinimunValue As Nullable(Of Single) = Nothing
+            Dim MaximunValue As Nullable(Of Single) = Nothing
+
+            Dim myOrderTestsDelegate As New OrderTestsDelegate
+            For Each resultRow As ResultsDS.vwksResultsRow In pResultsDS.vwksResults.Rows
+                If (Not resultRow.IsActiveRangeTypeNull) Then
+                    Dim mySampleType As String = String.Empty
+                    If (resultRow.TestType <> "CALC") Then mySampleType = resultRow.SampleType
+
+                    'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
+                    resultData = myOrderTestsDelegate.GetReferenceRangeInterval(pDBConnection, resultRow.OrderTestID, resultRow.TestType, _
+                                                                                resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
+
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+                        If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+                            MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
+                            MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
+                        End If
+                    End If
+
+                    If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
+                        If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
+                            resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                            resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                        End If
+                    End If
+                End If
+            Next resultRow
+
+        End Sub
 #End Region
 
 #Region "Private Methods"
