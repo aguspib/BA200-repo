@@ -5272,6 +5272,7 @@ Public Class IWSSampleRequest
     '''                              in BarcodePositionsWithNoRequestsDelegate has to be done only when LISWithFilesMode is TRUE
     '''              SA 21/03/2014 - BT #1545 ==> Changes to divide AddWorkSession process in several DB Transactions. When value of global flag 
     '''                                           NEWAddWorkSession is TRUE, call new version of function AddWorkSession 
+    '''              AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub PrepareOrderTestsForWS()
         Dim myGlobalDataTO As GlobalDataTO
@@ -5342,7 +5343,7 @@ Public Class IWSSampleRequest
                     If myWSDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                         CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".PrepareOrderTestsForWS ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
                         IAx00MainMDI.AddResultsIntoQueueToUpload(myWSDelegate.LastExportedResults)
-                        IAx00MainMDI.InvokeUploadResultsLIS(False)
+                        IAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
                     End If 'AG 21/02/2014 - #1505
                 End If
                 'TR 28/06/2013 -END.

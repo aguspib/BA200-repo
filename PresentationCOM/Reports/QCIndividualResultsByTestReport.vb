@@ -1,3 +1,6 @@
+Option Explicit On
+Option Strict On
+
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -7,6 +10,8 @@ Imports DevExpress.XtraCharts
 Imports System.Drawing
 
 Public Class QCIndividualResultsByTestReport
+
+#Region "Declarations"
     Private mTestSampleData As HistoryTestSamplesDS.tqcHistoryTestSamplesRow
     Private mDateRangeText As String
     Private mIncludeGraph As Boolean
@@ -14,38 +19,85 @@ Public Class QCIndividualResultsByTestReport
     Private mLabelMEAN As String = ""
     Private mLabelSD As String = ""
     Private mResultsDS As QCResultsDS
+#End Region
 
+#Region "Public Methods"
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On
+    '''                                          ** Added changes to remove all Excluded Results from the entry pResultsDS
+    '''                                          ** Added changes to verify for each Selected Control if there are not Excluded Results for it
+    '''                                          ** Changed from Sub to Function that returns a Boolean value: TRUE if the Report can be generated, 
+    '''                                             and FALSE if the Report cannot be generated (if none of the linked Controls are Selected, or if 
+    '''                                             all results for the selected Controls are marked as Excluded)
+    ''' </remarks>
+    Public Function SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, ByVal pControlsDS As OpenQCResultsDS, _
+                                                    ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, ByVal pDateRangeText As String, _
+                                                    ByVal pGraphType As REPORT_QC_GRAPH_TYPE) As Boolean
+        Dim generateReport As Boolean = False
 
-    Public Sub SetControlsAndResultsDatasource(ByVal pTestSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow, _
-                                               ByVal pControlsDS As OpenQCResultsDS, _
-                                               ByVal pResultsDS As QCResultsDS, ByVal pLocalDecimalAllow As Integer, _
-                                               ByVal pDateRangeText As String, ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
-        mTestSampleData = pTestSampleRow
-        mDateRangeText = pDateRangeText
-        mControlsDS = pControlsDS
-        mResultsDS = pResultsDS
+        'Get all selected Controls
+        Dim lstSelectedControls As List(Of OpenQCResultsDS.tOpenResultsRow) = (From c As OpenQCResultsDS.tOpenResultsRow In pControlsDS.tOpenResults _
+                                                                              Where c.Selected = True _
+                                                                             Select c).ToList()
 
-        'Adding the SubReports
-        For Each elem As OpenQCResultsDS.tOpenResultsRow In From c In pControlsDS.tOpenResults.Rows Where c.Selected
-            Dim mQCRep As New QCIndividualResultsByTestControlReport
-            mQCRep.ControlLotID.Value = elem.QCControlLotID
-            mQCRep.SetControlsAndResultsDatasource(pControlsDS, pResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
+        If (lstSelectedControls.Count > 0) Then
+            'BA-1608 - Get all Results marked as Excluded and remove them from the DataSet
+            Dim myLocalResultsDS As QCResultsDS = DirectCast(pResultsDS.Copy(), QCResultsDS)
+            Dim myRow() As QCResultsDS.tqcResultsRow = DirectCast(myLocalResultsDS.tqcResults.Select("Excluded = True"), QCResultsDS.tqcResultsRow())
+            For i As Integer = 0 To UBound(myRow)
+                myLocalResultsDS.tqcResults.Rows.Remove(myRow(i))
+            Next
+            myLocalResultsDS.AcceptChanges()
 
-            Dim mSubReport As New XRSubreport()
-            mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
-            mSubReport.ReportSource = mQCRep
-            Me.Detail1.Controls.Add(mSubReport)
-            mSubReport.TopF = Me.Detail1.HeightF
-            mSubReport.LeftF = 0
-            Me.Detail1.HeightF += mSubReport.HeightF
-        Next
+            If (myLocalResultsDS.tqcResults.Rows.Count > 0) Then
+                'Add the SubReports
+                For Each elem As OpenQCResultsDS.tOpenResultsRow In lstSelectedControls
+                    'BA-1608 - Verify if there are not Excluded Results for the Control - If all Results have been excluded, the Control is just ignored
+                    If (myLocalResultsDS.tqcResults.ToList.Where(Function(a) a.QCControlLotID = elem.QCControlLotID).Count > 0) Then
+                        'The Report will be generated only when there are Results to print for at least one of the selected Controls
+                        generateReport = True
 
-        'Show/Hide the graph
-        mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.YOUDEN_GRAPH)
-    End Sub
+                        Dim mQCRep As New QCIndividualResultsByTestControlReport
+                        mQCRep.ControlLotID.Value = elem.QCControlLotID
+                        mQCRep.SetControlsAndResultsDatasource(pControlsDS, myLocalResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
+                        'mQCRep.SetControlsAndResultsDatasource(pControlsDS, pResultsDS, pLocalDecimalAllow, pGraphType, pTestSampleRow.RejectionCriteria)
 
+                        Dim mSubReport As New XRSubreport()
+                        mSubReport.Name = "SubReport" & elem.QCControlLotID.ToString
+                        mSubReport.ReportSource = mQCRep
+                        Me.Detail1.Controls.Add(mSubReport)
+                        mSubReport.TopF = Me.Detail1.HeightF
+                        mSubReport.LeftF = 0
+                        Me.Detail1.HeightF += mSubReport.HeightF
+                    End If
+                Next
 
+                'BA-1608 - Inform the global variables used for LJ and Youden Reports
+                If (generateReport) Then
+                    mTestSampleData = pTestSampleRow
+                    mDateRangeText = pDateRangeText
+                    mControlsDS = pControlsDS
+                    mResultsDS = myLocalResultsDS
+                    mIncludeGraph = (pGraphType = REPORT_QC_GRAPH_TYPE.YOUDEN_GRAPH)
+                End If
+            End If
+        End If
+        lstSelectedControls = Nothing
+
+        Return generateReport
+    End Function
+#End Region
+
+#Region "Private Methods"
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> If ReportName is informed (field TestLongName is not Null nor empty), use it as Test Name in the report
+    ''' </remarks>
     Private Sub QCIndividualResultsByTestReport_BeforePrint(ByVal sender As Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles Me.BeforePrint
+
         If Me.DesignMode Then Exit Sub
 
         'Multilanguage support
@@ -61,8 +113,12 @@ Public Class QCIndividualResultsByTestReport
         XrLabelDateRange.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DateRange", CurrentLanguage)
         XrLabelControls.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_Controls_List", CurrentLanguage)
 
-        'The TestSample data
-        XrTestName.Text = mTestSampleData.TestName
+        'BA-1608 - If ReportName is informed (field TestLongName is not Null nor empty), use it as Test Name in the report
+        Dim myTestName As String = mTestSampleData.TestName
+        If (Not mTestSampleData.IsTestLongNameNull AndAlso mTestSampleData.TestLongName <> String.Empty) Then myTestName = mTestSampleData.TestLongName
+        XrTestName.Text = myTestName
+
+        'Rest of the TestSample data
         XrSample.Text = mTestSampleData.SampleType
         XrMode.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_QC_CALC_MODES_" & mTestSampleData.CalculationMode, CurrentLanguage)
         XrDateRange.Text = mDateRangeText
@@ -74,12 +130,14 @@ Public Class QCIndividualResultsByTestReport
             'Header: Control Level1 Name (Lot) + Control Level2 Name (Lot)
             XrGraphHeaderLabel.Text = ""
             For Each ctrl In From elem In mControlsDS.tOpenResults Where elem.Selected
-                If Not String.IsNullOrEmpty(XrGraphHeaderLabel.Text) Then XrGraphHeaderLabel.Text &= " + "
+                If (Not String.IsNullOrEmpty(XrGraphHeaderLabel.Text)) Then XrGraphHeaderLabel.Text &= " + "
                 XrGraphHeaderLabel.Text &= ctrl.ControlName & " (" & ctrl.LotNumber & ")"
             Next
             PrepareYoudenGraph()
         End If
+
     End Sub
+#End Region
 
 #Region "Youden Graph"
     ''' <summary>
@@ -397,6 +455,12 @@ Public Class QCIndividualResultsByTestReport
         End Try
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> ** Added some changes required after activation of Option Strict On (ConvertToSingle)
+    '''                                          ** Before drawn the graph, verify the selected Controls have at least a not exclude result
+    ''' </remarks>
     Private Sub PrepareYoudenGraph()
         'Multilanguage support
         Dim currentLanguageGlobal As New GlobalBase
@@ -415,10 +479,37 @@ Public Class QCIndividualResultsByTestReport
 
         Try
             'Get the list of selected Controls
-            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a In mControlsDS.tOpenResults _
-                                                                                        Where Not a.IsSelectedNull AndAlso a.Selected _
-                                                                                        Select a).ToList()
+            'Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a In mControlsDS.tOpenResults _
+            '                                                                            Where Not a.IsSelectedNull AndAlso a.Selected _
+            '                                                                            Select a).ToList()
+            'Dim numOfSelectedCtrls As Integer = mySelectecControlLotList.Count
+
+            'Get the list of selected Controls
+            Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a As OpenQCResultsDS.tOpenResultsRow In mControlsDS.tOpenResults _
+                                                                                   Where Not a.IsSelectedNull AndAlso a.Selected = True _
+                                                                                      Select a).ToList()
             Dim numOfSelectedCtrls As Integer = mySelectecControlLotList.Count
+
+            'BA-1608 - Verify for each selected Control that it has at least a not excluded result to plot and unselect Controls that not fulfill this conditions
+            '          If the number of selected Controls changes, get again the selected Controls (the ones that remain selected)
+            If (numOfSelectedCtrls > 0) Then
+                Dim validResults As Boolean = False
+                For Each selControl As OpenQCResultsDS.tOpenResultsRow In mySelectecControlLotList
+                    'Verify if the Control has at least a not excluded result to plot; otherwise, set Selected = False for it
+                    validResults = (mResultsDS.tqcResults.ToList.Where(Function(a) a.QCControlLotID = selControl.QCControlLotID AndAlso a.Excluded = False).Count > 0)
+                    If (Not validResults) Then selControl.Selected = False
+                Next
+
+
+                If (mControlsDS.tOpenResults.ToList.Where(Function(b) Not b.IsSelectedNull AndAlso b.Selected = True).Count <> numOfSelectedCtrls) Then
+                    'The number of selected Controls has changed, get the group of Controls that remains selected (if any) and count them
+                    mySelectecControlLotList = (From a As OpenQCResultsDS.tOpenResultsRow In mControlsDS.tOpenResults _
+                                           Where Not a.IsSelectedNull AndAlso a.Selected = True _
+                                              Select a).ToList()
+                    numOfSelectedCtrls = mySelectecControlLotList.Count
+                End If
+            End If
+
             If (numOfSelectedCtrls > 0) Then
                 If (numOfSelectedCtrls > 2) Then
                     'If there are more than two Control/Lots selected, the last one is unselected
@@ -492,7 +583,7 @@ Public Class QCIndividualResultsByTestReport
 
                         'Create cross lines with the Control Mean
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
-                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
+                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, Convert.ToSingle(mySelectecControlLotList.First().Mean), Color.Gray)
                     End If
 
                 ElseIf (numOfSelectedCtrls = 2) Then
@@ -516,10 +607,10 @@ Public Class QCIndividualResultsByTestReport
                                                Not a.Excluded _
                                          Select a.VisibleResultValue).ToList()
 
-                        Dim MinValue As Single = Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MinValue As Single = Convert.ToSingle(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3))
                         If (MinValue > XResultValues.Min) Then MinValue = XResultValues.Min
 
-                        Dim MaxValue As Single = Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MaxValue As Single = Convert.ToSingle(Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3))
                         If (MaxValue < XResultValues.Max) Then MaxValue = XResultValues.Max
 
                         myDiagram.AxisX.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
@@ -537,10 +628,10 @@ Public Class QCIndividualResultsByTestReport
                                                                       Not a.Excluded _
                                                                 Select a.VisibleResultValue).ToList()
 
-                        MinValue = Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3)
+                        MinValue = Convert.ToSingle(Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MinValue > YResultValues.Min) Then MinValue = YResultValues.Min
 
-                        MaxValue = Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3)
+                        MaxValue = Convert.ToSingle(Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MaxValue < YResultValues.Max) Then MaxValue = YResultValues.Max
 
                         myDiagram.AxisY.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
@@ -553,7 +644,7 @@ Public Class QCIndividualResultsByTestReport
 
                         'Create cross lines with the Mean of selected Controls
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Gray)
-                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.Last().Mean, Color.Gray)
+                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, Convert.ToSingle(mySelectecControlLotList.Last().Mean), Color.Gray)
 
                         'Create the graph squares
                         CreateSquares(mySelectecControlLotList.First().Mean, mySelectecControlLotList.First().SD, _
@@ -592,6 +683,11 @@ Public Class QCIndividualResultsByTestReport
         End Try
     End Sub
 
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: 
+    ''' Modified by: SA 23/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On (ConvertToInt32)
+    ''' </remarks>
     Private Sub XrYoudenGraph_CustomDrawSeriesPoint(ByVal sender As System.Object, ByVal e As DevExpress.XtraCharts.CustomDrawSeriesPointEventArgs) Handles XrYoudenGraph.CustomDrawSeriesPoint
         Try
             Dim myArgumentValue As String = e.SeriesPoint.Argument.ToString
@@ -602,7 +698,7 @@ Public Class QCIndividualResultsByTestReport
                 e.SeriesDrawOptions.Color = Color.Black
                 With CType(e.SeriesDrawOptions, PointDrawOptions).Marker
                     'Validate if the n on the tag property is the last to change the icon
-                    If (e.Series.Points(e.Series.Points.Count - 1).Tag = DirectCast(myPoint.Tag, Integer)) Then
+                    If (Convert.ToInt32(e.Series.Points(e.Series.Points.Count - 1).Tag) = DirectCast(myPoint.Tag, Integer)) Then
                         '.FillStyle.FillMode = FillMode.Solid
                         .Kind = MarkerKind.Star
                         .Size = 14

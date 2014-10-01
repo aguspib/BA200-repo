@@ -1571,18 +1571,16 @@ Public Class XRManager
     ''' The Controls data and processed results are the same used in GUI, the report filters and processes to show it
     ''' 
     ''' Created by:  JB 13/07/2012
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> Generate the Report only when function SetControlsAndResultsDatasource returns True (which means 
+    '''                                          there are Control Results to print)
     ''' </remarks>
     Public Shared Sub ShowQCIndividualResultsByTestReport(ByVal pQCTestSampleID As Integer, ByVal pDateFrom As Date, ByVal pDateTo As Date, _
                                                           ByVal pOpenQCResults As OpenQCResultsDS, ByVal pFilterQCResults As QCResultsDS, _
-                                                          ByVal pLocalDecimalAllow As Integer, _
-                                                          ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
+                                                          ByVal pLocalDecimalAllow As Integer, ByVal pGraphType As REPORT_QC_GRAPH_TYPE)
         Try
-            Dim report As New QCIndividualResultsByTestReport()
-
-            Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
-
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myHistoryTestSamplesDelegate As New HistoryTestSamplesDelegate
+            Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
 
             'Get the information from the History Tests/Sample Types table
             myGlobalDataTO = myHistoryTestSamplesDelegate.Read(Nothing, pQCTestSampleID)
@@ -1590,23 +1588,23 @@ Public Class XRManager
                 Dim myHistoryTestSampleDS As HistoryTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
                 If (myHistoryTestSampleDS.tqcHistoryTestSamples.Count > 0) Then
                     testSampleRow = myHistoryTestSampleDS.tqcHistoryTestSamples(0)
+
+                    'BA-1608 - Generate the Report only when function SetControlsAndResultsDatasource returns True
+                    Dim report As New QCIndividualResultsByTestReport()
+                    If (report.SetControlsAndResultsDatasource(testSampleRow, pOpenQCResults, pFilterQCResults, pLocalDecimalAllow, _
+                                                               pDateFrom.ToString(DatePattern) & " - " & pDateTo.ToString(DatePattern), pGraphType)) Then
+                        ShowPortrait(report)
+                    End If
                 End If
             End If
-
-            report.SetControlsAndResultsDatasource(testSampleRow, pOpenQCResults, pFilterQCResults, pLocalDecimalAllow, pDateFrom.ToString(DatePattern) & " - " & pDateTo.ToString(DatePattern), pGraphType)
-
-            ShowPortrait(report)
-
-
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
             myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowQCIndividualResultsByTestReport", EventLogEntryType.Error, False)
-
         End Try
     End Sub
 
     ''' <summary>
-    ''' Shows the Quality Control-Accumulated Results by Test/Sample Type Report
+    ''' Shows the Quality Control-Accumulated Results by Test/Sample Type Reportk
     ''' </summary>
     ''' <param name="pQCTestSampleID">Id of the TestSample to get the Header data</param>
     ''' <param name="pDateFrom">The initial date to the results calculations</param>
@@ -1619,18 +1617,16 @@ Public Class XRManager
     ''' The Controls data and processed results are the same used in GUI, the report filters and processes to show it
     ''' 
     ''' Created by:  JB 17/07/2012
+    ''' Modified by: SA 25/09/2014 - BA-1608 ==> Generate the Report only when function SetControlsAndResultsDatasource returns True (which means 
+    '''                                          there are Control Results to print)
     ''' </remarks>
     Public Shared Sub ShowQCAccumulatedResultsByTestReport(ByVal pQCTestSampleID As Integer, ByVal pDateFrom As Date, ByVal pDateTo As Date, _
-                                                           ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, _
-                                                           ByVal pQCCummulatedResultsDS As CumulatedResultsDS, _
+                                                           ByVal pQCCumulatedSummaryDS As QCCumulatedSummaryDS, ByVal pQCCummulatedResultsDS As CumulatedResultsDS, _
                                                            ByVal pLocalDecimalAllow As Integer)
         Try
-            Dim report As New QCCumulatedResultsByTestReport()
-
-            Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
-
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myHistoryTestSamplesDelegate As New HistoryTestSamplesDelegate
+            Dim testSampleRow As HistoryTestSamplesDS.tqcHistoryTestSamplesRow = Nothing
 
             'Get the information from the History Tests/Sample Types table
             myGlobalDataTO = myHistoryTestSamplesDelegate.Read(Nothing, pQCTestSampleID)
@@ -1638,13 +1634,14 @@ Public Class XRManager
                 Dim myHistoryTestSampleDS As HistoryTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
                 If (myHistoryTestSampleDS.tqcHistoryTestSamples.Count > 0) Then
                     testSampleRow = myHistoryTestSampleDS.tqcHistoryTestSamples(0)
+
+                    'BA-1608 - Generate the Report only when function SetControlsAndResultsDatasource returns True
+                    Dim report As New QCCumulatedResultsByTestReport()
+                    If (report.SetControlsAndResultsDatasource(testSampleRow, pQCCumulatedSummaryDS, pQCCummulatedResultsDS, pLocalDecimalAllow, pDateFrom.ToString(DatePattern) & " - " & pDateTo.ToString(DatePattern))) Then
+                        ShowPortrait(report)
+                    End If
                 End If
             End If
-
-            report.SetControlsAndResultsDatasource(testSampleRow, pQCCumulatedSummaryDS, pQCCummulatedResultsDS, pLocalDecimalAllow, pDateFrom.ToString(DatePattern) & " - " & pDateTo.ToString(DatePattern))
-
-            ShowPortrait(report)
-
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
             myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowQCAccumulatedResultsByTestReport", EventLogEntryType.Error, False)

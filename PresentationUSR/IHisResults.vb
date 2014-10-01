@@ -531,6 +531,8 @@ Public Class IHisResults
     '''                                          Added new hidden grid column: HistPatientID.
     '''                                          Call new function to get the saved width of all visible grid columns and assign the value.
     '''             SA 25/08/2014 - BA-1916  ==> Added new hidden grid column BackColorGroup, used to set the Row BackColor in grid event RowStyle
+    '''             SA 23/09/2014 - BA-1861  ==> Changed multilanguage resource used for PatientID column: use LBL_PatientSample, the same used in
+    '''                                          WS Samples Request Screen
     ''' </remarks>
     Private Sub InitializeResultHistoryGrid()
         Try
@@ -627,10 +629,10 @@ Public Class IHisResults
                 .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
-            'PATIENT ID/SAMPLE ID Column
+            'PATIENT/SAMPLE Column
             column = historyGridView.Columns.Add()
             With column
-                .Caption = GetText("LBL_PatientID")
+                .Caption = GetText("LBL_PatientSample")
                 .FieldName = "PatientID"
                 .Name = "PatientID"
                 .Visible = True
@@ -1449,6 +1451,7 @@ Public Class IHisResults
     '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Allow re-sent patient results from history
     '''              SA 19/09/2014 - BA-1927 ==> * Use multilanguage to shown the message of maximum number of results to be exported to LIS exceeded
     '''                                          * Before start the process, verify if LIS Connection is enabled. If it is not available, stop the process
+    '''              AG 30/09/2014 - BA-1440 inform that is a manual exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1511,7 +1514,7 @@ Public Class IHisResults
                 'Inform the new results to be updated into MDI property
                 If (myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                     IAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
-                    IAx00MainMDI.InvokeUploadResultsLIS(True, Nothing, Nothing, myHisWSResultsDS)
+                    IAx00MainMDI.InvokeUploadResultsLIS(True, False, Nothing, Nothing, myHisWSResultsDS) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                 End If 'AG 21/02/2014 - #1505
 
                 CreateLogActivity("Historical Results manual upload (end): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505

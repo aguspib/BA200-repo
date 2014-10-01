@@ -2748,6 +2748,34 @@
                             ControlNum, TestLongName, ShortName
       FROM         vwksWSISEOffSystemResults;
       GO
+            
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vhisWSBlankCalibResults]'))
+      DROP VIEW [dbo].[vhisWSBlankCalibResults]
+      GO
+      USE [Ax00]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisWSBlankCalibResults]
+      AS
+      SELECT DISTINCT 
+                            hres.HistOrderTestID, hres.AnalyzerID, hres.ResultDateTime, hres.ABSValue, hres.ABSWorkReagent, hres.KineticBlankLimit, hres.ABSInitial, hres.ABSMainFilter, 
+                            hres.BlankAbsorbanceLimit, hres.AlarmList, hres.CalibratorFactor, hres.FactorLowerLimit, hres.FactorUpperLimit, hot.SampleClass, hot.SampleType, hts.TestName, 
+                            tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, htc.CalibratorNum, 
+                            hres.WorkSessionID, hts.CalibPointUsed, hts.DecimalsAllowed, hres.RemarkAlert, htc.TestVersionNumber
+      FROM         dbo.thisWSResults AS hres INNER JOIN
+                            dbo.thisWSOrderTests AS hot ON hres.HistOrderTestID = hot.HistOrderTestID AND hres.AnalyzerID = hot.AnalyzerID AND 
+                            hres.WorkSessionID = hot.WorkSessionID INNER JOIN
+                            dbo.thisTestSamples AS hts ON hot.HistTestID = hts.HistTestID AND hot.TestVersionNumber = hts.TestVersionNumber AND 
+                            hot.SampleType = hts.SampleType LEFT OUTER JOIN
+                            dbo.thisCalibrators AS hca ON hot.HistCalibratorID = hca.HistCalibratorID LEFT OUTER JOIN
+                            dbo.thisTestCalibratorsValues AS htc ON hot.HistCalibratorID = htc.HistCalibratorID AND hot.SampleType = htc.SampleType AND 
+                            hot.TestVersionNumber = htc.TestVersionNumber AND hot.HistTestID = htc.HistTestID AND hres.MultiPointNumber = htc.CalibratorNum LEFT OUTER JOIN
+                            dbo.tcfgMasterData AS tcfg ON tcfg.SubTableID = 'TEST_UNITS' AND tcfg.ItemID = hts.MeasureUnit
+      WHERE     (hot.SampleClass &lt;&gt; 'PATIENT')
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.14'
@@ -2772,11 +2800,11 @@
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'PatientID', 95, 95, 'BIOSYSTEMS', GETDATE())
 
-      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'FamilyName') = 0)
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'LastName') = 0)
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'LastName', 95, 95, 'BIOSYSTEMS', GETDATE())
 
-      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'GivenName') = 0)
+      IF ((SELECT COUNT(*) FROM dbo.tcfgGridColsConfiguration WHERE ScreenID = 'HIS001' AND GridName = 'historyGridView' AND ColumnName = 'FirstName') = 0)
       INSERT INTO dbo.tcfgGridColsConfiguration (ScreenID, GridName, ColumnName, DefaultWidth, SavedWidth, TS_User, TS_DateTime)
       VALUES ('HIS001', 'historyGridView', 'FirstName', 95, 95, 'BIOSYSTEMS', GETDATE())
 
@@ -2850,6 +2878,19 @@
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparTestProfiles' AND sc.name = 'CustomPosition') = 1
       BEGIN
       UPDATE [Ax00].[dbo].tparTestProfiles SET CustomPosition = TestProfilePosition
+      END
+      GO
+      
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'MAX_RESULTS_FOR_LISEXPORT') = 0) 
+      BEGIN
+      INSERT INTO tfmwMessages (MessageID, MessageType, ResourceID)
+      VALUES ('MAX_RESULTS_FOR_LISEXPORT', 'Information', 'MSG_MAX_RESULTS_FOR_LISEXPORT') 
+      END
+      GO
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'RESULTS_CANNOT_BE_SENT') = 0) 
+      BEGIN
+      INSERT INTO tfmwMessages (MessageID, MessageType, ResourceID)
+      VALUES ('RESULTS_CANNOT_BE_SENT', 'Information', 'MSG_RESULTS_CANNOT_BE_SENT') 
       END
       GO
     </UpdateScript>

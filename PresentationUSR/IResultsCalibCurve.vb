@@ -89,7 +89,8 @@ Public Class IResultsCalibCurve
     Private SampleTypeSelectedTextField As String = String.Empty
     Private AcceptedRerunNumberField As Integer = 0
     Private HistoricalModeField As Boolean = False 'AG 16/10/2012
-    Private SelectedOrderTestIDField As Integer ' XB 30/07/2014  - BT #1863
+    Private SelectedOrderTestIDField As Integer ' XB 30/07/2014 - BA-1863
+    Private SelectedTestVersionNumberField As Integer ' XB 25/09/2014 - BA-1863
 #End Region
 
 #Region "Properties"
@@ -190,12 +191,21 @@ Public Class IResultsCalibCurve
         End Set
     End Property
 
-    Public Property SelectedOrderTestID As Integer   ' XB 30/07/2014  - BT #1863
+    Public Property SelectedOrderTestID As Integer   ' XB 30/07/2014 - BA-1863
         Get
             Return SelectedOrderTestIDField
         End Get
         Set(ByVal value As Integer)
             SelectedOrderTestIDField = value
+        End Set
+    End Property
+
+    Public Property SelectedTestVersionNumber As Integer   ' XB 25/09/2014 - BA-1863
+        Get
+            Return SelectedTestVersionNumberField
+        End Get
+        Set(ByVal value As Integer)
+            SelectedTestVersionNumberField = value
         End Set
     End Property
 #End Region
@@ -539,7 +549,7 @@ Public Class IResultsCalibCurve
     ''' </summary>
     ''' <remarks>
     ''' Created by:  RH 20/10/2010
-    ''' Modified by: XB 30/07/2014 - Code moved to a private function - BT #1863
+    ''' Modified by: XB 30/07/2014 - Code moved to a private function - BA-1863
     ''' </remarks>
     Private Sub bsPrintButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsPrintButton.Click
         Try
@@ -611,7 +621,7 @@ Public Class IResultsCalibCurve
             'AG 30/04/2014 - #1608 if informed use ReportName instead of TestName
             'XRManager.ShowResultsCalibCurveReport(ActiveAnalyzer, ActiveWorkSession, SelectedTestName, AcceptedRerunNumber)
 
-            ' XB 30/07/2014 - BT #1863
+            ' XB 30/07/2014 - BA-1863
             'Dim myList As List(Of ResultsDS.vwksResultsRow) = (From row In AverageResultsDSField.vwksResults _
             '                               Where row.TestName = SelectedTestName AndAlso row.SampleType = SampleTypeSelectedTextField _
             '                               AndAlso Not row.IsTestLongNameNull Select row).ToList
@@ -624,7 +634,7 @@ Public Class IResultsCalibCurve
             'myList = Nothing
 
             Me.PrintReport()
-            ' XB 30/07/2014 - BT #1863
+            ' XB 30/07/2014 - BA-1863
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsPrintButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1273,7 +1283,7 @@ Public Class IResultsCalibCurve
     ''' <remarks>
     ''' Created by:  TR 30/04/2010
     ''' Modified by: DL 21/06/2010 - Load the Icon in Image Property instead of in BackgroundImage
-    '''              XB 30/07/2014 - remove code that disable and hide the Print Button when the screen has been open from Historic Module - BT #1863
+    '''              XB 30/07/2014 - remove code that disable and hide the Print Button when the screen has been open from Historic Module - BA-1863
     ''' </remarks>
     Private Sub PrepareButtons()
         Try
@@ -1323,12 +1333,12 @@ Public Class IResultsCalibCurve
                 AddIconToImageList(SampleIconList, auxIconName)
             End If
 
-            ' XB 30/07/2014 - BT #1863
+            ' XB 30/07/2014 - BA-1863
             'If HistoricalModeField Then 'AG 17/10/2012
             '    bsPrintButton.Enabled = False
             '    bsPrintButton.Visible = False
             'End If
-            ' XB 30/07/2014 - BT #1863
+            ' XB 30/07/2014 - BA-1863
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1424,7 +1434,7 @@ Public Class IResultsCalibCurve
     ''' Print a report
     ''' </summary>
     ''' <remarks>
-    ''' Created by XB 30/07/2014 - BT #1863
+    ''' Created by XB 30/07/2014 - BA-1863
     ''' </remarks>
     Private Sub PrintReport()
         Try
@@ -1599,17 +1609,19 @@ Public Class IResultsCalibCurve
     ''' Created by: AG 03/08/2010 (based on UpdateCalibratorsDataGrid)
     ''' Modified by RH 08/10/2010
     '''             AG 18/07/2012 - filter also by sample type
-    '''             XB 30/07/2014 - BT #1863
+    '''             XB 30/07/2014 - BA-1863
+    '''             XB 23/09/2014 - Add TestVersion field to can filter by it when select the calibrator chart result from Historics - BA-1863
     ''' </remarks>
     Private Sub UpdateCalibratorsMuliItemDataGrid(ByVal pTestName As String, ByVal pSampleType As String)
         Try
             Dim dgv As BSDataGridView = CalibratorsDataGridView
             Dim Remark As String = String.Empty
 
-            'XB 30/07/2014 - BT #1863
+            'XB 30/07/2014 - BA-1863
             Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
             Dim myOrderTestID As Integer
-            ' XB 30/07/2014 - BT #1863
+            Dim myTestVersion As Integer
+            ' XB 30/07/2014 - BA-1863
 
             Me.Enabled = False
             Cursor = Cursors.WaitCursor
@@ -1639,14 +1651,18 @@ Public Class IResultsCalibCurve
 
                 myOrderTestID = TestList(0).OrderTestID
 
-                ' XB 30/07/2014 - BT #1863
+                ' From Current Results, TestVersion is always = 0
+                myTestVersion = 0
+                ' XB 30/07/2014 - BA-1863
             Else
                 myOrderTestID = SelectedOrderTestIDField
-                ' XB 30/07/2014 - BT #1863
+
+                myTestVersion = SelectedTestVersionNumberField
+                ' XB 30/07/2014 - BA-1863
 
             End If
 
-            ' XB 30/07/2014 - BT #1863
+            ' XB 30/07/2014 - BA-1863
             'Dim TheoreticalConcList As List(Of Single) = _
             '                (From row In AverageResults.vwksResults _
             '                 Where row.OrderTestID = TestList(0).OrderTestID _
@@ -1654,8 +1670,9 @@ Public Class IResultsCalibCurve
             Dim TheoreticalConcList As List(Of Single) = _
                   (From row In AverageResults.vwksResults _
                    Where row.OrderTestID = myOrderTestID _
+                 AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
                    Select row.TheoricalConcentration Distinct).ToList()
-            ' XB 30/07/2014 - BT #1863
+            ' XB 30/07/2014 - BA-1863
 
             If TheoreticalConcList.Count = 0 Then
                 For j As Integer = 0 To dgv.Rows.Count - 1
@@ -1679,15 +1696,15 @@ Public Class IResultsCalibCurve
                 'itempoint -= 1
                 itempoint += 1
 
-                ' XB 30/07/2014 - BT #1863
+                ' XB 30/07/2014 - BA-1863
                 If Not HistoricalModeField Then
                     myOrderTestID = TestList(0).OrderTestID
                 Else
                     myOrderTestID = SelectedOrderTestIDField
                 End If
-                ' XB 30/07/2014 - BT #1863
+                ' XB 30/07/2014 - BA-1863
 
-                ' XB 30/07/2014 - BT #1863
+                ' XB 30/07/2014 - BA-1863
                 'Dim AverageList As List(Of ResultsDS.vwksResultsRow) = _
                 '                (From row In AverageResults.vwksResults _
                 '                 Where row.OrderTestID = TestList(0).OrderTestID _
@@ -1704,33 +1721,35 @@ Public Class IResultsCalibCurve
                   AndAlso row.MultiPointNumber = itempoint _
                   AndAlso row.RerunNumber = AcceptedRerunNumber _
                   Select row).ToList()
-                ' XB 30/07/2014 - BT #1863
+                ' XB 30/07/2014 - BA-1863
 
                 'END AG 08/08/2010
 
-                With AverageList(0)
-                    PointAbsorbance(0) = .CalibratorBlankAbsUsed
+                If AverageList.Count > 0 Then   ' XB 23/09/2014 - Protection - BA-1863
+                    With AverageList(0)
+                        PointAbsorbance(0) = .CalibratorBlankAbsUsed
 
-                    'AG 16/10/2012
-                    'CurveResultsID = .CurveResultsID
-                    If Not HistoricalModeField Then
-                        CurveResultsID = .CurveResultsID
-                    Else
-                        HistOrderTestID = .OrderTestID
-                    End If
+                        'AG 16/10/2012
+                        'CurveResultsID = .CurveResultsID
+                        If Not HistoricalModeField Then
+                            CurveResultsID = .CurveResultsID
+                        Else
+                            HistOrderTestID = .OrderTestID
+                        End If
 
-                    ChartTestName = .TestName
-                    ChartSampleType = .SampleType
-                    ChartRerunNumber = .RerunNumber
-                    PointAbsorbance.Add(.ABSValue)
-                    PointConcentration.Add(.TheoricalConcentration)
-                    CurveGrowthType = .CurveGrowthType
-                    CurveType = .CurveType
-                    CurveAxisXType = .CurveAxisXType
-                    CurveAxisYType = .CurveAxisYType
-                    DecimalsAllowed = .DecimalsAllowed
-                    MonotonousCurve = String.IsNullOrEmpty(.CalibrationError)
-                End With
+                        ChartTestName = .TestName
+                        ChartSampleType = .SampleType
+                        ChartRerunNumber = .RerunNumber
+                        PointAbsorbance.Add(.ABSValue)
+                        PointConcentration.Add(.TheoricalConcentration)
+                        CurveGrowthType = .CurveGrowthType
+                        CurveType = .CurveType
+                        CurveAxisXType = .CurveAxisXType
+                        CurveAxisYType = .CurveAxisYType
+                        DecimalsAllowed = .DecimalsAllowed
+                        MonotonousCurve = String.IsNullOrEmpty(.CalibrationError)
+                    End With
+                End If
 
                 For Each resultRow As ResultsDS.vwksResultsRow In AverageList
                     If Not IsAverageDone.ContainsKey(resultRow.MultiPointNumber) Then
@@ -1945,7 +1964,7 @@ Public Class IResultsCalibCurve
                         Next
 
                         If Not Striked Then
-                            If TestList.Count > 0 Then ' XB 30/07/2014 - BT #1863
+                            If TestList.Count > 0 Then ' XB 30/07/2014 - BA-1863
                                 MergeCells(dgv, "TheorConc", i + 1, TestList.Count)
                                 MergeCells(dgv, "Unit", i + 1, TestList.Count)
                             End If
