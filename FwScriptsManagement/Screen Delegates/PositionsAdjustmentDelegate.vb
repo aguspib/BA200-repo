@@ -1808,15 +1808,16 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Creates the Script List for Screen Loading operation
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by SG 17/11/10</remarks>
+        ''' <remarks>Created by SG 17/11/10
+        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
+        ''' </remarks>
         Private Function SendQueueForADJUST_PREPARING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myListFwScript As New List(Of FwScriptQueueItem)
             Dim myFwScript0 As New FwScriptQueueItem ' XBC 28/03/2012 - Add previous movement to security fly position
             Dim myFwScript1 As New FwScriptQueueItem
             Dim myFwScript2 As New FwScriptQueueItem
-            Dim myFwScript3 As New FwScriptQueueItem
-            'Dim myMovAproxZ As Single
+
             Try
                 MyClass.HomesDoneAttr = False
                 MyClass.WSAdjustPreparedAttr = False
@@ -1949,8 +1950,25 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         '    .ParamList.Add("-9600")
                         'End With
 
-                        ' Relative movement to place close the wall between 5-6
+                        'AG 01/10/2014 - BA-1953 'After home move abs to the current value of adjustment GFWR1
                         With myFwScript0
+                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString   ' REACTIONS_REL_ROTOR
+                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                            .EvaluateValue = 1
+                            .NextOnResultOK = myFwScript1
+                            .NextOnResultNG = Nothing
+                            .NextOnTimeOut = myFwScript1
+                            .NextOnError = Nothing
+                            ' expects 1 param
+                            .ParamList = New List(Of String)
+                            .ParamList.Add(Me.pValueAdjustAttr)
+                        End With
+
+                        'With myFwScript0
+                        'AG 01/10/2014 - BA-1953
+
+                        ' Relative movement to place close the wall between 5-6
+                        With myFwScript1
                             .FwScriptID = FwSCRIPTS_IDS.REACTIONS_REL_ROTOR_2SECONDS.ToString   ' REACTIONS_REL_ROTOR
                             .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                             .EvaluateValue = 1
@@ -1973,10 +1991,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 End If
                             Next
                             If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, False)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False) 'AG 01/10/2014 - BA-1953
                         Else
                             If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript0, True)
-                            'If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False) 'AG 01/10/2014 - BA-1953
                         End If
 
                         ' XBC 04/01/2012 - Add Encoder functionality
@@ -2725,11 +2743,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SG 17/11/10
-        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR instead of REACTIONS_ROTOR_HOME_WELL1)
+        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver for REACTIONS HOME (use REAGENTS_HOME_ROTOR + REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
         ''' </remarks>
         Private Function SendQueueForADJUSTING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myFwScript1 As New FwScriptQueueItem
+            Dim myFwScript2 As New FwScriptQueueItem 'AG 01/10/2014 BA-1953
             Try
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
@@ -2755,9 +2774,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                             'AG 01/10/2014 BA-1953
                                             '.FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
                                             '.ParamList = Nothing
-                                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
-                                            .ParamList = New List(Of String)
-                                            .ParamList.Add(Me.pValueAdjustAttr)
+                                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_HOME_ROTOR.ToString
+                                            .ParamList = Nothing
+                                            .NextOnResultOK = myFwScript2
+                                            .NextOnTimeOut = myFwScript2
                                             'AG 01/10/2014 BA-1953
 
                                         Case MOVEMENT.ABSOLUTE
@@ -3129,8 +3149,31 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     End Select
 
                 End With
+
                 'add to the queue list
                 If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+
+                'AG 01/10/2014 - BA-1953 apply only pAdjustment = PHOTOMETRY, pAxisAdjustAttr = ROTOR and pMovAdjust = HOME
+                'After home move abs to the current value of adjustment GFWR1
+                If Not myResultData.HasError Then
+                    If pAdjustment = ADJUSTMENT_GROUPS.PHOTOMETRY AndAlso pAxisAdjustAttr = AXIS.ROTOR AndAlso pMovAdjustAttr = MOVEMENT.HOME Then
+                        With myFwScript2
+                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString   ' REACTIONS_REL_ROTOR
+                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                            .EvaluateValue = 1
+                            .NextOnResultOK = Nothing
+                            .NextOnResultNG = Nothing
+                            .NextOnTimeOut = Nothing
+                            .NextOnError = Nothing
+                            ' expects 1 param
+                            .ParamList = New List(Of String)
+                            .ParamList.Add(Me.pValueAdjustAttr)
+                        End With
+                        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript2, False)
+                    End If
+                End If
+                'AG 01/10/2014 - BA-1953
 
                 ManageArmsParkingStatus(pAdjustment, False)
 
@@ -3948,7 +3991,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by XBC 23/09/11
-        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR instead of REACTIONS_ROTOR_HOME_WELL1)
         ''' </remarks>
         Protected Friend Function SendQueueForABSORBANCE_PREPARE() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
@@ -3962,13 +4004,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 CurrentOperation = OPERATIONS.ABSORBANCE_PREPARE
 
                 With myFwScript1
-                    'AG 01/10/2014 BA-1953
-                    '.FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
-                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
-                    .ParamList = New List(Of String)
-                    .ParamList.Add(Me.pValueAdjustAttr)
-                    'AG 01/10/2014 BA-1953
-
+                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
                     .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                     .EvaluateValue = 1
                     .NextOnResultOK = Nothing
