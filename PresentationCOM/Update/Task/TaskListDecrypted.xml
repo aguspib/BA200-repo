@@ -2893,6 +2893,13 @@
       VALUES ('RESULTS_CANNOT_BE_SENT', 'Information', 'MSG_RESULTS_CANNOT_BE_SENT') 
       END
       GO
+      
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwPreloadedMasterData] WHERE [ItemID] = 'COMPACTPRINTCTR') = 0)
+	      BEGIN
+		      INSERT INTO [Ax00].[dbo].[tfmwPreloadedMasterData] ([SubTableID],[ItemID],[ResourceID],[FixedItemDesc],[MultiLanguageFlag],[Position],[Status])
+		      VALUES ('ICON_PATHS','COMPACTPRINTCTR',N'','PrintControls.png',0,0,1)
+	      END
+      GO   
     </UpdateScript>
   </AppVersion >
 </TaskListDS>

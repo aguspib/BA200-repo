@@ -1119,7 +1119,7 @@ Public Class IResults
             Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
+            'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             myLogAcciones.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -1136,6 +1136,7 @@ Public Class IResults
     ''' <summary></summary>
     ''' <remarks>
     ''' Created by:  JV 21/02/2014 - BT #1502
+    ''' Modified by: IT 01/10/2014 - #BA-1864
     ''' </remarks>
     Private Sub PrintTestCtrlButton_Click(sender As Object, e As EventArgs) Handles PrintTestCtrlButton.Click
         Try
@@ -1144,8 +1145,7 @@ Public Class IResults
             Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "CTRL")
-            XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False, "CTRL")
+            XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False, "CTRL") 'IT 01/10/2014 - #BA-1864
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             myLogAcciones.CreateLogActivity("Test Results Ctrl Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -5083,7 +5083,7 @@ Public Class IResults
             bsProgTestToolTips.SetToolTip(ExportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_ManualExport", LanguageID))
             bsProgTestToolTips.SetToolTip(PrintSampleButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintPatient", LanguageID))
             bsProgTestToolTips.SetToolTip(PrintTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintTest", LanguageID)) 'DL 26/07/2012
-            'bsProgTestToolTips.SetToolTip(bsPrintTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintTest", LanguageID))
+            bsProgTestToolTips.SetToolTip(PrintTestCtrlButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_PrintControls", LanguageID)) 'IT 01/10/2014 - #BA-1864
             bsProgTestToolTips.SetToolTip(PrintReportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_IndividualReport", LanguageID))
             bsProgTestToolTips.SetToolTip(SendManRepButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_ManualRerun", LanguageID))
             bsProgTestToolTips.SetToolTip(SummaryButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Results_OpenSummary", LanguageID))
@@ -5905,8 +5905,7 @@ Public Class IResults
                                             bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name)
 
                     'BT #1502 - This two buttons are hide because the test of the new reports have not been executed
-                    'PrintTestBlankButton.Visible = False
-                    'PrintTestCtrlButton.Visible = False
+                    PrintTestBlankButton.Visible = False
             End Select
 
             'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
