@@ -2417,7 +2417,7 @@ Public Class XRManager
         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
             Dim dsResults As New ResultsDS
             dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResults.Merge(dsResults.vwksResults)
+            data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
         End If
 
         resultData = myResultsDelegate.GetResultAlarms(Nothing)
