@@ -4546,6 +4546,7 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' Modified by DL 16/05/2013 - Modify system decimal separator by "."
         ''' AG 27/05/2013 - RefRanges father is Result instead of QualifyingElement
         ''' AG 29/09/2014 - BA-1440 part1 - Inform the new byref parameter pLISMappingError
+        ''' AG 30/09/2014 - All CreateLogActivity as EventLogEntryType.Information but the exception one
         ''' </remarks>
         Private Function CreateServiceNode(ByRef XmlDoc As XmlDocument, _
                                            ByVal pTestMappingDS As AllTestsByTypeDS, _
@@ -4664,7 +4665,7 @@ Namespace Biosystems.Ax00.LISCommunications
                         'Sample Type 
                         resultData = myLISMappingDelegate.GetLISSampleType(pConfigMappingDS, myResultRow.SampleType)
                         If resultData.HasError Then
-                            myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Sample Type is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
+                            myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Sample Type is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Information, False)
                             itMustSetToNotSent = True
                         Else
                             myMappedSampleType = CStr(resultData.SetDatos)
@@ -4674,7 +4675,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             'Test Id 
                             resultData = myAllTestMappingDelegate.GetLISTestID(pTestMappingDS, myResultRow.TestID, myResultRow.TestType)
                             If resultData.HasError Then
-                                myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Test ID is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Error, False)
+                                myLogAcciones.CreateLogActivity("History Result not exported: mapped LIS Test ID is missing", "ESxmlTranslator.CreateServiceNode", EventLogEntryType.Information, False)
                                 itMustSetToNotSent = True
                             Else
                                 myMappedTestId = CStr(resultData.SetDatos)
