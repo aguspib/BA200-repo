@@ -2923,7 +2923,7 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-    <IntegrityValidation>
+  <IntegrityValidation>
     <Version>3.10</Version>
     <Label>New messages defined in version 3.1.0</Label>
     <Script>
@@ -2931,6 +2931,17 @@
       SELECT 'True'
       ELSE
       SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New image defined in version 3.1.0</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwPreloadedMasterData] WHERE [ItemID] = 'COMPACTPRINTCTR') = 0)
+      SELECT 'False'
+      ELSE
+      SELECT 'True'
     </Script>
     <Result>True</Result>
   </IntegrityValidation>

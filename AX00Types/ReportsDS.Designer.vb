@@ -435,7 +435,7 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddControlsResultsDetailsRow(ByVal TestTypeTestID As String, ByVal TestName As String, ByVal Name As String, ByVal Concentration As Single, ByVal MeasureUnit As String, ByVal ConcentrationLimits As String, ByVal Remarks As String, ByVal Flags As String) As ControlsResultsDetailsRow
+        Public Overloads Function AddControlsResultsDetailsRow(ByVal TestTypeTestID As String, ByVal TestName As String, ByVal Name As String, ByVal Concentration As String, ByVal MeasureUnit As String, ByVal ConcentrationLimits As String, ByVal Remarks As String, ByVal Flags As String) As ControlsResultsDetailsRow
             Dim rowControlsResultsDetailsRow As ControlsResultsDetailsRow = CType(Me.NewRow, ControlsResultsDetailsRow)
             Dim columnValuesArray() As Object = New Object() {TestTypeTestID, TestName, Name, Concentration, MeasureUnit, ConcentrationLimits, Remarks, Flags}
             rowControlsResultsDetailsRow.ItemArray = columnValuesArray
@@ -479,7 +479,7 @@ Partial Public Class ReportsDS
             MyBase.Columns.Add(Me.columnTestName)
             Me.columnName = New Global.System.Data.DataColumn("Name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnName)
-            Me.columnConcentration = New Global.System.Data.DataColumn("Concentration", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
+            Me.columnConcentration = New Global.System.Data.DataColumn("Concentration", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnConcentration)
             Me.columnMeasureUnit = New Global.System.Data.DataColumn("MeasureUnit", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnMeasureUnit)
@@ -683,16 +683,16 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property Concentration() As Single
+        Public Property Concentration() As String
             Get
                 Try
-                    Return CType(Me(Me.tableControlsResultsDetails.ConcentrationColumn), Single)
+                    Return CType(Me(Me.tableControlsResultsDetails.ConcentrationColumn), String)
                 Catch e As Global.System.InvalidCastException
                     Throw New Global.System.Data.StrongTypingException("El valor de la columna 'Concentration' de la tabla 'ControlsResultsDetails' es DB" & _
                             "Null.", e)
                 End Try
             End Get
-            Set(value As Single)
+            Set(value As String)
                 Me(Me.tableControlsResultsDetails.ConcentrationColumn) = value
             End Set
         End Property

@@ -1209,93 +1209,6 @@ Public Class XRManager
     ''' </summary>
     ''' <param name="pAnalyzerID"></param>
     ''' <param name="pWorkSessionID"></param>
-    ''' <param name="pType"></param>
-    ''' <remarks>
-    ''' Created by:  JV #1502 20/02/2014 - new sub for new report creation
-    ''' Updated by:  JV #1502 21/02/2014 - multilanguage header for ctrl and blank-calib reports
-    ''' </remarks>
-    Public Shared Sub ShowResultsByTestReportCompactBySampleType(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pType As String)
-        Try
-            Dim myLogAcciones As New ApplicationLogManager()
-            Dim StartTime As DateTime = Now 'AG 13/06/2012 - time estimation
-
-            Dim resultData As GlobalDataTO
-            Dim myResultsDelegate As New ResultsDelegate
-
-            'DL 14/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-            resultData = myResultsDelegate.GetResultsByTestForReportCompactBySampleType(Nothing, pAnalyzerID, pWorkSessionID, pType)
-
-            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                Dim ResultsData As ResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
-
-                If ResultsData.ReportTestMaster.Count > 0 Then
-                    Dim Report As New ResultsByTestReportCompact
-
-                    'Multilanguage. Get texts from DB.
-                    Dim literalHeaderLabel As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurrentResults_Test", CurrentLanguage)
-                    Select Case pType
-                        Case "CTRL"
-                            Report.SetHeaderLabel(literalHeaderLabel & " - " & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CONTROLS", CurrentLanguage))
-                        Case "BLANK"
-                            Report.SetHeaderLabel(literalHeaderLabel & " - " & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Blanks", CurrentLanguage) & ", " & _
-                                                  myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Calibrators", CurrentLanguage))
-                    End Select
-
-
-                    Report.XrLabelName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Name", CurrentLanguage)        'DL 14/01/2012"Name"
-                    'Report.XrLabelPatientID.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_PatientID", CurrentLanguage)
-                    Report.XrLabelType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)            'DL 14/01/2012
-                    Report.XrLabelNumber.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Number_Short", CurrentLanguage)  'DL 14/01/2012 
-                    Report.XrLabelAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Short", CurrentLanguage)     'DL 14/01/2012 
-                    Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)
-                    Report.XrLabelUnit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", CurrentLanguage)
-                    Report.XrLabelClass.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleClass_Short", CurrentLanguage)     'DL 14/01/2012
-                    Report.XrLabelFactor.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibFactor", CurrentLanguage)     'DL 14/01/2012
-                    Report.XrLabelDate.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Date", CurrentLanguage)     'DL 14/01/2012
-
-                    Dim WSStartDateTime As String = String.Empty
-
-                    'Get WSStartDateTime from DB
-                    Dim myWSDelegate As New WorkSessionsDelegate
-
-                    resultData = myWSDelegate.GetByWorkSession(Nothing, pWorkSessionID)
-
-                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                        Dim myWSDataDS As WorkSessionsDS = DirectCast(resultData.SetDatos, WorkSessionsDS)
-                        If myWSDataDS.twksWorkSessions.Count > 0 AndAlso Not (myWSDataDS.twksWorkSessions.First.IsStartDateTimeNull) Then
-                            WSStartDateTime = myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(DatePattern) & " " & _
-                                                myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(TimePattern)
-                        End If
-                    End If
-
-                    Report.XrWSStartDateTimeLabel.Text = WSStartDateTime
-
-                    Report.DataSource = ResultsData
-                    ShowPortrait(Report)
-                End If
-
-                'Else
-                'ToDo: Try the error
-            End If
-
-            myLogAcciones.CreateLogActivity("Tests Report Compact(current results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowResultsByTestReportCompactBySampleType", EventLogEntryType.Information, False) 'AG 04/07/2012
-
-        Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowResultsByTestReportCompactBySampleType", EventLogEntryType.Error, False)
-
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="pAnalyzerID"></param>
-    ''' <param name="pWorkSessionID"></param>
     ''' <param name="Vertical"></param>
     ''' <remarks></remarks>
     Public Shared Sub ShowSummaryResultsReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal Vertical As Boolean)
@@ -1867,7 +1780,9 @@ Public Class XRManager
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="pIsHistorical"></param>
     ''' <param name="pClassList"></param>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Created by:  IT 01/10/2014 - BT #1864
+    ''' </remarks>
     Public Shared Sub ShowControlsCompactReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIsHistorical As Boolean, ByVal ParamArray pClassList() As String)
         Try
             Dim resultData As GlobalDataTO = Nothing
@@ -2488,7 +2403,9 @@ Public Class XRManager
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="pClassList"></param>
     ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Created by:  IT 01/10/2014 - BT #1864
+    ''' </remarks>
     Private Shared Function GetControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ResultsDS
 
         Dim resultData As GlobalDataTO = Nothing
@@ -2500,7 +2417,7 @@ Public Class XRManager
         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
             Dim dsResults As New ResultsDS
             dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResults.Merge(dsResults.vwksResults)
+            data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
         End If
 
         resultData = myResultsDelegate.GetResultAlarms(Nothing)
@@ -2522,7 +2439,9 @@ Public Class XRManager
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="pClassList"></param>
     ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Created by:  IT 01/10/2014 - BT #1864
+    ''' </remarks>
     Private Shared Function CreateControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ReportsDS
         Dim dsReport As New ReportsDS
         Dim dataRow As ReportsDS.ControlsResultsDetailsRow
@@ -2533,7 +2452,9 @@ Public Class XRManager
 
             Dim remarks As String = String.Empty
             Dim flags As String = String.Empty
+            Dim concentration As String = String.Empty
 
+            'FLAG field
             'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
             If ((Not row.IsActiveRangeTypeNull AndAlso Not String.Compare(row.ActiveRangeType, String.Empty, False) = 0) AndAlso _
                 (IsNumeric(row.CONC_Value))) Then
@@ -2555,6 +2476,7 @@ Public Class XRManager
                 End If
             End If
 
+            'REMARKS field
             For Each alarm As ResultsDS.vwksResultsAlarmsRow In results.vwksResultsAlarms.Where(Function(a) a.OrderTestID = row.OrderTestID)
                 remarks += String.Format("{0}, ", alarm.Description)
             Next
@@ -2563,10 +2485,38 @@ Public Class XRManager
                 remarks = remarks.Substring(0, remarks.Length - 2)
             End If
 
+            'CONCENTRATION field
+            If (Not row.IsCONC_ValueNull) Then
+                Dim hasConcentrationError As Boolean = False
+
+                If (Not row.IsCONC_ErrorNull) Then
+                    hasConcentrationError = Not String.IsNullOrEmpty(row.CONC_Error)
+                End If
+
+                If (Not hasConcentrationError) Then
+                    concentration = row.CONC_Value.ToStringWithDecimals(row.DecimalsAllowed)
+                Else
+                    concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                End If
+            Else
+                If (Not row.IsManualResultTextNull) Then
+                    concentration = row.ManualResultText
+                Else
+                    concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                End If
+            End If
+
+            If (Not row.IsABS_ErrorNull) Then
+                If (Not String.IsNullOrEmpty(row.ABS_Error)) Then
+                    concentration = GlobalConstants.CONC_DUE_ABS_ERROR
+                End If
+            End If
+
+
             dataRow = dsReport.ControlsResultsDetails.NewControlsResultsDetailsRow()
             dataRow.Name = String.Format("{0} ({1})", row.ControlName, row.ControlLotNumber)
-            dataRow.TestName = row.TestLongName
-            dataRow.Concentration = row.CONC_Value
+            dataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
+            dataRow.Concentration = concentration
             dataRow.MeasureUnit = row.MeasureUnit
             dataRow.ConcentrationLimits = String.Format("{0} - {1}", row.MinConcentration, row.MaxConcentration)
             dataRow.Flags = flags
@@ -2588,7 +2538,9 @@ Public Class XRManager
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="dsReport"></param>
     ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Created by:  IT 01/10/2014 - BT #1864
+    ''' </remarks>
     Private Shared Function CreateControlsCompactReport(ByVal pWorkSessionID As String, ByVal dsReport As DataSet) As ControlsCompactReport
 
         Dim currentLanguageGlobal As New GlobalBase
