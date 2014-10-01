@@ -2724,7 +2724,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Creates the Script List for Screen Loading operation
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by SG 17/11/10</remarks>
+        ''' <remarks>Created by SG 17/11/10
+        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR instead of REACTIONS_ROTOR_HOME_WELL1)
+        ''' </remarks>
         Private Function SendQueueForADJUSTING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myFwScript1 As New FwScriptQueueItem
@@ -2750,8 +2752,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Select Case pMovAdjust
                                         Case MOVEMENT.HOME
                                             ' reactions rotor Home
-                                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
-                                            .ParamList = Nothing
+                                            'AG 01/10/2014 BA-1953
+                                            '.FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
+                                            '.ParamList = Nothing
+                                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
+                                            .ParamList = New List(Of String)
+                                            .ParamList.Add(Me.pValueAdjustAttr)
+                                            'AG 01/10/2014 BA-1953
+
                                         Case MOVEMENT.ABSOLUTE
                                             ' Mov ABS
                                             ' Absolute positioning of the reactions rotor
@@ -3940,6 +3948,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by XBC 23/09/11
+        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR instead of REACTIONS_ROTOR_HOME_WELL1)
         ''' </remarks>
         Protected Friend Function SendQueueForABSORBANCE_PREPARE() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
@@ -3953,7 +3962,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 CurrentOperation = OPERATIONS.ABSORBANCE_PREPARE
 
                 With myFwScript1
-                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
+                    'AG 01/10/2014 BA-1953
+                    '.FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
+                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
+                    .ParamList = New List(Of String)
+                    .ParamList.Add(Me.pValueAdjustAttr)
+                    'AG 01/10/2014 BA-1953
+
                     .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                     .EvaluateValue = 1
                     .NextOnResultOK = Nothing

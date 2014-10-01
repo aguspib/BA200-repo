@@ -43,7 +43,6 @@ Public Class XRManager
 
 #End Region
 
-
 #Region "Public Methods"
 
     ''' <summary>
@@ -139,7 +138,6 @@ Public Class XRManager
 
         End Try
     End Sub
-
 
     ''' <summary>
     ''' CF 17/09/2013 - V2.1.1 / 3.0.0
@@ -640,7 +638,6 @@ Public Class XRManager
 
         End Try
     End Sub
-
 
     Public Shared Sub ShowISEReport(Optional ByVal SelectedISETest As List(Of String) = Nothing)
         Try
@@ -1559,7 +1556,6 @@ Public Class XRManager
         End Try
     End Sub
 
-
     ''' <summary>
     ''' Shows the Quality Control-Individual Results by Test/Sample Type Report
     ''' </summary>
@@ -1651,7 +1647,6 @@ Public Class XRManager
             myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowQCAccumulatedResultsByTestReport", EventLogEntryType.Error, False)
         End Try
     End Sub
-
 
     ''' <summary>
     ''' Calibration curve report
@@ -1865,8 +1860,46 @@ Public Class XRManager
         End Try
     End Sub
 
-#End Region
+    ''' <summary>
+    ''' Show Controls Report in compact format
+    ''' </summary>
+    ''' <param name="pAnalyzerID"></param>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="pIsHistorical"></param>
+    ''' <param name="pClassList"></param>
+    ''' <remarks></remarks>
+    Public Shared Sub ShowControlsCompactReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIsHistorical As Boolean, ByVal ParamArray pClassList() As String)
+        Try
+            Dim resultData As GlobalDataTO = Nothing
 
+            Dim myHisResultsDelegate As New HisWSResultsDelegate
+            Dim myResultsDelegate As New ResultsDelegate
+
+            Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+            Dim xtraReport As XtraReport = Nothing
+            Dim dsReport As ReportsDS = Nothing
+
+            If (Not pIsHistorical) Then
+                dsReport = CreateControlsCompactReportData(pAnalyzerID, pWorkSessionID, pClassList)
+            Else
+                'TODO: Call to the historical method
+            End If
+
+            If (Not dsReport Is Nothing) Then
+                xtraReport = CreateControlsCompactReport(pWorkSessionID, dsReport)
+                ShowPortrait(xtraReport)
+            End If
+
+        Catch ex As Exception
+            Dim myLogAcciones As New ApplicationLogManager()
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
+        End Try
+    End Sub
+
+#End Region
 
 #Region "Private Methods"
 
@@ -2442,6 +2475,156 @@ Public Class XRManager
 
         Return Samples
 
+    End Function
+
+#End Region
+
+#Region "Controls Compact Report"
+
+    ''' <summary>
+    ''' Get the results data of controls
+    ''' </summary>
+    ''' <param name="pAnalyzerID"></param>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="pClassList"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Shared Function GetControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ResultsDS
+
+        Dim resultData As GlobalDataTO = Nothing
+        Dim myResultsDelegate As New ResultsDelegate
+        Dim data As New ResultsDS
+
+        resultData = myResultsDelegate.GetResultsBySampleClass(Nothing, pAnalyzerID, pWorkSessionID, pClassList)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            Dim dsResults As New ResultsDS
+            dsResults = CType(resultData.SetDatos, ResultsDS)
+            data.vwksResults.Merge(dsResults.vwksResults)
+        End If
+
+        resultData = myResultsDelegate.GetResultAlarms(Nothing)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            Dim dsResults As New ResultsDS
+            dsResults = CType(resultData.SetDatos, ResultsDS)
+            data.vwksResultsAlarms.Merge(dsResults.vwksResultsAlarms)
+        End If
+
+        Return data
+
+    End Function
+
+    ''' <summary>
+    ''' Create the data needed to show the report
+    ''' </summary>
+    ''' <param name="pAnalyzerID"></param>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="pClassList"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Shared Function CreateControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ReportsDS
+        Dim dsReport As New ReportsDS
+        Dim dataRow As ReportsDS.ControlsResultsDetailsRow
+
+        Dim results = GetControlsCompactReportData(pAnalyzerID, pWorkSessionID, pClassList)
+
+        For Each row As ResultsDS.vwksResultsRow In results.vwksResults.OrderBy(Function(r) r.ControlName).ThenBy(Function(r) r.ControlLotNumber).ThenBy(Function(r) r.TestPosition)
+
+            Dim remarks As String = String.Empty
+            Dim flags As String = String.Empty
+
+            'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
+            If ((Not row.IsActiveRangeTypeNull AndAlso Not String.Compare(row.ActiveRangeType, String.Empty, False) = 0) AndAlso _
+                (IsNumeric(row.CONC_Value))) Then
+                If (Not row.IsNormalLowerLimitNull AndAlso Not row.IsNormalUpperLimitNull) Then
+                    If (CSng(row.CONC_Value) < CSng(row.NormalLowerLimit)) Then
+                        flags = GlobalConstants.LOW '"L"
+                    ElseIf (CSng(row.CONC_Value) > CSng(row.NormalUpperLimit)) Then
+                        flags = GlobalConstants.HIGH '"H"
+                    End If
+                End If
+            End If
+
+            'If there are Panic Ranges informed, then verify if the result is out of the limits of the PANIC RANGE
+            If IsNumeric(row.CONC_Value) And (Not row.IsPanicLowerLimitNull AndAlso Not row.IsPanicUpperLimitNull) Then
+                If (CSng(row.CONC_Value) < CSng(row.PanicLowerLimit)) Then
+                    flags = GlobalConstants.PANIC_LOW  'PL
+                ElseIf (CSng(row.PanicUpperLimit) < CSng(row.CONC_Value)) Then
+                    flags = GlobalConstants.PANIC_HIGH 'PH 
+                End If
+            End If
+
+            For Each alarm As ResultsDS.vwksResultsAlarmsRow In results.vwksResultsAlarms.Where(Function(a) a.OrderTestID = row.OrderTestID)
+                remarks += String.Format("{0}, ", alarm.Description)
+            Next
+
+            If (remarks <> String.Empty) Then
+                remarks = remarks.Substring(0, remarks.Length - 2)
+            End If
+
+            dataRow = dsReport.ControlsResultsDetails.NewControlsResultsDetailsRow()
+            dataRow.Name = String.Format("{0} ({1})", row.ControlName, row.ControlLotNumber)
+            dataRow.TestName = row.TestLongName
+            dataRow.Concentration = row.CONC_Value
+            dataRow.MeasureUnit = row.MeasureUnit
+            dataRow.ConcentrationLimits = String.Format("{0} - {1}", row.MinConcentration, row.MaxConcentration)
+            dataRow.Flags = flags
+            dataRow.Remarks = remarks
+
+            dsReport.ControlsResultsDetails.Rows.Add(dataRow)
+        Next
+
+        If (dsReport.ControlsResultsDetails.Count > 0) Then
+            Return dsReport
+        End If
+
+        Return Nothing
+    End Function
+
+    ''' <summary>
+    ''' Create the controls report
+    ''' </summary>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="dsReport"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Private Shared Function CreateControlsCompactReport(ByVal pWorkSessionID As String, ByVal dsReport As DataSet) As ControlsCompactReport
+
+        Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        Dim Report As New ControlsCompactReport
+
+        'Multilanguage. Get texts from DB.
+        Report.XrLabelName.Text = String.Format("{0} ({1})", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Control_Name", CurrentLanguage), myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Lot", CurrentLanguage))
+        Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Singular", CurrentLanguage)
+        Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)
+        Report.XrLabelUnit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", CurrentLanguage)
+        Report.XrLabelConcLimit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Concentration_Limits", CurrentLanguage)
+        Report.XrLabelRemarks.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage)
+
+        Dim WSStartDateTime As String = String.Empty
+
+        'Get WSStartDateTime from DB
+        Dim myWSDelegate As New WorkSessionsDelegate
+        Dim resultData As GlobalDataTO
+
+        resultData = myWSDelegate.GetByWorkSession(Nothing, pWorkSessionID)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            Dim myWSDataDS As WorkSessionsDS = DirectCast(resultData.SetDatos, WorkSessionsDS)
+            If myWSDataDS.twksWorkSessions.Count > 0 AndAlso Not (myWSDataDS.twksWorkSessions.First.IsStartDateTimeNull) Then
+                WSStartDateTime = myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(DatePattern) & " " & _
+                                    myWSDataDS.twksWorkSessions.First().StartDateTime.ToString(TimePattern)
+            End If
+        End If
+
+        Report.XrWSStartDateTimeLabel.Text = WSStartDateTime
+        Report.DataSource = dsReport
+
+        Return Report
     End Function
 
 #End Region

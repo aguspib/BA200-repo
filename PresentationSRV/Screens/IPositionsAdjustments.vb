@@ -2417,6 +2417,14 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Creation ?
+    ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
+    ''' </remarks>
     Private Sub PrepareAbsorbanceScannedMode()
         Try
             'Dim myGlobal As New GlobalDataTO
@@ -2433,7 +2441,7 @@ Public Class IPositionsAdjustments
                     MyBase.CurrentMode = ADJUSTMENT_MODES.ABSORBANCE_PREPARED
                     Me.PrepareArea()
                 Else
-
+                    myScreenDelegate.pValueAdjust = BsOpticAdjustmentLabel.Text 'AG 01/10/2014 - BA-1953 inform the current value of adjustment GFWR1 (Posición referencia lectura - Pocillo 1)
                     Me.SendFwScript(Me.CurrentMode)
                     Me.DisableAll()
                 End If
@@ -8944,7 +8952,17 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
-    'SGM
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by SGM
+    ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
+    '''                 Keep code XBC 12/11/2014 preliminary homes. The only change in this method is inform the current value of GFWR1 adjustment
+    ''' </remarks>
     Private Sub BsAdjustButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsOpticAdjustButton.Click, _
                                                                                                         BsWSAdjustButton.Click
         Dim myGlobal As New GlobalDataTO
@@ -8981,6 +8999,7 @@ Public Class IPositionsAdjustments
                             myScreenDelegate.AbsorbanceScanDone = False
                             myScreenDelegate.AbsorbanceScanReadings = 0
                             myScreenDelegate.ReadedCounts = New List(Of OpticCenterDataTO)
+                            myScreenDelegate.pValueAdjust = BsOpticAdjustmentLabel.Text 'AG 01/10/2014 - BA-1953 inform the current value of adjustment GFWR1 (Posición referencia lectura - Pocillo 1)
 
                             If Not MyBase.SimulationMode Then
                                 Me.ProgressBar1.Maximum = CInt(myScreenDelegate.NumWells * myScreenDelegate.StepsbyWell)

@@ -1144,7 +1144,8 @@ Public Class IResults
             Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "CTRL")
+            'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "CTRL")
+            XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False, "CTRL")
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             myLogAcciones.CreateLogActivity("Test Results Ctrl Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
@@ -2696,6 +2697,8 @@ Public Class IResults
             auxIconName = GetIconName("COMPACTPRINT")
             If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = Image.FromFile(iconPath & auxIconName)
 
+            auxIconName = GetIconName("COMPACTPRINTCTR")
+            If Not String.Equals(auxIconName, String.Empty) Then PrintTestCtrlButton.Image = Image.FromFile(iconPath & auxIconName)
 
             'SUMMARY Button
             auxIconName = GetIconName("GRID")
@@ -5902,8 +5905,8 @@ Public Class IResults
                                             bsResultsTabControl.SelectedTab.Name = XtraSamplesTabPage.Name)
 
                     'BT #1502 - This two buttons are hide because the test of the new reports have not been executed
-                    PrintTestBlankButton.Visible = False
-                    PrintTestCtrlButton.Visible = False
+                    'PrintTestBlankButton.Visible = False
+                    'PrintTestCtrlButton.Visible = False
             End Select
 
             'BA-1927: Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
