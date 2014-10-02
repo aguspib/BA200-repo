@@ -3991,6 +3991,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by XBC 23/09/11
+        ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
         ''' </remarks>
         Protected Friend Function SendQueueForABSORBANCE_PREPARE() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
@@ -4004,14 +4005,21 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 CurrentOperation = OPERATIONS.ABSORBANCE_PREPARE
 
                 With myFwScript1
-                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
+                    'AG 01/10/2014 BA-1953
+                    '.FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString
+                    '.ParamList = Nothing
+                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
+                    .ParamList = New List(Of String)
+                    .ParamList.Add(Me.pValueAdjustAttr)
+                    'AG 01/10/2014 BA-1953
+
                     .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                     .EvaluateValue = 1
                     .NextOnResultOK = Nothing
                     .NextOnResultNG = Nothing
                     .NextOnTimeOut = Nothing
                     .NextOnError = Nothing
-                    .ParamList = Nothing
+
                 End With
 
                 'add to the queue list
