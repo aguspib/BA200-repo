@@ -2514,6 +2514,7 @@ Public Class XRManager
 
 
             dataRow = dsReport.ControlsResultsDetails.NewControlsResultsDetailsRow()
+            dataRow.OrderTestID = row.OrderTestID
             dataRow.Name = String.Format("{0} ({1})", row.ControlName, row.ControlLotNumber)
             dataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
             dataRow.Concentration = concentration
