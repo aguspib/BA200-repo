@@ -46,6 +46,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''             XB 11/12/2013 - Add the condition required for #1422 (do not send END while action is AnalyzerManagerFlags.StartRunning)
         '''             AG 15/04/2014 - Fix issue number #1594 paused in v300 (if SOUND is in queue it will be sent on receives STATUS (it doesnt matter AnalyzerIsReadyAttribute))
         '''                             #1484 action SOUND_DONE in running also search next preparation
+        '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
         Private Function ManageRunningStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -511,9 +512,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ISE_CMD, myISECommand)
                         End If
 
-                        If Not myGlobal.HasError Then
-                            myGlobal = MyClass.ISE_Manager.StartInstructionStartedTimer
-                        End If
+                        ' XB 30/09/2014 - BA-1872
+                        'If Not myGlobal.HasError Then
+                        '    myGlobal = MyClass.ISE_Manager.StartInstructionStartedTimer
+                        'End If
                         ' XB 23/10/2013
 
                     End If

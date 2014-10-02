@@ -4979,10 +4979,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pLastInstructionTypeSent"></param>
         ''' <returns>Booelan</returns>
         ''' <remarks>
-        ''' Created by AG 27/03/2012
-        ''' Modifiedby XB 04/05/2012 - add pErrorValue and funtionality related to depurate errors ignores
-        '''            TR 19/09/2012 -Add the STATE alarms on validation and POLLSN ( belong to Xavi Badia).
-        '''            AG 25/09/2012 - Add the POLLRD instruction
+        ''' Created by  AG 27/03/2012
+        ''' Modified by XB 04/05/2012 - add pErrorValue and funtionality related to depurate errors ignores
+        '''             TR 19/09/2012 -Add the STATE alarms on validation and POLLSN ( belong to Xavi Badia).
+        '''             AG 25/09/2012 - Add the POLLRD instruction
+        '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
         Private Function IgnoreErrorCodes(ByVal pLastInstructionTypeSent As GlobalEnumerates.AppLayerEventList, ByVal pInstructionSent As String, ByVal pErrorValue As Integer) As Boolean
             Dim ignoreFlag As Boolean = False 'Default value FALSE
@@ -5089,11 +5090,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Abort current ise procedure in ise_manager class
                             If Not ignoreFlag Then
 
-                                'SGM 25/10/2012 - Abort ISE Operation only if E:61, E:20, E:21
-                                If pErrorValue = 61 Or pErrorValue = 20 Or pErrorValue = 21 Then
+                                ' XB 30/09/2014 - BA-1872
+                                ''SGM 25/10/2012 - Abort ISE Operation only if E:61, E:20, E:21
+                                'If pErrorValue = 61 Or pErrorValue = 20 Or pErrorValue = 21 Then
+                                '    If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException()
+                                'End If
+                                ''If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException() SGM 25/10/2012
+                                If pErrorValue = 61 Then
+                                    If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException(True)
+                                End If
+                                If pErrorValue = 20 Or pErrorValue = 21 Then
                                     If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException()
                                 End If
-                                'If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException() SGM 25/10/2012
+                                ' XB 30/09/2014 - BA-1872
                             End If
                         End If
                         'AG 30/03/2012
