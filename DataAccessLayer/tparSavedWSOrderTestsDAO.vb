@@ -683,6 +683,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''               SA 18/04/2012 - Changed the function template
         '''               TR 14/03/2013 - Changed the SQL by adding an INNER JOIN with table tparSavedWS to get value of field SavedWSName
         '''               SA 09/05/2013 - Changed the SQL to get also value of new field DeletedTestFlag
+        '''               XB 02/10/2014 - Add ORDER BY OT.SavedWSOrderTestID to fix the correct sorting received from LIS when there are Patients not existing yet in database - BA-1963
         ''' </remarks>
         Public Function ReadBySavedWSID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSavedWSID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -703,7 +704,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                              "WHEN OT.SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
                                                              "ELSE 'MAN' END) AS PatienTIDType " & vbCrLf & _
                                                 " FROM   tparSavedWSOrderTests OT INNER JOIN tparSavedWS SW ON OT.SavedWSID = SW.SavedWSID  " & vbCrLf & _
-                                                " WHERE  OT.SavedWSID =" & pSavedWSID
+                                                " WHERE  OT.SavedWSID =" & pSavedWSID & _
+                                                " ORDER BY OT.SavedWSOrderTestID "
 
                         Dim SavedWSOrderTestsDS As New SavedWSOrderTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
