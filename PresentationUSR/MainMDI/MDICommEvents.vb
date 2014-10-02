@@ -53,6 +53,7 @@ Partial Public Class IAx00MainMDI
     '''              XB - 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587
     '''              XB - 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
     '''              XB - 20/06/2014 - improve the ISE Timeouts control (E:61) - Task #1441
+    '''              AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pInstructionReceived As String, _
                                          ByVal pTreated As Boolean, _
@@ -701,7 +702,7 @@ Partial Public Class IAx00MainMDI
 
                         CreateLogActivity("Current results automatic upload (STD, ISE, CALC)", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
-                        InvokeUploadResultsLIS(False)
+                        InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
 
                         'Clear the last results automatically exported (in AnalyzerManager object)
                         MDIAnalyzerManager.ClearLastExportedResults()

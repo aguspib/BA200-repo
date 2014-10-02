@@ -1236,6 +1236,7 @@ Partial Public Class IAx00MainMDI
     '''              AG 18/02/2014 - BT #1505 ==> Added code to monitoring the RESETWS process real time (without msgboxs) 
     '''              AG 24/02/2014 - BT #1520 ==> Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters, 
     '''                                           and show a warning message when at least one of them has been exceeded 
+    '''              AG 30/09/2014 - BA-1440 inform that is a manual exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub ResetSessionButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSResetSessionButton.Click
         Try
@@ -1364,7 +1365,7 @@ Partial Public Class IAx00MainMDI
 
                                             'Call assynchronously to a synchronous process using another thread but not wait
                                             'At this point call the synchronous process instead of the assynchronous!!!
-                                            SynchronousLISManagerUploadResults(False, Nothing, Nothing, Nothing)
+                                            SynchronousLISManagerUploadResults(False, False, Nothing, Nothing, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                                         End If
                                     End If
                                 End If
@@ -9820,11 +9821,23 @@ Partial Public Class IAx00MainMDI
         'ProcessingLISManagerObject = False 'LIS object removed ' XB 24/04/2013
     End Sub
 
-    Public Sub InvokeUploadResultsLIS(ByVal pHistoricalFlag As Boolean, Optional ByVal pCurrentResults As ResultsDS = Nothing, Optional ByVal pCurrentResultAlarms As ResultsDS = Nothing, Optional ByVal pHistoricalResults As HisWSResultsDS = Nothing)
+
+    ''' <summary>
+    ''' Launch the upload results to LIS process using another flag for not affect the UI performance
+    ''' </summary>
+    ''' <param name="pHistoricalFlag"></param>
+    ''' <param name="pCurrentResults"></param>
+    ''' <param name="pCurrentResultAlarms"></param>
+    ''' <param name="pHistoricalResults"></param>
+    ''' <param name="pAutoExportFlag">Online export TRUE // Manual export FALSE</param>
+    ''' <remarks>
+    ''' Modified AG 30/09/2014 - BA-1440 new parameter pAutoExportFlag
+    ''' </remarks>
+    Public Sub InvokeUploadResultsLIS(ByVal pHistoricalFlag As Boolean, ByVal pAutoExportFlag As Boolean, Optional ByVal pCurrentResults As ResultsDS = Nothing, Optional ByVal pCurrentResultAlarms As ResultsDS = Nothing, Optional ByVal pHistoricalResults As HisWSResultsDS = Nothing)
         'Leave active only one of these options:
         'a) Asynchronous call to a synchronous process
         Dim updateResLISManagerThread As Thread
-        updateResLISManagerThread = New Thread(Sub() SynchronousLISManagerUploadResults(pHistoricalFlag, pCurrentResults, pCurrentResultAlarms, pHistoricalResults))
+        updateResLISManagerThread = New Thread(Sub() SynchronousLISManagerUploadResults(pHistoricalFlag, pAutoExportFlag, pCurrentResults, pCurrentResultAlarms, pHistoricalResults))
         updateResLISManagerThread.Start()
 
         'b) Synchronous call to a synchronous process
@@ -9838,11 +9851,13 @@ Partial Public Class IAx00MainMDI
     ''' <param name="pCurrentResults">Required when HistoricalFlag = False</param>
     ''' <param name="pCurrentResultAlarms">Required when HistoricalFlag = False</param>
     ''' <param name="pHistoricalResults">Required and Informed when HistoricalFlag = True</param>
+    ''' <param name="pAutoExportFlag" >online export TRUE / manual export FALSE</param>
     ''' <remarks>
     ''' Created by:  AG 19/03/2013
     ''' Modified by: AG 27/03/2013 - Do not upload results if LIS communications are disabled
-    ''' AG 17/02/2014 - #1505 use merge instead of loops</remarks>
-    Private Sub SynchronousLISManagerUploadResults(ByVal pHistoricalFlag As Boolean, Optional ByVal pCurrentResults As ResultsDS = Nothing, Optional ByVal pCurrentResultAlarms As ResultsDS = Nothing, Optional ByVal pHistoricalResults As HisWSResultsDS = Nothing)
+    ''' AG 17/02/2014 - #1505 use merge instead of loops
+    ''' AG 29/09/2014 - BA-1440 when not all results could be sent show a message to user (except during online export). Define new parameter pAutoExportFlag</remarks>
+    Private Sub SynchronousLISManagerUploadResults(ByVal pHistoricalFlag As Boolean, ByVal pAutoExportFlag As Boolean, Optional ByVal pCurrentResults As ResultsDS = Nothing, Optional ByVal pCurrentResultAlarms As ResultsDS = Nothing, Optional ByVal pHistoricalResults As HisWSResultsDS = Nothing)
         Try
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
@@ -9914,6 +9929,18 @@ Partial Public Class IAx00MainMDI
                                     confMappingDS = CType(resultData.SetDatos, LISMappingsDS)
                                 End If
                             End If
+
+                            'AG 29/09/2014 - BA-1440 part2 Exclude tests with incomplete mapping. Correction REJECTED at this point!! (historical business is complex and the error is a not habitual scenario)
+                            'New method in ESBusiness that evaluates mapping and exclude results with LIS mapping incomplete (SampleType, TestName required, MeasureUnit optional)
+                            'Fix issue here improves system requirements because the validation is done before start the process
+                            'Dim myBusiness As New ESBusiness
+                            'resultData = myBusiness.ExcludeNotMappedResults(pHistoricalFlag, inCourseUploadToLisDS, testMappingDS, confMappingDS)
+                            'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            '    inCourseUploadToLisDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+                            'End If
+                            '
+                            'If inCourseUploadToLisDS.twksWSExecutions.Rows.Count > 0 Then
+                            'AG 29/09/2014
 
                             'Get current WS results and result alarms
                             If Not resultData.HasError AndAlso Not pHistoricalFlag AndAlso (pCurrentResults Is Nothing OrElse pCurrentResultAlarms Is Nothing) Then
@@ -9993,12 +10020,33 @@ Partial Public Class IAx00MainMDI
                                 inCourseUploadToLisDS.Clear()
                             End SyncLock
 
+                            Dim showMsg As Boolean = False 'AG 30/09/2014 - BA-1440
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 For Each item As ExecutionsDS In CType(resultData.SetDatos, List(Of ExecutionsDS))
                                     resultData = MDILISManager.UploadOrdersResults(Nothing, item, pHistoricalFlag, testMappingDS, _
                                                             confMappingDS, pCurrentResults, pCurrentResultAlarms, pHistoricalResults)
+
+                                    'AG 30/09/2014 - BA-1440 - Only during MANUAL EXPORT!! if some result not sent (invalid LIS mapping) show message to user
+                                    If Not pAutoExportFlag AndAlso Not showMsg Then
+                                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                            If DirectCast(resultData.SetDatos, Integer) > 0 Then
+                                                showMsg = True 'Some result not sent!!. Inform the user
+                                            End If
+                                        End If
+                                    End If
+                                    'AG 30/09/2014 - BA-1440
                                 Next
+
+                                'AG 30/09/2014 - BA-1440 - Message has to be shown using the presentation Thread
+                                If Not pAutoExportFlag AndAlso showMsg Then
+                                    myLogAcciones.CreateLogActivity("Show message to user when there are results that CANNOT be sent (invalid LIS mapping) ", Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Information, False)
+                                    Me.UIThread(Function() ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me))
+                                End If
+                                'AG 30/09/2014 - BA-1440
                             End If
+
+
+                            'End If 'AG 29/09/2014 - BA-1440
                         End If 'AG 17/02/2014 - #1505
 
                     Else 'Clear class DataSets

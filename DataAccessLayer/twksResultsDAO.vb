@@ -3193,6 +3193,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " UPDATE twksResults SET ExportStatus = '" & dr.ExportStatus & "'" & ", LISMessageID = '" & dr.LISMessageID & "' "
                         cmdText &= " WHERE OrderTestID = " & dr.OrderTestID.ToString
                         cmdText &= " AND RerunNumber = " & dr.RerunNumber.ToString
+                        cmdText &= vbNewLine
                         'cmdText &= " AND ExportStatus = 'SENDING' " 'AG 24/03/2014 - AG 17/02/2014 this line must be COMMENTED when implement #1505 point 7 ('AG 14/02/2014 - #1505 comment this line)
 
                     Next

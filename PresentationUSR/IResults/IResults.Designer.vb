@@ -888,11 +888,10 @@ Partial Class IResults
         Me.PrintTestCtrlButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.PrintTestCtrlButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.PrintTestCtrlButton.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.PrintTestCtrlButton.Location = New System.Drawing.Point(38, 0)
+        Me.PrintTestCtrlButton.Location = New System.Drawing.Point(0, 0)
         Me.PrintTestCtrlButton.Name = "PrintTestCtrlButton"
         Me.PrintTestCtrlButton.Size = New System.Drawing.Size(32, 32)
         Me.PrintTestCtrlButton.TabIndex = 8
-        Me.PrintTestCtrlButton.Text = "CT"
         Me.PrintTestCtrlButton.UseVisualStyleBackColor = True
         '
         'PrintTestButton

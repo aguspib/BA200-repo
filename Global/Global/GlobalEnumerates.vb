@@ -1712,6 +1712,7 @@ Namespace Biosystems.Ax00.Global
             RES_RECOVER_INPAUSE 'AG 28/11/2013 - #1397
 
             READING_NOT_SAVED 'AG 21/05/2014 activate code: TR 06/05/2014 BT #1612, #1634 Indicate there was an error saving a received reading.-**UNCOMMENT Version 3.0.1**-
+            RESULTS_CANNOT_BE_SENT 'AG 30/09/2014 BA-1440 new message to inform the user when some result cannot be sent to LIS
 
         End Enum
 

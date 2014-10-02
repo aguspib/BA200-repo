@@ -2417,6 +2417,13 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Creation ?
+    ''' </remarks>
     Private Sub PrepareAbsorbanceScannedMode()
         Try
             'Dim myGlobal As New GlobalDataTO
@@ -2433,7 +2440,6 @@ Public Class IPositionsAdjustments
                     MyBase.CurrentMode = ADJUSTMENT_MODES.ABSORBANCE_PREPARED
                     Me.PrepareArea()
                 Else
-
                     Me.SendFwScript(Me.CurrentMode)
                     Me.DisableAll()
                 End If
@@ -5646,7 +5652,9 @@ Public Class IPositionsAdjustments
     ''' Defines the needed parameters for the screen delegate in order to make an adjustment
     ''' </summary>
     ''' <param name="pMovement"></param>
-    ''' <remarks>XBC 04/01/11</remarks>
+    ''' <remarks>XBC 04/01/11
+    ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_HOME_ROTOR + REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
+    ''' </remarks>
     Private Sub MakeAdjustment(ByVal pMovement As MOVEMENT)
         Dim myGlobal As New GlobalDataTO
         Try
@@ -5682,6 +5690,11 @@ Public Class IPositionsAdjustments
                         Case MOVEMENT.HOME
                             MovToDo = MOVEMENT.HOME
 
+                            'AG 01/10/2014 BA-1953 - in case photometric reactions rotor inform the current value of adjustment GFWR1 (Posición referencia lectura - Pocillo 1)
+                            If Me.CurrentMode = ADJUSTMENT_MODES.ADJUSTING AndAlso AxisToDo = GlobalEnumerates.AXIS.ROTOR Then
+                                myScreenDelegate.pValueAdjust = BsOpticAdjustmentLabel.Text
+                            End If
+                            'AG 01/10/2014 BA-1953
                     End Select
 
                 End With
@@ -7975,6 +7988,15 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Creation ?
+    ''' AG 01/10/2014 - BA-1953 - also reset REACTIONS_HOME_ROTOR because it is the script used during this adjustment
+    ''' </remarks>
     Private Sub BsTabPagesControl_Deselecting(ByVal sender As Object, ByVal e As System.Windows.Forms.TabControlCancelEventArgs) Handles BsTabPagesControl.Deselecting
 
         Dim myGlobal As New GlobalDataTO
@@ -7982,7 +8004,15 @@ Public Class IPositionsAdjustments
         Try
             ' SGM 28/11/2012 - Always reset preliminary GLF home before quit Optic Centering
             If e.TabPage Is TabOpticCentering Then
-                myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
+
+                'AG 01/10/2014 - BA-1953 - also reset REACTIONS_HOME_ROTOR because it is the script used during this adjustment
+                'myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
+                Dim preliminaryHomesToResetList As New List(Of String)
+                preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
+                preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_HOME_ROTOR.ToString)
+                myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, preliminaryHomesToResetList)
+                'AG 01/10/2014 - BA-1953
+
                 If myGlobal.HasError Then
                     PrepareErrorMode()
                     Exit Try
@@ -8944,7 +8974,16 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
-    'SGM
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Created by SGM
+    ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_HOME_ROTOR + REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
+    ''' </remarks>
     Private Sub BsAdjustButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsOpticAdjustButton.Click, _
                                                                                                         BsWSAdjustButton.Click
         Dim myGlobal As New GlobalDataTO
@@ -8961,8 +9000,15 @@ Public Class IPositionsAdjustments
                     Select Case Me.SelectedPage
                         Case ADJUSTMENT_PAGES.OPTIC_CENTERING
 
-                            ' XBC 12/11/2012 - Always reset preliminary GLF home before start Optic Centering
-                            myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
+                            'AG 01/10/2014 - BA-1953 - also reset REACTIONS_HOME_ROTOR because it is the script used during this adjustment
+                            '' XBC 12/11/2012 - Always reset preliminary GLF home before start Optic Centering
+                            'myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
+                            Dim preliminaryHomesToResetList As New List(Of String)
+                            preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString)
+                            preliminaryHomesToResetList.Add(FwSCRIPTS_IDS.REACTIONS_HOME_ROTOR.ToString)
+                            myGlobal = myScreenDelegate.ResetSpecifiedPreliminaryHomes(MyBase.myServiceMDI.ActiveAnalyzer, preliminaryHomesToResetList)
+                            'AG 01/10/2014 - BA-1953
+
                             If myGlobal.HasError Then
                                 PrepareErrorMode()
                                 Exit Try
@@ -8981,6 +9027,7 @@ Public Class IPositionsAdjustments
                             myScreenDelegate.AbsorbanceScanDone = False
                             myScreenDelegate.AbsorbanceScanReadings = 0
                             myScreenDelegate.ReadedCounts = New List(Of OpticCenterDataTO)
+                            myScreenDelegate.pValueAdjust = BsOpticAdjustmentLabel.Text 'AG 01/10/2014 - BA-1953 inform the current value of adjustment GFWR1 (Posición referencia lectura - Pocillo 1)
 
                             If Not MyBase.SimulationMode Then
                                 Me.ProgressBar1.Maximum = CInt(myScreenDelegate.NumWells * myScreenDelegate.StepsbyWell)

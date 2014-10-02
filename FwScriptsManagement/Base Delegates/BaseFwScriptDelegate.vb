@@ -546,12 +546,23 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Reset an specified Prelimimnary Home
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>XBC 12/11/2012</remarks>
-        Public Function ResetSpecifiedPreliminaryHomes(ByVal pAnalyzerID As String, ByVal pRequiredHomeID As String) As GlobalDataTO
+        ''' <remarks>XBC 12/11/2012
+        ''' AG 01/10/2014 BA-1953 adapt method in order to receive a list of required homes not only 1</remarks>
+        Public Function ResetSpecifiedPreliminaryHomes(ByVal pAnalyzerID As String, ByVal pListRequiredHomeID As List(Of String)) As GlobalDataTO
+            'Public Function ResetSpecifiedPreliminaryHomes(ByVal pAnalyzerID As String, ByVal pRequiredHomeID As String) As GlobalDataTO
             Dim resultdata As New GlobalDataTO
             Try
                 Dim myHomesDAO As New tadjPreliminaryHomesDAO
-                resultdata = myHomesDAO.ResetSpecifiedPreliminaryHomes(Nothing, pAnalyzerID, pRequiredHomeID)
+                'AG 01/10/2014 BA-1953
+                'resultdata = myHomesDAO.ResetSpecifiedPreliminaryHomes(Nothing, pAnalyzerID, pRequiredHomeID)
+                For Each item As String In pListRequiredHomeID
+                    If Not resultdata.HasError Then
+                        resultdata = myHomesDAO.ResetSpecifiedPreliminaryHomes(Nothing, pAnalyzerID, item)
+                    Else
+                        Exit For
+                    End If
+                Next
+                'AG 01/10/2014 BA-1953
 
             Catch ex As Exception
                 resultdata.HasError = True
@@ -609,7 +620,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
                                     (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where  a.Done = False Select a).ToList
+                                    Where a.Done = False Select a).ToList
 
                     For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
                         Dim myFwScript As New FwScriptQueueItem

@@ -1451,6 +1451,7 @@ Public Class IHisResults
     '''              AG 24/07/2014 - BT #1886 (RQ00086 v3.1.0) ==> Allow re-sent patient results from history
     '''              SA 19/09/2014 - BA-1927 ==> * Use multilanguage to shown the message of maximum number of results to be exported to LIS exceeded
     '''                                          * Before start the process, verify if LIS Connection is enabled. If it is not available, stop the process
+    '''              AG 30/09/2014 - BA-1440 inform that is a manual exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub ExportSelectedRowsFromGrid(ByVal pGrid As DevExpress.XtraGrid.Views.Grid.GridView)
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1513,7 +1514,7 @@ Public Class IHisResults
                 'Inform the new results to be updated into MDI property
                 If (myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                     IAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
-                    IAx00MainMDI.InvokeUploadResultsLIS(True, Nothing, Nothing, myHisWSResultsDS)
+                    IAx00MainMDI.InvokeUploadResultsLIS(True, False, Nothing, Nothing, myHisWSResultsDS) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                 End If 'AG 21/02/2014 - #1505
 
                 CreateLogActivity("Historical Results manual upload (end): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505

@@ -913,6 +913,63 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
+        ''' Get the result filtering by sample class and fill reference range interval
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerId"></param>
+        ''' <param name="pWorkSessionId"></param>
+        ''' <param name="pClassList"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function GetResultsBySampleClass(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerId As String, ByVal pWorkSessionId As String, ByVal ParamArray pClassList() As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim filterClause As String = String.Empty
+                        Dim InFilter As String = String.Empty
+
+                        For Each className As String In pClassList
+                            InFilter += String.Format("'{0}', ", className)
+                        Next
+
+                        If (InFilter <> String.Empty) Then
+                            InFilter = InFilter.Substring(0, InFilter.Length - 2)
+                            filterClause = String.Format("SampleClass IN ({0})", InFilter)
+                        End If
+
+                        Dim mytwksResultDAO As New twksResultsDAO()
+                        resultData = mytwksResultDAO.GetCompleteResults(dbConnection, pAnalyzerId, pWorkSessionId, filterClause)
+
+                        Dim resultsDS As New ResultsDS
+                        If (Not resultData.HasError) Then
+                            resultsDS = CType(resultData.SetDatos, ResultsDS)
+                        End If
+
+                        FillReferenceRangeInterval(dbConnection, resultsDS)
+
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByClass", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
         ''' Get all the Result Alarms (Blank or Calibrator Order Test)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
@@ -1406,7 +1463,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Add/update a Result for an OrderTest/RerunNumber/MultipointNumber
         ''' </summary>
@@ -1681,7 +1737,6 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
-
         ''' <summary>
         ''' Updates fields ManualResultFlag, ManualResult and ManualResultText for the specified OrderTestID/MultiItemNumber/RerunNumber
         ''' </summary>
@@ -1907,7 +1962,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Fill the column SpecimenIDList in the results DS using the required elements information
         ''' </summary>
@@ -1990,8 +2044,49 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Fill the reference range interval values of the results
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pResultsDS"></param>
+        ''' <remarks></remarks>
+        Public Sub FillReferenceRangeInterval(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pResultsDS As ResultsDS)
 
+            Dim resultData As GlobalDataTO = Nothing
 
+            'Read Reference Range Limits
+            Dim MinimunValue As Nullable(Of Single) = Nothing
+            Dim MaximunValue As Nullable(Of Single) = Nothing
+
+            Dim myOrderTestsDelegate As New OrderTestsDelegate
+            For Each resultRow As ResultsDS.vwksResultsRow In pResultsDS.vwksResults.Rows
+                If (Not resultRow.IsActiveRangeTypeNull) Then
+                    Dim mySampleType As String = String.Empty
+                    If (resultRow.TestType <> "CALC") Then mySampleType = resultRow.SampleType
+
+                    'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
+                    resultData = myOrderTestsDelegate.GetReferenceRangeInterval(pDBConnection, resultRow.OrderTestID, resultRow.TestType, _
+                                                                                resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
+
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+                        If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+                            MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
+                            MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
+                        End If
+                    End If
+
+                    If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
+                        If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
+                            resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                            resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
+                        End If
+                    End If
+                End If
+            Next resultRow
+
+        End Sub
 #End Region
 
 #Region "Private Methods"
@@ -5798,176 +5893,6 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
-
-        ''' <summary>
-        ''' Get Results info by Test for Report Compact new
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ResultDS (ReportMaster and ReportDetails tables)</returns>
-        ''' <remarks>
-        ''' Created by: RH 10/01/2012
-        '''             AG 28/06/2013 - Patch for the test types without executions
-        '''             JV 20/02/2014 - BT #1502  
-        '''             SA 30/04/2014 - BT #1608 ==> When the header for Test is filled, if field TestLongName is informed, use it as Test Name
-        '''                                          instead of field TestName
-        ''' </remarks>
-        Public Function GetResultsByTestForReportCompactBySampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                  ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myExecutionDelegate As New ExecutionsDelegate
-
-                        resultData = myExecutionDelegate.GetWSExecutionsResults(dbConnection, pAnalyzerID, pWorkSessionID)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim ExecutionsResultsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-                            Dim OrderTestList As List(Of Integer) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                                 Order By row.TestPosition _
-                                                                   Select row.OrderTestID Distinct).ToList()
-
-                            'TR 09/07/2012
-                            Dim AverageResultsDS As New ResultsDS
-                            resultData = GetResultsForReports(dbConnection, OrderTestList)
-                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
-
-                                'Get Calculated Results
-                                resultData = GetCalculatedTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    Next
-                                End If
-                            End If
-
-                            If (Not resultData.HasError) Then
-                                'Get ISE & OffSystem tests Results
-                                resultData = GetISEOFFSTestResults(dbConnection, pAnalyzerID, pWorkSessionID)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    For Each resultRow As ResultsDS.vwksResultsRow In DirectCast(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                                    Next resultRow
-                                End If
-
-                                'AG 28/06/2013 - Patch for the test types without executions
-                                resultData = FillSpecimenIDListForReport(dbConnection, pWorkSessionID, AverageResultsDS)
-                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                    AverageResultsDS = DirectCast(resultData.SetDatos, ResultsDS)
-                                End If
-                                'AG 28/06/2013
-
-                                Dim IsOrderProcessed As New Dictionary(Of String, Boolean)
-
-                                'Fill Average PatientID and Name fields
-                                For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults.Rows
-                                    If (String.Equals(executionRow.SampleClass, "PATIENT")) Then
-                                        If (Not IsOrderProcessed.ContainsKey(executionRow.OrderID)) Then
-                                            For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                                If (String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0) Then
-                                                    resultRow.PatientName = executionRow.PatientName
-                                                    resultRow.PatientID = executionRow.PatientID
-                                                End If
-                                            Next resultRow
-
-                                            IsOrderProcessed(executionRow.OrderID) = True
-                                        End If
-                                    End If
-                                Next executionRow
-
-                                'Fill ReportMaster table
-                                Dim TestsList As New List(Of String)
-                                Dim NamePlusUnit As String
-                                Dim TestTypeTestID As String
-                                Dim ResultsForReportDS As New ResultsDS
-
-                                'Note that here TestID is in fact TestPosition.
-                                Dim myTestName As String = String.Empty
-                                For Each testRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults
-                                    If (Not TestsList.Contains(testRow.TestName)) Then
-                                        TestsList.Add(testRow.TestName)
-                                        TestTypeTestID = testRow.TestType & testRow.TestID
-
-                                        'BT #1608 - When field TestLongName is informed for the Test, it is used as TestName in the Report
-                                        If (testRow.IsTestLongNameNull) Then
-                                            myTestName = testRow.TestName
-                                        Else
-                                            myTestName = testRow.TestLongName
-                                        End If
-
-                                        'RH 23/03/2012
-                                        If (String.IsNullOrEmpty(testRow.MeasureUnit)) Then
-                                            NamePlusUnit = myTestName 'testRow.TestName
-                                        Else
-                                            'NamePlusUnit = String.Format("{0} ({1})", testRow.TestName, testRow.MeasureUnit)
-                                            NamePlusUnit = String.Format("{0} ({1})", myTestName, testRow.MeasureUnit)
-                                        End If
-
-                                        ResultsForReportDS.ReportTestMaster.AddReportTestMasterRow(TestTypeTestID, NamePlusUnit)
-                                    End If
-                                Next testRow
-
-                                'Multilanguage
-                                Dim currentLanguageGlobal As New GlobalBase
-                                Dim LanguageID As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-                                Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                                Dim BLANKLiteral As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_BLANK", LanguageID)
-                                Dim CALIBLiteral As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_CALIB", LanguageID)
-                                Dim CTRLLiteral As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_CTRL", LanguageID)
-                                'Dim PATIENTLiteral As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "PMD_SAMPLE_CLASSES_PATIENT", LanguageID)
-                                'END Multilanguage
-
-                                'Fill ReportDetails table
-                                For Each Test As String In TestsList
-                                    Select Case pType
-                                        Case "CTRL"
-                                            InsertResultsCTRL(Test, AverageResultsDS, ExecutionsResultsDS, ResultsForReportDS, CTRLLiteral, False)
-                                        Case "BLANK"
-                                            InsertResultsBLANK(Test, AverageResultsDS, ExecutionsResultsDS, ResultsForReportDS, BLANKLiteral, False)
-                                            InsertResultsCALIB(Test, AverageResultsDS, ExecutionsResultsDS, ResultsForReportDS, CALIBLiteral, False)
-                                    End Select
-                                    'InsertResultsPATIENT(Test, AverageResultsDS, ExecutionsResultsDS, ResultsForReportDS, PATIENTLiteral)
-                                Next
-                                'Remove tec. without values from the report tables
-                                Dim lTec As IEnumerable(Of ResultsDS.ReportTestMasterRow) = From x In ResultsForReportDS.ReportTestMaster Join y _
-                                                                                                In ResultsForReportDS.ReportTestDetails On x.TestTypeTestID Equals y.TestTypeTestID Select x Distinct
-
-                                If lTec.Count > 0 Then
-                                    Dim dt As New DataTable(ResultsForReportDS.ReportTestMaster.TableName)
-                                    dt = ResultsForReportDS.ReportTestMaster.Clone()
-                                    For Each r As ResultsDS.ReportTestMasterRow In lTec
-                                        dt.LoadDataRow(New Object() {r.TestTypeTestID, r.TestName}, True)
-                                    Next
-                                    ResultsForReportDS.ReportTestMaster.Clear()
-                                    For Each r As ResultsDS.ReportTestMasterRow In dt.Rows
-                                        ResultsForReportDS.ReportTestMaster.LoadDataRow(New Object() {r.TestTypeTestID, r.TestName}, True)
-                                    Next
-                                End If
-                                resultData.SetDatos = ResultsForReportDS
-                            End If
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetResultsByTestForReportCompactBySampleType", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
 
         ''' <summary>
         ''' Get Results Calibrator Curve multipoint info for Report

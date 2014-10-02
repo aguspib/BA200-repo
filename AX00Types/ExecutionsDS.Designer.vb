@@ -502,6 +502,8 @@ Partial Public Class ExecutionsDS
 
         Private columnCtrlsSendingGroup As Global.System.Data.DataColumn
 
+        Private columnLISMappingError As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -994,6 +996,14 @@ Partial Public Class ExecutionsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property LISMappingErrorColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnLISMappingError
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -1087,9 +1097,10 @@ Partial Public Class ExecutionsDS
                     ByVal LISRequest As Boolean, _
                     ByVal ExternalQC As Boolean, _
                     ByVal LockedByLIS As Boolean, _
-                    ByVal CtrlsSendingGroup As Integer) As twksWSExecutionsRow
+                    ByVal CtrlsSendingGroup As Integer, _
+                    ByVal LISMappingError As Boolean) As twksWSExecutionsRow
             Dim rowtwksWSExecutionsRow As twksWSExecutionsRow = CType(Me.NewRow, twksWSExecutionsRow)
-            Dim columnValuesArray() As Object = New Object() {ExecutionID, AnalyzerID, WorkSessionID, SampleClass, StatFlag, OrderTestID, MultiItemNumber, RerunNumber, ReplicateNumber, ExecutionStatus, ExecutionType, BaseLineID, InUse, PostDilutionType, WellUsed, ABS_Value, ABS_Error, rkinetics, KineticsLinear, KineticsInitialValue, KineticsSlope, SubstrateDepletion, ABS_Initial, ABS_MainFilter, CONC_Value, CONC_CurveError, CONC_Error, ResultDate, PreparationID, ReadingCycle, OrderID, ReagentID, SampleType, Abs_WorkReagent, AdjustBaseLineID, TestType, TestID, ISE_ResultID, TestName, ElementID, SampleID, PatientID, SentNewRerunPostdilution, ClotValue, ThermoWarningFlag, HasReadings, Paused, ValidReadings, CompleteReadings, FirstReadingCycle, SecondReadingCycle, ReplicatesTotalNum, ControlID, LISRequest, ExternalQC, LockedByLIS, CtrlsSendingGroup}
+            Dim columnValuesArray() As Object = New Object() {ExecutionID, AnalyzerID, WorkSessionID, SampleClass, StatFlag, OrderTestID, MultiItemNumber, RerunNumber, ReplicateNumber, ExecutionStatus, ExecutionType, BaseLineID, InUse, PostDilutionType, WellUsed, ABS_Value, ABS_Error, rkinetics, KineticsLinear, KineticsInitialValue, KineticsSlope, SubstrateDepletion, ABS_Initial, ABS_MainFilter, CONC_Value, CONC_CurveError, CONC_Error, ResultDate, PreparationID, ReadingCycle, OrderID, ReagentID, SampleType, Abs_WorkReagent, AdjustBaseLineID, TestType, TestID, ISE_ResultID, TestName, ElementID, SampleID, PatientID, SentNewRerunPostdilution, ClotValue, ThermoWarningFlag, HasReadings, Paused, ValidReadings, CompleteReadings, FirstReadingCycle, SecondReadingCycle, ReplicatesTotalNum, ControlID, LISRequest, ExternalQC, LockedByLIS, CtrlsSendingGroup, LISMappingError}
             rowtwksWSExecutionsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtwksWSExecutionsRow)
             Return rowtwksWSExecutionsRow
@@ -1169,6 +1180,7 @@ Partial Public Class ExecutionsDS
             Me.columnExternalQC = MyBase.Columns("ExternalQC")
             Me.columnLockedByLIS = MyBase.Columns("LockedByLIS")
             Me.columnCtrlsSendingGroup = MyBase.Columns("CtrlsSendingGroup")
+            Me.columnLISMappingError = MyBase.Columns("LISMappingError")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1288,11 +1300,14 @@ Partial Public Class ExecutionsDS
             MyBase.Columns.Add(Me.columnLockedByLIS)
             Me.columnCtrlsSendingGroup = New Global.System.Data.DataColumn("CtrlsSendingGroup", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCtrlsSendingGroup)
+            Me.columnLISMappingError = New Global.System.Data.DataColumn("LISMappingError", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnLISMappingError)
             Me.columnExecutionID.AutoIncrementSeed = -1
             Me.columnExecutionID.AutoIncrementStep = -1
             Me.columnExecutionID.ReadOnly = True
             Me.columnISE_ResultID.DefaultValue = CType("", String)
             Me.columnPaused.DefaultValue = CType(False, Boolean)
+            Me.columnLISMappingError.DefaultValue = CType(False, Boolean)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -4377,6 +4392,21 @@ Partial Public Class ExecutionsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property LISMappingError() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletwksWSExecutions.LISMappingErrorColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'LISMappingError' in table 'twksWSExecutions' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletwksWSExecutions.LISMappingErrorColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsExecutionIDNull() As Boolean
             Return Me.IsNull(Me.tabletwksWSExecutions.ExecutionIDColumn)
         End Function
@@ -5057,6 +5087,18 @@ Partial Public Class ExecutionsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetCtrlsSendingGroupNull()
             Me(Me.tabletwksWSExecutions.CtrlsSendingGroupColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsLISMappingErrorNull() As Boolean
+            Return Me.IsNull(Me.tabletwksWSExecutions.LISMappingErrorColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetLISMappingErrorNull()
+            Me(Me.tabletwksWSExecutions.LISMappingErrorColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 
