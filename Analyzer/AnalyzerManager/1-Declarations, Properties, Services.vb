@@ -133,8 +133,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         ' XB 26/09/2014 - BA-1872
         Private ISECMDLost As Boolean
-        Private numSTATEsends As Integer
-        ' XB 26/09/2014 - BA-1872
 
         'Public IsDisplayingServiceData As Boolean = True 'SGM 15/09/2011 exclusion flag for avoiding to update data while displaying data
         'SGM 29/09/2011
@@ -2489,34 +2487,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.STATE
 
-                                ' XB 26/09/2014 - BA-1872
-                                If MyClass.ISECMDLost Then
-                                    MyClass.numSTATEsends += 1
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    If MyClass.numSTATEsends > GlobalBase.MaxRepetitionsTimeout Then
-                                        ' PDT !!!
-                                        Debug.Print(" SEND MESSAGE ERROR !!!")
-                                        myLogAcciones.CreateLogActivity("Num of Repetitions for STATE instruction excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
-                                        waitingStartTaskTimer.Enabled = False
-                                        MyClass.sendingRepetitions = False
-
-                                        RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                                    Else
-                                        If Not MyClass.sendingRepetitions Then
-                                            MyClass.numSTATEsends = 0
-                                        End If
-
-                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
-                                        Exit Select
-                                    End If
-
-                                Else
-                                    ' XB 26/09/2014 - BA-1872
-
-                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
-                                    Exit Select
-                                End If     ' XB 26/09/2014 - BA-1872 
-
+                                myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
+                                Exit Select
                                 'END AG 06/05/2010
 
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.WASH
@@ -2785,7 +2757,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                         End If ' XB 03/04/2014  
 
-
                                     End If
                                 End If
                                 Exit Select
@@ -2801,7 +2772,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.RECOVER 'AG 22/02/2012
+                            Case GlobalEnumerates.AnalyzerManagerSwActionList.RECOVER 'AG 22/02/2012 
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 If GlobalBase.IsServiceAssembly Then
@@ -2811,7 +2782,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RECOVER)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.POLLRD  'AG 31/07/2012
+                            Case GlobalEnumerates.AnalyzerManagerSwActionList.POLLRD  'AG 31/07/2012 
                                 If ConnectedAttribute Then
                                     Dim ActionMode As Integer = GlobalEnumerates.Ax00PollRDAction.Biochemical
                                     If IsNumeric(pSwAdditionalParameters) Then
@@ -3096,11 +3067,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         ' Set Waiting Timer Current Instruction OFF
                                         'Me.InitializeTimerStartTaskControl(WAITING_TIME_DEFAULT)
                                         MyClass.sendingRepetitions = True
+                                        Debug.Print("sendingRepetitions = TRUE 6")
                                         ClearQueueToSend()
                                         MyClass.numRepetitionsTimeout += 1
                                         If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
                                             waitingStartTaskTimer.Enabled = False
                                             MyClass.sendingRepetitions = False
+                                            Debug.Print("sendingRepetitions = FALSE 7")
 
                                             ConnectedAttribute = False
                                             InfoRefreshFirstTime = True
@@ -3268,7 +3241,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myGlobal = Me.ProcessSerialNumberReceived(pInstructionReceived)
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSTIN_RECEIVED 'AG 31/07/2012
+                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSTIN_RECEIVED 'AG 31/07/2012 
                                 InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSTIN_RECEIVED
                                 'AG 27/08/2012 - readings are received in running or when recovery results process is working
                                 If String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString), "INPROCESS", False) <> 0 Then
@@ -3278,7 +3251,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
                                 Exit Select
 
-                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSPRD_RECEIVED  'AG 31/07/2012
+                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSPRD_RECEIVED  'AG 31/07/2012 
                                 InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSPRD_RECEIVED
                                 myGlobal = Me.ProcessANSPRDReceived(pInstructionReceived)
                                 Exit Select
@@ -3588,7 +3561,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 'If myUI_RefreshEvent.Count = 0 Then myUI_RefreshDS.Clear()
                                 ClearRefreshDataSets(True, False) 'AG 22/05/2014 - #1637
-                                RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+
+                                If Not MyClass.sendingRepetitions Then    ' XB 30/09/2014 - BA-1872
+                                    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                                End If
 
                                 'AG 12/06/2012 - comment this part. Now the running refresh event is unique and called from wellBaseLineWorker_DoWork
                                 'normal case in RUNNING: only photometric readings instruction received raises event to presentation
