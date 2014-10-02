@@ -2423,6 +2423,7 @@ Public Class IPositionsAdjustments
     ''' </summary>
     ''' <remarks>
     ''' Creation ?
+    ''' AG 01/10/2014 - BA-1953 new photometry adjustment maneuver (use REAGENTS_HOME_ROTOR + REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1)
     ''' </remarks>
     Private Sub PrepareAbsorbanceScannedMode()
         Try
@@ -2440,6 +2441,7 @@ Public Class IPositionsAdjustments
                     MyBase.CurrentMode = ADJUSTMENT_MODES.ABSORBANCE_PREPARED
                     Me.PrepareArea()
                 Else
+                    myScreenDelegate.pValueAdjust = BsOpticAdjustmentLabel.Text 'AG 01/10/2014 - BA-1953 inform the current value of adjustment GFWR1 (Posición referencia lectura - Pocillo 1)
                     Me.SendFwScript(Me.CurrentMode)
                     Me.DisableAll()
                 End If
