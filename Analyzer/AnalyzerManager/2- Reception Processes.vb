@@ -44,6 +44,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' XB 03/04/2014 - Fix a malfunction when INFO;Q:3 was sent meanwhile a ISE operation was working or Abort process was not finished - task #1557
         ''' AG 15/04/2014 - #1594 paused in v300
         ''' XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
+        ''' XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
         Private Function ProcessStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
@@ -291,13 +292,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 ' XB 26/09/2014 - BA-1872
-                'errorValue = 61
                 If errorValue <> 61 Then
                     If MyClass.ISECMDLost Then
                         MyClass.ISECMDLost = False
 
                         If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
                             MyClass.sendingRepetitions = True
+                            Debug.Print("sendingRepetitions = TRUE 1")
                             MyClass.numRepetitionsTimeout += 1
                             Dim myLogAcciones As New ApplicationLogManager()
                             If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
@@ -306,6 +307,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                 waitingStartTaskTimer.Enabled = False
                                 MyClass.sendingRepetitions = False
+                                Debug.Print("sendingRepetitions = FALSE 2")
+
+                                'RaiseEvent ISEProcedureFinished()   ????
 
                                 RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                             Else
@@ -323,6 +327,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'MyClass.ISE_Manager.StopInstructionStartedTimer()
 
                         MyClass.sendingRepetitions = False
+                        Debug.Print("sendingRepetitions = FALSE 3")
                         MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
                         MyClass.ClearStartTaskQueueToSend()
                     End If
@@ -430,6 +435,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 ' XB 26/09/2014 - BA-1872
                                 MyClass.sendingRepetitions = True
+                                Debug.Print("sendingRepetitions = TRUE 4")
                                 MyClass.numRepetitionsTimeout += 1
                                 Dim myLogAcciones As New ApplicationLogManager()
                                 If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
@@ -438,28 +444,33 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                     waitingStartTaskTimer.Enabled = False
                                     MyClass.sendingRepetitions = False
+                                    Debug.Print("sendingRepetitions = FALSE 5")
+
+                                    'RaiseEvent ISEProcedureFinished()   ????
 
                                     RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                 Else
                                     ' Instruction has not started by Fw, so is need to send it again
                                     Debug.Print("Repeat Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]")
-                                    myLogAcciones.CreateLogActivity("Repeat Start Task Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                    myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                     myGlobal = MyClass.SendStartTaskinQueue()
                                 End If
+
+
+                                'If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                '    myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+
+                                '    'SGM 18/09/2012
+                                '    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                '    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                                '    If GlobalBase.IsServiceAssembly Then
+                                '        MyClass.ISE_Manager.IsISESwitchON = False
+                                '    End If
+
+                                'End If
+                                'myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
                                 ' XB 26/09/2014 - BA-1872
 
-                                If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
-                                    myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-
-                                    'SGM 18/09/2012
-                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                    If GlobalBase.IsServiceAssembly Then
-                                        MyClass.ISE_Manager.IsISESwitchON = False
-                                    End If
-
-                                End If
-                                myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
                             End If
                             'end SGM 02/07/2012
 
@@ -3747,7 +3758,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'AG 18/11/2013 - (#1385) Increment the number of tests that will be used positions for arm R2 washing
                         If Not resultData.HasError Then
-                            Debug.print("Step 3 - MarkWashWellContaminationRunningAccepted -> LastPreparationInstructionSent = " & applayer.LastPreparationInstructionSent)
+                            Debug.Print("Step 3 - MarkWashWellContaminationRunningAccepted -> LastPreparationInstructionSent = " & AppLayer.LastPreparationInstructionSent)
 
                             Dim inProcessDlg As New WSRotorPositionsInProcessDelegate
                             resultData = inProcessDlg.IncrementInProcessTestsNumber(Nothing, AnalyzerIDAttribute, AppLayer.LastPreparationInstructionSent)
@@ -4262,6 +4273,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by:  TR 03/01/2010
         ''' Modified by: SA 12/06/2014 - BT #1660 ==> Replaced call to function ProcessISETESTResults in ISEReception class, for its new 
         '''                                           version (ProcessISETESTResultsNEW) 
+        '''               XB 30/09/2014 - Implement Start Task Timeout for ISE commands - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
         Public Function ProcessRecivedISEResult(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -4272,6 +4284,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'myGlobalDataTO = DAOBase.GetOpenDBTransaction(Nothing)
                 'If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
                 '    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+
+                ' XB 30/09/2014 - BA-1872
+                ISECMDLost = False
+                MyClass.sendingRepetitions = False
+                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                MyClass.ClearStartTaskQueueToSend()
+                ' XB 30/09/2014 - BA-1872
 
                 Dim myPreparationID As Integer = -1
                 Dim myISEResultStr As String = ""
@@ -4312,7 +4331,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'SGM 17/02/2012 ISE Communications Ok
                         If MyClass.ISE_Manager IsNot Nothing Then
                             If MyClass.ISE_Manager.IsCommErrorDetected Then
-                                MyClass.ISE_Manager.IsISECommsOk = False
+                                'MyClass.ISE_Manager.IsISECommsOk = False       ' XB 30/09/2014 - BA-1872
                                 MyClass.ISE_Manager.IsCommErrorDetected = False
                             Else
                                 MyClass.ISE_Manager.IsISECommsOk = True

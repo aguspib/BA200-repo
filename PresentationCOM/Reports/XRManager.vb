@@ -2417,7 +2417,7 @@ Public Class XRManager
         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
             Dim dsResults As New ResultsDS
             dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResults.Merge(dsResults.vwksResults)
+            data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
         End If
 
         resultData = myResultsDelegate.GetResultAlarms(Nothing)
@@ -2452,7 +2452,9 @@ Public Class XRManager
 
             Dim remarks As String = String.Empty
             Dim flags As String = String.Empty
+            Dim concentration As String = String.Empty
 
+            'FLAG field
             'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
             If ((Not row.IsActiveRangeTypeNull AndAlso Not String.Compare(row.ActiveRangeType, String.Empty, False) = 0) AndAlso _
                 (IsNumeric(row.CONC_Value))) Then
@@ -2474,6 +2476,7 @@ Public Class XRManager
                 End If
             End If
 
+            'REMARKS field
             For Each alarm As ResultsDS.vwksResultsAlarmsRow In results.vwksResultsAlarms.Where(Function(a) a.OrderTestID = row.OrderTestID)
                 remarks += String.Format("{0}, ", alarm.Description)
             Next
@@ -2482,10 +2485,39 @@ Public Class XRManager
                 remarks = remarks.Substring(0, remarks.Length - 2)
             End If
 
+            'CONCENTRATION field
+            If (Not row.IsCONC_ValueNull) Then
+                Dim hasConcentrationError As Boolean = False
+
+                If (Not row.IsCONC_ErrorNull) Then
+                    hasConcentrationError = Not String.IsNullOrEmpty(row.CONC_Error)
+                End If
+
+                If (Not hasConcentrationError) Then
+                    concentration = row.CONC_Value.ToStringWithDecimals(row.DecimalsAllowed)
+                Else
+                    concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                End If
+            Else
+                If (Not row.IsManualResultTextNull) Then
+                    concentration = row.ManualResultText
+                Else
+                    concentration = GlobalConstants.CONCENTRATION_NOT_CALCULATED
+                End If
+            End If
+
+            If (Not row.IsABS_ErrorNull) Then
+                If (Not String.IsNullOrEmpty(row.ABS_Error)) Then
+                    concentration = GlobalConstants.CONC_DUE_ABS_ERROR
+                End If
+            End If
+
+
             dataRow = dsReport.ControlsResultsDetails.NewControlsResultsDetailsRow()
+            dataRow.OrderTestID = row.OrderTestID
             dataRow.Name = String.Format("{0} ({1})", row.ControlName, row.ControlLotNumber)
             dataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
-            dataRow.Concentration = row.CONC_Value
+            dataRow.Concentration = concentration
             dataRow.MeasureUnit = row.MeasureUnit
             dataRow.ConcentrationLimits = String.Format("{0} - {1}", row.MinConcentration, row.MaxConcentration)
             dataRow.Flags = flags

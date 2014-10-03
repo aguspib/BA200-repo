@@ -283,7 +283,7 @@ Partial Public Class ReportsDS
     Partial Public Class ControlsResultsDetailsDataTable
         Inherits Global.System.Data.TypedTableBase(Of ControlsResultsDetailsRow)
 
-        Private columnTestTypeTestID As Global.System.Data.DataColumn
+        Private columnOrderTestID As Global.System.Data.DataColumn
 
         Private columnTestName As Global.System.Data.DataColumn
 
@@ -336,9 +336,9 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public ReadOnly Property TestTypeTestIDColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property OrderTestIDColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnTestTypeTestID
+                Return Me.columnOrderTestID
             End Get
         End Property
 
@@ -435,9 +435,9 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddControlsResultsDetailsRow(ByVal TestTypeTestID As String, ByVal TestName As String, ByVal Name As String, ByVal Concentration As Single, ByVal MeasureUnit As String, ByVal ConcentrationLimits As String, ByVal Remarks As String, ByVal Flags As String) As ControlsResultsDetailsRow
+        Public Overloads Function AddControlsResultsDetailsRow(ByVal OrderTestID As Integer, ByVal TestName As String, ByVal Name As String, ByVal Concentration As String, ByVal MeasureUnit As String, ByVal ConcentrationLimits As String, ByVal Remarks As String, ByVal Flags As String) As ControlsResultsDetailsRow
             Dim rowControlsResultsDetailsRow As ControlsResultsDetailsRow = CType(Me.NewRow, ControlsResultsDetailsRow)
-            Dim columnValuesArray() As Object = New Object() {TestTypeTestID, TestName, Name, Concentration, MeasureUnit, ConcentrationLimits, Remarks, Flags}
+            Dim columnValuesArray() As Object = New Object() {OrderTestID, TestName, Name, Concentration, MeasureUnit, ConcentrationLimits, Remarks, Flags}
             rowControlsResultsDetailsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowControlsResultsDetailsRow)
             Return rowControlsResultsDetailsRow
@@ -460,7 +460,7 @@ Partial Public Class ReportsDS
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Friend Sub InitVars()
-            Me.columnTestTypeTestID = MyBase.Columns("TestTypeTestID")
+            Me.columnOrderTestID = MyBase.Columns("OrderTestID")
             Me.columnTestName = MyBase.Columns("TestName")
             Me.columnName = MyBase.Columns("Name")
             Me.columnConcentration = MyBase.Columns("Concentration")
@@ -473,13 +473,13 @@ Partial Public Class ReportsDS
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Private Sub InitClass()
-            Me.columnTestTypeTestID = New Global.System.Data.DataColumn("TestTypeTestID", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnTestTypeTestID)
+            Me.columnOrderTestID = New Global.System.Data.DataColumn("OrderTestID", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnOrderTestID)
             Me.columnTestName = New Global.System.Data.DataColumn("TestName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTestName)
             Me.columnName = New Global.System.Data.DataColumn("Name", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnName)
-            Me.columnConcentration = New Global.System.Data.DataColumn("Concentration", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
+            Me.columnConcentration = New Global.System.Data.DataColumn("Concentration", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnConcentration)
             Me.columnMeasureUnit = New Global.System.Data.DataColumn("MeasureUnit", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnMeasureUnit)
@@ -637,17 +637,17 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property TestTypeTestID() As String
+        Public Property OrderTestID() As Integer
             Get
                 Try
-                    Return CType(Me(Me.tableControlsResultsDetails.TestTypeTestIDColumn), String)
+                    Return CType(Me(Me.tableControlsResultsDetails.OrderTestIDColumn), Integer)
                 Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("El valor de la columna 'TestTypeTestID' de la tabla 'ControlsResultsDetails' es D" & _
-                            "BNull.", e)
+                    Throw New Global.System.Data.StrongTypingException("El valor de la columna 'OrderTestID' de la tabla 'ControlsResultsDetails' es DBNu" & _
+                            "ll.", e)
                 End Try
             End Get
-            Set(value As String)
-                Me(Me.tableControlsResultsDetails.TestTypeTestIDColumn) = value
+            Set(value As Integer)
+                Me(Me.tableControlsResultsDetails.OrderTestIDColumn) = value
             End Set
         End Property
 
@@ -683,16 +683,16 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property Concentration() As Single
+        Public Property Concentration() As String
             Get
                 Try
-                    Return CType(Me(Me.tableControlsResultsDetails.ConcentrationColumn), Single)
+                    Return CType(Me(Me.tableControlsResultsDetails.ConcentrationColumn), String)
                 Catch e As Global.System.InvalidCastException
                     Throw New Global.System.Data.StrongTypingException("El valor de la columna 'Concentration' de la tabla 'ControlsResultsDetails' es DB" & _
                             "Null.", e)
                 End Try
             End Get
-            Set(value As Single)
+            Set(value As String)
                 Me(Me.tableControlsResultsDetails.ConcentrationColumn) = value
             End Set
         End Property
@@ -760,14 +760,14 @@ Partial Public Class ReportsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Function IsTestTypeTestIDNull() As Boolean
-            Return Me.IsNull(Me.tableControlsResultsDetails.TestTypeTestIDColumn)
+        Public Function IsOrderTestIDNull() As Boolean
+            Return Me.IsNull(Me.tableControlsResultsDetails.OrderTestIDColumn)
         End Function
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Sub SetTestTypeTestIDNull()
-            Me(Me.tableControlsResultsDetails.TestTypeTestIDColumn) = Global.System.Convert.DBNull
+        Public Sub SetOrderTestIDNull()
+            Me(Me.tableControlsResultsDetails.OrderTestIDColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _

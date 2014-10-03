@@ -422,7 +422,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 12/03/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 12/03/2012
+        ''' Modified by XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        ''' </remarks>
         Public Property IsISESwitchON() As Boolean
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
@@ -447,12 +450,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     IsISESwitchONAttr = value
 
                     If Not value Then
-                        MyClass.IsISECommsOkAttr = False
-                        MyClass.IsISEInitiatedOKAttr = False
-                        'MyClass.IsISEInitializationDoneAttr = False
+                        ' XB 30/09/2014 - BA-1872
+                        'MyClass.IsISECommsOkAttr = False       
+                        'MyClass.IsISEInitiatedOKAttr = False
 
-                        'stop timeout timer
-                        MyClass.StopInstructionStartedTimer()
+                        ''MyClass.IsISEInitializationDoneAttr = False
+
+                        ''stop timeout timer
+                        'MyClass.StopInstructionStartedTimer()  
+                        ' XB 30/09/2014 - BA-1872
 
                         If MyClass.CurrentProcedure <> ISEProcedures.None Then
                             MyClass.AbortCurrentProcedureDueToException()
@@ -2355,38 +2361,42 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Modified by XBC 21/01/2013 - When a valid Reagent Pack is read, Page0 and Page1 must be refreshed with news values, and not set 
+        ''' Modified by XB 21/01/2013 - When a valid Reagent Pack is read, Page0 and Page1 must be refreshed with news values, and not set 
         '''                              to Nothing. Additionally, IsCleanPackInstalled change to FALSE (Bugs tracking #1108)
+        '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
         ''' </remarks>
         Private Function ManageLastISEResult() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If LastISEResult.ISEResultType <> ISEResultTO.ISEResultTypes.None Then
 
+                    ' XB 30/09/2014 - BA-1872
+                    'If MyClass.IsWaitingForInstructionStart Then
 
-                    If MyClass.IsWaitingForInstructionStart Then
+                    '    'START TIMEOUT 
 
-                        'START TIMEOUT 
+                    '    'there are communications errors
+                    '    MyClass.IsISECommsOk = False
 
-                        'there are communications errors
-                        MyClass.IsISECommsOk = False
+                    '    'stop timeout timer
+                    '    MyClass.StopInstructionStartedTimer()
 
-                        'stop timeout timer
-                        MyClass.StopInstructionStartedTimer()
+                    '    'abort procedure because of communucations error, timeout
+                    '    myGlobal = MyClass.AbortCurrentProcedureDueToException
 
-                        'abort procedure because of communucations error, timeout
-                        myGlobal = MyClass.AbortCurrentProcedureDueToException
+                    '    'force ISE START Timeout error
+                    '    RaiseEvent ISEProcedureFinished()
+                    '    'MyClass.myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED, False)
 
-                        'force ISE START Timeout error
-                        RaiseEvent ISEProcedureFinished()
-                        'MyClass.myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED, False)
+                    '    Exit Try
 
-                        Exit Try
+                    'Else
+                    ' XB 30/09/2014 - BA-1872
 
-                    ElseIf MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ComError Then 'SGM 11/05/2012
+                    If MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.ComError Then 'SGM 11/05/2012
 
                         'RESULT TIMEOUT
-                        MyClass.IsISECommsOk = False 'there are communications
+                        'MyClass.IsISECommsOk = False 'there are communications  ' XB 30/09/2014 - BA-1872
                         'error because of communucations error, timeout
                         myGlobal = MyClass.AbortCurrentProcedureDueToException
                         Exit Try
@@ -2400,13 +2410,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If MyClass.myAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
                             If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.R Or _
                                 MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
-                                MyClass.IsISECommsOkAttr = False
+                                'MyClass.IsISECommsOkAttr = False  ' XB 30/09/2014 - BA-1872
                                 MyClass.IsISEInitiatedOKAttr = False
                                 MyClass.IsCommErrorDetected = True
                             End If
                         Else
                             If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
-                                MyClass.IsISECommsOkAttr = False
+                                'MyClass.IsISECommsOkAttr = False  ' XB 30/09/2014 - BA-1872
                                 MyClass.IsISEInitiatedOKAttr = False
                                 MyClass.IsCommErrorDetected = True
                             End If
@@ -3311,19 +3321,25 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Cancel the current Procedure
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function AbortCurrentProcedureDueToException() As GlobalDataTO
+        ''' <remarks>
+        ''' Modified by XB 30/09/2014 - Add parameter isTimeoutException - Remove too restrictive limitations because timeouts - BA-1872
+        ''' </remarks>
+        Public Function AbortCurrentProcedureDueToException(Optional ByVal isTimeoutException As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                If MyClass.CurrentProcedure = ISEProcedures.GeneralCheckings Then
+                If Not isTimeoutException AndAlso MyClass.CurrentProcedure = ISEProcedures.GeneralCheckings Then
                     MyClass.IsISEInitializationDoneAttr = True
                     MyClass.IsISEInitiatedOKAttr = False
                     RaiseEvent ISEConnectionFinished(False)
                 End If
 
                 If MyClass.CurrentProcedure <> ISEProcedures.None Then
-                    MyClass.LastProcedureResultAttr = ISEProcedureResult.Exception
-                    RaiseEvent ISEProcedureFinished()
+
+                    If Not isTimeoutException Then
+                        MyClass.LastProcedureResultAttr = ISEProcedureResult.Exception
+
+                        RaiseEvent ISEProcedureFinished()
+                    End If
 
                     'MyClass.LastProcedureResultAttr = ISEProcedureResult.None
                 End If
@@ -3345,7 +3361,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Only invoked in constructor and after loading a Report SAT
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        ''' </remarks>
         Public Function RefreshAllDatabaseInformation() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3360,12 +3378,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ' XBC 22/03/2012
                     End If
 
-                    'SGM 02/07/2012
-                    myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CMD_TIMEOUT)
-                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                        MyClass.InstructionStartedTimeout = CInt(myGlobal.SetDatos)
-                    End If
-                    'SGM 02/07/2012
+                    ' XB 30/09/2014 - BA-1872
+                    ''SGM 02/07/2012
+                    'myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CMD_TIMEOUT)
+                    'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
+                    '    MyClass.InstructionStartedTimeout = CInt(myGlobal.SetDatos)
+                    'End If
+                    ''SGM 02/07/2012
+                    ' XB 30/09/2014 - BA-1872
 
                     ' XBC 18/07/2012
                     'get parameters
@@ -4557,7 +4577,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return myGlobal
         End Function
-
 
         Private Function UpdateISEModuleReady() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -8021,110 +8040,112 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'this functionality is implemented in order to manage timeouts 
         'when no Status Start notification is received after sending an ISE Command
 
-        Private InstructionStartedTimeout As Integer = 2000 '1000 miliseconds
+        ' XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        'Private InstructionStartedTimeout As Integer = 2000 '1000 miliseconds
 
-        Private InstructionStartedTimerCallBack As System.Threading.TimerCallback
-        Private WithEvents InstructionStartedTimer As System.Threading.Timer
+        'Private InstructionStartedTimerCallBack As System.Threading.TimerCallback
+        'Private WithEvents InstructionStartedTimer As System.Threading.Timer
 
-        ''' <summary>
-        ''' flag for knowing if it is waiting for the 1st instruction start after sending ISECMD
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns></returns>
-        ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Public ReadOnly Property IsWaitingForInstructionStart() As Boolean
-            Get
-                Return (MyClass.InstructionStartedTimer IsNot Nothing)
-            End Get
-        End Property
+        ' ''' <summary>
+        ' ''' flag for knowing if it is waiting for the 1st instruction start after sending ISECMD
+        ' ''' </summary>
+        ' ''' <value></value>
+        ' ''' <returns></returns>
+        ' ''' <remarks>Created by SGM 20/06/2012</remarks>
+        'Public ReadOnly Property IsWaitingForInstructionStart() As Boolean
+        '    Get
+        '        Return (MyClass.InstructionStartedTimer IsNot Nothing)
+        '    End Get
+        'End Property
 
-        ''' <summary>
-        ''' Start Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
-        ''' </summary>
-        ''' <param name="pTime"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by SGM 20/06/2012
-        ''' Modified by XBC 04/09/2012 - change to Public to allow calls from ManageAnalyzer
-        ''' </remarks>
-        Public Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO
-            Dim myGlobal As New GlobalDataTO
-            Try
-                Dim myTime As Integer
+        ' ''' <summary>
+        ' ''' Start Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
+        ' ''' </summary>
+        ' ''' <param name="pTime"></param>
+        ' ''' <returns></returns>
+        ' ''' <remarks>
+        ' ''' Created by SGM 20/06/2012
+        ' ''' Modified by XBC 04/09/2012 - change to Public to allow calls from ManageAnalyzer
+        ' ''' </remarks>
+        'Public Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO
+        '    Dim myGlobal As New GlobalDataTO
+        '    Try
+        '        Dim myTime As Integer
 
-                If pTime > 0 Then
-                    myTime = pTime
-                Else
-                    myTime = MyClass.InstructionStartedTimeout
-                End If
+        '        If pTime > 0 Then
+        '            myTime = pTime
+        '        Else
+        '            myTime = MyClass.InstructionStartedTimeout
+        '        End If
 
-                MyClass.StopInstructionStartedTimer()
+        '        MyClass.StopInstructionStartedTimer()
 
-                MyClass.InstructionStartedTimerCallBack = New System.Threading.TimerCallback(AddressOf OnInstructionStartedTimerTick)
+        '        MyClass.InstructionStartedTimerCallBack = New System.Threading.TimerCallback(AddressOf OnInstructionStartedTimerTick)
 
-                MyClass.InstructionStartedTimer = New System.Threading.Timer(MyClass.InstructionStartedTimerCallBack, New Object, myTime, 0)
+        '        MyClass.InstructionStartedTimer = New System.Threading.Timer(MyClass.InstructionStartedTimerCallBack, New Object, myTime, 0)
 
-                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer activated")
+        '        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer activated")
 
-            Catch ex As Exception
-                myGlobal = New GlobalDataTO()
-                myGlobal.HasError = True
-                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
-                myGlobal.ErrorMessage = ex.Message
+        '    Catch ex As Exception
+        '        myGlobal = New GlobalDataTO()
+        '        myGlobal.HasError = True
+        '        myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString()
+        '        myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.StartInstructionStartedTimer", EventLogEntryType.Error, False)
-            End Try
-            Return myGlobal
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.StartInstructionStartedTimer", EventLogEntryType.Error, False)
+        '    End Try
+        '    Return myGlobal
+        'End Function
 
-        ''' <summary>
-        ''' Stop Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
-        ''' </summary>
-        ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Public Sub StopInstructionStartedTimer()
-            Try
-                If MyClass.InstructionStartedTimer IsNot Nothing Then
-                    MyClass.InstructionStartedTimer.Dispose()
-                    MyClass.InstructionStartedTimer = Nothing
-                    MyClass.InstructionStartedTimerCallBack = Nothing
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer killed")
-                Else
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer es nothing")
-                End If
+        ' ''' <summary>
+        ' ''' Stop Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
+        ' ''' </summary>
+        ' ''' <remarks>Created by SGM 20/06/2012</remarks>
+        'Public Sub StopInstructionStartedTimer()
+        '    Try
+        '        If MyClass.InstructionStartedTimer IsNot Nothing Then
+        '            MyClass.InstructionStartedTimer.Dispose()
+        '            MyClass.InstructionStartedTimer = Nothing
+        '            MyClass.InstructionStartedTimerCallBack = Nothing
+        '            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer killed")
+        '        Else
+        '            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timer es nothing")
+        '        End If
 
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.StopInstructionStartedTimer", EventLogEntryType.Error, False)
-            End Try
-        End Sub
+        '    Catch ex As Exception
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.StopInstructionStartedTimer", EventLogEntryType.Error, False)
+        '    End Try
+        'End Sub
 
-        ''' <summary>
-        ''' Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
-        ''' </summary>
-        ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Private Sub OnInstructionStartedTimerTick(ByVal stateInfo As Object)
-            Try
+        ' ''' <summary>
+        ' ''' Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
+        ' ''' </summary>
+        ' ''' <remarks>Created by SGM 20/06/2012</remarks>
+        'Private Sub OnInstructionStartedTimerTick(ByVal stateInfo As Object)
+        '    Try
 
-                If MyClass.InstructionStartedTimer IsNot Nothing AndAlso MyClass.InstructionStartedTimerCallBack IsNot Nothing Then
-                    'MyClass.StopInstructionStartedTimer()
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timeout!!!")
+        '        If MyClass.InstructionStartedTimer IsNot Nothing AndAlso MyClass.InstructionStartedTimerCallBack IsNot Nothing Then
+        '            'MyClass.StopInstructionStartedTimer()
+        '            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Timeout!!!")
 
-                    Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
-                    myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-                    MyClass.LastISEResult = myISEResultWithComErrors
+        '            Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
+        '            myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
+        '            MyClass.LastISEResult = myISEResultWithComErrors
 
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("ISE timeout after waiting for Status instruction from Analyzer", "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
+        '            Dim myLogAcciones As New ApplicationLogManager()
+        '            myLogAcciones.CreateLogActivity("ISE timeout after waiting for Status instruction from Analyzer", "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
 
-                    MyClass.StopInstructionStartedTimer()
-                End If
+        '            MyClass.StopInstructionStartedTimer()
+        '        End If
 
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
-            End Try
-        End Sub
+        '    Catch ex As Exception
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.OnInstructionStartedTimerTick", EventLogEntryType.Error, False)
+        '    End Try
+        'End Sub
+        ' XB 30/09/2014 - BA-1872
 
 #End Region
 

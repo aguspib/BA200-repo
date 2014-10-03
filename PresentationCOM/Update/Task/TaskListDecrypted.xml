@@ -2880,26 +2880,25 @@
       UPDATE [Ax00].[dbo].tparTestProfiles SET CustomPosition = TestProfilePosition
       END
       GO
-      
-      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'MAX_RESULTS_FOR_LISEXPORT') = 0) 
+
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'MAX_RESULTS_FOR_LISEXPORT') = 0)
       BEGIN
       INSERT INTO tfmwMessages (MessageID, MessageType, ResourceID)
-      VALUES ('MAX_RESULTS_FOR_LISEXPORT', 'Information', 'MSG_MAX_RESULTS_FOR_LISEXPORT') 
+      VALUES ('MAX_RESULTS_FOR_LISEXPORT', 'Information', 'MSG_MAX_RESULTS_FOR_LISEXPORT')
       END
       GO
-      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'RESULTS_CANNOT_BE_SENT') = 0) 
+      IF ((SELECT COUNT(*) FROM tfmwMessages WHERE MessageID = 'RESULTS_CANNOT_BE_SENT') = 0)
       BEGIN
       INSERT INTO tfmwMessages (MessageID, MessageType, ResourceID)
-      VALUES ('RESULTS_CANNOT_BE_SENT', 'Information', 'MSG_RESULTS_CANNOT_BE_SENT') 
+      VALUES ('RESULTS_CANNOT_BE_SENT', 'Information', 'MSG_RESULTS_CANNOT_BE_SENT')
       END
       GO
-      
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwPreloadedMasterData] WHERE [ItemID] = 'COMPACTPRINTCTR') = 0)
-	      BEGIN
-		      INSERT INTO [Ax00].[dbo].[tfmwPreloadedMasterData] ([SubTableID],[ItemID],[ResourceID],[FixedItemDesc],[MultiLanguageFlag],[Position],[Status])
-		      VALUES ('ICON_PATHS','COMPACTPRINTCTR',N'','PrintControls.png',0,0,1)
-	      END
-      GO   
+
+      IF ((SELECT COUNT(*) FROM srv_tadjPreliminaryHomes WHERE AdjustmentGroupID = 'PHOTOMETRY' AND RequiredHomeID = 'REACTIONS_ROTOR_HOME_WELL1') &gt; 0)
+      BEGIN
+      UPDATE srv_tadjPreliminaryHomes SET RequiredHomeID = 'REACTIONS_HOME_ROTOR' WHERE AdjustmentGroupID = 'PHOTOMETRY' AND RequiredHomeID = 'REACTIONS_ROTOR_HOME_WELL1'
+      END
+      GO
     </UpdateScript>
   </AppVersion >
 </TaskListDS>

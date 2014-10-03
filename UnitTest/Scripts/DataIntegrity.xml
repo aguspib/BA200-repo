@@ -2903,9 +2903,9 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.10</Version>
-    <Label>Count ALL new images (sort tests button)</Label>
+    <Label>Count ALL new images (sort tests button, control's report)</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND ItemID = 'ORDER_TESTS' ) = 1)
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND (ItemID = 'ORDER_TESTS' OR ItemId = 'COMPACTPRINTCTR')) = 2)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -2936,16 +2936,15 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.10</Version>
-    <Label>New image defined in version 3.1.0</Label>
+    <Label>SERVICE SOFTWARE - Update the preliminary homes for optical centering adjustments</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwPreloadedMasterData] WHERE [ItemID] = 'COMPACTPRINTCTR') = 0)
+      IF ((SELECT COUNT(*) FROM srv_tadjPreliminaryHomes WHERE AdjustmentGroupID = 'PHOTOMETRY' AND RequiredHomeID = 'REACTIONS_ROTOR_HOME_WELL1') &lt;&gt; 0)
       SELECT 'False'
       ELSE
       SELECT 'True'
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
-
 </DBIntegrityDS>
 
 

@@ -33,6 +33,7 @@ Partial Public Class ControlsCompactReport
         Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
         Me.reportsDS = New Biosystems.Ax00.Types.ReportsDS()
         Me.GroupHeader = New DevExpress.XtraReports.UI.GroupHeaderBand()
+        Me.XrWSStartDateTimeLabel = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrPanel = New DevExpress.XtraReports.UI.XRPanel()
         Me.XrLabelFlag = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrLabelConcLimit = New DevExpress.XtraReports.UI.XRLabel()
@@ -41,7 +42,6 @@ Partial Public Class ControlsCompactReport
         Me.XrLabelConc = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrLabelRemarks = New DevExpress.XtraReports.UI.XRLabel()
-        Me.XrWSStartDateTimeLabel = New DevExpress.XtraReports.UI.XRLabel()
         CType(Me.XrTable, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.reportsDS, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -60,7 +60,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTable.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
         Me.XrTable.Name = "XrTable"
         Me.XrTable.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRow})
-        Me.XrTable.SizeF = New System.Drawing.SizeF(727.0001!, 25.0!)
+        Me.XrTable.SizeF = New System.Drawing.SizeF(725.9999!, 25.0!)
         Me.XrTable.StylePriority.UseFont = False
         '
         'XrTableRow
@@ -149,7 +149,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell7.StylePriority.UseTextAlignment = False
         Me.XrTableCell7.Text = "XrTableCell7"
         Me.XrTableCell7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
-        Me.XrTableCell7.Weight = 0.23287904674692417R
+        Me.XrTableCell7.Weight = 0.23117878709636366R
         '
         'TopMargin
         '
@@ -177,6 +177,20 @@ Partial Public Class ControlsCompactReport
         Me.GroupHeader.Name = "GroupHeader"
         Me.GroupHeader.RepeatEveryPage = True
         '
+        'XrWSStartDateTimeLabel
+        '
+        Me.XrWSStartDateTimeLabel.Borders = DevExpress.XtraPrinting.BorderSide.None
+        Me.XrWSStartDateTimeLabel.CanGrow = False
+        Me.XrWSStartDateTimeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.XrWSStartDateTimeLabel.LocationFloat = New DevExpress.Utils.PointFloat(499.92!, 0.0!)
+        Me.XrWSStartDateTimeLabel.Name = "XrWSStartDateTimeLabel"
+        Me.XrWSStartDateTimeLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
+        Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(227.08!, 15.0!)
+        Me.XrWSStartDateTimeLabel.StylePriority.UseBorders = False
+        Me.XrWSStartDateTimeLabel.StylePriority.UseFont = False
+        Me.XrWSStartDateTimeLabel.StylePriority.UseTextAlignment = False
+        Me.XrWSStartDateTimeLabel.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight
+        '
         'XrPanel
         '
         Me.XrPanel.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
@@ -184,7 +198,7 @@ Partial Public Class ControlsCompactReport
         Me.XrPanel.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelFlag, Me.XrLabelConcLimit, Me.XrLabelTest, Me.XrLabelName, Me.XrLabelConc, Me.XrLabelUnit, Me.XrLabelRemarks})
         Me.XrPanel.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 38.5!)
         Me.XrPanel.Name = "XrPanel"
-        Me.XrPanel.SizeF = New System.Drawing.SizeF(727.0001!, 21.5!)
+        Me.XrPanel.SizeF = New System.Drawing.SizeF(726.0!, 21.5!)
         Me.XrPanel.StylePriority.UseBorders = False
         Me.XrPanel.StylePriority.UseBorderWidth = False
         '
@@ -291,26 +305,12 @@ Partial Public Class ControlsCompactReport
         Me.XrLabelRemarks.LocationFloat = New DevExpress.Utils.PointFloat(589.9999!, 1.500003!)
         Me.XrLabelRemarks.Name = "XrLabelRemarks"
         Me.XrLabelRemarks.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelRemarks.SizeF = New System.Drawing.SizeF(137.0002!, 21.62498!)
+        Me.XrLabelRemarks.SizeF = New System.Drawing.SizeF(136.0!, 21.62498!)
         Me.XrLabelRemarks.StylePriority.UseBorders = False
         Me.XrLabelRemarks.StylePriority.UseFont = False
         Me.XrLabelRemarks.StylePriority.UseTextAlignment = False
         Me.XrLabelRemarks.Text = "Observaciones"
         Me.XrLabelRemarks.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
-        '
-        'XrWSStartDateTimeLabel
-        '
-        Me.XrWSStartDateTimeLabel.Borders = DevExpress.XtraPrinting.BorderSide.None
-        Me.XrWSStartDateTimeLabel.CanGrow = False
-        Me.XrWSStartDateTimeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.XrWSStartDateTimeLabel.LocationFloat = New DevExpress.Utils.PointFloat(499.92!, 0.0!)
-        Me.XrWSStartDateTimeLabel.Name = "XrWSStartDateTimeLabel"
-        Me.XrWSStartDateTimeLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(227.08!, 15.0!)
-        Me.XrWSStartDateTimeLabel.StylePriority.UseBorders = False
-        Me.XrWSStartDateTimeLabel.StylePriority.UseFont = False
-        Me.XrWSStartDateTimeLabel.StylePriority.UseTextAlignment = False
-        Me.XrWSStartDateTimeLabel.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleRight
         '
         'ControlsCompactReport
         '
