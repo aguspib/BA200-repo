@@ -83,14 +83,14 @@ Partial Public Class BlanksAndCalibratorsReport
         '
         'Detail
         '
-        Me.Detail.HeightF = 0.0!
+        Me.Detail.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrWSStartDateTimeLabel})
+        Me.Detail.HeightF = 26.04167!
         Me.Detail.Name = "Detail"
         Me.Detail.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.Detail.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         '
         'TopMargin
         '
-        Me.TopMargin.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrWSStartDateTimeLabel})
         Me.TopMargin.HeightF = 86.0!
         Me.TopMargin.Name = "TopMargin"
         Me.TopMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
@@ -101,7 +101,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrWSStartDateTimeLabel.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrWSStartDateTimeLabel.CanGrow = False
         Me.XrWSStartDateTimeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
-        Me.XrWSStartDateTimeLabel.LocationFloat = New DevExpress.Utils.PointFloat(841.92!, 61.0!)
+        Me.XrWSStartDateTimeLabel.LocationFloat = New DevExpress.Utils.PointFloat(841.92!, 0.0!)
         Me.XrWSStartDateTimeLabel.Name = "XrWSStartDateTimeLabel"
         Me.XrWSStartDateTimeLabel.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrWSStartDateTimeLabel.SizeF = New System.Drawing.SizeF(227.08!, 15.0!)
@@ -480,7 +480,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrTableCell12.StylePriority.UseTextAlignment = False
         Me.XrTableCell12.Text = "CALIB ASO (7889ABC)"
         Me.XrTableCell12.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell12.Weight = 0.33996914101114756R
+        Me.XrTableCell12.Weight = 0.2906025730888625R
         '
         'XrTableCell14
         '
@@ -491,7 +491,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrTableCell14.StylePriority.UseTextAlignment = False
         Me.XrTableCell14.Text = "1"
         Me.XrTableCell14.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell14.Weight = 0.044195862178814944R
+        Me.XrTableCell14.Weight = 0.044196069679399923R
         '
         'XrTableCell15
         '
@@ -512,7 +512,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrTableCell16.StylePriority.UseTextAlignment = False
         Me.XrTableCell16.Text = "XrTableCell16"
         Me.XrTableCell16.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell16.Weight = 0.11898918806330357R
+        Me.XrTableCell16.Weight = 0.11898918806330355R
         '
         'XrTableCell17
         '
@@ -526,7 +526,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrTableCell17.StylePriority.UseTextAlignment = False
         Me.XrTableCell17.Text = "IU/mL"
         Me.XrTableCell17.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell17.Weight = 0.11396046274826055R
+        Me.XrTableCell17.Weight = 0.11396056649855305R
         '
         'XrTableCell19
         '
@@ -537,7 +537,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrTableCell19.StylePriority.UseTextAlignment = False
         Me.XrTableCell19.Text = "1111,9999"
         Me.XrTableCell19.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell19.Weight = 0.11721842895095132R
+        Me.XrTableCell19.Weight = 0.11898913519285667R
         '
         'XrTableCell20
         '
@@ -548,7 +548,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrTableCell20.StylePriority.UseTextAlignment = False
         Me.XrTableCell20.Text = "1"
         Me.XrTableCell20.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrTableCell20.Weight = 0.11898913532117172R
+        Me.XrTableCell20.Weight = 0.16658468575067395R
         '
         'XrTableCell21
         '
@@ -597,10 +597,10 @@ Partial Public Class BlanksAndCalibratorsReport
         '
         Me.XrLabelFactorLimit.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelFactorLimit.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelFactorLimit.LocationFloat = New DevExpress.Utils.PointFloat(683.0833!, 1.499922!)
+        Me.XrLabelFactorLimit.LocationFloat = New DevExpress.Utils.PointFloat(655.0834!, 1.499922!)
         Me.XrLabelFactorLimit.Name = "XrLabelFactorLimit"
         Me.XrLabelFactorLimit.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelFactorLimit.SizeF = New System.Drawing.SizeF(70.0!, 20.0!)
+        Me.XrLabelFactorLimit.SizeF = New System.Drawing.SizeF(98.0!, 20.0!)
         Me.XrLabelFactorLimit.StylePriority.UseBorders = False
         Me.XrLabelFactorLimit.StylePriority.UseFont = False
         Me.XrLabelFactorLimit.StylePriority.UsePadding = False
@@ -612,7 +612,7 @@ Partial Public Class BlanksAndCalibratorsReport
         '
         Me.XrLabelFactor.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelFactor.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelFactor.LocationFloat = New DevExpress.Utils.PointFloat(613.0833!, 1.499907!)
+        Me.XrLabelFactor.LocationFloat = New DevExpress.Utils.PointFloat(585.0834!, 1.499907!)
         Me.XrLabelFactor.Name = "XrLabelFactor"
         Me.XrLabelFactor.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrLabelFactor.SizeF = New System.Drawing.SizeF(70.0!, 20.0!)
@@ -628,7 +628,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrLabelUnit.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelUnit.CanGrow = False
         Me.XrLabelUnit.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(547.0833!, 1.499922!)
+        Me.XrLabelUnit.LocationFloat = New DevExpress.Utils.PointFloat(518.0416!, 1.499922!)
         Me.XrLabelUnit.Name = "XrLabelUnit"
         Me.XrLabelUnit.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrLabelUnit.SizeF = New System.Drawing.SizeF(67.04175!, 20.00001!)
@@ -644,7 +644,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.XrLabelCalibratorAbs.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelCalibratorAbs.CanGrow = False
         Me.XrLabelCalibratorAbs.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelCalibratorAbs.LocationFloat = New DevExpress.Utils.PointFloat(407.0833!, 1.499931!)
+        Me.XrLabelCalibratorAbs.LocationFloat = New DevExpress.Utils.PointFloat(378.0416!, 1.499931!)
         Me.XrLabelCalibratorAbs.Name = "XrLabelCalibratorAbs"
         Me.XrLabelCalibratorAbs.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrLabelCalibratorAbs.SizeF = New System.Drawing.SizeF(70.0!, 20.0!)
@@ -659,7 +659,7 @@ Partial Public Class BlanksAndCalibratorsReport
         '
         Me.XrLabelMultipointNumber.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelMultipointNumber.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelMultipointNumber.LocationFloat = New DevExpress.Utils.PointFloat(381.0833!, 1.499946!)
+        Me.XrLabelMultipointNumber.LocationFloat = New DevExpress.Utils.PointFloat(352.0417!, 1.499946!)
         Me.XrLabelMultipointNumber.Name = "XrLabelMultipointNumber"
         Me.XrLabelMultipointNumber.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrLabelMultipointNumber.SizeF = New System.Drawing.SizeF(25.99997!, 20.0!)
@@ -690,7 +690,7 @@ Partial Public Class BlanksAndCalibratorsReport
         '
         Me.XrLabelTheoricalConc.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelTheoricalConc.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelTheoricalConc.LocationFloat = New DevExpress.Utils.PointFloat(477.0833!, 1.499931!)
+        Me.XrLabelTheoricalConc.LocationFloat = New DevExpress.Utils.PointFloat(448.0416!, 1.499931!)
         Me.XrLabelTheoricalConc.Name = "XrLabelTheoricalConc"
         Me.XrLabelTheoricalConc.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
         Me.XrLabelTheoricalConc.SizeF = New System.Drawing.SizeF(70.0!, 20.0!)
@@ -736,10 +736,10 @@ Partial Public Class BlanksAndCalibratorsReport
         '
         Me.XrLabelCalibratorName.Borders = DevExpress.XtraPrinting.BorderSide.None
         Me.XrLabelCalibratorName.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        Me.XrLabelCalibratorName.LocationFloat = New DevExpress.Utils.PointFloat(181.0833!, 1.500003!)
+        Me.XrLabelCalibratorName.LocationFloat = New DevExpress.Utils.PointFloat(181.0833!, 1.500009!)
         Me.XrLabelCalibratorName.Name = "XrLabelCalibratorName"
         Me.XrLabelCalibratorName.Padding = New DevExpress.XtraPrinting.PaddingInfo(2, 2, 0, 0, 100.0!)
-        Me.XrLabelCalibratorName.SizeF = New System.Drawing.SizeF(200.0!, 20.0!)
+        Me.XrLabelCalibratorName.SizeF = New System.Drawing.SizeF(170.9583!, 20.0!)
         Me.XrLabelCalibratorName.StylePriority.UseBorders = False
         Me.XrLabelCalibratorName.StylePriority.UseFont = False
         Me.XrLabelCalibratorName.StylePriority.UsePadding = False

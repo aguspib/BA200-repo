@@ -1836,11 +1836,12 @@ Public Class XRManager
 
             Dim xtraReport As XtraReport = Nothing
             Dim dsReport As ReportsDS = Nothing
+            Dim reportDate As DateTime = Nothing
 
-            dsReport = CreateBlanksAndCalibratorsReportHistoricalData(analyzerID, dateFrom, dateTo, testNameContains)
+            dsReport = CreateBlanksAndCalibratorsReportHistoricalData(analyzerID, dateFrom, dateTo, testNameContains, reportDate)
 
             If (Not dsReport Is Nothing) Then
-                xtraReport = CreateBlanksAndCalibratorsReport(dsReport)
+                xtraReport = CreateBlanksAndCalibratorsReport(reportDate, dsReport)
                 ShowLandscape(xtraReport)
             End If
 
@@ -2088,7 +2089,9 @@ Public Class XRManager
         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
             Dim dsResults As New ResultsDS
             dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
+            If (dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).Count > 0) Then
+                data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
+            End If
         End If
 
         resultData = myResultsDelegate.GetResultAlarms(Nothing)
@@ -2096,7 +2099,9 @@ Public Class XRManager
         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
             Dim dsResults As New ResultsDS
             dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResultsAlarms.Merge(dsResults.vwksResultsAlarms)
+            If (dsResults.vwksResultsAlarms.Count > 0) Then
+                data.vwksResultsAlarms.Merge(dsResults.vwksResultsAlarms)
+            End If
         End If
 
         Return data
@@ -2660,7 +2665,7 @@ Public Class XRManager
     ''' <remarks>
     ''' Created by:  IT 06/10/2014 - BA-1883 
     ''' </remarks>
-    Private Shared Function CreateBlanksAndCalibratorsReportHistoricalData(ByVal analyzerID As String, ByVal dateFrom As DateTime, ByVal dateTo As DateTime, ByVal testNameContains As String) As ReportsDS
+    Private Shared Function CreateBlanksAndCalibratorsReportHistoricalData(ByVal analyzerID As String, ByVal dateFrom As DateTime, ByVal dateTo As DateTime, ByVal testNameContains As String, ByRef reportDate As DateTime) As ReportsDS
         Dim dsReport As New ReportsDS
         Dim blankDataRow As ReportsDS.BlanksResultsDetailsRow
         Dim calibratorDataRow As ReportsDS.CalibratorsResultsDetailsRow
@@ -2684,7 +2689,7 @@ Public Class XRManager
             dsReport.BlanksResultsDetails.Rows.Add(blankDataRow)
         Next
 
-        For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "CALIB").OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.CalibratorName).ThenBy(Function(r) r.LotNumber)
+        For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "CALIB").OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.CalibratorName).ThenBy(Function(r) r.LotNumber).ThenBy(Function(r) r.ResultDateTime)
 
             calibratorDataRow = dsReport.CalibratorsResultsDetails.NewCalibratorsResultsDetailsRow()
             calibratorDataRow.OrderTestID = row.HistOrderTestID
@@ -2703,6 +2708,9 @@ Public Class XRManager
             dsReport.CalibratorsResultsDetails.Rows.Add(calibratorDataRow)
         Next
 
+        reportDate = (From detail In results.vhisWSResults _
+                                 Select detail.ResultDateTime).Max()
+
         If ((dsReport.BlanksResultsDetails.Count > 0) Or (dsReport.CalibratorsResultsDetails.Count > 0)) Then
             Return dsReport
         End If
@@ -2718,7 +2726,7 @@ Public Class XRManager
     ''' <remarks>
     ''' Created by:  IT 06/10/2014 - BA-1883
     ''' </remarks>
-    Private Shared Function CreateBlanksAndCalibratorsReport(ByVal dsReport As ReportsDS) As BlanksAndCalibratorsReport
+    Private Shared Function CreateBlanksAndCalibratorsReport(ByVal reporDate As DateTime, ByVal dsReport As ReportsDS) As BlanksAndCalibratorsReport
 
         Dim currentLanguageGlobal As New GlobalBase
         Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
@@ -2749,11 +2757,7 @@ Public Class XRManager
         Report.XrLabelCalibratorRemarks.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage)
         Report.XrLabelCalibratorDate.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Date", CurrentLanguage)
 
-        'Dim reportDatetime As String
-        'reportDatetime = (From detail In dsReport.BlanksResultsDetails _
-        '                         Select detail.ResultDate).Max()
-
-        'Report.XrWSStartDateTimeLabel.Text = reportDatetime
+        Report.XrWSStartDateTimeLabel.Text = reporDate.ToString(DatePattern) & " " & reporDate.ToString(TimePattern)
         Report.DataSource = dsReport
 
         Return Report
