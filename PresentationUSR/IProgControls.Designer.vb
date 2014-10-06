@@ -174,10 +174,10 @@ Partial Class IProgControls
         'bsLevelUpDown
         '
         Me.bsLevelUpDown.ForeColor = System.Drawing.Color.Black
-        Me.bsLevelUpDown.Location = New System.Drawing.Point(580, 58)
+        Me.bsLevelUpDown.Location = New System.Drawing.Point(235, 58)
         Me.bsLevelUpDown.Name = "bsLevelUpDown"
         Me.bsLevelUpDown.Size = New System.Drawing.Size(47, 21)
-        Me.bsLevelUpDown.TabIndex = 4
+        Me.bsLevelUpDown.TabIndex = 3
         Me.bsLevelUpDown.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsLevelLabel
@@ -186,7 +186,7 @@ Partial Class IProgControls
         Me.bsLevelLabel.BackColor = System.Drawing.Color.Transparent
         Me.bsLevelLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsLevelLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsLevelLabel.Location = New System.Drawing.Point(577, 42)
+        Me.bsLevelLabel.Location = New System.Drawing.Point(235, 40)
         Me.bsLevelLabel.Name = "bsLevelLabel"
         Me.bsLevelLabel.Size = New System.Drawing.Size(49, 13)
         Me.bsLevelLabel.TabIndex = 57
@@ -364,7 +364,7 @@ Partial Class IProgControls
         Me.bsExpirationDateLabel.BackColor = System.Drawing.Color.Transparent
         Me.bsExpirationDateLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsExpirationDateLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsExpirationDateLabel.Location = New System.Drawing.Point(580, 83)
+        Me.bsExpirationDateLabel.Location = New System.Drawing.Point(580, 84)
         Me.bsExpirationDateLabel.Name = "bsExpirationDateLabel"
         Me.bsExpirationDateLabel.Size = New System.Drawing.Size(130, 13)
         Me.bsExpirationDateLabel.TabIndex = 48
@@ -393,7 +393,7 @@ Partial Class IProgControls
         Me.bsSampleTypeComboBox.Location = New System.Drawing.Point(343, 58)
         Me.bsSampleTypeComboBox.Name = "bsSampleTypeComboBox"
         Me.bsSampleTypeComboBox.Size = New System.Drawing.Size(218, 21)
-        Me.bsSampleTypeComboBox.TabIndex = 3
+        Me.bsSampleTypeComboBox.TabIndex = 4
         '
         'bsSampleTypeLabel
         '
