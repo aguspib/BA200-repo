@@ -2799,7 +2799,7 @@
       SELECT DISTINCT
       hres.HistOrderTestID, hres.AnalyzerID, hres.ResultDateTime, hres.ABSValue, hres.ABSWorkReagent, hres.KineticBlankLimit, hres.ABSInitial, hres.ABSMainFilter,
       hres.BlankAbsorbanceLimit, hres.AlarmList, hres.CalibratorFactor, hres.FactorLowerLimit, hres.FactorUpperLimit, hot.SampleClass, hot.SampleType, hts.TestName,
-      tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, htc.CalibratorNum,
+      tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, hres.MultiPointNumber,
       hres.WorkSessionID, hts.CalibPointUsed, hts.DecimalsAllowed, hres.RemarkAlert, htc.TestVersionNumber, hot.TestType, hts.TestID, hts.TestPosition
       FROM         dbo.thisWSResults AS hres
       INNER JOIN dbo.thisWSOrderTests AS hot ON hres.HistOrderTestID = hot.HistOrderTestID AND hres.AnalyzerID = hot.AnalyzerID AND hres.WorkSessionID = hot.WorkSessionID
