@@ -1779,11 +1779,10 @@ Public Class XRManager
     ''' <param name="pAnalyzerID"></param>
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="pIsHistorical"></param>
-    ''' <param name="pClassList"></param>
     ''' <remarks>
     ''' Created by:  IT 01/10/2014 - BT #1864
     ''' </remarks>
-    Public Shared Sub ShowControlsCompactReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIsHistorical As Boolean, ByVal ParamArray pClassList() As String)
+    Public Shared Sub ShowControlsCompactReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIsHistorical As Boolean)
         Try
             Dim resultData As GlobalDataTO = Nothing
 
@@ -1798,7 +1797,7 @@ Public Class XRManager
             Dim dsReport As ReportsDS = Nothing
 
             If (Not pIsHistorical) Then
-                dsReport = CreateControlsCompactReportData(pAnalyzerID, pWorkSessionID, pClassList)
+                dsReport = CreateControlsCompactReportData(pAnalyzerID, pWorkSessionID)
             Else
                 'TODO: Call to the historical method
             End If
@@ -1806,6 +1805,43 @@ Public Class XRManager
             If (Not dsReport Is Nothing) Then
                 xtraReport = CreateControlsCompactReport(pWorkSessionID, dsReport)
                 ShowPortrait(xtraReport)
+            End If
+
+        Catch ex As Exception
+            Dim myLogAcciones As New ApplicationLogManager()
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Show Blanks and Calibrators Report
+    ''' </summary>
+    ''' <param name="analyzerID"></param>
+    ''' <param name="dateFrom"></param>
+    ''' <param name="dateTo"></param>
+    ''' <param name="testNameContains"></param>
+    ''' <remarks>
+    ''' Created by:  IT 06/10/2014 - BA-1883
+    ''' </remarks>
+    Public Shared Sub ShowBlanksAndCalibratorsReport(ByVal analyzerID As String, ByVal dateFrom As DateTime, ByVal dateTo As DateTime, ByVal testNameContains As String)
+        Try
+            Dim resultData As GlobalDataTO = Nothing
+
+            Dim myHisResultsDelegate As New HisWSResultsDelegate
+            Dim myResultsDelegate As New ResultsDelegate
+
+            Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+            Dim xtraReport As XtraReport = Nothing
+            Dim dsReport As ReportsDS = Nothing
+
+            dsReport = CreateBlanksAndCalibratorsReportHistoricalData(analyzerID, dateFrom, dateTo, testNameContains)
+
+            If (Not dsReport Is Nothing) Then
+                xtraReport = CreateBlanksAndCalibratorsReport(dsReport)
+                ShowLandscape(xtraReport)
             End If
 
         Catch ex As Exception
@@ -2030,6 +2066,69 @@ Public Class XRManager
 
         End Try
     End Sub
+
+    ''' <summary>
+    ''' Get the results data of controls
+    ''' </summary>
+    ''' <param name="pAnalyzerID"></param>
+    ''' <param name="pWorkSessionID"></param>
+    ''' <param name="pClassList"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by:  IT 01/10/2014 - BT #1864
+    ''' </remarks>
+    Private Shared Function GetResultsReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ResultsDS
+
+        Dim resultData As GlobalDataTO = Nothing
+        Dim myResultsDelegate As New ResultsDelegate
+        Dim data As New ResultsDS
+
+        resultData = myResultsDelegate.GetResultsBySampleClass(Nothing, pAnalyzerID, pWorkSessionID, pClassList)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            Dim dsResults As New ResultsDS
+            dsResults = CType(resultData.SetDatos, ResultsDS)
+            data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
+        End If
+
+        resultData = myResultsDelegate.GetResultAlarms(Nothing)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            Dim dsResults As New ResultsDS
+            dsResults = CType(resultData.SetDatos, ResultsDS)
+            data.vwksResultsAlarms.Merge(dsResults.vwksResultsAlarms)
+        End If
+
+        Return data
+
+    End Function
+
+    ''' <summary>
+    ''' Get the historical results data of blanks and calibrators
+    ''' </summary>
+    ''' <param name="analyzerID"></param>
+    ''' <param name="dateFrom"></param>
+    ''' <param name="dateTo"></param>
+    ''' <param name="testNameContains"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by:  IT 06/10/2014 - BT #1883
+    ''' </remarks>
+    Private Shared Function GetResultsReportHistoricalData(ByVal analyzerID As String, ByVal dateFrom As DateTime, ByVal dateTo As DateTime, ByVal testNameContains As String) As HisWSResultsDS
+
+        Dim resultData As GlobalDataTO = Nothing
+        Dim myResultsDelegate As New HisWSResultsDelegate
+        Dim data As New HisWSResultsDS
+
+        resultData = myResultsDelegate.GetHistoricalBlankCalibResultsByFilter(Nothing, analyzerID, dateFrom, dateTo, testNameContains)
+
+        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+            data = CType(resultData.SetDatos, HisWSResultsDS)
+        End If
+
+        Return data
+
+    End Function
 
 #Region "Summary Results Report"
 
@@ -2397,62 +2496,26 @@ Public Class XRManager
 #Region "Controls Compact Report"
 
     ''' <summary>
-    ''' Get the results data of controls
-    ''' </summary>
-    ''' <param name="pAnalyzerID"></param>
-    ''' <param name="pWorkSessionID"></param>
-    ''' <param name="pClassList"></param>
-    ''' <returns></returns>
-    ''' <remarks>
-    ''' Created by:  IT 01/10/2014 - BT #1864
-    ''' </remarks>
-    Private Shared Function GetControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ResultsDS
-
-        Dim resultData As GlobalDataTO = Nothing
-        Dim myResultsDelegate As New ResultsDelegate
-        Dim data As New ResultsDS
-
-        resultData = myResultsDelegate.GetResultsBySampleClass(Nothing, pAnalyzerID, pWorkSessionID, pClassList)
-
-        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            Dim dsResults As New ResultsDS
-            dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResults.Merge(dsResults.vwksResults.Where(Function(r) r.AcceptedResultFlag).CopyToDataTable())
-        End If
-
-        resultData = myResultsDelegate.GetResultAlarms(Nothing)
-
-        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-            Dim dsResults As New ResultsDS
-            dsResults = CType(resultData.SetDatos, ResultsDS)
-            data.vwksResultsAlarms.Merge(dsResults.vwksResultsAlarms)
-        End If
-
-        Return data
-
-    End Function
-
-    ''' <summary>
     ''' Create the data needed to show the report
     ''' </summary>
     ''' <param name="pAnalyzerID"></param>
     ''' <param name="pWorkSessionID"></param>
-    ''' <param name="pClassList"></param>
     ''' <returns></returns>
     ''' <remarks>
     ''' Created by:  IT 01/10/2014 - BT #1864
     ''' </remarks>
-    Private Shared Function CreateControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal ParamArray pClassList() As String) As ReportsDS
+    Private Shared Function CreateControlsCompactReportData(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As ReportsDS
         Dim dsReport As New ReportsDS
         Dim dataRow As ReportsDS.ControlsResultsDetailsRow
 
-        Dim results = GetControlsCompactReportData(pAnalyzerID, pWorkSessionID, pClassList)
+        Dim results = GetResultsReportData(pAnalyzerID, pWorkSessionID, "CTRL")
 
         For Each row As ResultsDS.vwksResultsRow In results.vwksResults.OrderBy(Function(r) r.ControlName).ThenBy(Function(r) r.ControlLotNumber).ThenBy(Function(r) r.TestPosition)
 
             Dim remarks As String = String.Empty
             Dim flags As String = String.Empty
             Dim concentration As String = String.Empty
+            Dim rerun As String = String.Empty
 
             'FLAG field
             'Verify if the result is out of the limits of the NORMALITY REFERENCE RANGE
@@ -2477,7 +2540,7 @@ Public Class XRManager
             End If
 
             'REMARKS field
-            For Each alarm As ResultsDS.vwksResultsAlarmsRow In results.vwksResultsAlarms.Where(Function(a) a.OrderTestID = row.OrderTestID)
+            For Each alarm As ResultsDS.vwksResultsAlarmsRow In results.vwksResultsAlarms.Where(Function(a) a.OrderTestID = row.OrderTestID And a.RerunNumber = row.RerunNumber)
                 remarks += String.Format("{0}, ", alarm.Description)
             Next
 
@@ -2512,10 +2575,12 @@ Public Class XRManager
                 End If
             End If
 
+            'RERUN field
+            If (row.RerunNumber > 1) Then rerun = String.Format("({0})", row.RerunNumber.ToString())
 
             dataRow = dsReport.ControlsResultsDetails.NewControlsResultsDetailsRow()
             dataRow.OrderTestID = row.OrderTestID
-            dataRow.Name = String.Format("{0} ({1})", row.ControlName, row.ControlLotNumber)
+            dataRow.Name = String.Format("{0} ({1}) {2}", row.ControlName, row.ControlLotNumber, rerun)
             dataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
             dataRow.Concentration = concentration
             dataRow.MeasureUnit = row.MeasureUnit
@@ -2534,7 +2599,7 @@ Public Class XRManager
     End Function
 
     ''' <summary>
-    ''' Create the controls report
+    ''' Create the Controls report
     ''' </summary>
     ''' <param name="pWorkSessionID"></param>
     ''' <param name="dsReport"></param>
@@ -2555,7 +2620,7 @@ Public Class XRManager
         Report.XrLabelTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Singular", CurrentLanguage)
         Report.XrLabelConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Conc_Short", CurrentLanguage)
         Report.XrLabelUnit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", CurrentLanguage)
-        Report.XrLabelConcLimit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Concentration_Limits", CurrentLanguage)
+        Report.XrLabelConcLimit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Limits", CurrentLanguage)
         Report.XrLabelRemarks.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage)
 
         Dim WSStartDateTime As String = String.Empty
@@ -2578,6 +2643,165 @@ Public Class XRManager
         Report.DataSource = dsReport
 
         Return Report
+    End Function
+
+#End Region
+
+#Region "Blanks and Calibrators Report"
+
+    ''' <summary>
+    ''' Create the data needed to show the report
+    ''' </summary>
+    ''' <param name="analyzerID"></param>
+    ''' <param name="dateFrom"></param>
+    ''' <param name="dateTo"></param>
+    ''' <param name="testNameContains"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by:  IT 06/10/2014 - BA-1883 
+    ''' </remarks>
+    Private Shared Function CreateBlanksAndCalibratorsReportHistoricalData(ByVal analyzerID As String, ByVal dateFrom As DateTime, ByVal dateTo As DateTime, ByVal testNameContains As String) As ReportsDS
+        Dim dsReport As New ReportsDS
+        Dim blankDataRow As ReportsDS.BlanksResultsDetailsRow
+        Dim calibratorDataRow As ReportsDS.CalibratorsResultsDetailsRow
+
+        Dim results = GetResultsReportHistoricalData(analyzerID, dateFrom, dateTo, testNameContains)
+
+        For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "BLANK").OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.ResultDateTime)
+
+            blankDataRow = dsReport.BlanksResultsDetails.NewBlanksResultsDetailsRow()
+            blankDataRow.OrderTestID = row.HistOrderTestID
+            blankDataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
+            blankDataRow.Absorbance = If((Not row.IsABSValueNull()), row.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            blankDataRow.ReagentAbsorbance = If((Not row.IsABSWorkReagentNull()), row.ABSWorkReagent.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            blankDataRow.KineticBlankLimit = If((Not row.IsKineticBlankLimitNull()), row.KineticBlankLimit.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            blankDataRow.InitialAbsorbance = If((Not row.IsABSInitialNull()), row.ABSInitial.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            blankDataRow.MainFilterAbsorbance = If((Not row.IsABSMainFilterNull()), row.ABSMainFilter.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            blankDataRow.BlankAbsorbanceLimit = If((Not row.IsBlankAbsorbanceLimitNull()), row.BlankAbsorbanceLimit.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            blankDataRow.Remarks = If((Not row.IsAlarmListNull()), GetRemarks(row.AlarmList), String.Empty)
+            blankDataRow.ResultDate = If((Not row.IsResultDateTimeNull()), row.ResultDateTime.ToString(SystemInfoManager.OSDateFormat & " " & SystemInfoManager.OSShortTimeFormat), String.Empty)
+
+            dsReport.BlanksResultsDetails.Rows.Add(blankDataRow)
+        Next
+
+        For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "CALIB").OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.CalibratorName).ThenBy(Function(r) r.LotNumber)
+
+            calibratorDataRow = dsReport.CalibratorsResultsDetails.NewCalibratorsResultsDetailsRow()
+            calibratorDataRow.OrderTestID = row.HistOrderTestID
+            calibratorDataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
+            calibratorDataRow.SampleType = row.SampleType
+            calibratorDataRow.Name = String.Format("{0} ({1})", row.CalibratorName, row.LotNumber)
+            calibratorDataRow.MultipointNumber = If((row.NumberOfCalibrators > 1), row.MultiPointNumber.ToString(), String.Empty)
+            calibratorDataRow.Absorbance = If((Not row.IsABSValueNull()), row.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+            calibratorDataRow.TheoreticalConcentration = If((Not row.IsTheoreticalConcentrationNull()), row.TheoreticalConcentration.ToStringWithDecimals(row.DecimalsAllowed), String.Empty)
+            calibratorDataRow.Unit = If((Not row.IsMeasureUnitNull()), row.MeasureUnit, String.Empty)
+            calibratorDataRow.CalibratorFactor = If((Not row.IsCalibratorFactorNull()), row.CalibratorFactor.ToString(GlobalConstants.CALIBRATOR_FACTOR_FORMAT.ToString), String.Empty)
+            calibratorDataRow.FactorLimit = If((Not row.IsFactorLowerLimitNull() And Not row.IsFactorUpperLimitNull()), String.Format("{0} - {1}", row.FactorLowerLimit, row.FactorUpperLimit), String.Empty)
+            calibratorDataRow.Remarks = If((Not row.IsAlarmListNull()), GetRemarks(row.AlarmList), String.Empty)
+            calibratorDataRow.ResultDate = If((Not row.IsResultDateTimeNull()), row.ResultDateTime.ToString(SystemInfoManager.OSDateFormat & " " & SystemInfoManager.OSShortTimeFormat), String.Empty)
+
+            dsReport.CalibratorsResultsDetails.Rows.Add(calibratorDataRow)
+        Next
+
+        If ((dsReport.BlanksResultsDetails.Count > 0) Or (dsReport.CalibratorsResultsDetails.Count > 0)) Then
+            Return dsReport
+        End If
+
+        Return Nothing
+    End Function
+
+    ''' <summary>
+    ''' Create the Blanks and Calibrators report
+    ''' </summary>
+    ''' <param name="dsReport"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by:  IT 06/10/2014 - BA-1883
+    ''' </remarks>
+    Private Shared Function CreateBlanksAndCalibratorsReport(ByVal dsReport As ReportsDS) As BlanksAndCalibratorsReport
+
+        Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+
+        Dim Report As New BlanksAndCalibratorsReport
+
+        'Multilanguage. Get texts from DB.
+        Report.XrLabelBlankTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Singular", CurrentLanguage)
+        Report.XrLabelBlankAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Short", CurrentLanguage)
+        Report.XrLabelReagentAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Results_WorkReagent", CurrentLanguage)
+        Report.XrLabelBlankLimit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_KineticBlankLimit", CurrentLanguage)
+        Report.XrLabelInitialAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AbsInitial", CurrentLanguage)
+        Report.XrLabelBlankRemarks.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage)
+        Report.XrLabelBlankAbsLimit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AbsLimit_Short", CurrentLanguage)
+        Report.XrLabelMainFilterAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AbsMainFilter", CurrentLanguage)
+        Report.XrLabelBlankDate.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Date", CurrentLanguage)
+
+        Report.XrLabelCalibratorTest.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test_Singular", CurrentLanguage)
+        Report.XrLabelSampleType.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Type", CurrentLanguage)
+        Report.XrLabelCalibratorName.Text = String.Format("{0} ({1})", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibratorName", CurrentLanguage), myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Lot", CurrentLanguage))
+        Report.XrLabelMultipointNumber.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveRes_Kit", CurrentLanguage)
+        Report.XrLabelCalibratorAbs.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Short", CurrentLanguage)
+        Report.XrLabelTheoricalConc.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TheoricalConc_Short", CurrentLanguage)
+        Report.XrLabelUnit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", CurrentLanguage)
+        Report.XrLabelFactor.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalibFactor", CurrentLanguage)
+        Report.XrLabelFactorLimit.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_FactorLimits", CurrentLanguage)
+        Report.XrLabelCalibratorRemarks.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Remarks", CurrentLanguage)
+        Report.XrLabelCalibratorDate.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Date", CurrentLanguage)
+
+        'Dim reportDatetime As String
+        'reportDatetime = (From detail In dsReport.BlanksResultsDetails _
+        '                         Select detail.ResultDate).Max()
+
+        'Report.XrWSStartDateTimeLabel.Text = reportDatetime
+        Report.DataSource = dsReport
+
+        Return Report
+    End Function
+
+    ''' <summary>
+    ''' Get the remarks of one result through alarms list value
+    ''' </summary>
+    ''' <param name="alarmList"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by:  IT 06/10/2014 - BA-1883
+    ''' </remarks>
+    Private Shared Function GetRemarks(ByVal alarmList As String) As String
+
+        Dim alarmsDelegate As New AlarmsDelegate
+        Dim dsAlarms As AlarmsDS
+        Dim resultData As New GlobalDataTO
+
+        Dim remarks As String = String.Empty
+        Dim myAlarms() As String
+
+        If (Not String.IsNullOrEmpty(alarmList)) Then
+
+            myAlarms = Split(alarmList, GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR)
+
+            For Each alarmId As String In myAlarms
+                If String.Compare(alarmId, "", False) <> 0 Then
+
+                    resultData = alarmsDelegate.Read(Nothing, alarmId)
+                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                        dsAlarms = CType(resultData.SetDatos, AlarmsDS)
+
+                        If (dsAlarms.tfmwAlarms.Count > 0) Then
+                            If (remarks = String.Empty) Then
+                                remarks = dsAlarms.tfmwAlarms.First().Description
+                            Else
+                                remarks &= ", " & dsAlarms.tfmwAlarms.First().Description
+                            End If
+                        End If
+                    End If
+                End If
+            Next
+        End If
+
+        Erase myAlarms
+        Return remarks
+
     End Function
 
 #End Region

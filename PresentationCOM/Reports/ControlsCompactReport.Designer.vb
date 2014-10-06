@@ -79,7 +79,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell1.StylePriority.UsePadding = False
         Me.XrTableCell1.StylePriority.UseTextAlignment = False
         Me.XrTableCell1.Text = "XrTableCell1"
-        Me.XrTableCell1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell1.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell1.Weight = 0.3346567942873564R
         '
         'XrTableCell2
@@ -92,7 +92,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell2.StylePriority.UsePadding = False
         Me.XrTableCell2.StylePriority.UseTextAlignment = False
         Me.XrTableCell2.Text = "XrTableCell2"
-        Me.XrTableCell2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell2.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell2.Weight = 0.24321936018449314R
         '
         'XrTableCell3
@@ -103,7 +103,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell3.StylePriority.UsePadding = False
         Me.XrTableCell3.StylePriority.UseTextAlignment = False
         Me.XrTableCell3.Text = "XrTableCell3"
-        Me.XrTableCell3.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell3.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell3.Weight = 0.11898913647051736R
         '
         'XrTableCell4
@@ -114,7 +114,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell4.StylePriority.UsePadding = False
         Me.XrTableCell4.StylePriority.UseTextAlignment = False
         Me.XrTableCell4.Text = "XrTableCell4"
-        Me.XrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell4.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell4.Weight = 0.11396046400019109R
         '
         'XrTableCell5
@@ -125,7 +125,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell5.StylePriority.UsePadding = False
         Me.XrTableCell5.StylePriority.UseTextAlignment = False
         Me.XrTableCell5.Text = "XrTableCell5"
-        Me.XrTableCell5.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell5.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell5.Weight = 0.025497673359373946R
         '
         'XrTableCell6
@@ -136,7 +136,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell6.StylePriority.UsePadding = False
         Me.XrTableCell6.StylePriority.UseTextAlignment = False
         Me.XrTableCell6.Text = "XrTableCell6"
-        Me.XrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell6.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell6.Weight = 0.16658479258396358R
         '
         'XrTableCell7
@@ -148,7 +148,7 @@ Partial Public Class ControlsCompactReport
         Me.XrTableCell7.StylePriority.UseFont = False
         Me.XrTableCell7.StylePriority.UseTextAlignment = False
         Me.XrTableCell7.Text = "XrTableCell7"
-        Me.XrTableCell7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
+        Me.XrTableCell7.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
         Me.XrTableCell7.Weight = 0.23117878709636366R
         '
         'TopMargin
@@ -196,7 +196,7 @@ Partial Public Class ControlsCompactReport
         Me.XrPanel.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
         Me.XrPanel.BorderWidth = 1
         Me.XrPanel.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelFlag, Me.XrLabelConcLimit, Me.XrLabelTest, Me.XrLabelName, Me.XrLabelConc, Me.XrLabelUnit, Me.XrLabelRemarks})
-        Me.XrPanel.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 38.5!)
+        Me.XrPanel.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 33.0!)
         Me.XrPanel.Name = "XrPanel"
         Me.XrPanel.SizeF = New System.Drawing.SizeF(726.0!, 21.5!)
         Me.XrPanel.StylePriority.UseBorders = False

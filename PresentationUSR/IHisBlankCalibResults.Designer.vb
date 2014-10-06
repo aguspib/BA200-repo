@@ -41,6 +41,7 @@ Partial Class IHisBlankCalibResults
         Me.CalibratorGridView = New DevExpress.XtraGrid.Views.Grid.GridView()
         Me.xtraBlanksGrid = New DevExpress.XtraGrid.GridControl()
         Me.BlankGridView = New DevExpress.XtraGrid.Views.Grid.GridView()
+        Me.printButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.searchGroup.SuspendLayout()
         Me.historyGroup.SuspendLayout()
         CType(Me.xtraCalibratorsGrid, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -466,6 +467,15 @@ Partial Class IHisBlankCalibResults
         Me.BlankGridView.OptionsView.ShowGroupPanel = False
         Me.BlankGridView.PaintStyleName = "WindowsXP"
         '
+        'printButton
+        '
+        Me.printButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.printButton.Location = New System.Drawing.Point(21, 614)
+        Me.printButton.Name = "printButton"
+        Me.printButton.Size = New System.Drawing.Size(32, 32)
+        Me.printButton.TabIndex = 28
+        Me.printButton.UseVisualStyleBackColor = True
+        '
         'IHisBlankCalibResults
         '
         Me.AcceptButton = Me.exitButton
@@ -477,6 +487,7 @@ Partial Class IHisBlankCalibResults
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(978, 654)
+        Me.Controls.Add(Me.printButton)
         Me.Controls.Add(Me.searchGroup)
         Me.Controls.Add(Me.historyGroup)
         Me.Controls.Add(Me.exitButton)
@@ -517,4 +528,5 @@ Partial Class IHisBlankCalibResults
     Friend WithEvents BsCalibsGridLabel1 As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents analyzerIDLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents analyzerIDComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
+    Friend WithEvents printButton As Biosystems.Ax00.Controls.UserControls.BSButton
 End Class

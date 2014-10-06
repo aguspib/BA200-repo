@@ -16,6 +16,7 @@ Imports System.IO
 Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
 Imports Biosystems.Ax00.InfoAnalyzer
+Imports Biosystems.Ax00.PresentationCOM
 
 Public Class IHisBlankCalibResults
 
@@ -218,6 +219,10 @@ Public Class IHisBlankCalibResults
             'SEARCH Button
             searchButton.Image = GetImage("FIND")
             myToolTipsControl.SetToolTip(searchButton, GetText("BTN_Search"))
+
+            'PRINT Button
+            printButton.Image = GetImage("PRINT")
+            myToolTipsControl.SetToolTip(printButton, GetText("BTN_Print"))
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1541,6 +1546,30 @@ Public Class IHisBlankCalibResults
         FindHistoricalResults()
     End Sub
 
+    Private Sub PrintBlanksAndCalibratorsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles printButton.Click
+        Try
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            Dim StartTime As DateTime = Now
+            Dim myLogAcciones As New ApplicationLogManager()
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+            Dim filter As SearchFilter = GetSearchFilter()
+            With filter
+                XRManager.ShowBlanksAndCalibratorsReport(.analyzerId, .dateFrom, .dateTo, .testNameContains) 'IT 06/10/2014 - BT #1883
+            End With
+
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            myLogAcciones.CreateLogActivity("Blanks and Calibrator Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "IHisBlankCalibResults.PrintBlanksAndCalibratorsButton_Click", EventLogEntryType.Information, False)
+            StartTime = Now
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrintBlanksAndCalibratorsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+        End Try
+    End Sub
+
 #End Region
 
 #Region " DateTimePicker Events "
@@ -1666,6 +1695,5 @@ Public Class IHisBlankCalibResults
 #End Region
 
 #End Region
-
 
 End Class
