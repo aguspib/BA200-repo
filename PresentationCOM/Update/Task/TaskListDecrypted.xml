@@ -667,7 +667,7 @@
       INSERT INTO [dbo].[tcfgUserSettings]
       ([SettingID],[SettingDataType],[CurrentValue],[Status],[TS_User],[TS_DateTime])
       VALUES
-      ('LIS_HOST_QUERY_PACKAGE','INTEGER','1',1,'BIOSYSTEMS','2013-03-04 10:46:58.000')
+      ('LIS_HOST_QUERY_PACKAGE','INTEGER','10',1,'BIOSYSTEMS','2013-03-04 10:46:58.000')
       GO
       IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_maxTimeWaitingForResponse') = 0)
       INSERT INTO [dbo].[tcfgUserSettings]
@@ -679,7 +679,7 @@
       INSERT INTO [dbo].[tcfgUserSettings]
       ([SettingID],[SettingDataType],[CurrentValue],[Status],[TS_User],[TS_DateTime])
       VALUES
-      ('LIS_maxTimeWaitingForACK','INTEGER','10',1,'BIOSYSTEMS','2013-03-04 10:46:58.000')
+      ('LIS_maxTimeWaitingForACK','INTEGER','60',1,'BIOSYSTEMS','2013-03-04 10:46:58.000')
       GO
       IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'LIS_HOST_ID') = 0)
       INSERT INTO [dbo].[tcfgUserSettings]
@@ -895,9 +895,6 @@
       IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
       WHERE so.xtype = 'U' AND so.name = 'thisWSOrderTests' AND sc.name = 'LISRequest') = 1)
       UPDATE dbo.thisWSOrderTests SET LISRequest = 'False' WHERE LISRequest IS NULL
-      GO
-      IF ((SELECT COUNT(*) FROM [dbo].tcfgUserSettings WHERE [SettingID] = 'LIS_maxTimeWaitingForACK') = 1)
-      UPDATE tcfgUserSettings SET CurrentValue = '60' WHERE [SettingID] = 'LIS_maxTimeWaitingForACK'
       GO
       IF ((SELECT COUNT(*) FROM [dbo].tcfgUserSettings WHERE [SettingID] = 'LIS_CODEPAGE') = 1)
       UPDATE tcfgUserSettings SET CurrentValue = '28591' WHERE [SettingID] = 'LIS_CODEPAGE'
@@ -1193,7 +1190,7 @@
 
       IF ((SELECT COUNT(*) FROM [dbo].[tcfgUserSettings] WHERE [SettingID] = 'AUTO_LIS_WAIT_TIME') = 0)
       INSERT INTO [dbo].[tcfgUserSettings] (SettingID, SettingDataType, CurrentValue, Status, TS_User , TS_DateTime )
-      VALUES ('AUTO_LIS_WAIT_TIME', 'INTEGER', '2', 1, 'BIOSYSTEMS', GETDATE())
+      VALUES ('AUTO_LIS_WAIT_TIME', 'INTEGER', '60', 1, 'BIOSYSTEMS', GETDATE())
       GO
 
       IF ((SELECT COUNT(*) FROM [dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_LIS_NOT_READY') = 0)
@@ -1333,12 +1330,6 @@
     </StructureScript>
     <UpdateScript>
       UPDATE Ax00.dbo.tfmwVersions SET UserSoftware = '2.1.1', ServiceSoftware = '1.1.0', FirmwareScripts = '1.1.0', Firmware = '1.26'
-      GO
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgUserSettings] WHERE SettingID = 'LIS_HOST_QUERY_PACKAGE') = 1)
-      UPDATE [Ax00].[dbo].[tcfgUserSettings]  SET CurrentValue = 10 WHERE SettingID = 'LIS_HOST_QUERY_PACKAGE'
-      GO
-      IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tcfgUserSettings] WHERE SettingID = 'AUTO_LIS_WAIT_TIME') = 1)
-      UPDATE [Ax00].[dbo].[tcfgUserSettings]  SET CurrentValue = 60 WHERE SettingID = 'AUTO_LIS_WAIT_TIME'
       GO
       IF ((SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwMessages] WHERE [MessageID] = 'AUTOLIS_BARCODE_ERROR') = 0)
       INSERT INTO [Ax00].[dbo].[tfmwMessages] ([MessageID],[MessageType],[ResourceID])
