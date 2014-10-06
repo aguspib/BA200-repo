@@ -2649,9 +2649,9 @@
       BEGIN
       ALTER TABLE [Ax00].[dbo].thisWSResults ALTER COLUMN ManualResultText NVARCHAR(15) COLLATE Modern_Spanish_CI_AS NULL
       END
-      
+
       GO
-      
+
       IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vwksWSISEOffSystemResults]'))
       DROP VIEW [dbo].[vwksWSISEOffSystemResults]
       GO
@@ -2661,49 +2661,49 @@
       GO
       CREATE VIEW [dbo].[vwksWSISEOffSystemResults]
       AS
-      SELECT     PartialWSEResult.OrderTestID, PartialWSEResult.RerunNumber, PartialWSEResult.MultiPointNumber, PartialWSEResult.ValidationStatus, 
-                            PartialWSEResult.AcceptedResultFlag, PartialWSEResult.TestVersion, PartialWSEResult.ManualResultFlag, PartialWSEResult.UserComment, 
-                            PartialWSEResult.ExportStatus, PartialWSEResult.ExportDateTime, PartialWSEResult.Printed, PartialWSEResult.ABSValue, PartialWSEResult.ABS_Error, 
-                            PartialWSEResult.SubstrateDepletion, PartialWSEResult.ABS_Initial, PartialWSEResult.ABS_MainFilter, PartialWSEResult.ABS_WorkReagent, 
-                            PartialWSEResult.CalibratorFactor, PartialWSEResult.CalibrationError, PartialWSEResult.CalibratorBlankAbsUsed, PartialWSEResult.CurveResultsID, 
-                            PartialWSEResult.CurveGrowthType, PartialWSEResult.CurveType, PartialWSEResult.CurveAxisXType, PartialWSEResult.CurveAxisYType, 
-                            PartialWSEResult.RelativeErrorCurve, PartialWSEResult.CONC_VALUE, PartialWSEResult.ManualResultText, PartialWSEResult.CONC_Error, 
-                            PartialWSEResult.ResultDateTime, PartialWSEResult.TS_User, PartialWSEResult.TS_DateTime, PartialWSEResult.SampleType, PartialWSEResult.AnalyzerID, 
-                            PartialWSEResult.TestType, PartialWSEResult.TestID, PartialWSEResult.OrderID, PartialWSEResult.TheoricalConcentration, PartialWSEResult.ControlNum, 
-                            PartialWSEResult.WorkSessionID, PartialWSEResult.StatFlag, PartialWSEResult.SampleClass, PartialWSEResult.OrderTestStatus, 
-                            (CASE PartialWSEResult.TestType WHEN 'ISE' THEN IT.Name ELSE OST.Name END) AS TestName, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN
-                                (SELECT     cfg.FixedItemDesc
-                                  FROM          tcfgMasterData cfg
-                                  WHERE      cfg.SubTableID = 'TEST_UNITS' AND cfg.ItemID = IT.Units) ELSE
-                                (SELECT     cfg.FixedItemDesc
-                                  FROM          tcfgMasterData cfg
-                                  WHERE      cfg.SubTableID = 'TEST_UNITS' AND cfg.ItemID = OST.Units) END) AS MeasureUnit, 
-                            (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.Decimals ELSE OST.Decimals END) AS DecimalsAllowed, 
-                            (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.ActiveRangeType ELSE OSTS.ActiveRangeType END) AS ActiveRangeType, PartialWSEResult.Collapsed, 
-                            PartialWSEResult.PatientName, PartialWSEResult.PatientID, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN IT.ShortName ELSE OST.ShortName END) 
-                            AS ShortName, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.TestLongName ELSE OST.Name END) AS TestLongName
-      FROM         (SELECT     R.OrderTestID, R.RerunNumber, R.MultiPointNumber, R.ValidationStatus, R.AcceptedResultFlag, R.TestVersion, R.ManualResultFlag, R.UserComment, 
-                                                    R.ExportStatus, R.ExportDateTime, R.Printed, R.ABSValue, R.ABS_Error, R.SubstrateDepletion, R.ABS_Initial, R.ABS_MainFilter, R.ABS_WorkReagent, 
-                                                    R.CalibratorFactor, R.CalibrationError, R.CalibratorBlankAbsUsed, R.CurveResultsID, R.CurveGrowthType, R.CurveType, R.CurveAxisXType, 
-                                                    R.CurveAxisYType, R.RelativeErrorCurve, (CASE OT.TestType WHEN 'ISE' THEN R.CONC_Value ELSE R.ManualResult END) AS CONC_VALUE, 
-                                                    R.ManualResultText, R.CONC_Error, R.ResultDateTime, R.TS_User, R.TS_DateTime, R.Collapsed, OT.SampleType, OT.AnalyzerID, OT.TestType, 
-                                                    OT.TestID, OT.OrderID, OT.OrderTestStatus, 0 AS TheoricalConcentration, 0 AS ControlNum, WSOT.WorkSessionID, O.StatFlag, O.SampleClass, 
-                                                    (CASE WHEN O.PatientID IS NOT NULL THEN P.FirstName + ' ' + P.LastName ELSE O.SampleID END) AS PatientName, ISNULL(O.PatientID, O.SampleID) 
-                                                    AS PatientID
-                             FROM          dbo.twksResults AS R INNER JOIN
-                                                    dbo.twksOrderTests AS OT ON R.OrderTestID = OT.OrderTestID INNER JOIN
-                                                    dbo.twksWSOrderTests AS WSOT ON OT.OrderTestID = WSOT.OrderTestID INNER JOIN
-                                                    dbo.twksOrders AS O ON OT.OrderID = O.OrderID LEFT OUTER JOIN
-                                                    dbo.tparPatients AS P ON O.PatientID = P.PatientID
-                             WHERE      (O.SampleClass = 'PATIENT') AND (OT.TestType = 'ISE') OR
-                                                    (OT.TestType = 'OFFS')) AS PartialWSEResult LEFT OUTER JOIN
-                            dbo.tparISETests AS IT ON PartialWSEResult.TestID = IT.ISETestID LEFT OUTER JOIN
-                            dbo.tparISETestSamples AS ITS ON IT.ISETestID = ITS.ISETestID AND PartialWSEResult.SampleType = ITS.SampleType LEFT OUTER JOIN
-                            dbo.tparOffSystemTests AS OST ON PartialWSEResult.TestID = OST.OffSystemTestID LEFT OUTER JOIN
-                            dbo.tparOffSystemTestSamples AS OSTS ON OST.OffSystemTestID = OSTS.OffSystemTestID AND PartialWSEResult.SampleType = OSTS.SampleType
+      SELECT     PartialWSEResult.OrderTestID, PartialWSEResult.RerunNumber, PartialWSEResult.MultiPointNumber, PartialWSEResult.ValidationStatus,
+      PartialWSEResult.AcceptedResultFlag, PartialWSEResult.TestVersion, PartialWSEResult.ManualResultFlag, PartialWSEResult.UserComment,
+      PartialWSEResult.ExportStatus, PartialWSEResult.ExportDateTime, PartialWSEResult.Printed, PartialWSEResult.ABSValue, PartialWSEResult.ABS_Error,
+      PartialWSEResult.SubstrateDepletion, PartialWSEResult.ABS_Initial, PartialWSEResult.ABS_MainFilter, PartialWSEResult.ABS_WorkReagent,
+      PartialWSEResult.CalibratorFactor, PartialWSEResult.CalibrationError, PartialWSEResult.CalibratorBlankAbsUsed, PartialWSEResult.CurveResultsID,
+      PartialWSEResult.CurveGrowthType, PartialWSEResult.CurveType, PartialWSEResult.CurveAxisXType, PartialWSEResult.CurveAxisYType,
+      PartialWSEResult.RelativeErrorCurve, PartialWSEResult.CONC_VALUE, PartialWSEResult.ManualResultText, PartialWSEResult.CONC_Error,
+      PartialWSEResult.ResultDateTime, PartialWSEResult.TS_User, PartialWSEResult.TS_DateTime, PartialWSEResult.SampleType, PartialWSEResult.AnalyzerID,
+      PartialWSEResult.TestType, PartialWSEResult.TestID, PartialWSEResult.OrderID, PartialWSEResult.TheoricalConcentration, PartialWSEResult.ControlNum,
+      PartialWSEResult.WorkSessionID, PartialWSEResult.StatFlag, PartialWSEResult.SampleClass, PartialWSEResult.OrderTestStatus,
+      (CASE PartialWSEResult.TestType WHEN 'ISE' THEN IT.Name ELSE OST.Name END) AS TestName, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN
+      (SELECT     cfg.FixedItemDesc
+      FROM          tcfgMasterData cfg
+      WHERE      cfg.SubTableID = 'TEST_UNITS' AND cfg.ItemID = IT.Units) ELSE
+      (SELECT     cfg.FixedItemDesc
+      FROM          tcfgMasterData cfg
+      WHERE      cfg.SubTableID = 'TEST_UNITS' AND cfg.ItemID = OST.Units) END) AS MeasureUnit,
+      (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.Decimals ELSE OST.Decimals END) AS DecimalsAllowed,
+      (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.ActiveRangeType ELSE OSTS.ActiveRangeType END) AS ActiveRangeType, PartialWSEResult.Collapsed,
+      PartialWSEResult.PatientName, PartialWSEResult.PatientID, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN IT.ShortName ELSE OST.ShortName END)
+      AS ShortName, (CASE PartialWSEResult.TestType WHEN 'ISE' THEN ITS.TestLongName ELSE OST.Name END) AS TestLongName
+      FROM         (SELECT     R.OrderTestID, R.RerunNumber, R.MultiPointNumber, R.ValidationStatus, R.AcceptedResultFlag, R.TestVersion, R.ManualResultFlag, R.UserComment,
+      R.ExportStatus, R.ExportDateTime, R.Printed, R.ABSValue, R.ABS_Error, R.SubstrateDepletion, R.ABS_Initial, R.ABS_MainFilter, R.ABS_WorkReagent,
+      R.CalibratorFactor, R.CalibrationError, R.CalibratorBlankAbsUsed, R.CurveResultsID, R.CurveGrowthType, R.CurveType, R.CurveAxisXType,
+      R.CurveAxisYType, R.RelativeErrorCurve, (CASE OT.TestType WHEN 'ISE' THEN R.CONC_Value ELSE R.ManualResult END) AS CONC_VALUE,
+      R.ManualResultText, R.CONC_Error, R.ResultDateTime, R.TS_User, R.TS_DateTime, R.Collapsed, OT.SampleType, OT.AnalyzerID, OT.TestType,
+      OT.TestID, OT.OrderID, OT.OrderTestStatus, 0 AS TheoricalConcentration, 0 AS ControlNum, WSOT.WorkSessionID, O.StatFlag, O.SampleClass,
+      (CASE WHEN O.PatientID IS NOT NULL THEN P.FirstName + ' ' + P.LastName ELSE O.SampleID END) AS PatientName, ISNULL(O.PatientID, O.SampleID)
+      AS PatientID
+      FROM          dbo.twksResults AS R INNER JOIN
+      dbo.twksOrderTests AS OT ON R.OrderTestID = OT.OrderTestID INNER JOIN
+      dbo.twksWSOrderTests AS WSOT ON OT.OrderTestID = WSOT.OrderTestID INNER JOIN
+      dbo.twksOrders AS O ON OT.OrderID = O.OrderID LEFT OUTER JOIN
+      dbo.tparPatients AS P ON O.PatientID = P.PatientID
+      WHERE      (O.SampleClass = 'PATIENT') AND (OT.TestType = 'ISE') OR
+      (OT.TestType = 'OFFS')) AS PartialWSEResult LEFT OUTER JOIN
+      dbo.tparISETests AS IT ON PartialWSEResult.TestID = IT.ISETestID LEFT OUTER JOIN
+      dbo.tparISETestSamples AS ITS ON IT.ISETestID = ITS.ISETestID AND PartialWSEResult.SampleType = ITS.SampleType LEFT OUTER JOIN
+      dbo.tparOffSystemTests AS OST ON PartialWSEResult.TestID = OST.OffSystemTestID LEFT OUTER JOIN
+      dbo.tparOffSystemTestSamples AS OSTS ON OST.OffSystemTestID = OSTS.OffSystemTestID AND PartialWSEResult.SampleType = OSTS.SampleType
 
       GO
-      
+
       IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vwksCompleteResults]'))
       DROP VIEW [dbo].[vwksCompleteResults]
       GO
@@ -2713,42 +2713,78 @@
       GO
       CREATE VIEW [dbo].[vwksCompleteResults]
       AS
-      SELECT DISTINCT 
-                            OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime, 
-                            Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed, 
-                            CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User, 
-                            TS_DateTime, AnalyzerID, WorkSessionID, BlankAbsorbanceLimit, KineticBlankLimit, CalibratorLotNumber, SampleType, TheoricalConcentration, MeasureUnit, 
-                            FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, ControlName, ControlLotNumber, MinConcentration, MaxConcentration, TestType, Collapsed, TestName, 
-                            OrderTestStatus, PostDilutionType, TestID, ActiveRangeType, OrderID, ManualResult, ManualResultText, StatFlag, CalibratorName, AnalysisMode, CurveSlope, 
-                            CurveOffset, CurveCorrelation, CalibratorID, SampleClass, NumberOfCalibrators, NULL AS STDOrderTestID, NULL AS PatientName, ISNULL(PatientID, SampleID) 
-                            AS PatientID, NULL AS ControlNum, TestLongName, ShortName
+      SELECT DISTINCT
+      OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime,
+      Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed,
+      CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User,
+      TS_DateTime, AnalyzerID, WorkSessionID, BlankAbsorbanceLimit, KineticBlankLimit, CalibratorLotNumber, SampleType, TheoricalConcentration, MeasureUnit,
+      FactorLowerLimit, FactorUpperLimit, DecimalsAllowed, ControlName, ControlLotNumber, MinConcentration, MaxConcentration, TestType, Collapsed, TestName,
+      OrderTestStatus, PostDilutionType, TestID, ActiveRangeType, OrderID, ManualResult, ManualResultText, StatFlag, CalibratorName, AnalysisMode, CurveSlope,
+      CurveOffset, CurveCorrelation, CalibratorID, SampleClass, NumberOfCalibrators, NULL AS STDOrderTestID, NULL AS PatientName, ISNULL(PatientID, SampleID)
+      AS PatientID, NULL AS ControlNum, TestLongName, ShortName
       FROM         dbo.vwksResults
       UNION ALL
-      SELECT DISTINCT 
-                            OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime, 
-                            Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed, 
-                            CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User, 
-                            TS_DateTime, AnalyzerID, WorkSessionID, NULL AS BlankAbsorbanceLimit, NULL AS KineticBlankLimit, NULL AS CalibratorLotNumber, SampleType, 
-                            TheoricalConcentration, MeasureUnit, NULL AS FactorLowerLimit, NULL AS FactorUpperLimit, DecimalsAllowed, NULL AS ControlName, NULL 
-                            AS ControlLotNumber, NULL AS MinConcentration, NULL AS MaxConcentration, TestType, Collapsed, TestName, NULL AS OrderTestStatus, NULL AS PostDilutionType, 
-                            TestID, ActiveRangeType, OrderID, NULL AS ManualResult, NULL AS ManualResultText, StatFlag, NULL AS CalibratorName, NULL AS AnalysisMode, NULL 
-                            AS CurveSlope, NULL AS CurveOffset, NULL AS CurveCorrelation, NULL AS CalibratorID, SampleClass, NULL AS NumberOfCalibrators, STDOrderTestID, NULL 
-                            AS PatientName, PatientID, NULL AS ControlNum, NULL AS TestLongName, ShortName
+      SELECT DISTINCT
+      OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime,
+      Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed,
+      CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User,
+      TS_DateTime, AnalyzerID, WorkSessionID, NULL AS BlankAbsorbanceLimit, NULL AS KineticBlankLimit, NULL AS CalibratorLotNumber, SampleType,
+      TheoricalConcentration, MeasureUnit, NULL AS FactorLowerLimit, NULL AS FactorUpperLimit, DecimalsAllowed, NULL AS ControlName, NULL
+      AS ControlLotNumber, NULL AS MinConcentration, NULL AS MaxConcentration, TestType, Collapsed, TestName, NULL AS OrderTestStatus, NULL AS PostDilutionType,
+      TestID, ActiveRangeType, OrderID, NULL AS ManualResult, NULL AS ManualResultText, StatFlag, NULL AS CalibratorName, NULL AS AnalysisMode, NULL
+      AS CurveSlope, NULL AS CurveOffset, NULL AS CurveCorrelation, NULL AS CalibratorID, SampleClass, NULL AS NumberOfCalibrators, STDOrderTestID, NULL
+      AS PatientName, PatientID, NULL AS ControlNum, NULL AS TestLongName, ShortName
       FROM         dbo.vwksCalcResults
       UNION ALL
-      SELECT DISTINCT 
-                            OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime, 
-                            Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed, 
-                            CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User, 
-                            TS_DateTime, AnalyzerID, WorkSessionID, NULL AS BlankAbsorbanceLimit, NULL AS KineticBlankLimit, NULL AS CalibratorLotNumber, SampleType, 
-                            TheoricalConcentration, MeasureUnit, NULL AS FactorLowerLimit, NULL AS FactorUpperLimit, DecimalsAllowed, NULL AS ControlName, NULL 
-                            AS ControlLotNumber, NULL AS MinConcentration, NULL AS MaxConcentration, TestType, Collapsed, TestName, OrderTestStatus, NULL AS PostDilutionType, TestID, 
-                            ActiveRangeType, OrderID, NULL AS ManualResult, ManualResultText, StatFlag, NULL AS CalibratorName, NULL AS AnalysisMode, NULL AS CurveSlope, NULL 
-                            AS CurveOffset, NULL AS CurveCorrelation, NULL AS CalibratorID, SampleClass, NULL AS NumberOfCalibrators, NULL AS STDOrderTestID, PatientName, PatientID, 
-                            ControlNum, TestLongName, ShortName
+      SELECT DISTINCT
+      OrderTestID, RerunNumber, MultiPointNumber, ValidationStatus, AcceptedResultFlag, TestVersion, ManualResultFlag, UserComment, ExportStatus, ExportDateTime,
+      Printed, ABSValue, ABS_Error, SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, CalibratorFactor, CalibrationError, CalibratorBlankAbsUsed,
+      CurveResultsID, CurveGrowthType, CurveType, CurveAxisXType, CurveAxisYType, RelativeErrorCurve, CONC_Value, CONC_Error, ResultDateTime, TS_User,
+      TS_DateTime, AnalyzerID, WorkSessionID, NULL AS BlankAbsorbanceLimit, NULL AS KineticBlankLimit, NULL AS CalibratorLotNumber, SampleType,
+      TheoricalConcentration, MeasureUnit, NULL AS FactorLowerLimit, NULL AS FactorUpperLimit, DecimalsAllowed, NULL AS ControlName, NULL
+      AS ControlLotNumber, NULL AS MinConcentration, NULL AS MaxConcentration, TestType, Collapsed, TestName, OrderTestStatus, NULL AS PostDilutionType, TestID,
+      ActiveRangeType, OrderID, NULL AS ManualResult, ManualResultText, StatFlag, NULL AS CalibratorName, NULL AS AnalysisMode, NULL AS CurveSlope, NULL
+      AS CurveOffset, NULL AS CurveCorrelation, NULL AS CalibratorID, SampleClass, NULL AS NumberOfCalibrators, NULL AS STDOrderTestID, PatientName, PatientID,
+      ControlNum, TestLongName, ShortName
       FROM         vwksWSISEOffSystemResults;
       GO
-            
+
+
+      IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vhisTestSamples]'))
+      DROP VIEW [dbo].[vhisTestSamples]
+      GO
+      USE [Ax00]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisTestSamples]
+      AS
+      SELECT     'STD' AS TestType, TS .HistTestID, TS .TestID, TS .TestName, TS .TestVersionNumber, TS .DecimalsAllowed, NULL AS FormulaText,
+      (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, TS .TestLongName, Ts.CalibPointUsed
+      FROM         thisTestSamples TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .TestName = T .TestName AND T .TestType = 'STD'
+      UNION
+      SELECT     'ISE' AS TestType, TS .HistISETestID AS HistTestID, TS .ISETestID AS TestID, TS .ISETestName AS TestName, 0 AS TestVersionNumber, TS .DecimalsAllowed, NULL
+      AS FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, TS.TestLongName, NULL CalibPointUsed
+      FROM         thisISETestSamples TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .ISETestName = T .TestName AND T .TestType = 'ISE'
+      UNION
+      SELECT     'CALC' AS TestType, TS .HistCalcTestID AS HistTestID, TS .CalcTestID AS TestID, TS .CalcTestLongName AS TestName, 0 AS TestVersionNumber,
+      TS .DecimalsAllowed, TS .FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, NULL
+      AS TestLongName, NULL CalibPointUsed
+      FROM         thisCalculatedTests TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .CalcTestLongName = T .TestName AND T .TestType = 'CALC'
+      UNION
+      SELECT     'OFFS' AS TestType, TS .HistOffSystemTestID AS HistTestID, TS .OffSystemTestID AS TestID, TS .OffSystemTestName AS TestName, 0 AS TestVersionNumber,
+      TS .DecimalsAllowed, NULL AS FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, NULL
+      AS TestLongName, NULL CalibPointUsed
+      FROM         thisOffSystemTestSamples TS LEFT OUTER JOIN
+      vcfgTestSortingForReports T ON TS .OffSystemTestName = T .TestName AND T .TestType = 'OFFS' ;
+      GO
+
+
       IF  EXISTS (SELECT * FROM sys.views WHERE object_id = OBJECT_ID(N'[dbo].[vhisWSBlankCalibResults]'))
       DROP VIEW [dbo].[vhisWSBlankCalibResults]
       GO
@@ -2760,22 +2796,21 @@
       GO
       CREATE VIEW [dbo].[vhisWSBlankCalibResults]
       AS
-      SELECT DISTINCT 
-                            hres.HistOrderTestID, hres.AnalyzerID, hres.ResultDateTime, hres.ABSValue, hres.ABSWorkReagent, hres.KineticBlankLimit, hres.ABSInitial, hres.ABSMainFilter, 
-                            hres.BlankAbsorbanceLimit, hres.AlarmList, hres.CalibratorFactor, hres.FactorLowerLimit, hres.FactorUpperLimit, hot.SampleClass, hot.SampleType, hts.TestName, 
-                            tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, htc.CalibratorNum, 
-                            hres.WorkSessionID, hts.CalibPointUsed, hts.DecimalsAllowed, hres.RemarkAlert, htc.TestVersionNumber
-      FROM         dbo.thisWSResults AS hres INNER JOIN
-                            dbo.thisWSOrderTests AS hot ON hres.HistOrderTestID = hot.HistOrderTestID AND hres.AnalyzerID = hot.AnalyzerID AND 
-                            hres.WorkSessionID = hot.WorkSessionID INNER JOIN
-                            dbo.thisTestSamples AS hts ON hot.HistTestID = hts.HistTestID AND hot.TestVersionNumber = hts.TestVersionNumber AND 
-                            hot.SampleType = hts.SampleType LEFT OUTER JOIN
-                            dbo.thisCalibrators AS hca ON hot.HistCalibratorID = hca.HistCalibratorID LEFT OUTER JOIN
-                            dbo.thisTestCalibratorsValues AS htc ON hot.HistCalibratorID = htc.HistCalibratorID AND hot.SampleType = htc.SampleType AND 
-                            hot.TestVersionNumber = htc.TestVersionNumber AND hot.HistTestID = htc.HistTestID AND hres.MultiPointNumber = htc.CalibratorNum LEFT OUTER JOIN
-                            dbo.tcfgMasterData AS tcfg ON tcfg.SubTableID = 'TEST_UNITS' AND tcfg.ItemID = hts.MeasureUnit
+      SELECT DISTINCT
+      hres.HistOrderTestID, hres.AnalyzerID, hres.ResultDateTime, hres.ABSValue, hres.ABSWorkReagent, hres.KineticBlankLimit, hres.ABSInitial, hres.ABSMainFilter,
+      hres.BlankAbsorbanceLimit, hres.AlarmList, hres.CalibratorFactor, hres.FactorLowerLimit, hres.FactorUpperLimit, hot.SampleClass, hot.SampleType, hts.TestName,
+      tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, htc.CalibratorNum,
+      hres.WorkSessionID, hts.CalibPointUsed, hts.DecimalsAllowed, hres.RemarkAlert, htc.TestVersionNumber, hot.TestType, hts.TestID, hts.TestPosition
+      FROM         dbo.thisWSResults AS hres
+      INNER JOIN dbo.thisWSOrderTests AS hot ON hres.HistOrderTestID = hot.HistOrderTestID AND hres.AnalyzerID = hot.AnalyzerID AND hres.WorkSessionID = hot.WorkSessionID
+      --INNER JOIN dbo.thisTestSamples AS hts ON hot.HistTestID = hts.HistTestID AND hot.TestVersionNumber = hts.TestVersionNumber AND hot.SampleType = hts.SampleType
+      INNER JOIN dbo.vhisTestSamples AS hts ON hot.HistTestID = hts.HistTestID AND hot.TestType = hts.TestType AND hts.TestVersionNumber = COALESCE (hot.TestVersionNumber, 0)
+      LEFT OUTER JOIN dbo.thisCalibrators AS hca ON hot.HistCalibratorID = hca.HistCalibratorID
+      LEFT OUTER JOIN dbo.thisTestCalibratorsValues AS htc ON hot.HistCalibratorID = htc.HistCalibratorID AND hot.SampleType = htc.SampleType AND hot.TestVersionNumber = htc.TestVersionNumber AND hot.HistTestID = htc.HistTestID AND hres.MultiPointNumber = htc.CalibratorNum
+      LEFT OUTER JOIN dbo.tcfgMasterData AS tcfg ON tcfg.SubTableID = 'TEST_UNITS' AND tcfg.ItemID = hot.MeasureUnit
       WHERE     (hot.SampleClass &lt;&gt; 'PATIENT')
       GO
+
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.0', ServiceSoftware = '1.2.3', FirmwareScripts = '1.1.0', Firmware = '2.14'

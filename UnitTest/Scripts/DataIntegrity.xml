@@ -2945,6 +2945,31 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>View vhisWSBlankCalibResults has been changed to return also the fields TestType, TestId and TestPosition</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  (so.name = 'vhisWSBlankCalibResults')
+      AND (sc.name = 'TestType'
+      OR sc.name = 'TestID'
+      Or sc.name = 'TestPosition')) = 3
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>View vhisWSBlankCalibResults has been changed to return also the fields TestType, TestId and TestPosition</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'vhisTestSamples' AND sc.name = 'CalibPointUsed') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
 
 
