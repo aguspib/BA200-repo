@@ -462,6 +462,7 @@ Namespace Biosystems.Ax00.BL
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 
             End Try
+            resultData.HasError = False 'Not inform error flag in this method!!
             Return resultData
         End Function
 

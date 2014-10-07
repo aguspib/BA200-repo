@@ -39,7 +39,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 21/01/2010 (Tested OK)
-        ''' AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
+        ''' AG 07/10/2014 - BA-1979 add traces into log when NO inuse rotor is saved with invalid values in order to find the origin
         ''' </remarks>
         Public Function Add(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                             ByVal pWorkSessionID As String, ByVal pVirtualRotorPos As VirtualRotorPosititionsDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
@@ -879,7 +879,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pProcessWhoCalls">Enumerate that informs the process who calls the delegate instance</param>
         ''' <returns></returns>
         ''' <remarks>AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin</remarks>
-        Public Function CheckForInvalidPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pNotInUseRotorPositionsDS As VirtualRotorPosititionsDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
+        Private Function CheckForInvalidPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pNotInUseRotorPositionsDS As VirtualRotorPosititionsDS, ByVal pProcessWhoCalls As ClassCalledFrom) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -968,6 +968,7 @@ Namespace Biosystems.Ax00.BL
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 
             End Try
+            resultData.HasError = False 'Not inform error flag in this method!!
             Return resultData
         End Function
 
