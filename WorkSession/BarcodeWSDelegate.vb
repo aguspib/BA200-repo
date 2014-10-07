@@ -53,7 +53,7 @@ Namespace Biosystems.Ax00.BL
         '''                                              NEWAddWorkSession is TRUE, call new version of function AddWorkSession 
         '''              SA 26/03/2014    - BT #1552 ==> For all Special Solutions in the WS, updates the Element Status to POS (there is at least a Bottle
         '''                                              of the Special Solution positioned in the Reagents Rotor)
-        '''              AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
+        '''              AG 07/10/2014 - BA-1979 add traces into log when NO INUSE rotor is saved with invalid values in order to find the origin
         ''' </remarks>
         Public Function ManageBarcodeInstruction(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarCodeRotorContentDS As WSRotorContentByPositionDS, _
                                                  ByVal pRotorType As String) As GlobalDataTO
@@ -2726,7 +2726,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 30/03/2012 - For both, NOT IN USE and IN USE Reagents, get fields TubeType and RealVolume from the DecodedDataDS and update
         '''                              them in tables of WS Not In Use Rotor Positions and WS Rotor Positions respectively
         '''              SA 09/09/2013 - Write a warning in the application LOG if the process of creation a new Empty WS was stopped due to a previous one still exists
-        '''              AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
+        '''              AG 07/10/2014 - BA-1979 add traces into log when NO INUSE rotor is saved with invalid values in order to find the origin
         ''' </remarks>
         Public Function ManageBarcodeInstructionOLD(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarCodeRotorContentDS As WSRotorContentByPositionDS, _
                                                     ByVal pRotorType As String) As GlobalDataTO
