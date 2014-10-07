@@ -1252,7 +1252,7 @@ Namespace Biosystems.Ax00.BL
                                         'TR 22/07/2013 Bug #1195 -Before clear set the bottle type to my local variable
                                         myPrevTubeType = pCurrentContentRow.TubeType
                                     End If
-                                    
+
 
                                     resultData = rcpDelegate.DeletePositions(dbConnection, updatedRcpDS, False)
                                     updatedRcpDS.Clear()
