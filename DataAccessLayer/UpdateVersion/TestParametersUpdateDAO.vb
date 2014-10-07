@@ -306,60 +306,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
-        ''' <summary>
-        ''' Get the Reagents volumens on the factory DB by the TestID and SampleType.
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID">Test ID</param>
-        ''' <param name="pSampleType">Sample Type</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' CREATE BY: TR 01/02/2013
-        ''' </remarks>
-        Public Function GetFactoryReagentsVolumesByTesIDAndSampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                               ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
-            Dim myGlobalDataTO As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Try
-                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT TestID, ReagentID, ReagentNumber ,SampleType"
-                        cmdText &= ", ReagentVolume, CONVERT(DECIMAL(20,12),ReagentVolumeSteps) AS ReagentVolumeSteps "
-                        cmdText &= ", RedPostReagentVolume, CONVERT(DECIMAL(20,12), RedPostReagentVolumeSteps) AS RedPostReagentVolumeSteps"
-                        cmdText &= ", IncPostReagentVolume, CONVERT(DECIMAL(20,12), IncPostReagentVolumeSteps) AS IncPostReagentVolumeSteps "
-                        cmdText &= " FROM " & GlobalBase.TemporalDBName & ".[dbo].tparTestReagentsVolumes " & vbCrLf
-                        cmdText &= " WHERE  TestID = " & pTestID.ToString & vbCrLf
-
-                        If pSampleType <> "" Then
-                            cmdText &= " AND SampleType = '" & pSampleType.ToString & "' "
-                        End If
-
-                        Dim resultData As New TestReagentsVolumesDS
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(resultData.tparTestReagentsVolumes)
-                            End Using
-                        End Using
-
-                        myGlobalDataTO.SetDatos = resultData
-                        myGlobalDataTO.HasError = False
-                    End If
-                End If
-            Catch ex As Exception
-                myGlobalDataTO = New GlobalDataTO()
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetReagentsVolumesByTesIDAndSampleType", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return myGlobalDataTO
-        End Function
 
         ''' <summary>
         ''' Gete the TestReagents data from factory DB.
@@ -456,54 +402,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.GetFactoryReagent", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get Factory TestCalibrator value by TestID and sampleType
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID">Test ID.</param>
-        ''' <param name="pSampleType">Sample Type.</param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetFactoryTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
-                                                                            Optional ByVal pSampleType As String = "") As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM " & GlobalBase.TemporalDBName & _
-                                                ".[dbo].tparTestCalibrators TC INNER JOIN tparCalibrators C ON C.CalibratorID = TC.CalibratorID " & vbCrLf & _
-                                                " WHERE  TestID = " & pTestID.ToString
-                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType ='" & pSampleType & "'"
-
-                        Dim testCalibratorDS As New TestCalibratorsDS
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(testCalibratorDS.tparTestCalibrators)
-                            End Using
-                        End Using
-
-                        resultData.SetDatos = testCalibratorDS
-                        resultData.HasError = False
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestCalibratorsDAO.GetTestCalibratorByTestID", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
@@ -608,6 +506,400 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return myGlobalDataTO
         End Function
+
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+        ''' <summary>
+        ''' Search in FACTORY DB all STD Tests that not exist in CUSTOMER DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a TestsDS with Test Identifiers of all STD Tests that exists in FACTORY DB but not in the CUSTOMER DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetNewFactoryTests(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TestID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TestID FROM [Ax00].[dbo].[tparTests] " & vbCrLf
+
+                        Dim factoryTestsDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestsDS.tparTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTests", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all data of the specified STD Test. If pMarkNew = True, the query includes 1 As NewTest.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pMarkNew">Optional parameter to return value of field NewTest: when True, it means the function is used to add
+        '''                        new elements and flag NewTest has to be set to TRUE in the DS to return</param>
+        ''' <returns>GlobalDataTO containing a TestsDS with all data of the specified STD Test in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetDataInFactoryDB(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                           Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT *, " & IIf(pMarkNew, 1, 0).ToString & "As NewTest " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf & _
+                                                " WHERE  TestID = " & pTestID.ToString & vbCrLf
+
+                        Dim factoryTestsDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestsDS.tparTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in tables tparTestReagents and tparReagents in FACTORY DB, all Reagents used for the informed STD TestID. 
+        ''' If pMarkNew = True, the query includes 1 As IsNew.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pMarkNew">Optional parameter to return value of field IsNew: when True, it means the function is used to add
+        '''                        new elements and flag IsNew has to be set to TRUE in the DS to return</param>
+        ''' <returns>GlobalDataTO containing a ReagentsDS with data of all Reagents linked to the specified STD TestID in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetFactoryReagentsByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                   Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TR.TestID, TR.ReagentNumber, R.*, " & IIf(pMarkNew, 1, 0).ToString & "As IsNew " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagents] TR INNER JOIN " & vbCrLf & _
+                                                           GlobalBase.TemporalDBName & ".[dbo].[tparReagents] R ON TR.ReagentID = R.ReagentID " & vbCrLf & _
+                                                " WHERE TR.TestID = " & pTestID.ToString & vbCrLf & _
+                                                " ORDER BY TR.ReagentNumber "
+
+                        Dim factoryTestReagentsDS As New ReagentsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestReagentsDS.tparReagents)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestReagentsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryReagentsByTestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in table tparTestSamples in FACTORY DB, data of all Sample Types for the informed STD TestID, or data for the specified STD TestID and Sample Type. 
+        ''' If MarkNew = True, the query includes 1 As IsNew and, for those Sample Types with CalibratorType = EXPERIMENT, the query includes also 1 As FactoryCalib.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter; when it is informed, only data of the informed Sample Type is obtained for the Test</param>
+        ''' <param name="pMarkNew">Optional parameter to return value of field IsNew: when True, it means the function is used to add
+        '''                        new elements and flag IsNew has to be set to TRUE in the DS to return</param>
+        ''' <returns>GlobalDataTO containing a TestSamplesDS with data of all Sample Types defined for the specified STD TestID in FACTORY DB or,
+        '''          if optional parameter pSampleType is informed, only the data of that specific SampleType</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetFactoryTestSamplesByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                      Optional ByVal pSampleType As String = "", Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = String.Empty
+
+                        If (pMarkNew) Then
+                            cmdText = " SELECT *, 1 AS IsNew, (CASE WHEN CalibratorType = 'EXPERIMENT' THEN 1 ELSE 0 END) AS FactoryCalib " & vbCrLf
+                        Else
+                            cmdText = " SELECT *, 0 AS IsNew, 0 AS FactoryCalib " & vbCrLf
+                        End If
+
+                        cmdText &= " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestSamples] " & vbCrLf & _
+                                   " WHERE TestID = " & pTestID.ToString
+
+                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType = '" & pSampleType.Trim & "' " & vbCrLf
+
+
+                        Dim factoryTestSamplesDS As New TestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestSamplesDS.tparTestSamples)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestSamplesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestSamplesByTestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in table tparTestCalibratorValues (joined with tparTestCalibrators by TestCalibratorID) in FACTORY DB, data of all points of the 
+        ''' Experimental Calibrators used for the informed STD TestID (all Sample Types) or for the informed STD TestID and Sample Type. If 
+        ''' MarkNew = True, the query includes 1 As IsNew.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter; when it is informed, only data of the informed Sample Type is obtained for the Test</param>
+        ''' <param name="pMarkNew">Optional parameter to return value of field IsNew: when True, it means the function is used to add
+        '''                        new elements and flag IsNew has to be set to TRUE in the DS to return</param>
+        ''' <returns>GlobalDataTO containing a TestCalibratorsValuesDS with values for all points of all Experimental Calibrators used for the informed STD TestID 
+        '''          (all Sample Types) in FACTORY DB or, if optional parameter pSampleType is informed, for all points of the Experimental Calibrator used for 
+        '''          the informed STD TestID and Sample Type</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetFactoryTestCalibValuesByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                          Optional ByVal pSampleType As String = "", Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TCV.*, " & IIf(pMarkNew, 1, 0).ToString & "As IsNew " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestCalibratorValues] TCV INNER JOIN " & vbCrLf & _
+                                                           GlobalBase.TemporalDBName & ".[dbo].[tparTestCalibrators] TC ON TCV.TestCalibratorID = TC.TestCalibratorID " & vbCrLf & _
+                                                " WHERE TC.TestID = " & pTestID.ToString & vbCrLf
+
+                        'When informed, get data only for the specified SampleType
+                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType = '" & pSampleType.Trim & "' " & vbCrLf
+
+                        Dim factoryTestCalibValuesDS As New TestCalibratorValuesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestCalibValuesDS.tparTestCalibratorValues)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestCalibValuesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestCalibValuesByTestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in table tparTestReagentsVolumes in FACTORY DB all Reagents Volumes for the informed STD TestID (all Sample Types) or for the informed 
+        ''' STD TestID and SampleType. If MarkNew = True, the query includes 1 As IsNew.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter; when it is informed, only data of the informed Sample Type is obtained for the Test</param>
+        ''' <param name="pMarkNew">Optional parameter to return value of field IsNew: when True, it means the function is used to add
+        '''                        new elements and flag IsNew has to be set to TRUE in the DS to return</param>
+        ''' <returns>GlobalDataTO containing a TestReagentsVolumesDS with all Reagents Volumes for the informed STD TestID (all Sample Types) in FACTORY DB or, 
+        '''          if optional parameter pSampleType is informed, for the informed STD TestID and Sample Type</returns>
+        ''' <remarks>
+        ''' Created by:  TR 01/02/2013
+        ''' Modified by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980) ==> Parameter pSampleType changed to optional 
+        '''                                                             Added new optional parameter pMarkNew with default value FALSE
+        '''                                                             Changed the SQL to return value of IsNew flag depending on value of parameter pMarkNew
+        ''' </remarks>
+        Public Function GetFactoryReagentsVolumesByTesIDAndSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                                      Optional ByVal pSampleType As String = "", Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TestID, ReagentID, ReagentNumber, SampleType, " & vbCrLf & _
+                                                       " ReagentVolume, CONVERT(DECIMAL(20,12),ReagentVolumeSteps) AS ReagentVolumeSteps, " & vbCrLf & _
+                                                       " RedPostReagentVolume, CONVERT(DECIMAL(20,12), RedPostReagentVolumeSteps) AS RedPostReagentVolumeSteps, " & vbCrLf & _
+                                                       " IncPostReagentVolume, CONVERT(DECIMAL(20,12), IncPostReagentVolumeSteps) AS IncPostReagentVolumeSteps, " & vbCrLf & _
+                                                       IIf(pMarkNew, 1, 0).ToString & " AS IsNew " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].tparTestReagentsVolumes " & vbCrLf & _
+                                                " WHERE TestID = " & pTestID.ToString & vbCrLf
+
+                        'When informed, get data only for the specified SampleType
+                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType = '" & pSampleType.ToString & "' "
+
+                        Dim myTestReagentsVolsDS As New TestReagentsVolumesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myTestReagentsVolsDS.tparTestReagentsVolumes)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = myTestReagentsVolsDS
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetReagentsVolumesByTesIDAndSampleType", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Search in table tparTestCalibrators in FACTORY DB data of the Experimental Calibrators used  for the informed STD TestID (all Sample Types) 
+        ''' or for the informed STD TestID and Sample Type. If MarkNew = True, the query includes 1 As IsNew.
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter; when it is informed, only data of the informed Sample Type is obtained for the Test</param>
+        ''' <param name="pMarkNew">Optional parameter to return value of field IsNew: when True, it means the function is used to add
+        '''                        new elements and flag IsNew has to be set to TRUE in the DS to return</param>
+        ''' <returns>GlobalDataTO containing a TestCalibratorsDS with data of the Experimental Calibrators used for the informed STD TestID (all Sample Types) 
+        '''          or, if optional parameter pSampleType is informed, for the informed STD TestID and Sample Type</returns>
+        ''' <remarks>
+        ''' Created by:  TR
+        ''' Modified by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980) ==> Added new optional parameter pMarkNew with default value FALSE
+        '''                                                             Changed the SQL to return value of IsNew flag depending on value of parameter pMarkNew
+        ''' </remarks>
+        Public Function GetFactoryTestCalibratorByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                         Optional ByVal pSampleType As String = "", Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].tparTestCalibrators TC INNER JOIN " & vbCrLf & _
+                                                           GlobalBase.TemporalDBName & ".[dbo].tparCalibrators C ON C.CalibratorID = TC.CalibratorID " & vbCrLf & _
+                                                " WHERE  TestID = " & pTestID.ToString & vbCrLf
+
+                        'When informed, get data only for the specified SampleType
+                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType ='" & pSampleType.Trim & "' " & vbCrLf
+
+                        Dim testCalibratorDS As New TestCalibratorsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(testCalibratorDS.tparTestCalibrators)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = testCalibratorDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestCalibratorByTestID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
 
     End Class
 

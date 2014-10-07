@@ -1731,6 +1731,200 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myGlobalDataTO
 
         End Function
+
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+
+        Public Function UpdateRenamedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestName As String, ByVal pShortName As String) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateRenamedTest", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all data (TestReagents data, basic TestSample data, Reagents Volumes and Calibrators) for the informed STD TestID 
+        ''' (all Sample Types) or, if optional parameter pSampleType is informed, only the data for that specific SampleType. This function is used
+        ''' to search data of NEW STD Tests or to search data of NEW SAMPLE TYPE for an existing STD Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter; when it is informed, only data of the informed Sample Type is obtained for the Test</param>
+        ''' <returns>GlobalDataTO containing a TestStructure with all additional data for the Test in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetOtherTestDataInfoFromFactory(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                        Optional ByVal pSampleType As String = "") As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                Dim myTestStructure As New TestStructure
+                Dim myTestParametersUpdateDAO As New TestParametersUpdateDAO
+
+                '(1) Get all Reagents used for the NEW STD Test in FACTORY DB
+                myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryReagentsByTestID(pDBConnection, pTestID, True)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    'Fill Reagents sub-table in TestStructure
+                    myTestStructure.myReagentsDS = DirectCast(myGlobalDataTO.SetDatos, ReagentsDS)
+
+                    'Fill TestReagents sub-table in TestStructure
+                    myTestStructure.myTestReagentsDS = New TestReagentsDS
+                    Dim myTestReagentsRow As TestReagentsDS.tparTestReagentsRow
+
+                    For Each reagentRow As ReagentsDS.tparReagentsRow In myTestStructure.myReagentsDS.tparReagents
+                        myTestReagentsRow = myTestStructure.myTestReagentsDS.tparTestReagents.NewtparTestReagentsRow
+                        myTestReagentsRow.TestID = pTestID
+                        myTestReagentsRow.ReagentID = reagentRow.ReagentID
+                        myTestReagentsRow.ReagentNumber = reagentRow.ReagentNumber
+                        myTestReagentsRow.IsNew = True
+                        myTestStructure.myTestReagentsDS.tparTestReagents.AddtparTestReagentsRow(myTestReagentsRow)
+                    Next
+                End If
+
+                '(2) Get all data in table tparTestSamples for the Test in Factory DB
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryTestSamplesByTestID(pDBConnection, pTestID, pSampleType, True)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        'Fill TestSamples sub-table in TestStructure
+                        myTestStructure.myTestSampleDS = DirectCast(myGlobalDataTO.SetDatos, TestSamplesDS)
+                    End If
+                End If
+
+                '(3) Get from table tparTestReagentsVolumes in Factory DB all Reagents Volumes for all Sample Types linked to the Test 
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryReagentsVolumesByTesIDAndSampleType(pDBConnection, pTestID, pSampleType, True)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        'Fill TestReagentsVolumes sub-table in TestStructure
+                        myTestStructure.myTestReagentsVolumesDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsVolumesDS)
+                    End If
+                End If
+
+                '(4) Get from table tparTestCalibrators in Factory DB, all data of the experimental Calibrators used for all Sample Types linked to the Test
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryTestCalibratorByTestID(pDBConnection, pTestID, pSampleType, True)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        'Fill TestCalibrators sub-table in TestStructure
+                        myTestStructure.myTestCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorsDS)
+
+                        'Initialize Calibrators sub-table in TestStructure
+                        myTestStructure.myCalibratorDS = New CalibratorsDS
+
+                        'For each Calibrator, search it by name in CUSTOMER DB to get the CalibratorID (it always exists due to UPDATE VERSION 
+                        'processes Calibrators before STD Tests)
+                        Dim myCustomerRow As CalibratorsDS.tparCalibratorsRow
+                        Dim myCalibratorsDelegate As New CalibratorsDelegate
+
+                        For Each factoryRow As TestCalibratorsDS.tparTestCalibratorsRow In myTestStructure.myTestCalibratorDS.tparTestCalibrators
+                            myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, factoryRow.CalibratorName)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                'Get the row with Calibrator information from the returned CalibratorsDS
+                                myCustomerRow = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS).tparCalibrators.First
+
+                                'Inform the CalibratorID saved in CUSTOMER DB in the row of sub-table TestCalibrators in TestStructure
+                                factoryRow.CalibratorID = myCustomerRow.CalibratorID
+
+                                'Add the row to Calibrators sub-table in TestStructure (if it not exists in it)
+                                If (myTestStructure.myCalibratorDS.tparCalibrators.ToList.Where(Function(a) a.CalibratorID = myCustomerRow.CalibratorID).Count = 0) Then
+                                    myTestStructure.myCalibratorDS.tparCalibrators.ImportRow(myCustomerRow)
+                                End If
+                            Else
+                                'Unexpected error...
+                                Exit For
+                            End If
+                        Next
+                    End If
+                End If
+
+                '(5) Get from table tparTestCalibratorValues in Factory DB, values for each point of the experimental Calibrators used for all Sample Types linked to the Test 
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryTestCalibValuesByTestID(pDBConnection, pTestID, pSampleType, True)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        'Fill TestCalibratorValuesDS sub-table in TestStructure
+                        myTestStructure.myTestCalibratorValuesDS = DirectCast(myGlobalDataTO.SetDatos, TestCalibratorValuesDS)
+                    End If
+
+                    'Finally, return all information inside the TestStructure 
+                    myGlobalDataTO.SetDatos = myTestStructure
+                    myGlobalDataTO.HasError = False
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.GetOtherTestDataInfoFromFactory", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        Public Function CreateNEWSTDTests(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myNewTestDS As New TestsDS
+                Dim myNewTestsList As New TestsDS
+                Dim myTestStructure As New TestStructure
+                Dim myTestsDelegate As New TestsDelegate
+                Dim myTestParametersUpdateDAO As New TestParametersUpdateDAO
+
+                '(1) Search in Factory DB all new STD TESTS
+                myGlobalDataTO = myTestParametersUpdateDAO.GetNewFactoryTests(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myNewTestsList = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+                    For Each newTest As TestsDS.tparTestsRow In myNewTestsList.tparTests
+                        '(2) Get all data in table tparTests in Factory DB
+                        myGlobalDataTO = myTestParametersUpdateDAO.GetDataInFactoryDB(pDBConnection, newTest.TestID, True)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myNewTestDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+                            'Rename!!
+                            myGlobalDataTO = UpdateRenamedTest(pDBConnection, myNewTestDS.tparTests.First.TestName, myNewTestDS.tparTests.First.ShortName)
+                        End If
+
+                        '(4) Get rest of Test data in Factory DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = GetOtherTestDataInfoFromFactory(pDBConnection, newTest.TestID)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myTestStructure = DirectCast(myGlobalDataTO.SetDatos, TestStructure)
+                            End If
+                        End If
+
+                        '(5) Save the NEW STD Test in CUSTOMER DB 
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myNewTestDS, _
+                                                                               myTestStructure.myTestSampleDS, myTestStructure.myTestReagentsVolumesDS, _
+                                                                               myTestStructure.myReagentsDS, myTestStructure.myTestReagentsDS, _
+                                                                               myTestStructure.myCalibratorDS, myTestStructure.myTestCalibratorDS, _
+                                                                               myTestStructure.myTestCalibratorValuesDS, New TestRefRangesDS, _
+                                                                               New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
+                                                                               New List(Of DeletedTestProgramingTO), New TestSamplesMultirulesDS, _
+                                                                               New TestControlsDS, Nothing)
+                        End If
+                    Next
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CreateNEWSTDTests", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+#End Region
+
     End Class
 
 End Namespace
