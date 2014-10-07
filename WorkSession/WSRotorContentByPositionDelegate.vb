@@ -14,6 +14,26 @@ Namespace Biosystems.Ax00.BL
 
     Partial Public Class WSRotorContentByPositionDelegate
 
+#Region "Public Enumerates"
+        ''' <summary>
+        ''' This enumerate informs the process who is saving the information about the rotors positions
+        ''' By now it is only use for UPDATE items, not for delete
+        ''' </summary>
+        ''' <remarks>AG 07/10/2014 BA-1979</remarks>
+        Public Enum ClassCalledFrom
+            ChangeElementPosition
+            ChangeVolumeByPosition
+            DeletePositions
+            AdditionalTubeSolutionPositioning
+            CalibratorPositioning
+            ControlPositioning
+            PatientSamplePositioning
+            ReagentPositioning
+            AdditionalSolutionPositioning
+        End Enum
+
+#End Region
+
 #Region "Public methods"
         ''' <summary>
         ''' Manages the automatic positioning of Additional Solutions. The default bottle used and the process will depend 
@@ -343,6 +363,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 15/02/2012 - Management of "death volume" bottle is removed; changes when a bottle in Reagents Rotor is moved from the internal
         '''                              ring to the external one, bottle is refilled only when the bottle size changes
         '''              SA 02/03/2012 - Changed the calling to function GetReagentBottles due it was modified by removing the parameter for the residual volume
+        '''              AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
         ''' </remarks>
         Public Function ChangeElementPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                               ByVal pToRingNumber As Integer, ByVal pToCellNumber As Integer, ByVal pToBarCodeStatus As String, _
@@ -494,11 +515,12 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 If (Not dataToReturn.HasError) Then
+                                    'AG 07/10/2014 BA-1979 add classCalledFrom parameter
                                     'Add the new NOT IN USE Position in with the same information of the previous one
                                     dataToReturn = myNotInUsePositionsDelegate.Add(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
                                                                                    pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
                                                                                    pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
-                                                                                   myNotInUsePositionDS)
+                                                                                   myNotInUsePositionDS, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.ChangeElementPosition)
                                 End If
                             End If
                         End If
@@ -3305,6 +3327,7 @@ Namespace Biosystems.Ax00.BL
         '''                              needed to search in DB the Position Status, all information about the cell is contained in DS myVirtualRotorPosDS
         '''              DL 30/04/2013 - 
         '''              XB+JC 09/10/2013 - Correction on Load Virtual Rotors #1274 Bugs tracking
+        '''              AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
         ''' </remarks>
         Public Function LoadRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                   ByVal pRotorType As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -3439,8 +3462,9 @@ Namespace Biosystems.Ax00.BL
                                         virtualRotorPosition = Nothing
                                         myNotInUseCells = Nothing
 
+                                        'AG 07/10/2014 BA-1979 add classCalledFrom parameter
                                         'Insert the positions in the table of positions not in use for the WorkSession
-                                        myGlobalDataTO = noInUseDelegate.Add(dbConnection, pAnalyzerID, pRotorType, pWorkSessionID, myNoInUseVirtualPosition)
+                                        myGlobalDataTO = noInUseDelegate.Add(dbConnection, pAnalyzerID, pRotorType, pWorkSessionID, myNoInUseVirtualPosition, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.LoadVirtualRotor)
 
                                         'DL 30/04/2013. Changes v2.0.0. Load also incomplete sample list from virtual rotor
                                         Dim myRotorContentByPosition As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
