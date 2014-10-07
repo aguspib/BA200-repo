@@ -2781,7 +2781,7 @@
       TS .DecimalsAllowed, NULL AS FormulaText, (CASE WHEN T .TestPosition IS NOT NULL THEN T .TestPosition ELSE 999999999 END) AS TestPosition, NULL
       AS TestLongName, NULL CalibPointUsed
       FROM         thisOffSystemTestSamples TS LEFT OUTER JOIN
-      vcfgTestSortingForReports T ON TS .OffSystemTestName = T .TestName AND T .TestType = 'OFFS' ;
+      vcfgTestSortingForReports T ON TS .OffSystemTestName = T .TestName AND T .TestType = 'OFFS'
       GO
 
 
