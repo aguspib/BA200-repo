@@ -1050,6 +1050,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 02/07/2012 - Changed the query to get also fields CompleteReadings and ValidReadings from twksWSExecutions
         '''              SA 11/07/2012 - Changed the query to get also field ExecutionType from twksWSExecutions and TestType, ReplicatesNumber,
         '''                              OrderID and ControlID from twksOrderTests
+        '''              XB 08/10/2014 - Get also KineticsLinear field to initialize preparation structure - BA-1970
         ''' </remarks>
         Public Function GetExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer, _
                                      Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
@@ -1070,7 +1071,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                        " (CASE WHEN WSE.ExecutionType = 'PREP_STD' THEN T.TestName " & vbCrLf & _
                                                        "       WHEN WSE.ExecutionType = 'PREP_ISE' THEN IT.ShortName ELSE NULL END) AS TestName, " & vbCrLf & _
                                                        "  WSE.ValidReadings, WSE.CompleteReadings, OT.TestType, OT.SampleType, OT.ReplicatesNumber AS ReplicatesTotalNum, " & vbCrLf & _
-                                                       "  OT.ControlID, OT.OrderID, O.SampleID " & vbCrLf & _
+                                                       "  OT.ControlID, OT.OrderID, O.SampleID, WSE.KineticsLinear " & vbCrLf & _
                                                 " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & vbCrLf & _
                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                             " LEFT JOIN tparTests T ON OT.TestID = T.TestID AND OT.TestType = 'STD' " & vbCrLf & _
