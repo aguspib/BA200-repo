@@ -2524,7 +2524,7 @@
     <Label>Data validation in tfmwVersions Table for v3.1.0</Label>
     <Script>
       IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.1.0'
-      AND ServiceSoftware = '1.2.3' AND FirmwareScripts = '1.1.0' AND Firmware = '2.14')= 1
+      AND ServiceSoftware = '1.3.0' AND FirmwareScripts = '1.3.0' AND Firmware = '2.14')= 1
       SELECT 'True'
       ELSE
       SELECT 'False'
