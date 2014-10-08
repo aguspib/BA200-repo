@@ -907,7 +907,7 @@ Namespace Biosystems.Ax00.BL
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
                                       Where a.TubeContent = "REAGENT" AndAlso a.IsReagentIDNull Select a).ToList
                             If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: REAGENT with ReagentID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Invalid values: REAGENT with ReagentID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                             'SPECIAL or WASH or SALINE solution without solutioncode
@@ -915,7 +915,7 @@ Namespace Biosystems.Ax00.BL
                                        Where (a.TubeContent = "SPEC_SOL" OrElse a.TubeContent = "WASH_SOL" OrElse a.TubeContent = "SALINESOL") AndAlso a.IsSolutionCodeNull Select a).ToList
 
                             If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: Bottle solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Invalid values: Bottle solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
 
@@ -924,21 +924,21 @@ Namespace Biosystems.Ax00.BL
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
                                       Where a.TubeContent = "CALIB" AndAlso a.IsCalibratorIDNull Select a).ToList
                             If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: CALIBRATOR with CalibratorID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Invalid values: CALIBRATOR with CalibratorID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                             'CONTROL without ControlID
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
                                       Where a.TubeContent = "CTRL" AndAlso a.IsControlIDNull Select a).ToList
                             If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: CONTROL with ControlID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Invalid values: CONTROL with ControlID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                             'PATIENT without PatientID
                             linqRes = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pNotInUseRotorPositionsDS.tparVirtualRotorPosititions _
                                       Where a.TubeContent = "PATIENT" AndAlso a.IsPatientIDNull Select a).ToList
                             If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: PATIENT with PatientID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Invalid values: PATIENT with PatientID = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                             'Tube SPECIAL or WASH solution without solutioncode
@@ -946,7 +946,7 @@ Namespace Biosystems.Ax00.BL
                                        Where (a.TubeContent = "TUBE_SPEC_SOL" OrElse a.TubeContent = "TUBE_WASH_SOL") AndAlso a.IsSolutionCodeNull Select a).ToList
 
                             If linqRes.Count > 0 Then
-                                myLogAcciones.CreateLogActivity("Invalid values: Tube solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Invalid values: Tube solution with SolutionCode = vbNULL " & textDetails, "WSNotInUseRotorPositionsDelegate.CheckForInvalidPosition", EventLogEntryType.Error, False)
                             End If
 
                         End If

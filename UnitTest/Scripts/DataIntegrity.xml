@@ -2543,4 +2543,16 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.03</Version>
+    <Label>Data validation in tfmwVersions Table</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.3'
+      AND ServiceSoftware = '1.2.3' AND FirmwareScripts = '1.1.0' AND Firmware = '2.12')= 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
