@@ -735,7 +735,7 @@ Namespace Biosystems.Ax00.BL
                                 rcpDS.Clear()
                                 rcpDS.twksWSRotorContentByPosition.ImportRow(pBarCodeResPosition)
                                 rcpDS.AcceptChanges()
-                                resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, rcpDS, False)
+                                resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, pRotorType, rcpDS, False)
                             End If
 
                             'FOR SAMPLES DELETE POSITION FROM ExternalSampleID with no requrest
@@ -862,7 +862,7 @@ Namespace Biosystems.Ax00.BL
                                 rcpDS.Clear()
                                 rcpDS.twksWSRotorContentByPosition.ImportRow(pBarCodeResPosition)
                                 rcpDS.AcceptChanges()
-                                resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, rcpDS, updateAdditionalFields)
+                                resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, pRotorType, rcpDS, updateAdditionalFields)
                             End If
 
                         End If
@@ -1150,7 +1150,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         'Update Barcode fields in table RotorContentByPosition
-                        If (Not resultData.HasError) Then resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, UpdatedRcpDS, updateAdditonalRcpFlag)
+                        If (Not resultData.HasError) Then resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, pRotorType, UpdatedRcpDS, updateAdditonalRcpFlag)
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -1392,7 +1392,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Update table RotorContentByPosition
                         If (Not resultData.HasError) Then
-                            resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, updatedRcpDS, updateAdditonalRcpFlag)
+                            resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, pRotorType, updatedRcpDS, updateAdditonalRcpFlag)
                         End If
 
                         If (Not resultData.HasError) Then
@@ -2587,7 +2587,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Update table RotorContentByPosition
                         If (Not resultData.HasError) Then
-                            resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, updatedRcpDS, updateAdditonalRcpFlag)
+                            resultData = rcpDelegate.UpdateBarCodeFields(dbConnection, pRotorType, updatedRcpDS, updateAdditonalRcpFlag)
                         End If
 
                         If (Not resultData.HasError) Then
