@@ -166,26 +166,29 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' ???
+        ''' Get information of the specified Test and the list of Sample Types linked to it. Used in the Update Version process
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pSampleType"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code (optional parameter)</param>
+        ''' <returns>GlobalDataTO containing a TestSamplesDS with Test data for all Sample Types defined for the informed Test or, if parameter 
+        '''          pSampleType is informed, only for the specific Sample Type</returns>
         ''' <remarks>
         ''' Created by:  TR 09/12/2010
+        ''' Modified by: SA 08/10/2014 - BA-1944 (SubTask BA-1983) ==> Parameter pSampleType changed to optional  
         ''' </remarks>
-        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                               Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytparTestsDAO As New tparTestsDAO
-                        resultData = mytparTestsDAO.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
+                        Dim myDAO As New tparTestsDAO
+                        resultData = myDAO.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
                     End If
                 End If
             Catch ex As Exception

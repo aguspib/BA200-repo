@@ -507,7 +507,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
-#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
         ''' <summary>
         ''' Search in FACTORY DB all STD Tests that not exist in CUSTOMER DB
         ''' </summary>
@@ -899,8 +899,154 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Execute the query to search all STD Tests that should be deleted (those preloaded STD Tests that exist in CUSTOMER DB 
+        ''' but not in FACTORY DB)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a TestsDS with the list of identifiers of STD Tests that have to be deleted from Customer DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA- 1983)
+        ''' </remarks>
+        Public Function GetDeletedPreloadedSTDTests(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TestID FROM [Ax00].[dbo].[tparTests] " & vbCrLf & _
+                                                " WHERE  PreloadedTest = 1 " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TestID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf
+
+                        Dim customerTestsDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(customerTestsDS.tparTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = customerTestsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDeletedPreloadedSTDTests", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Execute the query to search in CUSTOMER DB all Sample Types for preloaded STS Tests that should be deleted (those Sample Types of preloaded 
+        ''' STD Tests that exist in CUSTOMER DB but not in FACTORY DB)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a TestsDS with the list of pairs of STD TestID/SampleType that have to be deleted from Customer DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA- 1983)
+        ''' </remarks>
+        Public Function GetDeletedPreloadedSTDTestSamples(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TS.TestID, TS.SampleType " & vbCrLf & _
+                                                " FROM [Ax00].[dbo].[tparTestSamples] TS INNER JOIN [Ax00].[dbo].[tparTests] T " & vbCrLf & _
+                                                                                               " ON TS.TestID = T.TestID " & vbCrLf & _
+                                                " WHERE  PreloadedTest = 1 " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TestID, SampleType FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestSamples] " & vbCrLf
+
+                        Dim customerTestSamplesDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(customerTestSamplesDS.tparTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = customerTestSamplesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDeletedPreloadedSTDTestSamples", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all STD Tests that exist in CUSTOMER DB but for which at least one of the relevant fields have been changed
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a TestsDS with value of the relevant fields in FACTORY DB for modified STD Tests</returns>
+        ''' <remarks>
+        ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' </remarks>
+        Public Function GetUpdatedFactoryTests(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TestID, AnalysisMode, ReactionType, ReadingMode, MainWaveLength, ReferenceWaveLength, " & vbCrLf & _
+                                                       " FirstReadingCycle, SecondReadingCycle, KineticBlankLimit, ReagentsNumber " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TestID, AnalysisMode, ReactionType, ReadingMode, MainWaveLength, ReferenceWaveLength, " & vbCrLf & _
+                                                       " FirstReadingCycle, SecondReadingCycle, KineticBlankLimit, ReagentsNumber " & vbCrLf & _
+                                                " FROM   [Ax00].[dbo].[tparTests] " & vbCrLf
+
+                        Dim factoryTestsDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestsDS.tparTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTests", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
-
     End Class
-
 End Namespace

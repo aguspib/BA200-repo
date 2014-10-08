@@ -417,7 +417,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return myGlobalDataTO
         End Function
 
-
         ''' <summary>
         ''' Read all information needed for Biochemical calculations for an Standard Test/SampleType
         ''' </summary>
@@ -479,46 +478,48 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Get all  parameters of the specified Test and sample Type
+        ''' Get information of the specified Test and the list of Sample Types linked to it. Used in the Update Version process
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet TestsDS containing all basic parameters 
-        '''          of the informed Test</returns>
+        ''' <param name="pSampleType">Sample Type Code (optional parameter)</param>
+        ''' <returns>GlobalDataTO containing a TestSamplesDS with Test data for all Sample Types defined for the informed Test or, if parameter 
+        '''          pSampleType is informed, only for the specific Sample Type</returns>
         ''' <remarks>
         ''' Created by:  TR 09/12/2010
+        ''' Modified by: SA 08/10/2014 - BA-1944 (SubTask BA-1983) ==> Parameter pSampleType changed to optional. Changed the SQL to use 
+        '''                                                            INNER JOIN. Implement USING to execute the query
         ''' </remarks>
-        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                               ByVal pTestID As Integer, _
-                                               ByVal pSampleType As String) As GlobalDataTO
-
-            Dim myGlobalDataTO As New GlobalDataTO()
-            Dim dbConnection As New SqlClient.SqlConnection
+        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                               Optional ByVal pSampleType As String = "") As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 myGlobalDataTO = GetOpenDBConnection(pDBConnection)
                 If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-                        cmdText &= "SELECT T.*, TS.SampleType " & vbCrLf
-                        cmdText &= "  FROM tparTests T, tparTestSamples TS " & vbCrLf
-                        cmdText &= " WHERE T.TestID = " & pTestID & vbCrLf
-                        cmdText &= "   AND TS.TestID = T.TestID" & vbCrLf
-                        cmdText &= "   AND TS.SampleType = '" & pSampleType & "'"
+                        Dim cmdText As String = " SELECT T.*, TS.SampleType " & vbCrLf & _
+                                                " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
+                                                " WHERE  T.TestID = " & pTestID.ToString
 
-                        Dim cmd As SqlCommand = dbConnection.CreateCommand()
-                        cmd.CommandText = cmdText
-                        cmd.Connection = dbConnection
+                        'When informed, add a filter by SampleType
+                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND TS.SampleType = '" & pSampleType.Trim & "' "
 
-                        Dim da As New SqlClient.SqlDataAdapter(cmd)
-                        Dim result As New TestsDS()
-                        da.Fill(result.tparTests)
+                        Dim myTestsDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myTestsDS.tparTests)
+                            End Using
+                        End Using
 
-                        myGlobalDataTO.SetDatos = result
+                        myGlobalDataTO.SetDatos = myTestsDS
+                        myGlobalDataTO.HasError = False
                     End If
                 End If
             Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
@@ -526,7 +527,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "tparTestsDAO.ReadByTestIDSampleType", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return myGlobalDataTO
         End Function
