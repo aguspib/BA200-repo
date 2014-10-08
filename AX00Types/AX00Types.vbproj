@@ -505,6 +505,11 @@
     <Compile Include="TimeEstimationDS.vb">
       <DependentUpon>TimeEstimationDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="UpdateVersionChangesDS.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
+    </Compile>
     <Compile Include="VersionsDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1970,6 +1975,17 @@
     </None>
     <None Include="TemporalTableDS.xss">
       <DependentUpon>TemporalTableDS.xsd</DependentUpon>
+    </None>
+    <None Include="UpdateVersionChangesDS.xsc">
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
+    </None>
+    <None Include="UpdateVersionChangesDS.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>UpdateVersionChangesDS.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="UpdateVersionChangesDS.xss">
+      <DependentUpon>UpdateVersionChangesDS.xsd</DependentUpon>
     </None>
     <None Include="VersionsDS.xsc">
       <DependentUpon>VersionsDS.xsd</DependentUpon>
