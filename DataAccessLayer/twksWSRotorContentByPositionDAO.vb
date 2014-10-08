@@ -436,15 +436,12 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 26/01/2010 - Removed return of error "NO RECORD UPDATE"; this message does not exist. Added Exit For 
         '''                              when an update fails
         '''              SA 04/11/2010 - Added N preffix for multilanguage of field TS_User
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, _
                                ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
-                Dim NullAssigment As Boolean = False
-
                 If (pDBConnection Is Nothing) Then
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
@@ -480,7 +477,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                         values &= "RealVolume = "
                         If twksWSRotorContentByPositionDR.IsRealVolumeNull Then
                             values &= "NULL,"
-                            NullAssigment = True
                         Else
                             values &= ReplaceNumericString(twksWSRotorContentByPositionDR.RealVolume) & ","
                         End If
@@ -543,18 +539,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " AND    CellNumber = " & twksWSRotorContentByPositionDR.CellNumber & _
                                   " AND    WorkSessionID = '" & twksWSRotorContentByPositionDR.WorkSessionID.ToString().Replace("'", "''") & "' "
 
-
-                        If NullAssigment Then
-                            ' Rules that RealVolume NULL value is not allowed
-                            If twksWSRotorContentByPositionDR("RotorType").ToString() = "REAGENTS" Then
-                                If Not twksWSRotorContentByPositionDR("Status") Is DBNull.Value Then
-                                    If Not twksWSRotorContentByPositionDR("Status").ToString() = "FREE" Then
-                                        Dim myLogAccionesAux As New ApplicationLogManager()
-                                        myLogAccionesAux.CreateLogActivity("A not allowed NULL value it is performed on Real Volume field !", "twksWSRotorContentByPositionDAO.Update", EventLogEntryType.Error, False)
-                                    End If
-                                End If
-                            End If
-                        End If
 
                         cmd.CommandText = cmdText
                         myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
@@ -2068,14 +2052,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 15/11/2012 - Changed the SQL to avoid errors when updating field BarcodeInfo: validation BarcodeInfo = String.Empty
         '''                              has to be inside the condition "Not IsBarcodeInfoNULL" instead of in the Else; otherwise, an error is
         '''                              raised because BarcodeInfo is NULL 
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Public Function UpdateBarCodeFields(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarCodeDS As WSRotorContentByPositionDS, _
                                             ByVal pAdditionalFieldsFlag As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
-                Dim NullAssigmentPerhaps As Boolean = False
-
                 If (pDBConnection Is Nothing) Then
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
@@ -2152,8 +2133,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 'RealVolume 
                                 If (Not row.IsRealVolumeNull) Then
                                     cmdText &= " , RealVolume = " & ReplaceNumericString(row.RealVolume)
-                                Else
-                                    NullAssigmentPerhaps = True
                                 End If
 
                                 'Remaining Tests Number
@@ -2171,19 +2150,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " AND WorksessionID = " & String.Format("'{0}'", row.WorkSessionID)
                             cmdText &= " AND CellNumber = " & row.CellNumber
                             cmdText &= " AND RotorType = " & String.Format("'{0}'", row.RotorType)
-
-
-                            If NullAssigmentPerhaps Then
-                                ' Rules that RealVolume NULL value is not allowed
-                                If row.RotorType = "REAGENTS" Then
-                                    If Not row.IsStatusNull Then
-                                        If Not row.Status = "FREE" Then
-                                            Dim myLogAccionesAux As New ApplicationLogManager()
-                                            myLogAccionesAux.CreateLogActivity("ONLY PERHAPS: A not allowed NULL value it is performed on Real Volume field !", "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Information, False)
-                                        End If
-                                    End If
-                                End If
-                            End If
 
                             'Insert line break 
                             cmdText &= String.Format("{0}", vbNewLine)
