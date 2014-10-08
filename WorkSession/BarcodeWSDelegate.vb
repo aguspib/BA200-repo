@@ -322,6 +322,12 @@ Namespace Biosystems.Ax00.BL
                                                                             'SA/JV 12/12/2013 - BT #1384
                                                                             If (Not rcpNoInUseRow.IsStatusNull AndAlso (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW")) Then
                                                                                 newRow.RealVolume = rcpNoInUseRow.RealVolume
+
+                                                                                If rcpNoInUseRow.IsRealVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                                                    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                                                    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!!", "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
+                                                                                End If
+
                                                                                 newRow.Status = rcpNoInUseRow.Status
                                                                             End If
                                                                         End If
@@ -911,6 +917,7 @@ Namespace Biosystems.Ax00.BL
         '''              JV 09/01/2014 - BT #1443 ==> Added changes to update the Position Status with the Status saved in the table of Historic Reagent Bottles 
         '''              SA 26/03/2014 - BT #1552 ==> When the scanned position contains an Special Solution that exists as Required Element in the active WS,
         '''                                           save the ElementID in the list of Element IDs which Element Status has to be updated to POS 
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Private Function SaveOKReadReagentsRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                          ByVal pRotorType As String, ByVal pBarCodeResPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
@@ -970,6 +977,12 @@ Namespace Biosystems.Ax00.BL
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).MultiTubeNumber = 1
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
+
+                                            If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                                myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (1)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                            End If
+
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
                                             UpdatedRcpDS.AcceptChanges()
@@ -1021,6 +1034,12 @@ Namespace Biosystems.Ax00.BL
 
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
+
+                                                If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (2)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                                End If
+
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
 
@@ -1050,6 +1069,12 @@ Namespace Biosystems.Ax00.BL
 
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
+
+                                                If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (3)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                                End If
+
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "INUSE"
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
 
@@ -1078,6 +1103,12 @@ Namespace Biosystems.Ax00.BL
 
                                                             'Update the Rotor Position Volume with the Bottle Volume saved on Historic table
                                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = myReagentsBottlesDS.thisReagentsBottles(0).BottleVolume
+
+                                                            If myReagentsBottlesDS.thisReagentsBottles(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                                                myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (4)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                                            End If
+
                                                         End If
 
                                                         'Calculate the Number of Tests that can be executed with the Real Bottle Volume 
@@ -1221,7 +1252,7 @@ Namespace Biosystems.Ax00.BL
                                         'TR 22/07/2013 Bug #1195 -Before clear set the bottle type to my local variable
                                         myPrevTubeType = pCurrentContentRow.TubeType
                                     End If
-                                    
+
 
                                     resultData = rcpDelegate.DeletePositions(dbConnection, updatedRcpDS, False)
                                     updatedRcpDS.Clear()
@@ -2922,6 +2953,7 @@ Namespace Biosystems.Ax00.BL
                                                                     If (Not rcpNoInUseRow.IsReagentIDNull) Then newRow.ReagentID = rcpNoInUseRow.ReagentID
 
                                                                     If (Not rcpNoInUseRow.IsRealVolumeNull) Then newRow.RealVolume = rcpNoInUseRow.RealVolume
+
                                                                     If (Not rcpNoInUseRow.IsStatusNull AndAlso _
                                                                        (String.Compare(rcpNoInUseRow.Status, "DEPLETED", False) = 0 OrElse String.Compare(rcpNoInUseRow.Status, "FEW", False) = 0)) Then
                                                                         newRow.Status = rcpNoInUseRow.Status

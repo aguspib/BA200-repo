@@ -65,6 +65,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 12/01/2012 - This function has to open a DB Transaction instead of a DB Connection. Code improved
         '''              SA 10/02/2012 - Get also Additional Solutions marked as INCOMPLETE an positioning a bottle for each one of them in
         '''                              the internal Reagents Rotor Ring
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Public Function AdditionalSolutionsAutoPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
@@ -160,6 +161,9 @@ Namespace Biosystems.Ax00.BL
                                                     row.EndEdit()
                                                     myRotorContentPosTMP.twksWSRotorContentByPosition.ImportRow(row)
 
+                                                    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                    myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from AdditionalSolutionsAutoPositioning...", "WSRotorContentByPositionDelegate.AdditionalSolutionsAutoPositioning", EventLogEntryType.Information, False)
+
                                                     'Update the Rotor Cell/Position informing the Element positioned in it
                                                     'myGlobalDataTO = myWSRotorContentByPositionDAO.Update(dbConnection, myRotorContentPosTMP)
                                                     myGlobalDataTO = Update(dbConnection, pRotorType, myRotorContentPosTMP, ClassCalledFrom.AdditionalSolutionAUTOPositioning) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
@@ -230,6 +234,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: AG 08/09/2011 - Calculate Sample Position Status (PENDING, INPROCESS,....)
         '''              SA 11/01/2012 - Implementation improved; use value of field ElementFinished to set Cell Status = Finished. 
         '''                              Call function GetSamplePositionStatus only when ElementFinished is False
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Public Function AdditionalTubeSolutionPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
@@ -299,8 +304,11 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso String.IsNullOrEmpty(myGlobalDataTO.ErrorCode)) Then
                                     'Update the Rotor Cell / Position informing the Element positioned in it
                                     'Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO()
-                                    'myGlobalDataTO = myRotorContentByPositionDAO.Update(dbConnection, pWSRotorContentByPositionDS)
-                                    myGlobalDataTO = Update(dbConnection, "SAMPLES", pWSRotorContentByPositionDS, ClassCalledFrom.AdditionalTubeSolutionPositioning) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
+                                    Dim myLogAccionesAux As New ApplicationLogManager()
+                                    myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from AdditionalTubeSolutionPositioning...", "WSRotorContentByPositionDelegate.AdditionalTubeSolutionPositioning", EventLogEntryType.Information, False)
+myGlobalDataTO = Update(dbConnection, "SAMPLES", pWSRotorContentByPositionDS, ClassCalledFrom.AdditionalTubeSolutionPositioning) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
                                 End If
 
                                 If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.ErrorCode = "") Then
@@ -374,6 +382,7 @@ Namespace Biosystems.Ax00.BL
         '''                              ring to the external one, bottle is refilled only when the bottle size changes
         '''              SA 02/03/2012 - Changed the calling to function GetReagentBottles due it was modified by removing the parameter for the residual volume
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Public Function ChangeElementPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                               ByVal pToRingNumber As Integer, ByVal pToCellNumber As Integer, ByVal pToBarCodeStatus As String, _
@@ -410,8 +419,11 @@ Namespace Biosystems.Ax00.BL
 
                         'Update the Rotor Position
                         'Dim rotorContentPosition As New twksWSRotorContentByPositionDAO
-                        'dataToReturn = rotorContentPosition.Update(dbConnection, tmpWSRotorContentByPositionDS)
+
+                        Dim myLogAccionesAux As New ApplicationLogManager()
+                        myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeElementPosition (1) ...", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Information, False)
                         dataToReturn = Update(dbConnection, tmpWSRotorContentByPositionRow.RotorType, tmpWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
 
                         If (Not dataToReturn.HasError) Then
                             'If pWSRotorContentByPositionDS has not informed the BarCode but the destination yes .. do not delete destination BarCode
@@ -458,6 +470,8 @@ Namespace Biosystems.Ax00.BL
 
                                 Case "REAGENTS"
                                     If (pToRingNumber >= previousRing) Then
+                                        myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeElementPosition (2) ...", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Information, False)
+
                                         'Update the Rotor Cell / Position informing the Element positioned in it
                                         'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
                                         dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
@@ -497,6 +511,8 @@ Namespace Biosystems.Ax00.BL
                                                                                                                       pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeContent, False)
 
                                                         If (Not dataToReturn.HasError) Then
+                                                            myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeElementPosition (3) ...", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Information, False)
+
                                                             'Update the Rotor Cell / Position 
                                                             'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
                                                             dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
@@ -507,11 +523,15 @@ Namespace Biosystems.Ax00.BL
                                                     myNotInUsePositionDS.tparVirtualRotorPosititions.First.SetStatusNull()
                                                     myNotInUsePositionDS.tparVirtualRotorPosititions.First.TubeType = pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
 
+                                                    myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeElementPosition (4) ...", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Information, False)
+
                                                     'Update the Rotor Cell / Position 
                                                     'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
                                                     dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
                                                 End If
                                             Else
+                                                myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeElementPosition (5) ...", "WSRotorContentByPositionDelegate.ChangeElementPosition", EventLogEntryType.Information, False)
+
                                                 'The bottle size is the same, update the Rotor Cell / Position informing the Element positioned in it
                                                 'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
                                                 dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
@@ -603,6 +623,7 @@ Namespace Biosystems.Ax00.BL
         '''                              the previous state. Implementation changed.
         '''              SA 06/03/2012 - Change "IN_USE" for "INUSE", which is the correct code in PreloadedMasterData
         '''              JV 04/12/2013 - #1384 new optional parameter to assure we have not active session and the user wants to fill the cell.
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Public Function ChangeVolumeByPosition(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pSelectedPositionsDS As WSRotorContentByPositionDS, _
@@ -651,6 +672,9 @@ Namespace Biosystems.Ax00.BL
                                             myNewSelectedPositionsDS.Clear()
                                             myNewSelectedPositionsDS.twksWSRotorContentByPosition.ImportRow(rotorPosition)
 
+                                            Dim myLogAccionesAux As New ApplicationLogManager()
+                                            myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeVolumeByPosition (1) ...", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Information, False)
+
                                             'Update TubeType and Status = PENDING for the selected Rotor Position
                                             'returnedData = myRotorContentByPosDAO.Update(dbConnection, myNewSelectedPositionsDS)
                                             returnedData = Update(dbConnection, rotorPosition.RotorType, myNewSelectedPositionsDS, ClassCalledFrom.ChangeVolumeByPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
@@ -669,6 +693,9 @@ Namespace Biosystems.Ax00.BL
                                                 rotorPosition.Status = "PENDING"
                                                 myNewSelectedPositionsDS.Clear()
                                                 myNewSelectedPositionsDS.twksWSRotorContentByPosition.ImportRow(rotorPosition)
+
+                                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                                myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeVolumeByPosition (2) ...", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Information, False)
 
                                                 'Update Status = PENDING for the selected Rotor Position
                                                 'returnedData = myRotorContentByPosDAO.Update(dbConnection, myNewSelectedPositionsDS)
@@ -749,6 +776,9 @@ Namespace Biosystems.Ax00.BL
                                             myNewSelectedPositionsDS.Clear()
                                             myNewSelectedPositionsDS.twksWSRotorContentByPosition.ImportRow(rotorPosition)
 
+                                            Dim myLogAccionesAux As New ApplicationLogManager()
+                                            myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeVolumeByPosition (3) ...", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Information, False)
+
                                             'Update BottleType and Status = INUSE for the selected Rotor Position
                                             'returnedData = myRotorContentByPosDAO.Update(dbConnection, myNewSelectedPositionsDS)
                                             returnedData = Update(dbConnection, rotorPosition.RotorType, myNewSelectedPositionsDS, ClassCalledFrom.ChangeVolumeByPosition) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
@@ -769,6 +799,9 @@ Namespace Biosystems.Ax00.BL
                                                 'Move data to an auxiliary DataSet; position Status does not change
                                                 myNewSelectedPositionsDS.Clear()
                                                 myNewSelectedPositionsDS.twksWSRotorContentByPosition.ImportRow(rotorPosition)
+
+                                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                                myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeVolumeByPosition (4) ...", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Information, False)
 
                                                 'Update TubeType/BottleType for the selected Rotor Position
                                                 'returnedData = myRotorContentByPosDAO.Update(dbConnection, myNewSelectedPositionsDS)
@@ -825,6 +858,9 @@ Namespace Biosystems.Ax00.BL
                                                 'Move data to an auxiliary DataSet; position Status does not change
                                                 myNewSelectedPositionsDS.Clear()
                                                 myNewSelectedPositionsDS.twksWSRotorContentByPosition.ImportRow(rotorPosition)
+
+                                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                                myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ChangeVolumeByPosition (5) ...", "WSRotorContentByPositionDelegate.ChangeVolumeByPosition", EventLogEntryType.Information, False)
 
                                                 'Update TubeType/BottleType for the selected Rotor Position
                                                 'returnedData = myRotorContentByPosDAO.Update(dbConnection, myNewSelectedPositionsDS)
@@ -3354,6 +3390,7 @@ Namespace Biosystems.Ax00.BL
         '''              DL 30/04/2013 - 
         '''              XB+JC 09/10/2013 - Correction on Load Virtual Rotors #1274 Bugs tracking
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Public Function LoadRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                   ByVal pRotorType As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -3390,6 +3427,10 @@ Namespace Biosystems.Ax00.BL
 
                                     If (Not myGlobalDataTO.HasError) Then
                                         If (pRotorType = "REAGENTS") Then
+
+                                            Dim myLogAccionesAux As New ApplicationLogManager()
+                                            myLogAccionesAux.CreateLogActivity("Updated twksWSRotorContentByPosition from LoadRotor...", "WSRotorContentByPositionDelegate.LoadRotor", EventLogEntryType.Information, False)
+
                                             'Get Rotor Positions containing required Reagents to calculate its status (POS or INCOMPLETE)
                                             'Use TubeContent = REAGENT and ElementID NOT NULL, and sort data by ElementID; for each Reagent, calculate the Reagent Status just once
                                             '(due to it is possible to have several bottles of the same Reagent placed in the Rotor)
@@ -3847,6 +3888,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 02/03/2012 - Informed parameter for the BottleType with calling function CalculateRemainingTests
         '''              SA 06/03/2012 - Call to function for automatic positioning of Additional Solutions have to be done although
         '''                              there are not Reagents pending to positioning
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Public Function ReagentsAutoPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
@@ -3970,6 +4012,9 @@ Namespace Biosystems.Ax00.BL
                                                                                                                                               myReagTubeTypeRow.TubeVolume, myReagTubeTypeRow.TubeCode)
                                                                         If (myGlobalDataTO.HasError) Then Exit Do
                                                                         If (Not myGlobalDataTO.SetDatos Is Nothing) Then myRCPRow.RemainingTestsNumber = CType(myGlobalDataTO.SetDatos, Integer)
+
+                                                                        Dim myLogAccionesAux As New ApplicationLogManager()
+                                                                        myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ReagentsAutoPositioning...", "WSRotorContentByPositionDelegate.ReagentsAutoPositioning", EventLogEntryType.Information, False)
 
                                                                         'Update the Rotor Cell...
                                                                         'myGlobalDataTO = myWSRotorContentByPositionDAO.Update(dbConnection, myTempRCPDS)
@@ -5021,6 +5066,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  TR 20/11/2009 - Tested: OK
         ''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Public Function UpdateMultitubeNumber(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalizerID As String, _
@@ -5050,8 +5096,10 @@ Namespace Biosystems.Ax00.BL
                                 newMultitubeNumber += 1
                             Next
 
-                            'myGlobalDataTO = myRotorContentByPosition.Update(dbConnection, myWSRotorContentByPositionDS)
+                            Dim myLogAccionesAux As New ApplicationLogManager()
+                            myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from UpdateMultitubeNumber...", "WSRotorContentByPositionDelegate.UpdateMultitubeNumber", EventLogEntryType.Information, False)
                             myGlobalDataTO = Update(dbConnection, pRotorType, myWSRotorContentByPositionDS, ClassCalledFrom.UpdateMultiTubeNumber) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
                             If (Not myGlobalDataTO.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed
                                 If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
@@ -5159,6 +5207,7 @@ Namespace Biosystems.Ax00.BL
         '''              RH 31/08/2011 - Code optimization. short-circuit evaluation. Remove unneeded and memory wasting "New" instructions.
         '''              SA 15/02/2012 - Function updated due to changes in function CalculateReagentStatus
         '''              SA 02/03/2012 - Informed parameter for the BottleType with calling function CalculateRemainingTests
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Public Function UpdateReagentPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS) _
@@ -5192,8 +5241,11 @@ Namespace Biosystems.Ax00.BL
 
                                 'Update the Rotor Cell / Position informing the Element positioned in it
                                 'Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO
-                                'myGlobalDataTO = myRotorContentByPositionDAO.Update(dbConnection, pWSRotorContentByPositionDS)
+
+                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from UpdateReagentPosition...", "WSRotorContentByPositionDelegate.UpdateReagentPosition", EventLogEntryType.Information, False)
                                 myGlobalDataTO = Update(dbConnection, "REAGENTS", pWSRotorContentByPositionDS, ClassCalledFrom.ReagentPositioning) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
 
                                 If (Not myGlobalDataTO.HasError) Then
                                     'Fill needed data in a row of WSRequiredElementsDS 
@@ -5754,6 +5806,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  TR 30/11/2009 - Tested: OK
         ''' Modified by: SA 13/01/2010 - Changed the way of opening the DB Transaction to fulfill the new template
         '''              SA 11/01/2012 - Code improved
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Private Function AdditionalSolutionPositioning(ByVal pDBConnection As SqlClient.SqlConnection, _
@@ -5802,7 +5855,10 @@ Namespace Biosystems.Ax00.BL
                                         'Update the Rotor Cell / Position informing the Element positioned in it.
                                         'Dim myWSRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO
                                         'myGlobalDataTO = myWSRotorContentByPositionDAO.Update(dbConnection, pWSRotorContentByPositionDS)
+                                        Dim myLogAccionesAux As New ApplicationLogManager()
+                                        myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from AdditionalSolutionPositioning...", "WSRotorContentByPositionDelegate.AdditionalSolutionPositioning", EventLogEntryType.Information, False)
                                         myGlobalDataTO = Update(dbConnection, "REAGENTS", pWSRotorContentByPositionDS, ClassCalledFrom.AdditionalSolutionPositioning) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
                                         If (Not myGlobalDataTO.HasError) Then
                                             'Update Status of the Required Element to Positioned (POS)
                                             Dim myWSRequiredElementsDelegate As New WSRequiredElementsDelegate
@@ -5933,6 +5989,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 27/09/2011 - Set values of Barcode fields for all positions of a Multipoint Calibrator (currently they are updated only for the first point)
         '''              SA 10/01/2012 - Use value of field ElementFinished to set Cell Status = Finished. Call function GetSamplePositionStatus only when 
         '''                              ElementFinished is False. Implementation improved 
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Private Function CalibratorPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
@@ -6110,6 +6167,9 @@ Namespace Biosystems.Ax00.BL
                                             Dim myRotorContentPosTMP As New WSRotorContentByPositionDS
                                             'Dim myRotorContentbyPositionDAO As New twksWSRotorContentByPositionDAO
 
+                                            Dim myLogAccionesAux As New ApplicationLogManager()
+                                            myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from CalibratorPositioning...", "WSRotorContentByPositionDelegate.CalibratorPositioning", EventLogEntryType.Information, False)
+
                                             For Each rcpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In pWSRotorContentByPositionDS.twksWSRotorContentByPosition
                                                 'Add the row to a temporal DataSet to be processed
                                                 myRotorContentPosTMP.twksWSRotorContentByPosition.ImportRow(rcpRow)
@@ -6251,6 +6311,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 08/09/2011 - Calculate sample position status (PENDING, INPROCESS, ...)
         '''              TR 17/10/2011 - Removed Exit Try in code and changed the implementation
         '''              SA 10/01/2012 - Implementation improved
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Private Function ControlPositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
@@ -6319,8 +6380,11 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso String.IsNullOrEmpty(myGlobalDataTO.ErrorCode)) Then
                                     'Update the Rotor Cell / Position informing the Element positioned in it
                                     'Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO()
-                                    'myGlobalDataTO = myRotorContentByPositionDAO.Update(dbConnection, pWSRotorContentByPositionDS)
+
+                                    Dim myLogAccionesAux As New ApplicationLogManager()
+                                    myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from ControlPositioning...", "WSRotorContentByPositionDelegate.ControlPositioning", EventLogEntryType.Information, False)
                                     myGlobalDataTO = Update(dbConnection, "SAMPLES", pWSRotorContentByPositionDS, ClassCalledFrom.ControlPositioning) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+
                                 End If
 
                                 If (Not myGlobalDataTO.HasError AndAlso String.IsNullOrEmpty(myGlobalDataTO.ErrorCode)) Then
@@ -6905,6 +6969,7 @@ Namespace Biosystems.Ax00.BL
         '''                              ** If field SpecimenIDList is informed for the required Patient Sample, fill BarcodeInfo with the first SpecimenID in the list
         '''                                 and set BarcodeStatus = OK
         '''                              ** Otherwise, both Barcode fields remain with NULL value
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         '''              AG 07/10/2014 - BA-1979 add traces into log when rotor position is updated with invalid values in order to find the origin of the problem
         ''' </remarks>
         Private Function PatientSamplePositioning(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
@@ -7001,6 +7066,9 @@ Namespace Biosystems.Ax00.BL
                             If (Not myGlobalDataTO.HasError) Then
                                 'If a Rotor Full Warning was returned, save it
                                 wngMsgReturned = myGlobalDataTO.ErrorCode
+
+                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                myLogAccionesAux.CreateLogActivity("Update twksWSRotorContentByPosition from PatientSamplePositioning...", "WSRotorContentByPositionDelegate.PatientSamplePositioning", EventLogEntryType.Information, False)
 
                                 Dim tempDS As New WSRotorContentByPositionDS()
                                 'Dim myRotorContentByPosDAO As New twksWSRotorContentByPositionDAO()
