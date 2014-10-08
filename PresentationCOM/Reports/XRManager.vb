@@ -2672,47 +2672,62 @@ Public Class XRManager
 
         Dim results = GetResultsReportHistoricalData(analyzerID, dateFrom, dateTo, testNameContains)
 
-        For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "BLANK").OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.ResultDateTime)
+        If (results Is Nothing) Then Return Nothing
 
-            blankDataRow = dsReport.BlanksResultsDetails.NewBlanksResultsDetailsRow()
-            blankDataRow.OrderTestID = row.HistOrderTestID
-            blankDataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
-            blankDataRow.Absorbance = If((Not row.IsABSValueNull()), row.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            blankDataRow.ReagentAbsorbance = If((Not row.IsABSWorkReagentNull()), row.ABSWorkReagent.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            blankDataRow.KineticBlankLimit = If((Not row.IsKineticBlankLimitNull()), row.KineticBlankLimit.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            blankDataRow.InitialAbsorbance = If((Not row.IsABSInitialNull()), row.ABSInitial.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            blankDataRow.MainFilterAbsorbance = If((Not row.IsABSMainFilterNull()), row.ABSMainFilter.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            blankDataRow.BlankAbsorbanceLimit = If((Not row.IsBlankAbsorbanceLimitNull()), row.BlankAbsorbanceLimit.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            blankDataRow.Remarks = If((Not row.IsAlarmListNull()), GetRemarks(row.AlarmList), String.Empty)
-            blankDataRow.ResultDate = If((Not row.IsResultDateTimeNull()), row.ResultDateTime.ToString(SystemInfoManager.OSDateFormat & " " & SystemInfoManager.OSShortTimeFormat), String.Empty)
+        Dim SampleTypes() As String = Nothing
+        Dim myMasterDataDelegate As New MasterDataDelegate
+        Dim resultData As GlobalDataTO = Nothing
 
-            dsReport.BlanksResultsDetails.Rows.Add(blankDataRow)
-        Next
+        resultData = myMasterDataDelegate.GetSampleTypes(Nothing)
 
-        For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "CALIB").OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.CalibratorName).ThenBy(Function(r) r.LotNumber).ThenBy(Function(r) r.ResultDateTime)
+        If Not resultData.HasError Then
 
-            calibratorDataRow = dsReport.CalibratorsResultsDetails.NewCalibratorsResultsDetailsRow()
-            calibratorDataRow.OrderTestID = row.HistOrderTestID
-            calibratorDataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
-            calibratorDataRow.SampleType = row.SampleType
-            calibratorDataRow.Name = String.Format("{0} ({1})", row.CalibratorName, row.LotNumber)
-            calibratorDataRow.MultipointNumber = If((row.NumberOfCalibrators > 1), row.MultiPointNumber.ToString(), String.Empty)
-            calibratorDataRow.Absorbance = If((Not row.IsABSValueNull()), row.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
-            calibratorDataRow.TheoreticalConcentration = If((Not row.IsTheoreticalConcentrationNull()), row.TheoreticalConcentration.ToStringWithDecimals(row.DecimalsAllowed), String.Empty)
-            calibratorDataRow.Unit = If((Not row.IsMeasureUnitNull()), row.MeasureUnit, String.Empty)
-            calibratorDataRow.CalibratorFactor = If((Not row.IsCalibratorFactorNull()), row.CalibratorFactor.ToString(GlobalConstants.CALIBRATOR_FACTOR_FORMAT.ToString), String.Empty)
-            calibratorDataRow.FactorLimit = If((Not row.IsFactorLowerLimitNull() And Not row.IsFactorUpperLimitNull()), String.Format("{0} - {1}", row.FactorLowerLimit, row.FactorUpperLimit), String.Empty)
-            calibratorDataRow.Remarks = If((Not row.IsAlarmListNull()), GetRemarks(row.AlarmList), String.Empty)
-            calibratorDataRow.ResultDate = If((Not row.IsResultDateTimeNull()), row.ResultDateTime.ToString(SystemInfoManager.OSDateFormat & " " & SystemInfoManager.OSShortTimeFormat), String.Empty)
+            SampleTypes = resultData.SetDatos.ToString.Split(CChar(","))
 
-            dsReport.CalibratorsResultsDetails.Rows.Add(calibratorDataRow)
-        Next
+            For Each sortedSampleType In SampleTypes
+                For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "BLANK" And r.SampleType = sortedSampleType).OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.ResultDateTime)
 
-        reportDate = (From detail In results.vhisWSResults _
-                                 Select detail.ResultDateTime).Max()
+                    blankDataRow = dsReport.BlanksResultsDetails.NewBlanksResultsDetailsRow()
+                    blankDataRow.OrderTestID = row.HistOrderTestID
+                    blankDataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
+                    blankDataRow.Absorbance = If((Not row.IsABSValueNull()), row.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    blankDataRow.ReagentAbsorbance = If((Not row.IsABSWorkReagentNull()), row.ABSWorkReagent.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    blankDataRow.KineticBlankLimit = If((Not row.IsKineticBlankLimitNull()), row.KineticBlankLimit.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    blankDataRow.InitialAbsorbance = If((Not row.IsABSInitialNull()), row.ABSInitial.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    blankDataRow.MainFilterAbsorbance = If((Not row.IsABSMainFilterNull()), row.ABSMainFilter.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    blankDataRow.BlankAbsorbanceLimit = If((Not row.IsBlankAbsorbanceLimitNull()), row.BlankAbsorbanceLimit.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    blankDataRow.Remarks = If((Not row.IsAlarmListNull()), GetRemarks(row.AlarmList), String.Empty)
+                    blankDataRow.ResultDate = If((Not row.IsResultDateTimeNull()), row.ResultDateTime.ToString(SystemInfoManager.OSDateFormat & " " & SystemInfoManager.OSShortTimeFormat), String.Empty)
 
-        If ((dsReport.BlanksResultsDetails.Count > 0) Or (dsReport.CalibratorsResultsDetails.Count > 0)) Then
-            Return dsReport
+                    dsReport.BlanksResultsDetails.Rows.Add(blankDataRow)
+                Next
+
+                For Each row As HisWSResultsDS.vhisWSResultsRow In results.vhisWSResults.Where(Function(r) r.SampleClass = "CALIB" And r.SampleType = sortedSampleType).OrderBy(Function(r) r.TestPosition).ThenBy(Function(r) r.CalibratorName).ThenBy(Function(r) r.LotNumber).ThenBy(Function(r) r.ResultDateTime)
+
+                    calibratorDataRow = dsReport.CalibratorsResultsDetails.NewCalibratorsResultsDetailsRow()
+                    calibratorDataRow.OrderTestID = row.HistOrderTestID
+                    calibratorDataRow.TestName = If((row.TestLongName <> String.Empty), row.TestLongName, row.TestName)
+                    calibratorDataRow.SampleType = row.SampleType
+                    calibratorDataRow.Name = String.Format("{0} ({1})", row.CalibratorName, row.LotNumber)
+                    calibratorDataRow.MultipointNumber = If((row.NumberOfCalibrators > 1), row.MultiPointNumber.ToString(), String.Empty)
+                    calibratorDataRow.Absorbance = If((Not row.IsABSValueNull()), row.ABSValue.ToString(GlobalConstants.ABSORBANCE_FORMAT.ToString), String.Empty)
+                    calibratorDataRow.TheoreticalConcentration = If((Not row.IsTheoreticalConcentrationNull()), row.TheoreticalConcentration.ToStringWithDecimals(row.DecimalsAllowed), String.Empty)
+                    calibratorDataRow.Unit = If((Not row.IsMeasureUnitNull()), row.MeasureUnit, String.Empty)
+                    calibratorDataRow.CalibratorFactor = If((Not row.IsCalibratorFactorNull()), row.CalibratorFactor.ToString(GlobalConstants.CALIBRATOR_FACTOR_FORMAT.ToString), String.Empty)
+                    calibratorDataRow.FactorLimit = If((Not row.IsFactorLowerLimitNull() And Not row.IsFactorUpperLimitNull()), String.Format("{0} - {1}", row.FactorLowerLimit, row.FactorUpperLimit), String.Empty)
+                    calibratorDataRow.Remarks = If((Not row.IsAlarmListNull()), GetRemarks(row.AlarmList), String.Empty)
+                    calibratorDataRow.ResultDate = If((Not row.IsResultDateTimeNull()), row.ResultDateTime.ToString(SystemInfoManager.OSDateFormat & " " & SystemInfoManager.OSShortTimeFormat), String.Empty)
+
+                    dsReport.CalibratorsResultsDetails.Rows.Add(calibratorDataRow)
+                Next
+            Next
+
+            reportDate = (From detail In results.vhisWSResults _
+                                     Select detail.ResultDateTime).Max()
+
+            If ((dsReport.BlanksResultsDetails.Count > 0) Or (dsReport.CalibratorsResultsDetails.Count > 0)) Then
+                Return dsReport
+            End If
         End If
 
         Return Nothing
