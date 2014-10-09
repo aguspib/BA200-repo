@@ -320,25 +320,35 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         Dim myCalibratorsUpdate As New CalibratorUpdateData
                         resultData = myCalibratorsUpdate.ProcessForCALIBRATORS(dbConnection, pUpdateVersionChangesList)
 
-                        '(2) Execute the Update Version Process for NEW STD TESTS
+                        '(2) Execute the Update Version Process for DELETED STD TESTS
                         Dim mySTDTestsUpdate As New TestParametersUpdateData
-                        If (Not resultData.HasError) Then
-                            resultData = mySTDTestsUpdate.CreateNEWSTDTests(dbConnection, pUpdateVersionChangesList)
-                        End If
-
-                        '(3) Execute the Update Version Process for DELETED STD TESTS
                         If (Not resultData.HasError) Then
                             resultData = mySTDTestsUpdate.DELETERemovedSTDTests(dbConnection, pUpdateVersionChangesList)
                         End If
 
-                        '(4) Execute the Update Version Process for DELETED STD TESTS / SAMPLE TYPES
+                        '(3) Execute the Update Version Process for DELETED STD TESTS / SAMPLE TYPES
                         If (Not resultData.HasError) Then
                             resultData = mySTDTestsUpdate.DELETERemovedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(4) Execute the Update Version Process for NEW STD TESTS
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.CreateNEWSTDTests(dbConnection, pUpdateVersionChangesList)
                         End If
 
                         '(5) Execute the Update Version Process for UPDATED STD TESTS
                         If (Not resultData.HasError) Then
                             resultData = mySTDTestsUpdate.UPDATEModifiedSTDTests(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(6) Execute the Update Version Process for UPDATED STD TESTS / SAMPLE TYPES 
+                        If (Not resultData.HasError) Then
+                            ' resultData = mySTDTestsUpdate.UPDATEModifiedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(7) Execute the Update Version Process for CONTAMINATIONS
+                        If (Not resultData.HasError) Then
+
                         End If
 
                         If (Not resultData.HasError) Then

@@ -488,6 +488,42 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get the maximum value of field ReagentID in table tparReagents. Used in the Update Version process to assign a suitable temporary ReagentID
+        ''' to new Reagents (because function PrepareTestToSave needs it)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value with the maximum value of field ReagentID </returns>
+        ''' <remarks>
+        ''' Created by:  SA 09/10/20014 - BA-1944 
+        ''' </remarks>
+        Public Function GetMaxReagentID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparReagentsDAO
+                        resultData = myDAO.GetMaxReagentID(dbConnection)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ReagentsDelegate.GetMaxReagentID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
     End Class
 End Namespace

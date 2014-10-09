@@ -867,13 +867,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * " & vbCrLf & _
+                        Dim cmdText As String = " SELECT TC.*, C.CalibratorName, " & IIf(pMarkNew, 1, 0).ToString & " AS IsNew " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].tparTestCalibrators TC INNER JOIN " & vbCrLf & _
                                                            GlobalBase.TemporalDBName & ".[dbo].tparCalibrators C ON C.CalibratorID = TC.CalibratorID " & vbCrLf & _
-                                                " WHERE  TestID = " & pTestID.ToString & vbCrLf
+                                                " WHERE  TC.TestID = " & pTestID.ToString & vbCrLf
 
                         'When informed, get data only for the specified SampleType
-                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND SampleType ='" & pSampleType.Trim & "' " & vbCrLf
+                        If (pSampleType.Trim <> String.Empty) Then cmdText &= " AND TC.SampleType ='" & pSampleType.Trim & "' " & vbCrLf
 
                         Dim testCalibratorDS As New TestCalibratorsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -1042,6 +1042,52 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTests", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all new Sample Types added to preloaded STD Tests that already exist in CUSTOMER DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a TestsDS with all pairs of TestID/SampleType that exists in FACTORY DB but not in the CUSTOMER DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 09/10/2014 - BA-1944 (SubTask BA- 1981)
+        ''' </remarks>
+        Public Function GetNewFactoryTestSamples(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TestID, SampleType FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestSamples] " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TestID, SampleType FROM [Ax00].[dbo].[tparTestSamples] " & vbCrLf
+
+                        Dim factoryTestsDS As New TestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestsDS.tparTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTestSamples", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

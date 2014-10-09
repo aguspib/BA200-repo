@@ -619,6 +619,47 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Get the maximum value of field TestCalibratorID in table tparTestCalibrators. Used in the Update Version process to assign a suitable temporary 
+        ''' TestCalibratorID to new relations between Tests/SampleTypes and Calibrators (because function PrepareTestToSave needs it)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an integer value with the maximum value of field TestCalibratorID</returns>
+        ''' <remarks>
+        ''' Created by:  SA 09/10/20014 - BA-1944 
+        ''' </remarks>
+        Public Function GetMaxTestCalibratorID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT MAX(TestCalibratorID) AS MaxTestCalibratorID " & vbCrLf & _
+                                                " FROM   tparTestCalibrators  " & vbCrLf
+
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            resultData.SetDatos = dbCmd.ExecuteScalar()
+                            resultData.HasError = False
+                        End Using
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "tparTestCalibratorsDAO.GetMaxTestCalibratorID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
     End Class
 End Namespace
