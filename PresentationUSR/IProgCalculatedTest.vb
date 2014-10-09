@@ -975,9 +975,9 @@ Public Class IProgCalculatedTest
             calTestRow.EnableStatus = True
 
             If (calTestRow.EnableStatus) Then
-                calTestRow.FormulaText = bsCalTestFormula.FormulaString
+                calTestRow.FormulaText = bsCalTestFormula.FormulaString.Replace("'", "''").Replace(",", ".") 'IT 08/10/2014: BA-1991
             Else
-                calTestRow.FormulaText = myOriginalFormulaValue
+                calTestRow.FormulaText = myOriginalFormulaValue.Replace("'", "''").Replace(",", ".") 'IT 08/10/2014: BA-1991
             End If
 
             'If Reference Ranges have been defined, get value of the selected Range Type
