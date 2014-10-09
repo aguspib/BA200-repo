@@ -8827,6 +8827,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' Created by:  SA 09/07/2012 - Optimization of function InitPreparation
         ''' Modified     AG 23/10/2013 - initialize new properties in preparation structure (PausedReadings())
+        '''              XB 08/10/2014 - Get also KineticsLinear field to initialize preparation structure - BA-1970
         ''' </remarks>
         Private Sub InitPreparationNEW(ByVal pExecToCalculateRow As ExecutionsDS.twksWSExecutionsRow, ByVal pDimension As Integer)
             Dim resultData As New GlobalDataTO
@@ -8843,6 +8844,7 @@ Namespace Biosystems.Ax00.Calculations
                 If (Not pExecToCalculateRow.IsWellUsedNull) Then preparation(pDimension).WellUsed = pExecToCalculateRow.WellUsed
                 If (Not pExecToCalculateRow.IsThermoWarningFlagNull) Then preparation(pDimension).ThermoWarningFlag = pExecToCalculateRow.ThermoWarningFlag
                 If (Not pExecToCalculateRow.IsClotValueNull) Then preparation(pDimension).PossibleClot = pExecToCalculateRow.ClotValue
+                If (Not pExecToCalculateRow.IsKineticsLinearNull) Then preparation(pDimension).KineticsLinear = pExecToCalculateRow.KineticsLinear
 
                 preparation(pDimension).PostDilutionType = "NONE"
                 If (Not pExecToCalculateRow.IsPostDilutionTypeNull) Then preparation(pDimension).PostDilutionType = pExecToCalculateRow.PostDilutionType
