@@ -1382,14 +1382,16 @@ Public Class IWSRotorPositions
 
     ''' <summary>
     ''' Get the Expiration date from the reagent barcode information.
-    ''' Remember to change this function on Montitor screen.
+    ''' Remember to change this function on Monitor screen.
     ''' </summary>
     ''' <param name="pReagentBarcode"></param>
-    ''' <returns></returns>
+    ''' <returns>Valid datepart in pReagentBarcode ==> Expiration Date.
+    '''          Datepart in pReagentBarcode represents invalid date ==> Date.MinValue</returns>
     ''' <remarks>
-    ''' CREATED BY: TR 28/03/2014
-    '''             TR 10/04/2014 -Initialize the ExpirationDate variable to min Date value.
-    '''             XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
+    ''' Created by:  TR 28/03/2014
+    ''' Modified by: TR 10/04/2014 - Initialize the ExpirationDate variable to min Date value.
+    '''              XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
+    '''              WE 07/10/2014 - Extend code with check on Month field to prevent String to Date Conversion Error shown on screen (BA-1965).
     ''' </remarks>
     Private Function GetReagentExpDateFromBarCode(pReagentBarcode As String) As Date
         Dim ExpirationDate As Date = Date.MinValue
@@ -1405,7 +1407,8 @@ Public Class IWSRotorPositions
                 myYear = "20" & myYear
 
                 'Set the result value.
-                If myMonth <> "" OrElse myYear <> "" Then
+                'If myMonth <> "" OrElse myYear <> "" Then
+                If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
                     ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
                     'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
                     ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
@@ -2761,6 +2764,7 @@ Public Class IWSRotorPositions
     '''              TR 15/11/2013 - BT #1383 Complete the information required to get the Remaining test for reagents with status NOT INUSE.
     '''              JV 02/12/2013 - BT #1419 Don't show NumTestsRemaining when barcode is unknown.
     '''              TR 28/03/2014 - BT #1562 Show the expiration date on screen. get the value from the reagent barcode if exist.
+    '''              WE 07/10/2014 - BA #1965 Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
     ''' </remarks>
     Private Sub ShowPositionInfoArea(ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                                      ByVal pRingNumber As Integer, ByVal pCellNumber As Integer)
@@ -2966,8 +2970,9 @@ Public Class IWSRotorPositions
                             bsReagentsBarCodeTextBox.Clear()
                             If (Not myCellPosInfoDS.PositionInformation(0).IsBarcodeInfoNull) Then
                                 bsReagentsBarCodeTextBox.Text = myCellPosInfoDS.PositionInformation(0).BarcodeInfo
-                                'TR 28/03/2014 -Set the expiration date 
-                                If myCellPosInfoDS.Reagents.Count > 0 AndAlso Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" Then
+                                'TR 28/03/2014 -Set the expiration date
+                                ' WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+                                If myCellPosInfoDS.Reagents.Count > 0 AndAlso Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" AndAlso myCellPosInfoDS.PositionInformation(0).Content = "REAGENT" Then
                                     Dim myExpirationDate As Date = GetReagentExpDateFromBarCode(myCellPosInfoDS.PositionInformation(0).BarcodeInfo)
                                     'Validate if date is diferent than the minimun date value
                                     If myExpirationDate > Date.MinValue Then
@@ -2975,8 +2980,6 @@ Public Class IWSRotorPositions
                                     End If
                                 End If
                                 'TR 28/03/2014 -END.
-
-
                             End If
                         End If
 
@@ -3077,6 +3080,7 @@ Public Class IWSRotorPositions
     '''                            JV - 03/12/2013 - #1384: Changes in ElementId when reset the session and mantain status
     '''                            TR - 28/03/2014 - #1562: Show the Expiration Date on te report.
     '''                            XB - 03/06/2014 - #1648: Change the sort of this report alphabetically by the name of the reagent
+    '''                            WE - 07/10/2014 - #1965: Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
     ''' </remarks>
     Private Sub GetInfoAreaForReport(ByVal pAnalyzerID As String, ByVal pRotorType As String)
         Try
@@ -3143,16 +3147,21 @@ Public Class IWSRotorPositions
 
                                     'TR 10/04/2014 BT#1583
                                     myExpirationDate = Date.MinValue 'initialize variable
-                                    'Get the expiration date
-                                    myExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
-                                    'Validate if date is diferent than the minimun date value
-                                    If myExpirationDate > Date.MinValue Then
-                                        myReagent.First().ExpirationDate = myExpirationDate
-                                        myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                    ' WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+                                    If myCellPosInfoDS.PositionInformation(0).Content = "REAGENT" Then
+                                        'Get the expiration date
+                                        myExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
+                                        ' Validate if date is correct (different than the minimun date value).
+                                        If myExpirationDate > Date.MinValue Then
+                                            myReagent.First().ExpirationDate = myExpirationDate
+                                            myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                        End If
+                                        'TR 10/04/2014 BT#1583
+                                        'myReagent.First().ExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
+                                        'myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
                                     End If
-                                    'TR 10/04/2014 BT#1583
-                                    'myReagent.First().ExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
-                                    'myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                    ' WE 07/10/2014 BA-1965 - End.
+
                                     myReagent.First().LotNumber = GetReagentLotNumberFromBarCode(dr.BarCodeInfo)
                                     myReagent.First().EndEdit()
 
