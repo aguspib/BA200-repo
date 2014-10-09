@@ -74,7 +74,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet HisWSCalcTestRelations containing, for each informed Historic Order Test of a Calculated Test, 
         '''          the Historic Order Test of all the Tests included in its Formula and the PrintExpTests for them</returns>
         ''' <remarks>
-        ''' Created by:  SA 02/09/2014 - BA-1898 
+        ''' Created by:   SA 02/09/2014 - BA-1898 
+        ''' Modified by:  IT 09/10/2014 - BA-1898: For all Order Tests with a Calculated Test marked as CLOSED (ClosedCalcTest = True), the Experimental Tests will  be printed (PrintExpTests 
+        '''    returned as True)
         ''' </remarks>
         Public Function GetExpTestsToExclude(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisCalcOrderTestIDs As List(Of Integer), _
                                              ByVal pAnalyzerID As String) As GlobalDataTO
@@ -91,7 +93,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         'Query to get the PrintExpTests of all Tests included in the Formula of all selected Calculated Tests
                         Dim cmdText As String = " SELECT CTR.AnalyzerID, CTR.WorkSessionID, CTR.HistOrderTestIDCALC, CTR.HistOrderTestID, " & vbCrLf & _
-                                                      " (CASE WHEN C.ClosedCalcTest = 1 THEN 0 " & vbCrLf & _
+                                                      " (CASE WHEN C.ClosedCalcTest = 1 THEN 1 " & vbCrLf & _
                                                       "  ELSE (SELECT PrintExpTests FROM tparCalculatedTests CT WHERE C.CalcTestID = CT.CalcTestID) END) AS PrintExpTests " & vbCrLf & _
                                                 " FROM   thisWSCalcTestsRelations CTR INNER JOIN thisWSOrderTests OT ON CTR.AnalyzerID = OT.AnalyzerID " & vbCrLf & _
                                                                                                                    " AND CTR.WorkSessionID = OT.WorkSessionID " & vbCrLf & _
