@@ -1838,6 +1838,7 @@ Partial Public Class IMonitor
     ''' Modified by: TR 15/11/2013 - BT #1383 => Send information required to calculate the remaining test for Reagents with 
     '''                                          status NOT INUSE.
     '''              TR 28/03/2014 - BT #1562 Show the expiration date on screen. get the value from the reagent barcode if exist.
+    '''              WE 07/10/2014 - BA #1965 Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
     ''' </remarks>
     Private Sub ShowPositionInfoArea(ByVal pRotorType As String, ByVal pRingNumber As Integer, ByVal pCellNumber As Integer)
         Try
@@ -2032,8 +2033,12 @@ Partial Public Class IMonitor
                                     bsReagentsBarCodeTextBox.Text = myCellPosInfoDS.PositionInformation(0).BarcodeInfo
 
                                     'TR 28/03/2014 -Set the expiration date 
-                                    If Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" AndAlso _
-                                                  myCellPosInfoDS.PositionInformation(0).BarcodeStatus = "OK" Then
+                                    'If Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" AndAlso _
+                                    '              myCellPosInfoDS.PositionInformation(0).BarcodeStatus = "OK" Then
+
+                                    ' WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+                                    If Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" AndAlso myCellPosInfoDS.PositionInformation(0).BarcodeStatus = "OK" _
+                                            AndAlso myCellPosInfoDS.PositionInformation(0).Content = "REAGENT" Then
                                         myCellPosInfoDS.Reagents(0).ExpirationDate = GetReagentExpDateFromBarCode(myCellPosInfoDS.PositionInformation(0).BarcodeInfo)
                                     End If
                                     'TR 28/03/2014 -END.
@@ -2127,11 +2132,13 @@ Partial Public Class IMonitor
     ''' Get the Expiration date from the reagent barcode information.
     ''' </summary>
     ''' <param name="pReagentBarcode"></param>
-    ''' <returns></returns>
+    ''' <returns>Valid datepart in pReagentBarcode ==> Expiration Date.
+    '''          Datepart in pReagentBarcode represents invalid date ==> Date.MinValue</returns>
     ''' <remarks>
-    ''' CREATED BY: TR 28/03/2014
-    '''             TR 10/04/2014 bt #1583-Initialize the ExpirationDate variable to min Date value.
-    '''             XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
+    ''' Created by:  TR 28/03/2014
+    ''' Modified by: TR 10/04/2014 bt #1583-Initialize the ExpirationDate variable to min Date value.
+    '''              XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
+    '''              WE 07/10/2014 - Extend code with check on Month field to prevent String to Date Conversion Error shown on screen (BA-1965).
     ''' </remarks>
     Private Function GetReagentExpDateFromBarCode(pReagentBarcode As String) As Date
         Dim ExpirationDate As Date = Date.MinValue
@@ -2147,7 +2154,8 @@ Partial Public Class IMonitor
                 myYear = "20" & myYear
 
                 'Set the result value.
-                If myMonth <> "" OrElse myYear <> "" Then
+                'If myMonth <> "" OrElse myYear <> "" Then
+                If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
                     ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
                     'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
                     ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
