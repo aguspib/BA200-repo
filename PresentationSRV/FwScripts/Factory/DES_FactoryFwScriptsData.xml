@@ -644,7 +644,7 @@
           <InstructionID>1</InstructionID>
           <Sequence>1</Sequence>
           <Timer>0</Timer>
-          <Code>GLF.FO.MHO</Code>
+          <Code>GLF.MR.MHO</Code>
           <Params />
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
