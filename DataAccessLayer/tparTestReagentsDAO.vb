@@ -119,6 +119,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  SA 09/02/2010
         ''' Modified by: SA 07/10/2011 - Changed the function template amd the sintax of the SQL query
         '''              SA 18/10/2012 - Get also field PreloadedReagent from table tparReagents
+        '''              SA 10/10/2014 - BA-1944 (SubTask BA-1984) ==> Get also field CodeTest from table tparReagents
         ''' </remarks>
         Public Function GetTestReagents(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -130,7 +131,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ReagentsNumber, T.BlankReplicates, " & vbCrLf & _
-                                                       " TR.ReagentID, TR.ReagentNumber, R.ReagentName, R.PreloadedReagent " & vbCrLf & _
+                                                       " TR.ReagentID, TR.ReagentNumber, R.ReagentName, R.PreloadedReagent, R.CodeTest " & vbCrLf & _
                                                 " FROM   tparTestReagents TR INNER JOIN tparReagents R ON TR.ReagentID = R.ReagentID " & vbCrLf & _
                                                                            " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
                                                 " WHERE  TR.TestID    = " & pTestID & vbCrLf & _

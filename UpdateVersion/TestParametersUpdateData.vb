@@ -1788,13 +1788,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pReagentsDS">DS containing the group of Reagents to add</param>
         ''' <param name="pTestReagentsDS">DS containing the group of relations between STD Tests and Reagents to add</param>
-        ''' <param name="pTestReagentsVolumesDS">DS containing the group of Reagents Volumes by STD Test/SampleType to add</param>
+        ''' <param name="pTestReagentsVolumesDS">DS containing the group of Reagents Volumes by STD Test/SampleType to add;
+        '''                                      it is an optional parameter</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 09/10/2014 - BA-1944 
         ''' </remarks>
         Private Function SetTempReagentID(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pReagentsDS As ReagentsDS, ByRef pTestReagentsDS As TestReagentsDS, _
-                                          ByRef pTestReagentsVolumesDS As TestReagentsVolumesDS) As GlobalDataTO
+                                          Optional ByRef pTestReagentsVolumesDS As TestReagentsVolumesDS = Nothing) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -1806,7 +1807,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     tempReagentID = Convert.ToInt32(myGlobalDataTO.SetDatos)
 
-                    For Each reagentRow As ReagentsDS.tparReagentsRow In pReagentsDS.tparReagents
+                    'Set the temporary ReagentID only for NEW Reagents
+                    For Each reagentRow As ReagentsDS.tparReagentsRow In pReagentsDS.tparReagents.ToList.Where(Function(a) a.IsNew = True)
                         'Generate the temporary ReagentID 
                         tempReagentID += 1
 
@@ -1814,10 +1816,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         pTestReagentsDS.tparTestReagents.ToList.Where(Function(a) a.ReagentID = reagentRow.ReagentID).First.ReagentID = tempReagentID
 
                         'Search in pTestReagentsVolumesDS all rows for the Reagent in process and change value of field ReagentID for all of them
-                        For Each reagentVolRow As TestReagentsVolumesDS.tparTestReagentsVolumesRow _
-                                               In pTestReagentsVolumesDS.tparTestReagentsVolumes.ToList.Where(Function(a) a.ReagentID = reagentRow.ReagentID)
-                            reagentVolRow.ReagentID = tempReagentID
-                        Next
+                        If (Not pTestReagentsVolumesDS Is Nothing) Then
+                            For Each reagentVolRow As TestReagentsVolumesDS.tparTestReagentsVolumesRow _
+                                                   In pTestReagentsVolumesDS.tparTestReagentsVolumes.ToList.Where(Function(a) a.ReagentID = reagentRow.ReagentID)
+                                reagentVolRow.ReagentID = tempReagentID
+                            Next
+                        End If
 
                         'Finally, change value of field ReagentID for the current row
                         reagentRow.ReagentID = tempReagentID
@@ -1825,7 +1829,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     pReagentsDS.AcceptChanges()
                     pTestReagentsDS.AcceptChanges()
-                    pTestReagentsVolumesDS.AcceptChanges()
+                    If (Not pTestReagentsVolumesDS Is Nothing) Then pTestReagentsVolumesDS.AcceptChanges()
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
@@ -2339,7 +2343,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             myDeletedTestProgramingTO.TestID = deletedTestSample.TestID
                             myDeletedTestProgramingTO.SampleType = deletedTestSample.SampleType
                             myDeletedTestProgramingTO.TestVersion = myTestsDS.tparTests.First.TestVersionNumber
-                            myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = True
                             myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
 
                             '(2.3) Delete the STD Test/Sample Type from CUSTOMER DB
@@ -2398,21 +2401,17 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Try
                 Dim deleteBlkCalibResults As Boolean = False
-                Dim myUpdateVersionChangedElementsRow As UpdateVersionChangesDS.UpdatedElementsRow
-
+                Dim myTestName As String = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
+                
                 'Verify if field AnalysisMode has changed; in this case, it is possible that the ReagentsNumber field may also have changed
                 '(if the the AnalysisMode has changed from Mono to Bi Reagent or vice versa)
                 pCustomerTestRow.BeginEdit()
                 If (pCustomerTestRow.AnalysisMode <> pFactoryTestRow.AnalysisMode) Then
-                    'Add a row for field AnalysisMode in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                    myUpdateVersionChangedElementsRow.ElementType = "STD"
-                    myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                    myUpdateVersionChangedElementsRow.UpdatedField = "AnalysisMode"
-                    myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.AnalysisMode
-                    myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.AnalysisMode
-                    pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                    'Add a row for field AnalysisMode in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "AnalysisMode", pCustomerTestRow.AnalysisMode, _
+                                                        pFactoryTestRow.AnalysisMode)
 
+                    'Update fields in the Customer DataSet
                     pCustomerTestRow.AnalysisMode = pFactoryTestRow.AnalysisMode
                     pCustomerTestRow.ReagentsNumber = pFactoryTestRow.ReagentsNumber
                     deleteBlkCalibResults = True
@@ -2420,155 +2419,118 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 'Verify if field ReactionType has changed
                 If (pCustomerTestRow.ReactionType <> pFactoryTestRow.ReactionType) Then
-                    'Add a row for field ReactionType in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                    myUpdateVersionChangedElementsRow.ElementType = "STD"
-                    myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                    myUpdateVersionChangedElementsRow.UpdatedField = "ReactionType"
-                    myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.ReactionType
-                    myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.ReactionType
-                    pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                    'Add a row for field ReactionType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "ReactionType", pCustomerTestRow.ReactionType, _
+                                                        pFactoryTestRow.ReactionType)
 
+                    'Update field in the Customer DataSet
                     pCustomerTestRow.ReactionType = pFactoryTestRow.ReactionType
                     deleteBlkCalibResults = True
                 End If
 
                 'Verify if field ReadingMode has changed
                 If (pCustomerTestRow.ReadingMode <> pFactoryTestRow.ReadingMode) Then
-                    'Add a row for field ReadingMode in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                    myUpdateVersionChangedElementsRow.ElementType = "STD"
-                    myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                    myUpdateVersionChangedElementsRow.UpdatedField = "ReadingMode"
-                    myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.ReadingMode
-                    myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.ReadingMode
-                    pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                    'Add a row for field ReadingMode in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "ReadingMode", pCustomerTestRow.ReadingMode, _
+                                                        pFactoryTestRow.ReadingMode)
 
+                    'Update field in the Customer DataSet
                     pCustomerTestRow.ReadingMode = pFactoryTestRow.ReadingMode
                     deleteBlkCalibResults = True
                 End If
 
                 'Verify if field MainWaveLenth has changed
                 If (pCustomerTestRow.MainWavelength <> pFactoryTestRow.MainWavelength) Then
-                    'Add a row for field MainWavelength in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                    myUpdateVersionChangedElementsRow.ElementType = "STD"
-                    myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                    myUpdateVersionChangedElementsRow.UpdatedField = "MainWavelength"
-                    myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.MainWavelength.ToString
-                    myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.MainWavelength.ToString
-                    pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                    'Add a row for field MainWavelength in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "MainWavelength", pCustomerTestRow.MainWavelength.ToString, _
+                                                        pFactoryTestRow.MainWavelength.ToString)
 
+                    'Update field in the Customer DataSet
                     pCustomerTestRow.MainWavelength = pFactoryTestRow.MainWavelength
                     deleteBlkCalibResults = True
                 End If
 
                 'Verify if field FirstReadingCycle has changed
                 If (pCustomerTestRow.FirstReadingCycle <> pFactoryTestRow.FirstReadingCycle) Then
-                    'Add a row for field FirstReadingCycle in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                    myUpdateVersionChangedElementsRow.ElementType = "STD"
-                    myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                    myUpdateVersionChangedElementsRow.UpdatedField = "FirstReadingCycle"
-                    myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.FirstReadingCycle.ToString
-                    myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.FirstReadingCycle.ToString
-                    pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                    'Add a row for field FirstReadingCycle in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "FirstReadingCycle", pCustomerTestRow.FirstReadingCycle.ToString, _
+                                                        pFactoryTestRow.FirstReadingCycle.ToString)
 
+                    'Update field in the Customer DataSet
                     pCustomerTestRow.FirstReadingCycle = pFactoryTestRow.FirstReadingCycle
                     deleteBlkCalibResults = True
                 End If
 
                 'Verify if field SecondReadingCycle has changed
-                Dim mySndReading As String = String.Empty
+                Dim mySndReading As String = "--"
                 If (Not pFactoryTestRow.IsSecondReadingCycleNull) Then
                     If (pCustomerTestRow.IsSecondReadingCycleNull OrElse pCustomerTestRow.SecondReadingCycle <> pFactoryTestRow.SecondReadingCycle) Then
                         If (Not pCustomerTestRow.IsSecondReadingCycleNull) Then mySndReading = pCustomerTestRow.SecondReadingCycle.ToString
 
-                        'Add a row for field SecondReadingCycle in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                        myUpdateVersionChangedElementsRow.ElementType = "STD"
-                        myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                        myUpdateVersionChangedElementsRow.UpdatedField = "SecondReadingCycle"
-                        myUpdateVersionChangedElementsRow.PreviousValue = mySndReading
-                        myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.SecondReadingCycle.ToString
-                        pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                        'Add a row for field SecondReadingCycle in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SecondReadingCycle", mySndReading, _
+                                                            pFactoryTestRow.SecondReadingCycle.ToString)
 
+                        'Update field in the Customer DataSet
                         pCustomerTestRow.SecondReadingCycle = pFactoryTestRow.SecondReadingCycle
                         deleteBlkCalibResults = True
                     End If
                 Else
                     If (Not pCustomerTestRow.IsSecondReadingCycleNull) Then
-                        'Add a row for field SecondReadingCycle in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                        myUpdateVersionChangedElementsRow.ElementType = "STD"
-                        myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                        myUpdateVersionChangedElementsRow.UpdatedField = "SecondReadingCycle"
-                        myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.SecondReadingCycle.ToString
-                        myUpdateVersionChangedElementsRow.NewValue = mySndReading
-                        pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                        'Add a row for field SecondReadingCycle in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SecondReadingCycle", pCustomerTestRow.SecondReadingCycle.ToString, _
+                                                            mySndReading)
 
+                        'Update field in the Customer DataSet
                         pCustomerTestRow.SetSecondReadingCycleNull()
                         deleteBlkCalibResults = True
                     End If
                 End If
 
                 'Verify if field ReferenceWaveLength has changed
-                Dim myReferenceWL As String = String.Empty
+                Dim myReferenceWL As String = "--"
                 If (Not pFactoryTestRow.IsReferenceWavelengthNull) Then
                     If (pCustomerTestRow.IsReferenceWavelengthNull OrElse pCustomerTestRow.ReferenceWavelength <> pFactoryTestRow.ReferenceWavelength) Then
                         If (Not pCustomerTestRow.IsReferenceWavelengthNull) Then myReferenceWL = pCustomerTestRow.ReferenceWavelength.ToString
 
-                        'Add a row for field SecondReadingCycle in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                        myUpdateVersionChangedElementsRow.ElementType = "STD"
-                        myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                        myUpdateVersionChangedElementsRow.UpdatedField = "ReferenceWaveLength"
-                        myUpdateVersionChangedElementsRow.PreviousValue = myReferenceWL
-                        myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.SecondReadingCycle.ToString
-                        pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                        'Add a row for field ReferenceWaveLength in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "ReferenceWaveLength", myReferenceWL, _
+                                                            pFactoryTestRow.ReferenceWavelength.ToString)
 
+                        'Update field in the Customer DataSet
                         pCustomerTestRow.ReferenceWavelength = pFactoryTestRow.ReferenceWavelength
                         deleteBlkCalibResults = True
                     End If
                 Else
                     If (Not pCustomerTestRow.IsReferenceWavelengthNull) Then
-                        'Add a row for field SecondReadingCycle in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                        myUpdateVersionChangedElementsRow.ElementType = "STD"
-                        myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                        myUpdateVersionChangedElementsRow.UpdatedField = "ReferenceWaveLength"
-                        myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.SecondReadingCycle.ToString
-                        myUpdateVersionChangedElementsRow.NewValue = myReferenceWL
-                        pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                        'Add a row for field ReferenceWaveLength in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "ReferenceWaveLength", pCustomerTestRow.ReferenceWavelength.ToString, _
+                                                            myReferenceWL)
 
+                        'Update field in the Customer DataSet
                         pCustomerTestRow.SetReferenceWavelengthNull()
                         deleteBlkCalibResults = True
                     End If
                 End If
 
                 'Verify if field KineticBlankLimit has changed
+                Dim myKineticBlkLimit As String = "--"
                 If (Not pFactoryTestRow.IsKineticBlankLimitNull) Then
-                    'Add a row for field KineticBlankLimit in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                    myUpdateVersionChangedElementsRow.ElementType = "STD"
-                    myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                    myUpdateVersionChangedElementsRow.UpdatedField = "KineticBlankLimit"
-                    myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.KineticBlankLimit.ToString
-                    myUpdateVersionChangedElementsRow.NewValue = pFactoryTestRow.KineticBlankLimit.ToString
-                    pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                    If (Not pCustomerTestRow.IsKineticBlankLimitNull) Then myKineticBlkLimit = pCustomerTestRow.KineticBlankLimit.ToString
 
+                    'Add a row for field KineticBlankLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "KineticBlankLimit", myKineticBlkLimit, _
+                                                        pFactoryTestRow.KineticBlankLimit.ToString)
+
+                    'Update field in the Customer DataSet
                     pCustomerTestRow.KineticBlankLimit = pFactoryTestRow.KineticBlankLimit
                 Else
                     If (Not pCustomerTestRow.IsKineticBlankLimitNull) Then
-                        'Add a row for field KineticBlankLimit in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
-                        myUpdateVersionChangedElementsRow.ElementType = "STD"
-                        myUpdateVersionChangedElementsRow.ElementName = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                        myUpdateVersionChangedElementsRow.UpdatedField = "KineticBlankLimit"
-                        myUpdateVersionChangedElementsRow.PreviousValue = pCustomerTestRow.KineticBlankLimit.ToString
-                        myUpdateVersionChangedElementsRow.NewValue = String.Empty
-                        pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+                        'Add a row for field KineticBlankLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "KineticBlankLimit", pCustomerTestRow.KineticBlankLimit.ToString, _
+                                                            myKineticBlkLimit)
 
+                        'Update field in the Customer DataSet
                         pCustomerTestRow.SetKineticBlankLimitNull()
                     End If
                 End If
@@ -2589,15 +2551,20 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
         ''' <summary>
-        ''' For a STD Tests, compare values in table tparTestReagents in CUSTOMER DB with corresponding values in FACTORY DB, and update values in CUSTOMER DB
+        ''' For a STD Test, compare values in tables tparTestReagents in CUSTOMER DB with corresponding values in FACTORY DB, and execute following
+        ''' actions: 
+        ''' ** Update field CodeTest for Reagents linked to the STD Test in both DBs
+        ''' ** Add to CUSTOMER DB new Reagents linked to the STD Test in FACTORY DB
+        ''' ** Remove from CUSTOMER DB Reagents that do not exist in FACTORY DB
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">STD Test Identifier</param>
         ''' <param name="pTestName">Name of the STD Test in CUSTOMER DB</param>
-        ''' <param name="pTestSamplesDS"></param>
+        ''' <param name="pTestSamplesDS">TestsDS containing all SampleTypes linked to the STD Test</param>
         ''' <param name="pReagentsDS">ReagentsDS to return basic data of all Reagents linked to the STD Test</param>
         ''' <param name="pTestReagentsDS">TestReagentsDS to return the relation between the STD Test and all its linked Reagents</param>
-        ''' <param name="pDeletedTestReagentsVols"></param>
+        ''' <param name="pDeletedTestReagentsVols">List of DeletedTestReagentsVolumeTO to return if a Reagent linked to the STD Test has to be removed;
+        '''                                        in this case, a TO for each SampleType linked to the STD Test will be added to the list </param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: SA 08/10/2014 - BA-1944 (SubTask BA-1983)
@@ -2612,9 +2579,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim factoryReagentsNumber As Integer = 0
                 Dim myTestParametersUpdateDAO As New TestParametersUpdateDAO
 
-                Dim customerReagentsDS As New ReagentsDS
                 Dim customerReagentsNumber As Integer = 0
+                Dim customerReagentsDS As New TestReagentsDS
                 Dim myTestReagentsDelegate As New TestReagentsDelegate
+
+                Dim myTestReagentsRow As TestReagentsDS.tparTestReagentsRow
+                Dim myDelTestReagentsVolsTO As New DeletedTestReagentsVolumeTO
+                Dim myCustomerReagentsList As List(Of TestReagentsDS.tparTestReagentsRow)
 
                 '(1) Get from FACTORY DB data of all Reagents linked to the STD Tests
                 myGlobalDataTO = myTestParametersUpdateDAO.GetFactoryReagentsByTestID(pDBConnection, pTestID, True)
@@ -2629,78 +2600,90 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If (Not myGlobalDataTO.HasError) Then
                     myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, pTestID)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                        customerReagentsDS = DirectCast(myGlobalDataTO.SetDatos, ReagentsDS)
+                        customerReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
 
                         'Get the Number of Reagents linked to the STD Test in CUSTOMER DB
-                        customerReagentsNumber = customerReagentsDS.tparReagents.Rows.Count
+                        customerReagentsNumber = customerReagentsDS.tparTestReagents.Rows.Count
                     End If
                 End If
 
                 If (Not myGlobalDataTO.HasError) Then
-                    Dim myReagentsRow As ReagentsDS.tparReagentsRow
-                    Dim myTestReagentsRow As TestReagentsDS.tparTestReagentsRow
-
-                    'Compare Reagents linked to the STD Test in both DBs, CUSTOMER AND FACTORY:
-                    '** If (Number of Reagents in FACTORY DB < Number of Reagents in CUSTOMER DB) Then
+                    '(3) Compare Reagents linked to the STD Test in both DBs, CUSTOMER AND FACTORY:
+                    '    If (Number of Reagents in FACTORY DB < Number of Reagents in CUSTOMER DB) Then
                     '       ==> Some Reagents have to be deleted from CUSTOMER DB
-                    '** If (Number of Reagents in FACTORY DB > Number of Reagents in CUSTOMER DB) Then 
+                    '    If (Number of Reagents in FACTORY DB > Number of Reagents in CUSTOMER DB) Then 
                     '       ==> Some Reagents have to be added to CUSTOMER DB
-                    '** If (Number of Reagents in FACTORY DB = Number of Reagents in CUSTOMER DB) Then 
-                    '       ==> Update value of fields CodeTest and IsShared in CUSTOMER DB if it has been changed in FACTORY DB
-                    If (factoryReagentsNumber < customerReagentsNumber) Then
+                    '    If (Number of Reagents in FACTORY DB = Number of Reagents in CUSTOMER DB) Then 
+                    '       ==> Update value of field CodeTest in CUSTOMER DB if it has been changed in FACTORY DB
+                    For Each factoryReagentRow As ReagentsDS.tparReagentsRow In factoryReagentsDS.tparReagents
+                        If (factoryReagentRow.ReagentNumber <= customerReagentsNumber) Then
+                            '(3.1) Update REAGENTS that exist in FACTORY and CUSTOMER DBs
 
+                            'Search the Reagent data in CUSTOMER DB to update fields with data from FACTORY DB; then move the row to the ReagentsDS to return
+                            myCustomerReagentsList = (From a As TestReagentsDS.tparTestReagentsRow In customerReagentsDS.tparTestReagents _
+                                                     Where a.ReagentNumber = factoryReagentRow.ReagentNumber _
+                                                    Select a).ToList
 
+                            If (Not factoryReagentRow.IsCodeTestNull) Then
+                                myCustomerReagentsList.First.CodeTest = factoryReagentRow.CodeTest
+                            Else
+                                myCustomerReagentsList.First.SetCodeTestNull()
+                            End If
+                            pReagentsDS.tparReagents.ImportRow(myCustomerReagentsList.First)
 
+                            'Add also a row to the TestReagentsDS to return
+                            myTestReagentsRow = pTestReagentsDS.tparTestReagents.NewtparTestReagentsRow()
+                            myTestReagentsRow.TestID = pTestID
+                            myTestReagentsRow.ReagentID = myCustomerReagentsList.First.ReagentID
+                            myTestReagentsRow.ReagentNumber = factoryReagentRow.ReagentNumber
+                            pTestReagentsDS.tparTestReagents.AddtparTestReagentsRow(myTestReagentsRow)
+                        Else
+                            '(3.2) Add new REAGENTS (those that exists only in FACTORY DB)
 
-                    ElseIf (factoryReagentsNumber > customerReagentsNumber) Then
+                            'Build the ReagentName using the TestName in CUSTOMER BD and the ReagentNumber and mark it as new Reagent
+                            factoryReagentRow.ReagentName = pTestName.Trim & "-" & factoryReagentRow.ReagentNumber.ToString
+                            factoryReagentRow.IsNew = True
 
-                    Else
+                            'Move the row with the new Reagent to the ReagentsDS to return
+                            pReagentsDS.tparReagents.ImportRow(factoryReagentRow)
 
-                    End If
+                            'Add a new row to the TestReagentsDS to return
+                            myTestReagentsRow = pTestReagentsDS.tparTestReagents.NewtparTestReagentsRow()
+                            myTestReagentsRow.TestID = pTestID
+                            myTestReagentsRow.ReagentID = factoryReagentRow.ReagentID
+                            myTestReagentsRow.ReagentNumber = factoryReagentRow.ReagentNumber
+                            myTestReagentsRow.IsNew = True
+                            pTestReagentsDS.tparTestReagents.AddtparTestReagentsRow(myTestReagentsRow)
 
+                            'Set the ReagentID for the new Reagent to add in Customer DB
+                            myGlobalDataTO = SetTempReagentID(pDBConnection, pReagentsDS, pTestReagentsDS)
 
-
-
-
-
-                    'Dim myTestReagentsRow As TestReagentsDS.tparTestReagentsRow
-                    'Dim myCustomerReagentsList As List(Of ReagentsDS.tparReagentsRow)
-
-                    'For Each factoryReagentRow As ReagentsDS.tparReagentsRow In factoryReagentsDS.tparReagents
-                    '    If (factoryReagentRow.ReagentNumber <= customerReagentsNumber) Then
-                    '        'Search the Reagent data in CUSTOMER DB to update fields with data from FACTORY DB; then move the row to the ReagentsDS to return
-                    '        myCustomerReagentsList = (From a As ReagentsDS.tparReagentsRow In customerReagentsDS.tparReagents _
-                    '                                 Where a.ReagentNumber = factoryReagentRow.ReagentNumber _
-                    '                                Select a).ToList
-
-                    '        myCustomerReagentsList.First.CodeTest = factoryReagentRow.CodeTest
-                    '        myCustomerReagentsList.First.IsShared = factoryReagentRow.IsShared
-                    '        pReagentsDS.tparReagents.ImportRow(myCustomerReagentsList.First)
-
-                    '        'Add a row to the TestReagentsDS to return
-                    '        myTestReagentsRow = pTestReagentsDS.tparTestReagents.NewtparTestReagentsRow()
-                    '        myTestReagentsRow.TestID = pTestID
-                    '        myTestReagentsRow.ReagentID = myCustomerReagentsList.First.ReagentID
-                    '        myTestReagentsRow.ReagentNumber = factoryReagentRow.ReagentNumber
-                    '        pTestReagentsDS.tparTestReagents.AddtparTestReagentsRow(myTestReagentsRow)
-                    '    Else
-                    '        'Build the ReagentName using the TestName in CUSTOMER BD and the ReagentNumber
-                    '        factoryReagentRow.ReagentName = pTestName.Trim & "-" & factoryReagentRow.ReagentNumber.ToString
-
-                    '        'Move the row to the new Reagent to the ReagentsDS to return
-                    '        pReagentsDS.tparReagents.ImportRow(factoryReagentRow)
-
-                    '        'Add a new row to the TestReagentsDS to return
-                    '        myTestReagentsRow = pTestReagentsDS.tparTestReagents.NewtparTestReagentsRow()
-                    '        myTestReagentsRow.TestID = pTestID
-                    '        myTestReagentsRow.ReagentNumber = factoryReagentRow.ReagentNumber
-                    '        myTestReagentsRow.IsNew = True
-                    '        pTestReagentsDS.tparTestReagents.AddtparTestReagentsRow(myTestReagentsRow)
-                    '    End If
-                    'Next
-
+                            'If an error has been raised, then the process is finished
+                            If (myGlobalDataTO.HasError) Then Exit For
+                        End If
+                    Next
                     pReagentsDS.AcceptChanges()
                     pTestReagentsDS.AcceptChanges()
+                End If
+
+                '(3.3) Check if there is a Reagent has to be deleted from CUSTOMER DB (due to it does not exist in FACTORY DB)
+                If (Not myGlobalDataTO.HasError) Then
+                    myCustomerReagentsList = (From a As TestReagentsDS.tparTestReagentsRow In customerReagentsDS.tparTestReagents _
+                                             Where a.ReagentNumber > factoryReagentsNumber _
+                                            Select a).ToList
+
+                    If (myCustomerReagentsList.Count > 0) Then
+                        'Add the Reagent to delete (with all Sample Types linked to the STD Test) to the list of objects to delete
+                        For Each sampleTypeRow As TestsDS.tparTestsRow In pTestSamplesDS.tparTests
+                            myDelTestReagentsVolsTO.TestID = pTestID
+                            myDelTestReagentsVolsTO.SampleType = sampleTypeRow.SampleType
+                            myDelTestReagentsVolsTO.ReagentID = myCustomerReagentsList.First.ReagentID
+                            myDelTestReagentsVolsTO.ReagentNumber = myCustomerReagentsList.First.ReagentNumber
+
+                            pDeletedTestReagentsVols.Add(myDelTestReagentsVolsTO)
+                        Next
+                    End If
+                    myCustomerReagentsList = Nothing
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
@@ -2737,7 +2720,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 Dim myDeletedTestProgramingTO As New DeletedTestProgramingTO
                 Dim myDeletedTestProgramingList As New List(Of DeletedTestProgramingTO)
-                Dim myDeletedTestReagentsVolsTO As New DeletedTestReagentsVolumeTO
                 Dim myDeletedTestReagentsVolsList As New List(Of DeletedTestReagentsVolumeTO)
 
                 '(1) Search in Factory DB all STD TESTS that exists in Customer DB but for which at least one of the
@@ -2775,31 +2757,23 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         End If
 
                         '(2.4) Verify if there are changes in the Reagents used for the STD Test
-                        'If (Not myGlobalDataTO.HasError) Then
-                        '    myReagentsDS.Clear()
-                        '    myTestReagentsDS.Clear()
+                        If (Not myGlobalDataTO.HasError) Then
+                            myReagentsDS.Clear()
+                            myTestReagentsDS.Clear()
+                            myDeletedTestReagentsVolsList.Clear()
 
-                        '    myGlobalDataTO = UpdateCustomerTestReagents(pDBConnection, updatedTest.TestID, myCustomerTestDS.tparTests.First.TestName, _
-                        '                                                myReagentsDS, myTestReagentsDS)
-                        'End If
+                            myGlobalDataTO = UpdateCustomerTestReagents(pDBConnection, updatedTest.TestID, myCustomerTestDS.tparTests.First.TestName, _
+                                                                        myTestSamplesDS, myReagentsDS, myTestReagentsDS, myDeletedTestReagentsVolsList)
+                        End If
 
                         '(2.5) If previous Results of Blanks and Calibrators for the STD Tests have to be deleted, prepare the needed TO
                         If (Not myGlobalDataTO.HasError) Then
                             If (deleteBlankCalibResults) Then
-                                'Get all different SampleTypes for the STD Test in Customer DB
-                                myGlobalDataTO = myTestsDelegate.ReadByTestIDSampleType(pDBConnection, updatedTest.TestID)
-                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                    myTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
-
-                                    For Each sampleTypeRow As TestsDS.tparTestsRow In myTestSamplesDS.tparTests
-                                        'Add the TestID, SampleType and TestVersionNumber to the TO of Tests to delete, and mark DeleteBlankCalibResults = TRUE
-                                        myDeletedTestProgramingTO.TestID = sampleTypeRow.TestID
-                                        myDeletedTestProgramingTO.SampleType = sampleTypeRow.SampleType
-                                        myDeletedTestProgramingTO.TestVersion = sampleTypeRow.TestVersionNumber
-                                        myDeletedTestProgramingTO.DeleteBlankCalibResults = True
-                                        myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
-                                    Next
-                                End If
+                                'Add the TestID and TestVersionNumber to the TO of Tests to delete, and mark DeleteBlankCalibResults = TRUE
+                                myDeletedTestProgramingTO.TestID = myCustomerTestDS.tparTests.First.TestID
+                                myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
+                                myDeletedTestProgramingTO.DeleteBlankCalibResults = True
+                                myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
                             End If
                         End If
 
@@ -2808,7 +2782,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myCustomerTestDS, New TestSamplesDS, New TestReagentsVolumesDS, _
                                                                                myReagentsDS, myTestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
                                                                                New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
-                                                                               New List(Of DeletedTestReagentsVolumeTO), myDeletedTestProgramingList, _
+                                                                               myDeletedTestReagentsVolsList, myDeletedTestProgramingList, _
                                                                                New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
                         End If
 
@@ -2863,16 +2837,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myTestsList As List(Of Integer) = (From a In myNewTestSamplesList.tparTests _
                                                      Select a.TestID Distinct).ToList()
 
-                For Each testIDRow As Integer In myTestsList
+                For Each myTestID As Integer In myTestsList
                     '(2.1) Get all data in table tparTests in CUSTOMER DB for the TestID 
-                    myGlobalDataTO = myTestsDelegate.Read(pDBConnection, testIDRow)
+                    myGlobalDataTO = myTestsDelegate.Read(pDBConnection, myTestID)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         myTestDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
                     End If
 
                     '(2.2) Get all Reagents linked to the STD Test in CUSTOMER DB
                     If (Not myGlobalDataTO.HasError) Then
-                        myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, testIDRow)
+                        myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, myTestID)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
                         End If
@@ -2880,16 +2854,62 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     '(2.3) Process each new SampleType for the STD Test in Factory DB to add it to Customer DB
                     If (Not myGlobalDataTO.HasError) Then
-                        For Each newTestSample As TestsDS.tparTestsRow In myNewTestSamplesList.tparTests.ToList.Where(Function(a) a.TestID = testIDRow).ToList
+                        For Each newTestSample As TestsDS.tparTestsRow In myNewTestSamplesList.tparTests.ToList.Where(Function(a) a.TestID = myTestID).ToList
                             '(2.3.1) Get from FACTORY DB, all data for the new Sample Type
-                            myGlobalDataTO = GetOtherTestDataInfoFromFactory(pDBConnection, testIDRow, newTestSample.SampleType)
+                            myGlobalDataTO = GetOtherTestDataInfoFromFactory(pDBConnection, myTestID, newTestSample.SampleType)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 myTestStructure = DirectCast(myGlobalDataTO.SetDatos, TestStructure)
                             End If
+
+                            '(2.3.2) Generate the temporary TestCalibratorIDs and inform them in all Test Calibrators related DataSets
+                            If (Not myGlobalDataTO.HasError) Then
+                                If (myTestStructure.myTestCalibratorDS.tparTestCalibrators.Rows.Count > 0) Then
+                                    myGlobalDataTO = SetTempTestCalibratorID(pDBConnection, myTestStructure.myTestCalibratorDS, myTestStructure.myTestCalibratorValuesDS)
+                                End If
+                            End If
+
+                            '(2.3.3) Fill the ReagentsDS before call the function to save the STD Test / SampleType 
+                            Dim myReagentRow As ReagentsDS.tparReagentsRow
+                            myTestStructure.myReagentsDS = New ReagentsDS
+                            For Each testReagentRow As TestReagentsDS.tparTestReagentsRow In myTestReagentsDS.tparTestReagents
+                                myReagentRow = myTestStructure.myReagentsDS.tparReagents.NewtparReagentsRow()
+                                myReagentRow.ReagentID = testReagentRow.ReagentID
+                                myReagentRow.ReagentName = testReagentRow.ReagentName
+                                myReagentRow.ReagentNumber = testReagentRow.ReagentNumber
+                                myReagentRow.CodeTest = testReagentRow.CodeTest
+                                myTestStructure.myReagentsDS.tparReagents.AddtparReagentsRow(myReagentRow)
+                            Next
+                            myTestStructure.myReagentsDS.AcceptChanges()
+
+                            '(2.3.4) Save the NEW SampleType for the STD Test in CUSTOMER DB 
+                            If (Not myGlobalDataTO.HasError) Then
+                                myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myTestDS, _
+                                                                                   myTestStructure.myTestSampleDS, myTestStructure.myTestReagentsVolumesDS, _
+                                                                                   myTestStructure.myReagentsDS, myTestReagentsDS, _
+                                                                                   myTestStructure.myCalibratorDS, myTestStructure.myTestCalibratorDS, _
+                                                                                   myTestStructure.myTestCalibratorValuesDS, New TestRefRangesDS, _
+                                                                                   New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
+                                                                                   New List(Of DeletedTestProgramingTO), New TestSamplesMultirulesDS, _
+                                                                                   New TestControlsDS, Nothing, String.Empty, False)
+                            End If
+
+                            '(2.3.4) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table AddedElements) 
+                            '        for the Sample Type added for the new Factory STD Test
+                            If (Not myGlobalDataTO.HasError) Then
+                                myUpdateVersionAddedElementsRow = pUpdateVersionChangesList.AddedElements.NewAddedElementsRow
+                                myUpdateVersionAddedElementsRow.ElementType = "STD"
+                                myUpdateVersionAddedElementsRow.ElementName = myTestDS.tparTests.First.TestName & " (" & myTestDS.tparTests.First.ShortName & ")"
+                                myUpdateVersionAddedElementsRow.SampleType = newTestSample.SampleType
+                                pUpdateVersionChangesList.AddedElements.AddAddedElementsRow(myUpdateVersionAddedElementsRow)
+                                pUpdateVersionChangesList.AddedElements.AcceptChanges()
+                            End If
+
+                            'If an error has been raised, then the process is finished
+                            If (myGlobalDataTO.HasError) Then Exit For
                         Next
                     End If
 
-                    'If error
+                    'If an error has been raised, then the process is finished
                     If (myGlobalDataTO.HasError) Then Exit For
                 Next
             Catch ex As Exception
@@ -2899,6 +2919,603 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CreateNEWSamplesForSTDTests", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' For a STD Test/SampleType, compare value of relevant fields in table tparTestSampless in CUSTOMER DB with value of the same fields 
+        ''' in FACTORY DB, and update in CUSTOMER DB all modified fields.
+        ''' </summary>
+        ''' <param name="pFactoryTestSampleRow">Row of TestSamplesDS containing the Test/SampleType data in FACTORY DB</param>
+        ''' <param name="pCustomerTestSampleRow">Row of TestSamplesDS containing the Test/SampleType data in CUSTOMER DB</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing a Boolean value that indicates (when TRUE) that previous Blank and Calibrator Results have to be deleted due to
+        '''          field SampleVolume has changed</returns>
+        ''' <remarks>
+        ''' Created by: SA 10/10/2014 - BA-1944 (SubTask BA-1985)
+        ''' </remarks>
+        Private Function UpdateCustomerTestSamples(ByVal pFactoryTestSampleRow As TestSamplesDS.tparTestSamplesRow, _
+                                                   ByVal pCustomerTestSampleRow As TestSamplesDS.tparTestSamplesRow, _
+                                                   ByVal pTestName As String, ByVal pTestShortName As String, _
+                                                   ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim deleteBlkCalibResults As Boolean = False
+                Dim myTestName As String = pTestName & " (" & pTestShortName & ")"
+
+                'Verify if field SampleVolume has changed
+                pCustomerTestSampleRow.BeginEdit()
+                If (pCustomerTestSampleRow.SampleVolume <> pFactoryTestSampleRow.SampleVolume) Then
+                    'Add a row for field SampleVolume in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SampleVolume", pCustomerTestSampleRow.SampleVolume.ToString, _
+                                                        pFactoryTestSampleRow.SampleVolume.ToString)
+
+                    'Update fields in the Customer DataSet ==> Field SampleVolumeSteps is also affected
+                    pCustomerTestSampleRow.SampleVolume = pFactoryTestSampleRow.SampleVolume
+                    pCustomerTestSampleRow.SampleVolumeSteps = pFactoryTestSampleRow.SampleVolumeSteps
+                    deleteBlkCalibResults = True
+                End If
+
+                'Verify if field PredilutionUseFlag has changed
+                If (pCustomerTestSampleRow.PredilutionUseFlag <> pFactoryTestSampleRow.PredilutionUseFlag) Then
+                    'Add a row for field PredilutionUseFlag in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "PredilutionUseFlag", pCustomerTestSampleRow.PredilutionUseFlag.ToString, _
+                                                        pFactoryTestSampleRow.PredilutionUseFlag.ToString)
+
+                    'Update field in the Customer DataSet
+                    pCustomerTestSampleRow.PredilutionUseFlag = pFactoryTestSampleRow.PredilutionUseFlag
+                End If
+
+                'Verify if field PredilutionMode has changed
+                Dim myPredilutionMode As String = "--"
+                If (Not pFactoryTestSampleRow.IsPredilutionModeNull) Then
+                    If (Not pCustomerTestSampleRow.IsPredilutionModeNull) Then myPredilutionMode = pCustomerTestSampleRow.PredilutionMode
+
+                    If (pCustomerTestSampleRow.IsPredilutionModeNull OrElse pCustomerTestSampleRow.PredilutionMode <> pFactoryTestSampleRow.PredilutionMode) Then
+                        'Add a row for field PredilutionMode in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "PredilutionMode", myPredilutionMode, pFactoryTestSampleRow.PredilutionMode)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.PredilutionMode = pFactoryTestSampleRow.PredilutionMode
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsPredilutionModeNull) Then
+                        'Add a row for field PredilutionMode in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "PredilutionMode", pCustomerTestSampleRow.PredilutionMode, myPredilutionMode)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetPredilutionModeNull()
+                    End If
+                End If
+
+                'Verify if field PredilutionFactor has changed
+                Dim myPredilutionFactor As String = "--"
+                If (Not pFactoryTestSampleRow.IsPredilutionFactorNull) Then
+                    If (Not pCustomerTestSampleRow.IsPredilutionFactorNull) Then myPredilutionFactor = pCustomerTestSampleRow.PredilutionFactor.ToString
+
+                    If (pCustomerTestSampleRow.IsPredilutionFactorNull OrElse pCustomerTestSampleRow.PredilutionFactor <> pFactoryTestSampleRow.PredilutionFactor) Then
+                        'Add a row for field PredilutionFactor in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "PredilutionFactor", myPredilutionFactor, _
+                                                            pFactoryTestSampleRow.PredilutionFactor.ToString)
+
+                        'Update fields in the Customer DataSet ==> Fields PredilutedSampleVol, PredilutedSampleVolSteps, PredilutedDiluentVol and PreDiluentVolSteps are also affected
+                        pCustomerTestSampleRow.PredilutionFactor = pFactoryTestSampleRow.PredilutionFactor
+                        pCustomerTestSampleRow.PredilutedSampleVol = pFactoryTestSampleRow.PredilutedSampleVol
+                        pCustomerTestSampleRow.PredilutedSampleVolSteps = pFactoryTestSampleRow.PredilutedSampleVolSteps
+                        pCustomerTestSampleRow.PredilutedDiluentVol = pFactoryTestSampleRow.PredilutedDiluentVol
+                        pCustomerTestSampleRow.PreDiluentVolSteps = pFactoryTestSampleRow.PreDiluentVolSteps
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsPredilutionFactorNull) Then
+                        'Add a row for field PredilutionFactor in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "PredilutionFactor", pCustomerTestSampleRow.PredilutionFactor.ToString, _
+                                                            myPredilutionMode)
+
+                        'Update fields in the Customer DataSet ==> Fields PredilutedSampleVol, PredilutedSampleVolSteps, PredilutedDiluentVol and PreDiluentVolSteps are also affected
+                        pCustomerTestSampleRow.SetPredilutionModeNull()
+                        pCustomerTestSampleRow.SetPredilutedSampleVolNull()
+                        pCustomerTestSampleRow.SetPredilutedSampleVolStepsNull()
+                        pCustomerTestSampleRow.SetPredilutedDiluentVolNull()
+                        pCustomerTestSampleRow.SetPreDiluentVolStepsNull()
+                    End If
+                End If
+
+                'Verify if field DiluentSolution has changed
+                Dim myDiluentSolution As String = "--"
+                If (Not pFactoryTestSampleRow.IsDiluentSolutionNull) Then
+                    If (Not pCustomerTestSampleRow.IsDiluentSolutionNull) Then myDiluentSolution = pCustomerTestSampleRow.DiluentSolution
+
+                    If (pCustomerTestSampleRow.IsDiluentSolutionNull OrElse pCustomerTestSampleRow.DiluentSolution <> pFactoryTestSampleRow.DiluentSolution) Then
+                        'Add a row for field DiluentSolution in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "DiluentSolution", myDiluentSolution, pFactoryTestSampleRow.DiluentSolution)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.DiluentSolution = pFactoryTestSampleRow.DiluentSolution
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsDiluentSolutionNull) Then
+                        'Add a row for field DiluentSolution in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "DiluentSolution", pCustomerTestSampleRow.DiluentSolution, myDiluentSolution)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetDiluentSolutionNull()
+                    End If
+                End If
+
+                'Verify if field IncPostdilutionFactor has changed
+                Dim myIncPostDilutionFactor As String = "--"
+                If (Not pFactoryTestSampleRow.IsIncPostdilutionFactorNull) Then
+                    If (Not pCustomerTestSampleRow.IsIncPostdilutionFactorNull) Then myIncPostDilutionFactor = pCustomerTestSampleRow.IncPostdilutionFactor.ToString
+
+                    If (pCustomerTestSampleRow.IsIncPostdilutionFactorNull OrElse pCustomerTestSampleRow.IncPostdilutionFactor <> pFactoryTestSampleRow.IncPostdilutionFactor) Then
+                        'Add a row for field IncPostdilutionFactor in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "IncPostdilutionFactor", myIncPostDilutionFactor, _
+                                                            pFactoryTestSampleRow.IncPostdilutionFactor.ToString)
+
+                        'Update fields in the Customer DataSet ==> Fields IncPostSampleVolume are IncPostSampleVolumeSteps are also affected
+                        pCustomerTestSampleRow.IncPostdilutionFactor = pFactoryTestSampleRow.IncPostdilutionFactor
+                        pCustomerTestSampleRow.IncPostSampleVolume = pFactoryTestSampleRow.IncPostSampleVolume
+                        pCustomerTestSampleRow.IncPostSampleVolumeSteps = pFactoryTestSampleRow.IncPostSampleVolumeSteps
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsIncPostdilutionFactorNull) Then
+                        'Add a row for field IncPostdilutionFactor in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "IncPostdilutionFactor", pCustomerTestSampleRow.IncPostdilutionFactor.ToString, _
+                                                            myIncPostDilutionFactor)
+
+                        'Update fields in the Customer DataSet ==> Fields IncPostSampleVolume are IncPostSampleVolumeSteps are also affected
+                        pCustomerTestSampleRow.SetIncPostdilutionFactorNull()
+                        pCustomerTestSampleRow.SetIncPostSampleVolumeNull()
+                        pCustomerTestSampleRow.SetIncPostSampleVolumeStepsNull()
+                    End If
+                End If
+
+                'Verify if field RedPostdilutionFactor has changed
+                Dim myRedPostDilutionFactor As String = "--"
+                If (Not pFactoryTestSampleRow.IsRedPostdilutionFactorNull) Then
+                    If (Not pCustomerTestSampleRow.IsRedPostdilutionFactorNull) Then myRedPostDilutionFactor = pCustomerTestSampleRow.RedPostdilutionFactor.ToString
+
+                    If (pCustomerTestSampleRow.IsRedPostdilutionFactorNull OrElse pCustomerTestSampleRow.RedPostdilutionFactor <> pFactoryTestSampleRow.RedPostdilutionFactor) Then
+                        'Add a row for field RedPostdilutionFactor in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "RedPostdilutionFactor", myRedPostDilutionFactor, _
+                                                            pFactoryTestSampleRow.RedPostdilutionFactor.ToString)
+
+                        'Update fields in the Customer DataSet ==> Fields RedPostSampleVolume are RedPostSampleVolumeSteps are also affected
+                        pCustomerTestSampleRow.RedPostdilutionFactor = pFactoryTestSampleRow.RedPostdilutionFactor
+                        pCustomerTestSampleRow.RedPostSampleVolume = pFactoryTestSampleRow.RedPostSampleVolume
+                        pCustomerTestSampleRow.RedPostSampleVolumeSteps = pFactoryTestSampleRow.RedPostSampleVolumeSteps
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsRedPostdilutionFactorNull) Then
+                        'Add a row for field RedPostdilutionFactor in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "RedPostdilutionFactor", pCustomerTestSampleRow.RedPostdilutionFactor.ToString, _
+                                                            myRedPostDilutionFactor)
+
+                        'Update fields in the Customer DataSet ==> Fields RedPostSampleVolume are RedPostSampleVolumeSteps are also affected
+                        pCustomerTestSampleRow.SetRedPostdilutionFactorNull()
+                        pCustomerTestSampleRow.SetRedPostSampleVolumeNull()
+                        pCustomerTestSampleRow.SetRedPostSampleVolumeStepsNull()
+                    End If
+                End If
+
+                'Verify if field BlankAbsorbanceLimit has changed
+                Dim myBlkAbsLimit As String = "--"
+                If (Not pFactoryTestSampleRow.IsBlankAbsorbanceLimitNull) Then
+                    If (Not pCustomerTestSampleRow.IsBlankAbsorbanceLimitNull) Then myBlkAbsLimit = pCustomerTestSampleRow.BlankAbsorbanceLimit.ToString
+
+                    If (pCustomerTestSampleRow.IsBlankAbsorbanceLimitNull OrElse pCustomerTestSampleRow.BlankAbsorbanceLimit <> pFactoryTestSampleRow.BlankAbsorbanceLimit) Then
+                        'Add a row for field BlankAbsorbanceLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "BlankAbsorbanceLimit", myBlkAbsLimit, _
+                                                            pFactoryTestSampleRow.BlankAbsorbanceLimit.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.BlankAbsorbanceLimit = pFactoryTestSampleRow.BlankAbsorbanceLimit
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsBlankAbsorbanceLimitNull) Then
+                        'Add a row for field BlankAbsorbanceLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "BlankAbsorbanceLimit", pCustomerTestSampleRow.BlankAbsorbanceLimit.ToString, _
+                                                            myBlkAbsLimit)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetBlankAbsorbanceLimitNull()
+                    End If
+                End If
+
+                'Verify if field LinearityLimit has changed
+                Dim myLinearityLimit As String = "--"
+                If (Not pFactoryTestSampleRow.IsLinearityLimitNull) Then
+                    If (Not pCustomerTestSampleRow.IsLinearityLimitNull) Then myLinearityLimit = pCustomerTestSampleRow.LinearityLimit.ToString
+
+                    If (pCustomerTestSampleRow.IsLinearityLimitNull OrElse pCustomerTestSampleRow.LinearityLimit <> pFactoryTestSampleRow.LinearityLimit) Then
+                        'Add a row for field LinearityLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "LinearityLimit", myLinearityLimit, _
+                                                            pFactoryTestSampleRow.LinearityLimit.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.LinearityLimit = pFactoryTestSampleRow.LinearityLimit
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsLinearityLimitNull) Then
+                        'Add a row for field LinearityLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "LinearityLimit", pCustomerTestSampleRow.LinearityLimit.ToString, _
+                                                            myLinearityLimit)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetLinearityLimitNull()
+                    End If
+                End If
+
+                'Verify if field DetectionLimit has changed
+                Dim myDetectionLimit As String = "--"
+                If (Not pFactoryTestSampleRow.IsDetectionLimitNull) Then
+                    If (Not pCustomerTestSampleRow.IsDetectionLimitNull) Then myDetectionLimit = pCustomerTestSampleRow.DetectionLimit.ToString
+
+                    If (pCustomerTestSampleRow.IsDetectionLimitNull OrElse pCustomerTestSampleRow.DetectionLimit <> pFactoryTestSampleRow.DetectionLimit) Then
+                        'Add a row for field DetectionLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "DetectionLimit", myDetectionLimit, _
+                                                            pFactoryTestSampleRow.DetectionLimit.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.DetectionLimit = pFactoryTestSampleRow.DetectionLimit
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsDetectionLimitNull) Then
+                        'Add a row for field DetectionLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "DetectionLimit", pCustomerTestSampleRow.DetectionLimit.ToString, _
+                                                            myDetectionLimit)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetDetectionLimitNull()
+                    End If
+                End If
+
+                'Verify if field FactorLowerLimit has changed
+                Dim myFactorLowerLimit As String = "--"
+                If (Not pFactoryTestSampleRow.IsFactorLowerLimitNull) Then
+                    If (Not pCustomerTestSampleRow.IsFactorLowerLimitNull) Then myFactorLowerLimit = pCustomerTestSampleRow.FactorLowerLimit.ToString
+
+                    If (pCustomerTestSampleRow.IsFactorLowerLimitNull OrElse pCustomerTestSampleRow.FactorLowerLimit <> pFactoryTestSampleRow.FactorLowerLimit) Then
+                        'Add a row for field FactorLowerLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "FactorLowerLimit", myFactorLowerLimit, _
+                                                            pFactoryTestSampleRow.FactorLowerLimit.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.FactorLowerLimit = pFactoryTestSampleRow.FactorLowerLimit
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsFactorLowerLimitNull) Then
+                        'Add a row for field FactorLowerLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "FactorLowerLimit", pCustomerTestSampleRow.FactorLowerLimit.ToString, _
+                                                            myFactorLowerLimit)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetFactorLowerLimitNull()
+                    End If
+                End If
+
+                'Verify if field FactorUpperLimit has changed
+                Dim myFactorUpperLimit As String = "--"
+                If (Not pFactoryTestSampleRow.IsFactorUpperLimitNull) Then
+                    If (Not pCustomerTestSampleRow.IsFactorUpperLimitNull) Then myFactorUpperLimit = pCustomerTestSampleRow.FactorUpperLimit.ToString
+
+                    If (pCustomerTestSampleRow.IsFactorUpperLimitNull OrElse pCustomerTestSampleRow.FactorUpperLimit <> pFactoryTestSampleRow.FactorUpperLimit) Then
+                        'Add a row for field FactorUpperLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "FactorUpperLimit", myFactorUpperLimit, _
+                                                            pFactoryTestSampleRow.FactorUpperLimit.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.FactorUpperLimit = pFactoryTestSampleRow.FactorUpperLimit
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsFactorUpperLimitNull) Then
+                        'Add a row for field FactorLowerLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "FactorUpperLimit", pCustomerTestSampleRow.FactorUpperLimit.ToString, _
+                                                            myFactorUpperLimit)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetFactorUpperLimitNull()
+                    End If
+                End If
+
+                'Verify if field SlopeFactorA has changed
+                Dim mySlopeA As String = "--"
+                If (Not pFactoryTestSampleRow.IsSlopeFactorANull) Then
+                    If (Not pCustomerTestSampleRow.IsSlopeFactorANull) Then mySlopeA = pCustomerTestSampleRow.SlopeFactorA.ToString
+
+                    If (pCustomerTestSampleRow.IsSlopeFactorANull OrElse pCustomerTestSampleRow.SlopeFactorA <> pFactoryTestSampleRow.SlopeFactorA) Then
+                        'Add a row for field SlopeFactorA in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SlopeFactorA", mySlopeA, _
+                                                            pFactoryTestSampleRow.SlopeFactorA.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SlopeFactorA = pFactoryTestSampleRow.SlopeFactorA
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsSlopeFactorANull) Then
+                        'Add a row for field SlopeFactorA in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SlopeFactorA", pCustomerTestSampleRow.SlopeFactorA.ToString, _
+                                                            mySlopeA)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetSlopeFactorANull()
+                    End If
+                End If
+
+                'Verify if field SlopeFactorB has changed
+                Dim mySlopeB As String = "--"
+                If (Not pFactoryTestSampleRow.IsSlopeFactorBNull) Then
+                    If (Not pCustomerTestSampleRow.IsSlopeFactorBNull) Then mySlopeB = pCustomerTestSampleRow.SlopeFactorB.ToString
+
+                    If (pCustomerTestSampleRow.IsSlopeFactorBNull OrElse pCustomerTestSampleRow.SlopeFactorB <> pFactoryTestSampleRow.SlopeFactorB) Then
+                        'Add a row for field SlopeFactorB in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SlopeFactorB", mySlopeB, _
+                                                            pFactoryTestSampleRow.SlopeFactorB.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SlopeFactorB = pFactoryTestSampleRow.SlopeFactorB
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsSlopeFactorBNull) Then
+                        'Add a row for field SlopeFactorB in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SlopeFactorB", pCustomerTestSampleRow.SlopeFactorB.ToString, _
+                                                            mySlopeB)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetSlopeFactorBNull()
+                    End If
+                End If
+
+                'Verify if field SubstrateDepletionValue has changed
+                Dim mySubstrateDep As String = "--"
+                If (Not pFactoryTestSampleRow.IsSubstrateDepletionValueNull) Then
+                    If (Not pCustomerTestSampleRow.IsSubstrateDepletionValueNull) Then mySubstrateDep = pCustomerTestSampleRow.SubstrateDepletionValue.ToString
+
+                    If (pCustomerTestSampleRow.IsSubstrateDepletionValueNull OrElse pCustomerTestSampleRow.SubstrateDepletionValue <> pFactoryTestSampleRow.SubstrateDepletionValue) Then
+                        'Add a row for field SubstrateDepletionValue in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SubstrateDepletionValue", mySubstrateDep, _
+                                                            pFactoryTestSampleRow.SubstrateDepletionValue.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SubstrateDepletionValue = pFactoryTestSampleRow.SubstrateDepletionValue
+                    End If
+                Else
+                    If (Not pCustomerTestSampleRow.IsSubstrateDepletionValueNull) Then
+                        'Add a row for field SlopeFactorB in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SubstrateDepletionValue", pCustomerTestSampleRow.SubstrateDepletionValue.ToString, _
+                                                            mySubstrateDep)
+
+                        'Update field in the Customer DataSet
+                        pCustomerTestSampleRow.SetSubstrateDepletionValueNull()
+                    End If
+                End If
+
+                'Verify if Calibration data has to be updated
+                If (pCustomerTestSampleRow.CalibratorType = "EXPERIMENT") Then
+                    'Nothing to do --> Customer Calibration data is not updated
+                Else
+                    If (pFactoryTestSampleRow.CalibratorType = "FACTOR") Then
+                        Dim myCalibFactor As String = "--"
+                        If (Not pCustomerTestSampleRow.IsCalibrationFactorNull) Then myCalibFactor = pCustomerTestSampleRow.CalibrationFactor.ToString
+
+                        If (pCustomerTestSampleRow.IsCalibrationFactorNull OrElse pCustomerTestSampleRow.CalibrationFactor <> pFactoryTestSampleRow.CalibrationFactor) Then
+                            'Add a row for field CalibrationFactor in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                            AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "CalibrationFactor", myCalibFactor, _
+                                                                pFactoryTestSampleRow.CalibrationFactor.ToString)
+                        End If
+
+                        If (pCustomerTestSampleRow.CalibratorType = "ALTERNATIV") Then
+                            'Add a row for field CalibratorType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                            AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SampleTypeAlternative", pCustomerTestSampleRow.CalibratorType, _
+                                                                pFactoryTestSampleRow.CalibratorType)
+
+                            'Add a row for field SampleTypeAlternative in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                            AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SampleTypeAlternative", pCustomerTestSampleRow.SampleTypeAlternative, _
+                                                                "--")
+                        End If
+
+                        'Update fields CalibratorType and CalibrationFactor; set to NULL field SampleTypeAlternative
+                        pCustomerTestSampleRow.CalibratorType = pFactoryTestSampleRow.CalibratorType
+                        pCustomerTestSampleRow.CalibrationFactor = pFactoryTestSampleRow.CalibrationFactor
+                        pCustomerTestSampleRow.SetSampleTypeAlternativeNull()
+
+                    ElseIf (pFactoryTestSampleRow.CalibratorType = "ALTERNATIV") Then
+                        Dim mySTypeAlternative As String = "--"
+                        If (Not pCustomerTestSampleRow.IsSampleTypeAlternativeNull) Then mySTypeAlternative = pCustomerTestSampleRow.SampleTypeAlternative
+
+                        If (pCustomerTestSampleRow.IsSampleTypeAlternativeNull OrElse pCustomerTestSampleRow.SampleTypeAlternative <> pFactoryTestSampleRow.SampleTypeAlternative) Then
+                            'Add a row for field SampleTypeAlternative in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                            AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SampleTypeAlternative", mySTypeAlternative, _
+                                                                pFactoryTestSampleRow.SampleTypeAlternative.ToString)
+                        End If
+
+                        If (pCustomerTestSampleRow.CalibratorType = "FACTOR") Then
+                            'Add a row for field CalibratorType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                            AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "SampleTypeAlternative", pCustomerTestSampleRow.CalibratorType, _
+                                                                pFactoryTestSampleRow.CalibratorType)
+
+                            'Add a row for field CalibrationFactor in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                            AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, "CalibrationFactor", pCustomerTestSampleRow.CalibrationFactor.ToString, _
+                                                                "--")
+                        End If
+
+                        'Update fields CalibratorType and SampleTypeAlternative; set to NULL field CalibrationFactor
+                        pCustomerTestSampleRow.CalibratorType = pFactoryTestSampleRow.CalibratorType
+                        pCustomerTestSampleRow.SampleTypeAlternative = pFactoryTestSampleRow.SampleTypeAlternative
+                        pCustomerTestSampleRow.SetCalibrationFactorNull()
+                    Else
+                        'Nothing to do --> The Calibrator was added to Customer DB, but it is not linked to the STD Test/SampleType
+                    End If
+                End If
+
+                pCustomerTestSampleRow.EndEdit()
+                pCustomerTestSampleRow.AcceptChanges()
+
+                'Return the Boolean value indicating if previous results of Blanks and Calibrators for the STD Test have to be deleted 
+                myGlobalDataTO.SetDatos = deleteBlkCalibResults
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Add a new row with data of an updated element in the DS containing all changes in CUSTOMER DB due to the Update Version Process.
+        ''' Data is added in sub-table UpdatedElements
+        ''' </summary>
+        ''' <param name="pUpdateVersionChangesList">DataSet containing all changes made in CUSTOMER DB for the Update Version Process</param>
+        ''' <param name="pElementType">Type of affected Element: CALIB, STD, ...</param>
+        ''' <param name="pElementName">Name of the affected Element</param>
+        ''' <param name="pUpdatedField">Name of the affected field</param>
+        ''' <param name="pPreviousValue">Previous value of the field in CUSTOMER DB</param>
+        ''' <param name="pNewValue">New value of the field in CUSTOMER DB (from FACTORY DB)</param>
+        ''' <remarks>
+        ''' Created by:  SA 10/10/2014 - BA-1944 (SubTasks BA-1984 and BA-1985)
+        ''' </remarks>
+        Private Sub AddUpdatedElementToChangesStructure(ByRef pUpdateVersionChangesList As UpdateVersionChangesDS, ByVal pElementType As String, _
+                                                        ByVal pElementName As String, ByVal pUpdatedField As String, ByVal pPreviousValue As String, _
+                                                        ByVal pNewValue As String)
+            Try
+                Dim myUpdateVersionChangedElementsRow As UpdateVersionChangesDS.UpdatedElementsRow
+                myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
+                myUpdateVersionChangedElementsRow.ElementType = pElementType
+                myUpdateVersionChangedElementsRow.ElementName = pElementName
+                myUpdateVersionChangedElementsRow.UpdatedField = pUpdatedField
+                myUpdateVersionChangedElementsRow.PreviousValue = pPreviousValue
+                myUpdateVersionChangedElementsRow.NewValue = pNewValue
+                pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
+                Throw
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' Execute the process to search in FACTORY DB all STD TESTS that exists in CUSTOMER DB but for which at least one of the relevant Test fields 
+        ''' have changed and modify data in CUSTOMER DB (tables tparTests, tparReagents and tparTestReagents; additionally, depending on the modified 
+        ''' fields, previous results of Blanks and Calibrators for the STD Test can be deleted)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 10/10/2014 - BA-1944 (SubTask BA-1985)
+        ''' </remarks>
+        Public Function UPDATEModifiedSTDTestSamples(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myCustomerTestDS As New TestsDS
+                Dim myUpdatedTestSamplesDS As New TestSamplesDS
+                Dim myCustomerTestSampleDS As New TestSamplesDS
+
+                Dim myTestsDelegate As New TestsDelegate
+                Dim myTestSamplesDelegate As New TestSamplesDelegate
+                Dim myTestParametersUpdateDAO As New TestParametersUpdateDAO
+
+
+
+
+
+
+
+                Dim myReagentsDS As New ReagentsDS
+                Dim myTestReagentsDS As New TestReagentsDS
+                Dim deleteBlankCalibResults As Boolean = False
+
+                Dim myDeletedTestProgramingTO As New DeletedTestProgramingTO
+                Dim myDeletedTestProgramingList As New List(Of DeletedTestProgramingTO)
+                Dim myDeletedTestReagentsVolsList As New List(Of DeletedTestReagentsVolumeTO)
+
+                '(1) Search in Factory DB all STD TESTS/SAMPLE TYPES that exists in Customer DB but for which at least one of the
+                '    relevant SampleType fields have changed
+                myGlobalDataTO = myTestParametersUpdateDAO.GetUpdatedFactoryTestSamples(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myUpdatedTestSamplesDS = DirectCast(myGlobalDataTO.SetDatos, TestSamplesDS)
+
+
+                    '(2) Process each returned STD Test to update it in CUSTOMER DB
+                    For Each updatedTestSample As TestSamplesDS.tparTestSamplesRow In myUpdatedTestSamplesDS.tparTestSamples
+                        '(2.1) Get data of the Test in Customer DB
+                        myGlobalDataTO = myTestsDelegate.Read(pDBConnection, updatedTestSample.TestID)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myCustomerTestDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+                        End If
+
+                        '(2.2) Get data of the SampleType for the STD Test in Customer DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myTestSamplesDelegate.GetDefinition(pDBConnection, updatedTestSample.TestID, updatedTestSample.SampleType, False)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myCustomerTestSampleDS = DirectCast(myGlobalDataTO.SetDatos, TestSamplesDS)
+                            End If
+                        End If
+
+                        '(2.3) Verify changed fields and update values in myCustomerTestSampleDS
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = UpdateCustomerTestSamples(updatedTestSample, myCustomerTestSampleDS.tparTestSamples.First, myCustomerTestDS.tparTests.First.TestName, _
+                                                                       myCustomerTestDS.tparTests.First.ShortName, pUpdateVersionChangesList)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                deleteBlankCalibResults = Convert.ToBoolean(myGlobalDataTO.SetDatos)
+                            End If
+                        End If
+
+                        '(2.4) Verify if there are changes in Volumes of Reagents used for the STD Test/SampleType
+                        If (Not myGlobalDataTO.HasError) Then
+                            '(2.4.1) 
+
+
+
+                            'myReagentsDS.Clear()
+                            'myTestReagentsDS.Clear()
+                            'myDeletedTestReagentsVolsList.Clear()
+
+                            'myGlobalDataTO = UpdateCustomerTestReagents(pDBConnection, updatedTest.TestID, myCustomerTestDS.tparTests.First.TestName, _
+                            '                                            myTestSamplesDS, myReagentsDS, myTestReagentsDS, myDeletedTestReagentsVolsList)
+                        End If
+
+                        '(2.5) If previous Results of Blanks and Calibrators for the STD Tests have to be deleted, prepare the needed TO
+                        If (Not myGlobalDataTO.HasError) Then
+                            If (deleteBlankCalibResults) Then
+                                'Add the TestID and TestVersionNumber to the TO of Tests to delete, and mark DeleteBlankCalibResults = TRUE
+                                myDeletedTestProgramingTO.TestID = myCustomerTestDS.tparTests.First.TestID
+                                myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
+                                myDeletedTestProgramingTO.DeleteBlankCalibResults = True
+                                myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
+                            End If
+                        End If
+
+                        '(2.6) Update the STD Test from CUSTOMER DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, myCustomerTestDS, New TestSamplesDS, New TestReagentsVolumesDS, _
+                                                                               myReagentsDS, myTestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
+                                                                               New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
+                                                                               myDeletedTestReagentsVolsList, myDeletedTestProgramingList, _
+                                                                               New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
+                        End If
+
+                        'If an error has been raised, then the process is finished
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                End If
+
+                myDeletedTestProgramingTO = Nothing
+                myDeletedTestProgramingList = Nothing
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UPDATEModifiedSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

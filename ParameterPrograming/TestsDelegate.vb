@@ -1266,6 +1266,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pTestReagentesDS"></param>
         ''' <param name="pDelTestReagentsVolumeList"></param>
         ''' <param name="pDeletedTestProgramingList"></param>
+        ''' <param name="pApplyDeleteCascade"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:
@@ -1276,6 +1277,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 27/08/2014 - Inform field TestLongName when preparing the HistoryTestSamplesDS that is passed to function UpdateByQCTestIDAndSampleTypeNEW
         '''                              in HistoryTestSamplesDelegate (added as part of BT #1865, in which field TestLongName is also exported to QC Module for ISE Tests; 
         '''                              this change is to export the field also for Standard Tests)  
+        '''              SA 10/10/2014 - BA-1944 (SubTask BA-1981) ==> Added new optional parameter ApplyDeleteCascade (DefaultValue = TRUE) to avoid remove 
+        '''                                                            elements that are not in the DataSets when a new SampleType is added for the Test or when data 
+        '''                                                            of an existing Sample Type is updated
         ''' </remarks>
         Public Function PrepareTestToSave(ByVal pDBConnection As SqlClient.SqlConnection, _
                                           ByVal pAnalyzerID As String, _
@@ -1295,7 +1299,8 @@ Namespace Biosystems.Ax00.BL
                                           ByVal pTestSamplesMultiRulesDS As TestSamplesMultirulesDS, _
                                           ByVal pTestsControlsDS As TestControlsDS, _
                                           ByVal pDeleteControlTOList As List(Of DeletedControlTO), _
-                                          Optional ByVal pUpdateSampleType As String = "") As GlobalDataTO
+                                          Optional ByVal pUpdateSampleType As String = "", _
+                                          Optional ByVal pApplyDeleteCascade As Boolean = True) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO()
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1368,32 +1373,34 @@ Namespace Biosystems.Ax00.BL
                                            Where a.TestID = myTestID _
                                            Select a).ToList()
 
-                            'SG 07/09/2010
-                            Dim myDBSavedTestSample As New TestSamplesDS
-                            myGlobalDataTO = myTestSamplesDelegate.GetSampleDataByTestID(pDBConnection, myTestID)
-                            If Not myGlobalDataTO.HasError Then
-                                myDBSavedTestSample = CType(myGlobalDataTO.SetDatos, Types.TestSamplesDS)
-                                For Each savedTestSampleRow As TestSamplesDS.tparTestSamplesRow In myDBSavedTestSample.tparTestSamples.Rows
-                                    Dim NotToDelete As Boolean = True
-                                    For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
-                                        NotToDelete = (savedTestSampleRow.SampleType = tempTestSampleRow.SampleType)
-                                        If NotToDelete Then
-                                            Exit For
+                            'BA-1944 (SubTask BA-1981) - If optional parameter pApplyDeleteCascade is FALSE, data of SampleTypes different of the informed one are not deleted
+                            If (pApplyDeleteCascade) Then
+                                'SG 07/09/2010
+                                Dim myDBSavedTestSample As New TestSamplesDS
+                                myGlobalDataTO = myTestSamplesDelegate.GetSampleDataByTestID(pDBConnection, myTestID)
+                                If Not myGlobalDataTO.HasError Then
+                                    myDBSavedTestSample = CType(myGlobalDataTO.SetDatos, Types.TestSamplesDS)
+                                    For Each savedTestSampleRow As TestSamplesDS.tparTestSamplesRow In myDBSavedTestSample.tparTestSamples.Rows
+                                        Dim NotToDelete As Boolean = True
+                                        For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
+                                            NotToDelete = (savedTestSampleRow.SampleType = tempTestSampleRow.SampleType)
+                                            If NotToDelete Then
+                                                Exit For
+                                            End If
+                                        Next
+                                        'Delete the testsample
+                                        If Not NotToDelete Then
+                                            myGlobalDataTO = myTestSamplesDelegate.DeleteCascadeByTestIDSampleType(pDBConnection, myTestID, savedTestSampleRow.SampleType, pAnalyzerID, pWorkSessionID)
+                                            If myGlobalDataTO.HasError Then
+                                                Exit For
+                                            End If
                                         End If
                                     Next
-                                    'Delete the testsample
-                                    If Not NotToDelete Then
-                                        myGlobalDataTO = myTestSamplesDelegate.DeleteCascadeByTestIDSampleType(pDBConnection, myTestID, savedTestSampleRow.SampleType, pAnalyzerID, pWorkSessionID)
-                                        If myGlobalDataTO.HasError Then
-                                            Exit For
-                                        End If
-                                    End If
-                                Next
 
-                            Else
-                                Exit For
+                                Else
+                                    Exit For
+                                End If
                             End If
-                            'END 07/09/2010
 
                             For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
                                 tempTestSampleDS.tparTestSamples.ImportRow(tempTestSampleRow)
@@ -1530,9 +1537,12 @@ Namespace Biosystems.Ax00.BL
                                         'Call the delegate to save TestControls
                                         myGlobalDataTO = myTestControlsDelegate.SaveTestControlsNEW(dbConnection, pTestsControlsDS, Nothing, False)
                                     Else
-                                        'If there are not linked Controls, then delete all the existing ones in the DataSet
-                                        myGlobalDataTO = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, tempTestsDS.tparTests(0).TestID, _
-                                                                                                                         "STD", pUpdateSampleType)
+                                        'BA-1944 (SubTask BA-1981) - If optional parameter pApplyDeleteCascade is FALSE, Controls are not deleted when TestControlsDS is empty
+                                        If (pApplyDeleteCascade) Then
+                                            'If there are not linked Controls, then delete all the existing ones in the DataSet
+                                            myGlobalDataTO = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, tempTestsDS.tparTests(0).TestID, _
+                                                                                                                             "STD", pUpdateSampleType)
+                                        End If
                                     End If
                                 Else
                                     Exit For

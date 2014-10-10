@@ -1049,7 +1049,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Search in FACTORY DB all new Sample Types added to preloaded STD Tests that already exist in CUSTOMER DB
+        ''' Search in FACTORY DB all new Sample Types added to preloaded STD Tests that do not exist in CUSTOMER DB
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>GlobalDataTO containing a TestsDS with all pairs of TestID/SampleType that exists in FACTORY DB but not in the CUSTOMER DB</returns>
@@ -1088,6 +1088,131 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTestSamples", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all STD Test/SampleTypes that exist in CUSTOMER DB but for which at least one of the relevant Sample Type fields 
+        ''' have been changed
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a TestSamplesDS with value of the relevant Sample Type fields in FACTORY DB for all pairs of 
+        ''' modified STD TestID/SampleTypes
+        '''  </returns>
+        ''' <remarks>
+        ''' Created by: SA 10/10/2014 - BA-1944 (SubTask BA- 1985)
+        ''' </remarks>
+        Public Function GetUpdatedFactoryTestSamples(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT TestID, SampleType, SampleVolume, SampleVolumeSteps, PredilutionUseFlag, PredilutionMode, " & vbCrLf & _
+                                                       " PredilutionFactor, PredilutedSampleVol, PredilutedSampleVolSteps, PredilutedDiluentVol, PreDiluentVolSteps, " & vbCrLf & _
+                                                       " DiluentSolution, IncPostdilutionFactor, IncPostSampleVolume, IncPostSampleVolumeSteps, " & vbCrLf & _
+                                                       " RedPostdilutionFactor, RedPostSampleVolume, RedPostSampleVolumeSteps, " & vbCrLf & _
+                                                       " BlankAbsorbanceLimit, LinearityLimit, DetectionLimit, FactorLowerLimit, " & vbCrLf & _
+                                                       " FactorUpperLimit, SubstrateDepletionValue,SlopeFactorA, SlopeFactorB, " & vbCrLf & _
+                                                       " CalibratorType, CalibrationFactor, SampleTypeAlternative " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestSamples] " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TS.TestID, SampleType, SampleVolume, SampleVolumeSteps, PredilutionUseFlag, PredilutionMode, " & vbCrLf & _
+                                                         " PredilutionFactor, PredilutedSampleVol, PredilutedSampleVolSteps, PredilutedDiluentVol, PreDiluentVolSteps, " & vbCrLf & _
+                                                       " DiluentSolution, IncPostdilutionFactor, IncPostSampleVolume, IncPostSampleVolumeSteps, " & vbCrLf & _
+                                                       " RedPostdilutionFactor, RedPostSampleVolume, RedPostSampleVolumeSteps, " & vbCrLf & _
+                                                       " BlankAbsorbanceLimit, LinearityLimit, DetectionLimit, FactorLowerLimit, " & vbCrLf & _
+                                                       " FactorUpperLimit, SubstrateDepletionValue,SlopeFactorA, SlopeFactorB, " & vbCrLf & _
+                                                       " CalibratorType, CalibrationFactor, SampleTypeAlternative " & vbCrLf & _
+                                                " FROM [Ax00].[dbo].[tparTestSamples] TS INNER JOIN [Ax00].[dbo].[tparTests] T ON TS.TestID = T.TestID " & vbCrLf & _
+                                                " WHERE T.PreloadedTest = 1 "
+
+                        Dim factoryTestSamplesDS As New TestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestSamplesDS.tparTestSamples)
+                                End Using
+                            End Using
+
+                        resultData.SetDatos = factoryTestSamplesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTestSamples", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Get all Volumes of Reagents for preloaded STD Tests that have been changed (add or updated) in FACTORY DB. If optional parameters
+        ''' TestID and SampleType are informed, then the changes verification is made only for the informed STD Test and SampleType
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">STD Test Identifier; optional parameter</param>
+        ''' <param name="pSampleType">Sample Type Code; optional parameter</param>
+        ''' <returns>GlobalDataTO containing a TestReagentsVolumesDS with all new or updated Reagents Volumes in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 10/10/2014 - BA-1944 (SubTask BA- 1985)
+        ''' </remarks>
+        Public Function GetUpdatedFactoryTestReagentsVolumes(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pTestID As Integer = 0, _
+                                                             Optional ByVal pSampleType As String = "") As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myOptionalFilters As String = String.Empty
+                        If (pTestID <> 0 AndAlso pSampleType <> String.Empty) Then
+                            myOptionalFilters = " TRV.TestID = " & pTestID.ToString & vbCrLf & _
+                                                " AND TRV.SampleType = '" & pSampleType.Trim & "' " & vbCrLf
+                        End If
+
+                        Dim cmdText As String = " SELECT TRV.* " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagentsVolumes] TRV " & vbCrLf & _
+                                                IIf(myOptionalFilters = String.Empty, String.Empty, " WHERE " & myOptionalFilters).ToString & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT TRV.* " & vbCrLf & _
+                                                " FROM   [Ax00].[dbo].[tparTestReagentsVolumes] TRV INNER JOIN [Ax00].[dbo].[tparTests] T ON TRV.TestID = T.TestID " & vbCrLf & _
+                                                " WHERE  T.PreloadedTest = 1 " & vbCrLf & _
+                                                IIf(myOptionalFilters = String.Empty, String.Empty, " AND " & myOptionalFilters).ToString
+
+                        Dim factoryTestReagentsVolsDS As New TestReagentsVolumesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryTestReagentsVolsDS.tparTestReagentsVolumes)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryTestReagentsVolsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTestReagentsVolumes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

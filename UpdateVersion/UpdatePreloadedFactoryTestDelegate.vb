@@ -299,7 +299,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
         ''' <summary>
-        ''' 
+        ''' Execute the Upadate Version Process for STANDARD TESTS
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
@@ -341,7 +341,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             resultData = mySTDTestsUpdate.UPDATEModifiedSTDTests(dbConnection, pUpdateVersionChangesList)
                         End If
 
-                        '(6) Execute the Update Version Process for UPDATED STD TESTS / SAMPLE TYPES 
+                        '(6) Execute the Update Version Process for NEW STD TESTS / SAMPLE TYPES 
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.CreateNEWSamplesForSTDTests(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(7) Execute the Update Version Process for UPDATED STD TESTS / SAMPLE TYPES 
                         If (Not resultData.HasError) Then
                             ' resultData = mySTDTestsUpdate.UPDATEModifiedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
                         End If
