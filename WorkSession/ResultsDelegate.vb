@@ -6793,7 +6793,8 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="ResultsForReportDS">The DataSet to fill in</param>
         ''' <remarks>
         ''' Created by: RH 11/01/2012
-        ''' AG 28/06/2013 - Patch for the test types without executions
+        ''' Modified by AG 28/06/2013 - Patch for the test types without executions
+        '''             XB 10/10/2014 - Correction - BA-1993
         ''' </remarks>
         Private Sub InsertResultsPATIENT(ByVal TestName As String, _
                                          ByVal AverageResultsDS As ResultsDS, _
@@ -7006,6 +7007,14 @@ Namespace Biosystems.Ax00.BL
                                 CONC_Value = GlobalConstants.CONCENTRATION_NOT_CALCULATED
                             End If
 
+                            ' XB 10/10/2014 - BA-1993
+                            If (Not SampleList(j).IsABS_ValueNull) Then
+                                ABSValue = SampleList(j).ABS_Value.ToString(GlobalConstants.ABSORBANCE_FORMAT)
+                            Else
+                                ABSValue = String.Empty
+                            End If
+                            ' XB 10/10/2014 - BA-1993
+
                             'AG 15/09/2010 - Special case when Absorbance has error
                             If Not SampleList(j).IsABS_ErrorNull Then
                                 If Not String.IsNullOrEmpty(SampleList(j).ABS_Error) Then
@@ -7014,6 +7023,7 @@ Namespace Biosystems.Ax00.BL
                                 End If
                             End If
                             'END AG 15/09/2010
+
 
                             ReplicateNumber = SampleList(j).ReplicateNumber.ToString()
 
