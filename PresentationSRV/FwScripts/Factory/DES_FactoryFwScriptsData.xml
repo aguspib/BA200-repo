@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <FwScriptsDataTO xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <Version>1.1.0</Version>
+  <Version>1.3.0</Version>
   <Analyzers>
     <AnalyzerFwScriptsTO>
       <AnalyzerID>A400</AnalyzerID>
@@ -654,13 +654,13 @@
           <Timer>25000</Timer>
           <Code>END</Code>
           <Params />
-          <EnableEdition>true</EnableEdition>
+          <EnableEdition>false</EnableEdition>
         </InstructionTO>
       </Instructions>
       <Created>2013-07-24T08:41:53.1501383+02:00</Created>
-      <Modified>2014-10-01T14:24:31.0813087+02:00</Modified>
+      <Modified>2013-07-24T08:41:53.1501383+02:00</Modified>
       <Author>SW</Author>
-      <SyntaxOK>true</SyntaxOK>
+      <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
     <FwScriptTO>
@@ -2562,9 +2562,9 @@
         </InstructionTO>
       </Instructions>
       <Created>2013-07-24T08:41:53.1511384+02:00</Created>
-      <Modified>2013-07-24T08:41:53.1511384+02:00</Modified>
+      <Modified>2014-10-10T08:14:38.478854+02:00</Modified>
       <Author>SW</Author>
-      <SyntaxOK>false</SyntaxOK>
+      <SyntaxOK>true</SyntaxOK>
       <TestedOK>false</TestedOK>
     </FwScriptTO>
     <FwScriptTO>
@@ -6656,4 +6656,4 @@
       <TestedOK>false</TestedOK>
     </FwScriptTO>
   </FwScripts>
-</FwScriptsDataTO>DataTO>
+</FwScriptsDataTO>
