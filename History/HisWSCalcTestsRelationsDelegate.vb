@@ -74,6 +74,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  SA 02/09/2014 - BA-1868
         ''' Modified by: SA 09/09/2014 - BA-1868 ==> Changes to solve errors found in the unit test
+        ''' AG 13/10/2014 - BA-2006 In a CalcultedTest the Print Partial Tests (printExpTests) apply only 1 level, not in cascade when the calctest forms part of another calctest formula
         ''' </remarks>
         Public Function MarkExcludedExpTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisResultsDataTable As List(Of HisWSResultsDS.vhisWSResultsRow), _
                                              ByVal pAnalyzerID As String) As GlobalDataTO
@@ -100,28 +101,33 @@ Namespace Biosystems.Ax00.BL
                             If (Not myResultData.HasError AndAlso Not myResultData.SetDatos Is Nothing) Then
                                 Dim myHisWSCalcTestRelationsDS As HisWSCalcTestRelations = DirectCast(myResultData.SetDatos, HisWSCalcTestRelations)
 
-                                'Get the list of HistOrderTestIDs of Experimental Tests that have to be INCLUDED in reports
-                                Dim lstExpToPrint As List(Of HisWSCalcTestRelations.thisWSCalcTestsRelationsRow) = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
-                                                                                                                    Where a.PrintExpTests = True _
-                                                                                                                   Select a).ToList()
+                                'AG 13/10/2014 - BA-2006 In a CalcultedTest the Print Partial Tests (printExpTests) apply only 1 level, not in cascade when the calctest forms part of another calctest formula
+                                'Next business that evaluates recursivity must be commented
+                                ''Get the list of HistOrderTestIDs of Experimental Tests that have to be INCLUDED in reports
+                                'Dim lstExpToPrint As List(Of HisWSCalcTestRelations.thisWSCalcTestsRelationsRow) = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
+                                '                                                                                    Where a.PrintExpTests = True _
+                                '                                                                                   Select a).ToList()
 
                                 Dim lstSearch As List(Of HisWSCalcTestRelations.thisWSCalcTestsRelationsRow)
-                                For Each row As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstExpToPrint
-                                    'Verify if the Experimental Test to Print is in the formula of a Calculated Tests that is part of another Calculated Test with PrintExpTests = False
-                                    'Note to understand this case:
-                                    ' ** ALBUMIN/GLOBULIN has PrintExpTests = False, which means that component tests ALBUMIN and GLOBULIN will not be printed
-                                    ' ** GLOBULIN (=PROTEIN TOTAL - ALBUMIN) has PrintExpTests = True, which means that component tests ALBUMIN and PROTEIN TOTAL should be printed;
-                                    '    but, due to the GLOBULIN will be not printed, then ALBUMIN and PROTEIN TOTAL will not be printed either
-                                    lstSearch = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
-                                                Where a.AnalyzerID = row.AnalyzerID _
-                                              AndAlso a.WorkSessionID = row.WorkSessionID _
-                                              AndAlso a.HistOrderTestID = row.HistOrderTestIDCALC _
-                                              AndAlso a.PrintExpTests = False
-                                               Select a).ToList()
+                                'For Each row As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In lstExpToPrint
+                                '    'Verify if the Experimental Test to Print is in the formula of a Calculated Tests that is part of another Calculated Test with PrintExpTests = False
+                                '    'Note to understand this case:
+                                '    ' ** ALBUMIN/GLOBULIN has PrintExpTests = False, which means that component tests ALBUMIN and GLOBULIN will not be printed
+                                '    ' ** GLOBULIN (=PROTEIN TOTAL - ALBUMIN) has PrintExpTests = True, which means that component tests ALBUMIN and PROTEIN TOTAL should be printed;
+                                '    '    but, due to the GLOBULIN will be not printed, then ALBUMIN and PROTEIN TOTAL will not be printed either
+                                '    lstSearch = (From a As HisWSCalcTestRelations.thisWSCalcTestsRelationsRow In myHisWSCalcTestRelationsDS.thisWSCalcTestsRelations _
+                                '                Where a.AnalyzerID = row.AnalyzerID _
+                                '              AndAlso a.WorkSessionID = row.WorkSessionID _
+                                '              AndAlso a.HistOrderTestID = row.HistOrderTestIDCALC _
+                                '              AndAlso a.PrintExpTests = False _
+                                '              Select a).ToList()
 
-                                    'If the Calculated Test has not to be printed, then the component Test has not to be printed
-                                    If (lstSearch.Count > 0) Then row.PrintExpTests = False
-                                Next
+
+                                '    'If the Calculated Test has not to be printed, then the component Test has not to be printed
+                                '    If (lstSearch.Count > 0) Then row.PrintExpTests = False
+                                'Next
+                                'lstExpToPrint = Nothing
+                                'AG 13/10/2014 - BA-2006
 
                                 'For each Order Test selected to print, calculate the correct value for flag ExpTestToPrint
                                 For Each row As HisWSResultsDS.vhisWSResultsRow In pHisResultsDataTable

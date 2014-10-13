@@ -386,18 +386,24 @@ Public Class bsReception
     End Sub
 
     Private Sub bsDecodeEnBase2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsDecodeEnBase2.Click
-        'Try
-        Const errorValue As Integer = 5 'En base2 el 5 (0x101) está formado por 1 + 4 (0x001 or 0x100)
-        'Dim errorValue As Integer = 11 'En base2 el 11 (0x1011) está formado por 1 + 2 + 8 (0x001 or 0x010 or 0x1000)
+        Try
+            'Decodificar en base 2
+            'Const errorValue As Integer = 5 'En base2 el 5 (0x101) está formado por 1 + 4 (0x001 or 0x100)
+            'Dim errorValue As Integer = 11 'En base2 el 11 (0x1011) está formado por 1 + 2 + 8 (0x001 or 0x010 or 0x1000)
 
-        If (errorValue And 1) = 1 Then MessageBox.Show("Contiene el 1")
-        If (errorValue And 2) = 2 Then MessageBox.Show("Contiene el 2")
-        If (errorValue And 4) = 4 Then MessageBox.Show("Contiene el 4")
-        If (errorValue And 8) = 8 Then MessageBox.Show("Contiene el 8")
+            'If (errorValue And 1) = 1 Then MessageBox.Show("Contiene el 1")
+            'If (errorValue And 2) = 2 Then MessageBox.Show("Contiene el 2")
+            'If (errorValue And 4) = 4 Then MessageBox.Show("Contiene el 4")
+            'If (errorValue And 8) = 8 Then MessageBox.Show("Contiene el 8")
 
-        'Catch ex As Exception
+            'Pruebas BA-2006
+            Dim myDlgate As New OrderCalculatedTestsDelegate
+            Dim resultData As New GlobalDataTO
+            resultData = myDlgate.GetOrderTestsToExcludeInPatientsReport(Nothing)
 
-        'End Try
+        Catch ex As Exception
+
+        End Try
     End Sub
 
     Private Sub BsHistoricCalibCurve_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsHistoricCalibCurve.Click

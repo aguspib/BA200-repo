@@ -370,6 +370,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>
         ''' AG 29/07/2014 - #1894 (tests that form part of a calculated test must be excluded from final report depends on the CALC test programming)
+        ''' AG 13/10/2014 - BA-2006 also return CalcOrderTestID
         ''' </remarks>
         Public Function GetOrderTestsFormPartOfCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -384,7 +385,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
 
-                        cmdText = " SELECT OCT.OrderTestID ,CT.CalcTestID , ct.PrintExpTests  " & vbCrLf
+                        cmdText = " SELECT OCT.OrderTestID, OCT.CalcOrderTestID ,CT.CalcTestID , ct.PrintExpTests  " & vbCrLf
                         cmdText &= " FROM   twksOrderTests OT INNER JOIN tparCalculatedTests CT ON OT.TestID = CT.CalcTestID " & vbCrLf
                         cmdText &= " INNER JOIN twksOrderCalculatedTests OCT ON OT.OrderTestID = OCT.CalcOrderTestID  " & vbCrLf
                         cmdText &= " WHERE  OT.TestType = 'CALC'  " & vbCrLf
