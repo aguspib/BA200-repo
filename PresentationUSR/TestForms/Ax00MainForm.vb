@@ -359,81 +359,100 @@ Public Class Ax00MainForm
         Dim myGlobal As New GlobalDataTO
         Dim dbConnection As SqlClient.SqlConnection
 
-        myGlobal = DAOBase.GetOpenDBConnection(Nothing)
+        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
             dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
             If (Not dbConnection Is Nothing) Then
-                Dim myOrdersDelegate As New OrdersDelegate
-                myGlobal = myOrdersDelegate.ImportFromLIMS(Nothing, "C:\Users\Susana Angueira\Documents\Ax00 v1.1\AX00\PresentationUSR\bin\x86\Debug\Import\Import.txt", New WorkSessionResultDS, _
-                                                           "834000114", "C:\Users\Susana Angueira\Documents\", "2013041601", "EMPTY", True)
+                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
+                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
+
+                myGlobal = myUpdateProcessDelegate.SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList)
 
 
-                'Dim myXMLMsgDelegate As New xmlMessagesDelegate
-                'myGlobal = myXMLMsgDelegate.CancelAWOSID(Nothing, "AWOSID78")
+                If (Not myGlobal.HasError) Then
+                    'When the Database Connection was opened locally, then the Commit is executed
+                    DAOBase.CommitTransaction(dbConnection)
+
+                    'Write the XML File containing all changes made in CUSTOMER DB
+                    Dim myDirName As String = "C:\Temp\"  'Application.StartupPath
+                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & " UPDATE VERSION.xml"
+
+                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
+                Else
+                    'When the Database Connection was opened locally, then the Rollback is executed
+                    DAOBase.RollbackTransaction(dbConnection)
+                End If
+
+                    'myGlobal = myOrdersDelegate.ImportFromLIMS(Nothing, "C:\Users\Susana Angueira\Documents\Ax00 v1.1\AX00\PresentationUSR\bin\x86\Debug\Import\Import.txt", New WorkSessionResultDS, _
+                    '                                           "834000114", "C:\Users\Susana Angueira\Documents\", "2013041601", "EMPTY", True)
 
 
-                'Dim myXMLMsgDAO As New twksXmlMessagesDAO
-                'myGlobal = myXMLMsgDAO.ReadByStatus(dbConnection, "AAA")
+                    'Dim myXMLMsgDelegate As New xmlMessagesDelegate
+                    'myGlobal = myXMLMsgDelegate.CancelAWOSID(Nothing, "AWOSID78")
 
-                'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                '    Dim myXMLMessages As List(Of XMLMessagesTO) = DirectCast(myGlobal.SetDatos, List(Of XMLMessagesTO))
 
-                '    If (myXMLMessages.Count > 0) Then
-                '        Dim myUtils As New Utilities
-                '        myGlobal = myUtils.GetNewGUID()
-                '        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                '            Dim myGUID As String = DirectCast(myGlobal.SetDatos, String)
+                    'Dim myXMLMsgDAO As New twksXmlMessagesDAO
+                    'myGlobal = myXMLMsgDAO.ReadByStatus(dbConnection, "AAA")
 
-                '            myGlobal = myXMLMsgDAO.Create(dbConnection, myGUID, myXMLMessages(0).XMLMessage, "PENDING")
-                '        End If
-                '    End If
-                'End If
+                    'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    '    Dim myXMLMessages As List(Of XMLMessagesTO) = DirectCast(myGlobal.SetDatos, List(Of XMLMessagesTO))
+
+                    '    If (myXMLMessages.Count > 0) Then
+                    '        Dim myUtils As New Utilities
+                    '        myGlobal = myUtils.GetNewGUID()
+                    '        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    '            Dim myGUID As String = DirectCast(myGlobal.SetDatos, String)
+
+                    '            myGlobal = myXMLMsgDAO.Create(dbConnection, myGUID, myXMLMessages(0).XMLMessage, "PENDING")
+                    '        End If
+                    '    End If
+                    'End If
+                End If
             End If
-        End If
 
 
 
 
-        'Dim myOTDelegate As New OperateCalculatedTestDelegate
+            'Dim myOTDelegate As New OperateCalculatedTestDelegate
 
-        'myGlobal = myOTDelegate.ExecuteCalculatedTest(Nothing, 276, False)
+            'myGlobal = myOTDelegate.ExecuteCalculatedTest(Nothing, 276, False)
 
-        'Using MyForm As IWSIncompleteSamplesAuxScreen()
-        'MyForm.wo
-        'MyForm.analyzerid()
-        'MyForm.SampleClass = "PATIENT"
-        'MyForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
-        'MyForm.SampleTypeName = bsSampleTypeComboBox.Text
-        'MyForm.ListOfSelectedTests = mySelectedTestsDS
-        'MyForm.MaxValues = myMaxOrderTestsDS
+            'Using MyForm As IWSIncompleteSamplesAuxScreen()
+            'MyForm.wo
+            'MyForm.analyzerid()
+            'MyForm.SampleClass = "PATIENT"
+            'MyForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
+            'MyForm.SampleTypeName = bsSampleTypeComboBox.Text
+            'MyForm.ListOfSelectedTests = mySelectedTestsDS
+            'MyForm.MaxValues = myMaxOrderTestsDS
 
 
-        'End Using
-        'Dim f As New IWSIncompleteSamplesAuxScreen ' WSTestForm
-        'f.ShowDialog()
+            'End Using
+            'Dim f As New IWSIncompleteSamplesAuxScreen ' WSTestForm
+            'f.ShowDialog()
 
-        ' From IAx00MainMDI
-        'Using MyForm As New IWSIncompleteSamplesAuxScreen()
-        '    MyForm.AnalyzerID = "SN0000099999_Ax400"
-        '    MyForm.WorkSessionID = "2011091201"
-        '    MyForm.WorkSessionStatus = "EMPTY"
-        '    MyForm.SourceScreen = GlobalEnumerates.SourceScreen.START_BUTTON
-        '    MyForm.ShowDialog()
+            ' From IAx00MainMDI
+            'Using MyForm As New IWSIncompleteSamplesAuxScreen()
+            '    MyForm.AnalyzerID = "SN0000099999_Ax400"
+            '    MyForm.WorkSessionID = "2011091201"
+            '    MyForm.WorkSessionStatus = "EMPTY"
+            '    MyForm.SourceScreen = GlobalEnumerates.SourceScreen.START_BUTTON
+            '    MyForm.ShowDialog()
 
-        '    'OpenRotorPositionsForm(Nothing)
-        '    IAx00MainMDI.OpenRotorPositionsForm(Nothing)
-        'End Using
-        ''
+            '    'OpenRotorPositionsForm(Nothing)
+            '    IAx00MainMDI.OpenRotorPositionsForm(Nothing)
+            'End Using
+            ''
 
-        ' From IWSRotorPositions
-        'Using MyForm As New IWSIncompleteSamplesAuxScreen()
-        '    MyForm.AnalyzerID = "SN0000099999_Ax400"
-        '    MyForm.WorkSessionID = "2011090501"
-        '    MyForm.WorkSessionStatus = ""
-        '    MyForm.SourceScreen = "ROTORPOS"
-        '    MyForm.ShowDialog()
-        'End Using
-        ' InitializeScreen (false, false)
+            ' From IWSRotorPositions
+            'Using MyForm As New IWSIncompleteSamplesAuxScreen()
+            '    MyForm.AnalyzerID = "SN0000099999_Ax400"
+            '    MyForm.WorkSessionID = "2011090501"
+            '    MyForm.WorkSessionStatus = ""
+            '    MyForm.SourceScreen = "ROTORPOS"
+            '    MyForm.ShowDialog()
+            'End Using
+            ' InitializeScreen (false, false)
 
     End Sub
 

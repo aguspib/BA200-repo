@@ -166,26 +166,29 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' ???
+        ''' Get information of the specified Test and the list of Sample Types linked to it. Used in the Update Version process
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pSampleType"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code (optional parameter)</param>
+        ''' <returns>GlobalDataTO containing a TestSamplesDS with Test data for all Sample Types defined for the informed Test or, if parameter 
+        '''          pSampleType is informed, only for the specific Sample Type</returns>
         ''' <remarks>
         ''' Created by:  TR 09/12/2010
+        ''' Modified by: SA 08/10/2014 - BA-1944 (SubTask BA-1983) ==> Parameter pSampleType changed to optional  
         ''' </remarks>
-        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+        Public Function ReadByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                               Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytparTestsDAO As New tparTestsDAO
-                        resultData = mytparTestsDAO.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
+                        Dim myDAO As New tparTestsDAO
+                        resultData = myDAO.ReadByTestIDSampleType(dbConnection, pTestID, pSampleType)
                     End If
                 End If
             Catch ex As Exception
@@ -1263,6 +1266,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pTestReagentesDS"></param>
         ''' <param name="pDelTestReagentsVolumeList"></param>
         ''' <param name="pDeletedTestProgramingList"></param>
+        ''' <param name="pApplyDeleteCascade"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:
@@ -1273,6 +1277,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 27/08/2014 - Inform field TestLongName when preparing the HistoryTestSamplesDS that is passed to function UpdateByQCTestIDAndSampleTypeNEW
         '''                              in HistoryTestSamplesDelegate (added as part of BT #1865, in which field TestLongName is also exported to QC Module for ISE Tests; 
         '''                              this change is to export the field also for Standard Tests)  
+        '''              SA 10/10/2014 - BA-1944 (SubTask BA-1981) ==> Added new optional parameter ApplyDeleteCascade (DefaultValue = TRUE) to avoid remove 
+        '''                                                            elements that are not in the DataSets when a new SampleType is added for the Test or when data 
+        '''                                                            of an existing Sample Type is updated
         ''' </remarks>
         Public Function PrepareTestToSave(ByVal pDBConnection As SqlClient.SqlConnection, _
                                           ByVal pAnalyzerID As String, _
@@ -1292,7 +1299,8 @@ Namespace Biosystems.Ax00.BL
                                           ByVal pTestSamplesMultiRulesDS As TestSamplesMultirulesDS, _
                                           ByVal pTestsControlsDS As TestControlsDS, _
                                           ByVal pDeleteControlTOList As List(Of DeletedControlTO), _
-                                          Optional ByVal pUpdateSampleType As String = "") As GlobalDataTO
+                                          Optional ByVal pUpdateSampleType As String = "", _
+                                          Optional ByVal pApplyDeleteCascade As Boolean = True) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO()
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1365,32 +1373,34 @@ Namespace Biosystems.Ax00.BL
                                            Where a.TestID = myTestID _
                                            Select a).ToList()
 
-                            'SG 07/09/2010
-                            Dim myDBSavedTestSample As New TestSamplesDS
-                            myGlobalDataTO = myTestSamplesDelegate.GetSampleDataByTestID(pDBConnection, myTestID)
-                            If Not myGlobalDataTO.HasError Then
-                                myDBSavedTestSample = CType(myGlobalDataTO.SetDatos, Types.TestSamplesDS)
-                                For Each savedTestSampleRow As TestSamplesDS.tparTestSamplesRow In myDBSavedTestSample.tparTestSamples.Rows
-                                    Dim NotToDelete As Boolean = True
-                                    For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
-                                        NotToDelete = (savedTestSampleRow.SampleType = tempTestSampleRow.SampleType)
-                                        If NotToDelete Then
-                                            Exit For
+                            'BA-1944 (SubTask BA-1981) - If optional parameter pApplyDeleteCascade is FALSE, data of SampleTypes different of the informed one are not deleted
+                            If (pApplyDeleteCascade) Then
+                                'SG 07/09/2010
+                                Dim myDBSavedTestSample As New TestSamplesDS
+                                myGlobalDataTO = myTestSamplesDelegate.GetSampleDataByTestID(pDBConnection, myTestID)
+                                If Not myGlobalDataTO.HasError Then
+                                    myDBSavedTestSample = CType(myGlobalDataTO.SetDatos, Types.TestSamplesDS)
+                                    For Each savedTestSampleRow As TestSamplesDS.tparTestSamplesRow In myDBSavedTestSample.tparTestSamples.Rows
+                                        Dim NotToDelete As Boolean = True
+                                        For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
+                                            NotToDelete = (savedTestSampleRow.SampleType = tempTestSampleRow.SampleType)
+                                            If NotToDelete Then
+                                                Exit For
+                                            End If
+                                        Next
+                                        'Delete the testsample
+                                        If Not NotToDelete Then
+                                            myGlobalDataTO = myTestSamplesDelegate.DeleteCascadeByTestIDSampleType(pDBConnection, myTestID, savedTestSampleRow.SampleType, pAnalyzerID, pWorkSessionID)
+                                            If myGlobalDataTO.HasError Then
+                                                Exit For
+                                            End If
                                         End If
                                     Next
-                                    'Delete the testsample
-                                    If Not NotToDelete Then
-                                        myGlobalDataTO = myTestSamplesDelegate.DeleteCascadeByTestIDSampleType(pDBConnection, myTestID, savedTestSampleRow.SampleType, pAnalyzerID, pWorkSessionID)
-                                        If myGlobalDataTO.HasError Then
-                                            Exit For
-                                        End If
-                                    End If
-                                Next
 
-                            Else
-                                Exit For
+                                Else
+                                    Exit For
+                                End If
                             End If
-                            'END 07/09/2010
 
                             For Each tempTestSampleRow As TestSamplesDS.tparTestSamplesRow In qtestSample
                                 tempTestSampleDS.tparTestSamples.ImportRow(tempTestSampleRow)
@@ -1527,9 +1537,12 @@ Namespace Biosystems.Ax00.BL
                                         'Call the delegate to save TestControls
                                         myGlobalDataTO = myTestControlsDelegate.SaveTestControlsNEW(dbConnection, pTestsControlsDS, Nothing, False)
                                     Else
-                                        'If there are not linked Controls, then delete all the existing ones in the DataSet
-                                        myGlobalDataTO = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, tempTestsDS.tparTests(0).TestID, _
-                                                                                                                         "STD", pUpdateSampleType)
+                                        'BA-1944 (SubTask BA-1981) - If optional parameter pApplyDeleteCascade is FALSE, Controls are not deleted when TestControlsDS is empty
+                                        If (pApplyDeleteCascade) Then
+                                            'If there are not linked Controls, then delete all the existing ones in the DataSet
+                                            myGlobalDataTO = myTestControlsDelegate.DeleteTestControlsByTestIDAndTestTypeNEW(dbConnection, tempTestsDS.tparTests(0).TestID, _
+                                                                                                                             "STD", pUpdateSampleType)
+                                        End If
                                     End If
                                 Else
                                     Exit For

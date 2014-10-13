@@ -487,5 +487,44 @@ Partial Public Class tparReagentsDAO
         Return resultData
     End Function
 
+    ''' <summary>
+    ''' Get the maximum value of field ReagentID in table tparReagents. Used in the Update Version process to assign a suitable temporary ReagentID
+    ''' to new Reagents (because function PrepareTestToSave needs it)
+    ''' </summary>
+    ''' <param name="pDBConnection">Open DB Connection</param>
+    ''' <returns>GlobalDataTO containing an integer value with the maximum value of field ReagentID </returns>
+    ''' <remarks>
+    ''' Created by:  SA 09/10/20014 - BA-1944 
+    ''' </remarks>
+    Public Function GetMaxReagentID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Dim resultData As GlobalDataTO = Nothing
+        Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+        Try
+            resultData = GetOpenDBConnection(pDBConnection)
+            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                If (Not dbConnection Is Nothing) Then
+                    Dim cmdText As String = " SELECT MAX(ReagentID) AS MaxReagentID " & vbCrLf & _
+                                            " FROM   tparReagents  " & vbCrLf 
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                        resultData.SetDatos = dbCmd.ExecuteScalar()
+                        resultData.HasError = False
+                    End Using
+                End If
+            End If
+        Catch ex As Exception
+            resultData = New GlobalDataTO()
+            resultData.HasError = True
+            resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            resultData.ErrorMessage = ex.Message
+
+            Dim myLogAcciones As New ApplicationLogManager()
+            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.GetMaxReagentID", EventLogEntryType.Error, False)
+        Finally
+            If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        End Try
+        Return resultData
+    End Function
 End Class

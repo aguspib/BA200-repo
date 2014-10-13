@@ -184,11 +184,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #End Region
 
-
 #Region "PRIVATE METHODS"
 
 #End Region
-
 
 #Region "OLD METHODS commented- Initial development TR 2011"
 
@@ -299,6 +297,91 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #End Region
 
-    End Class
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
+        ''' <summary>
+        ''' Execute the Upadate Version Process for STANDARD TESTS
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 08/10/2014 - BA-1944
+        ''' </remarks>
+        Public Function SetFactorySTDTestsProgramming(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        '(1) Execute the Update Version Process for EXPERIMENTAL CALIBRATORS
+                        Dim myCalibratorsUpdate As New CalibratorUpdateData
+                        resultData = myCalibratorsUpdate.ProcessForCALIBRATORS(dbConnection, pUpdateVersionChangesList)
+
+                        '(2) Execute the Update Version Process for DELETED STD TESTS
+                        Dim mySTDTestsUpdate As New TestParametersUpdateData
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.DELETERemovedSTDTests(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(3) Execute the Update Version Process for DELETED STD TESTS / SAMPLE TYPES
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.DELETERemovedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(4) Execute the Update Version Process for NEW STD TESTS
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.CreateNEWSTDTests(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(5) Execute the Update Version Process for UPDATED STD TESTS
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.UPDATEModifiedSTDTests(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(6) Execute the Update Version Process for NEW STD TESTS / SAMPLE TYPES 
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.CreateNEWSamplesForSTDTests(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(7) Execute the Update Version Process for UPDATED STD TESTS / SAMPLE TYPES 
+                        If (Not resultData.HasError) Then
+                            ' resultData = mySTDTestsUpdate.UPDATEModifiedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
+                        End If
+
+                        '(7) Execute the Update Version Process for CONTAMINATIONS
+                        If (Not resultData.HasError) Then
+
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgrammingNEW", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
+    End Class
 End Namespace

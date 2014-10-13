@@ -824,6 +824,46 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
+        ''' Update field TestName for all records in thisTestSamples for the informed TestID and having ClosedTestSample = False and ClosedTestVersion = False
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestID">Test Identifier in Parameters Programming Module</param>
+        ''' <param name="pTestName">Test Name to update</param>
+        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 08/10/2014 - BA-1944 (SubTask BA-1980)
+        ''' </remarks>
+        Public Function UpdateNameByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pTestName As String) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
+                Else
+                    Dim cmdText As String = " UPDATE thisTestSamples " & vbCrLf & _
+                                            " SET    TestName = N'" & pTestName.Replace("'", "''").Trim & "', " & vbCrLf & _
+                                            " WHERE  TestID   = " & pTestID.ToString & vbCrLf & _
+                                            " AND    ClosedTestSample = 0 " & vbCrLf & _
+                                            " AND    ClosedTestVersion = 0 " & vbCrLf
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.SetDatos = dbCmd.ExecuteScalar()
+                        resultData.HasError = False
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "thisTestSamplesDAO.UpdateNameByTestID", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
         ''' Verify if the informed Reagent is used by other Tests in Historics Module besides the informed Test 
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
