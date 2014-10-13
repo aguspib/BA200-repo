@@ -786,20 +786,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     For Each myManagObj As Management.ManagementObject In InternalDev.Get
                         'validate the device with the list of ports.
                         For Each myPort As String In pPorts
-                            If myManagObj.Properties.Item("Name").Value.ToString().Contains(myPort) Then
 
-                                For Each myInvalidPortName As String In InvalidPortsName.Split(CChar(","))
-                                    'validate if the Device contains the name of one of the invalid port name.
-                                    If Not myManagObj.Properties.Item("DeviceID").Value.ToString().Contains(myInvalidPortName) Then
-                                        'TR 21/02/2012 -Validate the port is not added on the list
-                                        If validPortList.Where(Function(a) String.Compare(a, myPort, False) = 0).Count = 0 Then
-                                            'add into the valid port list.
-                                            validPortList.Add(myPort)
-                                            Exit For
+                            If (Not myManagObj.Properties.Item("Name").Value Is Nothing) Then 'IT 10/10/2014: BA-2000
+                                If myManagObj.Properties.Item("Name").Value.ToString().Contains(myPort) Then
+                                    For Each myInvalidPortName As String In InvalidPortsName.Split(CChar(","))
+                                        'validate if the Device contains the name of one of the invalid port name.
+                                        If Not myManagObj.Properties.Item("DeviceID").Value.ToString().Contains(myInvalidPortName) Then
+                                            'TR 21/02/2012 -Validate the port is not added on the list
+                                            If validPortList.Where(Function(a) String.Compare(a, myPort, False) = 0).Count = 0 Then
+                                                'add into the valid port list.
+                                                validPortList.Add(myPort)
+                                                Exit For
+                                            End If
+                                            'TR 21/02/2012 -END.
                                         End If
-                                        'TR 21/02/2012 -END.
-                                    End If
-                                Next
+                                    Next
+                                End If
                             End If
                         Next
                     Next
