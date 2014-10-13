@@ -348,10 +348,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(7) Execute the Update Version Process for UPDATED STD TESTS / SAMPLE TYPES 
                         If (Not resultData.HasError) Then
-                            ' resultData = mySTDTestsUpdate.UPDATEModifiedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
+                            resultData = mySTDTestsUpdate.UPDATEModifiedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
                         End If
 
-                        '(7) Execute the Update Version Process for CONTAMINATIONS
+                        '(8) Execute the Update Version Process for CONTAMINATIONS
                         If (Not resultData.HasError) Then
 
                         End If

@@ -9,7 +9,7 @@
     <Shape ID="DesignTable:RenamedElements" ZOrder="4" X="102" Y="94" Height="86" Width="173" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="82" />
     <Shape ID="DesignTable:AddedElements" ZOrder="3" X="304" Y="93" Height="86" Width="156" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="82" />
     <Shape ID="DesignTable:DeletedElements" ZOrder="2" X="487" Y="99" Height="86" Width="163" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="24" SplitterPosition="82" />
-    <Shape ID="DesignTable:UpdatedElements" ZOrder="1" X="804" Y="222" Height="124" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
+    <Shape ID="DesignTable:UpdatedElements" ZOrder="1" X="804" Y="222" Height="143" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
   </Shapes>
   <Connectors />
 </DiagramLayout>

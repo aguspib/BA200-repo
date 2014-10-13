@@ -1185,11 +1185,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND TRV.SampleType = '" & pSampleType.Trim & "' " & vbCrLf
                         End If
 
-                        Dim cmdText As String = " SELECT TRV.* " & vbCrLf & _
+                        Dim cmdText As String = " SELECT TRV.TestID, TRV.SampleType, TRV.ReagentNumber, TRV.ReagentVolume " & vbCrLf & _
                                                 " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagentsVolumes] TRV " & vbCrLf & _
                                                 IIf(myOptionalFilters = String.Empty, String.Empty, " WHERE " & myOptionalFilters).ToString & _
                                                 " EXCEPT " & vbCrLf & _
-                                                " SELECT TRV.* " & vbCrLf & _
+                                                " SELECT TRV.TestID, TRV.SampleType, TRV.ReagentNumber, TRV.ReagentVolume " & vbCrLf & _
                                                 " FROM   [Ax00].[dbo].[tparTestReagentsVolumes] TRV INNER JOIN [Ax00].[dbo].[tparTests] T ON TRV.TestID = T.TestID " & vbCrLf & _
                                                 " WHERE  T.PreloadedTest = 1 " & vbCrLf & _
                                                 IIf(myOptionalFilters = String.Empty, String.Empty, " AND " & myOptionalFilters).ToString

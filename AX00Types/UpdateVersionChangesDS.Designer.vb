@@ -1226,6 +1226,8 @@ Partial Public Class UpdateVersionChangesDS
 
         Private columnElementName As Global.System.Data.DataColumn
 
+        Private columnSampleType As Global.System.Data.DataColumn
+
         Private columnUpdatedField As Global.System.Data.DataColumn
 
         Private columnPreviousValue As Global.System.Data.DataColumn
@@ -1280,6 +1282,14 @@ Partial Public Class UpdateVersionChangesDS
         Public ReadOnly Property ElementNameColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnElementName
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property SampleTypeColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnSampleType
             End Get
         End Property
 
@@ -1344,9 +1354,9 @@ Partial Public Class UpdateVersionChangesDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddUpdatedElementsRow(ByVal ElementType As String, ByVal ElementName As String, ByVal UpdatedField As String, ByVal PreviousValue As String, ByVal NewValue As String) As UpdatedElementsRow
+        Public Overloads Function AddUpdatedElementsRow(ByVal ElementType As String, ByVal ElementName As String, ByVal SampleType As String, ByVal UpdatedField As String, ByVal PreviousValue As String, ByVal NewValue As String) As UpdatedElementsRow
             Dim rowUpdatedElementsRow As UpdatedElementsRow = CType(Me.NewRow, UpdatedElementsRow)
-            Dim columnValuesArray() As Object = New Object() {ElementType, ElementName, UpdatedField, PreviousValue, NewValue}
+            Dim columnValuesArray() As Object = New Object() {ElementType, ElementName, SampleType, UpdatedField, PreviousValue, NewValue}
             rowUpdatedElementsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowUpdatedElementsRow)
             Return rowUpdatedElementsRow
@@ -1371,6 +1381,7 @@ Partial Public Class UpdateVersionChangesDS
         Friend Sub InitVars()
             Me.columnElementType = MyBase.Columns("ElementType")
             Me.columnElementName = MyBase.Columns("ElementName")
+            Me.columnSampleType = MyBase.Columns("SampleType")
             Me.columnUpdatedField = MyBase.Columns("UpdatedField")
             Me.columnPreviousValue = MyBase.Columns("PreviousValue")
             Me.columnNewValue = MyBase.Columns("NewValue")
@@ -1383,6 +1394,8 @@ Partial Public Class UpdateVersionChangesDS
             MyBase.Columns.Add(Me.columnElementType)
             Me.columnElementName = New Global.System.Data.DataColumn("ElementName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnElementName)
+            Me.columnSampleType = New Global.System.Data.DataColumn("SampleType", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnSampleType)
             Me.columnUpdatedField = New Global.System.Data.DataColumn("UpdatedField", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnUpdatedField)
             Me.columnPreviousValue = New Global.System.Data.DataColumn("PreviousValue", GetType(String), Nothing, Global.System.Data.MappingType.Element)
@@ -1856,6 +1869,21 @@ Partial Public Class UpdateVersionChangesDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property SampleType() As String
+            Get
+                If Me.IsSampleTypeNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableUpdatedElements.SampleTypeColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableUpdatedElements.SampleTypeColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Property UpdatedField() As String
             Get
                 If Me.IsUpdatedFieldNull Then
@@ -1921,6 +1949,18 @@ Partial Public Class UpdateVersionChangesDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetElementNameNull()
             Me(Me.tableUpdatedElements.ElementNameColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsSampleTypeNull() As Boolean
+            Return Me.IsNull(Me.tableUpdatedElements.SampleTypeColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetSampleTypeNull()
+            Me(Me.tableUpdatedElements.SampleTypeColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
