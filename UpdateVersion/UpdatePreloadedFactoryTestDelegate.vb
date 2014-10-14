@@ -353,7 +353,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(8) Execute the Update Version Process for CONTAMINATIONS
                         If (Not resultData.HasError) Then
-
+                            Dim myContaminationsUpdate As New ContaminationsUpdateData
+                            resultData = myContaminationsUpdate.ProcessCONTAMINATIONS(dbConnection, pUpdateVersionChangesList)
                         End If
 
                         If (Not resultData.HasError) Then

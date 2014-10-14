@@ -111,17 +111,21 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Get the list of Reagents required for an specific Test
+        ''' Get the list of Reagents required for an specific Test or, if parameter pReagentNumber is informed, get the ID of the Reagent 
+        ''' linked to the Test as the specified Reagent Number
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet TestReagentsDS with the list of Reagents
-        '''          required for the informed Test</returns>
+        ''' <param name="pReagentNumber">Reagent Number. Optional parameter; when informed, only the ID of the Reagent linked to the Test as 
+        '''                              this Reagent Number is obtained</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestReagentsDS with the list of Reagents required for the informed Test</returns>
         ''' <remarks>
         ''' Created by:  SA 09/02/2010
         ''' Modified by: SA 07/10/2011 - Changed the function template
+        '''              SA 14/10/2014 - BA-1944 (SubTask BA-1986) ==> Added new optional parameter pReagentNumber
         ''' </remarks>
-        Public Function GetTestReagents(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
+        Public Function GetTestReagents(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                        Optional ByVal pReagentNumber As Integer = -1) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -131,7 +135,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myTestReagentsDAO As New tparTestReagentsDAO
-                        myGlobalDataTO = myTestReagentsDAO.GetTestReagents(dbConnection, pTestID)
+                        myGlobalDataTO = myTestReagentsDAO.GetTestReagents(dbConnection, pTestID, pReagentNumber)
 
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             If (DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS).tparTestReagents.Rows.Count = 0) Then

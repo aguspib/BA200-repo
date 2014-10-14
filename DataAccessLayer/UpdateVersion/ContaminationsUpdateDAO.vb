@@ -314,7 +314,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by: SA 13/10/2014 BA-1944 (SubTask BA-1986)
         ''' </remarks>
-        Public Function GetNEWorUPDContaminations(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetNEWorUPDContaminationsR1(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -358,7 +358,172 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNEWorUPDContaminations", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetNEWorUPDContaminationsR1", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all CUVETTES Contaminations defined for Preloaded STD TESTS that are not in the CUSTOMER DB or that 
+        ''' are in CUSTOMER DB but with different Washing Solution
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of CUVETTES Contaminations obtained</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function GetNEWorUPDContaminationsCUVETTES(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myOptionalFilters As String = String.Empty
+                        Dim cmdText As String = " SELECT C.ContaminationType, C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT C.ContaminationType, C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
+                                                " FROM   [Ax00].[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf
+
+                        Dim cuvettesContaminationsDS As New ContaminationsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(cuvettesContaminationsDS.tparContaminations)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = cuvettesContaminationsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetNEWorUPDContaminationsCUVETTES", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in  CUSTOMER DB all  Contaminations of R1 type (for preloaded Tests) that have been deleted from FACTORY DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of R1 Contaminations to delete</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function GetDELContaminationsR1(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myOptionalFilters As String = String.Empty
+                        Dim cmdText As String = " SELECT C.ContaminationType, T.TestID AS TestContaminatorID, T1.TestID AS TestContaminatedID " & vbCrLf & _
+                                                " FROM       [Ax00].[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " INNER JOIN [Ax00].[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
+                                                " INNER JOIN [Ax00].[dbo].[tparTests] T ON TR.TestID = T.TestID " &
+                                                " INNER JOIN [Ax00].[dbo].[tparTestReagents] TR1 ON C.ReagentContaminatedID = TR1.ReagentID " & vbCrLf & _
+                                                " INNER JOIN [Ax00].[dbo].[tparTests] T1 ON TR1.TestID = T1.TestID " &
+                                                " WHERE C.ContaminationType = 'R1' " & vbCrLf & _
+                                                " AND   T.PreloadedTest = 1 " & vbCrLf & _
+                                                " AND   T1.PreloadedTest = 1 " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT C.ContaminationType, T.TestID AS TestContaminatorID, T1.TestID AS TestContaminatedID " & vbCrLf & _
+                                                " FROM       " & GlobalBase.TemporalDBName & ".[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagents] TR ON C.ReagentContaminatorID = TR.ReagentID " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] T ON TR.TestID = T.TestID " &
+                                                " INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparTestReagents] TR1 ON C.ReagentContaminatedID = TR1.ReagentID " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparTests] T1 ON TR1.TestID = T1.TestID " &
+                                                " WHERE C.ContaminationType = 'R1' " & vbCrLf
+
+                        Dim r1ContaminationsDS As New ContaminationsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(r1ContaminationsDS.tparContaminations)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = r1ContaminationsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetDELContaminationsR1", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in  CUSTOMER DB all  Contaminations of CUVETTES type (for preloaded Tests) that have been deleted from FACTORY DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of CUVETTES Contaminations to delete</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function GetDELContaminationsCUVETTES(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myOptionalFilters As String = String.Empty
+                        Dim cmdText As String = " SELECT C.ContaminationType, C.TestContaminaCuvetteID " & vbCrLf & _
+                                                " FROM   [Ax00].[dbo].[tparContaminations] C INNER JOIN [Ax00].[dbo].[tparTests] T ON C.TestContaminaCuvetteID = T.TestID " & vbCrLf & _
+                                                " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf & _
+                                                " AND    T.PreloadedTest = 1 " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT C.ContaminationType, C.TestContaminaCuvetteID " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparContaminations] C " & vbCrLf & _
+                                                " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf
+
+                        Dim cuvettesContaminationsDS As New ContaminationsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(cuvettesContaminationsDS.tparContaminations)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = cuvettesContaminationsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetDELContaminationsCUVETTES", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

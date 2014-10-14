@@ -689,6 +689,193 @@ Namespace Biosystems.Ax00.BL
         End Function
 #End Region
 
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
+        ''' <summary>
+        ''' Create a new Contamination
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pContaminationsRow">Row containing all data of the new Contamination to add</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 14/10/2014 - BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationsRow As ContaminationsDS.tparContaminationsRow) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myContaminationsDAO As New tparContaminationsDAO
+                        resultData = myContaminationsDAO.Create(dbConnection, pContaminationsRow)
+                        
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.Create", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update fields WashingSolutionR1 and WashingSolutionR2 for the informed ContaminationID
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pContaminationsRow">Row containing all data of the new Contamination to add</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 14/10/2014 - BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function UpdateWashingSolutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pContaminationsRow As ContaminationsDS.tparContaminationsRow) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myContaminationsDAO As New tparContaminationsDAO
+                        resultData = myContaminationsDAO.UpdateWashingSolutions(dbConnection, pContaminationsRow)
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.UpdateWashingSolutions", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Delete the R1 Contamination between the specified Reagents
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pReagentContaminatorID">ID of the Contaminator Reagent</param>
+        ''' <param name="pReagentContaminatedID">ID of the Contaminated Reagent</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 14/10/2014 - BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function DeleteR1Contamination(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentContaminatorID As Integer, ByVal pReagentContaminatedID As Integer) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myContaminationsDAO As New tparContaminationsDAO
+                        resultData = myContaminationsDAO.DeleteR1Contamination(dbConnection, pReagentContaminatorID, pReagentContaminatedID)
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteR1Contamination", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Delete the CUVETTES Contamination for the specified Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestContaminatorID">ID of the Contaminator Test</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 14/10/2014 - BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function DeleteCUVETTESContamination(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestContaminatorID As Integer) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myContaminationsDAO As New tparContaminationsDAO
+                        resultData = myContaminationsDAO.DeleteCUVETTESContamination(dbConnection, pTestContaminatorID)
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteCUVETTESContamination", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
 #Region "TO REVIEW - DELETE - USED FOR THE PREVIOUS FORM OR NOT USED"
         ' ''' <summary>
         ' ''' USED FOR THE PREVIOUS CONTAMINATIONS FORM

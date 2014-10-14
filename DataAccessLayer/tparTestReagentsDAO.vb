@@ -109,19 +109,25 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Get the list of Reagents required for an specific Test
+        ''' Get the list of Reagents required for an specific Test or, if parameter pReagentNumber is informed, get the ID of the Reagent 
+        ''' linked to the Test as the specified Reagent Number
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet TestReagentsDS with the list of Reagents
-        '''          required for the informed Test</returns>
+        ''' <param name="pReagentNumber">Reagent Number. Optional parameter; when informed, only the ID of the Reagent linked to the Test as 
+        '''                              this Reagent Number is obtained</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet TestReagentsDS with the list of Reagents required for the informed Test</returns>
         ''' <remarks>
         ''' Created by:  SA 09/02/2010
         ''' Modified by: SA 07/10/2011 - Changed the function template amd the sintax of the SQL query
         '''              SA 18/10/2012 - Get also field PreloadedReagent from table tparReagents
         '''              SA 10/10/2014 - BA-1944 (SubTask BA-1984) ==> Get also field CodeTest from table tparReagents
+        '''              SA 14/10/2014 - BA-1944 (SubTask BA-1986) ==> Added new optional parameter pReagentNumber and changed the SQL Query
+        '''                                                            to filter it by ReagentNumber when the parameter is informed. Get also
+        '''                                                            field ShortName from tparTests
         ''' </remarks>
-        Public Function GetTestReagents(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer) As GlobalDataTO
+        Public Function GetTestReagents(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                        Optional ByVal pReagentNumber As Integer = -1) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -130,12 +136,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ReagentsNumber, T.BlankReplicates, " & vbCrLf & _
+                        Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ShortName, T.ReagentsNumber, T.BlankReplicates, " & vbCrLf & _
                                                        " TR.ReagentID, TR.ReagentNumber, R.ReagentName, R.PreloadedReagent, R.CodeTest " & vbCrLf & _
                                                 " FROM   tparTestReagents TR INNER JOIN tparReagents R ON TR.ReagentID = R.ReagentID " & vbCrLf & _
                                                                            " INNER JOIN tparTests T ON TR.TestID = T.TestID " & vbCrLf & _
-                                                " WHERE  TR.TestID    = " & pTestID & vbCrLf & _
-                                                " ORDER BY TR.ReagentNumber "
+                                                " WHERE  TR.TestID    = " & pTestID.ToString & vbCrLf
+
+                        If (pReagentNumber <> -1) Then cmdText &= " AND TR.ReagentNumber = " & pReagentNumber.ToString & vbCrLf
+                        cmdText &= " ORDER BY TR.ReagentNumber " & vbCrLf
 
                         Dim resultData As New TestReagentsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
