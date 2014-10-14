@@ -2861,6 +2861,8 @@
 		<row><td>presentationcom.dll1</td><td>PresentationCOM.dll1</td><td>PRESEN~1.DLL|PresentationCOM.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\PresentationCOM.dll</td><td>1</td><td/></row>
 		<row><td>print.png</td><td>ServiceSw_Images</td><td>Print.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Print.png</td><td>1</td><td/></row>
 		<row><td>print.png1</td><td>UserSw_Images</td><td>Print.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Print.png</td><td>1</td><td/></row>
+		<row><td>printcontrols.png</td><td>ServiceSw_Images</td><td>PRINTC~1.PNG|PrintControls.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PrintControls.png</td><td>1</td><td/></row>
+		<row><td>printcontrols.png1</td><td>UserSw_Images</td><td>PRINTC~1.PNG|PrintControls.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PrintControls.png</td><td>1</td><td/></row>
 		<row><td>printhead.png</td><td>ServiceSw_Images</td><td>PRINTH~1.PNG|PrintHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PrintHead.png</td><td>1</td><td/></row>
 		<row><td>printhead.png1</td><td>UserSw_Images</td><td>PRINTH~1.PNG|PrintHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\PrintHead.png</td><td>1</td><td/></row>
 		<row><td>printl.png</td><td>ServiceSw_Images</td><td>PrintL.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\PrintL.png</td><td>1</td><td/></row>
