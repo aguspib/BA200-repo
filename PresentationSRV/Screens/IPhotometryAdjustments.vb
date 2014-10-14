@@ -2988,7 +2988,10 @@ Public Class IPhotometryAdjustments
     ''' <summary>
     ''' Load Adjustments High Level Instruction to move Washing Station
     ''' </summary>
-    ''' <remarks>Created by XBC 20/02/2012</remarks>
+    ''' <remarks>
+    ''' Created by XBC 20/02/2012
+    ''' Modified by XB 13/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub SendWASH_STATION_CTRL()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -3011,7 +3014,8 @@ Public Class IPhotometryAdjustments
                     Else
                         ' Manage instruction for Washing Station UP/DOWN
                         If myScreenDelegate.IsWashingStationUp Then
-                            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                            'myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                            myScreenDelegate.SendNEW_ROTOR()
                         Else
                             myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
                         End If
@@ -3157,7 +3161,7 @@ Public Class IPhotometryAdjustments
     End Function
 
     ''' <summary>
-    ''' Gets the value corresponding to informed Axis from the selected adjustments dataset
+    ''' Gets the value corresponding to informed Adjustment identificator from the selected adjustments dataset
     ''' </summary>
     ''' <param name="pAdjustmentID"></param>
     ''' <returns></returns>
@@ -3200,10 +3204,58 @@ Public Class IPhotometryAdjustments
     End Function
 
     ''' <summary>
+    ''' Gets the value corresponding to informed Axis from the selected adjustments dataset (overwritten)
+    ''' </summary>
+    ''' <param name="pAxis"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953
+    ''' </remarks>
+    Private Function ReadSpecificAdjustmentData(ByVal pAxis As GlobalEnumerates.AXIS) As AdjustmentRowData
+        'Dim myGlobal As New GlobalDataTO
+        Dim myAdjustmentRowData As New AdjustmentRowData("")
+        Try
+            Dim myAxis As String = pAxis.ToString
+            If myAxis = "NONE" Then myAxis = ""
+
+            Dim myAdjustmentRows As New List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
+            myAdjustmentRows = (From a As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow _
+                                In Me.SelectedAdjustmentsDS.srv_tfmwAdjustments _
+                                Where a.AxisID.Trim = myAxis.Trim _
+                                Select a).ToList
+            'Where a.AxisID.Trim.ToUpper = myAxis.Trim.ToUpper _
+
+            If myAdjustmentRows.Count > 0 Then
+                With myAdjustmentRowData
+                    .AnalyzerID = myAdjustmentRows(0).AnalyzerID
+                    .CodeFw = myAdjustmentRows(0).CodeFw
+                    .Value = myAdjustmentRows(0).Value
+                    .AxisID = myAdjustmentRows(0).AxisID
+                    .GroupID = myAdjustmentRows(0).GroupID
+                    .CanSave = myAdjustmentRows(0).CanSave
+                    .CanMove = myAdjustmentRows(0).CanMove
+                    .InFile = myAdjustmentRows(0).InFile
+                End With
+            End If
+
+        Catch ex As Exception
+            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSpecificAdjustmentData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".ReadSpecificAdjustmentData ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
+        If myAdjustmentRowData.Value = "" Then myAdjustmentRowData.Value = "0"
+
+        Return myAdjustmentRowData
+    End Function
+
+    ''' <summary>
     ''' Gets the Dataset that corresponds to the editing adjustments
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>XBC 16/05/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 16/05/2011
+    ''' Modified by XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953
+    ''' </remarks>
     Private Function LoadAdjustmentGroupData() As GlobalDataTO
         Dim resultData As New GlobalDataTO
         Dim CopyOfSelectedAdjustmentsDS As SRVAdjustmentsDS = MyClass.SelectedAdjustmentsDS
@@ -3213,6 +3265,7 @@ Public Class IPhotometryAdjustments
                 MyClass.SelectedAdjustmentsDS.Clear()
             End If
             myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.LEDS_CURRENT_REF.ToString)
+            myAdjustmentsGroups.Add(ADJUSTMENT_GROUPS.PHOTOMETRY.ToString)     ' XB 13/10/2014 - BA-1953
             resultData = MyBase.myAdjustmentsDelegate.ReadAdjustmentsByGroupIDs(myAdjustmentsGroups)
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 MyClass.SelectedAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
@@ -3435,7 +3488,16 @@ Public Class IPhotometryAdjustments
         End Try
     End Sub
 
-    ' XBC 27-04-2011 - Place test buttons outside testing area into buttons below area
+    ' 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by XBC 27-04-2011 - Place test buttons outside testing area into buttons below area
+    '''              XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953 
+    ''' </remarks>
     Private Sub BsTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsTestButton.Click
         Dim myGlobal As New GlobalDataTO
         Dim myAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing
@@ -3452,6 +3514,9 @@ Public Class IPhotometryAdjustments
                         myScreenDelegate.HomesDone = False
                         myScreenDelegate.TestBaseLineDone = False
                         myScreenDelegate.WellToUse = CInt(Me.BsStep1WellUpDown.Value)
+                        ' XB 13/10/2014 - BA-1953
+                        myScreenDelegate.pValueAdjust = ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ROTOR).Value
+
                         If Me.BsStep1ManualFillRadioButton.Checked Then
                             myScreenDelegate.FillMode = FILL_MODE.MANUAL
                         ElseIf Me.BsStep1AutoFillRadioButton.Checked Then
