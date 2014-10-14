@@ -21,11 +21,14 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by:  TR
         ''' Modified by: SA 04/11/2010 - Added N preffix for multilanguage of field TS_User
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
+                Dim NullAssigment As Boolean = False
+
                 If (pDBConnection Is Nothing) Then
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
@@ -66,6 +69,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         If twksWSRotorContentByPositionDR("RealVolume") Is DBNull.Value Then
                             values &= " NULL, "
+                            NullAssigment = True
                         Else
                             values &= ReplaceNumericString(CSng(twksWSRotorContentByPositionDR("RealVolume"))) & ", "
                         End If
@@ -111,6 +115,18 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         Dim cmdText As String = ""
                         cmdText = "INSERT INTO twksWSRotorContentByPosition  " & keys & " VALUES (" & values & ")"
+
+                        If NullAssigment Then
+                            ' Rules that RealVolume NULL value is not allowed
+                            If twksWSRotorContentByPositionDR("RotorType").ToString() = "REAGENTS" Then
+                                If Not twksWSRotorContentByPositionDR("Status") Is DBNull.Value Then
+                                    If Not twksWSRotorContentByPositionDR("Status").ToString() = "FREE" Then
+                                        Dim myLogAccionesAux As New ApplicationLogManager()
+                                        myLogAccionesAux.CreateLogActivity("A not allowed NULL value it is performed on Real Volume field !", "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
+                                    End If
+                                End If
+                            End If
+                        End If
 
                         cmd.CommandText = cmdText
                         myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()
@@ -522,6 +538,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " AND    RingNumber = " & twksWSRotorContentByPositionDR.RingNumber & _
                                   " AND    CellNumber = " & twksWSRotorContentByPositionDR.CellNumber & _
                                   " AND    WorkSessionID = '" & twksWSRotorContentByPositionDR.WorkSessionID.ToString().Replace("'", "''") & "' "
+
 
                         cmd.CommandText = cmdText
                         myGlobalDataTO.AffectedRecords = cmd.ExecuteNonQuery()

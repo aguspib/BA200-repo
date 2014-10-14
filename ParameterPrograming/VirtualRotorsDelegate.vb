@@ -282,6 +282,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 10/03/2010 - Changed the way of opening the DB Transaction to fulfill the new template
         '''              SA 19/04/2011 - When field VirtualRotorID in the DS is informed but its value is -1 it means the Virtual
         '''                              Rotor has to be created (same as when the field has a Null value)
+        '''              AG 07/10/2014 - BA-1979 add traces into log when virtual rotor is saved with invalid values in order to find the origin
         ''' </remarks>
         Public Function Save(ByVal pDbConnection As SqlClient.SqlConnection, ByVal pRotorType As String, ByVal pVirtualRotorPositionsDS As VirtualRotorPosititionsDS, _
                              ByVal pVirtualRotorName As String, Optional ByVal pInternalRotor As Boolean = False) As GlobalDataTO
@@ -298,22 +299,32 @@ Namespace Biosystems.Ax00.BL
 
                             If (pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).IsVirtualRotorIDNull) OrElse _
                                (pVirtualRotorPositionsDS.tparVirtualRotorPosititions(0).VirtualRotorID = -1) Then
-                                'Saving a new Virtual Rotor
-                                Dim rotorToAdd As New tparVirtualRotorsDAO
-                                resultData = rotorToAdd.Create(dbConnection, pRotorType, pVirtualRotorName, pInternalRotor)
+                                'AG 07/10/2014 BA-1979
+                                Dim myVirtualPositionDlg As New VirtualRotorsPositionsDelegate
+                                resultData = myVirtualPositionDlg.CheckForInvalidPosition(dbConnection, pRotorType, pVirtualRotorPositionsDS, pInternalRotor)
 
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    'Successfully addition; get the automatically generated ID
-                                    Dim vRotorID As Integer = DirectCast(resultData.SetDatos, Integer)
+                                If Not resultData.HasError Then
+                                    'AG 07/10/2014 BA-1979
 
-                                    'Inform the generated ID for each one of the Rotor Positions before adding them
-                                    For i As Integer = 0 To pVirtualRotorPositionsDS.tparVirtualRotorPosititions.Rows.Count - 1
-                                        pVirtualRotorPositionsDS.tparVirtualRotorPosititions(i).VirtualRotorID = vRotorID
-                                    Next
+                                    'Saving a new Virtual Rotor
+                                    Dim rotorToAdd As New tparVirtualRotorsDAO
+                                    resultData = rotorToAdd.Create(dbConnection, pRotorType, pVirtualRotorName, pInternalRotor)
 
-                                    'Create also the Rotor Positions
-                                    resultData = virtualRotorPosToAdd.Create(dbConnection, pVirtualRotorPositionsDS)
-                                End If
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        'Successfully addition; get the automatically generated ID
+                                        Dim vRotorID As Integer = DirectCast(resultData.SetDatos, Integer)
+
+                                        'Inform the generated ID for each one of the Rotor Positions before adding them
+                                        For i As Integer = 0 To pVirtualRotorPositionsDS.tparVirtualRotorPosititions.Rows.Count - 1
+                                            pVirtualRotorPositionsDS.tparVirtualRotorPosititions(i).VirtualRotorID = vRotorID
+                                        Next
+
+                                        'Create also the Rotor Positions
+                                        resultData = virtualRotorPosToAdd.Create(dbConnection, pVirtualRotorPositionsDS)
+                                    End If
+                                End If 'AG 07/10/2014 BA-1979
+
+
                             Else
                                 'Updating an exiting Virtual Rotor
                                 'First delete all currently filled positions...
