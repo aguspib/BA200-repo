@@ -741,6 +741,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 08/02/2012 - When the Status of the tube/bottle placed in a Position is Depleted, then the Status of the correspondent
         '''                              Element is set to NOPOS (for Samples). For Reagents is set to POS due to the real Status has to be calculated later 
         '''                              based in the total volume needed and in the quantity of positioned volume 
+        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
         ''' </remarks>
         Public Function FindElementIDRelatedWithRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                               ByVal pRotorType As String, ByVal pRotorLoadedDS As VirtualRotorPosititionsDS, _
@@ -899,6 +900,11 @@ Namespace Biosystems.Ax00.BL
                             If (Not rowDS.IsMultiTubeNumberNull) Then newReturnRow.MultiTubeNumber = rowDS.MultiTubeNumber Else newReturnRow.SetMultiTubeNumberNull()
                             If (Not rowDS.IsTubeTypeNull) Then newReturnRow.TubeType = rowDS.TubeType Else newReturnRow.SetTubeTypeNull()
                             If (Not rowDS.IsRealVolumeNull) Then newReturnRow.RealVolume = rowDS.RealVolume Else newReturnRow.SetRealVolumeNull()
+
+                            If rowDS.IsRealVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                Dim myLogAccionesAux As New ApplicationLogManager()
+                                myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!!", "WSRequiredElementsDelegate.FindElementIDRelatesWithRotorPosition", EventLogEntryType.Error, False)
+                            End If
 
                             If (Not rowDS.IsBarcodeStatusNull) Then newReturnRow.BarcodeStatus = rowDS.BarcodeStatus Else newReturnRow.SetBarcodeStatusNull()
                             If (Not rowDS.IsBarcodeInfoNull) Then newReturnRow.BarCodeInfo = rowDS.BarcodeInfo Else newReturnRow.SetBarCodeInfoNull()
