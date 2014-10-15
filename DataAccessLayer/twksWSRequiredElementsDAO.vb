@@ -595,7 +595,10 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         ElseIf (pRotorType = "REAGENTS") Then
                             'In Reagents Rotor, all not positioned Elements are included in the total
-                            cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT') " & vbCrLf 'AG 04/06/2014 - #1519 - Ignore the WASH SOL that are not positioned (they do not shown warning)
+                            'cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT') " & vbCrLf 'AG 04/06/2014 - #1519 - Ignore the WASH SOL that are not positioned (they do not shown warning)
+
+                            'AG 15/10/2014 BA-1519 error in previous change. the WASH_SOL has not to be excluded here because  when RotorType = REAGENTS during reagents autopositioning process (See bug number BA-1968)
+                            cmdText += " AND TubeContent IN ('SPEC_SOL','REAGENT', 'WASH_SOL') " & vbCrLf
 
                         Else
                             If (Not pExcludePatients) Then
