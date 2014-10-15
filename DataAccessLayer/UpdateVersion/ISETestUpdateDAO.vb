@@ -253,6 +253,60 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
 
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+        ''' <summary>
+        ''' Search in FACTORY DB all changes in relevant fields of ISE Test/SampleTypes regarding values saved in CUSTOMER DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing an ISETestSamplesDS with all ISE Test/SampleTypes with values updated in FACTORY DB
+        '''  </returns>
+        ''' <remarks>
+        ''' Created by: SA 15/10/2014 - BA-1944 (SubTask BA-2013)
+        ''' </remarks>
+        Public Function GetUpdatedFactoryISETestSamples(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT IT.ISETestID, IT.ISE_ResultID, IT.ISE_Units, ITS.SampleType, ITS.SampleType_ResultID, " & vbCrLf & _
+                                                       " ITS.ISE_Volume, ITS.ISE_DilutionFactor " & vbCrLf & _
+                                                " FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparISETests] IT " & vbCrLf & _
+                                                " INNER JOIN " & GlobalBase.TemporalDBName & ".[dbo].[tparISETestSamples] ITS ON IT.ISETestID = ITS.ISETestID " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT IT.ISETestID, IT.ISE_ResultID, IT.ISE_Units, ITS.SampleType, ITS.SampleType_ResultID, " & vbCrLf & _
+                                                       " ITS.ISE_Volume, ITS.ISE_DilutionFactor " & vbCrLf & _
+                                                " FROM [Ax00].[dbo].[tparISETests] IT INNER JOIN [Ax00].[dbo].[tparISETestSamples] ITS ON IT.ISETestID = ITS.ISETestID " & vbCrLf
+
+                        Dim factoryISETestSamplesDS As New ISETestSamplesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryISETestSamplesDS.tparISETestSamples)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryISETestSamplesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestUpdateDAO.GetUpdatedFactoryISETestSamples", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
     End Class
 
 End Namespace

@@ -291,6 +291,12 @@ Partial Public Class ISETestSamplesDS
 
         Private columnDecimals As Global.System.Data.DataColumn
 
+        Private columnISE_Units As Global.System.Data.DataColumn
+
+        Private columnISE_ResultID As Global.System.Data.DataColumn
+
+        Private columnISE_Volume As Global.System.Data.DataColumn
+
         Private columnISE_DilutionFactor As Global.System.Data.DataColumn
 
         Private columnActiveRangeType As Global.System.Data.DataColumn
@@ -391,6 +397,30 @@ Partial Public Class ISETestSamplesDS
         Public ReadOnly Property DecimalsColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnDecimals
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ISE_UnitsColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnISE_Units
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ISE_ResultIDColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnISE_ResultID
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ISE_VolumeColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnISE_Volume
             End Get
         End Property
 
@@ -580,6 +610,9 @@ Partial Public Class ISETestSamplesDS
                     ByVal SampleType As String, _
                     ByVal SampleType_ResultID As String, _
                     ByVal Decimals As Byte, _
+                    ByVal ISE_Units As String, _
+                    ByVal ISE_ResultID As String, _
+                    ByVal ISE_Volume As Single, _
                     ByVal ISE_DilutionFactor As Single, _
                     ByVal ActiveRangeType As String, _
                     ByVal TS_User As String, _
@@ -599,7 +632,7 @@ Partial Public Class ISETestSamplesDS
                     ByVal SlopeFactorA2 As Single, _
                     ByVal SlopeFactorB2 As Single) As tparISETestSamplesRow
             Dim rowtparISETestSamplesRow As tparISETestSamplesRow = CType(Me.NewRow, tparISETestSamplesRow)
-            Dim columnValuesArray() As Object = New Object() {ISETestID, SampleType, SampleType_ResultID, Decimals, ISE_DilutionFactor, ActiveRangeType, TS_User, TS_DateTime, SampleTypeDesc, ISETestName, ISETestShortName, MeasureUnit, QCActive, ControlReplicates, NumberOfControls, RejectionCriteria, CalculationMode, NumberOfSeries, TotalAllowedError, TestLongName, SlopeFactorA2, SlopeFactorB2}
+            Dim columnValuesArray() As Object = New Object() {ISETestID, SampleType, SampleType_ResultID, Decimals, ISE_Units, ISE_ResultID, ISE_Volume, ISE_DilutionFactor, ActiveRangeType, TS_User, TS_DateTime, SampleTypeDesc, ISETestName, ISETestShortName, MeasureUnit, QCActive, ControlReplicates, NumberOfControls, RejectionCriteria, CalculationMode, NumberOfSeries, TotalAllowedError, TestLongName, SlopeFactorA2, SlopeFactorB2}
             rowtparISETestSamplesRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparISETestSamplesRow)
             Return rowtparISETestSamplesRow
@@ -626,6 +659,9 @@ Partial Public Class ISETestSamplesDS
             Me.columnSampleType = MyBase.Columns("SampleType")
             Me.columnSampleType_ResultID = MyBase.Columns("SampleType_ResultID")
             Me.columnDecimals = MyBase.Columns("Decimals")
+            Me.columnISE_Units = MyBase.Columns("ISE_Units")
+            Me.columnISE_ResultID = MyBase.Columns("ISE_ResultID")
+            Me.columnISE_Volume = MyBase.Columns("ISE_Volume")
             Me.columnISE_DilutionFactor = MyBase.Columns("ISE_DilutionFactor")
             Me.columnActiveRangeType = MyBase.Columns("ActiveRangeType")
             Me.columnTS_User = MyBase.Columns("TS_User")
@@ -657,6 +693,12 @@ Partial Public Class ISETestSamplesDS
             MyBase.Columns.Add(Me.columnSampleType_ResultID)
             Me.columnDecimals = New Global.System.Data.DataColumn("Decimals", GetType(Byte), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnDecimals)
+            Me.columnISE_Units = New Global.System.Data.DataColumn("ISE_Units", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnISE_Units)
+            Me.columnISE_ResultID = New Global.System.Data.DataColumn("ISE_ResultID", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnISE_ResultID)
+            Me.columnISE_Volume = New Global.System.Data.DataColumn("ISE_Volume", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnISE_Volume)
             Me.columnISE_DilutionFactor = New Global.System.Data.DataColumn("ISE_DilutionFactor", GetType(Single), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnISE_DilutionFactor)
             Me.columnActiveRangeType = New Global.System.Data.DataColumn("ActiveRangeType", GetType(String), Nothing, Global.System.Data.MappingType.Element)
@@ -894,6 +936,51 @@ Partial Public Class ISETestSamplesDS
             End Get
             Set(value As Byte)
                 Me(Me.tabletparISETestSamples.DecimalsColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property ISE_Units() As String
+            Get
+                If Me.IsISE_UnitsNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tabletparISETestSamples.ISE_UnitsColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tabletparISETestSamples.ISE_UnitsColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property ISE_ResultID() As String
+            Get
+                If Me.IsISE_ResultIDNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tabletparISETestSamples.ISE_ResultIDColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tabletparISETestSamples.ISE_ResultIDColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property ISE_Volume() As Single
+            Get
+                Try
+                    Return CType(Me(Me.tabletparISETestSamples.ISE_VolumeColumn), Single)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'ISE_Volume' in table 'tparISETestSamples' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Single)
+                Me(Me.tabletparISETestSamples.ISE_VolumeColumn) = value
             End Set
         End Property
 
@@ -1217,6 +1304,42 @@ Partial Public Class ISETestSamplesDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetDecimalsNull()
             Me(Me.tabletparISETestSamples.DecimalsColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsISE_UnitsNull() As Boolean
+            Return Me.IsNull(Me.tabletparISETestSamples.ISE_UnitsColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetISE_UnitsNull()
+            Me(Me.tabletparISETestSamples.ISE_UnitsColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsISE_ResultIDNull() As Boolean
+            Return Me.IsNull(Me.tabletparISETestSamples.ISE_ResultIDColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetISE_ResultIDNull()
+            Me(Me.tabletparISETestSamples.ISE_ResultIDColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsISE_VolumeNull() As Boolean
+            Return Me.IsNull(Me.tabletparISETestSamples.ISE_VolumeColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetISE_VolumeNull()
+            Me(Me.tabletparISETestSamples.ISE_VolumeColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _

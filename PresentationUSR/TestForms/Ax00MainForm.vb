@@ -368,6 +368,9 @@ Public Class Ax00MainForm
 
                 myGlobal = myUpdateProcessDelegate.SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList)
 
+                If (Not myGlobal.HasError) Then
+                    myGlobal = myUpdateProcessDelegate.SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList)
+                End If
 
                 If (Not myGlobal.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed

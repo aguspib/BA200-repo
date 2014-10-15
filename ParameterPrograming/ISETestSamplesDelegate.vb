@@ -327,6 +327,45 @@ Namespace Biosystems.Ax00.BL
         End Function
 #End Region
 
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+        ''' <summary>
+        ''' Get all data in table tparISETestSamples for the informed ISETestID and SampleType
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pISETestID">ISE Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code</param>
+        ''' <returns>GlobalDataTO containing an ISETestSamplesDS with all data of the informed ISETestID and SampleType</returns>
+        ''' <remarks>
+        ''' Created by:  SA 15/10/2014 - BA-1944 (SubTask BA-2013)
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New tparISETestSamplesDAO
+                        resultData = myDAO.Read(dbConnection, pISETestID, pSampleType)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ISETestSamplesDelegate.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
 #Region "TO DELETE - NOT USED"
         ''' <summary>
         ''' Add a new ISETestSample (NOT USED)
