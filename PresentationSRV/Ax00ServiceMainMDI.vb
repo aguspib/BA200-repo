@@ -770,6 +770,11 @@ Public Class Ax00ServiceMainMDI
 
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
                                 End Select
 
                             End If
@@ -792,6 +797,11 @@ Public Class Ax00ServiceMainMDI
                                         'If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
                                         '    CurrentMdiChild.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                                         'End If
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
 
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
@@ -820,6 +830,11 @@ Public Class Ax00ServiceMainMDI
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
                                     Case AnalyzerManagerAx00Actions.UTIL_START
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
+
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
                                 End Select
