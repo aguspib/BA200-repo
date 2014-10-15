@@ -504,23 +504,17 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
-                '(1) Process DELETED R1 Contaminations 
-                myGlobalDataTO = ProcessDELContaminationsR1(pDBConnection, pUpdateVersionChangesList)
+                ''(1) Process DELETED R1 Contaminations 
+                'myGlobalDataTO = ProcessDELContaminationsR1(pDBConnection, pUpdateVersionChangesList)
 
-                '(2) Process DELETED CUVETTES Contaminations
-                If (Not myGlobalDataTO.HasError) Then
-                    myGlobalDataTO = ProcessDELContaminationsCUVETTES(pDBConnection, pUpdateVersionChangesList)
-                End If
+                ''(2) Process DELETED CUVETTES Contaminations
+                'If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ProcessDELContaminationsCUVETTES(pDBConnection, pUpdateVersionChangesList)
 
                 '(3) Process NEW and UPDATED R1 Contaminations
-                If (Not myGlobalDataTO.HasError) Then
-                    myGlobalDataTO = ProcessNEWorUPDContaminationsR1(pDBConnection, pUpdateVersionChangesList)
-                End If
+                If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ProcessNEWorUPDContaminationsR1(pDBConnection, pUpdateVersionChangesList)
 
                 '(4) Process NEW and UPDATED CUVETTES Contaminations
-                If (Not myGlobalDataTO.HasError) Then
-                    myGlobalDataTO = ProcessNEWorUPDContaminationsCUVETTES(pDBConnection, pUpdateVersionChangesList)
-                End If
+                If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ProcessNEWorUPDContaminationsCUVETTES(pDBConnection, pUpdateVersionChangesList)
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

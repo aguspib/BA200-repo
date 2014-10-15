@@ -563,7 +563,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                        new elements and flag NewTest has to be set to TRUE in the DS to return</param>
         ''' <returns>GlobalDataTO containing a TestsDS with all data of the specified STD Test in FACTORY DB</returns>
         ''' <remarks>
-        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA- 1980)
+        ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA-1980)
         ''' </remarks>
         Public Function GetDataInFactoryDB(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                            Optional ByVal pMarkNew As Boolean = False) As GlobalDataTO
