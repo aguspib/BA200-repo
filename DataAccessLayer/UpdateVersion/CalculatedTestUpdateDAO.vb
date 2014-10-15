@@ -212,6 +212,201 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-    End Class
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+        ''' <summary>
+        ''' Search in FACTORY DB all preloaded Calculated Tests that do not exists in CUSTOMER DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing a CalculatedTestsDS with the list of BiosystemsIDs of Calculated Tests added in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by:  SA 15/10/2014 - BA-1944 (SubTask BA-2014)
+        ''' </remarks>
+        Public Function GetNewFactoryTests(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT BiosystemsID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparCalculatedTests] " & vbCrLf & _
+                                                " WHERE  PreloadedCalculatedTest = 1 " & vbCrLf & _
+                                                " EXCEPT " & vbCrLf & _
+                                                " SELECT BiosystemsID FROM [Ax00].[dbo].[tparCalculatedTests] " & vbCrLf
+
+                        Dim newCalcTestsDS As New CalculatedTestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(newCalcTestsDS.tparCalculatedTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = newCalcTestsDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetNewFactoryTests", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB the basic definition data of the specified preloaded Calculated Test (BiosystemsID is used as identifier of the
+        ''' Calculated Test)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pID">Unique Calculated Test Identifier for preloaded Calculated Tests</param>
+        ''' <param name="pSearchByBiosystemsID">When TRUE, the search is executed by field BiosystemsID instead of by field CalcTestID</param>
+        ''' <returns>GlobalDataTO containing a CalculatedTestsDS with data of the specified preloaded Calculated Test in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by:  SA 15/10/2014 - BA-1944 (SubTask BA-2014)
+        ''' </remarks>
+        Public Function GetDataInFactoryDB(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pID As Integer, ByVal pSearchByBiosystemsID As Boolean) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparCalculatedTests] " & vbCrLf
+
+                        If (pSearchByBiosystemsID) Then
+                            cmdText &= " WHERE BiosystemsID = " & pID.ToString & vbCrLf
+                        Else
+                            cmdText &= " WHERE CalcTestID = " & pID.ToString & vbCrLf
+                        End If
+
+                        Dim factoryCalcTestDS As New CalculatedTestsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryCalcTestDS.tparCalculatedTests)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryCalcTestDS
+                        resultData.HasError = False
+                    End If
+                    End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all values contained in the Formula of the specified preloaded Calculated Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCalcTestID">Calculated Test Identifier in FACTORY DB</param>
+        ''' <returns>GlobalDataTO containing a FormulaDS with all data of the Formula of the specified preloaded Calculated Test in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by:  SA 15/10/2014 - BA-1944 (SubTask BA-2014)
+        ''' </remarks>
+        Public Function GetFormulaInFactoryDB(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparFormulas] " & vbCrLf & _
+                                                " WHERE  CalcTestID = " & pCalcTestID.ToString & vbCrLf
+
+                        Dim factoryFormulaDS As New FormulasDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryFormulaDS.tparFormulas)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryFormulaDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetFormulaInFactoryDB", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Search in FACTORY DB all Reference Ranges defined for the specified preloaded Calculated Test
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCalcTestID">Calculated Test Identifier in FACTORY DB</param>
+        ''' <returns>GlobalDataTO containing a TestRefRangesDS with all Reference Ranges defined for the specified preloaded Calculated Test in FACTORY DB</returns>
+        ''' <remarks>
+        ''' Created by:  SA 15/10/2014 - BA-1944 (SubTask BA-2014)
+        ''' </remarks>
+        Public Function GetRefRangesInFactoryDB(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT * FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparTestRefRanges] " & vbCrLf & _
+                                                " WHERE  TestType = 'CALC' " & vbCrLf & _
+                                                " AND    TestID = " & pCalcTestID.ToString & vbCrLf
+
+                        Dim factoryRefRangesDS As New TestRefRangesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(factoryRefRangesDS.tparTestRefRanges)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = factoryRefRangesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetRefRangesInFactoryDB", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+#End Region
+
+    End Class
 End Namespace

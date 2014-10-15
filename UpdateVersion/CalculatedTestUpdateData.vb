@@ -1085,6 +1085,244 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #End Region
 #End Region
+
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
+        ''' <summary>
+        ''' Search all CALC Tests in FACTORY DB that do not exist in Customer DB and, for each one of them, execute the process of adding it to Customer DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection></param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 15/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Public Function CreateNEWCALCTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myCalcTestID As Integer = -1
+                Dim myNewFormulaDS As New FormulasDS
+                Dim myNewTestDS As New CalculatedTestsDS
+                Dim myNewRefRanges As New TestRefRangesDS
+                Dim myFormulaText As String = String.Empty
+                Dim myNewTestsList As New CalculatedTestsDS
+                Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
+                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                Dim myUpdateVersionAddedElementsRow As UpdateVersionChangesDS.AddedElementsRow
+
+                '(1) Search in Factory DB all new CALC TESTS
+                myGlobalDataTO = myCalcTestUpdateDAO.GetNewFactoryTests(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myNewTestsList = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                    '(2) Process each new CALC Test in Factory DB to add it to Customer DB
+                    For Each newTest As CalculatedTestsDS.tparCalculatedTestsRow In myNewTestsList.tparCalculatedTests
+                        '(2.1) Get all data in table tparCalculatedTests in Factory DB
+                        myGlobalDataTO = myCalcTestUpdateDAO.GetDataInFactoryDB(pDBConnection, newTest.BiosystemsID, True)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myNewTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                        End If
+
+                        '(2.2) Verify if there is an User CALC Test in Customer DB with the same Name and/or ShortName of the new Factory CALC Test, and in this case, 
+                        '      rename the User CALC Test 
+                        If (Not myGlobalDataTO.HasError) Then
+                            ' myGlobalDataTO = UpdateRenamedTest(pDBConnection, myNewTestDS.tparTests.First.TestName, myNewTestDS.tparTests.First.ShortName, pUpdateVersionChangesList)
+                        End If
+
+                        '(2.3) Get all members of the Formula of the NEW CALC Test in FACTORY DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myCalcTestUpdateDAO.GetFormulaInFactoryDB(pDBConnection, newTest.CalcTestID)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myNewFormulaDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+
+                                For Each formulaMember As FormulasDS.tparFormulasRow In myNewFormulaDS.tparFormulas
+                                    If (formulaMember.Value = "TEST") Then
+                                        'Get the Test name in CUSTOMER DB
+                                        myGlobalDataTO = GetTestNameForFormula(pDBConnection, formulaMember.TestType, Convert.ToInt32(formulaMember.Value), formulaMember.SampleType)
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            myFormulaText &= Convert.ToString(myGlobalDataTO.SetDatos)
+                                        Else
+                                            'If an error has been raised, then the process is stopped...
+                                            Exit For
+                                        End If
+
+                                        'If the Formula Member is a CALC Test, get value of CalcTestID in CUSTOMER DB
+                                    Else
+                                        myFormulaText &= formulaMember.ValueType.Trim
+                                    End If
+                                Next
+
+                                If (Not myGlobalDataTO.HasError) Then
+                                    'Update the FormulaText field for the Calculated Test (to use the name of Tests in CUSTOMER DB)
+                                    myNewTestDS.tparCalculatedTests.First.FormulaText = myFormulaText
+                                    myNewTestDS.tparCalculatedTests.AcceptChanges()
+                                End If
+                            End If
+                        End If
+
+                        '(2.4) Get Reference Ranges defined for the NEW CALC Test in FACTORY DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myCalcTestUpdateDAO.GetRefRangesInFactoryDB(pDBConnection, newTest.CalcTestID)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myNewRefRanges = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
+                            End If
+                        End If
+
+                        '(2.5) Save the NEW CALC Test in CUSTOMER DB 
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myCalcTestsDelegate.Add(pDBConnection, myNewTestDS, myNewFormulaDS, myNewRefRanges)
+                        End If
+
+                        '(2.6) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table AddedElements) 
+                        '      for the new Factory CALC Test
+                        If (Not myGlobalDataTO.HasError) Then
+                            myUpdateVersionAddedElementsRow = pUpdateVersionChangesList.AddedElements.NewAddedElementsRow
+                            myUpdateVersionAddedElementsRow.ElementType = "CALC"
+                            myUpdateVersionAddedElementsRow.ElementName = myNewTestDS.tparCalculatedTests.First.CalcTestLongName & " (" & myNewTestDS.tparCalculatedTests.First.CalcTestName & ")"
+                            If (myNewTestDS.tparCalculatedTests.First.UniqueSampleType) Then myUpdateVersionAddedElementsRow.SampleType = myNewTestDS.tparCalculatedTests.First.SampleType
+                            pUpdateVersionChangesList.AddedElements.AddAddedElementsRow(myUpdateVersionAddedElementsRow)
+                            pUpdateVersionChangesList.AddedElements.AcceptChanges()
+                        End If
+
+                        'If an error has been raised, then the process is finished
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.CreateNEWCALCTests", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestType">Test Type: STD, CALC, ISE or OFFS</param>
+        ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type code</param>
+        ''' <returns>GlobalDataTO containing an String with TestName followed by the informed SampleType code between brackets</returns>
+        ''' <remarks>
+        ''' Created by: SA 15/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Function GetTestNameForFormula(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String, ByVal pTestID As Integer, _
+                                               ByVal pSampleType As String) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                If (pTestType = "STD") Then
+                    Dim mySTDTestDS As New TestsDS
+                    Dim myTestsDelegate As New TestsDelegate
+
+                    myGlobalDataTO = myTestsDelegate.Read(pDBConnection, pTestID)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        mySTDTestDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+                        If (mySTDTestDS.tparTests.Rows.Count > 0) Then
+                            myGlobalDataTO.SetDatos = mySTDTestDS.tparTests.First.TestName & " [" & pSampleType & "]"
+                            myGlobalDataTO.HasError = False
+                        Else
+                            'This case is not possible...
+                            myGlobalDataTO.HasError = True
+                        End If
+                    End If
+
+                ElseIf (pTestType = "CALC") Then
+                    Dim myCALCTestDS As New CalculatedTestsDS
+                    Dim myCALCTestsDelegate As New CalculatedTestsDelegate
+
+                    myGlobalDataTO = myCALCTestsDelegate.GetCalcTest(pDBConnection, pTestID)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myCALCTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                        If (myCALCTestDS.tparCalculatedTests.Rows.Count > 0) Then
+                            myGlobalDataTO.SetDatos = myCALCTestDS.tparCalculatedTests.First.CalcTestLongName & " [" & pSampleType & "]"
+                            myGlobalDataTO.HasError = False
+                        Else
+                            'This case is not possible...
+                            myGlobalDataTO.HasError = True
+                        End If
+                    End If
+
+                ElseIf (pTestType = "ISE") Then
+                    Dim myISETestDS As New ISETestsDS
+                    Dim myISETestsDelegate As New ISETestsDelegate
+
+                    myGlobalDataTO = myISETestsDelegate.Read(pDBConnection, pTestID)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myISETestDS = DirectCast(myGlobalDataTO.SetDatos, ISETestsDS)
+
+                        If (myISETestDS.tparISETests.Rows.Count > 0) Then
+                            myGlobalDataTO.SetDatos = myISETestDS.tparISETests.First.Name & " [" & pSampleType & "]"
+                            myGlobalDataTO.HasError = False
+                        Else
+                            'This case is not possible...
+                            myGlobalDataTO.HasError = True
+                        End If
+                    End If
+
+                ElseIf (pTestType = "OFFS") Then
+                    Dim myOFFSTestDS As New OffSystemTestsDS
+                    Dim myOFFSTestsDelegate As New OffSystemTestsDelegate
+
+                    myGlobalDataTO = myOFFSTestsDelegate.Read(pDBConnection, pTestID)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myOFFSTestDS = DirectCast(myGlobalDataTO.SetDatos, OffSystemTestsDS)
+
+                        If (myOFFSTestDS.tparOffSystemTests.Rows.Count > 0) Then
+                            myGlobalDataTO.SetDatos = myOFFSTestDS.tparOffSystemTests.First.Name & " [" & pSampleType & "]"
+                            myGlobalDataTO.HasError = False
+                        Else
+                            'This case is not possible...
+                            myGlobalDataTO.HasError = True
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetTestNameForFormula", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        Private Function GetCalcTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFactoryCalcTestID As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
+                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+
+                'Search in FACTORY DB the BiosystemsID for the informed CalcTestID
+                myGlobalDataTO = myCalcTestUpdateDAO.GetDataInFactoryDB(pDBConnection, pFactoryCalcTestID, False)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+
+
+                    'Search in CUSTOMER DB the CalcTestID for the specified BiosystemsID
+                    ' myGlobalDataTO = myCalcTestsDelegate.GetCalcTest(pDBConnection)
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetCalcTestID", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+#End Region
     End Class
 End Namespace
 
