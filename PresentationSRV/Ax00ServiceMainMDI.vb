@@ -578,6 +578,7 @@ Public Class Ax00ServiceMainMDI
     ''' Created by XBC 10/11/2010
     ''' Modified by XBC 17/05/2011 - Unified Reception event for sensors to allowed to refresh some screens at same time
     ''' Modified by: RH - 27/05/2011
+    '''              XB - 13/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
     ''' </remarks>
     Public Function ManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
                                   ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) As Boolean
@@ -769,6 +770,11 @@ Public Class Ax00ServiceMainMDI
 
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
                                 End Select
 
                             End If
@@ -791,6 +797,11 @@ Public Class Ax00ServiceMainMDI
                                         'If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
                                         '    CurrentMdiChild.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                                         'End If
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
 
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
@@ -821,6 +832,11 @@ Public Class Ax00ServiceMainMDI
                                     Case AnalyzerManagerAx00Actions.UTIL_START
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
                                 End Select
                             End If
 
@@ -843,6 +859,11 @@ Public Class Ax00ServiceMainMDI
                                         'If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
                                         '    CurrentMdiChild.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                                         'End If
+
+                                        CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
+
+                                        ' XB 13/10/2014 - BA-2004
+                                    Case AnalyzerManagerAx00Actions.NEW_ROTOR_END
 
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
 

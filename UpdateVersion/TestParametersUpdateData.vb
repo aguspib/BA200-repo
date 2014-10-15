@@ -1874,7 +1874,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         'Search in pTestCalibValuesDS all rows for the Test/SampleType/Calibrator relation in process and change value of field TestCalibratorID for all of them
                         For Each testCalibValueRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow _
                                                    In pTestCalibValuesDS.tparTestCalibratorValues.ToList.Where(Function(a) a.TestCalibratorID = testCalibratorRow.TestCalibratorID)
-                            testCalibratorRow.TestCalibratorID = tempTestCalibratorID
+                            testCalibValueRow.TestCalibratorID = tempTestCalibratorID
                         Next
 
                         'Finally, change value of field TestCalibratorID for the current row

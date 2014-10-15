@@ -1625,7 +1625,10 @@ Public Class IThermosAdjustments
     ''' <summary>
     ''' Prepare GUI for Tested Mode
     ''' </summary>
-    ''' <remarks>Created by XBC 17/06/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 17/06/2011
+    ''' Modified by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub PrepareTestedMode()
         Dim myGlobal As New GlobalDataTO
         Dim myUtilities As New Utilities
@@ -1908,7 +1911,8 @@ Public Class IThermosAdjustments
                                                 ' instruction for Washing Station DOWN
                                                 If Not MyBase.SimulationMode Then
                                                     If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
-                                                        myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                                                        'myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                                                        myScreenDelegate.SendNEW_ROTOR(ThermosAdjustmentsDelegate.OPERATIONS.CONDITIONING_MANUAL_DOWN)
                                                     End If
                                                 End If
 
@@ -2950,7 +2954,10 @@ Public Class IThermosAdjustments
     ''' <summary>
     ''' Load Adjustments High Level Instruction to move Washing Station
     ''' </summary>
-    ''' <remarks>Created by XBC 20/04/2012</remarks>
+    ''' <remarks>
+    ''' Created by XBC 20/04/2012
+    ''' Modified by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub SendWASH_STATION_CTRL()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -2974,7 +2981,8 @@ Public Class IThermosAdjustments
                     Else
                         ' Manage instruction for Washing Station UP/DOWN
                         If myScreenDelegate.IsWashingStationUp Then
-                            myScreenDelegate.SendWASH_STATION_CTRL2(Ax00WashStationControlModes.DOWN)
+                            'myScreenDelegate.SendWASH_STATION_CTRL2(Ax00WashStationControlModes.DOWN)
+                            myScreenDelegate.SendNEW_ROTOR(ThermosAdjustmentsDelegate.OPERATIONS.WASHING_STATION_DOWN)
                         Else
                             myScreenDelegate.SendWASH_STATION_CTRL2(Ax00WashStationControlModes.UP)
                         End If

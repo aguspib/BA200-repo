@@ -2117,6 +2117,31 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Return myResultData
         End Function
 
+        ''' <summary>
+        ''' NRotor High Level Instruction
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004</remarks>
+        Public Function SendNEW_ROTOR(ByVal pCurrentOperation As OPERATIONS) As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myParams As New List(Of String)
+            Try
+
+                CurrentOperation = pCurrentOperation
+
+                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True)
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
         '''' <summary>
         '''' Needles arms to Parking
         '''' </summary>

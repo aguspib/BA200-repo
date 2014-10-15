@@ -489,6 +489,517 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myResult
         End Function
 
+
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
+        ''' <summary>
+        ''' Execute the process to search in FACTORY DB all changes in Test Contaminations and the update of the CUSTOMER DB with these changes
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 - BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Public Function ProcessCONTAMINATIONS(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                '(1) Process DELETED R1 Contaminations 
+                myGlobalDataTO = ProcessDELContaminationsR1(pDBConnection, pUpdateVersionChangesList)
+
+                '(2) Process DELETED CUVETTES Contaminations
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = ProcessDELContaminationsCUVETTES(pDBConnection, pUpdateVersionChangesList)
+                End If
+
+                '(3) Process NEW and UPDATED R1 Contaminations
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = ProcessNEWorUPDContaminationsR1(pDBConnection, pUpdateVersionChangesList)
+                End If
+
+                '(4) Process NEW and UPDATED CUVETTES Contaminations
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = ProcessNEWorUPDContaminationsCUVETTES(pDBConnection, pUpdateVersionChangesList)
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessCONTAMINATIONS", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Execute the process to search and delete from CUSTOMER DB all R1 Contaminations for preloaded STD Tests that do not exist in FACTORY DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Private Function ProcessDELContaminationsR1(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myContaminatorReagentID As Integer = 0
+                Dim myContaminatedReagentID As Integer = 0
+
+                Dim myContaminatorTestName As String = String.Empty
+                Dim myContaminatedTestName As String = String.Empty
+
+                Dim myTestReagentsDS As New TestReagentsDS
+                Dim myCustomerContaminationsR1 As New ContaminationsDS
+
+                Dim myTestReagentsDelegate As New TestReagentsDelegate
+                Dim myContaminationsDelegate As New ContaminationsDelegate
+                Dim myContaminationsUpdateDAO As New ContaminationsUpdateDAO
+
+                '(1) Search in CUSTOMER DB all R1 Contaminations defined for preloaded STD Tests that are not in FACTORY DB
+                myGlobalDataTO = myContaminationsUpdateDAO.GetDELContaminationsR1(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myCustomerContaminationsR1 = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
+                End If
+
+                '(2) Process each R1 Contamination to delete 
+                If (Not myGlobalDataTO.HasError) Then
+                    For Each customerR1Contamination As ContaminationsDS.tparContaminationsRow In myCustomerContaminationsR1.tparContaminations
+                        '(2.1) Get the identifier of the first Reagent for the Contaminator Test in CUSTOMER DB 
+                        myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, customerR1Contamination.TestContaminatorID, 1)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                            If (myTestReagentsDS.tparTestReagents.Rows.Count > 0) Then
+                                myContaminatorReagentID = myTestReagentsDS.tparTestReagents.First.ReagentID
+                                myContaminatorTestName = myTestReagentsDS.tparTestReagents.First.TestName & " (" & myTestReagentsDS.tparTestReagents.First.ShortName & ") "
+                            Else
+                                'This case is not possible....
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+
+                        '(2.2) Get the identifier of the first Reagent for the Contaminated Test in CUSTOMER DB 
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, customerR1Contamination.TestContaminatedID, 1)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                                If (myTestReagentsDS.tparTestReagents.Rows.Count > 0) Then
+                                    myContaminatedReagentID = myTestReagentsDS.tparTestReagents.First.ReagentID
+                                    myContaminatedTestName = myTestReagentsDS.tparTestReagents.First.TestName & " (" & myTestReagentsDS.tparTestReagents.First.ShortName & ") "
+                                Else
+                                    'This case is not possible....
+                                    myGlobalDataTO.HasError = True
+                                End If
+                            End If
+                        End If
+
+                        '(2.3) Delete the R1 Contamination from CUSTOMER DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            'Add a new row in the list of Contaminations affected by Update Version Process
+                            AddContaminationToChangesStructure(pUpdateVersionChangesList, "DELETE", "R1", myContaminatorTestName, myContaminatedTestName)
+
+                            'Delete the R1 Contamination
+                            myGlobalDataTO = myContaminationsDelegate.DeleteR1Contamination(pDBConnection, myContaminatorReagentID, myContaminatedReagentID)
+                        End If
+
+                        'If an error is raised, then the process finishes
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessDELContaminationsR1", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Execute the process to search and delete from CUSTOMER DB all CUVETTES Contaminations for preloaded STD Tests that do not exist in FACTORY DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Private Function ProcessDELContaminationsCUVETTES(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myContaminatorReagentID As Integer = 0
+                Dim myContaminatedReagentID As Integer = 0
+
+                Dim myContaminatorTestName As String = String.Empty
+                Dim myContaminatedTestName As String = String.Empty
+
+                Dim myTestsDS As New TestsDS
+                Dim myCustomerContaminationsCUVETTES As New ContaminationsDS
+
+                Dim myTestsDelegate As New TestsDelegate
+                Dim myContaminationsDelegate As New ContaminationsDelegate
+                Dim myContaminationsUpdateDAO As New ContaminationsUpdateDAO
+
+                '(1) Search in CUSTOMER DB all CUVETTES Contaminations defined for preloaded STD Tests that are not in FACTORY DB
+                myGlobalDataTO = myContaminationsUpdateDAO.GetDELContaminationsCUVETTES(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myCustomerContaminationsCUVETTES = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
+                End If
+
+                '(2) Process each CUVETTES Contamination to delete 
+                If (Not myGlobalDataTO.HasError) Then
+                    For Each customerCUVETTESContamination As ContaminationsDS.tparContaminationsRow In myCustomerContaminationsCUVETTES.tparContaminations
+                        '(2.1) Get the name of the Test Contaminator
+                        myGlobalDataTO = myTestsDelegate.Read(pDBConnection, customerCUVETTESContamination.TestContaminaCuvetteID)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myTestsDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+                            If (myTestsDS.tparTests.Rows.Count > 0) Then
+                                'Get the name of the Contaminator Test
+                                myContaminatorTestName = myTestsDS.tparTests.First.TestName & " (" & myTestsDS.tparTests.First.ShortName & ") "
+                            Else
+                                'This case is not possible
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+
+                        '(2.2) Delete the CUVETTES Contamination from CUSTOMER DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            'Add a new row in the list of Contaminations affected by Update Version Process
+                            AddContaminationToChangesStructure(pUpdateVersionChangesList, "DELETE", "CUVETTES", myContaminatorTestName, "--")
+
+                            'Delete the CUVETTES Contamination
+                            myGlobalDataTO = myContaminationsDelegate.DeleteCUVETTESContamination(pDBConnection, customerCUVETTESContamination.TestContaminaCuvetteID)
+                        End If
+
+                        'If an error is raised, then the process finishes
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessDELContaminationsR1", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Execute the process to search in FACTORY DB all R1 Contaminations that do not exist in CUSTOMER DB or that exist but with a different 
+        ''' Washing Solution R1 and add/modify data in CUSTOMER DB (table tparContaminations)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Private Function ProcessNEWorUPDContaminationsR1(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myContaminatorReagentID As Integer = 0
+                Dim myContaminatedReagentID As Integer = 0
+
+                Dim myWashSol1 As String = String.Empty
+                Dim myContaminatorTestName As String = String.Empty
+                Dim myContaminatedTestName As String = String.Empty
+
+                Dim myTestReagentsDS As New TestReagentsDS
+                Dim myFactoryContaminationsR1 As New ContaminationsDS
+                Dim myCustomerContaminationsR1 As New ContaminationsDS
+
+                Dim myTestReagentsDelegate As New TestReagentsDelegate
+                Dim myContaminationsDelegate As New ContaminationsDelegate
+                Dim myContaminationsUpdateDAO As New ContaminationsUpdateDAO
+
+                Dim customerR1Contamination As New List(Of ContaminationsDS.tparContaminationsRow)
+
+                '(1) Search in Factory DB all R1 Contaminations  defined for Preloaded STD TESTS that are not in the CUSTOMER DB or that 
+                '    are in CUSTOMER DB but with different Washing Solution
+                myGlobalDataTO = myContaminationsUpdateDAO.GetNEWorUPDContaminationsR1(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myFactoryContaminationsR1 = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
+                End If
+
+                '(2) Get all R1 Contaminations in CUSTOMER DB
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myContaminationsDelegate.GetContaminationsByType(pDBConnection, "R1")
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myCustomerContaminationsR1 = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
+                    End If
+                End If
+
+                '(3) Process each new/updated R1 Contamination in FACTORY DB
+                If (Not myGlobalDataTO.HasError) Then
+                    For Each factoryR1Contamination As ContaminationsDS.tparContaminationsRow In myFactoryContaminationsR1.tparContaminations
+                        '(3.1) Get the identifier of the first Reagent for the Contaminator Test in CUSTOMER DB 
+                        myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, factoryR1Contamination.TestContaminatorID, 1)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                            If (myTestReagentsDS.tparTestReagents.Rows.Count > 0) Then
+                                myContaminatorReagentID = myTestReagentsDS.tparTestReagents.First.ReagentID
+                                myContaminatorTestName = myTestReagentsDS.tparTestReagents.First.TestName & " (" & myTestReagentsDS.tparTestReagents.First.ShortName & ") "
+                            Else
+                                'This case is not possible....
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+
+                        '(3.2) Get the identifier of the first Reagent for the Contaminated Test in CUSTOMER DB 
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, factoryR1Contamination.TestContaminatedID, 1)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                                If (myTestReagentsDS.tparTestReagents.Rows.Count > 0) Then
+                                    myContaminatedReagentID = myTestReagentsDS.tparTestReagents.First.ReagentID
+                                    myContaminatedTestName = myTestReagentsDS.tparTestReagents.First.TestName & " (" & myTestReagentsDS.tparTestReagents.First.ShortName & ") "
+                                Else
+                                    'This case is not possible....
+                                    myGlobalDataTO.HasError = True
+                                End If
+                            End If
+                        End If
+
+                        '(3.3) Verify in the list of R1 Contaminations from CUSTOMER DB if the pair ReagentContaminatorID/ReagentContaminatedID already exists
+                        If (Not myGlobalDataTO.HasError) Then
+                            customerR1Contamination = (From a As ContaminationsDS.tparContaminationsRow In myCustomerContaminationsR1.tparContaminations _
+                                                      Where a.ReagentContaminatorID = myContaminatorReagentID _
+                                                    AndAlso a.ReagentContaminatedID = myContaminatedReagentID _
+                                                     Select a).ToList()
+
+                            If (customerR1Contamination.Count = 0) Then
+                                '(3.3.1) New R1 Contamination: inform the obtained ReagentIDs in the ContaminationsDS row as ReagentContaminatorID and ReagentContaminatedID 
+                                '        respectively and create the new R1 Contamination in CUSTOMER DB
+                                factoryR1Contamination.ReagentContaminatorID = myContaminatorReagentID
+                                factoryR1Contamination.ReagentContaminatedID = myContaminatedReagentID
+                                myGlobalDataTO = myContaminationsDelegate.Create(pDBConnection, factoryR1Contamination)
+
+                                'Add a new row in the list of Contaminations affected by Update Version Process
+                                myWashSol1 = "--"
+                                If (Not factoryR1Contamination.IsWashingSolutionR1Null) Then myWashSol1 = factoryR1Contamination.WashingSolutionR1
+                                AddContaminationToChangesStructure(pUpdateVersionChangesList, "NEW", "R1", myContaminatorTestName, myContaminatedTestName, "--", myWashSol1)
+                            Else
+                                '(3.3.2) Verify if the Washing Solution needed to avoid the Contamination has changed, and in this case, update it in CUSTOMER DB
+                                If (Not factoryR1Contamination.IsWashingSolutionR1Null) Then
+                                    If (customerR1Contamination.First.IsWashingSolutionR1Null OrElse _
+                                        customerR1Contamination.First.WashingSolutionR1 <> factoryR1Contamination.WashingSolutionR1) Then
+                                        'Add a new row in the list of Contaminations affected by Update Version Process
+                                        myWashSol1 = "--"
+                                        If (Not customerR1Contamination.First.IsWashingSolutionR1Null) Then myWashSol1 = customerR1Contamination.First.WashingSolutionR1
+                                        AddContaminationToChangesStructure(pUpdateVersionChangesList, "UPDATE", "R1", myContaminatorTestName, myContaminatedTestName, _
+                                                                           myWashSol1, factoryR1Contamination.WashingSolutionR1)
+
+                                        'Update the Washing Solution in CUSTOMER DB
+                                        customerR1Contamination.First.WashingSolutionR1 = factoryR1Contamination.WashingSolutionR1
+                                        myGlobalDataTO = myContaminationsDelegate.UpdateWashingSolutions(pDBConnection, customerR1Contamination.First)
+                                    End If
+                                End If
+                            End If
+                        End If
+
+                        'If an error is raised, then the process finishes
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                    customerR1Contamination = Nothing
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessNEWorUPDContaminationsR1", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Execute the process to search in FACTORY DB all CUVETTES Contaminations that do not exist in CUSTOMER DB or that exist but with a different 
+        ''' Washing Solution R1 and/or R2 and add/modify data in CUSTOMER DB (table tparContaminations)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Private Function ProcessNEWorUPDContaminationsCUVETTES(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myWashSol1 As String = String.Empty
+                Dim myWashSol2 As String = String.Empty
+                Dim myContaminatorTestName As String = String.Empty
+
+                Dim myTestsDS As New TestsDS
+                Dim myFactoryContaminationsCUVETTES As New ContaminationsDS
+                Dim myCustomerContaminationsCUVETTES As New ContaminationsDS
+
+                Dim myTestsDelegate As New TestsDelegate
+                Dim myContaminationsDelegate As New ContaminationsDelegate
+                Dim myContaminationsUpdateDAO As New ContaminationsUpdateDAO
+
+                Dim updateContamination As Boolean = False
+                Dim customerCUVETTESContamination As New List(Of ContaminationsDS.tparContaminationsRow)
+
+                '(1) Search in Factory DB all CUVETTES Contaminations  defined for Preloaded STD TESTS that are not in the CUSTOMER DB or that 
+                '    are in CUSTOMER DB but with different Washing Solutions
+                myGlobalDataTO = myContaminationsUpdateDAO.GetNEWorUPDContaminationsCUVETTES(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myFactoryContaminationsCUVETTES = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
+                End If
+
+                '(2) Get all CUVETTES Contaminations in CUSTOMER DB
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myContaminationsDelegate.GetContaminationsByType(pDBConnection, "CUVETTES")
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myCustomerContaminationsCUVETTES = DirectCast(myGlobalDataTO.SetDatos, ContaminationsDS)
+                    End If
+                End If
+
+                '(3) Process each new/updated CUVETTES Contamination in FACTORY DB
+                If (Not myGlobalDataTO.HasError) Then
+                    For Each factoryCUVETTESContamination As ContaminationsDS.tparContaminationsRow In myFactoryContaminationsCUVETTES.tparContaminations
+                        '(3.1) Get the name of the Test Contaminator
+                        myGlobalDataTO = myTestsDelegate.Read(pDBConnection, factoryCUVETTESContamination.TestContaminaCuvetteID)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myTestsDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+                            If (myTestsDS.tparTests.Rows.Count > 0) Then
+                                'Get the name of the Contaminator Test
+                                myContaminatorTestName = myTestsDS.tparTests.First.TestName & " (" & myTestsDS.tparTests.First.ShortName & ") "
+                            Else
+                                'This case is not possible
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+
+                        '(3.2) Verify in the list of CUVETTES Contaminations from CUSTOMER DB if the Test Contaminator already exists
+                        If (Not myGlobalDataTO.HasError) Then
+                            customerCUVETTESContamination = (From a As ContaminationsDS.tparContaminationsRow In myCustomerContaminationsCUVETTES.tparContaminations _
+                                                            Where a.TestContaminaCuvetteID = factoryCUVETTESContamination.TestContaminaCuvetteID _
+                                                           Select a).ToList()
+
+                            If (customerCUVETTESContamination.Count = 0) Then
+                                '(3.2.1) New CUVETTES Contamination: create it in CUSTOMER DB
+                                myGlobalDataTO = myContaminationsDelegate.Create(pDBConnection, factoryCUVETTESContamination)
+
+                                'Add a new row in the list of Contaminations affected by Update Version Process
+                                myWashSol1 = "--"
+                                myWashSol2 = "--"
+                                If (Not factoryCUVETTESContamination.IsWashingSolutionR1Null) Then myWashSol1 = factoryCUVETTESContamination.WashingSolutionR1
+                                If (Not factoryCUVETTESContamination.IsWashingSolutionR2Null) Then myWashSol2 = factoryCUVETTESContamination.WashingSolutionR2
+                                AddContaminationToChangesStructure(pUpdateVersionChangesList, "NEW", "CUVETTES", myContaminatorTestName, "--", "--", myWashSol1, "--", myWashSol2)
+                            Else
+                                '(3.2.2) Verify if the Washing Solutions needed to avoid the Contamination have changed, and in this case, update them in CUSTOMER DB
+                                updateContamination = False
+                                If (Not factoryCUVETTESContamination.IsWashingSolutionR1Null) Then
+                                    If (customerCUVETTESContamination.First.IsWashingSolutionR1Null OrElse _
+                                        customerCUVETTESContamination.First.WashingSolutionR1 <> factoryCUVETTESContamination.WashingSolutionR1) Then
+                                        myWashSol1 = "--"
+                                        If (Not customerCUVETTESContamination.First.IsWashingSolutionR1Null) Then myWashSol1 = customerCUVETTESContamination.First.WashingSolutionR1
+
+                                        customerCUVETTESContamination.First.WashingSolutionR1 = factoryCUVETTESContamination.WashingSolutionR1
+                                        updateContamination = True
+                                    End If
+                                End If
+
+                                If (Not factoryCUVETTESContamination.IsWashingSolutionR2Null) Then
+                                    If (customerCUVETTESContamination.First.IsWashingSolutionR2Null OrElse _
+                                        customerCUVETTESContamination.First.WashingSolutionR2 <> factoryCUVETTESContamination.WashingSolutionR2) Then
+                                        myWashSol2 = "--"
+                                        If (Not customerCUVETTESContamination.First.IsWashingSolutionR2Null) Then myWashSol2 = customerCUVETTESContamination.First.WashingSolutionR2
+
+                                        customerCUVETTESContamination.First.WashingSolutionR2 = factoryCUVETTESContamination.WashingSolutionR2
+                                        updateContamination = True
+                                    End If
+                                End If
+
+                                If (updateContamination) Then
+                                    'Add a new row in the list of Contaminations affected by Update Version Process
+                                    AddContaminationToChangesStructure(pUpdateVersionChangesList, "UPDATE", "CUVETTES", myContaminatorTestName, "--", _
+                                                                       myWashSol1, factoryCUVETTESContamination.WashingSolutionR1, myWashSol2, factoryCUVETTESContamination.WashingSolutionR2)
+
+                                    'Update the Washing Solutions in CUSTOMER DB
+                                    myGlobalDataTO = myContaminationsDelegate.UpdateWashingSolutions(pDBConnection, customerCUVETTESContamination.First)
+                                End If
+                            End If
+                        End If
+
+                        'If an error is raised, then the process finishes
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                    customerCUVETTESContamination = Nothing
+                End If
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessNEWorUPDContaminationsCUVETTES", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Add a new row with data of an added, updated or deleted Test Contamination in the DS containing all changes in CUSTOMER DB due to the Update Version Process.
+        ''' Data is added in sub-table TestContaminations
+        ''' </summary>
+        ''' <param name="pUpdateVersionChangesList">DataSet containing all changes made in CUSTOMER DB for the Update Version Process</param>
+        ''' <param name="pAction">Action type: NEW, UPDATE, DELETE</param>
+        ''' <param name="pContaminationType">Type of Contamination: R1 or CUVETTES</param>
+        ''' <param name="pTestContaminatorName">Name of the Contaminator STD Test</param>
+        ''' <param name="pTestContaminatedName">Name of the Contaminated STD Test. Informed only for Contaminations of R1 Type</param>
+        ''' <param name="pPreviousWS1">For Contaminations updated: previous value of the Washing Solution R1 in CUSTOMER DB; optional parameter</param>
+        ''' <param name="pNewWS1">For Contaminations updated: new value of the Washing Solution R1 (from FACTORY DB); optional parameter</param>
+        ''' <param name="pPreviousWS2">For CUVETTES Contaminations updated: previous value of the Washing Solution R2 in CUSTOMER DB; optional parameter</param>
+        ''' <param name="pNewWS2">For CUVETTES Contaminations updated: new value of the Washing Solution R2 (from FACTORY DB); optional parameter</param>
+        ''' <remarks>
+        ''' Created by:  SA 14/10/2014 - BA-1944 (SubTask BA-1986)
+        ''' </remarks>
+        Private Sub AddContaminationToChangesStructure(ByRef pUpdateVersionChangesList As UpdateVersionChangesDS, ByVal pAction As String, _
+                                                       ByVal pContaminationType As String, ByVal pTestContaminatorName As String, ByVal pTestContaminatedName As String, _
+                                                       Optional ByVal pPreviousWS1 As String = "", Optional ByVal pNewWS1 As String = "", _
+                                                       Optional ByVal pPreviousWS2 As String = "", Optional ByVal pNewWS2 As String = "")
+            Try
+                Dim myUpdateVersionContaminationsRow As UpdateVersionChangesDS.TestContaminationsRow
+                myUpdateVersionContaminationsRow = pUpdateVersionChangesList.TestContaminations.NewTestContaminationsRow
+                myUpdateVersionContaminationsRow.Action = pAction
+                myUpdateVersionContaminationsRow.ContaminationType = pContaminationType
+                myUpdateVersionContaminationsRow.TestContaminator = pTestContaminatorName
+                myUpdateVersionContaminationsRow.TestContaminated = pTestContaminatedName
+
+                If (pPreviousWS1 <> String.Empty) Then myUpdateVersionContaminationsRow.PreviousWashingSolR1 = pPreviousWS1
+                If (pNewWS1 <> String.Empty) Then myUpdateVersionContaminationsRow.NewWashingSolR1 = pNewWS1
+                If (pPreviousWS2 <> String.Empty) Then myUpdateVersionContaminationsRow.PreviousWashingSolR2 = pPreviousWS2
+                If (pNewWS2 <> String.Empty) Then myUpdateVersionContaminationsRow.NewWashingSolR2 = pNewWS2
+
+                pUpdateVersionChangesList.TestContaminations.AddTestContaminationsRow(myUpdateVersionContaminationsRow)
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "ContaminationsUpdateData.AddContaminationToChangesStructure", EventLogEntryType.Error, False)
+                Throw
+            End Try
+        End Sub
+
+#End Region
+
     End Class
 
 
@@ -705,3 +1216,5 @@ End Namespace
 'End Function
 
 #End Region
+
+

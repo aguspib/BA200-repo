@@ -33,6 +33,8 @@ Partial Public Class UpdateVersionChangesDS
 
     Private tableUpdatedElements As UpdatedElementsDataTable
 
+    Private tableTestContaminations As TestContaminationsDataTable
+
     Private _schemaSerializationMode As Global.System.Data.SchemaSerializationMode = Global.System.Data.SchemaSerializationMode.IncludeSchema
 
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -73,6 +75,9 @@ Partial Public Class UpdateVersionChangesDS
             End If
             If (Not (ds.Tables("UpdatedElements")) Is Nothing) Then
                 MyBase.Tables.Add(New UpdatedElementsDataTable(ds.Tables("UpdatedElements")))
+            End If
+            If (Not (ds.Tables("TestContaminations")) Is Nothing) Then
+                MyBase.Tables.Add(New TestContaminationsDataTable(ds.Tables("TestContaminations")))
             End If
             Me.DataSetName = ds.DataSetName
             Me.Prefix = ds.Prefix
@@ -128,6 +133,16 @@ Partial Public Class UpdateVersionChangesDS
     Public ReadOnly Property UpdatedElements() As UpdatedElementsDataTable
         Get
             Return Me.tableUpdatedElements
+        End Get
+    End Property
+
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
+     Global.System.ComponentModel.Browsable(False), _
+     Global.System.ComponentModel.DesignerSerializationVisibility(Global.System.ComponentModel.DesignerSerializationVisibility.Content)> _
+    Public ReadOnly Property TestContaminations() As TestContaminationsDataTable
+        Get
+            Return Me.tableTestContaminations
         End Get
     End Property
 
@@ -210,6 +225,9 @@ Partial Public Class UpdateVersionChangesDS
             If (Not (ds.Tables("UpdatedElements")) Is Nothing) Then
                 MyBase.Tables.Add(New UpdatedElementsDataTable(ds.Tables("UpdatedElements")))
             End If
+            If (Not (ds.Tables("TestContaminations")) Is Nothing) Then
+                MyBase.Tables.Add(New TestContaminationsDataTable(ds.Tables("TestContaminations")))
+            End If
             Me.DataSetName = ds.DataSetName
             Me.Prefix = ds.Prefix
             Me.Namespace = ds.Namespace
@@ -266,6 +284,12 @@ Partial Public Class UpdateVersionChangesDS
                 Me.tableUpdatedElements.InitVars()
             End If
         End If
+        Me.tableTestContaminations = CType(MyBase.Tables("TestContaminations"), TestContaminationsDataTable)
+        If (initTable = True) Then
+            If (Not (Me.tableTestContaminations) Is Nothing) Then
+                Me.tableTestContaminations.InitVars()
+            End If
+        End If
     End Sub
 
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -284,6 +308,8 @@ Partial Public Class UpdateVersionChangesDS
         MyBase.Tables.Add(Me.tableDeletedElements)
         Me.tableUpdatedElements = New UpdatedElementsDataTable()
         MyBase.Tables.Add(Me.tableUpdatedElements)
+        Me.tableTestContaminations = New TestContaminationsDataTable()
+        MyBase.Tables.Add(Me.tableTestContaminations)
     End Sub
 
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -307,6 +333,12 @@ Partial Public Class UpdateVersionChangesDS
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
     Private Function ShouldSerializeUpdatedElements() As Boolean
+        Return False
+    End Function
+
+    <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+     Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+    Private Function ShouldSerializeTestContaminations() As Boolean
         Return False
     End Function
 
@@ -379,6 +411,9 @@ Partial Public Class UpdateVersionChangesDS
 
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
     Public Delegate Sub UpdatedElementsRowChangeEventHandler(ByVal sender As Object, ByVal e As UpdatedElementsRowChangeEvent)
+
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+    Public Delegate Sub TestContaminationsRowChangeEventHandler(ByVal sender As Object, ByVal e As TestContaminationsRowChangeEvent)
 
     '''<summary>
     '''Represents the strongly named DataTable class.
@@ -1532,6 +1567,349 @@ Partial Public Class UpdateVersionChangesDS
     End Class
 
     '''<summary>
+    '''Represents the strongly named DataTable class.
+    '''</summary>
+    <Global.System.Serializable(), _
+     Global.System.Xml.Serialization.XmlSchemaProviderAttribute("GetTypedTableSchema")> _
+    Partial Public Class TestContaminationsDataTable
+        Inherits Global.System.Data.TypedTableBase(Of TestContaminationsRow)
+
+        Private columnAction As Global.System.Data.DataColumn
+
+        Private columnContaminationType As Global.System.Data.DataColumn
+
+        Private columnTestContaminator As Global.System.Data.DataColumn
+
+        Private columnTestContaminated As Global.System.Data.DataColumn
+
+        Private columnPreviousWashingSolR1 As Global.System.Data.DataColumn
+
+        Private columnNewWashingSolR1 As Global.System.Data.DataColumn
+
+        Private columnPreviousWashingSolR2 As Global.System.Data.DataColumn
+
+        Private columnNewWashingSolR2 As Global.System.Data.DataColumn
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub New()
+            MyBase.New()
+            Me.TableName = "TestContaminations"
+            Me.BeginInit()
+            Me.InitClass()
+            Me.EndInit()
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Friend Sub New(ByVal table As Global.System.Data.DataTable)
+            MyBase.New()
+            Me.TableName = table.TableName
+            If (table.CaseSensitive <> table.DataSet.CaseSensitive) Then
+                Me.CaseSensitive = table.CaseSensitive
+            End If
+            If (table.Locale.ToString <> table.DataSet.Locale.ToString) Then
+                Me.Locale = table.Locale
+            End If
+            If (table.Namespace <> table.DataSet.Namespace) Then
+                Me.Namespace = table.Namespace
+            End If
+            Me.Prefix = table.Prefix
+            Me.MinimumCapacity = table.MinimumCapacity
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Sub New(ByVal info As Global.System.Runtime.Serialization.SerializationInfo, ByVal context As Global.System.Runtime.Serialization.StreamingContext)
+            MyBase.New(info, context)
+            Me.InitVars()
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ActionColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnAction
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ContaminationTypeColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnContaminationType
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property TestContaminatorColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnTestContaminator
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property TestContaminatedColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnTestContaminated
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property PreviousWashingSolR1Column() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnPreviousWashingSolR1
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property NewWashingSolR1Column() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnNewWashingSolR1
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property PreviousWashingSolR2Column() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnPreviousWashingSolR2
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property NewWashingSolR2Column() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnNewWashingSolR2
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
+         Global.System.ComponentModel.Browsable(False)> _
+        Public ReadOnly Property Count() As Integer
+            Get
+                Return Me.Rows.Count
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Default Public ReadOnly Property Item(ByVal index As Integer) As TestContaminationsRow
+            Get
+                Return CType(Me.Rows(index), TestContaminationsRow)
+            End Get
+        End Property
+
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Event TestContaminationsRowChanging As TestContaminationsRowChangeEventHandler
+
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Event TestContaminationsRowChanged As TestContaminationsRowChangeEventHandler
+
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Event TestContaminationsRowDeleting As TestContaminationsRowChangeEventHandler
+
+        <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Event TestContaminationsRowDeleted As TestContaminationsRowChangeEventHandler
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Overloads Sub AddTestContaminationsRow(ByVal row As TestContaminationsRow)
+            Me.Rows.Add(row)
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Overloads Function AddTestContaminationsRow(ByVal Action As String, ByVal ContaminationType As String, ByVal TestContaminator As String, ByVal TestContaminated As String, ByVal PreviousWashingSolR1 As String, ByVal NewWashingSolR1 As String, ByVal PreviousWashingSolR2 As String, ByVal NewWashingSolR2 As String) As TestContaminationsRow
+            Dim rowTestContaminationsRow As TestContaminationsRow = CType(Me.NewRow, TestContaminationsRow)
+            Dim columnValuesArray() As Object = New Object() {Action, ContaminationType, TestContaminator, TestContaminated, PreviousWashingSolR1, NewWashingSolR1, PreviousWashingSolR2, NewWashingSolR2}
+            rowTestContaminationsRow.ItemArray = columnValuesArray
+            Me.Rows.Add(rowTestContaminationsRow)
+            Return rowTestContaminationsRow
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Overrides Function Clone() As Global.System.Data.DataTable
+            Dim cln As TestContaminationsDataTable = CType(MyBase.Clone, TestContaminationsDataTable)
+            cln.InitVars()
+            Return cln
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Function CreateInstance() As Global.System.Data.DataTable
+            Return New TestContaminationsDataTable()
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Friend Sub InitVars()
+            Me.columnAction = MyBase.Columns("Action")
+            Me.columnContaminationType = MyBase.Columns("ContaminationType")
+            Me.columnTestContaminator = MyBase.Columns("TestContaminator")
+            Me.columnTestContaminated = MyBase.Columns("TestContaminated")
+            Me.columnPreviousWashingSolR1 = MyBase.Columns("PreviousWashingSolR1")
+            Me.columnNewWashingSolR1 = MyBase.Columns("NewWashingSolR1")
+            Me.columnPreviousWashingSolR2 = MyBase.Columns("PreviousWashingSolR2")
+            Me.columnNewWashingSolR2 = MyBase.Columns("NewWashingSolR2")
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Private Sub InitClass()
+            Me.columnAction = New Global.System.Data.DataColumn("Action", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnAction)
+            Me.columnContaminationType = New Global.System.Data.DataColumn("ContaminationType", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnContaminationType)
+            Me.columnTestContaminator = New Global.System.Data.DataColumn("TestContaminator", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnTestContaminator)
+            Me.columnTestContaminated = New Global.System.Data.DataColumn("TestContaminated", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnTestContaminated)
+            Me.columnPreviousWashingSolR1 = New Global.System.Data.DataColumn("PreviousWashingSolR1", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnPreviousWashingSolR1)
+            Me.columnNewWashingSolR1 = New Global.System.Data.DataColumn("NewWashingSolR1", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnNewWashingSolR1)
+            Me.columnPreviousWashingSolR2 = New Global.System.Data.DataColumn("PreviousWashingSolR2", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnPreviousWashingSolR2)
+            Me.columnNewWashingSolR2 = New Global.System.Data.DataColumn("NewWashingSolR2", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnNewWashingSolR2)
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function NewTestContaminationsRow() As TestContaminationsRow
+            Return CType(Me.NewRow, TestContaminationsRow)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Function NewRowFromBuilder(ByVal builder As Global.System.Data.DataRowBuilder) As Global.System.Data.DataRow
+            Return New TestContaminationsRow(builder)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Function GetRowType() As Global.System.Type
+            Return GetType(TestContaminationsRow)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Sub OnRowChanged(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowChanged(e)
+            If (Not (Me.TestContaminationsRowChangedEvent) Is Nothing) Then
+                RaiseEvent TestContaminationsRowChanged(Me, New TestContaminationsRowChangeEvent(CType(e.Row, TestContaminationsRow), e.Action))
+            End If
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Sub OnRowChanging(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowChanging(e)
+            If (Not (Me.TestContaminationsRowChangingEvent) Is Nothing) Then
+                RaiseEvent TestContaminationsRowChanging(Me, New TestContaminationsRowChangeEvent(CType(e.Row, TestContaminationsRow), e.Action))
+            End If
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Sub OnRowDeleted(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowDeleted(e)
+            If (Not (Me.TestContaminationsRowDeletedEvent) Is Nothing) Then
+                RaiseEvent TestContaminationsRowDeleted(Me, New TestContaminationsRowChangeEvent(CType(e.Row, TestContaminationsRow), e.Action))
+            End If
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Protected Overrides Sub OnRowDeleting(ByVal e As Global.System.Data.DataRowChangeEventArgs)
+            MyBase.OnRowDeleting(e)
+            If (Not (Me.TestContaminationsRowDeletingEvent) Is Nothing) Then
+                RaiseEvent TestContaminationsRowDeleting(Me, New TestContaminationsRowChangeEvent(CType(e.Row, TestContaminationsRow), e.Action))
+            End If
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub RemoveTestContaminationsRow(ByVal row As TestContaminationsRow)
+            Me.Rows.Remove(row)
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Shared Function GetTypedTableSchema(ByVal xs As Global.System.Xml.Schema.XmlSchemaSet) As Global.System.Xml.Schema.XmlSchemaComplexType
+            Dim type As Global.System.Xml.Schema.XmlSchemaComplexType = New Global.System.Xml.Schema.XmlSchemaComplexType()
+            Dim sequence As Global.System.Xml.Schema.XmlSchemaSequence = New Global.System.Xml.Schema.XmlSchemaSequence()
+            Dim ds As UpdateVersionChangesDS = New UpdateVersionChangesDS()
+            Dim any1 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
+            any1.Namespace = "http://www.w3.org/2001/XMLSchema"
+            any1.MinOccurs = New Decimal(0)
+            any1.MaxOccurs = Decimal.MaxValue
+            any1.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
+            sequence.Items.Add(any1)
+            Dim any2 As Global.System.Xml.Schema.XmlSchemaAny = New Global.System.Xml.Schema.XmlSchemaAny()
+            any2.Namespace = "urn:schemas-microsoft-com:xml-diffgram-v1"
+            any2.MinOccurs = New Decimal(1)
+            any2.ProcessContents = Global.System.Xml.Schema.XmlSchemaContentProcessing.Lax
+            sequence.Items.Add(any2)
+            Dim attribute1 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
+            attribute1.Name = "namespace"
+            attribute1.FixedValue = ds.Namespace
+            type.Attributes.Add(attribute1)
+            Dim attribute2 As Global.System.Xml.Schema.XmlSchemaAttribute = New Global.System.Xml.Schema.XmlSchemaAttribute()
+            attribute2.Name = "tableTypeName"
+            attribute2.FixedValue = "TestContaminationsDataTable"
+            type.Attributes.Add(attribute2)
+            type.Particle = sequence
+            Dim dsSchema As Global.System.Xml.Schema.XmlSchema = ds.GetSchemaSerializable
+            If xs.Contains(dsSchema.TargetNamespace) Then
+                Dim s1 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
+                Dim s2 As Global.System.IO.MemoryStream = New Global.System.IO.MemoryStream()
+                Try
+                    Dim schema As Global.System.Xml.Schema.XmlSchema = Nothing
+                    dsSchema.Write(s1)
+                    Dim schemas As Global.System.Collections.IEnumerator = xs.Schemas(dsSchema.TargetNamespace).GetEnumerator
+                    Do While schemas.MoveNext
+                        schema = CType(schemas.Current, Global.System.Xml.Schema.XmlSchema)
+                        s2.SetLength(0)
+                        schema.Write(s2)
+                        If (s1.Length = s2.Length) Then
+                            s1.Position = 0
+                            s2.Position = 0
+
+                            Do While ((s1.Position <> s1.Length) _
+                                        AndAlso (s1.ReadByte = s2.ReadByte))
+
+
+                            Loop
+                            If (s1.Position = s1.Length) Then
+                                Return type
+                            End If
+                        End If
+
+                    Loop
+                Finally
+                    If (Not (s1) Is Nothing) Then
+                        s1.Close()
+                    End If
+                    If (Not (s2) Is Nothing) Then
+                        s2.Close()
+                    End If
+                End Try
+            End If
+            xs.Add(dsSchema)
+            Return type
+        End Function
+    End Class
+
+    '''<summary>
     '''Represents strongly named DataRow class.
     '''</summary>
     Partial Public Class RenamedElementsRow
@@ -2001,6 +2379,238 @@ Partial Public Class UpdateVersionChangesDS
     End Class
 
     '''<summary>
+    '''Represents strongly named DataRow class.
+    '''</summary>
+    Partial Public Class TestContaminationsRow
+        Inherits Global.System.Data.DataRow
+
+        Private tableTestContaminations As TestContaminationsDataTable
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Friend Sub New(ByVal rb As Global.System.Data.DataRowBuilder)
+            MyBase.New(rb)
+            Me.tableTestContaminations = CType(Me.Table, TestContaminationsDataTable)
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property Action() As String
+            Get
+                If Me.IsActionNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.ActionColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.ActionColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property ContaminationType() As String
+            Get
+                If Me.IsContaminationTypeNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.ContaminationTypeColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.ContaminationTypeColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property TestContaminator() As String
+            Get
+                If Me.IsTestContaminatorNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.TestContaminatorColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.TestContaminatorColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property TestContaminated() As String
+            Get
+                If Me.IsTestContaminatedNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.TestContaminatedColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.TestContaminatedColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property PreviousWashingSolR1() As String
+            Get
+                If Me.IsPreviousWashingSolR1Null Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.PreviousWashingSolR1Column), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.PreviousWashingSolR1Column) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property NewWashingSolR1() As String
+            Get
+                If Me.IsNewWashingSolR1Null Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.NewWashingSolR1Column), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.NewWashingSolR1Column) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property PreviousWashingSolR2() As String
+            Get
+                If Me.IsPreviousWashingSolR2Null Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.PreviousWashingSolR2Column), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.PreviousWashingSolR2Column) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property NewWashingSolR2() As String
+            Get
+                If Me.IsNewWashingSolR2Null Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tableTestContaminations.NewWashingSolR2Column), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tableTestContaminations.NewWashingSolR2Column) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsActionNull() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.ActionColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetActionNull()
+            Me(Me.tableTestContaminations.ActionColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsContaminationTypeNull() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.ContaminationTypeColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetContaminationTypeNull()
+            Me(Me.tableTestContaminations.ContaminationTypeColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsTestContaminatorNull() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.TestContaminatorColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetTestContaminatorNull()
+            Me(Me.tableTestContaminations.TestContaminatorColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsTestContaminatedNull() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.TestContaminatedColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetTestContaminatedNull()
+            Me(Me.tableTestContaminations.TestContaminatedColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsPreviousWashingSolR1Null() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.PreviousWashingSolR1Column)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetPreviousWashingSolR1Null()
+            Me(Me.tableTestContaminations.PreviousWashingSolR1Column) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsNewWashingSolR1Null() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.NewWashingSolR1Column)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetNewWashingSolR1Null()
+            Me(Me.tableTestContaminations.NewWashingSolR1Column) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsPreviousWashingSolR2Null() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.PreviousWashingSolR2Column)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetPreviousWashingSolR2Null()
+            Me(Me.tableTestContaminations.PreviousWashingSolR2Column) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsNewWashingSolR2Null() As Boolean
+            Return Me.IsNull(Me.tableTestContaminations.NewWashingSolR2Column)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetNewWashingSolR2Null()
+            Me(Me.tableTestContaminations.NewWashingSolR2Column) = Global.System.Convert.DBNull
+        End Sub
+    End Class
+
+    '''<summary>
     '''Row event argument class
     '''</summary>
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
@@ -2130,6 +2740,42 @@ Partial Public Class UpdateVersionChangesDS
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public ReadOnly Property Row() As UpdatedElementsRow
+            Get
+                Return Me.eventRow
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property Action() As Global.System.Data.DataRowAction
+            Get
+                Return Me.eventAction
+            End Get
+        End Property
+    End Class
+
+    '''<summary>
+    '''Row event argument class
+    '''</summary>
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+    Public Class TestContaminationsRowChangeEvent
+        Inherits Global.System.EventArgs
+
+        Private eventRow As TestContaminationsRow
+
+        Private eventAction As Global.System.Data.DataRowAction
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub New(ByVal row As TestContaminationsRow, ByVal action As Global.System.Data.DataRowAction)
+            MyBase.New()
+            Me.eventRow = row
+            Me.eventAction = action
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property Row() As TestContaminationsRow
             Get
                 Return Me.eventRow
             End Get

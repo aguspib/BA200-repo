@@ -287,6 +287,8 @@ Partial Public Class TestReagentsDS
 
         Private columnTestName As Global.System.Data.DataColumn
 
+        Private columnShortName As Global.System.Data.DataColumn
+
         Private columnReagentsNumber As Global.System.Data.DataColumn
 
         Private columnBlankReplicates As Global.System.Data.DataColumn
@@ -357,6 +359,14 @@ Partial Public Class TestReagentsDS
         Public ReadOnly Property TestNameColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnTestName
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property ShortNameColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnShortName
             End Get
         End Property
 
@@ -485,9 +495,9 @@ Partial Public Class TestReagentsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparTestReagentsRow(ByVal TestID As Integer, ByVal TestName As String, ByVal ReagentsNumber As Integer, ByVal BlankReplicates As Integer, ByVal ReagentID As Integer, ByVal IconPath As String, ByVal IsNew As Boolean, ByVal InUse As Boolean, ByVal ReagentName As String, ByVal PreloadedTest As Boolean, ByVal ReagentNumber As Integer, ByVal PreloadedReagent As Boolean, ByVal CodeTest As String) As tparTestReagentsRow
+        Public Overloads Function AddtparTestReagentsRow(ByVal TestID As Integer, ByVal TestName As String, ByVal ShortName As String, ByVal ReagentsNumber As Integer, ByVal BlankReplicates As Integer, ByVal ReagentID As Integer, ByVal IconPath As String, ByVal IsNew As Boolean, ByVal InUse As Boolean, ByVal ReagentName As String, ByVal PreloadedTest As Boolean, ByVal ReagentNumber As Integer, ByVal PreloadedReagent As Boolean, ByVal CodeTest As String) As tparTestReagentsRow
             Dim rowtparTestReagentsRow As tparTestReagentsRow = CType(Me.NewRow, tparTestReagentsRow)
-            Dim columnValuesArray() As Object = New Object() {TestID, TestName, ReagentsNumber, BlankReplicates, ReagentID, IconPath, IsNew, InUse, ReagentName, PreloadedTest, ReagentNumber, PreloadedReagent, CodeTest}
+            Dim columnValuesArray() As Object = New Object() {TestID, TestName, ShortName, ReagentsNumber, BlankReplicates, ReagentID, IconPath, IsNew, InUse, ReagentName, PreloadedTest, ReagentNumber, PreloadedReagent, CodeTest}
             rowtparTestReagentsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparTestReagentsRow)
             Return rowtparTestReagentsRow
@@ -512,6 +522,7 @@ Partial Public Class TestReagentsDS
         Friend Sub InitVars()
             Me.columnTestID = MyBase.Columns("TestID")
             Me.columnTestName = MyBase.Columns("TestName")
+            Me.columnShortName = MyBase.Columns("ShortName")
             Me.columnReagentsNumber = MyBase.Columns("ReagentsNumber")
             Me.columnBlankReplicates = MyBase.Columns("BlankReplicates")
             Me.columnReagentID = MyBase.Columns("ReagentID")
@@ -532,6 +543,8 @@ Partial Public Class TestReagentsDS
             MyBase.Columns.Add(Me.columnTestID)
             Me.columnTestName = New Global.System.Data.DataColumn("TestName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTestName)
+            Me.columnShortName = New Global.System.Data.DataColumn("ShortName", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnShortName)
             Me.columnReagentsNumber = New Global.System.Data.DataColumn("ReagentsNumber", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnReagentsNumber)
             Me.columnBlankReplicates = New Global.System.Data.DataColumn("BlankReplicates", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
@@ -733,6 +746,21 @@ Partial Public Class TestReagentsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property ShortName() As String
+            Get
+                If Me.IsShortNameNull Then
+                    Return String.Empty
+                Else
+                    Return CType(Me(Me.tabletparTestReagents.ShortNameColumn), String)
+                End If
+            End Get
+            Set(value As String)
+                Me(Me.tabletparTestReagents.ShortNameColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Property ReagentsNumber() As Integer
             Get
                 Try
@@ -918,6 +946,18 @@ Partial Public Class TestReagentsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetTestNameNull()
             Me(Me.tabletparTestReagents.TestNameColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsShortNameNull() As Boolean
+            Return Me.IsNull(Me.tabletparTestReagents.ShortNameColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetShortNameNull()
+            Me(Me.tabletparTestReagents.ShortNameColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _

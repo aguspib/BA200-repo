@@ -5969,7 +5969,10 @@ Public Class IPositionsAdjustments
     ''' <summary>
     ''' Load Adjustments High Level Instruction to move Washing Station
     ''' </summary>
-    ''' <remarks>Created by XBC 30/11/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 30/11/2011
+    ''' Modified by XB 14/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub SendWASH_STATION_CTRL()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -5993,7 +5996,8 @@ Public Class IPositionsAdjustments
                     Else
                         ' Manage instruction for Washing Station UP/DOWN
                         If myScreenDelegate.IsWashingStationUp Then
-                            myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                            'myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
+                            myScreenDelegate.SendNEW_ROTOR()
                         Else
                             myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
                         End If

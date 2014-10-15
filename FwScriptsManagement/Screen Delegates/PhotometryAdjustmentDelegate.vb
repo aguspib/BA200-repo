@@ -1898,6 +1898,32 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         End Function
 
         ''' <summary>
+        ''' NRotor High Level Instruction
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by XB 13/10/2014 - Use NROTOR instead WSCTRL when Wash Station is down - BA-2004</remarks>
+        Public Function SendNEW_ROTOR() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myParams As New List(Of String)
+            Try
+
+                CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
+
+                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True)
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+
+        ''' <summary>
         ''' Method to decode the data information of the this screen from a String format source and obtain the data information easily legible
         ''' </summary>
         ''' <param name="pTask">task identifier</param>
@@ -2459,7 +2485,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Creates the Script List for Screen Testing operation
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by XBC 28/02/2011</remarks>
+        ''' <remarks>
+        ''' Created by XBC 28/02/2011
+        ''' Modified by XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953
+        ''' </remarks>
         Private Function SendQueueForTESTING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myListFwScript As New List(Of FwScriptQueueItem)
@@ -2494,9 +2523,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 .FwScriptID = H.RequiredHomeID.ToString
                                 .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                                 .EvaluateValue = 1
-                                .NextOnResultOK = Nothing
+                                .NextOnResultOK = myFwScript1   ' XB 13/10/2014 - BA-1953
                                 .NextOnResultNG = Nothing
-                                .NextOnTimeOut = Nothing
+                                .NextOnTimeOut = myFwScript1    ' XB 13/10/2014 - BA-1953
                                 .NextOnError = Nothing
                                 .ParamList = Nothing
                             End With
@@ -2519,6 +2548,37 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 Select Case pAdjustment
                     Case ADJUSTMENT_GROUPS.PHOTOMETRY
+
+                        ' XB 13/10/2014 - BA-1953
+                        'If myListFwScript.Count > 0 Then
+                        '    CurrentOperation = OPERATIONS.HOMES
+                        '    For i As Integer = 0 To myListFwScript.Count - 1
+                        '        If i = 0 Then
+                        '            ' First Script
+                        '            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                        '        Else
+                        '            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                        '        End If
+                        '    Next
+                        'Else
+                        '    MyClass.HomesDoneAttr = True
+                        '    MyClass.NoneInstructionToSend = False
+                        'End If
+
+                        ' After home move abs to the current value of adjustment GFWR1
+                        With myFwScript1
+                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
+                            .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                            .EvaluateValue = 1
+                            .NextOnResultOK = Nothing
+                            .NextOnResultNG = Nothing
+                            .NextOnTimeOut = Nothing
+                            .NextOnError = Nothing
+                            ' expects 1 param
+                            .ParamList = New List(Of String)
+                            .ParamList.Add(Me.pValueAdjustAttr)
+                        End With
+
                         ' Send Preliminary Homes
                         If myListFwScript.Count > 0 Then
                             CurrentOperation = OPERATIONS.HOMES
@@ -2530,10 +2590,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
                                 End If
                             Next
+                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
                         Else
                             MyClass.HomesDoneAttr = True
                             MyClass.NoneInstructionToSend = False
                         End If
+                        ' XB 13/10/2014 - BA-1953
 
                         'Select Case MyClass.FillMode
                         '    'Case FILL_MODE.MANUAL
