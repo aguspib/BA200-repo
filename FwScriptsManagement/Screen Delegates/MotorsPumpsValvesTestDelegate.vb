@@ -813,6 +813,32 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Return myResultData
         End Function
 
+        ''' <summary>
+        ''' NRotor High Level Instruction
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004</remarks>
+        Public Function SendNEW_ROTOR() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myParams As New List(Of String)
+            Try
+
+                CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
+
+                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True)
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "MotorsTestDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+
 #End Region
 
 #Region "Private Methods"

@@ -2155,6 +2155,15 @@ Public Class BSAdjustmentBaseForm
 
                     End If
 
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR
+                    If pResponse = RESPONSE_TYPES.OK Then
+                        MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_NROTOR_PERFORMED
+                    ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
+                        MyClass.ErrorMode()
+
+                    End If
+
                     'SGM 21/11/2011
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN
                     If pResponse = RESPONSE_TYPES.OK Then

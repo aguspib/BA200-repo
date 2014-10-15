@@ -2123,11 +2123,16 @@ Public Class IMotorsPumpsValvesTest
     ''' <summary>
     ''' Enables the current page tab elements
     ''' </summary>
-    ''' <remarks>Created by SGM 13/05/2011</remarks>
+    ''' <remarks>
+    ''' Created by SGM 13/05/2011
+    ''' Modified by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub EnableCurrentPage()
         Try
             'SGM 21/05/2012
-            If MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN Or MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_UP Then
+            If MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN Or _
+               MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_UP Or _
+               MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR Then
                 Exit Sub
             End If
 
@@ -4030,7 +4035,10 @@ Public Class IMotorsPumpsValvesTest
     ''' <summary>
     ''' Prepare Tab Area according with current operations
     ''' </summary>
-    ''' <remarks>Created by: XBC 19/04/2011</remarks>
+    ''' <remarks>
+    ''' Created by: XBC 19/04/2011
+    ''' Modified by: XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub PrepareArea()
         Try
             Application.DoEvents()
@@ -4046,6 +4054,14 @@ Public Class IMotorsPumpsValvesTest
 
                 Case ADJUSTMENT_MODES.MBEV_ALL_ARMS_IN_WASHING
                     MyClass.PrepareAllArmsInWashingMode()
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR
+                    MyClass.PrepareWashingStationIsDowningMode()
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_NROTOR_PERFORMED
+                    MyClass.WashingStationToDownAfterNRotor()
 
                 Case ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
                     MyClass.PrepareWashingStationIsDownMode()
@@ -4793,6 +4809,39 @@ Public Class IMotorsPumpsValvesTest
 
     End Sub
 
+
+    ''' <summary>
+    ''' Prepare GUI for Washing Station is Downing Mode (NRotor)
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub PrepareWashingStationIsDowningMode()
+        Try
+            Dim myGlobal As New GlobalDataTO
+
+            If Not myGlobal.HasError Then
+
+                Me.WSAsp_UpDownButton.Enabled = False
+                Me.WSDisp_UpDownButton.Enabled = False
+
+                If MyBase.SimulationMode Then
+                    myGlobal = MyBase.DisplayMessage(Messages.SRV_WS_TO_DOWN.ToString)
+                    MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_IS_DOWN
+                    MyClass.PrepareArea()
+                End If
+            Else
+                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                MyClass.PrepareArea()
+            End If
+
+        Catch ex As Exception
+            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWashingStationIsDowningMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareWashingStationIsDowningMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+
+    End Sub
+
     ''' <summary>
     ''' Prepare GUI for Washing Station is Up Mode
     ''' </summary>
@@ -5064,7 +5113,10 @@ Public Class IMotorsPumpsValvesTest
     ''' <summary>
     ''' Brings the Washing Station Down
     ''' </summary>
-    ''' <remarks>SGM 21/11/2011</remarks>
+    ''' <remarks>
+    ''' Created by SGM 21/11/2011
+    ''' Modified by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
     Private Sub WashingStationToDown()
         Dim myGlobal As New GlobalDataTO
         Try
@@ -5084,11 +5136,29 @@ Public Class IMotorsPumpsValvesTest
 
             MyClass.DisableCurrentPage()
 
-            MyClass.StartWashingStationToDownTimer()
+            'MyClass.StartWashingStationToDownTimer()
+            MyClass.StartWashingStationToNRotorTimer()
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".WashingStationToDown ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Brings the Washing Station Down
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub WashingStationToDownAfterNRotor()
+        Dim myGlobal As New GlobalDataTO
+        Try
+            MyClass.StartWashingStationToDownTimer()
+
+        Catch ex As Exception
+            MyBase.CreateLogActivity(ex.Message, Me.Name & ".WashingStationToDownAfterNRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".WashingStationToDownAfterNRotor ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -5433,6 +5503,42 @@ Public Class IMotorsPumpsValvesTest
         Return myGlobal
     End Function
 
+    ''' <summary>
+    ''' Previous step to WASHING_STATION_IS_DOWN
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Function StartWashingStationToNRotorTimer() As GlobalDataTO
+        Dim myGlobal As New GlobalDataTO
+        Try
+
+            MyClass.DisableCurrentPage()
+
+            MyClass.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_NROTOR
+            MyClass.PrepareArea()
+
+            If MyBase.SimulationMode Then
+
+                System.Threading.Thread.Sleep(SimulationProcessTime)
+
+                MyBase.CurrentMode = ADJUSTMENT_MODES.MBEV_WASHING_STATION_TO_DOWN
+                MyClass.PrepareArea()
+            Else
+                Me.OnWashingStationToNRotorTimerTick()
+            End If
+
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            MyBase.CreateLogActivity(ex.Message, Me.Name & " StartWashingStationToNRotorTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+        Return myGlobal
+    End Function
+
     'SGM 21/11/2011
     Private Function StartWashingStationToUpTimer() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
@@ -5488,6 +5594,33 @@ Public Class IMotorsPumpsValvesTest
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             MyBase.CreateLogActivity(ex.Message, Me.Name & " OnArmsToParkingTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Sends NROTOR instruction
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Use NROTOR when Wash Station is down - BA-2004
+    ''' </remarks>
+    Private Sub OnWashingStationToNRotorTimerTick()
+        Dim myGlobal As New GlobalDataTO
+        Try
+
+            If Not myGlobal.HasError Then
+                Me.Cursor = Cursors.WaitCursor
+                myScreenDelegate.SendNEW_ROTOR()
+            Else
+                MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
+                MyClass.PrepareArea()
+            End If
+
+        Catch ex As Exception
+            myGlobal.HasError = True
+            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorMessage = ex.Message
+            MyBase.CreateLogActivity(ex.Message, Me.Name & " OnWashingStationToNRotorTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
