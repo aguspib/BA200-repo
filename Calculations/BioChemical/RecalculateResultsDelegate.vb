@@ -690,7 +690,8 @@ Namespace Biosystems.Ax00.Calculations
                     If Not resultData.HasError Then
                         If myExecType = "PREP_STD" And myExecSampleClass = "CALIB" Then
                             Dim resultsDelegate As New ResultsDelegate
-                            resultData = resultsDelegate.UpdateManualResult(dbConnection, False, "QUANTIVE", 1, "", myExecOrderTestID, myExecutionItemNumber, myExecRerunNumber)
+                            'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
+                            resultData = resultsDelegate.UpdateManualResult(dbConnection, False, "QUANTIVE", 1, "", myExecOrderTestID, myExecutionItemNumber, myExecRerunNumber, "NOTSENT")
                         End If
                     End If
                     'END AG 10/11/2010
@@ -978,7 +979,8 @@ Namespace Biosystems.Ax00.Calculations
 
                 '1st update the result (mark as ManualResultFlag = TRUE and the entered ManualFactorValue
                 Dim myResults As New ResultsDelegate
-                resultData = myResults.UpdateManualResult(dbConnection, pManualFactorFlag, "QUANTIVE", pFactorValue, "", pOrderTestID, pItemNumber, pRerunNumber)
+                'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
+                resultData = myResults.UpdateManualResult(dbConnection, pManualFactorFlag, "QUANTIVE", pFactorValue, "", pOrderTestID, pItemNumber, pRerunNumber, "NOTSENT")
 
                 If Not resultData.HasError Then
                     If pExecutionID = -1 Then 'Special code for ManualFactor recalculations from WS Preparation screen
@@ -1318,8 +1320,9 @@ Namespace Biosystems.Ax00.Calculations
                                 'Only for Calibrators, the experimental results are recovered
                                 If (pSelectedExecRow.SampleClass = "CALIB" AndAlso pSelectedExecRow.ExecutionType = "PREP_STD") Then
                                     Dim resultsDelegate As New ResultsDelegate
+                                    'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
                                     resultData = resultsDelegate.UpdateManualResult(Nothing, False, "QUANTIVE", 1, "", pSelectedExecRow.OrderTestID, maxMultiItemNumber, _
-                                                                                    pSelectedExecRow.RerunNumber)
+                                                                                    pSelectedExecRow.RerunNumber, "NOTSENT")
                                 End If
                             End If
 
@@ -1505,8 +1508,9 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 'Update the result setting ManualResultFlag = TRUE and ManualResult = the entered Factor value
                 Dim myResults As New ResultsDelegate
+                'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
                 resultData = myResults.UpdateManualResult(Nothing, pManualFactorFlag, "QUANTIVE", pFactorValue, String.Empty, _
-                                                          pSelectedExecRow.OrderTestID, pSelectedExecRow.MultiItemNumber, pSelectedExecRow.RerunNumber)
+                                                          pSelectedExecRow.OrderTestID, pSelectedExecRow.MultiItemNumber, pSelectedExecRow.RerunNumber, "NOTSENT")
                 
                 If (Not resultData.HasError) Then
                     'Special code for ManualFactor recalculations from WS Preparation screen
