@@ -8724,6 +8724,7 @@ Namespace Biosystems.Ax00.BL
                         If pNewExportStatus = "SENT" Then
                             resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
                         Else
+                            'Set OrderToExport = TRUE because some result sent to LIS has not been accepted!!!
                             resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
                         End If
                         'AG 30/07/2014

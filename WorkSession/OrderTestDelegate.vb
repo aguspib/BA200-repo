@@ -7374,6 +7374,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 31/07/2014 - BA-1887 ==> Set OrderToExport = TRUE after 1 order test status is set to CLOSED
         '''              SA 19/09/2014 - BA-1927 ==> When calling function UpdateOrderToExport in OrdersDelegate, pass the local DB Connection instead 
         '''                                          of the received as parameter (to avoid timeouts)
+        '''              AG 16/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
         ''' </remarks>
         Public Function UpdateStatusByOrderTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                                   ByVal pNewStatusValue As String, Optional pOFFSOrderTest As Boolean = False) As GlobalDataTO
@@ -7405,10 +7406,10 @@ Namespace Biosystems.Ax00.BL
                                 If Not myOrderTestWSAnalyzerDS.twksOrderTestWSAnalyzer(0).IsWSStatusNull Then myWSStatus = myOrderTestWSAnalyzerDS.twksOrderTestWSAnalyzer(0).WSStatus()
                                 'AG 22/05/2012
                                 If (pNewStatusValue = "CLOSED") Then
-                                    'AG 31/07/2014 #1887 - Set OrderToExport = TRUE after 1 order test status is set to CLOSED
+                                    'AG 16/10/2014 BA-2011 - Update properly the OrderToExport field after save new Calc test result (always accepted)
                                     Dim myOrdersDelegate As New OrdersDelegate
-                                    dataToReturn = myOrdersDelegate.UpdateOrderToExport(dbConnection, True, , pOrderTestID)
-                                    'AG 31/07/2014 #1887
+                                    dataToReturn = myOrdersDelegate.SetNewOrderToExportValue(dbConnection, , pOrderTestID)
+                                    'AG 16/10/2014 BA-2011
 
                                     'Verify if all the Order Tests of the same Order are already CLOSED to set also to CLOSED the Status of the Order 
 
