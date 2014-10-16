@@ -1261,9 +1261,9 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 '(4) Finally update the new value
-                                If Not resultData.HasError AndAlso Not myResDS.vwksResults(0).IsOrderIDNull Then
+                                If Not resultData.HasError Then
                                     If updateAlways OrElse affectedOrderToExportValue <> newOrderToExportValue Then 'AG 15/10/2014 BA-2011 update only when changes
-                                        resultData = myDAO.UpdateOrderToExport(dbConnection, myResDS.vwksResults(0).OrderID, newOrderToExportValue)
+                                        resultData = myDAO.UpdateOrderToExport(dbConnection, affectedOrderID, newOrderToExportValue)
                                     End If
                                 End If
 
