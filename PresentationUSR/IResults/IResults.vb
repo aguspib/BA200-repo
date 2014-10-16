@@ -4763,7 +4763,13 @@ Public Class IResults
             End If
 
             Cursor = Cursors.WaitCursor     'AG 14/10/2010
-            myGlobal = myRecalDelegate.ChangeAcceptedResult(Nothing, AnalyzerIDField, WorkSessionIDField, RowValues.OrderTestID, RowValues.RerunNumber, executionToRecalculate, RowValues.TestType, pSampleClass)
+
+            'AG 15/10/2014 BA-2011
+            'myGlobal = myRecalDelegate.ChangeAcceptedResult(Nothing, AnalyzerIDField, WorkSessionIDField, RowValues.OrderTestID, RowValues.RerunNumber, executionToRecalculate, RowValues.TestType, pSampleClass)
+            Dim myExportStatus As String = ""
+            If Not RowValues.IsExportStatusNull Then myExportStatus = RowValues.ExportStatus
+            myGlobal = myRecalDelegate.ChangeAcceptedResult(Nothing, AnalyzerIDField, WorkSessionIDField, RowValues.OrderTestID, RowValues.RerunNumber, executionToRecalculate, RowValues.TestType, pSampleClass, RowValues.ExportStatus)
+            'AG 15/10/2014 BA-2011
 
             Dim actionAllowed As Boolean = False
 
@@ -4949,6 +4955,7 @@ Public Class IResults
     ''' <param name="pSampleClass" ></param>
     ''' <remarks>
     ''' Created by:  AG 17/02/2011 
+    ''' AG 16/10/2014 BA-2011 re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
     ''' </remarks>
     Private Sub RejectResult(ByRef dgv As BSDataGridView, ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
         Try
@@ -4960,8 +4967,10 @@ Public Class IResults
             myGlobal = myResDelegate.UpdateAcceptedResult(Nothing, RowValues.OrderTestID, RowValues.RerunNumber, False)
 
             If Not myGlobal.HasError Then
-                'When the OrderTestID is STD_TEST and belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
-                If String.Compare(RowValues.TestType, "STD", False) = 0 And String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                'When the OrderTestID belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
+                'AG 16/10/2014 BA-2011
+                'If String.Compare(RowValues.TestType, "STD", False) = 0 And String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                If String.Compare(pSampleClass, "PATIENT", False) = 0 Then
                     Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
                     myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
                     myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
@@ -5001,6 +5010,7 @@ Public Class IResults
     ''' <param name="pSampleClass" ></param>
     '''<remarks>
     ''' Created by:  AG 17/02/2011 
+    ''' AG 16/10/2014 BA-2011 re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
     ''' </remarks>
     Private Sub RejectResult(ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
         Try
@@ -5012,8 +5022,10 @@ Public Class IResults
             myGlobal = myResDelegate.UpdateAcceptedResult(Nothing, RowValues.OrderTestID, RowValues.RerunNumber, False)
 
             If Not myGlobal.HasError Then
-                'When the OrderTestID is STD_TEST and belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
-                If RowValues.TestType = "STD" AndAlso String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                'When the OrderTestID belongs to a CALC_TEST Sw has to call recalculations for CALC_TEST
+                'AG 16/10/2014 BA-2011
+                'If RowValues.TestType = "STD" AndAlso String.Compare(pSampleClass, "PATIENT", False) = 0 Then
+                If String.Compare(pSampleClass, "PATIENT", False) = 0 Then
                     Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
                     myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
                     myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
@@ -5564,6 +5576,7 @@ Public Class IResults
     ''' <param name="RowValues">Row of a typed DataSet ResultsDS containing data of the result (OrderTestID/RerunNumber) selected to be accepted</param>
     ''' <remarks>
     ''' Created by:  SA 16/07/2012 - Based on ChangeAcceptedResult
+    ''' AG 16/10/2014 BA-2011 For ISE, CALC and OFFS inform test type and sample class in dataset before call RecalculateResultsDelegate
     ''' </remarks>
     Private Sub ChangeAcceptedResultNEW(ByVal RowValues As ResultsDS.vwksResultsRow)
         Try
@@ -5595,11 +5608,23 @@ Public Class IResults
                 executionRowToRecalculate.WorkSessionID = RowValues.WorkSessionID
                 executionRowToRecalculate.OrderTestID = RowValues.OrderTestID
                 executionRowToRecalculate.RerunNumber = RowValues.RerunNumber
+
+                'AG 16/10/2014 BA-2011
+                executionRowToRecalculate.SampleClass = RowValues.SampleClass
+                executionRowToRecalculate.TestType = RowValues.TestType
+                'AG 16/10/2014 BA-2011
+
                 executionRowToRecalculate.EndEdit()
             End If
 
             Cursor = Cursors.WaitCursor
-            myGlobal = myRecalDelegate.ChangeAcceptedResultNEW(executionRowToRecalculate)
+
+            'AG 16/10/2014 BA-2011
+            'myGlobal = myRecalDelegate.ChangeAcceptedResultNEW(executionRowToRecalculate)
+            Dim myExportStatus As String = ""
+            If Not RowValues.IsExportStatusNull Then myExportStatus = RowValues.ExportStatus
+            myGlobal = myRecalDelegate.ChangeAcceptedResultNEW(executionRowToRecalculate, RowValues.ExportStatus)
+            'AG 15/10/2014 BA-2011
 
             If (Not myGlobal.HasError) Then
                 UpdateScreenGlobalDSWithAffectedResults()
