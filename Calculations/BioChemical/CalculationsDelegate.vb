@@ -38,6 +38,7 @@ Namespace Biosystems.Ax00.Calculations
             'Recalculation flags
             Dim RecalculationFlag As Boolean
             Dim SampleClassRecalculated As String   'If not recalculation ... = '' // Else ... 'BLANK' or 'CALIB' or 'CTRL' or 'PATIENT'            
+            Dim PatientOrControlChangeAcceptedResult As Boolean 'AG 15/10/2014 BA-2011
 
             'General information (Ax00 and others)
             Dim LimitAbs As Single
@@ -80,6 +81,7 @@ Namespace Biosystems.Ax00.Calculations
             Dim MaxReplicates As Integer
             Dim ReplicateID As Integer  'Current replicate
             Dim ReRun As Integer        'Rerun number
+            Dim AcceptedResult As Boolean 'AG 15/10/2014 BA-2011 indicates if the OrderTestId - Rerun belonging this preparation is accepted or not!! (twksResults.AcceptedResultFlag)
             Dim WellUsed As Integer     'Well where the water or preparation to calculate was performed
             'Dim RotorTurn As Integer    'Rotor turn without changing rotor (AG 03/05/2010 - Field is deleted from database)
             Dim PostDilutionType As String     ''NONE', 'INC' or 'RED' - tfmwPreloadedMasterData (subItemID = POSTDILUTION_tYPE)
@@ -4153,6 +4155,7 @@ Namespace Biosystems.Ax00.Calculations
         '''              AG 25/06/2012 - ResultsDS also informs AnalyzerID and WorkSessionID
         '''              TR 19/07/2012 - Inform field SampleClass for the result
         '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
+        '''              AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
         ''' </remarks>
         Private Sub SaveAverageResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pItem As Integer, ByRef curveResultID As Integer)
             Try
@@ -4222,11 +4225,6 @@ Namespace Biosystems.Ax00.Calculations
                             myGlobal = res_delegate.RecalculateExportStatusValue(pDBConnection, myOrderTestID, myRerunNumber)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 res_row.ExportStatus = CType(myGlobal.SetDatos, String)
-
-                                'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
-                                Dim orders_dlg As New OrdersDelegate
-                                myGlobal = orders_dlg.UpdateOrderToExport(pDBConnection, True, , myOrderTestID)
-
                             End If
                         End If
                         'END AG 10/09/2010 - new rules
@@ -4383,6 +4381,13 @@ Namespace Biosystems.Ax00.Calculations
                         If myGlobal.HasError Then
                             myClassGlobalResult = myGlobal
                             Exit Try
+
+                            'AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
+                        ElseIf .AcceptedResult Then
+                            Dim orders_dlg As New OrdersDelegate
+                            myGlobal = orders_dlg.SetNewOrderToExportValue(pDBConnection, , myOrderTestID)
+                            'AG 15/10/2014 BA-2011
+
                         End If
 
                         '3) Mark all other rerun as NOT ACCEPTED
@@ -7367,7 +7372,7 @@ Namespace Biosystems.Ax00.Calculations
                                            ByVal pWorkSessionID As String, _
                                            ByVal pRecalculusFlag As Boolean, _
                                            ByVal pSampleClassRecalculated As String, _
-                                           Optional ByVal pManualRecalculationsFlag As Boolean = False) As GlobalDataTO
+                                            ByVal pManualRecalculationsFlag As Boolean) As GlobalDataTO
 
             Dim globalData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -7452,23 +7457,8 @@ Namespace Biosystems.Ax00.Calculations
                         Dim myRecalculations As New RecalculateResultsDelegate
                         myRecalculations.AnalyzerModel = myAnalyzerModel
 
-                        'AG 23/07/2010 - Dont use different init code, use private Init method (Initialize recalculations structures)
-                        'With myRecalculations
-                        '    .AnalyzerID = myAnalyzerID
-                        '    .WorkSessionID = myWorkSessionID
-                        '    .OrderTestID = myOrderTestID
-                        '    .RerunNumber = myRerunNumber
-                        '    .SampleClass = preparation(0).SampleClass
-                        '    .TestID = test.TestID
-                        '    .SampleType = test.SampleType
-                        '    .ExecutionID = myExecutionID(UBound(myExecutionID))
-                        '    .MaxItemsNumber = UBound(myExecutionID) + 1
-                        '    .MaxReplicates = preparation(0).MaxReplicates
-                        '    .InitializedFlag = True
-                        'End With
-
-                        'Last parameter as FALSE
-                        globalData = myRecalculations.RecalculateResults(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, False)
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
+                        globalData = myRecalculations.RecalculateResults(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, False, False)
                     End If
                 End If
                 'END AG 22/07/2010
@@ -8227,6 +8217,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' Modified by: AG 25/02/2010 (Tested OK)
         ''' Modified by AG 22/03/2011 - add ThermoWarningFlag, ClotValue
         ''' Modified    AG 23/10/2013 - initialize new properties in preparation structure (PausedReadings())
+        '''             AG 15/10/2014 BA-2011 Initialize the AcceptedResult flag (if no results exists for the orderTestID – Rerun means new result, initiate to TRUE)
         Private Sub InitPreparation(ByVal pdbConnection As SqlClient.SqlConnection, _
                                     ByVal pExecutionDS As ExecutionsDS, _
                                     ByVal pDimension As Integer, _
@@ -8254,6 +8245,17 @@ Namespace Biosystems.Ax00.Calculations
                 If Not pExecutionDS.twksWSExecutions.Item(0).IsRerunNumberNull Then
                     preparation(pDimension).ReRun = pExecutionDS.twksWSExecutions.Item(0).RerunNumber
                 End If
+
+                'AG 15/10/2014 BA-2011 - Initiate the AcceptedResult flag
+                preparation(pDimension).AcceptedResult = True 'Initiate TRUE supposing that the result still not exists
+                Dim resultDlg As New ResultsDelegate
+                resultData = resultDlg.ReadByOrderTestIDandRerunNumber(pdbConnection, myOrderTestID, preparation(pDimension).ReRun)
+                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    If DirectCast(resultData.SetDatos, ResultsDS).twksResults.Rows.Count > 0 Then
+                        preparation(pDimension).AcceptedResult = DirectCast(resultData.SetDatos, ResultsDS).twksResults(0).AcceptedResultFlag
+                    End If
+                End If
+                'AG 15/10/2014 BA-2011
 
                 preparation(pDimension).PostDilutionType = "NONE"
                 If Not pExecutionDS.twksWSExecutions.Item(0).IsPostDilutionTypeNull Then
@@ -8828,6 +8830,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by:  SA 09/07/2012 - Optimization of function InitPreparation
         ''' Modified     AG 23/10/2013 - initialize new properties in preparation structure (PausedReadings())
         '''              XB 08/10/2014 - Get also KineticsLinear field to initialize preparation structure - BA-1970
+        '''              AG 15/10/2014 BA-2011 Initialize the AcceptedResult flag (if no results exists for the orderTestID – Rerun means new result, initiate to TRUE)
         ''' </remarks>
         Private Sub InitPreparationNEW(ByVal pExecToCalculateRow As ExecutionsDS.twksWSExecutionsRow, ByVal pDimension As Integer)
             Dim resultData As New GlobalDataTO
@@ -8839,6 +8842,17 @@ Namespace Biosystems.Ax00.Calculations
 
                 preparation(pDimension).MultiItemNumber = pExecToCalculateRow.MultiItemNumber
                 preparation(pDimension).ReRun = pExecToCalculateRow.RerunNumber
+
+                'AG 15/10/2014 BA-2011 - Initiate the AcceptedResult flag
+                preparation(pDimension).AcceptedResult = True 'Initiate TRUE supposing that the result still not exists
+                Dim resultDlg As New ResultsDelegate
+                resultData = resultDlg.ReadByOrderTestIDandRerunNumber(Nothing, myOrderTestID, preparation(pDimension).ReRun)
+                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    If DirectCast(resultData.SetDatos, ResultsDS).twksResults.Rows.Count > 0 Then
+                        preparation(pDimension).AcceptedResult = DirectCast(resultData.SetDatos, ResultsDS).twksResults(0).AcceptedResultFlag
+                    End If
+                End If
+                'AG 15/10/2014 BA-2011
 
                 If (Not pExecToCalculateRow.IsReplicateNumberNull) Then preparation(pDimension).ReplicateID = pExecToCalculateRow.ReplicateNumber
                 If (Not pExecToCalculateRow.IsWellUsedNull) Then preparation(pDimension).WellUsed = pExecToCalculateRow.WellUsed

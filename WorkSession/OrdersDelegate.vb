@@ -1159,6 +1159,7 @@ Namespace Biosystems.Ax00.BL
                             resultData = myDAO.UpdateOrderToExport(dbConnection, affectedOrderID, pNewValue)
 
                             'If affected orderID not found because no parameter informed ... update all by sampleclass = PATIENT
+                            '<Note: when user enables or disables all the LIS checkbox by clicking on list header>
                         ElseIf pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "" Then
                             resultData = myDAO.UpdateOrderToExport(dbConnection, "", pNewValue)
                         End If
@@ -1201,7 +1202,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pF1OrderTestID"></param>
         ''' <param name="pF2LISMessageID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management</remarks>
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management
+        ''' AG 15/10/2014 BA-2011 - When none of the results of the patient is accepted automatically the LIS checkbox in the list of patients becomes disabled
+        '''                       - Do not update the field OrderToExport if no changes</remarks>
         Public Function SetNewOrderToExportValue(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pOrderID As String = "", _
                                                  Optional ByVal pF1OrderTestID As Integer = -1, Optional ByVal pF2LISMessageID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1216,6 +1219,10 @@ Namespace Biosystems.Ax00.BL
                         '(1) Get the affected orderID by filter1 or filter2
                         Dim myDAO As New TwksOrdersDAO
                         Dim affectedOrderID As String = pOrderID
+
+                        Dim updateAlways As Boolean = CBool(IIf(pOrderID <> "", True, False)) 'AG 15/10/2014 BA-2011 - when orderID informed update always, else update only when changes
+                        Dim affectedOrderToExportValue As Boolean = False 'AG 15/10/2014 BA-2011
+
                         If affectedOrderID = "" Then
                             If pF1OrderTestID <> -1 Then
                                 resultData = myDAO.ReadByOrderTestID(dbConnection, pF1OrderTestID)
@@ -1226,6 +1233,7 @@ Namespace Biosystems.Ax00.BL
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
                                     affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                    affectedOrderToExportValue = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderToExport 'AG 15/10/2014 BA-2011
                                 End If
                             End If
                         End If
@@ -1233,26 +1241,32 @@ Namespace Biosystems.Ax00.BL
                         '(2) Get all results belongs the current orderID
                         If affectedOrderID <> "" Then
                             Dim resultsDlg As New ResultsDelegate
-                            resultData = resultsDlg.GetAcceptedResultsByOrder(dbConnection, affectedOrderID)
+                            resultData = resultsDlg.GetAcceptedResultsByOrder(dbConnection, affectedOrderID, True)
 
                             '(3) Calculate the new OrderToExport value
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 Dim myResDS As New ResultsDS
                                 myResDS = DirectCast(resultData.SetDatos, ResultsDS)
 
-                                Dim newOrderToExportValue As Boolean = False 'All results with ExportStatus = 'SENT'
+                                Dim newOrderToExportValue As Boolean = False 'Default value: Suppose ALL results of the orderID with ExportStatus = 'SENT'
                                 If myResDS.vwksResults.Rows.Count > 0 Then
                                     If (From a As ResultsDS.vwksResultsRow In myResDS.vwksResults Where a.ExportStatus <> "SENT").ToList.Count > 0 Then
                                         'Some result with ExportStatus <> 'SENT'
                                         newOrderToExportValue = True
                                     End If
 
-                                    '(4) Finally update the new value
-                                    If Not resultData.HasError AndAlso Not myResDS.vwksResults(0).IsOrderIDNull Then
-                                        resultData = myDAO.UpdateOrderToExport(dbConnection, myResDS.vwksResults(0).OrderID, newOrderToExportValue)
-                                    End If
+                                    'AG 15/10/2014 BA-2011 move code in order to call the myDAO.UpdateOrderToExport method out of this IF ... ENDIF block
+                                    '...
 
                                 End If
+
+                                '(4) Finally update the new value
+                                If Not resultData.HasError AndAlso Not myResDS.vwksResults(0).IsOrderIDNull Then
+                                    If updateAlways OrElse affectedOrderToExportValue <> newOrderToExportValue Then 'AG 15/10/2014 BA-2011 update only when changes
+                                        resultData = myDAO.UpdateOrderToExport(dbConnection, myResDS.vwksResults(0).OrderID, newOrderToExportValue)
+                                    End If
+                                End If
+
                             End If
                         End If
 

@@ -76,6 +76,7 @@ Namespace Biosystems.Ax00.Calculations
         '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
         '''              SA 19/09/2014 - BA-1927 ==> When calling function UpdateOrderToExport in OrdersDelegate, pass the local DB Connection instead 
         '''                                          of the received as parameter (to avoid timeouts)
+        '''              AG 16/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
         ''' </remarks> 
         Public Function ExecuteCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                               ByVal pManualRecalculation As Boolean) As GlobalDataTO
@@ -228,10 +229,6 @@ Namespace Biosystems.Ax00.Calculations
                                                             resultData = resultsDelegate.RecalculateExportStatusValue(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber)
                                                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                                                 resultRow.ExportStatus = CType(resultData.SetDatos, String)
-
-                                                                'AG 30/07/2014 #1887 - Set OrderToExport = TRUE after manual recalculations
-                                                                Dim orders_dlg As New OrdersDelegate
-                                                                resultData = orders_dlg.UpdateOrderToExport(dbConnection, True, , resultRow.OrderTestID)
                                                             Else
                                                                 'Error recalculating the Export Status
                                                                 Exit For
@@ -248,7 +245,15 @@ Namespace Biosystems.Ax00.Calculations
 
                                                         'Save the calculated Result; if an error happens, the loop is finished
                                                         resultData = resultsDelegate.SaveResults(dbConnection, resultDS)
+
                                                         If (resultData.HasError) Then Exit For
+
+                                                        'AG 16/10/2014 BA-2011 - Update properly the OrderToExport field after save new Calc test result (always accepted)
+                                                        If Not resultData.HasError Then
+                                                            Dim orders_dlg As New OrdersDelegate
+                                                            resultData = orders_dlg.SetNewOrderToExportValue(dbConnection, , resultRow.OrderTestID)
+                                                        End If
+                                                        'AG 16/10/2014 BA-2011
 
                                                         'Update the OrderTestStatus of the requested Calculated Test (if all the OrderTestID related are closed,
                                                         'then the Calculated OrderTestID becomes CLOSED too

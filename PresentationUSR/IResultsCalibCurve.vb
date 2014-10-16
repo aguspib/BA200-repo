@@ -2293,6 +2293,7 @@ Public Class IResultsCalibCurve
     ''' <remarks>
     ''' Created by: RH 27/05/2011 Based on a previous version by AG 03/09/2010
     ''' AG 03/07/2012 - Use Nothing instead of Connection
+    ''' AG 15/10/2014 BA-2011 inform the new required parameters
     ''' </remarks>
     Private Function RecalculateCurveAfterDefinitionChanges() As GlobalDataTO
         Dim resultData As GlobalDataTO
@@ -2371,7 +2372,8 @@ Public Class IResultsCalibCurve
 
                             Dim myRecalDelegate As New RecalculateResultsDelegate
                             myRecalDelegate.AnalyzerModel = AnalyzerModel
-                            resultData = myRecalDelegate.RecalculateResults(Nothing, AnalyzerIDField, WorkSessionIDField, executionToRecalculate, True)
+                            'AG 15/10/2014 BA-2011 inform the new required parameters
+                            resultData = myRecalDelegate.RecalculateResults(Nothing, AnalyzerIDField, WorkSessionIDField, executionToRecalculate, True, False)
 
                             If Not resultData.HasError Then
                                 OperationSuccess = True
@@ -2471,6 +2473,7 @@ Public Class IResultsCalibCurve
     ''' <returns>GlobalDataTO containing success/error information</returns>
     ''' <remarks>
     ''' Created by:  SA - Based in RecalculateCurveAfterDefinitionChanges
+    ''' AG 15/10/2014 BA-2011 inform the new required parameters
     ''' </remarks>
     Private Function RecalculateCurveAfterDefinitionChangesNEW() As GlobalDataTO
         Dim resultData As GlobalDataTO
@@ -2532,6 +2535,7 @@ Public Class IResultsCalibCurve
 
                         Dim myRecalDelegate As New RecalculateResultsDelegate
                         myRecalDelegate.AnalyzerModel = AnalyzerModel
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
                         resultData = myRecalDelegate.RecalculateResultsNEW(Nothing, selectedExecRow, executionRowToRecalculate, True, False)
                         'resultData = myRecalDelegate.RecalculateResults(Nothing, AnalyzerIDField, WorkSessionIDField, executionToRecalculate, True)
 

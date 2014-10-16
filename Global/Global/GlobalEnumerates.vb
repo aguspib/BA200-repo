@@ -3064,6 +3064,10 @@ Namespace Biosystems.Ax00.Global
             NEW_ROTOR_START
             NEW_ROTOR_END
 
+            ' XB 15/10/2014 - BA-2004
+            FINE_OPTICAL_CENTERING_PERFORMING
+            FINE_OPTICAL_CENTERING_DONE
+
         End Enum
 
 
@@ -3367,6 +3371,7 @@ Namespace Biosystems.Ax00.Global
             REAGENTS_HOME_ROTOR
             REACTIONS_HOME_ROTOR
             REACTIONS_ROTOR_HOME_WELL1
+            REACTIONS_ROTOR_AUTO_CENTERING
             ' Absolute Movements
             WASHING_STATION_ABS_Z
             WASHING_STATION_PARK

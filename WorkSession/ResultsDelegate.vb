@@ -1254,6 +1254,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 25/06/2012 - Inform AnalyzerID and WorkSessionID when the result is added to the ResultsDS dataset. Call function Create
         '''                              instead of InsertResult (both in twksResultsDAO) 
         '''              SA 31/10/2012 - When a result for an OffSystem Test is created, set field ExportStatus to NOTSENT instead of to NULL
+        '''              AG 16/1/2014 BA-2011 inform the proper value for the ExportStatus
         ''' </remarks>
         Public Function SaveOffSystemResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestResultsDS As OffSystemTestsResultsDS, _
                                              ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
@@ -1281,6 +1282,7 @@ Namespace Biosystems.Ax00.BL
                         Dim mytwksResultDAO As New twksResultsDAO()
                         Dim myOrderTestsDelegate As New OrderTestsDelegate
                         Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
+                        Dim updatedExportStatusValue As String = String.Empty 'AG 16/10/2014 BA-2011
 
                         For Each offSystemTestResult As OffSystemTestsResultsDS.OffSystemTestsResultsRow In pOffSystemTestResultsDS.OffSystemTestsResults
                             'Verify if the Result for the OffSystem Test already exists...
@@ -1323,6 +1325,13 @@ Namespace Biosystems.Ax00.BL
                                         resultData = mytwksResultDAO.Create(dbConnection, myResultsDS)
                                     End If
                                 Else
+                                    'AG 16/10/2014 BA-2011 -assign new value for ExportStatus
+                                    updatedExportStatusValue = "NOTSENT" 'defaul value
+                                    If Not myTempResultsDS.twksResults(0).IsExportStatusNull AndAlso myTempResultsDS.twksResults(0).ExportStatus = "SENT" Then
+                                        updatedExportStatusValue = "UPDATED"
+                                    End If
+                                    'AG 16/10/2014 BA-2011
+
                                     If (Not String.IsNullOrEmpty(offSystemTestResult.ResultValue)) Then
                                         'There is a result for the OffSystem Test; update the value if it has been changed
                                         If (offSystemTestResult.ResultType = "QUANTIVE") Then
@@ -1330,7 +1339,7 @@ Namespace Biosystems.Ax00.BL
                                                 ignoreOffSystemTest = False
                                                 resultData = mytwksResultDAO.UpdateManualResult(dbConnection, myResultsDS.twksResults(0).ManualResultFlag, _
                                                                                                 offSystemTestResult.ResultType, myResultsDS.twksResults(0).ManualResult, _
-                                                                                                Nothing, myResultsDS.twksResults(0).OrderTestID, 1, 1)
+                                                                                                Nothing, myResultsDS.twksResults(0).OrderTestID, 1, 1, updatedExportStatusValue)
                                             End If
 
                                         ElseIf (offSystemTestResult.ResultType = "QUALTIVE") Then
@@ -1339,7 +1348,7 @@ Namespace Biosystems.Ax00.BL
                                                 resultData = mytwksResultDAO.UpdateManualResult(dbConnection, myResultsDS.twksResults(0).ManualResultFlag, _
                                                                                                 offSystemTestResult.ResultType, Nothing, _
                                                                                                 myResultsDS.twksResults(0).ManualResultText, _
-                                                                                                myResultsDS.twksResults(0).OrderTestID, 1, 1)
+                                                                                                myResultsDS.twksResults(0).OrderTestID, 1, 1, updatedExportStatusValue)
                                             End If
                                         End If
                                     Else
@@ -1749,14 +1758,16 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pOrderTestID">Order Test Identifier</param>
         ''' <param name="pMultiItemNumber">MultiItem Number (only for multipoint Calibrators; otherwise, its value is always one</param>
         ''' <param name="pRerunNumber">Rerun Number</param>
+        ''' <param name="pExportStatus"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: 
         ''' Modified by: SA 26/11/2010 - Changed parameter pRerunNumber to optional
+        '''              AG 16/1/2014 BA-2011 do not use optional parameters + add new parameter ExportStatus and also update ExportStatus and ExportDateTime
         ''' </remarks>
         Public Function UpdateManualResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pManualResultFlag As Boolean, ByVal pResultType As String, _
                                            ByVal pManualResult As Single, ByVal pManualResultText As String, ByVal pOrderTestID As Integer, _
-                                           ByVal pMultiItemNumber As Integer, Optional ByVal pRerunNumber As Integer = -1) As GlobalDataTO
+                                           ByVal pMultiItemNumber As Integer, ByVal pRerunNumber As Integer, ByVal pExportStatus As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -1766,7 +1777,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksResultsDAO
                         resultData = myDAO.UpdateManualResult(dbConnection, pManualResultFlag, pResultType, pManualResult, pManualResultText, _
-                                                              pOrderTestID, pMultiItemNumber, pRerunNumber)
+                                                              pOrderTestID, pMultiItemNumber, pRerunNumber, pExportStatus)
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -8724,6 +8735,7 @@ Namespace Biosystems.Ax00.BL
                         If pNewExportStatus = "SENT" Then
                             resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
                         Else
+                            'Set OrderToExport = TRUE because some result sent to LIS has not been accepted!!!
                             resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
                         End If
                         'AG 30/07/2014
@@ -8764,9 +8776,13 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pOrderID"></param>
+        ''' <param name="pOnlyMappedWithLIS"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 30/07/2014 Creation - #1887 OrderToExport management</remarks>
-        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
+        ''' <remarks>
+        ''' AG 30/07/2014 Creation - #1887 OrderToExport management
+        ''' AG 16/10/2014 BA-2011 parameter for return only the results mapped with LIS
+        ''' </remarks>
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pOnlyMappedWithLIS As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -8777,6 +8793,18 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksResultsDAO
                         resultData = myDAO.GetAcceptedResultsByOrder(dbConnection, pOrderID)
+
+                        If pOnlyMappedWithLIS AndAlso Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            Dim myResDS As New ResultsDS
+                            myResDS = DirectCast(resultData.SetDatos, ResultsDS)
+
+                            'TODO
+                            'From myResDS.vwksResults remove all rows with tests without LIS mapped value
+                            '
+                            'End Loop
+                            'resultData.SetDatos = dataset with results accepted and mapped with LIS
+                        End If
+
                     End If
                 End If
             Catch ex As Exception

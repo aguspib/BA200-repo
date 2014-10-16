@@ -90,6 +90,7 @@
         <int>87</int>
         <int>88</int>
         <int>89</int>
+        <int>102</int>
       </FwScriptIDs>
     </ScreenTO>
     <ScreenTO>
@@ -2647,6 +2648,34 @@
       </Instructions>
       <Created>2013-07-24T08:41:53.1511384+02:00</Created>
       <Modified>2013-07-24T08:41:53.1511384+02:00</Modified>
+      <Author>SW</Author>
+      <SyntaxOK>false</SyntaxOK>
+      <TestedOK>false</TestedOK>
+    </FwScriptTO>
+    <FwScriptTO>
+      <FwScriptID>102</FwScriptID>
+      <ActionID>REACTIONS_ROTOR_AUTO_CENTERING</ActionID>
+      <Description>performs a reactions rotor fine auto centering</Description>
+      <Instructions>
+        <InstructionTO>
+          <InstructionID>1</InstructionID>
+          <Sequence>1</Sequence>
+          <Timer>0</Timer>
+          <Code>GLF.FO.FCK</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+        <InstructionTO>
+          <InstructionID>2</InstructionID>
+          <Sequence>2</Sequence>
+          <Timer>24000</Timer>
+          <Code>END</Code>
+          <Params />
+          <EnableEdition>true</EnableEdition>
+        </InstructionTO>
+      </Instructions>
+      <Created>2014-10-15T08:41:53.1511384+02:00</Created>
+      <Modified>2014-10-15T08:41:53.1511384+02:00</Modified>
       <Author>SW</Author>
       <SyntaxOK>false</SyntaxOK>
       <TestedOK>false</TestedOK>

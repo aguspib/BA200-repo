@@ -4405,7 +4405,7 @@ Public Class Ax00ServiceMainMDI
 
             Me.SettingsToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
             Me.SendableScriptsToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
-
+            Me.BorrameToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

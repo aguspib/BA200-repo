@@ -178,6 +178,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' Created by:  SA 12/06/2014 - BT #1660
         ''' Modified by: AG 30/07/2014 #1887 (recalculate the ExportStatus after manual recalculations)
+        ''' AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
         ''' </remarks>
         Public Function RecalculateISEAverageValue(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                    ByVal pWorkSessionID As String, ByVal pExecutionID As Integer) As GlobalDataTO
@@ -231,9 +232,6 @@ Namespace Biosystems.Ax00.Calculations
                                             resultData = myResultsDelegate.RecalculateExportStatusValue(dbConnection, myOT, myRerun)
                                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                                 res_DS.twksResults(0).ExportStatus = CType(resultData.SetDatos, String)
-
-                                                Dim orders_dlg As New OrdersDelegate
-                                                resultData = orders_dlg.UpdateOrderToExport(dbConnection, True, , myOT)
                                             End If
                                             'AG 30/07/2014 #1887
 
@@ -241,6 +239,14 @@ Namespace Biosystems.Ax00.Calculations
 
                                             'Update the Result Value
                                             resultData = myResultsDelegate.SaveResults(dbConnection, res_DS)
+
+                                            'AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
+                                            If Not resultData.HasError AndAlso res_DS.twksResults(0).AcceptedResultFlag Then
+                                                Dim orders_dlg As New OrdersDelegate
+                                                resultData = orders_dlg.SetNewOrderToExportValue(dbConnection, , myOT)
+                                            End If
+                                            'AG 15/10/2014 BA-2011
+
                                             If (Not resultData.HasError) Then
                                                 'Delete all Alarms saved previously for the Average Result
                                                 resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, myOT, myRerun, res_DS.twksResults(0).MultiPointNumber)
@@ -505,16 +511,21 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pExecutionID"></param>
         ''' <param name="pTestType" ></param>
         ''' <param name="pSampleClass" ></param>
+        ''' <param name="pExportStatus"></param>
         ''' <returns>GlobalDataTo (set data as boolean)</returns>
         ''' <remarks>Created by AG 04/08/2010
         ''' Modified by AG 02/12/2010 - adapt for accept rerun different than STD tests (executionID)
         ''' AG 18/03/2011 - add pSampleClass due controls can accept more than one result
         ''' AG 03/07/2012 - Running Cycles lost - Improvements!
+        ''' AG 16/10/2014 BA-2011
+        '''     Inform new required parameters + add pExportStatus parameter
+        '''     #1 Change Accepted result for a PATIENT or CONTROL do not launch recalculations (but in case of PATIENTs recalculate affected calculated tests)
+        '''     #2 Set OrderToExport = TRUE when the new accepted result belongs a patient or a control and his export status is different than SENT
         ''' </remarks>
         Public Function ChangeAcceptedResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
                                          ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer, _
                                          ByVal pExecutionID As Integer, ByVal pTestType As String, _
-                                         ByVal pSampleClass As String) As GlobalDataTO
+                                         ByVal pSampleClass As String, ByVal pExportStatus As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -533,8 +544,31 @@ Namespace Biosystems.Ax00.Calculations
                         resultData = myResDelegate.ResetAcceptedResultFlag(dbConnection, pOrderTestID, pRerunNumber)
                     End If
 
-                    If Not resultData.HasError And pTestType = "STD" Then
-                        resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True)
+                    If Not resultData.HasError Then
+                        'AG 16/10/2014 BA-2011 #2 Recalculate only for blank and calib
+                        'If pTestType = "STD" Then
+                        If pTestType = "STD" AndAlso (pSampleClass = "BLANK" OrElse pSampleClass = "CALIB") Then
+
+                            'AG 15/10/2014 BA-2011 inform the new required parameters
+                            resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True, False)
+                        End If
+
+                        'AG 16/10/2014 BA-2011
+                        '#1 recalculate calculated tests
+                        If (pSampleClass = "PATIENT") Then
+                            Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                            myCalcTestsDelegate.AnalyzerID = pAnalyzer
+                            myCalcTestsDelegate.WorkSessionID = pWorkSession
+                            resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, pOrderTestID, True)
+                        End If
+
+                        ' #2 set OrderToExport = TRUE (except if the test is not mapped)
+                        If (pSampleClass = "CTRL" OrElse pSampleClass = "PATIENT") AndAlso pExportStatus <> "SENT" Then
+                            Dim orders_dlg As New OrdersDelegate
+                            resultData = orders_dlg.SetNewOrderToExportValue(dbConnection, , pOrderTestID)
+                        End If
+                        'AG 16/10/2014 BA-2011
+
                     End If
                 End If
 
@@ -588,6 +622,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by AG 21/07/2010
         ''' Modified by AG 15/09/2010: InUseReplicates count do not count replicates with Absorbance error
         ''' AG 03/07/2012 - Running Cycles lost - Improvements!
+        ''' AG 15/10/2014 BA-2011 inform the new required parameters
         ''' </remarks>
         Public Function ChangeInUseFlagReplicate(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
                                                  ByVal pExecutionID As Integer, ByVal pNewInUseValue As Boolean) As GlobalDataTO
@@ -655,14 +690,16 @@ Namespace Biosystems.Ax00.Calculations
                     If Not resultData.HasError Then
                         If myExecType = "PREP_STD" And myExecSampleClass = "CALIB" Then
                             Dim resultsDelegate As New ResultsDelegate
-                            resultData = resultsDelegate.UpdateManualResult(dbConnection, False, "QUANTIVE", 1, "", myExecOrderTestID, myExecutionItemNumber, myExecRerunNumber)
+                            'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
+                            resultData = resultsDelegate.UpdateManualResult(dbConnection, False, "QUANTIVE", 1, "", myExecOrderTestID, myExecutionItemNumber, myExecRerunNumber, "NOTSENT")
                         End If
                     End If
                     'END AG 10/11/2010
 
                     If Not resultData.HasError Then
                         'Last parameter = TRUE due the change in use replicate flag is an user action!!
-                        resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True)
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
+                        resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True, False)
                     End If
                 End If
 
@@ -707,16 +744,18 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pExecution"></param>
         ''' <param name="pManualRecalculationFlag"> Re-calculations due to an user action (TRUE) or not (FALSE) (receive new Ax00 results and calculate them)</param>
         ''' <param name="pManualFactorEvent"></param> Optional parameter. When TRUE means the recalculations are called from ManualFactor functionality
+        ''' <param name="pChangeAcceptedResultFlag">TRUE when recalculations are called while changing the accepted result</param>
         ''' <returns>GlobalDataTO indicate if an error has succeed or not</returns>
         ''' <remarks>
         ''' Created AG 21/07/21010
         ''' Modified AG 10/11/2010 - add optinal parameter pManualFactorEvent (when true the CalculationsDelegate.CalculateExecution method is not necessary)
         ''' AG 03/07/2012 - Running Cycles lost - Improvements!
+        ''' AG 15/10/2014 BA-2011 do not use optional parameters
         ''' </remarks>
         Public Function RecalculateResults(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pAnalyzer As String, ByVal pWorkSession As String, _
                                            ByVal pExecution As Integer, ByVal pManualRecalculationFlag As Boolean, _
-                                           Optional ByVal pManualFactorEvent As Boolean = False) As GlobalDataTO
+                                            ByVal pManualFactorEvent As Boolean) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -923,7 +962,9 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pRerunNumber"> = -1 if called from WS Preparation screen</param>
         ''' <returns>GlobalDataTo indicates if error or not</returns>
         ''' <remarks>AG 09/11/2010
-        ''' AG 03/07/2012 - Running Cycles lost - Improvements!</remarks>
+        ''' AG 03/07/2012 - Running Cycles lost - Improvements!
+        ''' AG 15/10/2014 BA-2011 inform the new required parameters
+        ''' </remarks>
         Public Function UpdateManualCalibrationFactor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzer As String, ByVal pWorkSession As String, _
                                                       ByVal pManualFactorFlag As Boolean, ByVal pFactorValue As Single, ByVal pExecutionID As Integer, _
                                                       ByVal pOrderTestID As Integer, ByVal pItemNumber As Integer, ByVal pRerunNumber As Integer) As GlobalDataTO
@@ -938,7 +979,8 @@ Namespace Biosystems.Ax00.Calculations
 
                 '1st update the result (mark as ManualResultFlag = TRUE and the entered ManualFactorValue
                 Dim myResults As New ResultsDelegate
-                resultData = myResults.UpdateManualResult(dbConnection, pManualFactorFlag, "QUANTIVE", pFactorValue, "", pOrderTestID, pItemNumber, pRerunNumber)
+                'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
+                resultData = myResults.UpdateManualResult(dbConnection, pManualFactorFlag, "QUANTIVE", pFactorValue, "", pOrderTestID, pItemNumber, pRerunNumber, "NOTSENT")
 
                 If Not resultData.HasError Then
                     If pExecutionID = -1 Then 'Special code for ManualFactor recalculations from WS Preparation screen
@@ -976,6 +1018,7 @@ Namespace Biosystems.Ax00.Calculations
                     End If
 
                     If Not resultData.HasError Then
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
                         resultData = Me.RecalculateResults(dbConnection, pAnalyzer, pWorkSession, pExecutionID, True, True)
                     End If
 
@@ -1153,11 +1196,17 @@ Namespace Biosystems.Ax00.Calculations
         ''' Change the accepted result when there are several reruns. Apply to all Sample Classes excepting CONTROLS (for Controls it is 
         ''' possible to accept several Reruns)
         ''' </summary>
+        ''' <param name="pSelectedExecRow"></param>
+        ''' <param name="pExportStatus"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: SA 16/07/2012 - Based in ChangeAcceptedResult
+        ''' AG 16/10/2014 BA-2011
+        '''     Inform new required parameters + add pExportStatus parameter
+        '''     #1 Change Accepted result for a PATIENT or CONTROL do not launch recalculations (but in case of PATIENTs recalculate affected calculated tests)
+        '''     #2 Set OrderToExport = TRUE when the new accepted result belongs a patient or a control and his export status is different than SENT
         ''' </remarks>
-        Public Function ChangeAcceptedResultNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow) As GlobalDataTO
+        Public Function ChangeAcceptedResultNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pExportStatus As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1177,11 +1226,33 @@ Namespace Biosystems.Ax00.Calculations
 
                 If (Not resultData.HasError) Then
                     'For Results of STANDARD Tests, recalculate all Results affected for the new accepted Rerun
-                    If (pSelectedExecRow.TestType = "STD") Then
+                    'AG 16/10/2014 BA-2011 #2 Recalculate only for blank and calib
+                    'If (pSelectedExecRow.TestType = "STD") Then
+                    If (pSelectedExecRow.TestType = "STD") AndAlso (pSelectedExecRow.SampleClass = "BLANK" OrElse pSelectedExecRow.SampleClass = "CALIB") Then
                         'Recalculate all the affected Results - The row with all data of the Execution to recalculate is sent as selected 
                         'Execution and also as Execution to recalculate
+
+                        'AG 15/10/2014 BA-2011 inform the new required parameters
                         resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, pSelectedExecRow, True, False)
                     End If
+
+
+                    'AG 16/10/2014 BA-2011 
+                    '#1 recalculate calculated tests
+                    If (pSelectedExecRow.SampleClass = "PATIENT") Then
+                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        myCalcTestsDelegate.AnalyzerID = pSelectedExecRow.AnalyzerID
+                        myCalcTestsDelegate.WorkSessionID = pSelectedExecRow.WorkSessionID
+                        resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, pSelectedExecRow.OrderTestID, True)
+                    End If
+
+                    '#2 set OrderToExport = TRUE (except if the test is not mapped)
+                    If (pSelectedExecRow.SampleClass = "CTRL" OrElse pSelectedExecRow.SampleClass = "PATIENT") AndAlso (pExportStatus <> "SENT") Then
+                        Dim orders_dlg As New OrdersDelegate
+                        resultData = orders_dlg.SetNewOrderToExportValue(dbConnection, , pSelectedExecRow.OrderTestID)
+                    End If
+                    'AG 16/10/2014 BA-2011
+
                 End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
@@ -1209,6 +1280,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <returns>GlobalDataTO </returns>
         ''' <remarks>
         ''' Created by: SA 09/07/2012 - Based in ChangeInUseFlagReplicate
+        ''' AG 15/10/2014 BA-2011 inform the new required parameters
         ''' </remarks>
         Public Function ChangeInUseFlagReplicateNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                                     ByVal pNewInUseValue As Boolean) As GlobalDataTO
@@ -1248,14 +1320,16 @@ Namespace Biosystems.Ax00.Calculations
                                 'Only for Calibrators, the experimental results are recovered
                                 If (pSelectedExecRow.SampleClass = "CALIB" AndAlso pSelectedExecRow.ExecutionType = "PREP_STD") Then
                                     Dim resultsDelegate As New ResultsDelegate
+                                    'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
                                     resultData = resultsDelegate.UpdateManualResult(Nothing, False, "QUANTIVE", 1, "", pSelectedExecRow.OrderTestID, maxMultiItemNumber, _
-                                                                                    pSelectedExecRow.RerunNumber)
+                                                                                    pSelectedExecRow.RerunNumber, "NOTSENT")
                                 End If
                             End If
 
                             If (Not resultData.HasError) Then
                                 'Execute recalculations excluding the annuled Replicate
-                                resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, myExecutionsDS.vwksWSExecutionsResults.First, True)
+                                'AG 15/10/2014 BA-2011 inform the new required parameters
+                                resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, myExecutionsDS.vwksWSExecutionsResults.First, True, False)
                             End If
                         End If
 
@@ -1291,10 +1365,11 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by:  SA 09/07/2012 - Based in RecalculateResults
         ''' Modified by: SA 12/06/2014 - BT# 1660 ==> When the Result to recalculate is for an  ISETest/SampleType, new function RecalculateISEAverageValue is
         '''                                           called instead of the previous version function (RecalculateAverageValue)
+        ''' AG 15/10/2014 BA-2011 do not use optional parameters
         ''' </remarks>
         Public Function RecalculateResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                               ByVal pExecToRecalculateRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pManualRecalculationFlag As Boolean, _
-                                              Optional ByVal pManualFactorEvent As Boolean = False) As GlobalDataTO
+                                              ByVal pManualFactorEvent As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1321,9 +1396,8 @@ Namespace Biosystems.Ax00.Calculations
                         If (pManualRecalculationFlag AndAlso Not pManualFactorEvent) Then
                             Dim myCalcDelegate As New CalculationsDelegate()
                             myCalcDelegate.AnalyzerModel = myAnalyzerModel
-
                             resultData = myCalcDelegate.CalculateExecutionNEW(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.Execution, _
-                                                                              True, myRecalData.SampleClass, pManualRecalculationFlag)
+                                                                              True, myRecalData.SampleClass, pManualRecalculationFlag, Nothing)
                         End If
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1349,7 +1423,6 @@ Namespace Biosystems.Ax00.Calculations
                                     For Each ex_row As ExecutionsDS.twksWSExecutionsRow In executionsList.twksWSExecutions
                                         'Dim myCalcDelegate As New CalculationsDelegate()
                                         myCalcDelegate.AnalyzerModel = myAnalyzerModel
-
                                         resultData = myCalcDelegate.CalculateExecutionNEW(dbConnection, myRecalData.AnalyzerID, myRecalData.WorkSessionID, ex_row.ExecutionID, _
                                                                                           True, myRecalData.SampleClass, pManualRecalculationFlag, ex_row)
                                         If (resultData.HasError) Then Exit For
@@ -1425,6 +1498,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 16/07/2012
+        ''' AG 15/10/2014 BA-2011 inform the new required parameters
         ''' </remarks>
         Public Function UpdateManualCalibrationFactorNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                                          ByVal pManualFactorFlag As Boolean, ByVal pFactorValue As Single) As GlobalDataTO
@@ -1434,8 +1508,9 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 'Update the result setting ManualResultFlag = TRUE and ManualResult = the entered Factor value
                 Dim myResults As New ResultsDelegate
+                'AG 16/10/2014 BA-2011 inform ExportStatus as NOTSENT
                 resultData = myResults.UpdateManualResult(Nothing, pManualFactorFlag, "QUANTIVE", pFactorValue, String.Empty, _
-                                                          pSelectedExecRow.OrderTestID, pSelectedExecRow.MultiItemNumber, pSelectedExecRow.RerunNumber)
+                                                          pSelectedExecRow.OrderTestID, pSelectedExecRow.MultiItemNumber, pSelectedExecRow.RerunNumber, "NOTSENT")
                 
                 If (Not resultData.HasError) Then
                     'Special code for ManualFactor recalculations from WS Preparation screen
@@ -1458,6 +1533,7 @@ Namespace Biosystems.Ax00.Calculations
                         End With
                     End If
 
+                    'AG 15/10/2014 BA-2011 inform the new required parameters
                     resultData = RecalculateResultsNEW(Nothing, pSelectedExecRow, pSelectedExecRow, True, True)
                 End If
                 resultData.SetDatos = (Not resultData.HasError)

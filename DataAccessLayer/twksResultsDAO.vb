@@ -2937,16 +2937,18 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pOrderTestID">Order Test Identifier</param>
         ''' <param name="pMultiItemNumber">MultiItem Number (only for multipoint Calibrators; otherwise, its value is always one</param>
         ''' <param name="pRerunNumber">Rerun Number</param>
+        ''' <param name="pExportStatus">NOTE: The parameter value cannot be "SENT", is responsibility of method that calls pass a valid value</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: 
         ''' Modified by: SA 26/11/2010 - Changed parameter pRerunNumber to optional; when it is not informed, then the result
         '''                              to update will be the one accepted and validated
         '''              SA 21/01/2011 - Update also fields ResultDateTime, TS_User and TS_DateTime
+        '''              AG 16/1/2014 BA-2011 do not use optional parameters + add new parameter ExportStatus and also update ExportStatus and ExportDateTime
         ''' </remarks>
         Public Function UpdateManualResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pManualResultFlag As Boolean, ByVal pResultType As String, _
                                            ByVal pManualResult As Single, ByVal pManualResultText As String, ByVal pOrderTestID As Integer, _
-                                           ByVal pMultiItemNumber As Integer, Optional ByVal pRerunNumber As Integer = -1) As GlobalDataTO
+                                           ByVal pMultiItemNumber As Integer, ByVal pRerunNumber As Integer, ByVal pExportStatus As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
                 If (pDBConnection Is Nothing) Then
@@ -2968,6 +2970,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText += ", ManualResult = NULL " & vbCrLf
                         cmdText += ", ManualResultText = N'" & pManualResultText.ToString.Replace("'", "''") & "' " & vbCrLf
                     End If
+
+                    'AG 16/10/2014 BA-2011 - inform also ExportStatus (it cannot be SENT!!!) and ExportDateTime NULL
+                    Dim newExportStatusValue As String = pExportStatus
+                    If pExportStatus = "" Then
+                        newExportStatusValue = "NOTSENT"
+                    End If
+                    cmdText += ", ExportStatus = N'" & newExportStatusValue.ToString.Replace("'", "''") & "' " & vbCrLf
+                    cmdText += ", ExportDateTime = NULL "
+                    'AG 16/10/2014 BA-2011
 
                     'Get the connected Username from the current Application Session
                     Dim currentSession As New GlobalBase
