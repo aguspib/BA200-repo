@@ -186,11 +186,18 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Get data of the specified Calculated Test
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
-        ''' <param name="pCalcTestID">Identifier of the Calculated Test</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the specified
-        '''          Calculated Test</returns>
-        ''' <remarks></remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+        ''' <param name="pID">Unique Calculated Test Identifier (CalcTestID or BiosystemsID)</param>
+        ''' <param name="pSearchByBiosystemsID">When TRUE, the search is executed by field BiosystemsID instead of by field CalcTestID.
+        '''                                     Optional parameter with FALSE as default value</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the specified Calculated Test</returns>
+        ''' <remarks>
+        ''' Created by:  SA 07/05/2010
+        ''' Modified by: SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added optional parameter pSearchByBiosystemsID to allow search the
+        '''                                                            Calculated Test by BiosystemsID instead of by CalcTestID 
+        '''                                                            (needed in UpdateVersion process)
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pID As Integer, _
+                             Optional ByVal pSearchByBiosystemsID As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -199,8 +206,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM tparCalculatedTests " & vbCrLf & _
-                                                " WHERE  CalcTestID = " & pCalcTestID.ToString
+                        Dim cmdText As String = " SELECT * FROM tparCalculatedTests " & vbCrLf
+
+                        If (Not pSearchByBiosystemsID) Then
+                            cmdText &= " WHERE CalcTestID = " & pID.ToString
+                        Else
+                            cmdText &= " WHERE BiosystemsID = " & pID.ToString
+                        End If
 
                         Dim myCalculatedTests As New CalculatedTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -212,7 +224,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.SetDatos = myCalculatedTests
                         resultData.HasError = False
                     End If
-                End If
+                    End If
 
             Catch ex As Exception
                 resultData = New GlobalDataTO()
@@ -746,14 +758,21 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pNameToSearch">Value indicating which is the name to validate: the short name or the long one</param>
         ''' <param name="pCalTestID">Calculated Test Identifier. It is an optional parameter informed
         '''                          only in case of updation</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if there is another Calculated Test with the same 
-        '''          name; otherwise, False</returns>
+        ''' <param name="pReturnBoolean">Flag indicating the type of value to return inside the GlobalDataTO. When TRUE (default value),
+        '''                              the function returns True/False; when FALSE, the function returns the obtained CalculatedTestsDS</param>
+        ''' <returns>If pReturnBoolean = TRUE ==> GlobalDataTO containing a boolean value: True if there is another Calculated Test with the same 
+        '''                                       name; otherwise, False
+        '''          If pReturnBoolean = FALSE ==> GlobalDataTO containing the obtained CalculatedTestsDS</returns>
         ''' <remarks>
         ''' Created by:
         ''' Modified by: SA 26/10/2010 - Added N preffix for multilanguage when comparing by fields CalcTestName or CalcTestLongName
+        '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added new optional parameter pReturnBoolean with default value TRUE.
+        '''                                                            When its value is FALSE, instead of return True/False, the function
+        '''                                                            will return the obtained CalculatedTestsDS inside the GlobalDataTO
         ''' </remarks>
         Public Function ExistsCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalTestName As String, _
-                                             ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0) As GlobalDataTO
+                                             ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0, _
+                                             Optional ByVal pReturnBoolean As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -784,10 +803,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                             End Using
                         End Using
 
-                        resultData.SetDatos = (myCalculatedTests.tparCalculatedTests.Rows.Count > 0)
+                        If (pReturnBoolean) Then
+                            resultData.SetDatos = (myCalculatedTests.tparCalculatedTests.Rows.Count > 0)
+                        Else
+                            resultData.SetDatos = myCalculatedTests
+                        End If
                         resultData.HasError = False
                     End If
-                End If
+                    End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True

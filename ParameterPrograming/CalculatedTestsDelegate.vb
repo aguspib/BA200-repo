@@ -116,7 +116,7 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTests">Typed DataSet CalculatedTestsDS with the list of Calculated Tests to delete</param>        
-        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        ''' <returns>GlobalDataTO containing a CalculatedTestsDS with all Calculated Tests also deleted due to the removed one was part of their Formulas</returns>
         ''' <remarks>
         ''' Modified by: SA 22/06/2010 - Changed function logic to allow deletion of several Calculated Tests. Removed 
         '''                              Concurrency Error control. After deleting a Calculated Test, set EnableStatus=False
@@ -132,6 +132,8 @@ Namespace Biosystems.Ax00.BL
         '''                              in Historic Module, then it is also marked as closed
         '''              XB 18/02/2013 - Fix the use of parameter pTestType which is not used in this function nowadays (BugsTracking #1136)
         '''              AG 10/05/2013 - Mark as deleted test if this test form part of a LIS saved worksession
+        '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Return the CalculatedTestsDS containing all Calculated Tests also deleted
+        '''                                                            due to the removed one was part of their Formulas
         ''' </remarks>
         Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTests As CalculatedTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -218,6 +220,9 @@ Namespace Biosystems.Ax00.BL
                         Next
 
                         If (Not resultData.HasError) Then
+                            'Return the CalculatedTestsDS containing the Calculated Test indirectly affected...
+                            resultData.SetDatos = myTempCalcTestDS
+
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
                         Else
@@ -377,13 +382,21 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pNameToSearch">Value indicating which is the name to validate: the short name or the long one</param>
         ''' <param name="pCalTestID">Calculated Test Identifier. It is an optional parameter informed
         '''                          only in case of updation</param>
-        ''' <returns>GlobalDataTO containing a boolean value: True if there is another Calculated Test with the same 
-        '''          name; otherwise, False</returns>
+        ''' <param name="pReturnBoolean">Flag indicating the type of value to return inside the GlobalDataTO. When TRUE (default value),
+        '''                              the function returns True/False; when FALSE, the function returns the obtained CalculatedTestsDS</param>
+        ''' <returns>If pReturnBoolean = TRUE ==> GlobalDataTO containing a boolean value: True if there is another Calculated Test with the same 
+        '''                                       name; otherwise, False
+        '''          If pReturnBoolean = FALSE ==> GlobalDataTO containing the obtained CalculatedTestsDS</returns>
         ''' <remarks>
-        ''' Created by:  SA 14/01/2011
+        ''' Created by:
+        ''' Modified by: SA 26/10/2010 - Added N preffix for multilanguage when comparing by fields CalcTestName or CalcTestLongName
+        '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added new optional parameter pReturnBoolean with default value TRUE.
+        '''                                                            When its value is FALSE, instead of return True/False, the function
+        '''                                                            will return the obtained CalculatedTestsDS inside the GlobalDataTO
         ''' </remarks>
         Public Function ExistsCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalTestName As String, _
-                                             ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0) As GlobalDataTO
+                                             ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0, _
+                                             Optional ByVal pReturnBoolean As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -393,7 +406,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim calTestToUpdate As New tparCalculatedTestsDAO
-                        resultData = calTestToUpdate.ExistsCalculatedTest(dbConnection, pCalTestName, pNameToSearch, pCalTestID)
+                        resultData = calTestToUpdate.ExistsCalculatedTest(dbConnection, pCalTestName, pNameToSearch, pCalTestID, pReturnBoolean)
                     End If
                 End If
             Catch ex As Exception
@@ -555,13 +568,18 @@ Namespace Biosystems.Ax00.BL
         ''' Get data of the specified Calculated Test
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
-        ''' <param name="pCalcTestID">Identifier of the Calculated Test</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the specified
-        '''          Calculated Test</returns>
+        ''' <param name="pID">Unique Calculated Test Identifier (CalcTestID or BiosystemsID)</param>
+        ''' <param name="pSearchByBiosystemsID">When TRUE, the search is executed by field BiosystemsID instead of by field CalcTestID.
+        '''                                     Optional parameter with FALSE as default value</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet CalculatedTestsDS with data of the specified Calculated Test</returns>
         ''' <remarks>
         ''' Created by:  SA 07/05/2010
+        ''' Modified by: SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added optional parameter pSearchByBiosystemsID to allow search the
+        '''                                                            Calculated Test by BiosystemsID instead of by CalcTestID 
+        '''                                                            (needed in UpdateVersion process)
         ''' </remarks>
-        Public Function GetCalcTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
+        Public Function GetCalcTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pID As Integer, _
+                                    Optional ByVal pSearchByBiosystemsID As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -571,7 +589,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.Read(dbConnection, pCalcTestID)
+                        resultData = myCalculatedTests.Read(dbConnection, pID)
                     End If
                 End If
             Catch ex As Exception

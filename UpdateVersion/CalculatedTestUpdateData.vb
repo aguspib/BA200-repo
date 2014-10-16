@@ -552,93 +552,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
         ''' <summary>
-        ''' Get a valid  CalcTestName and CalcTestLongName.
-        ''' This method is used by the Update process.
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pCalcTestsRow"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' CREATED BY: SGM 15/02/2013
-        ''' </remarks>
-        Private Function RenameCalcTestName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestsRow As CalculatedTestsDS.tparCalculatedTestsRow) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
-            Try
-
-                'Validate Change the name and validate if do not exist on Client DB.
-                Dim isValidNewName As Boolean = False
-                Dim isValidNewLongName As Boolean = False
-
-                Dim myValidCalcTestName As String = String.Empty
-                Dim myValidCalcTestLongName As String = String.Empty
-                myValidCalcTestName = pCalcTestsRow.CalcTestName
-                myValidCalcTestLongName = pCalcTestsRow.CalcTestLongName
-
-                Dim myCalcTestDAO As New tparCalculatedTestsDAO
-                Dim myCalcTestDS As New CalculatedTestsDS
-
-
-
-                While Not isValidNewName OrElse Not isValidNewLongName
-
-                    'NAME
-                    If Not isValidNewName Then
-                        'Add the R at the begining
-                        myValidCalcTestName = "R" & myValidCalcTestName
-
-                        'Validate the name lenght should not be more than 8
-                        If myValidCalcTestName.Length > 8 Then
-                            'Remove the last letter
-                            myValidCalcTestName = myValidCalcTestName.Remove(myValidCalcTestName.Length - 1)
-                        End If
-
-                        'Search on local db if name exist.
-                        myGlobalDataTO = myCalcTestDAO.ExistsCalculatedTest(pDBConnection, myValidCalcTestName, "NAME")
-                        If Not myGlobalDataTO.HasError AndAlso Not DirectCast(myGlobalDataTO.SetDatos, Boolean) Then
-                            'If Not exist then is a valid name
-                            isValidNewName = True
-                        End If
-
-                    End If
-
-                    'LONG NAME
-                    If Not isValidNewLongName Then
-                        'Add the R at the begining
-                        myValidCalcTestLongName = "R" & myValidCalcTestLongName
-
-                        'Validate the name lenght should not be more than 16
-                        If myValidCalcTestLongName.Length > 16 Then
-                            'Remove the last letter
-                            myValidCalcTestLongName = myValidCalcTestLongName.Remove(myValidCalcTestLongName.Length - 1)
-                        End If
-
-                        'Search on local db if name exist.
-                        myGlobalDataTO = myCalcTestDAO.ExistsCalculatedTest(pDBConnection, myValidCalcTestLongName, "FNAME")
-                        If Not myGlobalDataTO.HasError AndAlso Not DirectCast(myGlobalDataTO.SetDatos, Boolean) Then
-                            'If Not exist then is a valid name
-                            isValidNewLongName = True
-                        End If
-
-                    End If
-
-                End While
-
-                pCalcTestsRow.BeginEdit()
-                pCalcTestsRow.CalcTestName = myValidCalcTestName
-                pCalcTestsRow.CalcTestLongName = myValidCalcTestLongName
-                pCalcTestsRow.EndEdit()
-
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.RenameCalcTestName", EventLogEntryType.Error, False)
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-            End Try
-            Return myGlobalDataTO
-        End Function
-
-        ''' <summary>
         ''' Update Calc Test as Factory definition
         ''' </summary>
         ''' <param name="pDBConnection"></param>
@@ -1096,16 +1009,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <remarks>
         ''' Created by: SA 15/10/2014 - BA-1944 (SubTask BA-2017)
         ''' </remarks>
-        Public Function CreateNEWCALCTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+        Public Function CREATENewCALCTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
                 Dim myCalcTestID As Integer = -1
                 Dim myNewFormulaDS As New FormulasDS
-                Dim myNewTestDS As New CalculatedTestsDS
+                Dim myNewCalcTestDS As New CalculatedTestsDS
                 Dim myNewRefRanges As New TestRefRangesDS
                 Dim myFormulaText As String = String.Empty
-                Dim myNewTestsList As New CalculatedTestsDS
+                Dim myNewCalcTestsList As New CalculatedTestsDS
                 Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
                 Dim myCalcTestsDelegate As New CalculatedTestsDelegate
                 Dim myUpdateVersionAddedElementsRow As UpdateVersionChangesDS.AddedElementsRow
@@ -1113,56 +1026,32 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 '(1) Search in Factory DB all new CALC TESTS
                 myGlobalDataTO = myCalcTestUpdateDAO.GetNewFactoryTests(pDBConnection)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    myNewTestsList = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                    myNewCalcTestsList = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
 
                     '(2) Process each new CALC Test in Factory DB to add it to Customer DB
-                    For Each newTest As CalculatedTestsDS.tparCalculatedTestsRow In myNewTestsList.tparCalculatedTests
+                    For Each newTest As CalculatedTestsDS.tparCalculatedTestsRow In myNewCalcTestsList.tparCalculatedTests
                         '(2.1) Get all data in table tparCalculatedTests in Factory DB
                         myGlobalDataTO = myCalcTestUpdateDAO.GetDataInFactoryDB(pDBConnection, newTest.BiosystemsID, True)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            myNewTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                            myNewCalcTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
                         End If
 
                         '(2.2) Verify if there is an User CALC Test in Customer DB with the same Name and/or ShortName of the new Factory CALC Test, and in this case, 
                         '      rename the User CALC Test 
                         If (Not myGlobalDataTO.HasError) Then
-                            ' myGlobalDataTO = UpdateRenamedTest(pDBConnection, myNewTestDS.tparTests.First.TestName, myNewTestDS.tparTests.First.ShortName, pUpdateVersionChangesList)
+                            myGlobalDataTO = UpdateRenamedTest(pDBConnection, myNewCalcTestDS.tparCalculatedTests.First.CalcTestLongName, _
+                                                               myNewCalcTestDS.tparCalculatedTests.First.CalcTestName, pUpdateVersionChangesList)
                         End If
 
-                        '(2.3) Get all members of the Formula of the NEW CALC Test in FACTORY DB
+                        '(2.3) Get the Formula of the NEW CALC Test in FACTORY DB; rebuild field FormulaText using Test Names from CUSTOMER DB
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = myCalcTestUpdateDAO.GetFormulaInFactoryDB(pDBConnection, newTest.CalcTestID)
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myNewFormulaDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
-
-                                For Each formulaMember As FormulasDS.tparFormulasRow In myNewFormulaDS.tparFormulas
-                                    If (formulaMember.Value = "TEST") Then
-                                        'Get the Test name in CUSTOMER DB
-                                        myGlobalDataTO = GetTestNameForFormula(pDBConnection, formulaMember.TestType, Convert.ToInt32(formulaMember.Value), formulaMember.SampleType)
-                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                            myFormulaText &= Convert.ToString(myGlobalDataTO.SetDatos)
-                                        Else
-                                            'If an error has been raised, then the process is stopped...
-                                            Exit For
-                                        End If
-
-                                        'If the Formula Member is a CALC Test, get value of CalcTestID in CUSTOMER DB
-                                    Else
-                                        myFormulaText &= formulaMember.ValueType.Trim
-                                    End If
-                                Next
-
-                                If (Not myGlobalDataTO.HasError) Then
-                                    'Update the FormulaText field for the Calculated Test (to use the name of Tests in CUSTOMER DB)
-                                    myNewTestDS.tparCalculatedTests.First.FormulaText = myFormulaText
-                                    myNewTestDS.tparCalculatedTests.AcceptChanges()
-                                End If
-                            End If
+                            myNewFormulaDS.Clear()
+                            myGlobalDataTO = UpdateCalcTestFormula(pDBConnection, myNewCalcTestDS.tparCalculatedTests.First, myNewFormulaDS)
                         End If
 
                         '(2.4) Get Reference Ranges defined for the NEW CALC Test in FACTORY DB
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = myCalcTestUpdateDAO.GetRefRangesInFactoryDB(pDBConnection, newTest.CalcTestID)
+                            myGlobalDataTO = myCalcTestUpdateDAO.GetRefRangesInFactoryDB(pDBConnection, myNewCalcTestDS.tparCalculatedTests.First.CalcTestID)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 myNewRefRanges = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
                             End If
@@ -1170,7 +1059,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(2.5) Save the NEW CALC Test in CUSTOMER DB 
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = myCalcTestsDelegate.Add(pDBConnection, myNewTestDS, myNewFormulaDS, myNewRefRanges)
+                            myGlobalDataTO = myCalcTestsDelegate.Add(pDBConnection, myNewCalcTestDS, myNewFormulaDS, myNewRefRanges)
                         End If
 
                         '(2.6) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table AddedElements) 
@@ -1178,8 +1067,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Not myGlobalDataTO.HasError) Then
                             myUpdateVersionAddedElementsRow = pUpdateVersionChangesList.AddedElements.NewAddedElementsRow
                             myUpdateVersionAddedElementsRow.ElementType = "CALC"
-                            myUpdateVersionAddedElementsRow.ElementName = myNewTestDS.tparCalculatedTests.First.CalcTestLongName & " (" & myNewTestDS.tparCalculatedTests.First.CalcTestName & ")"
-                            If (myNewTestDS.tparCalculatedTests.First.UniqueSampleType) Then myUpdateVersionAddedElementsRow.SampleType = myNewTestDS.tparCalculatedTests.First.SampleType
+                            myUpdateVersionAddedElementsRow.ElementName = myNewCalcTestDS.tparCalculatedTests.First.CalcTestLongName & " (" & myNewCalcTestDS.tparCalculatedTests.First.CalcTestName & ")"
+                            If (myNewCalcTestDS.tparCalculatedTests.First.UniqueSampleType) Then myUpdateVersionAddedElementsRow.SampleType = myNewCalcTestDS.tparCalculatedTests.First.SampleType
                             pUpdateVersionChangesList.AddedElements.AddAddedElementsRow(myUpdateVersionAddedElementsRow)
                             pUpdateVersionChangesList.AddedElements.AcceptChanges()
                         End If
@@ -1195,13 +1084,92 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.CreateNEWCALCTests", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.CREATENewCALCTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
 
         ''' <summary>
-        ''' 
+        ''' Get the Formula of a CALC Test in FACTORY DB, and update field FormulaText by using Test Names from CUSTOMER DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pNewCalcTestRow">Row of CalculatedTestsDS containing all data of the Calculated Test in FACTORY DB</param>
+        ''' <param name="pNewFormulaDS">FormulasDS to return the Formula of the Calculated Test in FACTORY DB</param>
+        ''' <param name="pCustomerCalcTestID">Identifier of the Calculated Test in CUSTOMER DB; optional parameter, informed when this
+        '''                                   function is called to update with values in FACTORY DB the Formula of a Calculated Test that
+        '''                                   exists in CUSTOMER DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Function UpdateCalcTestFormula(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pNewCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, _
+                                               ByRef pNewFormulaDS As FormulasDS, Optional ByVal pCustomerCalcTestID As Integer = 0) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myTestID As Integer = 0
+                Dim myFormulaText As String = String.Empty
+                Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
+
+                'Get all members of the Formula of the NEW CALC Test in FACTORY DB
+                myGlobalDataTO = myCalcTestUpdateDAO.GetFormulaInFactoryDB(pDBConnection, pNewCalcTestRow.CalcTestID)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    pNewFormulaDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+
+                    For Each formulaMember As FormulasDS.tparFormulasRow In pNewFormulaDS.tparFormulas
+                        If (pCustomerCalcTestID > 0) Then formulaMember.CalcTestID = pCustomerCalcTestID
+
+                        If (formulaMember.ValueType = "TEST") Then
+                            'Get the Test Identifier
+                            myTestID = Convert.ToInt32(formulaMember.Value)
+
+                            'If the Formula Member is a CALC Test, get value of CalcTestID in CUSTOMER DB
+                            If (formulaMember.TestType = "CALC") Then
+                                myGlobalDataTO = GetCustomerCalcTestID(pDBConnection, myTestID)
+                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                    myTestID = Convert.ToInt32(myGlobalDataTO.SetDatos)
+
+                                    'Update the Formula by informing the ID of the Calculated Test in CUSTOMER DB
+                                    formulaMember.Value = myTestID.ToString
+                                End If
+                            End If
+
+                            'Get the Test name in CUSTOMER DB and rebuild field FormulaText
+                            If (Not myGlobalDataTO.HasError) Then
+                                myGlobalDataTO = GetTestNameForFormula(pDBConnection, formulaMember.TestType, myTestID, formulaMember.SampleType)
+                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                    myFormulaText &= Convert.ToString(myGlobalDataTO.SetDatos)
+                                End If
+                            End If
+                        Else
+                            myFormulaText &= formulaMember.Value.Trim
+                        End If
+
+                        'If an error has been raised, then the process is stopped...
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                    pNewFormulaDS.AcceptChanges()
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'Update the FormulaText field for the Calculated Test (to use the name of Tests in CUSTOMER DB)
+                        pNewCalcTestRow.FormulaText = myFormulaText
+                        pNewCalcTestRow.AcceptChanges()
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCalcTestFormula", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Get the name of the informed Test in CUSTOMER DB (according its Test Type), and return the TestName followed by the informed SampleType
+        ''' between brackets (used to rebuild the FormulaText field of a Calculated Test in which Formula the informed Test is included)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestType">Test Type: STD, CALC, ISE or OFFS</param>
@@ -1296,7 +1264,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myGlobalDataTO
         End Function
 
-        Private Function GetCalcTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFactoryCalcTestID As Integer) As GlobalDataTO
+        ''' <summary>
+        ''' Search the Identifier of a Calculated Test in CUSTOMER DB, searching it by BiosystemsID
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pFactoryCalcTestID">Identifier of the Calculated Test in FACTORY DB</param>
+        ''' <returns>GlobalDataTO containing an integer value with the Identifier of the Calculated Test in CUSTOMER DB</returns>
+        ''' <remarks>
+        ''' Created by: SA 15/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Function GetCustomerCalcTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFactoryCalcTestID As Integer) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -1306,11 +1283,413 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 'Search in FACTORY DB the BiosystemsID for the informed CalcTestID
                 myGlobalDataTO = myCalcTestUpdateDAO.GetDataInFactoryDB(pDBConnection, pFactoryCalcTestID, False)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    Dim myCalcTestDS As CalculatedTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
 
+                    If (myCalcTestDS.tparCalculatedTests.Rows.Count > 0) Then
+                        Dim factoryBiosystemsID As Integer = myCalcTestDS.tparCalculatedTests.First.BiosystemsID
 
-                    'Search in CUSTOMER DB the CalcTestID for the specified BiosystemsID
-                    ' myGlobalDataTO = myCalcTestsDelegate.GetCalcTest(pDBConnection)
+                        'Search in CUSTOMER DB the CalcTestID for the specified BiosystemsID
+                        myGlobalDataTO = myCalcTestsDelegate.GetCalcTest(pDBConnection, factoryBiosystemsID, True)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myCalcTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                            If (myCalcTestDS.tparCalculatedTests.Rows.Count > 0) Then
+                                myGlobalDataTO.SetDatos = myCalcTestDS.tparCalculatedTests.First.CalcTestID
+                                myGlobalDataTO.HasError = False
+                            Else
+                                'This case is not possible...
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+                    Else
+                        'This case is not possible...
+                        myGlobalDataTO.HasError = True
+                    End If
                 End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetCustomerCalcTestID", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Verify if there is an User CALC Test in Customer DB with the same Name and/or ShortName of a new Factory CALC Test, and in this case, rename
+        ''' the User Test by adding as many "R" letters at the beginning of the Name and ShortName as needed until get an unique Name and ShortName
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestName">Name of the new Factory CALC Test to verify</param>
+        ''' <param name="pShortName">ShortName of the new Factory CALC Test to verify</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Function UpdateRenamedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestName As String, ByVal pShortName As String, _
+                                           ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                Dim myCalcTestsDS As New CalculatedTestsDS
+                Dim myAuxCalcTestsDS As New CalculatedTestsDS
+                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                Dim myHistCalcTestsDAO As New thisCalculatedTestsDAO
+
+                Dim myUpdateVersionRenamedElementsRow As UpdateVersionChangesDS.RenamedElementsRow
+
+                '(1) Search if there is an User Test with the same Name...
+                myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, pTestName, "FNAME", 0, False)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                End If
+
+                '(2) Search if there is an User Test with the same ShortName
+                If (Not myGlobalDataTO.HasError) Then
+                    myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, pTestName, "NAME", 0, False)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myAuxCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                    End If
+                End If
+
+                '(3) Merge results of both searches
+                If (Not myGlobalDataTO.HasError) Then
+                    myCalcTestsDS.Merge(myAuxCalcTestsDS, True)
+
+                    '(4) Process each one of the STD Tests found
+                    For Each calcTestRow As CalculatedTestsDS.tparCalculatedTestsRow In myCalcTestsDS.tparCalculatedTests
+                        'Rename the STD Test (add as many "R" letters as needed at the beginning of Name and ShortName)
+                        myGlobalDataTO = RenameCalcTestName(pDBConnection, calcTestRow)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
+                                '(4.1) Update the renamed CALC Test in Customer DB
+                                myAuxCalcTestsDS.Clear()
+                                myAuxCalcTestsDS.tparCalculatedTests.AddtparCalculatedTestsRow(calcTestRow)
+                                myAuxCalcTestsDS.AcceptChanges()
+
+                                myGlobalDataTO = myCalcTestsDelegate.Modify(pDBConnection, myAuxCalcTestsDS, New FormulasDS, New TestRefRangesDS, False, True)
+
+                                '(4.2) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table RenamedElements)
+                                If (Not myGlobalDataTO.HasError) Then
+                                    myUpdateVersionRenamedElementsRow = pUpdateVersionChangesList.RenamedElements.NewRenamedElementsRow
+                                    myUpdateVersionRenamedElementsRow.ElementType = "CALC"
+                                    myUpdateVersionRenamedElementsRow.PreviousName = pTestName & " (" & pShortName & ")"
+                                    myUpdateVersionRenamedElementsRow.UpdatedName = calcTestRow.CalcTestLongName & " (" & calcTestRow.CalcTestName & ")"
+                                    pUpdateVersionChangesList.RenamedElements.AddRenamedElementsRow(myUpdateVersionRenamedElementsRow)
+                                    pUpdateVersionChangesList.RenamedElements.AcceptChanges()
+                                End If
+                            Else
+                                'If it was not possible to rename the Test (really unlikely case), it is considered an error
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+
+                        'If an error has been raised, then the process is finished
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateDate.UpdateRenamedTest", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Add "R" letters at the beginning of a CALC Test Name and ShortName until get an unique Name/ShortName.
+        ''' Used during Update Version process when a new Factory CALC Test is added and there is an User Test in 
+        ''' Customer DB with the same Test Name and/or ShortName of the one to add
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pCalcTestsRow">Row of CalculatedTestsDS containing the basic data of the CALC Test to rename</param>
+        ''' <returns>GlobalDataTO containing a Boolean value indicating if the STD Test has been renamed (when TRUE)</returns>
+        ''' <remarks>
+        ''' Created by:  SG 15/02/2013
+        ''' Modified by: SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Return a Boolean value to indicate if the CALC Test has been renamed
+        ''' </remarks>
+        Private Function RenameCalcTestName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestsRow As CalculatedTestsDS.tparCalculatedTestsRow) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                Dim myCalcTestDS As New CalculatedTestsDS
+                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+
+                Dim isValidNewName As Boolean = False
+                Dim isValidTestName As Boolean = False
+                Dim isValidShortName As Boolean = False
+
+                Dim numOfRs As Integer = 1
+                Dim errorFound As Boolean = False
+                Dim myValidTestName As String = pCalcTestsRow.CalcTestLongName
+                Dim myValidShortName As String = pCalcTestsRow.CalcTestName
+
+                While (Not isValidNewName AndAlso numOfRs < 16 AndAlso Not errorFound)
+                    If (Not isValidTestName) Then
+                        'Add an "R" at the beginning of the Test Name
+                        myValidTestName = "R" & myValidTestName
+
+                        'If the length of the new Test Name is greater than 16, remove the last character
+                        If (myValidTestName.Length > 16) Then myValidTestName = myValidTestName.Remove(myValidTestName.Length - 1)
+
+                        'Verify if the new Test Name is unique in Customer DB (there is not another Test with the same Name)
+                        myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, myValidTestName, "FNAME")
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            isValidTestName = (DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS).tparCalculatedTests.Count = 0)
+                        Else
+                            errorFound = True
+                        End If
+                    End If
+
+                    If (Not isValidShortName) Then
+                        'Add an "R" at the beginning of the Test Short Name
+                        myValidShortName = "R" & myValidShortName
+
+                        'If the length of the new Test Short Name is greater than 8, remove the last character
+                        If (myValidShortName.Length > 8) Then myValidShortName = myValidShortName.Remove(myValidShortName.Length - 1)
+
+                        'Verify if the new Test Short Name is unique in Customer DB (there is not another Test with the same Short Name)
+                        myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, myValidShortName, "NAME")
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            isValidShortName = (DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS).tparCalculatedTests.Count = 0)
+                        Else
+                            errorFound = True
+                        End If
+                    End If
+
+                    'The rename is accepted with the rename of both fields Name and ShortName is accepted
+                    isValidNewName = (isValidShortName AndAlso isValidTestName)
+
+                    'Just to avoid the very unlikely probability of endless loop 
+                    numOfRs += 1
+                End While
+
+                'Finally, update the name in the CalculatedTestsDS row received as entry parameter
+                If (isValidNewName) Then
+                    pCalcTestsRow.BeginEdit()
+                    pCalcTestsRow.CalcTestLongName = myValidTestName
+                    pCalcTestsRow.CalcTestName = myValidShortName
+                    pCalcTestsRow.EndEdit()
+                End If
+
+                myGlobalDataTO.SetDatos = isValidNewName
+                myGlobalDataTO.HasError = errorFound
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.RenameTestName", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Execute the process to search all CALC Tests that should be deleted from CUSTOMER DB (those preloaded CALC Tests that exist in CUSTOMER DB but not in FACTORY DB) and 
+        ''' remove them from CUSTOMER DB 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Public Function DELETERemovedCALCTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim myDeletedCalcTestDS As New CalculatedTestsDS
+                Dim myRemovedCalcTestsDS As New CalculatedTestsDS
+                Dim myAffectedCalcTestsDS As New CalculatedTestsDS
+                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                Dim myCalculatedTestUpdateDAO As New CalculatedTestUpdateDAO
+                Dim myUpdateVersionDeletedElementsRow As UpdateVersionChangesDS.DeletedElementsRow
+
+                '(1) Search in Customer DB all Preloaded CALC TESTS that do not exist in Factory DB:
+                myGlobalDataTO = myCalculatedTestUpdateDAO.GetDeletedPreloadedCALCTests(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myRemovedCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                    '(2) Process each returned CALC Test to delete it from CUSTOMER DB
+                    For Each removedCalcTest As CalculatedTestsDS.tparCalculatedTestsRow In myRemovedCalcTestsDS.tparCalculatedTests
+                        '(2.1) In CUSTOMER DB, search data of the CALC Test to delete 
+                        myGlobalDataTO = myCalcTestsDelegate.GetCalcTest(pDBConnection, removedCalcTest.BiosystemsID, True)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            myDeletedCalcTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                            If (myDeletedCalcTestDS.tparCalculatedTests.Rows.Count = 0) Then
+                                'This case is not possible due to the query is sorted by BiosystemsID descending and component CALC Tests are 
+                                'processed after parent CALC Tests
+                                myGlobalDataTO.HasError = True
+                            End If
+                        End If
+
+                        '(2.2) Delete the CALC Test from CUSTOMER DB
+                        If (Not myGlobalDataTO.HasError) Then
+                            myGlobalDataTO = myCalcTestsDelegate.Delete(pDBConnection, myDeletedCalcTestDS)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myAffectedCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+                            End If
+                        End If
+
+                        '(2.3) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table DeletedElements) 
+                        '      for the deleted CALC Test
+                        If (Not myGlobalDataTO.HasError) Then
+                            myUpdateVersionDeletedElementsRow = pUpdateVersionChangesList.DeletedElements.NewDeletedElementsRow
+                            myUpdateVersionDeletedElementsRow.ElementType = "CALC"
+                            myUpdateVersionDeletedElementsRow.ElementName = myDeletedCalcTestDS.tparCalculatedTests.First.CalcTestLongName & " (" & myDeletedCalcTestDS.tparCalculatedTests.First.CalcTestName & ")"
+                            If (myDeletedCalcTestDS.tparCalculatedTests.First.UniqueSampleType) Then myUpdateVersionDeletedElementsRow.SampleType = myDeletedCalcTestDS.tparCalculatedTests.First.SampleType
+                            pUpdateVersionChangesList.DeletedElements.AddDeletedElementsRow(myUpdateVersionDeletedElementsRow)
+                            pUpdateVersionChangesList.DeletedElements.AcceptChanges()
+
+                            'For each Calculated Test also remove (due to the deleted one was part of its formula), add a row in the global DS containing all changes in 
+                            'Customer DB due to the Update Version Process (sub-table DeletedElements) 
+                            For Each affectedCalcTest As CalculatedTestsDS.tparCalculatedTestsRow In myAffectedCalcTestsDS.tparCalculatedTests
+                                myUpdateVersionDeletedElementsRow = pUpdateVersionChangesList.DeletedElements.NewDeletedElementsRow
+                                myUpdateVersionDeletedElementsRow.ElementType = "CALC"
+                                myUpdateVersionDeletedElementsRow.ElementName = affectedCalcTest.CalcTestLongName & " (" & affectedCalcTest.CalcTestName & ")"
+                                If (affectedCalcTest.UniqueSampleType) Then myUpdateVersionDeletedElementsRow.SampleType = affectedCalcTest.SampleType
+                                pUpdateVersionChangesList.DeletedElements.AddDeletedElementsRow(myUpdateVersionDeletedElementsRow)
+                                pUpdateVersionChangesList.DeletedElements.AcceptChanges()
+                            Next
+                        End If
+
+                        'If an error has been raised, then the process is stopped
+                        If (myGlobalDataTO.HasError) Then Exit For
+                    Next
+                End If
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.DELETERemovedCALCTests", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Execute the process to search in FACTORY DB all CALC TESTS that exists in CUSTOMER DB but for which at least one of the relevant Test fields 
+        ''' have changed and modify data in CUSTOMER DB (tables tparCalculatedTests, tparFormulas and/or tparTestRefRanges
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Public Function UPDATEModifiedCALCTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim formulaChanged As Boolean
+                Dim refRangesChanged As Boolean
+
+                Dim myCalcTestsDS As New CalculatedTestsDS
+                Dim myFormulaDS As New FormulasDS
+                Dim myRefRanges As New TestRefRangesDS
+                Dim myCustomerCalcTestsDS As New CalculatedTestsDS
+                Dim myFactoryCalcTestDS As New CalculatedTestsDS
+                Dim myFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow
+                Dim myPreloadedCALCTestList As New List(Of CalculatedTestsDS.tparCalculatedTestsRow)
+
+                Dim myFormulasDelegate As New FormulasDelegate
+                Dim myRefRangesDelegate As New TestRefRangesDelegate
+                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                Dim myCalculatedTestUpdateDAO As New CalculatedTestUpdateDAO
+
+                '(1) Get from CUSTOMER DB all preloaded CALC Tests 
+                myGlobalDataTO = myCalcTestsDelegate.GetList(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    myCustomerCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                    'Get only the preloaded ones...
+                    myPreloadedCALCTestList = (From a As CalculatedTestsDS.tparCalculatedTestsRow In myCustomerCalcTestsDS.tparCalculatedTests _
+                                              Where a.PreloadedCalculatedTest = True _
+                                        AndAlso Not a.IsBiosystemsIDNull() _
+                                             Select a).ToList()
+                End If
+
+                '(2) For each preloaded CALC Test in CUSTOMER DB, verify if there are changes in FACTORY DB
+                For Each preloadedCustomerCalcTest As CalculatedTestsDS.tparCalculatedTestsRow In myPreloadedCALCTestList
+                    '(2.1) Get data of the CALC Test in Factory DB (search by BiosystemsID)
+                    myGlobalDataTO = myCalculatedTestUpdateDAO.GetDataInFactoryDB(pDBConnection, preloadedCustomerCalcTest.BiosystemsID, True)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myFactoryCalcTestDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                        If (myFactoryCalcTestDS.tparCalculatedTests.Rows.Count > 0) Then
+                            myFactoryCalcTestRow = myFactoryCalcTestDS.tparCalculatedTests.First
+                        Else
+                            'This case is not possible due to CALC Test deleted in FACTORY DB were processed before
+                            myGlobalDataTO.HasError = True
+                        End If
+                    End If
+
+                    '(2.2) Get the Formula of the CALC Test in Factory DB but with following changes: 
+                    '      ** In FormulaDS, all IDs of Calculated Tests have been replaced for the ones in Customer DB
+                    '      ** Field FormulaText for the Calculated Test has been rebuilt using the name of the Tests in Custormer DB
+                    If (Not myGlobalDataTO.HasError) Then
+                        myFormulaDS.Clear()
+                        myGlobalDataTO = UpdateCalcTestFormula(pDBConnection, myFactoryCalcTestRow, myFormulaDS, preloadedCustomerCalcTest.CalcTestID)
+                    End If
+
+                    '(2.3) Verify if the Formula of the CALC Test has been changed 
+                    If (Not myGlobalDataTO.HasError) Then
+                        myGlobalDataTO = UpdateCustomerTest(myFactoryCalcTestRow, preloadedCustomerCalcTest, pUpdateVersionChangesList)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            formulaChanged = Convert.ToBoolean(myGlobalDataTO.SetDatos)
+                        End If
+                    End If
+
+                    '(2.4) Verify if the Reference Ranges defined for the CALC Test have been changed
+                    If (Not myGlobalDataTO.HasError) Then
+                        myRefRanges.Clear()
+                        myGlobalDataTO = UpdateCalcTestRefRanges(pDBConnection, myFactoryCalcTestRow, preloadedCustomerCalcTest, myRefRanges, _
+                                                                 pUpdateVersionChangesList, formulaChanged)
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            refRangesChanged = Convert.ToBoolean(myGlobalDataTO.SetDatos)
+                        End If
+                    End If
+
+                    '(2.5) Verify if the CALC Test has to be updated
+                    If (Not myGlobalDataTO.HasError) Then
+                        If (formulaChanged AndAlso Not refRangesChanged) Then
+                            'Get the Reference Ranges for the CALC Test in CUSTOMER DB
+                            myGlobalDataTO = myRefRangesDelegate.ReadByTestID(pDBConnection, preloadedCustomerCalcTest.CalcTestID, String.Empty, "CALC")
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myRefRanges = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
+                            End If
+
+                        ElseIf (Not formulaChanged AndAlso refRangesChanged) Then
+                            'Get the Formula for the CALC Test in CUSTOMER DB
+                            myGlobalDataTO = myFormulasDelegate.GetFormulaValues(pDBConnection, preloadedCustomerCalcTest.CalcTestID)
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myFormulaDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+                            End If
+                        End If
+                    End If
+
+                    If (Not myGlobalDataTO.HasError) Then
+                        'Finally, if the Formula and/or the Reference Ranges have been changed, then the CALC Test is updated in CUSTOMER DB
+                        If (formulaChanged OrElse refRangesChanged) Then
+                            myCalcTestsDS.Clear()
+                            myCalcTestsDS.tparCalculatedTests.ImportRow(preloadedCustomerCalcTest)
+                            myCalcTestsDS.AcceptChanges()
+
+                            myGlobalDataTO = myCalcTestsDelegate.Modify(pDBConnection, myCalcTestsDS, myFormulaDS, myRefRanges, formulaChanged, formulaChanged)
+                        End If
+                    End If
+
+                    'If an error has been raised, then the process is stopped
+                    If (myGlobalDataTO.HasError) Then Exit For
+                Next
+                myPreloadedCALCTestList = Nothing
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
@@ -1318,10 +1697,233 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetCalcTestID", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UPDATEModifiedCALCTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
+
+        ''' <summary>
+        ''' For a CALC Test, compare value of relevant fields in table tparCalculatedTests in CUSTOMER DB with value of the same fields in FACTORY DB, 
+        ''' and update in CUSTOMER DB all modified fields.
+        ''' </summary>
+        ''' <param name="pFactoryCalcTestRow">Row of CalculatedTestsDS containing data of the CALC Test in FACTORY DB (although with field FormulaText
+        '''                                   updated to use the name of the component Tests from CUSTOMER DB)</param>
+        ''' <param name="pCustomerCalcTestRow">Row of CalculatedTestsDS containing data of the CALC Test in CUSTOMER DB</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <returns>GlobalDataTO containing a Boolean value: when TRUE, it means the Formula of the CALC Test has changed</returns>
+        ''' <remarks>
+        ''' Created by:  SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Function UpdateCustomerTest(ByVal pFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, _
+                                            ByVal pCustomerCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, _
+                                            ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                'Build the TestName to report changes...
+                Dim myCalcTestName As String = pCustomerCalcTestRow.CalcTestLongName & " (" & pCustomerCalcTestRow.CalcTestName & ") "
+
+                'Verify if field SampleType has changed
+                Dim mySampleType As String = "--"
+                Dim formulaUpdated As Boolean = False
+
+                If (Not pFactoryCalcTestRow.IsSampleTypeNull) Then
+                    If (pCustomerCalcTestRow.IsSampleTypeNull OrElse pCustomerCalcTestRow.SampleType <> pFactoryCalcTestRow.SampleType) Then
+                        If (Not pCustomerCalcTestRow.IsSampleTypeNull) Then mySampleType = pCustomerCalcTestRow.SampleType
+
+                        'Add a row for field SampleType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "SampleType", mySampleType, _
+                                                            pFactoryCalcTestRow.SampleType)
+
+                        'Update field in the Customer DataSet (update also field UniqueSampleType)
+                        pCustomerCalcTestRow.SampleType = pFactoryCalcTestRow.SampleType
+                        pCustomerCalcTestRow.UniqueSampleType = pFactoryCalcTestRow.UniqueSampleType
+                    End If
+                Else
+                    If (Not pCustomerCalcTestRow.IsSampleTypeNull) Then
+                        'Add a row for field SampleType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "SampleType", pCustomerCalcTestRow.SampleType, _
+                                                            mySampleType)
+
+                        'Update field in the Customer DataSet (update also field UniqueSampleType)
+                        pCustomerCalcTestRow.SetSampleTypeNull()
+                        pCustomerCalcTestRow.UniqueSampleType = pFactoryCalcTestRow.UniqueSampleType
+                    End If
+                End If
+
+                'If the SampleType is the same, verify if the Formula has changed
+                If (pCustomerCalcTestRow.FormulaText <> pFactoryCalcTestRow.FormulaText) Then
+                    formulaUpdated = True
+
+                    'Add a row for field FormulaText in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "FormulaText", pCustomerCalcTestRow.FormulaText, _
+                                                        pFactoryCalcTestRow.FormulaText)
+
+                    'Update field in the Customer DataSet
+                    pCustomerCalcTestRow.FormulaText = pFactoryCalcTestRow.FormulaText
+
+                    'If the Formula has changed, verify also if fields MeasureUnit and Decimals have changed
+                    If (pCustomerCalcTestRow.MeasureUnit <> pFactoryCalcTestRow.MeasureUnit) Then
+                        'Add a row for field MeasureUnit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "MeasureUnit", pCustomerCalcTestRow.MeasureUnit, _
+                                                            pFactoryCalcTestRow.MeasureUnit)
+
+                        'Update field in the Customer DataSet
+                        pCustomerCalcTestRow.MeasureUnit = pFactoryCalcTestRow.MeasureUnit
+                    End If
+
+                    If (pCustomerCalcTestRow.Decimals <> pFactoryCalcTestRow.Decimals) Then
+                        'Add a row for field Decimals in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "MeasureUnit", pCustomerCalcTestRow.Decimals.ToString, _
+                                                            pFactoryCalcTestRow.Decimals.ToString)
+
+                        'Update field in the Customer DataSet
+                        pCustomerCalcTestRow.Decimals = pFactoryCalcTestRow.Decimals
+                    End If
+                End If
+
+                myGlobalDataTO.SetDatos = formulaUpdated
+                myGlobalDataTO.HasError = False
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' For a CALC Test, verify if there are changes in the Reference Ranges in FACTORY DB and if these changes have to be applied in 
+        ''' CUSTOMER DB: 
+        ''' ** If the Formula of the CALC Test has changed, the Reference Ranges are updated in all cases
+        ''' ** If the Formula of the CALC Test is the same, the Reference Ranges are updated only when the CALC Test has not DETAILED Reference
+        '''    Ranges defined in CUSTOMER DB
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pFactoryCalcTestRow">Row of CalculatedTestsDS containing data of the CALC Test in FACTORY DB</param>
+        ''' <param name="pCustomerCalcTestRow">Row of CalculatedTestsDS containing data of the CALC Test in CUSTOMER DB</param>
+        ''' <param name="pNewRefRangesDS">TestRefRangesDS to return the Reference Ranges defined for the Calculated Test in FACTORY DB</param>
+        ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
+        ''' <param name="pFormulaChanged">Flag indicating if the Formula of the Calculated Test has been changed in FACTORY DB</param>
+        ''' <returns>GlobalDataTO containing a Boolean value: when TRUE, it means the Reference Ranges of the CALC Test have changed</returns>
+        '''  <remarks>
+        ''' Created by:  SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Function UpdateCalcTestRefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, _
+                                                 ByVal pCustomerCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, ByRef pNewRefRangesDS As TestRefRangesDS, _
+                                                 ByRef pUpdateVersionChangesList As UpdateVersionChangesDS, ByVal pFormulaChanged As Boolean) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                Dim updateRefRanges As Boolean = False
+                Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
+
+                'Get the Reference Ranges defined for the CALC Test in FACTORY DB
+                If (Not pFactoryCalcTestRow.IsActiveRangeTypeNull) Then
+                    myGlobalDataTO = myCalcTestUpdateDAO.GetRefRangesInFactoryDB(pDBConnection, pFactoryCalcTestRow.CalcTestID)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        pNewRefRangesDS = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
+                    End If
+                End If
+
+                If (Not pFormulaChanged) Then
+                    'If the Formula of the CALC Test has not changed, then the Reference Ranges are updated only if there are not
+                    'DETAILED Reference Ranges in CUSTOMER DB
+                    If (Not pFactoryCalcTestRow.IsActiveRangeTypeNull) Then
+                        If (pCustomerCalcTestRow.IsActiveRangeTypeNull OrElse pCustomerCalcTestRow.ActiveRangeType <> "DETAILED") Then
+                            updateRefRanges = True
+                        End If
+                    Else
+                        updateRefRanges = (Not pCustomerCalcTestRow.IsActiveRangeTypeNull)
+                    End If
+                Else
+                    'If the Formula of the CALC Test has changed, then the Reference Ranges are always updated
+                    updateRefRanges = True
+                End If
+
+                If (updateRefRanges) Then
+                    'Build the TestName to report changes...
+                    Dim myCalcTestName As String = pCustomerCalcTestRow.CalcTestLongName & " (" & pCustomerCalcTestRow.CalcTestName & ") "
+
+                    Dim myActiveRangeType As String = "--"
+                    If (Not pFactoryCalcTestRow.IsActiveRangeTypeNull) Then
+                        If (Not pCustomerCalcTestRow.IsActiveRangeTypeNull) Then myActiveRangeType = pCustomerCalcTestRow.ActiveRangeType
+
+                        'Add a row for field ActiveRangeType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "ActiveRangeType", myActiveRangeType, _
+                                                            pFactoryCalcTestRow.ActiveRangeType)
+
+                        'Update field in Customer DB
+                        pCustomerCalcTestRow.ActiveRangeType = pFactoryCalcTestRow.ActiveRangeType
+
+                        'In the TestRefRangesDS from FACTORY DB, update field TestID with value of CalcTestID from CUSTOMER DB
+                        For Each refRangeRow As TestRefRangesDS.tparTestRefRangesRow In pNewRefRangesDS.tparTestRefRanges
+                            refRangeRow.SetRangeIDNull()
+                            refRangeRow.TestID = pCustomerCalcTestRow.CalcTestID
+                        Next
+                        pNewRefRangesDS.AcceptChanges()
+                    Else
+                        'Add a row for field ActiveRangeType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "ActiveRangeType", _
+                                                            pCustomerCalcTestRow.ActiveRangeType, myActiveRangeType)
+
+                        'There are not Reference Ranges for the CALC Test with the new Formula
+                        pNewRefRangesDS = New TestRefRangesDS
+                        pCustomerCalcTestRow.SetActiveRangeTypeNull()
+                    End If
+                    pCustomerCalcTestRow.AcceptChanges()
+                End If
+
+                myGlobalDataTO.SetDatos = updateRefRanges
+                myGlobalDataTO.HasError = False
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCalcTestRefRanges", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Add a new row with data of an updated element in the DS containing all changes in CUSTOMER DB due to the Update Version Process.
+        ''' Data is added in sub-table UpdatedElements
+        ''' </summary>
+        ''' <param name="pUpdateVersionChangesList">DataSet containing all changes made in CUSTOMER DB for the Update Version Process</param>
+        ''' <param name="pElementType">Type of affected Element: CALC</param>
+        ''' <param name="pElementName">Name of the affected Element</param>
+        ''' <param name="pSampleType">Sample Type of the affected Element</param>
+        ''' <param name="pUpdatedField">Name of the affected field</param>
+        ''' <param name="pPreviousValue">Previous value of the field in CUSTOMER DB</param>
+        ''' <param name="pNewValue">New value of the field in CUSTOMER DB (from FACTORY DB)</param>
+        ''' <remarks>
+        ''' Created by:  SA 16/10/2014 - BA-1944 (SubTask BA-2017)
+        ''' </remarks>
+        Private Sub AddUpdatedElementToChangesStructure(ByRef pUpdateVersionChangesList As UpdateVersionChangesDS, ByVal pElementType As String, _
+                                                        ByVal pElementName As String, ByVal pSampleType As String, ByVal pUpdatedField As String, ByVal pPreviousValue As String, _
+                                                        ByVal pNewValue As String)
+            Try
+                Dim myUpdateVersionChangedElementsRow As UpdateVersionChangesDS.UpdatedElementsRow
+                myUpdateVersionChangedElementsRow = pUpdateVersionChangesList.UpdatedElements.NewUpdatedElementsRow
+                myUpdateVersionChangedElementsRow.ElementType = pElementType
+                myUpdateVersionChangedElementsRow.ElementName = pElementName
+                myUpdateVersionChangedElementsRow.SampleType = pSampleType
+                myUpdateVersionChangedElementsRow.UpdatedField = pUpdatedField
+                myUpdateVersionChangedElementsRow.PreviousValue = pPreviousValue
+                myUpdateVersionChangedElementsRow.NewValue = pNewValue
+                pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
+                Throw
+            End Try
+        End Sub
 #End Region
     End Class
 End Namespace

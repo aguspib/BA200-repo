@@ -293,7 +293,7 @@ Public Class Ax00MainForm
                 Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
                 Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
 
-                'myGlobal = myUpdateProcessDelegate.SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
+                myGlobal = myUpdateProcessDelegate.SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
                 If (Not myGlobal.HasError) Then
                     'When the Database Connection was opened locally, then the Commit is executed
                     DAOBase.CommitTransaction(dbConnection)
