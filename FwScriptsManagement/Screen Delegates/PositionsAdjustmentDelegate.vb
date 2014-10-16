@@ -1044,6 +1044,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <remarks>
         ''' Created by SG 17/11/10
         ''' Modified by XBC 04/01/11 - add pAdjustment parameter
+        '''              XB 15/10/2014 - Use FCK to fine optical centering - BA-2004 
         ''' </remarks>
         Public Function SendFwScriptsQueueList(ByVal pMode As ADJUSTMENT_MODES, _
                                                Optional ByVal pAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing) As GlobalDataTO
@@ -1084,6 +1085,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Case ADJUSTMENT_MODES.STIRRER_TESTING
                         myResultData = Me.SendQueueForMIXER_OFF(pAdjustmentGroup)
+
+                    Case ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_PERFORMING
+                        myResultData = Me.SendQueueForFINE_OPTICAL_CENTERING()
 
                     Case Else
                         Debug.Print("Aturat !!!")
@@ -4267,6 +4271,66 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForMIXER_OFF", EventLogEntryType.Error, False)
+            End Try
+            Return myResultData
+        End Function
+
+        ''' <summary>
+        ''' Creates the Script List for a fine optical centering
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by XB 15/10/2014 - Use FCK to fine optical centering - BA-2004
+        ''' </remarks>
+        Private Function SendQueueForFINE_OPTICAL_CENTERING() As GlobalDataTO
+            Dim myResultData As New GlobalDataTO
+            Dim myListFwScript As New List(Of FwScriptQueueItem)
+            Dim myFwScript1 As New FwScriptQueueItem
+
+            Try
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+
+                ' Arm Absolute Pos-Down 
+                ' Move absolute position the current arm:  predefined approaching position (steps)
+                With myFwScript1
+                    .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_AUTO_CENTERING.ToString
+                    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+                    .EvaluateValue = 1
+                    .NextOnResultOK = Nothing
+                    .NextOnResultNG = Nothing
+                    .NextOnTimeOut = Nothing
+                    .NextOnError = Nothing
+                    .ParamList = Nothing
+                End With
+
+                'add to the queue list
+                If myListFwScript.Count > 0 Then
+                    For i As Integer = 0 To myListFwScript.Count - 1
+                        If i = 0 Then
+                            ' First Script
+                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), True)
+                        Else
+                            If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myListFwScript(i), False)
+                        End If
+                    Next
+                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, False)
+                Else
+                    If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+                End If
+
+            Catch ex As Exception
+                myResultData.HasError = True
+                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myResultData.ErrorMessage = ex.Message
+
+                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+                End If
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForFINE_OPTICAL_CENTERING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function

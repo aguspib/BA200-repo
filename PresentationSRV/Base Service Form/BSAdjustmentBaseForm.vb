@@ -926,6 +926,28 @@ Public Class BSAdjustmentBaseForm
         Return myGlobal
     End Function
 
+    ' XB 15/10/2014 - BA-2004
+    Protected Friend Function FineOpticalCentering() As GlobalDataTO
+        Dim myGlobal As New GlobalDataTO
+        Try
+            Me.Cursor = Cursors.WaitCursor
+            MyClass.CurrentMode = ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_PERFORMING
+            MyClass.PrepareCommonAreas()
+
+            If myGlobal.HasError Then
+                ' PDT !!!
+                MyClass.ShowMessage(Me.Name & ".Save", "SYSTEM_ERROR", "SYSTEM ERROR")
+            End If
+
+        Catch ex As Exception
+            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FineOpticalCentering ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyClass.ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        Finally
+            Me.Cursor = Cursors.Default
+        End Try
+        Return myGlobal
+    End Function
+
     Protected Friend Function Park() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
@@ -1985,6 +2007,8 @@ Public Class BSAdjustmentBaseForm
     ''' <param name="pResponse"></param>
     ''' <remarks>
     ''' Created by XBC 04/05/2011 - Separation between FwScripts Low level Instructions and High level Instructions
+    ''' Modified by XB 15/10/2014 - Use NROTOR when wash station is down - BA-2004
+    '''                           - Use FCK command after save Optical Centering adjustment - BA-2004
     ''' </remarks>
     Private Sub RefreshModes(ByVal pResponse As RESPONSE_TYPES)
         Try
@@ -2089,6 +2113,15 @@ Public Class BSAdjustmentBaseForm
                 Case ADJUSTMENT_MODES.STIRRER_TESTING
                     If pResponse = RESPONSE_TYPES.OK Then
                         MyClass.CurrentMode = ADJUSTMENT_MODES.STIRRER_TESTED
+                    ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
+                        MyClass.ErrorMode()
+
+                    End If
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_PERFORMING
+                    If pResponse = RESPONSE_TYPES.OK Then
+                        MyClass.CurrentMode = ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_DONE
                     ElseIf pResponse = RESPONSE_TYPES.EXCEPTION Then
                         MyClass.ErrorMode()
 

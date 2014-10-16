@@ -434,7 +434,10 @@ Public Class IPositionsAdjustments
     ''' </summary>
     ''' <param name="pResponse">response type</param>
     ''' <param name="pData">data received</param>
-    ''' <remarks>Created by SG 17/11/10</remarks>
+    ''' <remarks>
+    ''' Created by: SG 17/11/10
+    ''' Modified by XB 15/10/2014 - Perform Fine Optical Centering - BA-2004
+    ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) As Boolean
         Dim myGlobal As New GlobalDataTO
         Try
@@ -644,6 +647,12 @@ Public Class IPositionsAdjustments
 
                     ' XBC 30/11/2011
                 Case ADJUSTMENT_MODES.PARKED
+                    If pResponse = RESPONSE_TYPES.OK Then
+                        PrepareArea()
+                    End If
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_DONE
                     If pResponse = RESPONSE_TYPES.OK Then
                         PrepareArea()
                     End If
@@ -1930,7 +1939,10 @@ Public Class IPositionsAdjustments
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <remarks>XBC 10/01/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 10/01/2011
+    ''' Modified by XB 15/10/2014 - Use FCK command after save Optical Centering adjustment - BA-2004
+    ''' </remarks>
     Private Sub PrepareArea()
 
         Dim myGlobal As New GlobalDataTO
@@ -2019,7 +2031,13 @@ Public Class IPositionsAdjustments
                     Me.PrepareSavingMode()
 
                 Case ADJUSTMENT_MODES.SAVED
-                    Me.PrepareSavedMode()
+                    ' XB 15/10/2014 - BA-2004
+                    Select Case Me.SelectedPage
+                        Case ADJUSTMENT_PAGES.OPTIC_CENTERING
+                            PrepareFineOpticalCenteringPerformingMode()
+                        Case Else
+                            Me.PrepareSavedMode()
+                    End Select
 
                 Case ADJUSTMENT_MODES.TESTING
                     Me.PrepareTestingMode()
@@ -2050,6 +2068,10 @@ Public Class IPositionsAdjustments
                     ' XBC 30/11/2011
                 Case ADJUSTMENT_MODES.PARKED
                     Me.PrepareParkedMode()
+
+                    ' XB 15/10/2014 - BA-2004
+                Case ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_DONE
+                    Me.PrepareSavedMode()
 
                 Case ADJUSTMENT_MODES.ERROR_MODE
                     Me.PrepareErrorMode()
@@ -3400,6 +3422,40 @@ Public Class IPositionsAdjustments
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareSavingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareSavingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Prepare GUI and Sends a Command to perform a Fine Optical Centering Performing Mode
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 15/10/2014 - Sends a Command to perform a fine optical centering - BA-2004
+    ''' </remarks>
+    Private Sub PrepareFineOpticalCenteringPerformingMode()
+        Dim myResultData As New GlobalDataTO
+        Try
+            myResultData = MyBase.FineOpticalCentering
+            If myResultData.HasError Then
+                PrepareErrorMode()
+                Exit Sub
+            Else
+                ' Sending fck command
+                If MyBase.SimulationMode Then
+                    ' simulating
+                    Me.Cursor = Cursors.WaitCursor
+                    System.Threading.Thread.Sleep(SimulationProcessTime)
+                    MyBase.myServiceMDI.Focus()
+                    Me.Cursor = Cursors.Default
+                Else
+                    ' Manage FwScripts must to be sent to parking
+                    Me.SendFwScript(Me.CurrentMode, EditedValue.AdjustmentID)
+                    Me.Cursor = Cursors.WaitCursor
+                End If
+            End If
+
+        Catch ex As Exception
+            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareFineOpticalCenteringPerformingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            MyBase.ShowMessage(Me.Name & ".PrepareFineOpticalCenteringPerformingMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -7758,7 +7814,7 @@ Public Class IPositionsAdjustments
     ''' <param name="e"></param>
     ''' <remarks>Created by XBC 12/09/2011</remarks>
     Private Sub IPositionsAdjustments_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-       
+
         Try
 
             If e.CloseReason = CloseReason.MdiFormClosing Then
@@ -7941,7 +7997,7 @@ Public Class IPositionsAdjustments
                 Dim dialogResultToReturn As DialogResult = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
                 If dialogResultToReturn = Windows.Forms.DialogResult.No Then
-                    
+
                     Me.ManageTabArms = False
                 Else
 
@@ -8187,7 +8243,7 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
-  
+
 
     Private Sub SelectedValueEvent(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) Handles BsGridSample.SelectedValueEvent, _
                                                                                                    BsGridReagent1.SelectedValueEvent, _
@@ -9209,7 +9265,7 @@ Public Class IPositionsAdjustments
                     End If
                 End If
 
-                End If
+            End If
 
 
         Catch ex As Exception
@@ -10430,5 +10486,5 @@ Public Class IPositionsAdjustments
     'End Sub
 #End Region
 
-    
+
 End Class
