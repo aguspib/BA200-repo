@@ -4955,7 +4955,9 @@ Public Class IResults
     ''' <param name="pSampleClass" ></param>
     ''' <remarks>
     ''' Created by:  AG 17/02/2011 
-    ''' AG 16/10/2014 BA-2011 re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
+    ''' AG 16/10/2014 BA-2011: 
+    '''    Re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
+    '''    For patient and controls re-evaluate the OrderToExport value
     ''' </remarks>
     Private Sub RejectResult(ByRef dgv As BSDataGridView, ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
         Try
@@ -4976,8 +4978,14 @@ Public Class IResults
                     myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
                     myGlobal = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, RowValues.OrderTestID, True)
                 End If
-
             End If
+
+            'AG 16/10/2014 BA-2011
+            If Not myGlobal.HasError AndAlso (pSampleClass = "CTRL" OrElse pSampleClass = "PATIENT") Then
+                Dim ordersDlg As New OrdersDelegate
+                myGlobal = ordersDlg.SetNewOrderToExportValue(Nothing, , RowValues.OrderTestID)
+            End If
+            'AG 16/10/2014 BA-2011
 
             If Not myGlobal.HasError Then
                 UpdateScreenGlobalDSWithAffectedResults()
@@ -5010,7 +5018,9 @@ Public Class IResults
     ''' <param name="pSampleClass" ></param>
     '''<remarks>
     ''' Created by:  AG 17/02/2011 
-    ''' AG 16/10/2014 BA-2011 re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
+    ''' AG 16/10/2014 BA-2011
+    '''    Re-evaluate calculated tests always that changes in patient results (remove condition test type = 'STD')
+    '''    For patient and controls re-evaluate the OrderToExport value
     ''' </remarks>
     Private Sub RejectResult(ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
         Try
@@ -5032,6 +5042,13 @@ Public Class IResults
                     myGlobal = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, RowValues.OrderTestID, True)
                 End If
             End If
+
+            'AG 16/10/2014 BA-2011
+            If Not myGlobal.HasError AndAlso (pSampleClass = "CTRL" OrElse pSampleClass = "PATIENT") Then
+                Dim ordersDlg As New OrdersDelegate
+                myGlobal = ordersDlg.SetNewOrderToExportValue(Nothing, , RowValues.OrderTestID)
+            End If
+            'AG 16/10/2014 BA-2011
 
             If Not myGlobal.HasError Then
                 'UpdateScreenGlobalDSWithAffectedResults()
