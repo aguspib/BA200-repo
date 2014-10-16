@@ -8724,6 +8724,7 @@ Namespace Biosystems.Ax00.BL
                         If pNewExportStatus = "SENT" Then
                             resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
                         Else
+                            'Set OrderToExport = TRUE because some result sent to LIS has not been accepted!!!
                             resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
                         End If
                         'AG 30/07/2014
@@ -8764,9 +8765,13 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pOrderID"></param>
+        ''' <param name="pOnlyMappedWithLIS"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 30/07/2014 Creation - #1887 OrderToExport management</remarks>
-        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
+        ''' <remarks>
+        ''' AG 30/07/2014 Creation - #1887 OrderToExport management
+        ''' AG 16/10/2014 BA-2011 parameter for return only the results mapped with LIS
+        ''' </remarks>
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pOnlyMappedWithLIS As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -8777,6 +8782,11 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksResultsDAO
                         resultData = myDAO.GetAcceptedResultsByOrder(dbConnection, pOrderID)
+
+                        If pOnlyMappedWithLIS Then
+                            'TODO
+                        End If
+
                     End If
                 End If
             Catch ex As Exception

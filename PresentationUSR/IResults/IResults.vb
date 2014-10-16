@@ -5206,6 +5206,8 @@ Public Class IResults
                     Else
                         myOrderToExportValue = False
                     End If
+
+                    'Force the value for OrderToExport because it is the user desire!!
                     resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue)
 
                     'Refresh list
