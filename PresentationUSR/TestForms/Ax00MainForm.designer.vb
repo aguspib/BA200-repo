@@ -46,6 +46,7 @@ Partial Class Ax00MainForm
         Me.Button4 = New System.Windows.Forms.Button()
         Me.butTestSergio = New System.Windows.Forms.Button()
         Me.Button6 = New System.Windows.Forms.Button()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.Panel2.SuspendLayout()
         Me.Panel3.SuspendLayout()
         Me.SuspendLayout()
@@ -205,6 +206,7 @@ Partial Class Ax00MainForm
         '
         'Panel3
         '
+        Me.Panel3.Controls.Add(Me.Button2)
         Me.Panel3.Controls.Add(Me.Button8)
         Me.Panel3.Controls.Add(Me.Button7)
         Me.Panel3.Controls.Add(Me.bsSusanaTest2)
@@ -238,25 +240,25 @@ Partial Class Ax00MainForm
         '
         'bsSusanaTest2
         '
-        Me.bsSusanaTest2.Location = New System.Drawing.Point(508, 48)
+        Me.bsSusanaTest2.Location = New System.Drawing.Point(201, 3)
         Me.bsSusanaTest2.Name = "bsSusanaTest2"
         Me.bsSusanaTest2.Size = New System.Drawing.Size(100, 39)
         Me.bsSusanaTest2.TabIndex = 22
-        Me.bsSusanaTest2.Text = "Susana Test2"
+        Me.bsSusanaTest2.Text = "UPDATE ISE"
         Me.bsSusanaTest2.UseVisualStyleBackColor = True
         '
         'bsSusanaButton
         '
-        Me.bsSusanaButton.Location = New System.Drawing.Point(508, 3)
+        Me.bsSusanaButton.Location = New System.Drawing.Point(307, 3)
         Me.bsSusanaButton.Name = "bsSusanaButton"
         Me.bsSusanaButton.Size = New System.Drawing.Size(100, 39)
         Me.bsSusanaButton.TabIndex = 21
-        Me.bsSusanaButton.Text = "Susana Test"
+        Me.bsSusanaButton.Text = "UPDATE STD"
         Me.bsSusanaButton.UseVisualStyleBackColor = True
         '
         'Button4
         '
-        Me.Button4.Location = New System.Drawing.Point(421, 3)
+        Me.Button4.Location = New System.Drawing.Point(633, 48)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(81, 39)
         Me.Button4.TabIndex = 20
@@ -265,7 +267,7 @@ Partial Class Ax00MainForm
         '
         'butTestSergio
         '
-        Me.butTestSergio.Location = New System.Drawing.Point(247, 3)
+        Me.butTestSergio.Location = New System.Drawing.Point(97, 3)
         Me.butTestSergio.Name = "butTestSergio"
         Me.butTestSergio.Size = New System.Drawing.Size(81, 39)
         Me.butTestSergio.TabIndex = 18
@@ -280,6 +282,15 @@ Partial Class Ax00MainForm
         Me.Button6.TabIndex = 17
         Me.Button6.Text = "ISE Test"
         Me.Button6.UseVisualStyleBackColor = True
+        '
+        'Button2
+        '
+        Me.Button2.Location = New System.Drawing.Point(413, 3)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(100, 39)
+        Me.Button2.TabIndex = 27
+        Me.Button2.Text = "UPDATE CALC"
+        Me.Button2.UseVisualStyleBackColor = True
         '
         'Ax00MainForm
         '
@@ -329,5 +340,6 @@ Partial Class Ax00MainForm
     Friend WithEvents BsButton4 As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents SimpleButton1 As DevExpress.XtraEditors.SimpleButton
     Friend WithEvents SimpleButton2 As DevExpress.XtraEditors.SimpleButton
+    Friend WithEvents Button2 As System.Windows.Forms.Button
 
 End Class

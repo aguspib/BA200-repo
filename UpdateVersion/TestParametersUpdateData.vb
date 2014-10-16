@@ -1666,7 +1666,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <remarks>
         ''' Created by: SA 07/10/2014 - BA-1944 (SubTask BA-1980)
         ''' </remarks>
-        Public Function CreateNEWSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+        Public Function CREATENewSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -1775,7 +1775,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CreateNEWSTDTests", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CREATENewSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2814,7 +2814,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <remarks>
         ''' Created by: SA 09/10/2014 - BA-1944 (SubTask BA-1981)
         ''' </remarks>
-        Public Function CreateNEWSamplesForSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
+        Public Function CREATENewSamplesForSTDTests(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -2918,7 +2918,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CreateNEWSamplesForSTDTests", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CREATENewSamplesForSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
