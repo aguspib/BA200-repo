@@ -1241,7 +1241,7 @@ Namespace Biosystems.Ax00.BL
                         '(2) Get all results belongs the current orderID
                         If affectedOrderID <> "" Then
                             Dim resultsDlg As New ResultsDelegate
-                            resultData = resultsDlg.GetAcceptedResultsByOrder(dbConnection, affectedOrderID)
+                            resultData = resultsDlg.GetAcceptedResultsByOrder(dbConnection, affectedOrderID, True)
 
                             '(3) Calculate the new OrderToExport value
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
