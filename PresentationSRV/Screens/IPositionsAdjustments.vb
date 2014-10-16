@@ -3444,8 +3444,10 @@ Public Class IPositionsAdjustments
                     ' simulating
                     Me.Cursor = Cursors.WaitCursor
                     System.Threading.Thread.Sleep(SimulationProcessTime)
+                    MyBase.CurrentMode = ADJUSTMENT_MODES.FINE_OPTICAL_CENTERING_DONE
                     MyBase.myServiceMDI.Focus()
                     Me.Cursor = Cursors.Default
+                    Me.PrepareSavedMode()
                 Else
                     ' Manage FwScripts must to be sent to parking
                     Me.SendFwScript(Me.CurrentMode, EditedValue.AdjustmentID)
