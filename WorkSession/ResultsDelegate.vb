@@ -8780,9 +8780,9 @@ Namespace Biosystems.Ax00.BL
         ''' <returns></returns>
         ''' <remarks>
         ''' AG 30/07/2014 Creation - #1887 OrderToExport management
-        ''' AG 16/10/2014 BA-2011 parameter for return only the results mapped with LIS
+        ''' AG 17/10/2014 BA-2011 parameter for return only the results mapped with LIS + pOrderID parameters changes is 'List (Of String)' instead of 'String'
         ''' </remarks>
-        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pOnlyMappedWithLIS As Boolean) As GlobalDataTO
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String), ByVal pOnlyMappedWithLIS As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try

@@ -3308,8 +3308,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection"></param>
         ''' <param name="pOrderID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 30/07/2014 - #1887 creation OrderToExport management</remarks>
-        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
+        ''' <remarks>AG 30/07/2014 - #1887 creation OrderToExport management
+        ''' AG 17/10/2014 BA-2011 pOrderID parameters changes is 'List (Of String)' instead of 'String'
+        ''' </remarks>
+        Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String)) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -3321,13 +3323,26 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (Not dbConnection Is Nothing) Then
                         'By now get only ExportStatus, and OrderID
-                        Dim cmdText As String = " SELECT R.ExportStatus , O.OrderID, R.OrderTestID, R.RerunNumber   FROM twksResults R INNER JOIN twksOrderTests OT ON "
+                        Dim cmdText As String = " SELECT R.ExportStatus , O.OrderID, R.OrderTestID, R.RerunNumber, OT.TestType, OT.TestID   FROM twksResults R INNER JOIN twksOrderTests OT ON "
                         cmdText &= " R.OrderTestID = OT.OrderTestID INNER JOIN twksOrders O ON "
                         cmdText &= " O.OrderID = OT.OrderID "
                         cmdText &= " WHERE R.ValidationStatus = 'OK' AND R.AcceptedResultFlag = 1  "
                         cmdText &= " AND (O.SampleClass = 'PATIENT' OR O.SampleClass = 'CTRL') "
-                        cmdText &= " AND O.OrderID = N'" & pOrderID.Replace("'", "''") & "'"
                         cmdText &= " AND OT.OrderTestStatus = 'CLOSED' "
+
+                        'AG 17/10/2014 BA-2011
+                        'cmdText &= " AND O.OrderID = N'" & pOrderID.Replace("'", "''") & "'"
+                        If pOrderID.Count > 0 Then
+                            cmdText &= " AND ( "
+                            For item As Integer = 0 To pOrderID.Count - 1
+                                cmdText &= " O.OrderID = N'" & pOrderID(item).Trim.Replace("'", "''") & "' "
+                                If item < pOrderID.Count - 1 Then
+                                    cmdText &= " OR "
+                                End If
+                            Next
+                            cmdText &= " ) "
+                        End If
+                        'AG 17/10/2014 BA-2011
 
                         Dim myDataSet As New ResultsDS
 
