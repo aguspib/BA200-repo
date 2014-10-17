@@ -395,7 +395,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myUpdateVersionAddedElementsRow As UpdateVersionChangesDS.AddedElementsRow
 
                 '(1) Search in Factory DB all new or updated CALIBRATORS
-                myGlobalDataTO = myCalibratorUpdateDAO.GetCalibratorsDistinctInClient(pDBConnection)
+                myGlobalDataTO = CalibratorUpdateDAO.GetCalibratorsDistinctInClient(pDBConnection)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     myCalibratorsDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
 

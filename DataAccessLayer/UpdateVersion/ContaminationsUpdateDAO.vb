@@ -305,7 +305,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
+#Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
         ''' <summary>
         ''' Search in FACTORY DB all R1 Contaminations defined for Preloaded STD TESTS that are not in the CUSTOMER DB or that are in CUSTOMER DB but with different Washing Solution
         ''' </summary>
