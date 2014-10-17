@@ -979,8 +979,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pOrderID"></param>
         ''' <param name="pNewValue"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management</remarks>
-        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As String, pNewValue As Boolean) As GlobalDataTO
+        ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management
+        ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID</remarks>
+        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As List(Of String), pNewValue As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
                 If (pDBConnection Is Nothing) Then
@@ -991,14 +992,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                                            " SET    OrderToExport = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf & _
                                            " WHERE  ( SampleClass   = 'PATIENT' )" & vbCrLf
 
-                    If pOrderID <> "" Then
-                        cmdText &= " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                    'AG 17/10/2014 BA-2011
+                    'If pOrderID <> "" Then
+                    '    cmdText &= " AND   OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' "
+                    'End If
+                    If pOrderID.Count > 0 Then
+                        cmdText &= " AND ( "
+                        For item As Integer = 0 To pOrderID.Count - 1
+                            cmdText &= " OrderID = N'" & pOrderID(item).Trim.Replace("'", "''") & "' "
+                            If item < pOrderID.Count - 1 Then
+                                cmdText &= " OR "
+                            End If
+                        Next
+                        cmdText &= " ) "
                     End If
+                    'AG 17/10/2014 BA-2011
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                     End Using
-                    End If
+                End If
 
             Catch ex As Exception
                 resultData.HasError = True
@@ -1100,6 +1113,56 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
 
+        ''' <summary>
+        ''' Look for different orderID belonging the same patient/control sample
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pOrderID">Order Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified OrderTest belongs</returns>
+        ''' <remarks>
+        ''' Created by:  AG 16/10/2014 BA-2011
+        ''' </remarks>
+        Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        cmdText = "SELECT DISTINCT O2.* FROM twksOrders O INNER JOIN twksOrders O2 ON O.OrderID <> O2.OrderID AND (O.PatientID = O2.PatientID OR O.SampleID = O2.SampleID) " & vbCrLf & _
+                                  " WHERE O.OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                  "AND (O.SampleClass = 'PATIENT' ) "
+
+                        Dim resultData As New OrdersDS
+                        Using dbCmd As New SqlCommand(cmdText, dbConnection)
+                            Using da As New SqlClient.SqlDataAdapter(dbCmd)
+                                da.Fill(resultData.twksOrders)
+                            End Using
+                        End Using
+
+                        myGlobalDataTO.SetDatos = resultData
+                        myGlobalDataTO.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksOrdersDAO.ReadRelatedOrdersByOrderID", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+
 #End Region
+
     End Class
 End Namespace
