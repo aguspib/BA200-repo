@@ -483,6 +483,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Try
                 Dim executeUpdate As Boolean = False
+                Dim myUnits As String = String.Empty
                 Dim myISEUnits As String = String.Empty
                 Dim myISEResultID As String = String.Empty
                 Dim myISETestName As String = String.Empty
@@ -507,9 +508,21 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             'Build the Test Name for the update version changes structure
                             myISETestName = myCustomerISETestDS.tparISETests.First.Name & " (" & myCustomerISETestDS.tparISETests.First.ShortName & ")"
 
-                            'Get value of fields ISE_Units and ISE_ResultID for the ISE Test in FACTORY DB
+                            'Get value of fields ISE_Units, Units and ISE_ResultID for the ISE Test in FACTORY DB
+                            myUnits = pFactoryISETestSamplesDS.tparISETestSamples.ToList.Where(Function(a) a.ISETestID = myISETestID).First.MeasureUnit
                             myISEUnits = pFactoryISETestSamplesDS.tparISETestSamples.ToList.Where(Function(a) a.ISETestID = myISETestID).First.ISE_Units
                             myISEResultID = pFactoryISETestSamplesDS.tparISETestSamples.ToList.Where(Function(a) a.ISETestID = myISETestID).First.ISE_ResultID
+
+                            'Verify if field Units has changed 
+                            If (myCustomerISETestDS.tparISETests.First.Units <> myUnits) Then
+                                'Add a row for field Units in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                                AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "ISE", myISETestName, String.Empty, "Units", _
+                                                                    myCustomerISETestDS.tparISETests.First.Units, myUnits)
+
+                                'Update the field in the Customer DS
+                                executeUpdate = True
+                                myCustomerISETestDS.tparISETests.First.Units = myUnits
+                            End If
 
                             'Verify if field ISE_Units has changed 
                             If (myCustomerISETestDS.tparISETests.First.ISE_Units <> myISEUnits) Then
