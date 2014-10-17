@@ -536,63 +536,65 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''  <param name="pLoadingRSAT">Indicate if loading a RSAT.</param>
         ''' <returns>GlobalDataTo</returns>
         ''' <remarks>
-        ''' Created AG 16/01/2013
-        ''' Modified by : TR 29/01/2013 -Add new optional parameter PLoadingRSAT to validate if user is loading a RSAT
-        '''                              in this case the reset worsession and Set the factory test programming is not 
-        '''                              execute.
-        ''' Modified by: TR 18/02/2013  - Add the new parameter pServer to implement the transaction.
-        '''              XB 13/05/2013  - Add the new parameter pusSwVersion to evaluate required updates.
+        ''' Created by:  AG 16/01/2013
+        ''' Modified by: TR 29/01/2013 - Added new optional parameter pLoadingRSAT to validate if user is loading a RSAT, in which case
+        '''                              the Reset WorSession and the Factory Tests Programming updates are not executed
+        '''              TR 18/02/2013 - Added the new parameter pServer to implement the required DB Transaction
+        '''              XB 13/05/2013 - Added the new parameter pusSwVersion to evaluate required updates
+        '''              SA 17/10/2014 - BA-1944 ==> 
         ''' </remarks>
-        Private Function ConfigureDataBaseAfterUpdateVersion(ByRef pServer As Server, _
-                                                             ByVal pusSwVersion As String, _
+        Private Function ConfigureDataBaseAfterUpdateVersion(ByRef pServer As Server, ByVal pusSwVersion As String, _
                                                              Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 'Get the current language (USR software)
                 'We do not get the SRV language because it not requires update the alarms definition (name, description, solution)
                 Dim myUserSettingsDelegate As New UserSettingsDelegate
-                'pServer.ConnectionContext.SqlConnectionObject()
-
-                'myGlobal = myUserSettingsDelegate.GetCurrentValueBySettingID(Nothing, GlobalEnumerates.UserSettingsEnum.CURRENT_LANGUAGE.ToString)
                 myGlobal = myUserSettingsDelegate.GetCurrentValueBySettingID(pServer.ConnectionContext.SqlConnectionObject(), _
                                                                              GlobalEnumerates.UserSettingsEnum.CURRENT_LANGUAGE.ToString)
 
-                If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim langID As String = CType(myGlobal.SetDatos, String)
 
                     'Update alarms definition
                     Dim alarmsDlg As New AlarmsDelegate
-                    'myGlobal = alarmsDlg.UpdateLanguageResource(Nothing, langID)
                     myGlobal = alarmsDlg.UpdateLanguageResource(pServer.ConnectionContext.SqlConnectionObject(), langID)
 
+                    'TR 29/01/2013 - Validate the user is not loading a RSAT
+                    If (Not pLoadingRSAT) Then
+                        If (Not myGlobal.HasError) Then
+                            Dim analyzerModel As String = String.Empty
+                            Dim analyzerID As String = String.Empty
+                            Dim worksessionID As String = String.Empty
 
-                    'TR 29/01/2013 -Validate the user is not loading a RSAT
-                    If Not pLoadingRSAT Then
-                        If Not myGlobal.HasError Then
-                            Dim analyzerModel As String = ""
-                            Dim analyzerID As String = ""
-                            Dim worksessionID As String = ""
-                            'GetAnalyzerAndWorksessionInfo(Nothing, analyzerModel, analyzerID, worksessionID)
+                            'Get WorkSessionID and AnalyzerID
                             GetAnalyzerAndWorksessionInfo(pServer.ConnectionContext.SqlConnectionObject(), analyzerModel, analyzerID, worksessionID)
 
-                            'Reset WorkSession with no messages to user
+                            'Reset any WorkSession before starting the Update Version Process
                             Dim myWS As New WorkSessionsDelegate
-                            'Reset any work session before starting update. Need to get the Worksession ID and the AnalyzerIDAttribute to reset the current WorkSession
                             If (Not GlobalConstants.HISTWorkingMode) Then
-                                'myGlobal = myWS.ResetWS(Nothing, analyzerID, worksessionID)
                                 myGlobal = myWS.ResetWS(pServer.ConnectionContext.SqlConnectionObject(), analyzerID, worksessionID)
                             Else
-                                'myGlobal = myWS.ResetWSNEW(Nothing, analyzerID, worksessionID)
                                 myGlobal = myWS.ResetWSNEW(pServer.ConnectionContext.SqlConnectionObject(), analyzerID, worksessionID, False, True, True)
                             End If
 
-                            If Not myGlobal.HasError Then
-                                'Update preloaded BioSystems tests
+                            'Update preloaded BioSystems Tests
+                            If (Not myGlobal.HasError) Then
                                 Dim updateTest As New UpdatePreloadedFactoryTestDelegate
-                                'myGlobal = updateTest.SetFactoryTestProgramming(Nothing)
-                                'myGlobal = updateTest.SetFactoryTestProgramming(pServer.ConnectionContext.SqlConnectionObject())
-                                myGlobal = updateTest.SetFactoryTestProgramming(pServer.ConnectionContext.SqlConnectionObject(), pusSwVersion)    'XB 13/05/2013 -pass pusSwVersion parameter to function
-                                'Remove Previous folder contents - CANCELLED!!
+
+                                myGlobal = updateTest.SetFactoryTestProgrammingNEW(pServer.ConnectionContext.SqlConnectionObject(), pusSwVersion)
+                                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                    Dim myUpdateVersionChangesList As UpdateVersionChangesDS = DirectCast(myGlobal.SetDatos, UpdateVersionChangesDS)
+
+                                    Dim myDirName As String = Application.StartupPath & GlobalBase.XmlLogFilePath
+                                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & " UPDATE VERSION CHANGES.xml"
+
+                                    'If needed, create the final directory... 
+                                    If (Not IO.Directory.Exists(myDirName)) Then IO.Directory.CreateDirectory(myDirName)
+
+                                    'Write the XML
+                                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
+                                End If
                             End If
                         End If
                     End If

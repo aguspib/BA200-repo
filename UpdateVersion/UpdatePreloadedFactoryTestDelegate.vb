@@ -454,7 +454,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         resultData = myCALCTestsUpdate.DELETERemovedCALCTests(dbConnection, pUpdateVersionChangesList)
 
                         '(2) Execute the Update Version Process for UPDATED CALC TESTS
-                        'If (Not resultData.HasError) Then resultData = myCALCTestsUpdate.UPDATEModifiedCALCTests(dbConnection, pUpdateVersionChangesList)
+                        If (Not resultData.HasError) Then resultData = myCALCTestsUpdate.UPDATEModifiedCALCTests(dbConnection, pUpdateVersionChangesList)
 
                         '(3) Execute the Update Version Process for NEW CALC TESTS
                         If (Not resultData.HasError) Then resultData = myCALCTestsUpdate.CREATENewCALCTests(dbConnection, pUpdateVersionChangesList)
@@ -479,6 +479,70 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryCALCTestsProgramming", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' New implementation of the UPDATE VERSION Process. Modify CUSTOMER DB with changes found in FACTORY DB. 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pusSwVersion">Customer SW Version</param>
+        ''' <returns>GlobalDataTO containing an UpdateVersionChangesDS with all changes the UPDATE VERSION Process has made in CUSTOMER DB</returns>
+        ''' <remarks>
+        ''' Created by:  SA 17/10/2014 - BA-1944
+        ''' </remarks>
+        Public Function SetFactoryTestProgrammingNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pusSwVersion As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
+
+                        'STEP 1 ==> Execute UPDATE VERSION Process for ISE TESTS
+                        resultData = SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList)
+
+                        'STEP 2 ==> Execute UPDATE VERSION Process for STD TESTS (including CALIBRATORS and CONTAMINATIONS)
+                        If (Not resultData.HasError) Then resultData = SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList)
+
+                        'STEP 3 ==> Execute UPDATE VERSION Process for CALC TESTS 
+                        If (Not resultData.HasError) Then resultData = SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
+
+                        'STEP 4 ==> If SW VERSION is v1, execute UPDATE VERSION Process to update ISE DATA information
+                        If (pusSwVersion = "1.0.0") Then
+                            Dim iseDataInfoUpd As New ISEInformationUpdateData
+                            resultData = iseDataInfoUpd.UpdateDataFormatv1Tov2(dbConnection)
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+
+                            'Return the structure containing all changes made in CUSTOMER DB
+                            resultData.SetDatos = myUpdateVersionChangesList
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgrammingNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
