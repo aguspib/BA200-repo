@@ -768,7 +768,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 26/10/2010 - Added N preffix for multilanguage when comparing by fields CalcTestName or CalcTestLongName
         '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Added new optional parameter pReturnBoolean with default value TRUE.
         '''                                                            When its value is FALSE, instead of return True/False, the function
-        '''                                                            will return the obtained CalculatedTestsDS inside the GlobalDataTO
+        '''                                                            will return the obtained CalculatedTestsDS inside the GlobalDataTO.
+        '''                                                            Changed the SQL to return all data of the Calculated Test.
         ''' </remarks>
         Public Function ExistsCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalTestName As String, _
                                              ByVal pNameToSearch As String, Optional ByVal pCalTestID As Integer = 0, _
@@ -783,12 +784,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
                         If (pNameToSearch = "NAME") Then
-                            cmdText = " SELECT CalcTestID " & vbCrLf & _
+                            cmdText = " SELECT * " & vbCrLf & _
                                       " FROM   tparCalculatedTests " & vbCrLf & _
                                       " WHERE  UPPER(CalcTestName) = N'" & pCalTestName.Trim.ToUpper.Replace("'", "''") & "' " & vbCrLf
 
                         ElseIf (pNameToSearch = "FNAME") Then
-                            cmdText = " SELECT CalcTestID " & vbCrLf & _
+                            cmdText = " SELECT * " & vbCrLf & _
                                       " FROM tparCalculatedTests " & vbCrLf & _
                                       " WHERE UPPER(CalcTestLongName) = N'" & pCalTestName.Trim.ToUpper.Replace("'", "''") & "' " & vbCrLf
                         End If
@@ -806,6 +807,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pReturnBoolean) Then
                             resultData.SetDatos = (myCalculatedTests.tparCalculatedTests.Rows.Count > 0)
                         Else
+                            'BA-1944 (SubTask BA-2017): When called from UpdateVersion Process, then return the obtained CalculatedTestsDS
                             resultData.SetDatos = myCalculatedTests
                         End If
                         resultData.HasError = False

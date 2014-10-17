@@ -589,7 +589,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myCalculatedTests As New tparCalculatedTestsDAO
-                        resultData = myCalculatedTests.Read(dbConnection, pID)
+                        resultData = myCalculatedTests.Read(dbConnection, pID, pSearchByBiosystemsID)
                     End If
                 End If
             Catch ex As Exception

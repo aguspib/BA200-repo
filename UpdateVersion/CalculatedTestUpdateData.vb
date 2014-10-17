@@ -1152,6 +1152,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     If (Not myGlobalDataTO.HasError) Then
                         'Update the FormulaText field for the Calculated Test (to use the name of Tests in CUSTOMER DB)
+                        pNewCalcTestRow.BeginEdit()
                         pNewCalcTestRow.FormulaText = myFormulaText
                         pNewCalcTestRow.AcceptChanges()
                     End If
@@ -1333,22 +1334,27 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                            ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Try
+                Dim myDuplicatedNameCalcTestID As Integer = 0
                 Dim myCalcTestsDS As New CalculatedTestsDS
                 Dim myAuxCalcTestsDS As New CalculatedTestsDS
                 Dim myCalcTestsDelegate As New CalculatedTestsDelegate
                 Dim myHistCalcTestsDAO As New thisCalculatedTestsDAO
-
                 Dim myUpdateVersionRenamedElementsRow As UpdateVersionChangesDS.RenamedElementsRow
 
                 '(1) Search if there is an User Test with the same Name...
                 myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, pTestName, "FNAME", 0, False)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     myCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
+
+                    If (myCalcTestsDS.tparCalculatedTests.Rows.Count > 0) Then
+                        myDuplicatedNameCalcTestID = myCalcTestsDS.tparCalculatedTests.First.CalcTestID
+                    End If
                 End If
 
-                '(2) Search if there is an User Test with the same ShortName
+                '(2) Search if there is an User Test with the same ShortName (excluding the Calculated Test with the same Name 
+                '    found in the previous step
                 If (Not myGlobalDataTO.HasError) Then
-                    myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, pTestName, "NAME", 0, False)
+                    myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, pTestName, "NAME", myDuplicatedNameCalcTestID, False)
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         myAuxCalcTestsDS = DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS)
                     End If
@@ -1356,7 +1362,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 '(3) Merge results of both searches
                 If (Not myGlobalDataTO.HasError) Then
-                    myCalcTestsDS.Merge(myAuxCalcTestsDS, True)
+                    myCalcTestsDS.Merge(myAuxCalcTestsDS, False)
 
                     '(4) Process each one of the STD Tests found
                     For Each calcTestRow As CalculatedTestsDS.tparCalculatedTestsRow In myCalcTestsDS.tparCalculatedTests
@@ -1366,7 +1372,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
                                 '(4.1) Update the renamed CALC Test in Customer DB
                                 myAuxCalcTestsDS.Clear()
-                                myAuxCalcTestsDS.tparCalculatedTests.AddtparCalculatedTestsRow(calcTestRow)
+                                myAuxCalcTestsDS.tparCalculatedTests.ImportRow(calcTestRow)
                                 myAuxCalcTestsDS.AcceptChanges()
 
                                 myGlobalDataTO = myCalcTestsDelegate.Modify(pDBConnection, myAuxCalcTestsDS, New FormulasDS, New TestRefRangesDS, False, True)
@@ -1439,7 +1445,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         'Verify if the new Test Name is unique in Customer DB (there is not another Test with the same Name)
                         myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, myValidTestName, "FNAME")
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            isValidTestName = (DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS).tparCalculatedTests.Count = 0)
+                            isValidTestName = (Not Convert.ToBoolean(myGlobalDataTO.SetDatos))
                         Else
                             errorFound = True
                         End If
@@ -1455,7 +1461,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         'Verify if the new Test Short Name is unique in Customer DB (there is not another Test with the same Short Name)
                         myGlobalDataTO = myCalcTestsDelegate.ExistsCalculatedTest(pDBConnection, myValidShortName, "NAME")
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            isValidShortName = (DirectCast(myGlobalDataTO.SetDatos, CalculatedTestsDS).tparCalculatedTests.Count = 0)
+                            isValidShortName = (Not Convert.ToBoolean(myGlobalDataTO.SetDatos))
                         Else
                             errorFound = True
                         End If
@@ -1613,6 +1619,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     myPreloadedCALCTestList = (From a As CalculatedTestsDS.tparCalculatedTestsRow In myCustomerCalcTestsDS.tparCalculatedTests _
                                               Where a.PreloadedCalculatedTest = True _
                                         AndAlso Not a.IsBiosystemsIDNull() _
+                                           Order By a.BiosystemsID _
                                              Select a).ToList()
                 End If
 
@@ -1650,33 +1657,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     '(2.4) Verify if the Reference Ranges defined for the CALC Test have been changed
                     If (Not myGlobalDataTO.HasError) Then
                         myRefRanges.Clear()
-                        myGlobalDataTO = UpdateCalcTestRefRanges(pDBConnection, myFactoryCalcTestRow, preloadedCustomerCalcTest, myRefRanges, _
-                                                                 pUpdateVersionChangesList, formulaChanged)
+                        myGlobalDataTO = UpdateCalcTestRefRanges(pDBConnection, myFactoryCalcTestRow, preloadedCustomerCalcTest, myRefRanges, pUpdateVersionChangesList)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             refRangesChanged = Convert.ToBoolean(myGlobalDataTO.SetDatos)
                         End If
                     End If
 
-                    '(2.5) Verify if the CALC Test has to be updated
+                    '(2.5) 'Finally, if the Formula and/or the Reference Ranges have been changed, then the CALC Test is updated in CUSTOMER DB
                     If (Not myGlobalDataTO.HasError) Then
-                        If (formulaChanged AndAlso Not refRangesChanged) Then
-                            'Get the Reference Ranges for the CALC Test in CUSTOMER DB
-                            myGlobalDataTO = myRefRangesDelegate.ReadByTestID(pDBConnection, preloadedCustomerCalcTest.CalcTestID, String.Empty, "CALC")
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myRefRanges = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
-                            End If
-
-                        ElseIf (Not formulaChanged AndAlso refRangesChanged) Then
-                            'Get the Formula for the CALC Test in CUSTOMER DB
-                            myGlobalDataTO = myFormulasDelegate.GetFormulaValues(pDBConnection, preloadedCustomerCalcTest.CalcTestID)
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myFormulaDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
-                            End If
-                        End If
-                    End If
-
-                    If (Not myGlobalDataTO.HasError) Then
-                        'Finally, if the Formula and/or the Reference Ranges have been changed, then the CALC Test is updated in CUSTOMER DB
                         If (formulaChanged OrElse refRangesChanged) Then
                             myCalcTestsDS.Clear()
                             myCalcTestsDS.tparCalculatedTests.ImportRow(preloadedCustomerCalcTest)
@@ -1729,10 +1717,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 If (Not pFactoryCalcTestRow.IsSampleTypeNull) Then
                     If (pCustomerCalcTestRow.IsSampleTypeNull OrElse pCustomerCalcTestRow.SampleType <> pFactoryCalcTestRow.SampleType) Then
-                        If (Not pCustomerCalcTestRow.IsSampleTypeNull) Then mySampleType = pCustomerCalcTestRow.SampleType
+                        If (Not pCustomerCalcTestRow.IsSampleTypeNull AndAlso pCustomerCalcTestRow.SampleType <> String.Empty) Then mySampleType = pCustomerCalcTestRow.SampleType
 
                         'Add a row for field SampleType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "SampleType", mySampleType, _
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pFactoryCalcTestRow.SampleType, "SampleType", mySampleType, _
                                                             pFactoryCalcTestRow.SampleType)
 
                         'Update field in the Customer DataSet (update also field UniqueSampleType)
@@ -1756,16 +1744,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     formulaUpdated = True
 
                     'Add a row for field FormulaText in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "FormulaText", pCustomerCalcTestRow.FormulaText, _
+                    AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pFactoryCalcTestRow.SampleType, "FormulaText", pCustomerCalcTestRow.FormulaText, _
                                                         pFactoryCalcTestRow.FormulaText)
 
                     'Update field in the Customer DataSet
                     pCustomerCalcTestRow.FormulaText = pFactoryCalcTestRow.FormulaText
 
-                    'If the Formula has changed, verify also if fields MeasureUnit and Decimals have changed
+                    'If the Formula has changed, verify also if field MeasureUnit has changed
                     If (pCustomerCalcTestRow.MeasureUnit <> pFactoryCalcTestRow.MeasureUnit) Then
                         'Add a row for field MeasureUnit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "MeasureUnit", pCustomerCalcTestRow.MeasureUnit, _
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pFactoryCalcTestRow.SampleType, "MeasureUnit", pCustomerCalcTestRow.MeasureUnit, _
                                                             pFactoryCalcTestRow.MeasureUnit)
 
                         'Update field in the Customer DataSet
@@ -1774,7 +1762,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     If (pCustomerCalcTestRow.Decimals <> pFactoryCalcTestRow.Decimals) Then
                         'Add a row for field Decimals in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "MeasureUnit", pCustomerCalcTestRow.Decimals.ToString, _
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pFactoryCalcTestRow.SampleType, "MeasureUnit", pCustomerCalcTestRow.Decimals.ToString, _
                                                             pFactoryCalcTestRow.Decimals.ToString)
 
                         'Update field in the Customer DataSet
@@ -1797,29 +1785,30 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
         ''' <summary>
         ''' For a CALC Test, verify if there are changes in the Reference Ranges in FACTORY DB and if these changes have to be applied in 
-        ''' CUSTOMER DB: 
-        ''' ** If the Formula of the CALC Test has changed, the Reference Ranges are updated in all cases
-        ''' ** If the Formula of the CALC Test is the same, the Reference Ranges are updated only when the CALC Test has not DETAILED Reference
-        '''    Ranges defined in CUSTOMER DB
+        ''' CUSTOMER DB
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pFactoryCalcTestRow">Row of CalculatedTestsDS containing data of the CALC Test in FACTORY DB</param>
         ''' <param name="pCustomerCalcTestRow">Row of CalculatedTestsDS containing data of the CALC Test in CUSTOMER DB</param>
         ''' <param name="pNewRefRangesDS">TestRefRangesDS to return the Reference Ranges defined for the Calculated Test in FACTORY DB</param>
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
-        ''' <param name="pFormulaChanged">Flag indicating if the Formula of the Calculated Test has been changed in FACTORY DB</param>
         ''' <returns>GlobalDataTO containing a Boolean value: when TRUE, it means the Reference Ranges of the CALC Test have changed</returns>
         '''  <remarks>
         ''' Created by:  SA 16/10/2014 - BA-1944 (SubTask BA-2017)
         ''' </remarks>
         Private Function UpdateCalcTestRefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, _
                                                  ByVal pCustomerCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow, ByRef pNewRefRangesDS As TestRefRangesDS, _
-                                                 ByRef pUpdateVersionChangesList As UpdateVersionChangesDS, ByVal pFormulaChanged As Boolean) As GlobalDataTO
+                                                 ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
                 Dim updateRefRanges As Boolean = False
+                Dim customerRefRangesDS As New TestRefRangesDS
                 Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
+                Dim myTestRefRangesDelegate As New TestRefRangesDelegate
+
+                'Build the TestName to report changes...
+                Dim myCalcTestName As String = pCustomerCalcTestRow.CalcTestLongName & " (" & pCustomerCalcTestRow.CalcTestName & ") "
 
                 'Get the Reference Ranges defined for the CALC Test in FACTORY DB
                 If (Not pFactoryCalcTestRow.IsActiveRangeTypeNull) Then
@@ -1829,52 +1818,71 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     End If
                 End If
 
-                If (Not pFormulaChanged) Then
-                    'If the Formula of the CALC Test has not changed, then the Reference Ranges are updated only if there are not
-                    'DETAILED Reference Ranges in CUSTOMER DB
-                    If (Not pFactoryCalcTestRow.IsActiveRangeTypeNull) Then
-                        If (pCustomerCalcTestRow.IsActiveRangeTypeNull OrElse pCustomerCalcTestRow.ActiveRangeType <> "DETAILED") Then
-                            updateRefRanges = True
-                        End If
-                    Else
-                        updateRefRanges = (Not pCustomerCalcTestRow.IsActiveRangeTypeNull)
-                    End If
-                Else
-                    'If the Formula of the CALC Test has changed, then the Reference Ranges are always updated
-                    updateRefRanges = True
-                End If
-
-                If (updateRefRanges) Then
-                    'Build the TestName to report changes...
-                    Dim myCalcTestName As String = pCustomerCalcTestRow.CalcTestLongName & " (" & pCustomerCalcTestRow.CalcTestName & ") "
-
+                'There are Reference Ranges for the Calculated Test in FACTORY DB
+                If (pNewRefRangesDS.tparTestRefRanges.Rows.Count > 0) Then
                     Dim myActiveRangeType As String = "--"
-                    If (Not pFactoryCalcTestRow.IsActiveRangeTypeNull) Then
-                        If (Not pCustomerCalcTestRow.IsActiveRangeTypeNull) Then myActiveRangeType = pCustomerCalcTestRow.ActiveRangeType
 
-                        'Add a row for field ActiveRangeType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "ActiveRangeType", myActiveRangeType, _
-                                                            pFactoryCalcTestRow.ActiveRangeType)
-
-                        'Update field in Customer DB
-                        pCustomerCalcTestRow.ActiveRangeType = pFactoryCalcTestRow.ActiveRangeType
+                    If (pCustomerCalcTestRow.IsActiveRangeTypeNull) Then
+                        updateRefRanges = True
 
                         'In the TestRefRangesDS from FACTORY DB, update field TestID with value of CalcTestID from CUSTOMER DB
+                        pNewRefRangesDS.BeginInit()
                         For Each refRangeRow As TestRefRangesDS.tparTestRefRangesRow In pNewRefRangesDS.tparTestRefRanges
-                            refRangeRow.SetRangeIDNull()
                             refRangeRow.TestID = pCustomerCalcTestRow.CalcTestID
                         Next
                         pNewRefRangesDS.AcceptChanges()
-                    Else
-                        'Add a row for field ActiveRangeType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
-                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, String.Empty, "ActiveRangeType", _
-                                                            pCustomerCalcTestRow.ActiveRangeType, myActiveRangeType)
 
-                        'There are not Reference Ranges for the CALC Test with the new Formula
-                        pNewRefRangesDS = New TestRefRangesDS
-                        pCustomerCalcTestRow.SetActiveRangeTypeNull()
+                        'Add a row for field ActiveRangeType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                        AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pCustomerCalcTestRow.SampleType, "ActiveRangeType", myActiveRangeType, _
+                                                            pFactoryCalcTestRow.ActiveRangeType)
+
+                        'Update field ActiveRangeType in Customer DB
+                        pCustomerCalcTestRow.ActiveRangeType = pFactoryCalcTestRow.ActiveRangeType
+                        pCustomerCalcTestRow.AcceptChanges()
+                    Else
+                        'Get the Reference Ranges defined for the Calculated Test in CUSTOMER DB
+                        myGlobalDataTO = myTestRefRangesDelegate.ReadByTestID(pDBConnection, pCustomerCalcTestRow.CalcTestID, String.Empty, String.Empty, "CALC")
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            customerRefRangesDS = DirectCast(myGlobalDataTO.SetDatos, TestRefRangesDS)
+                        End If
+
+                        If (pFactoryCalcTestRow.ActiveRangeType = "GENERIC") Then
+                            updateRefRanges = True
+
+                            If (pCustomerCalcTestRow.ActiveRangeType = "GENERIC") Then
+                                'Values of the GENERIC RANGE defined for the CALC Test in CUSTOMER DB are replaced by values in FACTORY DB
+                                'Prepare the TestRefRangesDS with values needed for the update
+                                pNewRefRangesDS.tparTestRefRanges.BeginInit()
+                                'pNewRefRangesDS.tparTestRefRanges.First.RangeID = customerRefRangesDS.tparTestRefRanges.First.RangeID
+                                pNewRefRangesDS.tparTestRefRanges.First.TestID = customerRefRangesDS.tparTestRefRanges.First.TestID
+                                pNewRefRangesDS.tparTestRefRanges.First.IsNew = False
+                                pNewRefRangesDS.tparTestRefRanges.First.IsDeleted = False
+                                pNewRefRangesDS.tparTestRefRanges.AcceptChanges()
+
+                                'Add a row for field NormalLowerLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                                AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pCustomerCalcTestRow.SampleType, "NormalLowerLimit", _
+                                                                    customerRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString, _
+                                                                    pNewRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString)
+
+                                'Add a row for field NormalUpperLimit in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                                AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pCustomerCalcTestRow.SampleType, "NormalUpperLimit", _
+                                                                    customerRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString, _
+                                                                    pNewRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString)
+                            ElseIf (pCustomerCalcTestRow.ActiveRangeType = "DETAILED") Then
+                                'No changes in field ActiveRangeType nor in the defined DETAILED Reference Ranges, although the Generic Range in FACTORY DB will be added
+                                'as not active (same behaviour than the screen). In the TestRefRangesDS from FACTORY DB, update field TestID with value of CalcTestID 
+                                'from CUSTOMER DB
+                                pNewRefRangesDS.tparTestRefRanges.BeginInit()
+                                pNewRefRangesDS.tparTestRefRanges.First.TestID = customerRefRangesDS.tparTestRefRanges.First.TestID
+                                pNewRefRangesDS.tparTestRefRanges.AcceptChanges()
+                            End If
+
+                        ElseIf (pFactoryCalcTestRow.ActiveRangeType = "DETAILED") Then
+                            'NOT IMPLEMENTED; CURRENTLY, BIOSYSTEMS DISTRIBUTES ONLY GENERIC REFERENCE RANGES FOR CALCULATED TESTS
+                        End If
                     End If
-                    pCustomerCalcTestRow.AcceptChanges()
+                Else
+                    'No changes in the Reference Ranges defined for the Calculated Test in CUSTOMER DB
                 End If
 
                 myGlobalDataTO.SetDatos = updateRefRanges
