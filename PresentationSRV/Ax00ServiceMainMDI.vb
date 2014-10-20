@@ -5567,7 +5567,11 @@ Public Class Ax00ServiceMainMDI
             'Registry and maintenance
             Me.RegistryMaintenanceToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_Results", CurrentLanguageAttribute) ' DL 30/11/2012  "SRV_MENU_RegistryMaintenance", CurrentLanguageAttribute)
             Me.HistoryToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_MENU_HistoryReports", CurrentLanguageAttribute)
-            Me.SATReportsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_SATReports", CurrentLanguageAttribute)
+
+            'AG 20/10/2014 BA-1939 -point 5 change text in MDI menu
+            'Me.SATReportsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_SATReports", CurrentLanguageAttribute)
+            Me.SATReportsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SATReport", CurrentLanguageAttribute)
+
             Me.CycleCountsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_MENU_CycleCounts", CurrentLanguageAttribute)
             Me.PreventiveMaintenanceToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_MENU_PreventiveMaintenance", CurrentLanguageAttribute)
 

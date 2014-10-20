@@ -5725,7 +5725,11 @@ Partial Public Class IAx00MainMDI
             ReviewFwBlackBoxToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MMENU_BlackBoxFW", CurrentLanguageAttribute)
             VersionsCheckingToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_VersionsCheck", CurrentLanguageAttribute)
             RemoteConnectionToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_RemoteCnn", CurrentLanguageAttribute)
-            SATReportsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_SATReports", CurrentLanguageAttribute)
+
+            'AG 20/10/2014 BA-1939 -point 5 change text in MDI menu
+            'SATReportsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MENU_SATReports", CurrentLanguageAttribute)
+            SATReportsToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SATReport", CurrentLanguageAttribute)
+
             LoadSATReportToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LoadSAT_Title", CurrentLanguageAttribute)
             LoadSATReportToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LoadSAT_Title", CurrentLanguageAttribute)
             CreateRestorePointToolStripMenuItem.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LoadSAT_Restore", CurrentLanguageAttribute)
