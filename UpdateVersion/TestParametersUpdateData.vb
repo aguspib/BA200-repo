@@ -2666,7 +2666,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     pTestReagentsDS.AcceptChanges()
                 End If
 
-                '(3.3) Check if there is a Reagent has to be deleted from CUSTOMER DB (due to it does not exist in FACTORY DB)
+                '(3.3) Check if there is a Reagent that has to be deleted from CUSTOMER DB (due to it does not exist in FACTORY DB)
                 If (Not myGlobalDataTO.HasError) Then
                     myCustomerReagentsList = (From a As TestReagentsDS.tparTestReagentsRow In customerReagentsDS.tparTestReagents _
                                              Where a.ReagentNumber > factoryReagentsNumber _
@@ -3577,15 +3577,22 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                                                  Select a).ToList()
 
                                     'Verify changed fields and update values in myCustomerReagentsVolsDS
-                                    myGlobalDataTO = UpdateCustomerReagentVolumes(myFactoryReagentVolumesList.First, myCustomerReagentVolumesList.First, _
-                                                                                  myCustomerTestDS.tparTests.First.TestName, myCustomerTestDS.tparTests.First.ShortName, _
-                                                                                  pUpdateVersionChangesList)
+                                    If (myCustomerReagentVolumesList.Count > 0 AndAlso myFactoryReagentVolumesList.Count > 0) Then
+                                        myGlobalDataTO = UpdateCustomerReagentVolumes(myFactoryReagentVolumesList.First, myCustomerReagentVolumesList.First, _
+                                                                                      myCustomerTestDS.tparTests.First.TestName, myCustomerTestDS.tparTests.First.ShortName, _
+                                                                                      pUpdateVersionChangesList)
 
-                                    'Returned value is obtained only if flag deleteBlankCalibResults is still FALSE
-                                    If (Not deleteBlkCalibResults) Then
-                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                            deleteBlkCalibResults = Convert.ToBoolean(myGlobalDataTO.SetDatos)
+                                        'Returned value is obtained only if flag deleteBlankCalibResults is still FALSE
+                                        If (Not deleteBlkCalibResults) Then
+                                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                                deleteBlkCalibResults = Convert.ToBoolean(myGlobalDataTO.SetDatos)
+                                            End If
                                         End If
+
+                                    ElseIf (myCustomerReagentVolumesList.Count = 0 AndAlso myFactoryReagentVolumesList.Count > 0) Then
+                                        'It is a new Reagent for the STD Test (AnalysisMode was changed from Mono to Bi Reagent). New Test Reagent Volumes
+                                        myFactoryReagentVolumesList.First.IsNew = True
+                                        myCustomerReagentsVolsDS.tparTestReagentsVolumes.ImportRow(myFactoryReagentVolumesList.First)
                                     End If
 
                                     'If an error has happened, then the process finishes
@@ -3599,7 +3606,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 'Update the Reagents Volumes for the Test/SampleType
                                 If (Not myGlobalDataTO.HasError) Then
                                     myCustomerReagentsVolsDS.AcceptChanges()
-                                    myGlobalDataTO = myReagentVolsDelegate.Update(pDBConnection, myCustomerReagentsVolsDS)
+                                    myGlobalDataTO = myReagentVolsDelegate.CreateOrUpdate(pDBConnection, myCustomerReagentsVolsDS)
                                 End If
 
                                 'If previous Results of Blanks and Calibrators for the STD Tests have to be deleted, prepare the needed TO

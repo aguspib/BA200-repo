@@ -249,6 +249,71 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' Separe Test Reagents Volumes received in the entry DS between New and Updated and call the DAO function Create or Update for each group
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTestReagentsVolumeDS">Typed DataSet TestReagentsVolumesDS containing all Test Reagents Volumes to add or update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  SA 20/10/2014 - BA-1944 (SubTask BA-1985) 
+        ''' </remarks>
+        Public Function CreateOrUpdate(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestReagentsVolumeDS As TestReagentsVolumesDS) As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Separe new and updated Test Reagents Volumes
+                        Dim myAddedVolumesDS As New TestReagentsVolumesDS
+                        Dim myUpdatedVolumesDS As New TestReagentsVolumesDS
+
+                        For Each testReagentVol As TestReagentsVolumesDS.tparTestReagentsVolumesRow In pTestReagentsVolumeDS.tparTestReagentsVolumes.Rows
+                            If (testReagentVol.IsNew) Then
+                                myAddedVolumesDS.tparTestReagentsVolumes.ImportRow(testReagentVol)
+                            Else
+                                myUpdatedVolumesDS.tparTestReagentsVolumes.ImportRow(testReagentVol)
+                            End If
+                        Next
+
+                        'Add or update the Test Reagents Volumes
+                        Dim myTestReagentsVolDAO As New tparTestReagentsVolumeDAO()
+                        If (myAddedVolumesDS.tparTestReagentsVolumes.Rows.Count > 0) Then
+                            'New Test Reagents Volumes
+                            myGlobalDataTO = myTestReagentsVolDAO.Update(dbConnection, myAddedVolumesDS)
+                        ElseIf (myUpdatedVolumesDS.tparTestReagentsVolumes.Rows.Count > 0) Then
+                            'Update Test Reagents Volumes
+                            myGlobalDataTO = myTestReagentsVolDAO.Update(dbConnection, myUpdatedVolumesDS)
+                        End If
+
+                        If (Not myGlobalDataTO.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                myGlobalDataTO = New GlobalDataTO()
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "TestReagentsVolumeDelegate.Update", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobalDataTO
+        End Function
 #End Region
     End Class
 End Namespace
