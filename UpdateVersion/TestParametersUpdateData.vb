@@ -3593,6 +3593,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                         'It is a new Reagent for the STD Test (AnalysisMode was changed from Mono to Bi Reagent). New Test Reagent Volumes
                                         myFactoryReagentVolumesList.First.IsNew = True
                                         myCustomerReagentsVolsDS.tparTestReagentsVolumes.ImportRow(myFactoryReagentVolumesList.First)
+                                        deleteBlkCalibResults = True
                                     End If
 
                                     'If an error has happened, then the process finishes
