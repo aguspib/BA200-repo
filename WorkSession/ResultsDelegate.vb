@@ -8777,10 +8777,13 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection"></param>
         ''' <param name="pOrderID"></param>
         ''' <param name="pOnlyMappedWithLIS"></param>
-        ''' <returns></returns>
+        ''' <returns>Returns dataset containing only all Accepted results that have a valid mapping with LIS. </returns>
         ''' <remarks>
         ''' AG 30/07/2014 Creation - #1887 OrderToExport management
         ''' AG 17/10/2014 BA-2011 parameter for return only the results mapped with LIS + pOrderID parameters changes is 'List (Of String)' instead of 'String'
+        ''' WE 17/10/2014 BA-2018 Req.6: Tests without a LIS mapping can´t be sent to LIS, as a consequence if a patient only has Tests without LIS mapping or
+        '''                              the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
+        '''                              must be unchecked on screen Actual Results.
         ''' </remarks>
         Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String), ByVal pOnlyMappedWithLIS As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -8798,13 +8801,35 @@ Namespace Biosystems.Ax00.BL
                             Dim myResDS As New ResultsDS
                             myResDS = DirectCast(resultData.SetDatos, ResultsDS)
 
-                            'TODO
-                            'From myResDS.vwksResults remove all rows with tests without LIS mapped value
-                            '
-                            'End Loop
-                            'resultData.SetDatos = dataset with results accepted and mapped with LIS
-                        End If
+                            Dim myAllTestsByType As New AllTestByTypeDelegate
+                            resultData = Nothing
+                            resultData = myAllTestsByType.ReadAll(dbConnection)
 
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim dsAllTestsByType As New AllTestsByTypeDS
+                                dsAllTestsByType = DirectCast(resultData.SetDatos, AllTestsByTypeDS)
+
+                                ' From myResDS.vwksResults remove all rows with tests without LIS mapped value
+                                ' Easier coding approach: fill a separate dataset only with those rows that have a LIS mapping.
+
+                                ' Create separate dataset to collect only rows with tests that have a LIS mapping.
+                                Dim myNewDataSet As New ResultsDS
+                                myNewDataSet.Clear()
+
+                                For Each myDataRow As ResultsDS.vwksResultsRow In myResDS.vwksResults
+                                    resultData = Nothing
+                                    resultData = myAllTestsByType.GetLISTestID(dsAllTestsByType, myDataRow.TestID, myDataRow.TestType)
+                                    ' If Row(i) has LIS mapping => add Row(i) to separate dataset.
+                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                        myNewDataSet.vwksResults.ImportRow(myDataRow)
+                                    End If
+                                Next
+
+                                ' Return dataset with all accepted results that have mapping with LIS.
+                                resultData.SetDatos = myNewDataSet
+                            End If
+
+                        End If
                     End If
                 End If
             Catch ex As Exception
@@ -8815,14 +8840,10 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.GetAcceptedResultsByOrder", EventLogEntryType.Error, False)
-
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
-
             Return resultData
-
         End Function
 
 
