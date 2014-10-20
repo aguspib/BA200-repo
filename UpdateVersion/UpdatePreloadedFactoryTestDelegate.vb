@@ -507,6 +507,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     If (Not dbConnection Is Nothing) Then
                         Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
 
+                        'STEP 0 ==> Include information about VERSIONS in the structure containing all changes made in CUSTOMER DB
+                        Dim myVersionInfoRow As UpdateVersionChangesDS.VersionDetailsRow = myUpdateVersionChangesList.VersionDetails.NewVersionDetailsRow()
+                        myVersionInfoRow.UpdatedFROM = pCustomerSwVersion
+                        myVersionInfoRow.UpdatedTO = pFactorySwVersion
+                        myVersionInfoRow.UpdatedDateTime = Now.ToString("yyyyMMdd HH:mm")
+                        myUpdateVersionChangesList.VersionDetails.AddVersionDetailsRow(myVersionInfoRow)
+
                         'STEP 1 ==> Execute UPDATE VERSION Process for ISE TESTS
                         resultData = SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList)
 
@@ -525,13 +532,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-
-                            'Include information about VERSIONS in the structure containing all changes made in CUSTOMER DB
-                            Dim myVersionInfoRow As UpdateVersionChangesDS.AA_VersionDetailsRow = myUpdateVersionChangesList.AA_VersionDetails.NewAA_VersionDetailsRow()
-                            myVersionInfoRow.UpdatedFROM = pCustomerSwVersion
-                            myVersionInfoRow.UpdatedTO = pFactorySwVersion
-                            myVersionInfoRow.UpdatedDateTime = Now.ToString("yyyyMMdd HH:mm")
-                            myUpdateVersionChangesList.AA_VersionDetails.AddAA_VersionDetailsRow(myVersionInfoRow)
 
                             'Return the structure containing all changes made in CUSTOMER DB
                             resultData.SetDatos = myUpdateVersionChangesList

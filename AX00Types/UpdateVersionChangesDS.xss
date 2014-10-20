@@ -11,7 +11,7 @@
     <Shape ID="DesignTable:DeletedElements" ZOrder="4" X="753" Y="97" Height="86" Width="163" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="24" SplitterPosition="82" />
     <Shape ID="DesignTable:UpdatedElements" ZOrder="3" X="925" Y="98" Height="143" Width="168" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="139" />
     <Shape ID="DesignTable:TestContaminations" ZOrder="2" X="1105" Y="98" Height="181" Width="182" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="177" />
-    <Shape ID="DesignTable:AA_VersionDetails" ZOrder="1" X="241" Y="93" Height="86" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="82" />
+    <Shape ID="DesignTable:VersionDetails" ZOrder="1" X="241" Y="93" Height="86" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="82" />
   </Shapes>
   <Connectors />
 </DiagramLayout>

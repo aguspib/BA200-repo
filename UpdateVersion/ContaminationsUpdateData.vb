@@ -708,7 +708,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 Dim myTestReagentsDS As New TestReagentsDS
                 Dim myFactoryContaminationsR1 As New ContaminationsDS
-                Dim deletedR1Contaminations As New List(Of UpdateVersionChangesDS.TestContaminationsRow)
 
                 Dim myTestReagentsDelegate As New TestReagentsDelegate
                 Dim myContaminationsDelegate As New ContaminationsDelegate
@@ -761,31 +760,17 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             factoryR1Contamination.ReagentContaminatedID = myContaminatedReagentID
                             myGlobalDataTO = myContaminationsDelegate.Create(pDBConnection, factoryR1Contamination)
 
-                            '(2.3.2) Verify if the added R1 Contamination is in the list of DELETED R1 Contaminations, and if it is not in this list, 
-                            '        add the R1 Contaminations to the list of NEW R1 Contaminations
-                            deletedR1Contaminations = (From a As UpdateVersionChangesDS.TestContaminationsRow In pUpdateVersionChangesList.TestContaminations _
-                                                            Where a.Action = "DELETE" _
-                                                          AndAlso a.ContaminationType = "R1" _
-                                                          AndAlso a.TestContaminator = myContaminatorTestName _
-                                                          AndAlso a.TestContaminated = myContaminatedTestName _
-                                                           Select a).ToList()
-
-                            If (deletedR1Contaminations.Count = 0) Then
-                                'Add a new row in the list of Contaminations affected by Update Version Process
+                            '(2.3.2) Add a new row in the list of Contaminations affected by Update Version Process
+                            If (Not myGlobalDataTO.HasError) Then
                                 myWashSol1 = "--"
                                 If (Not factoryR1Contamination.IsWashingSolutionR1Null) Then myWashSol1 = factoryR1Contamination.WashingSolutionR1
                                 AddContaminationToChangesStructure(pUpdateVersionChangesList, "NEW", "R1", myContaminatorTestName, myContaminatedTestName, "--", myWashSol1)
-                            Else
-                                'If the R1 Contamination existed before in CUSTOMER DB, remove it from the list of Contaminations affected by Update Version Process
-                                deletedR1Contaminations.RemoveAt(0)
-                                pUpdateVersionChangesList.TestContaminations.AcceptChanges()
                             End If
                         End If
 
                         'If an error is raised, then the process finishes
                         If (myGlobalDataTO.HasError) Then Exit For
                     Next
-                    deletedR1Contaminations = Nothing
                 End If
 
             Catch ex As Exception
@@ -819,7 +804,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 Dim myTestsDS As New TestsDS
                 Dim myFactoryContaminationsCUVETTES As New ContaminationsDS
-                Dim deletedCUVETTESContaminations As New List(Of UpdateVersionChangesDS.TestContaminationsRow)
 
                 Dim myTestsDelegate As New TestsDelegate
                 Dim myContaminationsDelegate As New ContaminationsDelegate
@@ -853,17 +837,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             '(2.2.1) Create the CUVETTES Contamination in CUSTOMER DB
                             myGlobalDataTO = myContaminationsDelegate.Create(pDBConnection, factoryCUVETTESContamination)
 
-                            '(2.2.2) Verify if the added CUVETTES Contamination is in the list of DELETED Cuvettes Contaminations, and if it is not in this list, 
-                            '        add the CUVETTES Contaminations to the list of NEW CUVETTES Contaminations
-                            deletedCUVETTESContaminations = (From a As UpdateVersionChangesDS.TestContaminationsRow In pUpdateVersionChangesList.TestContaminations _
-                                                            Where a.Action = "DELETE" _
-                                                          AndAlso a.ContaminationType = "CUVETTES" _
-                                                          AndAlso a.TestContaminator = myContaminatorTestName _
-                                                           Select a).ToList()
-
-                            If (deletedCUVETTESContaminations.Count = 0) Then
-                                'Add a new row in the list of Contaminations affected by Update Version Process
-                                myWashSol1 = "--"
+                            '(2.2.2) Add a new row in the list of Contaminations affected by Update Version Process
+                            If (Not myGlobalDataTO.HasError) Then
+                                 myWashSol1 = "--"
                                 myWashSol2 = "--"
                                 If (Not factoryCUVETTESContamination.IsWashingSolutionR1Null) Then myWashSol1 = factoryCUVETTESContamination.WashingSolutionR1
                                 If (Not factoryCUVETTESContamination.IsWashingSolutionR2Null) Then myWashSol2 = factoryCUVETTESContamination.WashingSolutionR2
@@ -874,7 +850,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         'If an error is raised, then the process finishes
                         If (myGlobalDataTO.HasError) Then Exit For
                     Next
-                    deletedCUVETTESContaminations = Nothing
                 End If
 
             Catch ex As Exception
