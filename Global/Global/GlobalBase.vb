@@ -553,7 +553,13 @@ Namespace Biosystems.Ax00.Global
             End Set
         End Property
 
-
+        'SA 20/10/2014
+        'BA-1944: Read new setting for the name of the XML file containing all changes made in CUSTOMER DB for the Update Version Process
+        Shared ReadOnly Property UpdateVersionProcessLogFileName() As String
+            Get
+                Return My.Settings.UpdateVersionProcessLogFileName
+            End Get
+        End Property
 
 #Region "NOT USED - Get from Database"
 

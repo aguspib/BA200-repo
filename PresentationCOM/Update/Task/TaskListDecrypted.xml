@@ -141,14 +141,7 @@
       INSERT INTO  [Ax00].[dbo].[tfmwFieldLimits]
       SELECT * FROM [Ax00TEM].[dbo].[tfmwFieldLimits]
       GO
-      DELETE tparContaminations
-      WHERE tparContaminations.ReagentContaminatorID IN( SELECT reagentID FROM tparReagents WHERE tparReagents.PreloadedReagent = 1)
-      AND tparContaminations.ReagentContaminatedID  IN (SELECT reagentID FROM tparReagents WHERE tparReagents.PreloadedReagent = 1)
-      GO
-      DELETE tparContaminations
-      WHERE tparContaminations.TestContaminaCuvetteID IN( SELECT TestID FROM tparTests WHERE tparTests.PreloadedTest  = 1)
-      GO
-    </UpdateScript>
+   </UpdateScript>
   </CommonTask>
   <AppVersion>
     <Version>2.0</Version>

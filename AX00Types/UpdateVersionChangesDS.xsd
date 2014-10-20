@@ -65,6 +65,15 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="AA_VersionDetails" msprop:Generator_TableClassName="AA_VersionDetailsDataTable" msprop:Generator_TableVarName="tableAA_VersionDetails" msprop:Generator_RowChangedName="AA_VersionDetailsRowChanged" msprop:Generator_TablePropName="AA_VersionDetails" msprop:Generator_RowDeletingName="AA_VersionDetailsRowDeleting" msprop:Generator_RowChangingName="AA_VersionDetailsRowChanging" msprop:Generator_RowEvHandlerName="AA_VersionDetailsRowChangeEventHandler" msprop:Generator_RowDeletedName="AA_VersionDetailsRowDeleted" msprop:Generator_RowClassName="AA_VersionDetailsRow" msprop:Generator_UserTableName="AA_VersionDetails" msprop:Generator_RowEvArgName="AA_VersionDetailsRowChangeEvent">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="UpdatedFROM" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UpdatedFROM" msprop:Generator_ColumnVarNameInTable="columnUpdatedFROM" msprop:Generator_ColumnPropNameInTable="UpdatedFROMColumn" msprop:Generator_UserColumnName="UpdatedFROM" type="xs:string" minOccurs="0" />
+              <xs:element name="UpdatedTO" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UpdatedTO" msprop:Generator_ColumnVarNameInTable="columnUpdatedTO" msprop:Generator_ColumnPropNameInTable="UpdatedTOColumn" msprop:Generator_UserColumnName="UpdatedTO" type="xs:string" minOccurs="0" />
+              <xs:element name="UpdatedDateTime" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="UpdatedDateTime" msprop:Generator_ColumnVarNameInTable="columnUpdatedDateTime" msprop:Generator_ColumnPropNameInTable="UpdatedDateTimeColumn" msprop:Generator_UserColumnName="UpdatedDateTime" type="xs:string" minOccurs="0" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:choice>
     </xs:complexType>
   </xs:element>

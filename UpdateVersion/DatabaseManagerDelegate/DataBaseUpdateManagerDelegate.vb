@@ -22,64 +22,67 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 #Region "Public Methods"
 
         ''' <summary>
-        ''' Valiatate the installe database And application database version in case the application db version is greather than the
-        ''' installed db, start the update process incharge to change database sctuctures and data.
+        ''' Compare versions of the installed CUSTOMER DB and the FACTORY DB and determine the next step based on the result:  
+        ''' ** If version of FACTORY DB is greather than version of CUSTOMER DB, the Update Version process is executed to update DB 
+        '''    structures and data
+        ''' ** If version of FACTORY DB is equal to version of CUSTOMER DB, nothing to do, Update Version process is not executed
+        ''' ** If version of FACTORY DB is less than version of CUSTOMER DB, the Update Version process is not executed
         ''' </summary>
-        ''' <param name="pServerName">Server name where database is installed</param>
-        ''' <param name="pDataBaseName">Database name</param>
-        ''' <param name="DBLogin">User login</param>
-        ''' <param name="DBPassword">User password</param>
-        ''' <returns>
-        ''' GlobalDataTo with the result of the update procces if there was any db update return TRUE otherwise False.
-        ''' incase there is and error on the update process will return has error and the error type.
+        ''' <param name="pServerName">Name of the Server where CUSTOMER DB is installed</param>
+        ''' <param name="pDataBaseName">CUSTOMER DB Name (Ax00)</param>
+        ''' <param name="pDBLogin">DB Login</param>
+        ''' <param name="pDBPassword">DB Password</param>
+        ''' <returns>GlobalDataTO with the result of the Update Version procces: if the Update Version was successfully executed, the function
+        '''          returns TRUE; otherwise it returns FALSE. If the Update Version is executed but an error is raised during execution, the 
+        '''          Error is informed in fields ErrorCode and ErrorDescription in the GlobalDataTO, and HasError is set to TRUE
         ''' </returns>
         ''' <remarks>
-        ''' CREATED BY: TR 
-        ''' Modified by XB 13/05/2013  - Add the new parameter pusSwVersion to evaluate required updates 
-        '''                              when call ConfigureDataBaseAfterUpdateVersion method.
+        ''' Created by:  TR 
+        ''' Modified by: XB 13/05/2013 - Inform parameter usSwVersion when calling function ConfigureDataBaseAfterUpdateVersion (to evaluate 
+        '''                              required updates)
+        '''              SA 20/10/2014 - BA-1944 ==> Inform parameter with the Application Version beign installed when calling function  
+        '''                                          ConfigureDataBaseAfterUpdateVersion (to inform version updated in the name of the XML containing  
+        '''                                          all changes made for the Update Version process)
         ''' </remarks>
-        Public Function UpdateDatabase(ByVal pServerName As String, ByVal pDataBaseName As String, _
-                                             ByVal DBLogin As String, ByVal DBPassword As String, _
-                                              Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
-
-            Dim myGlobalDataTO As New GlobalDataTO
+        Public Function UpdateDatabase(ByVal pServerName As String, ByVal pDataBaseName As String, ByVal pDBLogin As String, ByVal pDBPassword As String, _
+                                       Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
             Dim result As Boolean = False
+            Dim myGlobalDataTO As New GlobalDataTO
+
             Dim myLogAcciones As New ApplicationLogManager()
             myLogAcciones.CreateLogActivity("On UpdateDatabase method ", "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Information, False)
 
             Try
-                'TR 16/01/2013 v1.0.1 - New implementation for DataBaseVersionEqual return a globaldataTO.
-                Dim usSwVersion As String = ""
-                Dim srvSwVersion As String = ""
+                'Compare the DB Version in CUSTOMER and FACTORY Databases
+                Dim usSwVersion As String = String.Empty
+                Dim srvSwVersion As String = String.Empty
                 myGlobalDataTO = DataBaseVersionEqual(usSwVersion, srvSwVersion)
 
                 'Validate the database version (if ">" method returns HasError = True)
-                If Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos.ToString() = "<" Then
-
-                    'DL 18/01/2013  Create an automatic restore point (subfolders RestorePoints and Previous only for User Sw)
-                    Dim mySATUtil As New SATReportUtilities
+                If (Not myGlobalDataTO.HasError AndAlso myGlobalDataTO.SetDatos.ToString() = "<") Then
+                    'DL 18/01/2013 - Create an automatic restore point (subfolders RestorePoints and Previous only for User Sw)
                     Dim myGlobal As New GlobalDataTO
+                    Dim mySATUtil As New SATReportUtilities
+
                     myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion)
-                    'DL 18/01/2013
-                    If Not myGlobal.HasError Then
+                    If (Not myGlobal.HasError) Then
                         Dim myDatabaseAdmin As New DataBaseManagerDelegate()
-                        'TR 16/01/2013 v1.0.1 -Search new database backup file to restore on temporal db
+
+                        'TR 16/01/2013 v1.0.1 - Search new database backup file to restore on temporal db
                         Dim myBackUpFile As String = AppDomain.CurrentDomain.BaseDirectory & GlobalBase.BakDirectoryPath & GlobalBase.TempDBBakupFileName
+                        If (IO.File.Exists(myBackUpFile)) Then
+                            'Copy the file to the a new temporary directory and assign the value
+                            myBackUpFile = CopyBackupToTempDirectory(myBackUpFile)
 
-                        If IO.File.Exists(myBackUpFile) Then
-                            'Create a temporal directory
-                            myBackUpFile = CopyBackupToTempDirectory(myBackUpFile) 'copy the file to the new directory and assign the value.
-                            'restore temporal database (Ax00_TEM)
-                            If myDatabaseAdmin.RestoreDatabase(pServerName, GlobalBase.TemporalDBName, DBLogin, DBPassword, myBackUpFile) Then
-
+                            'Restore the temporary DB (Ax00TEM)
+                            If (myDatabaseAdmin.RestoreDatabase(pServerName, GlobalBase.TemporalDBName, pDBLogin, pDBPassword, myBackUpFile)) Then
                                 myLogAcciones.CreateLogActivity("Temporal Database restore Success ", "DataBaseUpdateManager.UpdateDatabase", _
-                                                                                                            EventLogEntryType.Information, False)
-                                Dim myServer As Server = New Server(pServerName)
+                                                                EventLogEntryType.Information, False)
 
-                                'RH 17/05/2011
+                                Dim myServer As Server = New Server(pServerName)
                                 myServer.ConnectionContext.LoginSecure = False
-                                myServer.ConnectionContext.Login = DBLogin
-                                myServer.ConnectionContext.Password = DBPassword
+                                myServer.ConnectionContext.Login = pDBLogin
+                                myServer.ConnectionContext.Password = pDBPassword
                                 myServer.ConnectionContext.BeginTransaction()
 
                                 'SGM 18/02/2013
@@ -87,78 +90,72 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 SystemInfoManager.IsUpdateProcess = True
 
                                 'Create 'Previous' folder if not exists
-                                If Not Directory.Exists(Application.StartupPath & GlobalBase.PreviousFolder) Then
+                                If (Not Directory.Exists(Application.StartupPath & GlobalBase.PreviousFolder)) Then
                                     Directory.CreateDirectory(Application.StartupPath & GlobalBase.PreviousFolder)
                                 End If
-                                'end SGM 18/02/2013
-                                'TR 16/01/2013 -New implementation Update the tables structures and data.
+
+                                'TR 16/01/2013 - Update the DB Structures (tables and views) 
                                 myGlobalDataTO = UpdateDatabaseSructureAndData(pDataBaseName, myServer)
 
-                                'TR 18/02/2013 -Add the data update into the same transaction.
-                                'AG 16/01/2013 v1.0.1
-                                If Not myGlobalDataTO.HasError Then
-                                    myGlobalDataTO = ConfigureDataBaseAfterUpdateVersion(myServer, usSwVersion, pLoadingRSAT) 'XB 13/05/2013 -pass usSwVersion parameter to function
-                                    'Inform the database update version process failed
-                                    If myGlobalDataTO.HasError Then myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString
-                                Else
-                                    'Warn the user (return myGlobalDataTo with HasError = True and the same ErrorCode)
-                                End If
-                                'AG 16/01/2013 v1.0.1
-                                'TR 18/02/2013 -END
+                                'TR 18/02/2013 - Update the DB Preloaded Data 
+                                If (Not myGlobalDataTO.HasError) Then
+                                    myGlobalDataTO = ConfigureDataBaseAfterUpdateVersion(myServer, usSwVersion, Application.ProductVersion, pLoadingRSAT)
 
-                                'Validate if there was error updating the structures and data.
-                                If myGlobalDataTO.HasError Then
+                                    'If an error has been raised during execution of Update Version Process, inform the ErrorCode in the GlobalDataTO to return
+                                    If (myGlobalDataTO.HasError) Then myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString
+                                End If
+                                
+                                'Validate if there was an Error during the Update Version Process
+                                If (myGlobalDataTO.HasError) Then
+                                    'ERROR CASE
                                     myServer.ConnectionContext.RollBackTransaction()
+
                                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
                                     myGlobalDataTO.SetDatos = False
-                                    Dim myLogFile As String = String.Empty
-                                    'Validate if exist log file 
 
                                     'Search for update log file on previous folder and add it to RSAT
-                                    If System.IO.File.Exists(Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile) Then
+                                    Dim myLogFile As String = String.Empty
+                                    If (System.IO.File.Exists(Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile)) Then
                                         myLogFile = Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile
                                     End If
 
-                                    'CREATE A RSAT and copy the Xml file used for log in updateprocess.
-                                    'myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE, False, "", "", "", "", usSwVersion)
-                                    myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE_ERR, False, "", _
+                                    'CREATE a RSAT and copy the XML file containing the LOG of the Update Process 
+                                    myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_UPDATE_ERR, False, String.Empty, _
                                                                          myLogFile, Application.StartupPath & GlobalBase.PreviousFolder, _
                                                                          "RSATUpdateError", usSwVersion)
 
-                                    'Remove the UpdateLog File because is included on the RSAT
-                                    If File.Exists(myLogFile) Then
-                                        File.Delete(myLogFile)
-                                    End If
+                                    'Remove the UpdateLog File because it is included on the RSAT
+                                    If (File.Exists(myLogFile)) Then File.Delete(myLogFile)
                                 Else
+                                    'SUCCESS CASE
                                     myServer.ConnectionContext.CommitTransaction()
+
                                     myGlobalDataTO.SetDatos = True
-                                    'If the process was successful Delete the log file - SGM 18/02/2013
-                                    If System.IO.File.Exists(Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile) Then
+
+                                    'If the process was successful delete the log file - SGM 18/02/2013
+                                    If (System.IO.File.Exists(Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile)) Then
                                         System.IO.File.Delete(Application.StartupPath & GlobalBase.PreviousFolder & GlobalBase.UpdateLogFile)
                                     End If
-                                    'TR 08/07/2013 -After Update process then execute the SHRINK Command outside the transaction.
+
+                                    'TR 08/07/2013 - After Update Process execute the SHRINK Command (outside the DB Transaction)
                                     myGlobalDataTO = ShrinkDatabase(pDataBaseName, myServer)
                                 End If
-                                'TR 16/01/2013 -End
                             End If
-                            'End If
                         End If
                     Else
-                        'Restore point creation error.
+                        'Restore point creation error
                         myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_UPDATE.ToString()
                         myGlobalDataTO.SetDatos = False
                         myGlobalDataTO.HasError = True
                     End If
-                    'DL 18/01/2013
                 Else
                     myGlobalDataTO.SetDatos = False
-                    'TODO: AG Validate if there was an error or if the versions are equals.
-                    If myGlobalDataTO.HasError OrElse myGlobalDataTO.SetDatos.ToString() = ">" Then
+
+                    'If CUSTOMER DB is greater than FACTORY DB, inform the Error
+                    If (myGlobalDataTO.HasError OrElse myGlobalDataTO.SetDatos.ToString() = ">") Then
                         myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_VERSION.ToString()
                     End If
-                    'myLogAcciones.CreateLogActivity("database version Equals", "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Information, False)
                 End If
-
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
@@ -168,7 +165,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             'Set the update process as finished - SGM 18/02/2013
             SystemInfoManager.IsUpdateProcess = False
-
             Return myGlobalDataTO
         End Function
 
@@ -451,42 +447,47 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
         ''' <summary>
-        ''' Compare the Installed database version with the application database version.
+        ''' Compare the DB Version in CUSTOMER and FACTORY Databases
         ''' </summary>
-        ''' <returns> "=" if equal, if lower or if greather</returns>
+        ''' <returns>GlobalDataTO containing an String value with the result of the DB Versions comparison: 
+        '''          equal symbol, less than symbol or greater than symbol</returns>
         ''' <remarks>
-        ''' CREATE BY: 
-        ''' MODIFIED BY: TR 16/01/2013 V1.0.1 -Use the table tfmwVersions to get the application version and the database version instead the ApplicationSetting data table.
-        ''' AG 17/01/2013 v1.0.1 - informs also the 2 byref parameters
+        ''' Created by: 
+        ''' Modified by: TR 16/01/2013 v1.0.1 ==> Use the table tfmwVersions to get the Application Version and the DB Version instead of the 
+        '''                                       ApplicationSettings data table
+        '''              AG 17/01/2013 v1.0.1 ==> Informs the two ByRef parameters
         ''' </remarks>
         Private Function DataBaseVersionEqual(ByRef pUsSwVersion As String, ByRef pSrvSwVersion As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
+
             Try
                 'Get the Application and Database Version from installed application 
-                Dim AppDataBaseVersion As Double = CDbl(GlobalBase.DataBaseVersion.Replace(".", SystemInfoManager.OSDecimalSeparator)) 'Global setting.
-                Dim AppApplicationVersion As String = Application.ProductVersion ' application product version.
-                ' InstalledDataBaseVersion = CDbl(myVersionsDS.tfmwVersions(0).DBSoftware.Replace(".", SystemInfoManager.OSDecimalSeparator))
-                'Get the Application and Database version from installed database
+                Dim AppDataBaseVersion As Double = CDbl(GlobalBase.DataBaseVersion.Replace(".", SystemInfoManager.OSDecimalSeparator))
+                Dim AppApplicationVersion As String = Application.ProductVersion
+
+                'Get Application Version and Database Version from CUSTOMER DB
                 Dim myVersionsDelegate As New VersionsDelegate
                 myGlobalDataTO = myVersionsDelegate.GetVersionsData(Nothing)
-                If Not myGlobalDataTO.HasError Then
-                    Dim myVersionsDS As New VersionsDS
-                    myVersionsDS = DirectCast(myGlobalDataTO.SetDatos, VersionsDS)
-                    If myVersionsDS.tfmwVersions.Count > 0 Then
-                        'AG 17/01/2013 v1.0.1 - Inform the Us and Srv Sw versions
+
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    Dim myVersionsDS As VersionsDS = DirectCast(myGlobalDataTO.SetDatos, VersionsDS)
+
+                    If (myVersionsDS.tfmwVersions.Count > 0) Then
+                        'Inform the USER and SERVICE SW Versions to return
                         pUsSwVersion = myVersionsDS.tfmwVersions(0).UserSoftware
                         pSrvSwVersion = myVersionsDS.tfmwVersions(0).ServiceSoftware
+
                         Dim myDBVersion As Double = CDbl(myVersionsDS.tfmwVersions(0).DBSoftware.Replace(".", SystemInfoManager.OSDecimalSeparator))
-                        'Validate if versions are equal
-                        If myDBVersion = AppDataBaseVersion Then
+
+                        'Compare the DB Versions
+                        If (myDBVersion = AppDataBaseVersion) Then
                             myGlobalDataTO.SetDatos = "="
-                        ElseIf myDBVersion < AppDataBaseVersion Then
+                        ElseIf (myDBVersion < AppDataBaseVersion) Then
                             myGlobalDataTO.SetDatos = "<"
-                        ElseIf myDBVersion > AppDataBaseVersion Then
+                        ElseIf (myDBVersion > AppDataBaseVersion) Then
                             myGlobalDataTO.SetDatos = ">"
-                            'There is an error 'cause database version installed on server is greather than the application dbVersion.
+                            'This case is an error because CUSTOMER DB Version is greather than FACTORY DB Version
                             myGlobalDataTO.HasError = True
-                            'Set the corresponding error code indicating the invalid database version
                             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.INVALID_DATABASE_VERSION.ToString()
                         End If
                     End If
@@ -496,6 +497,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
+
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "DataBaseUpdateManager.DataBaseVersionEqual", EventLogEntryType.Error, False)
             End Try
@@ -526,26 +528,35 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return result
         End Function
 
-
         ''' <summary>
-        ''' Execute required business after update database process
-        ''' 1) Update alarms definition table
-        ''' 2) Reset current WorkSession
-        ''' 3) Update preloaded BioSystems test programming
+        ''' Once the DB Structures have been updated, the Update Version process to update preloaded data is executed. Steps:
+        ''' 1) Update the Alarms definition table
+        ''' 2) Reset the current WorkSession
+        ''' 3) Update preloaded BioSystems Tests programming (all types)
         ''' </summary>
-        '''  <param name="pLoadingRSAT">Indicate if loading a RSAT.</param>
-        ''' <returns>GlobalDataTo</returns>
+        ''' <param name="pServer">Name of the Server where CUSTOMER DB is installed</param>
+        ''' <param name="pCustomerSwVersion">DB Version in CUSTOMER DB</param>
+        ''' <param name="pFactorySwVersion">DB Version in FACTORY DB</param>
+        ''' <param name="pLoadingRSAT">When TRUE, it indicates the function is executed while loading a RSAT and in this case, only step 1
+        '''                            (update the Alarms definition table) is executed. When FALSE, it indicates the function is executed 
+        '''                            for the Update Version process and all steps are executed
+        '''                            </param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 16/01/2013
         ''' Modified by: TR 29/01/2013 - Added new optional parameter pLoadingRSAT to validate if user is loading a RSAT, in which case
         '''                              the Reset WorSession and the Factory Tests Programming updates are not executed
         '''              TR 18/02/2013 - Added the new parameter pServer to implement the required DB Transaction
-        '''              XB 13/05/2013 - Added the new parameter pusSwVersion to evaluate required updates
-        '''              SA 17/10/2014 - BA-1944 ==> 
+        '''              XB 13/05/2013 - Added parameter pCustomerSwVersion to inform the DB Version in the CUSTOMER DB
+        '''              SA 17/10/2014 - BA-1944 ==> Added parameter pFactorySwVersion to inform the DB Version in the FACTORY DB. Call the  
+        '''                                          function that executes the new Update Version process (SetFactoryTestProgrammingNEW) and, if
+        '''                                          the process finishes successfully, write in Application Log directory the XML file containing all
+        '''                                          changes made for the Update Version process in the CUSTOMER DB  
         ''' </remarks>
-        Private Function ConfigureDataBaseAfterUpdateVersion(ByRef pServer As Server, ByVal pusSwVersion As String, _
+        Private Function ConfigureDataBaseAfterUpdateVersion(ByRef pServer As Server, ByVal pCustomerSwVersion As String, ByVal pFactorySwVersion As String, _
                                                              Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
+
             Try
                 'Get the current language (USR software)
                 'We do not get the SRV language because it not requires update the alarms definition (name, description, solution)
@@ -556,7 +567,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim langID As String = CType(myGlobal.SetDatos, String)
 
-                    'Update alarms definition
+                    'Update Alarms definition
                     Dim alarmsDlg As New AlarmsDelegate
                     myGlobal = alarmsDlg.UpdateLanguageResource(pServer.ConnectionContext.SqlConnectionObject(), langID)
 
@@ -582,17 +593,20 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             If (Not myGlobal.HasError) Then
                                 Dim updateTest As New UpdatePreloadedFactoryTestDelegate
 
-                                myGlobal = updateTest.SetFactoryTestProgrammingNEW(pServer.ConnectionContext.SqlConnectionObject(), pusSwVersion)
+                                myGlobal = updateTest.SetFactoryTestProgrammingNEW(pServer.ConnectionContext.SqlConnectionObject(), pCustomerSwVersion, pFactorySwVersion)
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                     Dim myUpdateVersionChangesList As UpdateVersionChangesDS = DirectCast(myGlobal.SetDatos, UpdateVersionChangesDS)
 
                                     Dim myDirName As String = Application.StartupPath & GlobalBase.XmlLogFilePath
-                                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & " UPDATE VERSION CHANGES.xml"
+                                    Dim myFileName As String = GlobalBase.UpdateVersionProcessLogFileName
 
                                     'If needed, create the final directory... 
                                     If (Not IO.Directory.Exists(myDirName)) Then IO.Directory.CreateDirectory(myDirName)
 
-                                    'Write the XML
+                                    'If there is a previous version of the UpdateVersion file, delete it 
+                                    If (IO.File.Exists(myDirName & myFileName)) Then IO.File.Delete(myDirName & myFileName)
+
+                                    'Finally, write the XML
                                     myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
                                 End If
                             End If

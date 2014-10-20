@@ -2402,7 +2402,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Try
                 Dim deleteBlkCalibResults As Boolean = False
                 Dim myTestName As String = pCustomerTestRow.TestName & " (" & pCustomerTestRow.ShortName & ")"
-                
+
                 'Verify if field AnalysisMode has changed; in this case, it is possible that the ReagentsNumber field may also have changed
                 '(if the the AnalysisMode has changed from Mono to Bi Reagent or vice versa)
                 pCustomerTestRow.BeginEdit()

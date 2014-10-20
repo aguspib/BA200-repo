@@ -55,6 +55,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         '''                                            ** When CreateSATReport is called from ServiceSW, inform the new parameter as TRUE
         '''                                           To known if the RSAT has been launched from UserSW or from ServiceSW, inform the optional parameter with value of 
         '''                                           the GlobalBase property IsServiceAssembly
+        '''              SA 20/10/2014 - BA-1944 ==> Include in the RSAT the last XML File generated for the Update Version process
         ''' </remarks>
         Public Function CreateSATReport(ByVal pAction As GlobalEnumerates.SATReportActions, Optional ByVal pAuto As Boolean = False, _
                                         Optional ByVal ExcelPath As String = "", Optional ByVal pAdjFilePath As String = "", _
@@ -328,6 +329,16 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             End If
                         Next
                     End If
+
+                    'BA-1944: Add the XML of the last Update Version process executed
+                    Dim diar3 As IO.FileInfo() = di.GetFiles(GlobalBase.UpdateVersionProcessLogFileName)
+                    For Each dra In diar3
+                        logFileName = ReportFolderPath & "\" & dra.ToString
+                        If (File.Exists(SATLogFolder & dra.ToString)) Then
+                            If (Not Directory.Exists(ReportFolderPath)) Then Directory.CreateDirectory(ReportFolderPath)
+                            If (Not File.Exists(logFileName)) Then File.Copy(SATLogFolder & dra.ToString, logFileName)
+                        End If
+                    Next
                 End If
 
                 '2.6 - Add the FW Adjustments file

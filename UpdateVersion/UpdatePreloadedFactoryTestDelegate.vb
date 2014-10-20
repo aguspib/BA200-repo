@@ -489,12 +489,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' New implementation of the UPDATE VERSION Process. Modify CUSTOMER DB with changes found in FACTORY DB. 
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pusSwVersion">Customer SW Version</param>
+        ''' <param name="pCustomerSwVersion">SW Version in CUSTOMER DB</param>
+        ''' <param name="pFactorySwVersion">SW Version in FACTORY DB</param>
         ''' <returns>GlobalDataTO containing an UpdateVersionChangesDS with all changes the UPDATE VERSION Process has made in CUSTOMER DB</returns>
         ''' <remarks>
         ''' Created by:  SA 17/10/2014 - BA-1944
         ''' </remarks>
-        Public Function SetFactoryTestProgrammingNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pusSwVersion As String) As GlobalDataTO
+        Public Function SetFactoryTestProgrammingNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCustomerSwVersion As String, _
+                                                     ByVal pFactorySwVersion As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -515,7 +517,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Not resultData.HasError) Then resultData = SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
 
                         'STEP 4 ==> If SW VERSION is v1, execute UPDATE VERSION Process to update ISE DATA information
-                        If (pusSwVersion = "1.0.0") Then
+                        If (pCustomerSwVersion = "1.0.0") Then
                             Dim iseDataInfoUpd As New ISEInformationUpdateData
                             resultData = iseDataInfoUpd.UpdateDataFormatv1Tov2(dbConnection)
                         End If
@@ -523,6 +525,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+
+                            'Include information about VERSIONS in the structure containing all changes made in CUSTOMER DB
+                            Dim myVersionInfoRow As UpdateVersionChangesDS.AA_VersionDetailsRow = myUpdateVersionChangesList.AA_VersionDetails.NewAA_VersionDetailsRow()
+                            myVersionInfoRow.UpdatedFROM = pCustomerSwVersion
+                            myVersionInfoRow.UpdatedTO = pFactorySwVersion
+                            myVersionInfoRow.UpdatedDateTime = Now.ToString("yyyyMMdd HH:mm")
+                            myUpdateVersionChangesList.AA_VersionDetails.AddAA_VersionDetailsRow(myVersionInfoRow)
 
                             'Return the structure containing all changes made in CUSTOMER DB
                             resultData.SetDatos = myUpdateVersionChangesList

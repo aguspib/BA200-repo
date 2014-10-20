@@ -312,7 +312,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of R1 Contaminations obtained</returns>
         ''' <remarks>
-        ''' Created by: SA 13/10/2014 BA-1944 (SubTask BA-1986)
+        ''' Created by: SA 13/10/2014 - BA-1944 (SubTask BA-1986)
         ''' </remarks>
         Public Function GetNEWorUPDContaminationsR1(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -372,7 +372,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of CUVETTES Contaminations obtained</returns>
         ''' <remarks>
-        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' Created by: SA 14/10/2014 - BA-1944 (SubTask BA-1986)
         ''' </remarks>
         Public Function GetNEWorUPDContaminationsCUVETTES(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -423,7 +423,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of R1 Contaminations to delete</returns>
         ''' <remarks>
-        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' Created by: SA 14/10/2014 - BA-1944 (SubTask BA-1986)
         ''' </remarks>
         Public Function GetDELContaminationsR1(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -484,7 +484,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <returns>GlobalDataTO containing a ContaminationsDS with the group of CUVETTES Contaminations to delete</returns>
         ''' <remarks>
-        ''' Created by: SA 14/10/2014 BA-1944 (SubTask BA-1986)
+        ''' Created by: SA 14/10/2014 - BA-1944 (SubTask BA-1986)
         ''' </remarks>
         Public Function GetDELContaminationsCUVETTES(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing

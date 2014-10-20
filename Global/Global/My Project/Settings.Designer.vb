@@ -835,6 +835,18 @@ Namespace My
                 Me("ServiceProjectName") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("Ax00UpdateVersion.xml")>  _
+        Public Property UpdateVersionProcessLogFileName() As String
+            Get
+                Return CType(Me("UpdateVersionProcessLogFileName"),String)
+            End Get
+            Set
+                Me("UpdateVersionProcessLogFileName") = value
+            End Set
+        End Property
     End Class
 End Namespace
 
