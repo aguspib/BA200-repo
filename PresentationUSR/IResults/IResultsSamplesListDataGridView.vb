@@ -99,7 +99,7 @@ Partial Class IResults
                 .Name = "OrderToPrint"
                 '.HeaderText = "Print"
                 .HeaderText = ""
-                .Width = 30
+                .Width = 25 'IT 21/10/2014: BA-2036
             End With
             bsSamplesListDataGridView.Columns.Add(PrintReportColumnNew)
 
@@ -107,8 +107,8 @@ Partial Class IResults
             With ExportColumn
                 .Name = "OrderToExport"
                 '.HeaderText = "OrderToExport"
-                .HeaderText = MyClass.LISNameForColumnHeaders '"" SGM 12/04/2013
-                .Width = 37 '30 SGM 16/04/2013
+                .HeaderText = "" 'IT 21/10/2014: BA-2036
+                .Width = 25 'IT 21/10/2014: BA-2036
             End With
             bsSamplesListDataGridView.Columns.Add(ExportColumn)
             ' End DL 16/03/2011

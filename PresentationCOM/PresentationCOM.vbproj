@@ -498,6 +498,7 @@
     <Content Include="Images\BtlInProcessReagSmallR2_Sel.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\CheckExportHead.png" />
     <Content Include="Images\CompactPrint.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
