@@ -10030,7 +10030,9 @@ Partial Public Class IAx00MainMDI
                                     resultData = MDILISManager.UploadOrdersResults(Nothing, item, pHistoricalFlag, testMappingDS, _
                                                             confMappingDS, pCurrentResults, pCurrentResultAlarms, pHistoricalResults)
 
-                                    'AG 30/09/2014 - BA-1440 - Only during MANUAL EXPORT!! if some result not sent (invalid LIS mapping) show message to user
+                                    'AG 30/09/2014 - BA-1440 - Only during MANUAL EXPORT!! If some result not sent (invalid LIS mapping) show message to user
+                                    'Message is also shown when setting LIS_UPLOAD_UNSOLICITED_PAT_RES = 0 and there are some patient requested by BA400
+                                    'and when LIS_UPLOAD_UNSOLICITED_QC_RES = 0 and there are some control requested by BA400
                                     If Not pAutoExportFlag AndAlso Not showMsg Then
                                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                             If DirectCast(resultData.SetDatos, Integer) > 0 Then
