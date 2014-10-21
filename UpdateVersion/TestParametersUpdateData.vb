@@ -1064,35 +1064,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myGlobalDataTO
         End Function
 
-        ''' <summary>
-        ''' Update the sort of the Tests as alphabetically order by the name of the test (except User tests)
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by XB 04/06/2014 - BT #1646
-        ''' </remarks>
-        Private Function UpdateTestSortByTestName(pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim myGlobalDataTO As New GlobalDataTO
-            Try
-                Dim myTestDelegate As New TestsDelegate
-
-                myGlobalDataTO = myTestDelegate.UpdatePreloadedTestSortByTestName(pDBConnection)
-                If Not myGlobalDataTO.HasError Then
-                    myGlobalDataTO = myTestDelegate.UpdateUserTestPosition(pDBConnection)
-                End If
-
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateTestSortByTestName", EventLogEntryType.Error, False)
-                myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myGlobalDataTO.ErrorMessage = ex.Message
-            End Try
-
-            Return myGlobalDataTO
-        End Function
-
 #End Region
 
         ''' <summary>
@@ -1656,7 +1627,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         End Function
 
 #Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
-
         ''' <summary>
         ''' Search all STD Tests in FACTORY DB that do not exist in Customer DB and, for each one of them, execute the process of adding it to Customer DB
         ''' </summary>
@@ -1948,87 +1918,93 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 '(3) Merge results of both searches
                 If (Not myGlobalDataTO.HasError) Then
-                    myTestsDS.Merge(myAuxTestsDS, True)
-
-                    '(4) Process each one of the STD Tests found
-                    For Each testRow As TestsDS.tparTestsRow In myTestsDS.tparTests
-                        'Rename the STD Test (add as many "R" letters as needed at the beginning of Name and ShortName)
-                        myGlobalDataTO = RenameTestName(pDBConnection, testRow)
-                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
-                                '(4.1) Update the renamed STD Test in Customer DB
-                                myAuxTestsDS.Clear()
-                                myAuxTestsDS.tparTests.AddtparTestsRow(testRow)
-                                myAuxTestsDS.AcceptChanges()
-
-                                myGlobalDataTO = myTestDelegate.Update(pDBConnection, myAuxTestsDS)
-
-                                '(4.2) Rename the linked Reagents and update them in Customer DB 
-                                If (Not myGlobalDataTO.HasError) Then
-                                    'Get all Reagents linked to the STD Test in Customer DB
-                                    myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, testRow.TestID)
-                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                        myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
-
-                                        'Rename the linked Reagents using the new Test Name
-                                        myReagentsDS.Clear()
-                                        For Each testReagent As TestReagentsDS.tparTestReagentsRow In myTestReagentsDS.tparTestReagents
-                                            'Rename the Reagent and add it to a ReagentsDS
-                                            myReagentsRow = myReagentsDS.tparReagents.NewtparReagentsRow
-                                            myReagentsRow.ReagentID = testReagent.ReagentID
-                                            myReagentsRow.ReagentName = testRow.TestName & "-" & testReagent.ReagentNumber.ToString
-                                            myReagentsDS.tparReagents.AddtparReagentsRow(myReagentsRow)
-                                        Next
-                                        myReagentsDS.AcceptChanges()
-
-                                        'Finally, update the Reagents
-                                        myGlobalDataTO = myReagentsDelegate.Update(pDBConnection, myReagentsDS)
-                                    End If
-                                End If
-
-                                '(4.3) Update field FormulaText of all Calculated Tests containing the renamed STD Test in their Formula
-                                If (Not myGlobalDataTO.HasError) Then
-                                    myGlobalDataTO = myCalcTestsDelegate.UpdateFormulaText(pDBConnection, "STD", testRow.TestID)
-                                End If
-
-                                '(4.4) Update the TestName and ShortName in QC Module (only for OPEN Tests)
-                                If (Not myGlobalDataTO.HasError) Then
-                                    myQCTestSamplesRow = myQCTestSamplesDS.tqcHistoryTestSamples.NewtqcHistoryTestSamplesRow()
-                                    myQCTestSamplesRow.TestType = "STD"
-                                    myQCTestSamplesRow.TestID = testRow.TestID
-                                    myQCTestSamplesRow.TestName = testRow.TestName
-                                    myQCTestSamplesRow.TestShortName = testRow.ShortName
-                                    myQCTestSamplesRow.PreloadedTest = testRow.PreloadedTest
-                                    myQCTestSamplesRow.MeasureUnit = testRow.MeasureUnit
-                                    myQCTestSamplesRow.DecimalsAllowed = testRow.DecimalsAllowed
-                                    myQCTestSamplesDS.tqcHistoryTestSamples.AddtqcHistoryTestSamplesRow(myQCTestSamplesRow)
-
-                                    myGlobalDataTO = myQCTestSamplesDelegate.UpdateByTestIDNEW(pDBConnection, myQCTestSamplesDS)
-                                End If
-
-                                '(4.5) Update the TestName and ShortName in Historic Module (only for OPEN Tests) - Delegate Class is not visible from this Class, 
-                                '      and due to that, the function in DAO Class is directly used
-                                If (Not myGlobalDataTO.HasError) Then
-                                    myGlobalDataTO = myHistTestSamplesDAO.UpdateNameByTestID(pDBConnection, testRow.TestID, testRow.TestName)
-                                End If
-
-                                '(4.6) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table RenamedElements)
-                                myUpdateVersionRenamedElementsRow = pUpdateVersionChangesList.RenamedElements.NewRenamedElementsRow
-                                myUpdateVersionRenamedElementsRow.ElementType = "STD"
-                                myUpdateVersionRenamedElementsRow.PreviousName = pTestName & " (" & pShortName & ")"
-                                myUpdateVersionRenamedElementsRow.UpdatedName = testRow.TestName & " (" & testRow.ShortName & ")"
-                                pUpdateVersionChangesList.RenamedElements.AddRenamedElementsRow(myUpdateVersionRenamedElementsRow)
-                                pUpdateVersionChangesList.RenamedElements.AcceptChanges()
-                            Else
-                                'If it was not possible to rename the Test (really unlikely case), it is considered an error
-                                myGlobalDataTO.HasError = True
-                            End If
+                    If (myTestsDS.tparTests.Rows.Count > 0 AndAlso myAuxTestsDS.tparTests.Rows.Count > 0) Then
+                        If (myTestsDS.tparTests.First.TestID <> myAuxTestsDS.tparTests.First.TestID) Then
+                            myTestsDS.tparTests.ImportRow(myAuxTestsDS.tparTests.First)
                         End If
-
-                        'If an error has been raised, then the process is finished
-                        If (myGlobalDataTO.HasError) Then Exit For
-                    Next
+                    ElseIf (myTestsDS.tparTests.Rows.Count = 0 AndAlso myAuxTestsDS.tparTests.Rows.Count > 0) Then
+                        myTestsDS.tparTests.ImportRow(myAuxTestsDS.tparTests.First)
+                    End If
                 End If
+
+                '(4) Process each one of the STD Tests found
+                For Each testRow As TestsDS.tparTestsRow In myTestsDS.tparTests
+                    'Rename the STD Test (add as many "R" letters as needed at the beginning of Name and ShortName)
+                    myGlobalDataTO = RenameTestName(pDBConnection, testRow)
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
+                            '(4.1) Update the renamed STD Test in Customer DB
+                            myAuxTestsDS.Clear()
+                            myAuxTestsDS.tparTests.AddtparTestsRow(testRow)
+                            myAuxTestsDS.AcceptChanges()
+
+                            myGlobalDataTO = myTestDelegate.Update(pDBConnection, myAuxTestsDS)
+
+                            '(4.2) Rename the linked Reagents and update them in Customer DB 
+                            If (Not myGlobalDataTO.HasError) Then
+                                'Get all Reagents linked to the STD Test in Customer DB
+                                myGlobalDataTO = myTestReagentsDelegate.GetTestReagents(pDBConnection, testRow.TestID)
+                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                    myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                                    'Rename the linked Reagents using the new Test Name
+                                    myReagentsDS.Clear()
+                                    For Each testReagent As TestReagentsDS.tparTestReagentsRow In myTestReagentsDS.tparTestReagents
+                                        'Rename the Reagent and add it to a ReagentsDS
+                                        myReagentsRow = myReagentsDS.tparReagents.NewtparReagentsRow
+                                        myReagentsRow.ReagentID = testReagent.ReagentID
+                                        myReagentsRow.ReagentName = testRow.TestName & "-" & testReagent.ReagentNumber.ToString
+                                        myReagentsDS.tparReagents.AddtparReagentsRow(myReagentsRow)
+                                    Next
+                                    myReagentsDS.AcceptChanges()
+
+                                    'Finally, update the Reagents
+                                    myGlobalDataTO = myReagentsDelegate.Update(pDBConnection, myReagentsDS)
+                                End If
+                            End If
+
+                            '(4.3) Update field FormulaText of all Calculated Tests containing the renamed STD Test in their Formula
+                            If (Not myGlobalDataTO.HasError) Then
+                                myGlobalDataTO = myCalcTestsDelegate.UpdateFormulaText(pDBConnection, "STD", testRow.TestID)
+                            End If
+
+                            '(4.4) Update the TestName and ShortName in QC Module (only for OPEN Tests)
+                            If (Not myGlobalDataTO.HasError) Then
+                                myQCTestSamplesRow = myQCTestSamplesDS.tqcHistoryTestSamples.NewtqcHistoryTestSamplesRow()
+                                myQCTestSamplesRow.TestType = "STD"
+                                myQCTestSamplesRow.TestID = testRow.TestID
+                                myQCTestSamplesRow.TestName = testRow.TestName
+                                myQCTestSamplesRow.TestShortName = testRow.ShortName
+                                myQCTestSamplesRow.PreloadedTest = testRow.PreloadedTest
+                                myQCTestSamplesRow.MeasureUnit = testRow.MeasureUnit
+                                myQCTestSamplesRow.DecimalsAllowed = testRow.DecimalsAllowed
+                                myQCTestSamplesDS.tqcHistoryTestSamples.AddtqcHistoryTestSamplesRow(myQCTestSamplesRow)
+
+                                myGlobalDataTO = myQCTestSamplesDelegate.UpdateByTestIDNEW(pDBConnection, myQCTestSamplesDS)
+                            End If
+
+                            '(4.5) Update the TestName and ShortName in Historic Module (only for OPEN Tests) - Delegate Class is not visible from this Class, 
+                            '      and due to that, the function in DAO Class is directly used
+                            If (Not myGlobalDataTO.HasError) Then
+                                myGlobalDataTO = myHistTestSamplesDAO.UpdateNameByTestID(pDBConnection, testRow.TestID, testRow.TestName)
+                            End If
+
+                            '(4.6) Add a row in the global DS containing all changes in Customer DB due to the Update Version Process (sub-table RenamedElements)
+                            myUpdateVersionRenamedElementsRow = pUpdateVersionChangesList.RenamedElements.NewRenamedElementsRow
+                            myUpdateVersionRenamedElementsRow.ElementType = "STD"
+                            myUpdateVersionRenamedElementsRow.PreviousName = pTestName & " (" & pShortName & ")"
+                            myUpdateVersionRenamedElementsRow.UpdatedName = testRow.TestName & " (" & testRow.ShortName & ")"
+                            pUpdateVersionChangesList.RenamedElements.AddRenamedElementsRow(myUpdateVersionRenamedElementsRow)
+                            pUpdateVersionChangesList.RenamedElements.AcceptChanges()
+                        Else
+                            'If it was not possible to rename the Test (really unlikely case), it is considered an error
+                            myGlobalDataTO.HasError = True
+                        End If
+                    End If
+
+                    'If an error has been raised, then the process is finished
+                    If (myGlobalDataTO.HasError) Then Exit For
+                Next
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3772,6 +3748,40 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UPDATEModifiedSTDTestSamples", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
+        ''' Recalculate value of field TestPosition for all STD Tests in CUSTOMER DB:
+        ''' ** Preloaded STD Tests are sorted by TestName and then field TestPosition is set for them begining with 1
+        ''' ** User STD Tests are placed after the last of the Preloaded ones but they are not sorted by TestName but by TestID (they 
+        '''    will be shown in the same order they were created)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by:  XB 04/06/2014 - BT #1646
+        ''' Modified by: SA 21/10/2014 - BA-1944 ==> Function changed from Private to Public
+        ''' </remarks>
+        Public Function UpdateTestSortByTestName(pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+
+            Try
+                '(1) Sort Preloaded STD Tests by TestName and then set TestPosition field begining with 1
+                Dim myTestDelegate As New TestsDelegate
+                myGlobalDataTO = myTestDelegate.UpdatePreloadedTestSortByTestName(pDBConnection)
+
+                '(2) Get all User STD Tests (in the order they were created) and then set TestPosition field following the last Preloaded STD Test
+                If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = myTestDelegate.UpdateUserTestPosition(pDBConnection)
+
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateTestSortByTestName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
