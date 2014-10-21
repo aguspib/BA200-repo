@@ -2971,11 +2971,10 @@
     <Result>True</Result>
   </IntegrityValidation>
   <IntegrityValidation>
-    <Version>3.03</Version>
-    <Label>Data validation in tfmwVersions Table</Label>
+    <Version>3.10</Version>
+    <Label>Add new icon to ICON_PATHS SubTable in PRELOADED MASTER DATA table (tfmwPreloadedMasterData)</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.3'
-      AND ServiceSoftware = '1.2.3' AND FirmwareScripts = '1.1.0' AND Firmware = '2.12')= 1
+      IF (SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND ItemID = 'EXPORTHEADCHECK') = 1
       SELECT 'True'
       ELSE
       SELECT 'False'
