@@ -67,7 +67,7 @@ Public Class XmlEncrypt
     End Function
 
     Private Sub EncriptButton_Click(sender As Object, e As EventArgs) Handles EncriptButton.Click
-        OpenFileDialog1.InitialDirectory = Application.StartupPath
+        OpenFileDialog1.InitialDirectory = System.Windows.Forms.Application.StartupPath
         OpenFileDialog1.FileName = String.Empty
         OpenFileDialog1.ShowDialog()
 

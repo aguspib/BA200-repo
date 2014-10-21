@@ -15,6 +15,7 @@ Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communica
 Imports System.Xml 'AG 25/02/2013 - for LIS communications
 Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 Imports System.Timers
+Imports Biosystems.Ax00.Core.Entities
 
 
 'Refactoring code in CommEvents partial class inherits form MDI (specially method ManageReceptionEvent)
@@ -202,8 +203,8 @@ Partial Public Class IAx00MainMDI
                     ' XBC 03/10/2012
 
                     '(ISE instaled and (initiated or not SwitchedON)) Or not instaled
-                    If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-                       MDIAnalyzerManager.ISE_Manager.ConnectionTasksCanContinue Then
+                    If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
+                       MDIAnalyzerManager.ISEAnalyzer.ConnectionTasksCanContinue Then
 
                         If MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" OrElse MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" Then
                             ShowStatus(Messages.STARTING_INSTRUMENT)
@@ -336,8 +337,8 @@ Partial Public Class IAx00MainMDI
                     If CheckAnalyzerIDOnFirstConnectionForISE Then
                         If MDIAnalyzerManager.Connected AndAlso MDIAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
                             If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "CLOSED", False) = 0 Then
-                                If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
-                                    MDIAnalyzerManager.ISE_Manager.UpdateAnalyzerInformation(AnalyzerIDAttribute, AnalyzerModelAttribute)
+                                If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
+                                    MDIAnalyzerManager.ISEAnalyzer.UpdateAnalyzerInformation(AnalyzerIDAttribute, AnalyzerModelAttribute)
                                     CheckAnalyzerIDOnFirstConnectionForISE = False
                                 End If
                             End If
@@ -421,9 +422,9 @@ Partial Public Class IAx00MainMDI
                     ' XBC 26/06/2012 - ISE final self-maintenance 
 
                     ' XBC 04/09/2012 - Correction : MDI send can't send next instruction until the last operation has been whole completed
-                    'If Not MDIAnalyzerManager.ISE_Manager Is Nothing AndAlso MDIAnalyzerManager.ISE_Manager.CurrentProcedureIsFinished Then
+                    'If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing AndAlso MDIAnalyzerManager.ISEAnalyzer.CurrentProcedureIsFinished Then
                     'JBL 06/09/2012 - Correction: Undo XBC correction: Now is not needed
-                    If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                    If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
 
                         ' XBC 27/09/2012 - Correction : This code just must be executed when the whole ISE procedure has finished
                         If ISEProcedureFinished Then
@@ -433,7 +434,7 @@ Partial Public Class IAx00MainMDI
                                 ShutDownisPending = False
                                 EnableButtonAndMenus(True)
                                 SetEnableMainTab(True)
-                                If MDIAnalyzerManager.ISE_Manager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                                If MDIAnalyzerManager.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                     ' Continues with Shut Down
                                     Me.NotDisplayShutDownConfirmMsg = True
                                     Me.bsTSShutdownButton.Enabled = True
@@ -449,7 +450,7 @@ Partial Public Class IAx00MainMDI
                                 StopMarqueeProgressBar()
                                 EnableButtonAndMenus(True)
                                 SetEnableMainTab(True)
-                                If MDIAnalyzerManager.ISE_Manager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                                If MDIAnalyzerManager.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                     ' Continues with Work Session
                                     Me.StartSession(True)
 
@@ -462,11 +463,11 @@ Partial Public Class IAx00MainMDI
                                     ' XB 28/04/2014 - Task #1587
                                     'ElseIf Me.StartSessionisInitialPUGsent AndAlso _
                                     '       (Not Me.StartSessionisCALBsent And Not Me.StartSessionisPMCLsent And Not Me.StartSessionisBMCLsent) AndAlso _
-                                    '       MDIAnalyzerManager.ISE_Manager.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
+                                    '       MDIAnalyzerManager.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
 
                                 ElseIf (Me.StartSessionisInitialPUGAsent Or Me.StartSessionisInitialPUGBsent) AndAlso _
                                        (Not Me.StartSessionisCALBsent And Not Me.StartSessionisPMCLsent And Not Me.StartSessionisBMCLsent) AndAlso _
-                                       MDIAnalyzerManager.ISE_Manager.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
+                                       MDIAnalyzerManager.ISEAnalyzer.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
                                     ' XB 28/04/2014 - Task #1587
 
                                     ' XB 16/12/2013
@@ -478,10 +479,10 @@ Partial Public Class IAx00MainMDI
                                     ' XB 16/12/2013 - Manage Exceptions of ISE module - Task #1441
                                     'ElseIf Me.StartSessionisCALBsent Or Me.StartSessionisPMCLsent Or Me.StartSessionisBMCLsent Then
                                 ElseIf (Me.StartSessionisCALBsent Or Me.StartSessionisPMCLsent Or Me.StartSessionisBMCLsent) OrElse _
-                                       (MDIAnalyzerManager.ISE_Manager.LastProcedureResult = ISEManager.ISEProcedureResult.Exception) Then
+                                       (MDIAnalyzerManager.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.Exception) Then
                                     ' XB 16/12/2013
 
-                                    If MDIAnalyzerManager.ISE_Manager.LastProcedureResult = ISEManager.ISEProcedureResult.NOK Then
+                                    If MDIAnalyzerManager.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.NOK Then
                                         ' Results Error
                                         If Me.StartSessionisCALBsent Then
                                             Me.SkipCALB = True
@@ -548,7 +549,7 @@ Partial Public Class IAx00MainMDI
 
                                                     ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
                                                     'userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                                    If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                                    If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
                                                         userAnswer = ShowMessage(Me.Name & "ManageReceptionEvent", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
                                                     Else
                                                         userAnswer = Windows.Forms.DialogResult.Yes
@@ -998,12 +999,12 @@ Partial Public Class IAx00MainMDI
                 'myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary
 
 
-                If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-                   MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled AndAlso _
-                   MDIAnalyzerManager.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
+                If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
+                   MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled AndAlso _
+                   MDIAnalyzerManager.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
                     Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
                     myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-                    MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
+                    MDIAnalyzerManager.ISEAnalyzer.LastISEResult = myISEResultWithComErrors
 
                     If (TypeOf ActiveMdiChild Is IISEUtilities) Then
                         Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
@@ -1063,12 +1064,12 @@ Partial Public Class IAx00MainMDI
             If String.Compare(pInstructionSent, AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString, False) = 0 Then
 
                 'SGM 11/05/2012
-                If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-               MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled AndAlso _
-               MDIAnalyzerManager.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
+                If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
+               MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled AndAlso _
+               MDIAnalyzerManager.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
                     Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
                     myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-                    MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
+                    MDIAnalyzerManager.ISEAnalyzer.LastISEResult = myISEResultWithComErrors
                 End If
 
                 If Not ActiveMdiChild Is Nothing Then
@@ -1203,13 +1204,13 @@ Partial Public Class IAx00MainMDI
                         Debug.Print("ERROR-COMM IN Ax00MainMDI.OnDeviceRemoved")
 
                         'SGM 11/05/2012
-                        If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-                           MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled AndAlso _
-                           MDIAnalyzerManager.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
+                        If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
+                           MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled AndAlso _
+                           MDIAnalyzerManager.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
 
                             Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
                             myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-                            MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
+                            MDIAnalyzerManager.ISEAnalyzer.LastISEResult = myISEResultWithComErrors
 
                             If (TypeOf ActiveMdiChild Is IISEUtilities) Then
                                 Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
@@ -1346,9 +1347,9 @@ Partial Public Class IAx00MainMDI
                             Case GlobalEnumerates.AnalyzerManagerStatus.STANDBY
                                 ' XBC 13/07/2012
                                 Dim ISEOperating As Boolean = False
-                                If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-                                   MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled AndAlso _
-                                   MDIAnalyzerManager.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
+                                If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
+                                   MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled AndAlso _
+                                   MDIAnalyzerManager.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
                                     'Do not change the status text
                                     ISEOperating = True
                                 End If
@@ -1391,7 +1392,7 @@ Partial Public Class IAx00MainMDI
                                                     WarmUpFinishedAttribute = True
                                                     If MDIAnalyzerManager.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 Then
                                                         MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
-                                                        MyClass.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = False 'AG 22/05/2012 -Ise alarms ready to be shown
+                                                        MyClass.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 -Ise alarms ready to be shown
                                                     End If
                                                 End If
                                             End If
@@ -1423,7 +1424,7 @@ Partial Public Class IAx00MainMDI
                                     'Do not change the status text
 
                                     '8th ISE initialitation (connection in StandBy)                                   
-                                ElseIf MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso MDIAnalyzerManager.ISE_Manager.IsISEInitiating Then
+                                ElseIf MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating Then
                                     'Do not change the status text
 
                                     'Other  cases if analyzer is working do not change the status text (for example bar code read from WSPreparation and RotorPosition)
@@ -1761,7 +1762,7 @@ Partial Public Class IAx00MainMDI
 
             End If
 
-                'AG 17/10/2011
+            'AG 17/10/2011
             If processingBeforeRunning = "0" Then refreshTriggeredFlag = False 'AG 23/01/2012 - special case: enter running process in progress
             If MdiChildIsDisabled AndAlso refreshTriggeredFlag Then
                 'Activate the current mdi child who is disabled once the refresh method is finished
@@ -1774,7 +1775,7 @@ Partial Public Class IAx00MainMDI
                     End If
                 End If
             End If
-                'AG 17/10/2011
+            'AG 17/10/2011
 
             'DL 31/07/2012. Begin 
             Dim linq As New List(Of UIRefreshDS.ReceivedAlarmsRow)
@@ -1794,7 +1795,7 @@ Partial Public Class IAx00MainMDI
             linq = Nothing
 
             'Alarm Messages (Messages do not required ActiveMdiChild) 
-                '--------------------------------------------------------
+            '--------------------------------------------------------
             '(All screens) Finally show message depending the alarms received and update vertical button bar depending the current alarms
             ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS) 
             SetActionButtonsEnableProperty(True)
@@ -2095,10 +2096,10 @@ Partial Public Class IAx00MainMDI
                     End If
                     'AG 23/05/2012
 
-                    End If
-                    'TR 20/09/2012 Commented by TR. 
-                    'EnableButtonAndMenus(True)
-                    Cursor = Cursors.Default
+                End If
+                'TR 20/09/2012 Commented by TR. 
+                'EnableButtonAndMenus(True)
+                Cursor = Cursors.Default
             End If
             lnqRes = Nothing
 
@@ -2316,7 +2317,7 @@ Partial Public Class IAx00MainMDI
                     'AG 07/01/2014
 
                 Else 'Normal code (code before add condition for recovery results)
-                    Dim myAction As AnalyzerManager.BarcodeWorksessionActions = AnalyzerManager.BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                    Dim myAction As AnalyzerEntity.BarcodeWorksessionActions = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST
                     myAction = MDIAnalyzerManager.BarCodeProcessBeforeRunning
 
                     If myAction = AnalyzerManager.BarcodeWorksessionActions.ENTER_RUNNING Then
@@ -2339,7 +2340,7 @@ Partial Public Class IAx00MainMDI
                                 MDIAnalyzerManager.StopAnalyzerRinging()
                             End If
                         End If
-                        MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE
+                        MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE
                     End If
 
                     If (userAns = Windows.Forms.DialogResult.Yes) Then

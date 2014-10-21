@@ -15,6 +15,7 @@ Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communica
 Imports System.Xml 'AG 25/02/2013 - for LIS communications
 Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 Imports System.Timers
+Imports Biosystems.Ax00.Core.Entities
 
 
 'Refactoring code in VericalButtons partial class inherits form MDI (specially method ActivateActionButtonBarOrSendNewAction)
@@ -222,8 +223,8 @@ Partial Public Class IAx00MainMDI
             'AG 02/04/2012
             '(ISE instaled and (initiated or not SwitchedON)) Or not instaled
             Dim iseInitiatedFinishedFlag As Boolean = True
-            If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-               (MDIAnalyzerManager.ISE_Manager.IsISEInitiating OrElse Not MDIAnalyzerManager.ISE_Manager.ConnectionTasksCanContinue) Then
+            If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
+               (MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating OrElse Not MDIAnalyzerManager.ISEAnalyzer.ConnectionTasksCanContinue) Then
                 iseInitiatedFinishedFlag = False
             End If
             'AG 02/04/2012
@@ -599,7 +600,7 @@ Partial Public Class IAx00MainMDI
                 ' XBC 04/07/2012
                 If Not MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
                     If Not MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" Then
-                        If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso Not MDIAnalyzerManager.ISE_Manager.IsISEInitiating Then
+                        If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso Not MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating Then
                             If Not isStartInstrumentActivating Then
 
                                 bsTSStartInstrumentButton.Enabled = True
@@ -654,7 +655,7 @@ Partial Public Class IAx00MainMDI
                 End If
                 'AG 04/09/2012
 
-            ElseIf MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso MDIAnalyzerManager.ISE_Manager.IsISEInitiating Then
+            ElseIf MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating Then
                 '    'Do nothing, no activate buttons until the ISE initialitazion finishes
 
             ElseIf String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
@@ -707,7 +708,7 @@ Partial Public Class IAx00MainMDI
                                     'AG 22/03/2012
                                     If MDIAnalyzerManager.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 Then
                                         MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
-                                        MyClass.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
+                                        MyClass.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
                                     End If
                                     'AG 22/03/2012
 
@@ -1389,7 +1390,7 @@ Partial Public Class IAx00MainMDI
 
             'AG 24/01/2014 - #1467 If analyzer freezes during process set all variables to their original value
             If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
-                MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE
+                MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE
                 SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
                 InitializeAutoWSFlags()
             End If

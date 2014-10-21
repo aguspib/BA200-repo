@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BD38761F-269A-428A-A15E-9D40B387F992}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>Biosystems.Ax00.Core</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+    <Import Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="01.-Interfaces\IAnalyzerEntity.vb" />
+    <Compile Include="01.-Interfaces\IBaseLineEntity.vb" />
+    <Compile Include="01.-Interfaces\IISEAnalyzerEntity.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\1-Declarations, Properties, Services.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\2- Reception Processes - Service.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\2- Reception Processes.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\3- Status Business, Internal Flags.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\4- Alarms.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\5- Well base line calculations.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\6- Sending Processes.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\7- Recovery Results.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity\SN- Temporal Testing and Old Methods.vb" />
+    <Compile Include="02.-Entities\BA200AnalyzerEntity.vb" />
+    <Compile Include="02.-Entities\BA400AnalyzerEntity.vb" />
+    <Compile Include="02.-Entities\BaseLineEntity.vb" />
+    <Compile Include="02.-Entities\DynamicBaseLineEntity.vb" />
+    <Compile Include="02.-Entities\ISEAnalyzerEntity.vb" />
+    <Compile Include="02.-Entities\ISEReceptionEntity.vb" />
+    <Compile Include="02.-Entities\StaticBaseLineEntity.vb" />
+    <Compile Include="03.-Enums\AnalyzerModelEnum.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Analyzer\Analyzer.vbproj">
+      <Project>{bd816d19-6903-4603-8a75-a14c099d4eb2}</Project>
+      <Name>Analyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
+      <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
+      <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BussinessLayer\Framework\Framework.vbproj">
+      <Project>{806a1f2f-07c1-43d2-af67-59accf4b5754}</Project>
+      <Name>Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Calculations\Calculations.vbproj">
+      <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>
+      <Name>Calculations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DataAccessLayer\DataAccessLayer.vbproj">
+      <Project>{51863cf3-a3e9-4e41-8924-c69704796fb9}</Project>
+      <Name>DataAccessLayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Global\Global\Global.vbproj">
+      <Project>{5d65020c-c2d7-4ac3-b557-223fc290e526}</Project>
+      <Name>Global</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\InfoAnalyzer\InfoAnalyzer.vbproj">
+      <Project>{6471ee6c-c00c-4db6-881c-bfca99aba928}</Project>
+      <Name>InfoAnalyzer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ParameterPrograming\ParametersPrograming.vbproj">
+      <Project>{3aaf43d5-55d8-4a0b-9fd3-e8841008e13e}</Project>
+      <Name>ParametersPrograming</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\WorkSession\WorkSession.vbproj">
+      <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
+      <Name>WorkSession</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

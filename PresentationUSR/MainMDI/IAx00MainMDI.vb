@@ -16,6 +16,9 @@ Imports System.Xml 'AG 25/02/2013 - for LIS communications
 Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 Imports System.Timers
 Imports System.IO
+Imports Biosystems.Ax00.Application
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Entities
 
 Partial Public Class IAx00MainMDI
 
@@ -25,7 +28,8 @@ Partial Public Class IAx00MainMDI
     Private AutoConnectFailsTitle As String = ""
     Private AutoConnectFailsErrorCode As String = ""
 
-    Private WithEvents MDIAnalyzerManager As AnalyzerManager
+    'Private WithEvents MDIAnalyzerManager As AnalyzerManager
+    Private WithEvents MDIAnalyzerManager As IAnalyzerEntity ' #REFACTORING
 
     Private ProcessActivate As Boolean = True
     Private ChangeReactionsRotorRecommendedWarning As Integer = 0
@@ -639,11 +643,11 @@ Partial Public Class IAx00MainMDI
             '
             '' XBC 26/03/2012
             '' Check ISE Alarms
-            'If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+            'If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
             '    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
             '    Dim myAlarmStatusList As New List(Of Boolean)
 
-            '    myGlobal = MDIAnalyzerManager.ISE_Manager.CheckAlarms(MDIAnalyzerManager.Connected, myAlarmList, myAlarmStatusList)
+            '    myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckAlarms(MDIAnalyzerManager.Connected, myAlarmList, myAlarmStatusList)
             '    If Not myGlobal.HasError Then
             '        'Add alarms globe
             '        If myAlarmList.Count > 0 Then
@@ -798,7 +802,7 @@ Partial Public Class IAx00MainMDI
             'JV + AG - Revision 18/10/2013 task # 1341
             imagePause = Image.FromFile(".\Images\Embedded\MDIVertPause.png")
             imagePlay = Image.FromFile(".\Images\Embedded\MDIVertPlay.png")
-            
+
             showSTARTWSiconFlag = True
             showPAUSEWSiconFlag = False
             ChangeStatusImageMultipleSessionButton()
@@ -1330,10 +1334,10 @@ Partial Public Class IAx00MainMDI
                             EnableButtonAndMenus(False)
 
                             'SG 25/09/2012 - Reset the ISE error counter
-                            If (MDIAnalyzerManager.ISE_Manager IsNot Nothing) Then
-                                MDIAnalyzerManager.ISE_Manager.ISEWSCancelErrorCounter = 0
+                            If (MDIAnalyzerManager.ISEAnalyzer IsNot Nothing) Then
+                                MDIAnalyzerManager.ISEAnalyzer.ISEWSCancelErrorCounter = 0
                             End If
-                            
+
                             'TR 16/05/2012
                             If (Not Me.ActiveMdiChild Is Nothing) Then
                                 DisabledMdiForms = Me.ActiveMdiChild
@@ -2531,7 +2535,7 @@ Partial Public Class IAx00MainMDI
                             IMonitor.bsEndWarmUp.Visible = True
                             completeWupProcessFlag = True
                             SetEnableMainTab(True) 'RH 26/03/2012
-                            MyClass.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = False 'SGM 17/05/2012
+                            MyClass.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = False 'SGM 17/05/2012
                             'Else
                             'IMonitor.bsEndWarmUp.Visible = False
                         End If
@@ -2778,12 +2782,12 @@ Partial Public Class IAx00MainMDI
 
             '        Dim isShutDown As Boolean = (MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS" OrElse MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "PAUSED")
             '        If Not isShutDown Then
-            '            If Not Me.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp Then
-            '                If Not Me.MDIAnalyzerManager.ISE_Manager.IsISEInitiating And Me.MDIAnalyzerManager.ISE_Manager.IsISEInitializationDone Then
+            '            If Not Me.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp Then
+            '                If Not Me.MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating And Me.MDIAnalyzerManager.ISEAnalyzer.IsISEInitializationDone Then
             '                    'when initialization finished
-            '                    Me.ISEUtilitiesToolStripMenuItem.Enabled = Me.MDIAnalyzerManager.ISE_Manager.IsISESwitchON
+            '                    Me.ISEUtilitiesToolStripMenuItem.Enabled = Me.MDIAnalyzerManager.ISEAnalyzer.IsISESwitchON
 
-            '                ElseIf Me.MDIAnalyzerManager.ISE_Manager.IsISESwitchON And Not Me.MDIAnalyzerManager.ISE_Manager.IsISECommsOk And Not Me.MDIAnalyzerManager.ISE_Manager.IsISEInitiatedOK And Me.MDIAnalyzerManager.ISE_Manager.IsISEInitializationDone Then
+            '                ElseIf Me.MDIAnalyzerManager.ISEAnalyzer.IsISESwitchON And Not Me.MDIAnalyzerManager.ISEAnalyzer.IsISECommsOk And Not Me.MDIAnalyzerManager.ISEAnalyzer.IsISEInitiatedOK And Me.MDIAnalyzerManager.ISEAnalyzer.IsISEInitializationDone Then
             '                    'when switch on but initialization is pending
             '                    Me.ISEUtilitiesToolStripMenuItem.Enabled = True
             '                Else
@@ -2808,7 +2812,7 @@ Partial Public Class IAx00MainMDI
             '        'ChangeReactionsRotorToolStripMenuItem.Enabled = False             'DL 06/06/2012
             '    End If
 
-            'ElseIf MDIAnalyzerManager.ISE_Manager.IsAnalyzerDisconnected Then
+            'ElseIf MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerDisconnected Then
             '    ISEUtilitiesToolStripMenuItem.Enabled = True
             '    'ConditioningToolStripMenuItem.Enabled = True                     'DL 06/06/2012
             '    'ChangeReactionsRotorToolStripMenuItem.Enabled = True             'DL 06/06/2012
@@ -2837,8 +2841,8 @@ Partial Public Class IAx00MainMDI
             Application.DoEvents()
 
             ' XBC 12/09/2012 - Correction : Set ISE Manager Worksession ID
-            If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
-                MDIAnalyzerManager.ISE_Manager.WorkSessionID = WorkSessionIDAttribute
+            If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
+                MDIAnalyzerManager.ISEAnalyzer.WorkSessionID = WorkSessionIDAttribute
             End If
 
             'myISEUtilities = New IISEUtilities(Me)
@@ -3246,7 +3250,7 @@ Partial Public Class IAx00MainMDI
                     'DL 17/05/2012
                     SetEnableMainTab(False, True) 'DL 26/03/2012 test
                     ChangeErrorStatusLabel(True) 'AG 18/05/2012 - Clear error provider 
-                    MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = True
+                    MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = True
                     'DL 17/05/2012
 
                     'AG 20/02/2012 - The following condition is added into a public method
@@ -3396,20 +3400,20 @@ Partial Public Class IAx00MainMDI
                     ChangeErrorStatusLabel(True) 'AG 18/05/2012 - Clear error provider 
 
                     ' XBC 26/06/2012 - ISE final self-washing
-                    If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                    If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
                         ' XBC 03/10/2012
-                        'If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                        'If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
 
                         ' XBC 08/11/2012 - No send ISE Cleans when It is configured as Log Term deactivated
-                        'If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled And MDIAnalyzerManager.ISE_Manager.IsISEInitiatedOK Then
-                        If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled AndAlso _
-                           MDIAnalyzerManager.ISE_Manager.IsISEInitiatedOK AndAlso _
-                           Not MDIAnalyzerManager.ISE_Manager.IsLongTermDeactivation Then
+                        'If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled And MDIAnalyzerManager.ISEAnalyzer.IsISEInitiatedOK Then
+                        If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled AndAlso _
+                           MDIAnalyzerManager.ISEAnalyzer.IsISEInitiatedOK AndAlso _
+                           Not MDIAnalyzerManager.ISEAnalyzer.IsLongTermDeactivation Then
                             ' XBC 08/11/2012
 
                             ' XBC 03/10/2012
                             ' Check if ISE cycle clean is required
-                            myGlobal = MDIAnalyzerManager.ISE_Manager.CheckCleanIsNeeded
+                            myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckCleanIsNeeded
                             If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                 If (CType(myGlobal.SetDatos, Boolean)) Then
 
@@ -3428,7 +3432,7 @@ Partial Public Class IAx00MainMDI
                                             Dim myMsgList As New List(Of String)
                                             myMsgList.Add(Messages.ISE_CLEAN_REQUIRED.ToString)
                                             If ShowMultipleMessage("Information", myMsgList, Nothing, TextPar) = Windows.Forms.DialogResult.Yes Then
-                                                myGlobal = MDIAnalyzerManager.ISE_Manager.DoCleaning(myTubePos)
+                                                myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoCleaning(myTubePos)
                                                 If Not myGlobal.HasError Then
                                                     Me.ShutDownisPending = True
                                                     ' waiting until ISE CLEAN operation is performed
@@ -3610,8 +3614,8 @@ Partial Public Class IAx00MainMDI
         Try
             ' XBC 24/07/2012 - Estimated ISE Consumption by Firmware
             ' initializations
-            MDIAnalyzerManager.ISE_Manager.PurgeAbyFirmware = 0
-            MDIAnalyzerManager.ISE_Manager.PurgeBbyFirmware = 0
+            MDIAnalyzerManager.ISEAnalyzer.PurgeAbyFirmware = 0
+            MDIAnalyzerManager.ISEAnalyzer.PurgeBbyFirmware = 0
             Me.SkipCALB = False
             Me.SkipPMCL = False
             Me.SkipBMCL = False
@@ -3918,7 +3922,7 @@ Partial Public Class IAx00MainMDI
                             'myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
                             'If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             '    If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '        If (MDIAnalyzerManager.ISE_Manager Is Nothing) OrElse (Not MDIAnalyzerManager.ISE_Manager.IsISEModuleReady) Then
+                            '        If (MDIAnalyzerManager.ISEAnalyzer Is Nothing) OrElse (Not MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady) Then
                             '            'ISE Module is not available, verify is there is at least an STANDARD Test pending of execution
                             '            'to shown the proper Message 
                             '            myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
@@ -3959,13 +3963,13 @@ Partial Public Class IAx00MainMDI
 
                             '            ' XBC 26/06/2012 - ISE self-maintenance
                             '        Else
-                            '            MDIAnalyzerManager.ISE_Manager.WorkSessionID = WorkSessionIDAttribute
+                            '            MDIAnalyzerManager.ISEAnalyzer.WorkSessionID = WorkSessionIDAttribute
                             '            myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
                             '            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             '                If (CType(myGlobal.SetDatos, Boolean)) Then
-                            '                    MDIAnalyzerManager.ISE_Manager.WorkSessionTestsByType = "ALL"
+                            '                    MDIAnalyzerManager.ISEAnalyzer.WorkSessionTestsByType = "ALL"
                             '                Else
-                            '                    MDIAnalyzerManager.ISE_Manager.WorkSessionTestsByType = "ISE"
+                            '                    MDIAnalyzerManager.ISEAnalyzer.WorkSessionTestsByType = "ISE"
                             '                End If
                             '            End If
 
@@ -3975,24 +3979,24 @@ Partial Public Class IAx00MainMDI
                             '                ' Previously existing ISE preparations have been locked
                             '            Else
                             '                ' Check ISE calibrations required
-                            '                If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
-                            '                    If MDIAnalyzerManager.ISE_Manager.IsISEModuleReady Then
+                            '                If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
+                            '                    If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady Then
                             '                        ' Check if initial Purges are required. This is required when any calibration is required
                             '                        Dim ElectrodesCalibrationRequired As Boolean = False
                             '                        Dim PumpsCalibrationRequired As Boolean = False
                             '                        Dim BubblesCalibrationRequired As Boolean = False
                             '                        ' Check if ISE Electrodes calibration is required
-                            '                        myGlobal = MDIAnalyzerManager.ISE_Manager.CheckElectrodesCalibrationIsNeeded
+                            '                        myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded
                             '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             '                            ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                             '                        End If
                             '                        ' Check if ISE Pumps calibration is required
-                            '                        myGlobal = MDIAnalyzerManager.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                            '                        myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
                             '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             '                            PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                             '                        End If
                             '                        ' Check if ISE Bubbles calibration is required 
-                            '                        myGlobal = MDIAnalyzerManager.ISE_Manager.CheckBubbleCalibrationIsNeeded
+                            '                        myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckBubbleCalibrationIsNeeded
                             '                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             '                            BubblesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                             '                        End If
@@ -4002,10 +4006,10 @@ Partial Public Class IAx00MainMDI
                             '                            If Not StartSessionisInitialPUGsent Then
                             '                                ' Execute initial Purge A and Purge B
                             '                                Me.StartSessionisInitialPUGsent = True
-                            '                                myGlobal = MDIAnalyzerManager.ISE_Manager.DoMaintenanceExit() ' this function throws Purge A and Purge B 
+                            '                                myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoMaintenanceExit() ' this function throws Purge A and Purge B 
                             '                                If Not myGlobal.HasError Then
-                            '                                    MDIAnalyzerManager.ISE_Manager.PurgeAbyFirmware += 1
-                            '                                    MDIAnalyzerManager.ISE_Manager.PurgeBbyFirmware += 1
+                            '                                    MDIAnalyzerManager.ISEAnalyzer.PurgeAbyFirmware += 1
+                            '                                    MDIAnalyzerManager.ISEAnalyzer.PurgeBbyFirmware += 1
                             '                                    ShowStatus(Messages.STARTING_SESSION)
                             '                                    Me.StartSessionisPending = True
                             '                                    EnableButtonAndMenus(False)
@@ -4026,7 +4030,7 @@ Partial Public Class IAx00MainMDI
 
                             '                                If ElectrodesCalibrationRequired And Not Me.SkipCALB Then
                             '                                    Me.StartSessionisCALBsent = True
-                            '                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoElectrodesCalibration()
+                            '                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoElectrodesCalibration()
                             '                                    If myGlobal.HasError Then
                             '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_CALB_WRONG.ToString)
                             '                                    Else
@@ -4049,7 +4053,7 @@ Partial Public Class IAx00MainMDI
 
                             '                                If PumpsCalibrationRequired And Not Me.SkipPMCL Then
                             '                                    Me.StartSessionisPMCLsent = True
-                            '                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoPumpsCalibration()
+                            '                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPumpsCalibration()
                             '                                    If myGlobal.HasError Then
                             '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_PMCL_WRONG.ToString)
                             '                                    Else
@@ -4072,7 +4076,7 @@ Partial Public Class IAx00MainMDI
 
                             '                                If BubblesCalibrationRequired And Not Me.SkipBMCL Then
                             '                                    Me.StartSessionisBMCLsent = True
-                            '                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoBubblesCalibration()
+                            '                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoBubblesCalibration()
                             '                                    If myGlobal.HasError Then
                             '                                        ShowMessage("Error", GlobalEnumerates.Messages.ISE_BMCL_WRONG.ToString)
                             '                                    Else
@@ -4103,8 +4107,8 @@ Partial Public Class IAx00MainMDI
                             '        End If
 
                             '    Else
-                            '        If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
-                            '            MDIAnalyzerManager.ISE_Manager.WorkSessionTestsByType = "STD"
+                            '        If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
+                            '            MDIAnalyzerManager.ISEAnalyzer.WorkSessionTestsByType = "STD"
                             '        End If
                             '        ' XBC 26/06/2012
 
@@ -4123,11 +4127,11 @@ Partial Public Class IAx00MainMDI
 
                     ' XBC 23/07/2012
                     'Me.StartSessionisPending = False
-                    'If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                    'If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
                     '    If Not ActiveMdiChild Is Nothing Then
                     '        If (TypeOf ActiveMdiChild Is IMonitor) Then
                     '            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
-                    '            MDIAnalyzerManager.ISE_Manager.WorkSessionOverallTime = CurrentMdiChild.remainingTime
+                    '            MDIAnalyzerManager.ISEAnalyzer.WorkSessionOverallTime = CurrentMdiChild.remainingTime
                     '        End If
                     '    End If
                     'End If
@@ -4140,7 +4144,7 @@ Partial Public Class IAx00MainMDI
                         '                in order to be reused also for the process of automatic WS creation with LIS only by START WS click
 
                         ' XBC 17/07/2012 - Estimated ISE Consumption by Firmware
-                        'If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                        'If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
 
                         '    'SGM 01/10/2012 - If no calibration is needed set ISE preparations as PENDING
                         '    Dim myOrderTestsDelegate As New OrderTestsDelegate
@@ -4151,7 +4155,7 @@ Partial Public Class IAx00MainMDI
                         '            ' XBC 12/04/2013 - Create Executions is a long time process so is need to be called on threading mode
                         '            'Dim isReady As Boolean = False
                         '            'Dim myAffectedElectrodes As List(Of String)
-                        '            'myGlobal = MDIAnalyzerManager.ISE_Manager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
+                        '            'myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                         '            'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         '            '    isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                         '            'End If
@@ -4179,12 +4183,12 @@ Partial Public Class IAx00MainMDI
                         '        End If
                         '    End If
 
-                        '    MDIAnalyzerManager.ISE_Manager.WorkSessionIsRunning = True
+                        '    MDIAnalyzerManager.ISEAnalyzer.WorkSessionIsRunning = True
 
                         '    'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
                         '    'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         '    ' Update date for the ISE test executed while running
-                        '    MDIAnalyzerManager.ISE_Manager.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
+                        '    MDIAnalyzerManager.ISEAnalyzer.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
                         '    'end SGM 01/10/2012
                         'End If
                         ' XBC 17/07/2012
@@ -4365,11 +4369,11 @@ Partial Public Class IAx00MainMDI
             Dim PumpsCalibrationRequired As Boolean = False
 
             ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
-            If Not MDIAnalyzerManager.ISE_Manager Is Nothing AndAlso _
-               MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+            If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing AndAlso _
+               MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
 
                 If MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
-                    If (MDIAnalyzerManager.ISE_Manager Is Nothing) OrElse (Not MDIAnalyzerManager.ISE_Manager.IsISEModuleReady) Then
+                    If (MDIAnalyzerManager.ISEAnalyzer Is Nothing) OrElse (Not MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady) Then
                         'ISE Module is not available, verify is there is at least an STANDARD Test pending of execution
                         'to shown the proper Message 
                         myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
@@ -4413,7 +4417,7 @@ Partial Public Class IAx00MainMDI
 
                                         ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
                                         'userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                        If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                        If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
                                             userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
                                         Else
                                             userAnswer = Windows.Forms.DialogResult.Yes
@@ -4478,10 +4482,10 @@ Partial Public Class IAx00MainMDI
 
                         End If
 
-                            ' ISE self-maintenance
+                        ' ISE self-maintenance
                     Else
                         ' Check if ISE Pumps calibration is required
-                        myGlobal = MDIAnalyzerManager.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                        myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                             PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                         End If
@@ -4491,10 +4495,10 @@ Partial Public Class IAx00MainMDI
                         '    If Not StartSessionisInitialPUGsent Then
                         '        ' Execute initial Purge A and Purge B
                         '        Me.StartSessionisInitialPUGsent = True
-                        '        myGlobal = MDIAnalyzerManager.ISE_Manager.DoMaintenanceExit() ' this function throws Purge A and Purge B 
+                        '        myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoMaintenanceExit() ' this function throws Purge A and Purge B 
                         '        If Not myGlobal.HasError Then
-                        '            MDIAnalyzerManager.ISE_Manager.PurgeAbyFirmware += 1
-                        '            MDIAnalyzerManager.ISE_Manager.PurgeBbyFirmware += 1
+                        '            MDIAnalyzerManager.ISEAnalyzer.PurgeAbyFirmware += 1
+                        '            MDIAnalyzerManager.ISEAnalyzer.PurgeBbyFirmware += 1
                         '            ShowStatus(Messages.STARTING_SESSION)
                         '            Me.StartSessionisPending = True
                         '            EnableButtonAndMenus(False)
@@ -4515,9 +4519,9 @@ Partial Public Class IAx00MainMDI
                             If Not StartSessionisInitialPUGAsent Then
                                 ' Execute initial Purge A
                                 Me.StartSessionisInitialPUGAsent = True
-                                myGlobal = MDIAnalyzerManager.ISE_Manager.DoPurge("A") ' this function throws Purge A 
+                                myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPurge("A") ' this function throws Purge A 
                                 If Not myGlobal.HasError Then
-                                    MDIAnalyzerManager.ISE_Manager.PurgeAbyFirmware += 1
+                                    MDIAnalyzerManager.ISEAnalyzer.PurgeAbyFirmware += 1
                                     ShowStatus(Messages.STARTING_SESSION)
                                     Me.StartSessionisPending = True
                                     EnableButtonAndMenus(False)
@@ -4533,9 +4537,9 @@ Partial Public Class IAx00MainMDI
                             If Not StartSessionisInitialPUGBsent Then
                                 ' Execute initial Purge A
                                 Me.StartSessionisInitialPUGBsent = True
-                                myGlobal = MDIAnalyzerManager.ISE_Manager.DoPurge("B") ' this function throws Purge A 
+                                myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPurge("B") ' this function throws Purge A 
                                 If Not myGlobal.HasError Then
-                                    MDIAnalyzerManager.ISE_Manager.PurgeBbyFirmware += 1
+                                    MDIAnalyzerManager.ISEAnalyzer.PurgeBbyFirmware += 1
                                     ShowStatus(Messages.STARTING_SESSION)
                                     Me.StartSessionisPending = True
                                     EnableButtonAndMenus(False)
@@ -4553,7 +4557,7 @@ Partial Public Class IAx00MainMDI
 
                         If PumpsCalibrationRequired And Not Me.SkipPMCL Then
                             Me.StartSessionisPMCLsent = True
-                            myGlobal = MDIAnalyzerManager.ISE_Manager.DoPumpsCalibration()
+                            myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPumpsCalibration()
                             If myGlobal.HasError Then
                                 ShowMessage("Error", GlobalEnumerates.Messages.ISE_PMCL_WRONG.ToString)
                             Else
@@ -4577,7 +4581,7 @@ Partial Public Class IAx00MainMDI
                 myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "ISE")
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     If (CType(myGlobal.SetDatos, Boolean)) Then
-                        If (MDIAnalyzerManager.ISE_Manager Is Nothing) OrElse (Not MDIAnalyzerManager.ISE_Manager.IsISEModuleReady) Then
+                        If (MDIAnalyzerManager.ISEAnalyzer Is Nothing) OrElse (Not MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady) Then
                             'ISE Module is not available, verify is there is at least an STANDARD Test pending of execution
                             'to shown the proper Message 
                             myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
@@ -4610,7 +4614,7 @@ Partial Public Class IAx00MainMDI
 
                                             ' XB 20/11/2013 - No ISE warnings can appear when ISE module is not installed
                                             'userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
-                                            If MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                            If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleInstalled Then
                                                 userAnswer = ShowMessage(Me.Name & ".VerifyISEConditioningBeforeRunning", GlobalEnumerates.Messages.ISE_MODULE_NOT_AVAILABLE.ToString)
                                             Else
                                                 userAnswer = Windows.Forms.DialogResult.Yes
@@ -4675,13 +4679,13 @@ Partial Public Class IAx00MainMDI
 
                             ' XBC 26/06/2012 - ISE self-maintenance
                         Else
-                            MDIAnalyzerManager.ISE_Manager.WorkSessionID = WorkSessionIDAttribute
+                            MDIAnalyzerManager.ISEAnalyzer.WorkSessionID = WorkSessionIDAttribute
                             myGlobal = myOrderTestsDelegate.IsThereAnyTestByType(Nothing, WorkSessionIDAttribute, "STD")
                             If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                 If (CType(myGlobal.SetDatos, Boolean)) Then
-                                    MDIAnalyzerManager.ISE_Manager.WorkSessionTestsByType = "ALL"
+                                    MDIAnalyzerManager.ISEAnalyzer.WorkSessionTestsByType = "ALL"
                                 Else
-                                    MDIAnalyzerManager.ISE_Manager.WorkSessionTestsByType = "ISE"
+                                    MDIAnalyzerManager.ISEAnalyzer.WorkSessionTestsByType = "ISE"
                                 End If
                             End If
 
@@ -4691,28 +4695,28 @@ Partial Public Class IAx00MainMDI
                                 ' Previously existing ISE preparations have been locked
                             Else
                                 ' Check ISE calibrations required
-                                If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
-                                    If MDIAnalyzerManager.ISE_Manager.IsISEModuleReady Then
+                                If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
+                                    If MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady Then
                                         ' Check if initial Purges are required. This is required when any calibration is required
                                         Dim ElectrodesCalibrationRequired As Boolean = False
                                         'Dim PumpsCalibrationRequired As Boolean = False    ' XB 22/10/2013 - BT #1343
                                         Dim BubblesCalibrationRequired As Boolean = False
                                         ' Check if ISE Electrodes calibration is required
-                                        myGlobal = MDIAnalyzerManager.ISE_Manager.CheckElectrodesCalibrationIsNeeded
+                                        myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckElectrodesCalibrationIsNeeded
                                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                             ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                                         End If
 
                                         ' XB 22/10/2013 - BT #1343
                                         '' Check if ISE Pumps calibration is required
-                                        'myGlobal = MDIAnalyzerManager.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                                        'myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
                                         'If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                         '    PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                                         'End If
                                         ' XB 22/10/2013
 
                                         ' Check if ISE Bubbles calibration is required 
-                                        myGlobal = MDIAnalyzerManager.ISE_Manager.CheckBubbleCalibrationIsNeeded
+                                        myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckBubbleCalibrationIsNeeded
                                         If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
                                             BubblesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
                                         End If
@@ -4724,10 +4728,10 @@ Partial Public Class IAx00MainMDI
                                             'If Not StartSessionisInitialPUGsent Then
                                             '    ' Execute initial Purge A and Purge B
                                             '    Me.StartSessionisInitialPUGsent = True
-                                            '    myGlobal = MDIAnalyzerManager.ISE_Manager.DoMaintenanceExit() ' this function throws Purge A and Purge B 
+                                            '    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoMaintenanceExit() ' this function throws Purge A and Purge B 
                                             '    If Not myGlobal.HasError Then
-                                            '        MDIAnalyzerManager.ISE_Manager.PurgeAbyFirmware += 1
-                                            '        MDIAnalyzerManager.ISE_Manager.PurgeBbyFirmware += 1
+                                            '        MDIAnalyzerManager.ISEAnalyzer.PurgeAbyFirmware += 1
+                                            '        MDIAnalyzerManager.ISEAnalyzer.PurgeBbyFirmware += 1
                                             '        ShowStatus(Messages.STARTING_SESSION)
                                             '        Me.StartSessionisPending = True
                                             '        EnableButtonAndMenus(False)
@@ -4750,9 +4754,9 @@ Partial Public Class IAx00MainMDI
                                                 If Not StartSessionisInitialPUGAsent Then
                                                     ' Execute initial Purge A
                                                     Me.StartSessionisInitialPUGAsent = True
-                                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoPurge("A") ' this function throws Purge A 
+                                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPurge("A") ' this function throws Purge A 
                                                     If Not myGlobal.HasError Then
-                                                        MDIAnalyzerManager.ISE_Manager.PurgeAbyFirmware += 1
+                                                        MDIAnalyzerManager.ISEAnalyzer.PurgeAbyFirmware += 1
                                                         ShowStatus(Messages.STARTING_SESSION)
                                                         Me.StartSessionisPending = True
                                                         EnableButtonAndMenus(False)
@@ -4768,9 +4772,9 @@ Partial Public Class IAx00MainMDI
                                                 If Not StartSessionisInitialPUGBsent Then
                                                     ' Execute initial Purge A
                                                     Me.StartSessionisInitialPUGBsent = True
-                                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoPurge("B") ' this function throws Purge A 
+                                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPurge("B") ' this function throws Purge A 
                                                     If Not myGlobal.HasError Then
-                                                        MDIAnalyzerManager.ISE_Manager.PurgeBbyFirmware += 1
+                                                        MDIAnalyzerManager.ISEAnalyzer.PurgeBbyFirmware += 1
                                                         ShowStatus(Messages.STARTING_SESSION)
                                                         Me.StartSessionisPending = True
                                                         EnableButtonAndMenus(False)
@@ -4791,7 +4795,7 @@ Partial Public Class IAx00MainMDI
 
                                                 If ElectrodesCalibrationRequired And Not Me.SkipCALB Then
                                                     Me.StartSessionisCALBsent = True
-                                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoElectrodesCalibration()
+                                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoElectrodesCalibration()
                                                     If myGlobal.HasError Then
                                                         ShowMessage("Error", GlobalEnumerates.Messages.ISE_CALB_WRONG.ToString)
                                                     Else
@@ -4815,7 +4819,7 @@ Partial Public Class IAx00MainMDI
                                                 ' XB 22/10/2013 - PMCL check is performed always (although there are no ISE preparations on WS) - BT #1343
                                                 'If PumpsCalibrationRequired And Not Me.SkipPMCL Then
                                                 '    Me.StartSessionisPMCLsent = True
-                                                '    myGlobal = MDIAnalyzerManager.ISE_Manager.DoPumpsCalibration()
+                                                '    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoPumpsCalibration()
                                                 '    If myGlobal.HasError Then
                                                 '        ShowMessage("Error", GlobalEnumerates.Messages.ISE_PMCL_WRONG.ToString)
                                                 '    Else
@@ -4839,7 +4843,7 @@ Partial Public Class IAx00MainMDI
 
                                                 If BubblesCalibrationRequired And Not Me.SkipBMCL Then
                                                     Me.StartSessionisBMCLsent = True
-                                                    myGlobal = MDIAnalyzerManager.ISE_Manager.DoBubblesCalibration()
+                                                    myGlobal = MDIAnalyzerManager.ISEAnalyzer.DoBubblesCalibration()
                                                     If myGlobal.HasError Then
                                                         ShowMessage("Error", GlobalEnumerates.Messages.ISE_BMCL_WRONG.ToString)
                                                     Else
@@ -4871,8 +4875,8 @@ Partial Public Class IAx00MainMDI
                         End If
 
                     Else
-                        If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
-                            MDIAnalyzerManager.ISE_Manager.WorkSessionTestsByType = "STD"
+                        If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
+                            MDIAnalyzerManager.ISEAnalyzer.WorkSessionTestsByType = "STD"
                         End If
                         ' XBC 26/06/2012
 
@@ -4886,17 +4890,17 @@ Partial Public Class IAx00MainMDI
 
             ' XBC 23/07/2012
             Me.StartSessionisPending = False
-            If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+            If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
                 If Not ActiveMdiChild Is Nothing Then
                     If (TypeOf ActiveMdiChild Is IMonitor) Then
                         Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
-                        MDIAnalyzerManager.ISE_Manager.WorkSessionOverallTime = CurrentMdiChild.remainingTime
+                        MDIAnalyzerManager.ISEAnalyzer.WorkSessionOverallTime = CurrentMdiChild.remainingTime
                     End If
                 End If
             End If
 
             If Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes Then
-                If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing Then
 
                     'SGM 01/10/2012 - If no calibration is needed set ISE preparations as PENDING
                     'Dim myOrderTestsDelegate As New OrderTestsDelegate
@@ -4907,7 +4911,7 @@ Partial Public Class IAx00MainMDI
                             ' XBC 12/04/2013 - Create Executions is a long time process so is need to be called on threading mode
                             'Dim isReady As Boolean = False
                             'Dim myAffectedElectrodes As List(Of String)
-                            'myGlobal = MDIAnalyzerManager.ISE_Manager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
+                            'myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                             'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             '    isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                             'End If
@@ -4954,12 +4958,12 @@ Partial Public Class IAx00MainMDI
                     'end SGM 01/10/2012
 
                     If userAnswer = Windows.Forms.DialogResult.Yes Then ' XB 23/05/2014
-                        MDIAnalyzerManager.ISE_Manager.WorkSessionIsRunning = True
+                        MDIAnalyzerManager.ISEAnalyzer.WorkSessionIsRunning = True
 
                         'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
                         'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         ' Update date for the ISE test executed while running
-                        MDIAnalyzerManager.ISE_Manager.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
+                        MDIAnalyzerManager.ISEAnalyzer.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
                     End If
                 End If
 
@@ -5024,7 +5028,7 @@ Partial Public Class IAx00MainMDI
         Try
             Dim isReady As Boolean = False
             Dim myAffectedElectrodes As List(Of String)
-            myGlobal = MDIAnalyzerManager.ISE_Manager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
+            myGlobal = MDIAnalyzerManager.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
             End If
@@ -6227,7 +6231,7 @@ Partial Public Class IAx00MainMDI
                         If Not (CType(myGlobal.SetDatos, Boolean)) Then
                             ' ONLY ISE preparations
                             If (Not MDIAnalyzerManager Is Nothing) Then
-                                If Not MDIAnalyzerManager.ISE_Manager Is Nothing AndAlso MDIAnalyzerManager.ISE_Manager.IsISEModuleReady Then
+                                If Not MDIAnalyzerManager.ISEAnalyzer Is Nothing AndAlso MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady Then
                                     returnValue = True
                                 End If
                             End If
@@ -6837,7 +6841,7 @@ Partial Public Class IAx00MainMDI
             End If
             'END DL 09/09/2011
 
-            Me.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = True 'SGM 13/04/2012
+            Me.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = True 'SGM 13/04/2012
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeStartInstrument ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -7014,13 +7018,13 @@ Partial Public Class IAx00MainMDI
             'MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST   'Initialize barcode read before running process
             'myGlobal = MDIAnalyzerManager.ManageBarCodeRequestBeforeRUNNING(Nothing, AnalyzerManager.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST)
 
-            Dim myAction As AnalyzerManager.BarcodeWorksessionActions = AnalyzerManager.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST 'Enter running but, if configured, perform the barcode read before
+            Dim myAction As AnalyzerEntity.BarcodeWorksessionActions = AnalyzerEntity.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST 'Enter running but, if configured, perform the barcode read before
             If Not readBarcodeIfConfigured Then
-                myAction = AnalyzerManager.BarcodeWorksessionActions.FORCE_ENTER_RUNNING    'Force enter running and skip incomplete sampes if any
+                myAction = AnalyzerEntity.BarcodeWorksessionActions.FORCE_ENTER_RUNNING    'Force enter running and skip incomplete sampes if any
 
                 'AG 01/04/2014 - #1565 if Sw is executing the automaticWS creation process AND finishes OK assign new action that not creates executions again!!
                 'else (an exception stops the process but user decides continue) leave action = FORCE_ENTER_RUNNING and create executions for security!!!
-                If automateProcessCurrentState = LISautomateProcessSteps.subProcessEnterRunning AndAlso Not autoWSNotFinishedButGoRunningAttribute Then myAction = AnalyzerManager.BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
+                If automateProcessCurrentState = LISautomateProcessSteps.subProcessEnterRunning AndAlso Not autoWSNotFinishedButGoRunningAttribute Then myAction = AnalyzerEntity.BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
 
             End If
             MDIAnalyzerManager.BarCodeProcessBeforeRunning = myAction
@@ -8460,7 +8464,8 @@ Partial Public Class IAx00MainMDI
                 'AG 22/09/2011 - change GlobalAnalyzerManager for MDIAnalyzerManager // 'GlobalAnalyzerManager.ActiveWorkSession = WorkSessionIDAttribute
                 'TR 23/09/2011 -If MDIAnalyzerManager is nothing the set the value of GlobalAnalyzerManager in memory.
                 If MDIAnalyzerManager Is Nothing Then
-                    MDIAnalyzerManager = DirectCast(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+                    'MDIAnalyzerManager = DirectCast(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+                    MDIAnalyzerManager = DirectCast(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), IAnalyzerEntity)
                 End If
                 'TR 23/09/2011 -END.
 
@@ -8523,12 +8528,14 @@ Partial Public Class IAx00MainMDI
             'AG 22/04/0210 - Moved from BSBaseForm_Load
             If (AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
                 'AG 06/09/2012 - Analyzer manager initialization requires WorkSessionID to be informed before AnalyzerID
+                '#REFACTORING
                 'MDIAnalyzerManager = New AnalyzerManager(My.Application.Info.AssemblyName, MyClass.AnalyzerModel) With {.ActiveAnalyzer = AnalyzerIDAttribute, .ActiveWorkSession = WorkSessionIDAttribute}
-                MDIAnalyzerManager = New AnalyzerManager(My.Application.Info.AssemblyName, MyClass.AnalyzerModel) With {.StartingApplication = pStartingApplication, _
-                                                                                                                        .ActiveWorkSession = WorkSessionIDAttribute, _
-                                                                                                                        .ActiveAnalyzer = AnalyzerIDAttribute, _
-                                                                                                                        .ActiveFwVersion = FwVersionAttribute}
+                'MDIAnalyzerManager = New AnalyzerManager(My.Application.Info.AssemblyName, MyClass.AnalyzerModel) With {.StartingApplication = pStartingApplication, _
+                '                                                                                                        .ActiveWorkSession = WorkSessionIDAttribute, _
+                '                                                                                                        .ActiveAnalyzer = AnalyzerIDAttribute, _
+                '                                                                                                        .ActiveFwVersion = FwVersionAttribute}
                 ' XBC 08/06/2012
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Application.DoEvents()
 
@@ -8763,7 +8770,7 @@ Partial Public Class IAx00MainMDI
 
             If Not isAlarm Then
                 ShowStatus(Messages.STANDBY) 'RH 21/03/2012
-                Me.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = False 'AG 16/05/2012
+                Me.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 16/05/2012
 
                 'WUPCOMPLETEFLAG
                 myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
@@ -9466,7 +9473,7 @@ Partial Public Class IAx00MainMDI
 
                     ' XB 06/02/2014 - When Barcode no works fine, must initialize all corresponding falgs - Task #1438
                     MDIAnalyzerManager.SetSessionFlags(AnalyzerManagerFlags.BarcodeSTARTWSProcess, "CLOSED")
-                    MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                    MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST
                     SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
 
                 Case Else
@@ -10162,7 +10169,7 @@ Partial Public Class IAx00MainMDI
 
                     'AG 31/03/2014 - #1565 inform new parameter RunningMode
                     resultData = otDelegate.LoadLISSavedWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute, _
-                                                           MDIAnalyzerManager.ISE_Manager.IsISEModuleReady, auxDS, autoWSProcessInProcess, runningMode)
+                                                           MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady, auxDS, autoWSProcessInProcess, runningMode)
                     'AG 31/03/2014 - #1565
 
                     'AG 02/01/2014 - BT #1433 add more traces to orderdownload LIS workorders (v211 patch2)
@@ -10203,7 +10210,7 @@ Partial Public Class IAx00MainMDI
                                 'AG 31/03/2014 - #1565 inform new parameter RunningMode
                                 runningMode = (MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.RUNNING)
                                 resultData = otDelegate.LoadLISSavedWS(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute, _
-                                                                       MDIAnalyzerManager.ISE_Manager.IsISEModuleReady, auxDS, autoWSProcessInProcess, runningMode)
+                                                                       MDIAnalyzerManager.ISEAnalyzer.IsISEModuleReady, auxDS, autoWSProcessInProcess, runningMode)
                                 'AG 31/03/2014 - #1565
 
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
