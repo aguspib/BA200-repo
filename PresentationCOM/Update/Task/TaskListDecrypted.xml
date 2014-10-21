@@ -127,6 +127,28 @@
       GO
       SET ANSI_PADDING OFF
       GO
+      IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[tfmwHelpFilesSetting]') AND type in (N'U'))
+      DROP TABLE [dbo].[tfmwHelpFilesSetting]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      SET ANSI_PADDING ON
+      GO
+      CREATE TABLE [dbo].[tfmwHelpFilesSetting](
+      [TypeID] [varchar](20) NOT NULL,
+      [Language] [varchar](3) NOT NULL,
+      [HelpFileName] [varchar](50) NOT NULL,
+      CONSTRAINT [PK_tfmwHelpFilesSetting] PRIMARY KEY CLUSTERED
+      (
+      [TypeID] ASC,
+      [Language] ASC
+      )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+      ) ON [PRIMARY]
+      GO
+      SET ANSI_PADDING OFF
+      GO
     </StructureScript>
     <UpdateScript>
       INSERT INTO [Ax00].[dbo].[tfmwMultiLanguageResources]
@@ -141,7 +163,9 @@
       INSERT INTO  [Ax00].[dbo].[tfmwFieldLimits]
       SELECT * FROM [Ax00TEM].[dbo].[tfmwFieldLimits]
       GO
-   </UpdateScript>
+      INSERT INTO  [Ax00].[dbo].[tfmwHelpFilesSetting]
+      SELECT * FROM [Ax00TEM].[dbo].[tfmwHelpFilesSetting]
+    </UpdateScript>
   </CommonTask>
   <AppVersion>
     <Version>2.0</Version>
