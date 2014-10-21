@@ -1935,7 +1935,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
                             '(4.1) Update the renamed STD Test in Customer DB
                             myAuxTestsDS.Clear()
-                            myAuxTestsDS.tparTests.AddtparTestsRow(testRow)
+                            myAuxTestsDS.tparTests.ImportRow(testRow)
                             myAuxTestsDS.AcceptChanges()
 
                             myGlobalDataTO = myTestDelegate.Update(pDBConnection, myAuxTestsDS)
