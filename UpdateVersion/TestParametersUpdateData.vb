@@ -2005,7 +2005,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     'If an error has been raised, then the process is finished
                     If (myGlobalDataTO.HasError) Then Exit For
                 Next
-                End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
