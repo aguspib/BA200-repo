@@ -421,6 +421,7 @@
 		<row><td>Framework.dll1</td><td>{938A4083-9422-45C8-BE30-BED795B9A802}</td><td>USER_SW</td><td>8</td><td/><td>framework.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwBA400v208</td><td>{2521F542-6414-4D7F-83FA-D2515C5C8000}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwBA400v210</td><td>{396A5F5C-E94A-4719-8B8F-B4AAA0C6B14A}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>FwBA400v212</td><td>{45BA1446-57EF-49FC-AD23-86CBD12042DB}</td><td>FIRMWARE</td><td>72</td><td>0=1</td><td/><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwBA400v214</td><td>{1B1BE30A-081B-46B8-921B-C7E136E17226}</td><td>FIRMWARE</td><td>8</td><td/><td>ba400v214.ba4</td><td>17</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwScriptsManagement.dll</td><td>{0B7D8845-CE9B-4AF0-B87F-8DE1A9222F67}</td><td>SERVICE_SW</td><td>8</td><td/><td>fwscriptsmanagement.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>FwScriptsManagement.dll1</td><td>{24F5D650-0CA0-457D-8935-FE184D4E5AF9}</td><td>USER_SW</td><td>8</td><td/><td>fwscriptsmanagement.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -2055,6 +2056,7 @@
 		<row><td>Firmware</td><td>FirmwareLast</td></row>
 		<row><td>Firmware</td><td>FwBA400v208</td></row>
 		<row><td>Firmware</td><td>FwBA400v210</td></row>
+		<row><td>Firmware</td><td>FwBA400v212</td></row>
 		<row><td>Firmware</td><td>FwBA400v214</td></row>
 		<row><td>Service_Sw</td><td>AX00Global.dll</td></row>
 		<row><td>Service_Sw</td><td>AX00Types.dll</td></row>
@@ -2269,6 +2271,7 @@
 		<row><td>ba400v206.ba4</td><td>FirmwareLast</td><td>BA400V~1.BA4|BA400v206.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v206.ba4</td><td>1</td><td/></row>
 		<row><td>ba400v208.ba4</td><td>FwBA400v208</td><td>BA400V~1.BA4|BA400v208.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v208.ba4</td><td>1</td><td/></row>
 		<row><td>ba400v210.ba4</td><td>FwBA400v210</td><td>BA400V~1.BA4|BA400v210.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v210.ba4</td><td>1</td><td/></row>
+		<row><td>ba400v212.ba4</td><td>FwBA400v212</td><td>BA400V~1.BA4|BA400v212.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\Old Components\FW\BA400v212.ba4</td><td>1</td><td/></row>
 		<row><td>ba400v214.ba4</td><td>FwBA400v214</td><td>BA400V~1.BA4|BA400v214.ba4</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_INSTALLSHIELD 2_FILES&gt;\BA400v214.ba4</td><td>1</td><td/></row>
 		<row><td>ba4svr_login.png</td><td>ServiceSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded1&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
 		<row><td>ba4svr_login.png1</td><td>UserSw_Images_Embedded</td><td>BA4SVR~1.PNG|BA4SVR_Login.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Embedded&gt;\BA4SVR_Login.png</td><td>1</td><td/></row>
@@ -2467,6 +2470,8 @@
 		<row><td>changerotorbtn.png1</td><td>UserSw_Images</td><td>CHANGE~1.PNG|ChangeRotorBtn.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ChangeRotorBtn.png</td><td>1</td><td/></row>
 		<row><td>check.png</td><td>ServiceSw_Images</td><td>Check.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Check.png</td><td>1</td><td/></row>
 		<row><td>check.png1</td><td>UserSw_Images</td><td>Check.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Check.png</td><td>1</td><td/></row>
+		<row><td>checkexporthead.png</td><td>UserSw_Images</td><td>CHECKE~1.PNG|CheckExportHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\CheckExportHead.png</td><td>1</td><td/></row>
+		<row><td>checkexporthead.png1</td><td>ServiceSw_Images</td><td>CHECKE~1.PNG|CheckExportHead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\CheckExportHead.png</td><td>1</td><td/></row>
 		<row><td>chgpw.png</td><td>ServiceSw_Images</td><td>ChgPW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\ChgPW.png</td><td>1</td><td/></row>
 		<row><td>chgpw.png1</td><td>UserSw_Images</td><td>ChgPW.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\ChgPW.png</td><td>1</td><td/></row>
 		<row><td>clear.png</td><td>ServiceSw_Images</td><td>Clear.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Clear.png</td><td>1</td><td/></row>
@@ -2995,6 +3000,7 @@
 		<row><td>teus00048_01_ing.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-ING.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-ING.pdf</td><td>1</td><td/></row>
 		<row><td>teus00048_01_ita.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-ITA.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-ITA.pdf</td><td>1</td><td/></row>
 		<row><td>teus00048_01_por.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-POR.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-POR.pdf</td><td>1</td><td/></row>
+		<row><td>teus00048_01_rus.pdf</td><td>UserSw_HelpFiles</td><td>TEUS00~1.PDF|TEUS00048-01-RUS.pdf</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;HelpFiles&gt;\TEUS00048-01-RUS.pdf</td><td>1</td><td/></row>
 		<row><td>top.png</td><td>ServiceSw_Images</td><td>Top.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Top.png</td><td>1</td><td/></row>
 		<row><td>top.png1</td><td>UserSw_Images</td><td>Top.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Top.png</td><td>1</td><td/></row>
 		<row><td>tubeadditionalsolution.png</td><td>ServiceSw_Images</td><td>TUBEAD~1.PNG|TubeAdditionalSolution.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\TubeAdditionalSolution.png</td><td>1</td><td/></row>
@@ -3382,6 +3388,7 @@
 		<row><td>Framework.dll1</td><td/><td/><td>_4C0AFB0B_AF76_41F7_A93B_0F121C6FBF1D_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwBA400v208</td><td/><td/><td>_8D041E32_1247_434C_A73B_98BEC33497F5_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwBA400v210</td><td/><td/><td>_99CFA5EE_5C36_4E72_8567_1FBB2C67D582_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>FwBA400v212</td><td/><td/><td>_7B137A6E_E3F0_43E5_A38A_BF487D0B218E_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwBA400v214</td><td/><td/><td>_FB4F0080_9FC9_4346_955D_8268F46F6950_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwScriptsManagement.dll</td><td/><td/><td>_1B0991FB_8116_43AC_B249_F54AC0AEABAB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>FwScriptsManagement.dll1</td><td/><td/><td>_CA61D457_E380_4058_89A8_0A5919602B49_FILTER</td><td/><td/><td/><td/></row>
