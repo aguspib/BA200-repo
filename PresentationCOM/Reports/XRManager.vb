@@ -1809,7 +1809,7 @@ Public Class XRManager
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowControlsCompactReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1847,7 +1847,7 @@ Public Class XRManager
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
+            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowBlanksAndCalibratorsReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
