@@ -8915,6 +8915,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Orders to set OrderToExport = FALSE
                         For Each tmpOrder As String In OrderToExportFALSE_OrderList
+                            'Infomr the SampleClass of the Order
                             myGlobalDataTO = myOrder.UpdateOrderToExport(dbConnection, False, False, tmpOrder)
                         Next
 
@@ -8954,13 +8955,15 @@ Namespace Biosystems.Ax00.BL
         ''' Check wether all results belonging to 1 Patient´s Order(s) are valid and accepted OR all related Tests are NOT mapped to LIS.
         ''' </summary>
         ''' <param name="pOrderID"></param>
+        ''' <param name="pSampleClass">Sample class of the order</param>
         ''' <returns>Returns TRUE if Patient´s results are all NOT Accepted OR all Tests NOT mapped to LIS. Else returns FALSE.</returns>
         ''' <remarks>
         ''' Created:  WE 20/10/2014 BA-2018 Req.7: Tests without a LIS mapping can´t be sent to LIS, as a consequence if a patient only has Tests without LIS mapping or
         '''                         the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
         '''                         must be unchecked on screen Actual Results.
+        ''' 22/10/2014 AG BA-2011 validation new parameter pSampleClass because the control also can have 2 orders
         ''' </remarks>
-        Public Function AllResultsNotAcceptedOrAllTestsNotMapped(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String)) As Boolean
+        Public Function AllResultsNotAcceptedOrAllTestsNotMapped(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String), ByVal pSampleClass As String) As Boolean
             ' IN:  List of Patients/OrderID (1 or more patients)
             '
             Dim result As Boolean = False
@@ -8977,7 +8980,7 @@ Namespace Biosystems.Ax00.BL
                         'Look for other orders for the same sample
                         If pOrderID.Count = 1 Then
                             Dim ordersDlg As New OrdersDelegate
-                            resultData = ordersDlg.ReadRelatedOrdersByOrderID(dbConnection, pOrderID(0))
+                            resultData = ordersDlg.ReadRelatedOrdersByOrderID(dbConnection, pOrderID(0), pSampleClass)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
 
                                 For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders

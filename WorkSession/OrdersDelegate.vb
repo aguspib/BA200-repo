@@ -1144,6 +1144,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Search the orderID (if not informed)
                         Dim affectedOrderID As String = pOrderID
+                        Dim affectedSampleClass As String = "PATIENT"
                         If affectedOrderID = "" Then
                             If pOrderTestID <> -1 Then
                                 resultData = myDAO.ReadByOrderTestID(dbConnection, pOrderTestID)
@@ -1155,9 +1156,21 @@ Namespace Biosystems.Ax00.BL
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
                                         affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
+                                        If Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsSampleClassNull Then
+                                            affectedSampleClass = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).SampleClass
+                                        End If
                                     End If
                                 End If
                             End If
+
+                        Else 'orderID informed, look for the sample class
+                            resultData = myDAO.Read(dbConnection, affectedOrderID)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsSampleClassNull Then
+                                    affectedSampleClass = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).SampleClass
+                                End If
+                            End If
+
                         End If
 
                         Dim listOfAffectedOrderID As New List(Of String) 'AG 17/10/2014 BA-2011
@@ -1167,7 +1180,7 @@ Namespace Biosystems.Ax00.BL
                             listOfAffectedOrderID.Add(affectedOrderID) 'Add to list the order found
 
                             'Look for other orders for the same sample
-                            resultData = myDAO.ReadRelatedOrdersByOrderID(dbConnection, affectedOrderID)
+                            resultData = myDAO.ReadRelatedOrdersByOrderID(dbConnection, affectedOrderID, affectedSampleClass)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
 
                                 For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders
@@ -1246,6 +1259,7 @@ Namespace Biosystems.Ax00.BL
                         '(1) Get the affected orderID by filter1 or filter2
                         Dim myDAO As New TwksOrdersDAO
                         Dim affectedOrderID As String = pOrderID
+                        Dim affectedSampleClass As String = "PATIENT"
 
                         Dim requiredUpdateValue As Boolean = CBool(IIf(pOrderID <> "", True, False)) 'AG 15/10/2014 BA-2011 - when orderID informed (click on LIS check in IResults screen) update always, else (automatic business) update only when changes in current value
                         Dim affectedOrderToExportValue As Boolean = False 'AG 15/10/2014 BA-2011
@@ -1261,8 +1275,22 @@ Namespace Biosystems.Ax00.BL
                                 If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsOrderIDNull Then
                                     affectedOrderID = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderID
                                     affectedOrderToExportValue = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).OrderToExport 'AG 15/10/2014 BA-2011
+
+                                    If Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsSampleClassNull Then
+                                        affectedSampleClass = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).SampleClass
+                                    End If
+
                                 End If
                             End If
+
+                        Else 'orderID informed, look for the sample class
+                            resultData = myDAO.Read(dbConnection, affectedOrderID)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                If DirectCast(resultData.SetDatos, OrdersDS).twksOrders.Rows.Count > 0 AndAlso Not DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).IsSampleClassNull Then
+                                    affectedSampleClass = DirectCast(resultData.SetDatos, OrdersDS).twksOrders(0).SampleClass
+                                End If
+                            End If
+
                         End If
 
                         '(2) Get all results belongs the current orderID
@@ -1277,7 +1305,7 @@ Namespace Biosystems.Ax00.BL
                             listOfaffectedOrderToExportValue.Add(affectedOrderToExportValue)
 
                             'Look for other orders for the same sample
-                            resultData = myDAO.ReadRelatedOrdersByOrderID(dbConnection, affectedOrderID)
+                            resultData = myDAO.ReadRelatedOrdersByOrderID(dbConnection, affectedOrderID, affectedSampleClass)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
 
                                 For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders
@@ -1487,8 +1515,9 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified OrderTest belongs</returns>
         ''' <remarks>
         ''' Created by:  AG 16/10/2014 BA-2011
+        ''' 22/10/2014 AG BA-2011 validation new parameter pSampleClass because the control also can have 2 orders
         ''' </remarks>
-        Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
+        Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pSampleClass As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1498,7 +1527,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myOrdersDAO As New TwksOrdersDAO
-                        myGlobalDataTO = myOrdersDAO.ReadRelatedOrdersByOrderID(dbConnection, pOrderID)
+                        myGlobalDataTO = myOrdersDAO.ReadRelatedOrdersByOrderID(dbConnection, pOrderID, pSampleClass)
                     End If
                 End If
             Catch ex As Exception

@@ -1127,11 +1127,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pOrderID">Order Identifier</param>
+        ''' <param name="pSampleClass">Sample class of the order</param>
         ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified OrderTest belongs</returns>
         ''' <remarks>
         ''' Created by:  AG 16/10/2014 BA-2011
+        ''' 22/10/2014 AG BA-2011 validation new parameter pSampleClass because the control also can have 2 orders
         ''' </remarks>
-        Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String) As GlobalDataTO
+        Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pSampleClass As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1141,9 +1143,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        cmdText = "SELECT DISTINCT O2.* FROM twksOrders O INNER JOIN twksOrders O2 ON O.OrderID <> O2.OrderID AND (O.PatientID = O2.PatientID OR O.SampleID = O2.SampleID) " & vbCrLf & _
-                                  " WHERE O.OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                  "AND (O.SampleClass = 'PATIENT' ) "
+                        If pSampleClass = "PATIENT" Then
+                            cmdText = "SELECT DISTINCT O2.* FROM twksOrders O INNER JOIN twksOrders O2 ON O.OrderID <> O2.OrderID AND (O.PatientID = O2.PatientID OR O.SampleID = O2.SampleID) " & vbCrLf & _
+                                      " WHERE O.OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                      "AND (O.SampleClass = 'PATIENT' ) "
+                        Else
+                            'SampleClass = CTRL
+                            cmdText = "SELECT DISTINCT O2.* FROM twksOrders O INNER JOIN twksOrders O2 ON O.OrderID <> O2.OrderID AND O.SampleClass = O2.SampleClass " & vbCrLf & _
+                                      " WHERE O.OrderID = N'" & pOrderID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                      "AND (O.SampleClass = 'CTRL' ) "
+
+                        End If
 
                         Dim resultData As New OrdersDS
                         Using dbCmd As New SqlCommand(cmdText, dbConnection)
@@ -1155,7 +1165,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         myGlobalDataTO.SetDatos = resultData
                         myGlobalDataTO.HasError = False
                     End If
-                End If
+                    End If
             Catch ex As Exception
                 myGlobalDataTO = New GlobalDataTO()
                 myGlobalDataTO.HasError = True

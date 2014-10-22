@@ -5213,7 +5213,7 @@ Public Class IResults
 
                     ' Check if all results are not valid/accepted or all related Tests not mapped to LIS.
                     Dim myResultsDlg As New ResultsDelegate
-                    If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID) Then
+                    If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID, "PATIENT") Then
                         ' Display message "Results cannot be sent".
 
                         warningShown = True
@@ -5307,7 +5307,7 @@ Public Class IResults
                                 'Look for more orders related to the same patient as in linqOrder
                                 If linqOrderID.Count = 1 Then
                                     Dim ordersDlg As New OrdersDelegate
-                                    resultData = ordersDlg.ReadRelatedOrdersByOrderID(Nothing, linqOrderID(0))
+                                    resultData = ordersDlg.ReadRelatedOrdersByOrderID(Nothing, linqOrderID(0), "PATIENT")
                                     If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
 
                                         For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders
@@ -5320,7 +5320,7 @@ Public Class IResults
 
                                 ' Check if for Patient(i) all results are not valid/accepted or all related Tests not mapped to LIS.
                                 Dim myResultsDlg As New ResultsDelegate
-                                If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID) Then
+                                If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID, "PATIENT") Then
                                     ' After processing of this loop display message "Results cannot be sent".
                                     ShowWarning = True
                                     ' Don´t allow State (OrderToExport) to change because current Patient Row does NOT comply with rule 7.
