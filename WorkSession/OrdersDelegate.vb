@@ -1515,7 +1515,7 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet OrdersDS with all data of the Order to which the specified OrderTest belongs</returns>
         ''' <remarks>
         ''' Created by:  AG 16/10/2014 BA-2011
-        ''' 22/10/2014 AG BA-2011 validation new parameter pSampleClass because the control also can have 2 orders
+        ''' Modified:    AG 22/10/2014 BA-2011 validation new parameter pSampleClass because the control also can have 2 or more orders.
         ''' </remarks>
         Public Function ReadRelatedOrdersByOrderID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As String, ByVal pSampleClass As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing

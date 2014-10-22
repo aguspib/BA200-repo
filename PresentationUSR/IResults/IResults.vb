@@ -5165,16 +5165,20 @@ Public Class IResults
     ''' <summary>
     ''' Click on the patient list (header or item)
     ''' - Click on item (name) select item and load results
-    ''' - Click on item (columns OrderToExport /OrderToPrint) change current field value (screen and database)
+    ''' - Click on item (column OrderToPrint) change current field value (screen and database)
+    ''' - Click on item (column OrderToExport): checks if complies with rule (7) for sending to LIS; if not show warning; if true => change current field value (screen and database). {BA-2018}
     ''' 
     ''' - Click on header (name) sort alphabetical
     ''' - Click on header (columns OrderToExport /OrderToPrint) select all (if any not selected) or deselect all (if all selected) -> New 31/07/2014 #1187
+    ''' - Click on header (column OrderToExport): If some or all are not selected => All checkboxes will be selected that comply with rule (7) for sending to LIS;
+    '''                                                                              if at least 1 does not comply => show warning; change current field value (screen and database) accordingly. {BA-2018}
+    '''                                           If all are selected => All checkboxes will be unchecked.
     ''' </summary>
     ''' <remarks>
     ''' Created by:  RH 04/06/2012
     ''' Modified by: AG 31/07/2014 - BT #1887 ==> Click on header select all / deselect all
     '''              WE 17/10/2014 - BA-2018 Req.7
-    ''' AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
+    '''              AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
     ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsSamplesListDataGridView.CellMouseClick
         Try
@@ -5248,7 +5252,7 @@ Public Class IResults
 
                     Cursor = Cursors.WaitCursor
 
-                    'Inform DS refresh at the end is required
+                    ' DS refresh at the end is required.
                     updateDSRequired = True
                     updateColumnOrderToExport = False
                     linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
@@ -5280,16 +5284,15 @@ Public Class IResults
                     linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where a.SampleClass = "PATIENT" AndAlso a.OrderToExport = False Select a).ToList
                     If linqRes.Count > 0 Then
-                        ' Previous state:   Some or All checkboxes not selected.
+                        ' Previous state:   Some or All checkboxes are NOT selected.
                         ' New state:        All checkboxes are selected that comply with rule (7) for sending to LIS.
-                        ' myOrderToExportValue = True
 
                         Cursor = Cursors.WaitCursor
 
                         ' FOR EACH Patient Row in column OrderToExport.
                         For item As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
 
-                            ' Check if for current Patient Row the checkbox was not selected.
+                            ' Check if for current Patient Row the checkbox was NOT selected.
                             If Not CBool(bsSamplesListDataGridView("OrderToExport", item).Value) Then
                                 ' Complies with rule 7 for sending to LIS ==> Select this checkbox.
 
@@ -5314,7 +5317,7 @@ Public Class IResults
                                     End If
                                 End If
 
-                                ' Check if for Patient(i) all results are not valid/accepted or all related Tests not mapped to LIS.
+                                ' Check if for Patient(i) all results are NOT valid/accepted OR all related Tests NOT mapped to LIS.
                                 Dim myResultsDlg As New ResultsDelegate
                                 If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID, "PATIENT") Then
                                     ' After processing of this loop display message "Results cannot be sent".
@@ -5351,10 +5354,11 @@ Public Class IResults
                                 End If
 
                             Else
-                                ' Do nothing...
+                                ' For current Patient Row the checkbox was not selected:
+                                ' -> Do nothing...
                             End If
 
-                        Next
+                        Next    ' FOR EACH Patient Row in column OrderToExport.
 
                         ' Show warning if at least 1 Patient Row does NOT comply with rule 7 for sending to LIS.
                         If ShowWarning Then
@@ -5388,12 +5392,12 @@ Public Class IResults
             End If
 
             ' Finally update DS if required. Applies for:
-            ' OrderToPrint: click on item
-            '               click on header
+            ' OrderToPrint:  click on item
+            '                click on header
             '
             ' OrderToExport: click on item 
             '                click on header only when new state = unselect all
-            '               (NOTE: click on header when new state = select all the DataSEt refresh will be done in previous loop)
+            '                (NOTE: click on header when new state = select all the DataSet refresh will be done in previous loop)
             If updateDSRequired Then
                 If Not resultData Is Nothing AndAlso Not resultData.HasError Then
                     If myPatientID <> "" Then 'Click on item

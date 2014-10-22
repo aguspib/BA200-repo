@@ -8787,11 +8787,11 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pOnlyMappedWithLIS"></param>
         ''' <returns>Returns dataset containing only all Accepted results that have a valid mapping with LIS. </returns>
         ''' <remarks>
-        ''' AG 30/07/2014 Creation - #1887 OrderToExport management
-        ''' AG 17/10/2014 BA-2011 parameter for return only the results mapped with LIS + pOrderID parameters changes is 'List (Of String)' instead of 'String'
-        ''' WE 17/10/2014 BA-2018 Req.6: Tests without a LIS mapping can´t be sent to LIS, as a consequence if a patient only has Tests without LIS mapping or
-        '''                              the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
-        '''                              must be unchecked on screen Actual Results.
+        ''' Created:  AG 30/07/2014 #1887   OrderToExport management
+        ''' Modified: AG 17/10/2014 BA-2011 parameter for return only the results mapped with LIS + pOrderID parameters changes is 'List (Of String)' instead of 'String'
+        '''           WE 17/10/2014 BA-2018 Req.6: Tests without a LIS mapping can´t be sent to LIS, as a consequence if a patient only has Tests without LIS mapping or
+        '''                                 the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
+        '''                                 must be unchecked on screen Actual Results.
         ''' </remarks>
         Public Function GetAcceptedResultsByOrder(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String), ByVal pOnlyMappedWithLIS As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -8839,7 +8839,6 @@ Namespace Biosystems.Ax00.BL
 
                                 'AG 21/10/2014 BA-2018 remove the error flag!!!
                                 resultData.ErrorCode = ""
-
                             End If
 
                         End If
@@ -8954,14 +8953,15 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' Check wether all results belonging to 1 Patient´s Order(s) are valid and accepted OR all related Tests are NOT mapped to LIS.
         ''' </summary>
-        ''' <param name="pOrderID"></param>
+        ''' <param name="pDBConnection">Database Connection to be used</param>
+        ''' <param name="pOrderID">List of 1 or more OrderID(s)</param>
         ''' <param name="pSampleClass">Sample class of the order</param>
         ''' <returns>Returns TRUE if Patient´s results are all NOT Accepted OR all Tests NOT mapped to LIS. Else returns FALSE.</returns>
         ''' <remarks>
         ''' Created:  WE 20/10/2014 BA-2018 Req.7: Tests without a LIS mapping can´t be sent to LIS, as a consequence if a patient only has Tests without LIS mapping or
         '''                         the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
         '''                         must be unchecked on screen Actual Results.
-        ''' 22/10/2014 AG BA-2011 validation new parameter pSampleClass because the control also can have 2 orders
+        ''' Modified: AG 22/10/2014 BA-2011 validation new parameter pSampleClass because the control also can have 2 or more orders.
         ''' </remarks>
         Public Function AllResultsNotAcceptedOrAllTestsNotMapped(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String), ByVal pSampleClass As String) As Boolean
             ' IN:  List of Patients/OrderID (1 or more patients)
@@ -8977,7 +8977,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
-                        'Look for other orders for the same sample
+                        ' Look for other orders for the same sample.
                         If pOrderID.Count = 1 Then
                             Dim ordersDlg As New OrdersDelegate
                             resultData = ordersDlg.ReadRelatedOrdersByOrderID(dbConnection, pOrderID(0), pSampleClass)
@@ -9004,9 +9004,7 @@ Namespace Biosystems.Ax00.BL
                                     result = True
                                 End If
                             End If
-
                         End If
-
                     End If
                 End If
 
@@ -9018,10 +9016,8 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.AllResultsNotAcceptedOrAllTestsNotMapped", EventLogEntryType.Error, False)
-
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
             End Try
             Return result
         End Function
