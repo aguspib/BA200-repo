@@ -8826,6 +8826,7 @@ Namespace Biosystems.Ax00.BL
                                 Next
 
                                 ' Return dataset with all accepted results that have mapping with LIS.
+                                resultData.HasError = False
                                 resultData.SetDatos = myNewDataSet
                             End If
 
@@ -8934,6 +8935,56 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return myGlobalDataTO
         End Function
+
+
+
+        ''' <summary>
+        ''' Check wether all results belonging to 1 Patient´s Order(s) are valid and accepted OR all related Tests are NOT mapped to LIS.
+        ''' </summary>
+        ''' <param name="pOrderID"></param>
+        ''' <returns>Returns TRUE if Patient´s results are all NOT Accepted OR all Tests NOT mapped to LIS. Else returns FALSE.</returns>
+        ''' <remarks>
+        ''' Created:  WE 20/10/2014 BA-2018 Req.7: Tests without a LIS mapping can´t be sent to LIS, as a consequence if a patient only has Tests without LIS mapping or
+        '''                         the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
+        '''                         must be unchecked on screen Actual Results.
+        ''' </remarks>
+        Public Function AllResultsNotAcceptedOrAllTestsNotMapped(ByVal pOrderID As List(Of String)) As Boolean
+            ' IN:  List of Patients/OrderID (1 or more patients)
+            '
+            Dim result As Boolean = False
+            Dim resultData As GlobalDataTO
+            Dim resultsDlg As New ResultsDelegate
+
+            Try
+                resultData = resultsDlg.GetAcceptedResultsByOrder(Nothing, pOrderID, True)
+
+                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                    Dim myResDS As New ResultsDS
+                    myResDS = DirectCast(resultData.SetDatos, ResultsDS)
+
+                    If myResDS.vwksResults.Rows.Count > 0 Then
+                        result = False
+                    Else
+                        result = True
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.AllResultsNotAcceptedOrAllTestsNotMapped", EventLogEntryType.Error, False)
+            End Try
+            Return result
+
+        End Function
+
+
+
+
 
 #End Region
 

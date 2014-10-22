@@ -5165,6 +5165,7 @@ Public Class IResults
     ''' <remarks>
     ''' Created by:  RH 04/06/2012
     ''' Modified by: AG 31/07/2014 - BT #1887 ==> Click on header select all / deselect all
+    '''              WE 17/10/2014 - BA-2018 Req.7
     ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsSamplesListDataGridView.CellMouseClick
         Try
@@ -5178,64 +5179,63 @@ Public Class IResults
             Dim myOrdersDelegate As New OrdersDelegate
             Dim myOrderToExportValue As Boolean = False
             Dim myOrderToPrintValue As Boolean = False
-            Dim resultData As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
             Dim linqRes As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+            Dim dgv As BSDataGridView = bsSamplesListDataGridView
+            Dim warningShown As Boolean = False
+            Dim ShowWarning As Boolean = False
+            Dim currentPatientID As String
 
             If e.RowIndex >= 0 Then
                 'Click on item
 
-                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 OrElse _
-                   String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+                'TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
+                myPatientID = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
+
+                ' Part below only execute for OrderToExport AND Only if Send to LIS checkbox has just been checked (from state unchecked to checked).
+                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 AndAlso Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) Then
+
+                    ' Determine OrderID(s) for selected Patient.
+                    Dim linqOrderID As List(Of String)
+                    linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                    Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a.OrderID Distinct).ToList
+
+                    ' Check if all results are not valid/accepted or all related Tests not mapped to LIS.
+                    Dim myResultsDlg As New ResultsDelegate
+                    If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(linqOrderID) Then
+                        ' Display message "Results cannot be sent".
+
+                        warningShown = True
+                        CreateLogActivity("Results cannot be sent to LIS", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Warning, False)
+                        ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me)
+
+                    End If
+                End If
+
+                ' Execute part below for OrderToExport (but only in case "Results cannot be sent" message is not displayed) and for OrderToPrint.
+                If (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 AndAlso Not warningShown) OrElse _
+                     String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
 
                     Cursor = Cursors.WaitCursor
 
                     updateDSRequired = True
                     updateColumnOrderToExport = (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0)
 
-                    Dim dgv As BSDataGridView = bsSamplesListDataGridView
+                    ' Refresh list.
                     Dim myField As String = dgv.Columns(e.ColumnIndex).Name
                     dgv(myField, e.RowIndex).Value = Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) 'Assign new value = Not current
-
-
-                    'TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
-                    myPatientID = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
 
                     myOrderToExportValue = Convert.ToBoolean(dgv("OrderToExport", e.RowIndex).Value)
                     myOrderToPrintValue = Convert.ToBoolean(dgv("OrderToPrint", e.RowIndex).Value)
                     resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrintValue, myOrderToExportValue)
+
                 End If
+
 
             Else
                 'Click on header
-                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 Then
-                    'Order To Export
-                    'Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
-
-                    Cursor = Cursors.WaitCursor
-
-                    updateDSRequired = True
-                    updateColumnOrderToExport = True
-                    linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
-                               Where a.SampleClass = "PATIENT" AndAlso a.OrderToExport = False Select a).ToList
-                    If linqRes.Count > 0 Then
-                        'Some no selected
-                        myOrderToExportValue = True
-                    Else
-                        myOrderToExportValue = False
-                    End If
-
-                    'Force the value for OrderToExport because it is the user desire!!
-                    resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue)
-
-                    'Refresh list
-                    If Not resultData.HasError Then
-                        For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
-                            bsSamplesListDataGridView("OrderToExport", i).Value = myOrderToExportValue
-                        Next
-                    End If
-
-                ElseIf String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
-                    'Order To Print
+                If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
+                    'ORDER TO PRINT
                     'Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
 
                     Cursor = Cursors.WaitCursor
@@ -5260,35 +5260,125 @@ Public Class IResults
                         Next
                     End If
 
-                End If
-            End If
+                ElseIf String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 Then
+                    'ORDER TO EXPORT
+                    'Search new value: Some or All NOT selected -> SELECT ALL // All selected -> SELECT NONE
 
-            'Finally update DS if required
-            If updateDSRequired Then
-                If Not resultData Is Nothing AndAlso Not resultData.HasError Then
-                    If myPatientID <> "" Then 'Click on item
-                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                   Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a).ToList
+                    linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                               Where a.SampleClass = "PATIENT" AndAlso a.OrderToExport = False Select a).ToList
+                    If linqRes.Count > 0 Then
+                        ' Previous state:   Some or All checkboxes not selected.
+                        ' New state:        All checkboxes are selected that comply with rule (7) for sending to LIS.
+                        ' myOrderToExportValue = True
 
-                    Else 'Click on header
-                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                   Where a.SampleClass = "PATIENT" Select a).ToList
-                    End If
+                        Cursor = Cursors.WaitCursor
 
-                    For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
-                        row.BeginEdit()
-                        If Not updateColumnOrderToExport Then
-                            row.OrderToPrint = myOrderToPrintValue
-                        Else
-                            row.OrderToExport = myOrderToExportValue
+                        ' FOR EACH Patient Row in column OrderToExport.
+                        For item As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+
+                            ' Check if for current Patient Row the checkbox was not selected.
+                            If Not CBool(bsSamplesListDataGridView("OrderToExport", item).Value) Then
+                                ' Complies with rule 7 for sending to LIS ==> Select this checkbox.
+
+                                currentPatientID = bsSamplesListDataGridView("PatientIDToSearch", item).Value.ToString()
+
+                                ' Determine OrderID(s) for selected Patient(i).
+                                Dim linqOrderID As List(Of String)
+                                linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                Where a.SampleClass = "PATIENT" AndAlso a.PatientID = currentPatientID Select a.OrderID Distinct).ToList
+
+                                ' Check if for Patient(i) all results are not valid/accepted or all related Tests not mapped to LIS.
+                                Dim myResultsDlg As New ResultsDelegate
+                                If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(linqOrderID) Then
+                                    ' After processing of this loop display message "Results cannot be sent".
+                                    ShowWarning = True
+                                    ' Don´t allow State (OrderToExport) to change because current Patient Row does NOT comply with rule 7.
+                                    ' => myOrderToExportValue stays False.
+                                    myOrderToExportValue = False
+                                Else
+                                    ' Set New state (OrderToExport).
+                                    myOrderToExportValue = True
+                                End If
+
+                                ' Call UpdateOrderToExport for current Patient's Orders - inform only first element, UpdateOrderToExport seeks all related orders.
+                                resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, linqOrderID(0).ToString)
+
+                                ' Refresh the current row in the list.
+                                If Not resultData.HasError Then
+                                    bsSamplesListDataGridView("OrderToExport", item).Value = myOrderToExportValue
+                                End If
+
+                                'Inform DS refresh will be required at the end of the loop
+                                updateDSRequired = True
+                                updateColumnOrderToExport = True
+
+                            Else
+                                ' Do nothing...
+                            End If
+
+                        Next
+
+                        ' Show warning if at least 1 Patient Row does NOT comply with rule 7 for sending to LIS.
+                        If ShowWarning Then
+                            ' CreateLogActivity("UploadOrdersResults Method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            '                   "ESWrapper.UploadOrdersResults", EventLogEntryType.Information, False)
+                            CreateLogActivity("Results cannot be sent to LIS", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Warning, False)
+                            ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me)
                         End If
-                        row.EndEdit()
-                    Next
 
-                    ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
+
+
+                    Else
+                        ' Previous state:   All checkboxes were selected
+                        ' New state:        Deselect all checkboxes
+                        myOrderToExportValue = False
+
+                        Cursor = Cursors.WaitCursor
+
+                        updateDSRequired = True
+                        updateColumnOrderToExport = True
+
+                        'Force the value for OrderToExport because it is the user desire!!
+                        resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue)
+
+                        'Refresh list
+                        If Not resultData.HasError Then
+                            For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
+                                bsSamplesListDataGridView("OrderToExport", i).Value = myOrderToExportValue
+                            Next
+                        End If
+
+                    End If
                 End If
+
+                'Finally update DS if required
+                If updateDSRequired Then
+                    If Not resultData Is Nothing AndAlso Not resultData.HasError Then
+                        If myPatientID <> "" Then 'Click on item
+                            linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                       Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a).ToList
+
+                        Else 'Click on header
+                            linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                       Where a.SampleClass = "PATIENT" Select a).ToList
+                        End If
+
+                        For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
+                            row.BeginEdit()
+                            If Not updateColumnOrderToExport Then
+                                row.OrderToPrint = myOrderToPrintValue
+                            Else
+                                row.OrderToExport = myOrderToExportValue
+                            End If
+                            row.EndEdit()
+                        Next
+
+                        ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
+                    End If
+                End If
+                linqRes = Nothing 'Release memory
+
             End If
-            linqRes = Nothing 'Release memory
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
