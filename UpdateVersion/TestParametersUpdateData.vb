@@ -1935,7 +1935,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Convert.ToBoolean(myGlobalDataTO.SetDatos)) Then
                             '(4.1) Update the renamed STD Test in Customer DB
                             myAuxTestsDS.Clear()
-                            myAuxTestsDS.tparTests.AddtparTestsRow(testRow)
+                            myAuxTestsDS.tparTests.ImportRow(testRow)
                             myAuxTestsDS.AcceptChanges()
 
                             myGlobalDataTO = myTestDelegate.Update(pDBConnection, myAuxTestsDS)
@@ -2232,7 +2232,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     For Each deletedTest As TestsDS.tparTestsRow In myDeletedTestDS.tparTests
                         '(2.1) Add the TestID to the TO of Tests to delete
                         myDeletedTestProgramingTO.TestID = deletedTest.TestID
-                        myDeletedTestProgramingTO.DeleteBlankCalibResults = True
                         myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
 
                         '(2.2) Get all different Sample Types for the Test in CUSTOMER DB 
