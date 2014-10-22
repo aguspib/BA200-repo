@@ -651,7 +651,6 @@ Partial Public Class TestRefRangesDS
             MyBase.Columns.Add(Me.columnTS_User)
             Me.columnTS_DateTime = New Global.System.Data.DataColumn("TS_DateTime", GetType(Date), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnTS_DateTime)
-            Me.columnRangeID.ReadOnly = True
             Me.columnTestType.DefaultValue = CType("STD", String)
             Me.columnIsNew.DefaultValue = CType(False, Boolean)
             Me.columnIsDeleted.DefaultValue = CType(False, Boolean)
@@ -810,7 +809,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletparTestRefRanges.RangeIDColumn) = Value
+                Me(Me.tabletparTestRefRanges.RangeIDColumn) = value
             End Set
         End Property
 
@@ -825,7 +824,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletparTestRefRanges.TestIDColumn) = Value
+                Me(Me.tabletparTestRefRanges.TestIDColumn) = value
             End Set
         End Property
 
@@ -840,7 +839,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.TestTypeColumn) = Value
+                Me(Me.tabletparTestRefRanges.TestTypeColumn) = value
             End Set
         End Property
 
@@ -855,7 +854,7 @@ Partial Public Class TestRefRangesDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.SampleTypeColumn) = Value
+                Me(Me.tabletparTestRefRanges.SampleTypeColumn) = value
             End Set
         End Property
 
@@ -870,7 +869,7 @@ Partial Public Class TestRefRangesDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.RangeTypeColumn) = Value
+                Me(Me.tabletparTestRefRanges.RangeTypeColumn) = value
             End Set
         End Property
 
@@ -885,7 +884,7 @@ Partial Public Class TestRefRangesDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.GenderColumn) = Value
+                Me(Me.tabletparTestRefRanges.GenderColumn) = value
             End Set
         End Property
 
@@ -900,7 +899,7 @@ Partial Public Class TestRefRangesDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.GenderDescColumn) = Value
+                Me(Me.tabletparTestRefRanges.GenderDescColumn) = value
             End Set
         End Property
 
@@ -915,7 +914,7 @@ Partial Public Class TestRefRangesDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.AgeUnitColumn) = Value
+                Me(Me.tabletparTestRefRanges.AgeUnitColumn) = value
             End Set
         End Property
 
@@ -930,7 +929,7 @@ Partial Public Class TestRefRangesDS
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.AgeUnitDescColumn) = Value
+                Me(Me.tabletparTestRefRanges.AgeUnitDescColumn) = value
             End Set
         End Property
 
@@ -945,7 +944,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletparTestRefRanges.AgeRangeFromColumn) = Value
+                Me(Me.tabletparTestRefRanges.AgeRangeFromColumn) = value
             End Set
         End Property
 
@@ -960,7 +959,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Integer)
-                Me(Me.tabletparTestRefRanges.AgeRangeToColumn) = Value
+                Me(Me.tabletparTestRefRanges.AgeRangeToColumn) = value
             End Set
         End Property
 
@@ -975,7 +974,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletparTestRefRanges.NormalLowerLimitColumn) = Value
+                Me(Me.tabletparTestRefRanges.NormalLowerLimitColumn) = value
             End Set
         End Property
 
@@ -990,7 +989,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletparTestRefRanges.NormalUpperLimitColumn) = Value
+                Me(Me.tabletparTestRefRanges.NormalUpperLimitColumn) = value
             End Set
         End Property
 
@@ -1006,7 +1005,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletparTestRefRanges.BorderLineLowerLimitColumn) = Value
+                Me(Me.tabletparTestRefRanges.BorderLineLowerLimitColumn) = value
             End Set
         End Property
 
@@ -1022,7 +1021,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Single)
-                Me(Me.tabletparTestRefRanges.BorderLineUpperLimitColumn) = Value
+                Me(Me.tabletparTestRefRanges.BorderLineUpperLimitColumn) = value
             End Set
         End Property
 
@@ -1037,7 +1036,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Boolean)
-                Me(Me.tabletparTestRefRanges.IsNewColumn) = Value
+                Me(Me.tabletparTestRefRanges.IsNewColumn) = value
             End Set
         End Property
 
@@ -1052,7 +1051,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Boolean)
-                Me(Me.tabletparTestRefRanges.IsDeletedColumn) = Value
+                Me(Me.tabletparTestRefRanges.IsDeletedColumn) = value
             End Set
         End Property
 
@@ -1067,7 +1066,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As String)
-                Me(Me.tabletparTestRefRanges.TS_UserColumn) = Value
+                Me(Me.tabletparTestRefRanges.TS_UserColumn) = value
             End Set
         End Property
 
@@ -1082,7 +1081,7 @@ Partial Public Class TestRefRangesDS
                 End Try
             End Get
             Set(value As Date)
-                Me(Me.tabletparTestRefRanges.TS_DateTimeColumn) = Value
+                Me(Me.tabletparTestRefRanges.TS_DateTimeColumn) = value
             End Set
         End Property
 

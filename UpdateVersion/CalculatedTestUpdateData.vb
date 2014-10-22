@@ -1806,6 +1806,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim customerRefRangesDS As New TestRefRangesDS
                 Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
                 Dim myTestRefRangesDelegate As New TestRefRangesDelegate
+                Dim lstCustomerRangesByType As New List(Of TestRefRangesDS.tparTestRefRangesRow)
 
                 'Build the TestName to report changes...
                 Dim myCalcTestName As String = pCustomerCalcTestRow.CalcTestLongName & " (" & pCustomerCalcTestRow.CalcTestName & ") "
@@ -1847,52 +1848,64 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         End If
 
                         If (pFactoryCalcTestRow.ActiveRangeType = "GENERIC") Then
-                            If (pCustomerCalcTestRow.ActiveRangeType = "GENERIC") Then
-                                updateRefRanges = (customerRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString) OrElse _
-                                                  (customerRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString)
+                            'Verify if there is a GENERIC Reference Range for the CALC TEST in CUSTOMER DB 
+                            lstCustomerRangesByType = (From a As TestRefRangesDS.tparTestRefRangesRow In customerRefRangesDS.tparTestRefRanges _
+                                                      Where a.RangeType = "GENERIC" _
+                                                     Select a).ToList()
+
+                            If (lstCustomerRangesByType.Count > 0) Then
+                                'There is a GENERIC Range in CUSTOMER DB; verify if the limits have been changed
+                                updateRefRanges = (lstCustomerRangesByType.First.NormalLowerLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString) OrElse _
+                                                  (lstCustomerRangesByType.First.NormalUpperLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString)
 
                                 If (updateRefRanges) Then
                                     'Values of the GENERIC RANGE defined for the CALC Test in CUSTOMER DB are replaced by values in FACTORY DB
                                     'Prepare the TestRefRangesDS with values needed for the update
                                     pNewRefRangesDS.tparTestRefRanges.BeginInit()
-                                    pNewRefRangesDS.tparTestRefRanges.First.TestID = customerRefRangesDS.tparTestRefRanges.First.TestID
+                                    pNewRefRangesDS.tparTestRefRanges.First.RangeID = lstCustomerRangesByType.First.RangeID
+                                    pNewRefRangesDS.tparTestRefRanges.First.TestID = lstCustomerRangesByType.First.TestID
                                     pNewRefRangesDS.tparTestRefRanges.First.IsNew = False
                                     pNewRefRangesDS.tparTestRefRanges.First.IsDeleted = False
                                     pNewRefRangesDS.tparTestRefRanges.AcceptChanges()
 
                                     'If LowerLimit has been changed, add a row for field NormalLowerLimit in the DS containing all changes in Customer DB due to 
                                     'the Update Version Process (sub-table UpdatedElements) 
-                                    If (customerRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString) Then
-
+                                    If (lstCustomerRangesByType.First.NormalLowerLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString) Then
                                         AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pCustomerCalcTestRow.SampleType, "NormalLowerLimit", _
-                                                                            customerRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString, _
+                                                                            lstCustomerRangesByType.First.NormalLowerLimit.ToString, _
                                                                             pNewRefRangesDS.tparTestRefRanges.First.NormalLowerLimit.ToString)
                                     End If
 
                                     'If the UpperLimit has been changed, add a row for field NormalUpperLimit in the DS containing all changes in Customer DB due to 
                                     'the Update Version Process (sub-table UpdatedElements) 
-                                    If (customerRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString) Then
+                                    If (lstCustomerRangesByType.First.NormalUpperLimit.ToString <> pNewRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString) Then
                                         AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "CALC", myCalcTestName, pCustomerCalcTestRow.SampleType, "NormalUpperLimit", _
-                                                                            customerRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString, _
+                                                                            lstCustomerRangesByType.First.NormalUpperLimit.ToString, _
                                                                             pNewRefRangesDS.tparTestRefRanges.First.NormalUpperLimit.ToString)
                                     End If
                                 End If
-                            ElseIf (pCustomerCalcTestRow.ActiveRangeType = "DETAILED") Then
-                                'No changes in field ActiveRangeType nor in the defined DETAILED Reference Ranges, although the Generic Range in FACTORY DB will be added
-                                'as not active (same behaviour than the screen). In the TestRefRangesDS from FACTORY DB, update field TestID with value of CalcTestID 
-                                'from CUSTOMER DB
-                                pNewRefRangesDS.tparTestRefRanges.BeginInit()
-                                pNewRefRangesDS.tparTestRefRanges.First.TestID = customerRefRangesDS.tparTestRefRanges.First.TestID
-                                pNewRefRangesDS.tparTestRefRanges.AcceptChanges()
+                            Else
+                                If (pCustomerCalcTestRow.ActiveRangeType = "GENERIC") Then
+                                    'This case is not possible...
+                                    myGlobalDataTO.HasError = True
+                                ElseIf (pCustomerCalcTestRow.ActiveRangeType = "DETAILED") Then
+                                    'New Reference Range to add: in the TestRefRangesDS from FACTORY DB, update field TestID with value of CalcTestID from CUSTOMER DB
+                                    pNewRefRangesDS.tparTestRefRanges.BeginInit()
+                                    pNewRefRangesDS.tparTestRefRanges.First.TestID = customerRefRangesDS.tparTestRefRanges.First.TestID
+                                    pNewRefRangesDS.tparTestRefRanges.AcceptChanges()
+
+                                    updateRefRanges = True
+                                End If
                             End If
 
                         ElseIf (pFactoryCalcTestRow.ActiveRangeType = "DETAILED") Then
                             'NOT IMPLEMENTED; CURRENTLY, BIOSYSTEMS DISTRIBUTES ONLY GENERIC REFERENCE RANGES FOR CALCULATED TESTS
                         End If
-                        End If
+                    End If
                 Else
-                        'No changes in the Reference Ranges defined for the Calculated Test in CUSTOMER DB
+                    'No changes in the Reference Ranges defined for the Calculated Test in CUSTOMER DB
                 End If
+                lstCustomerRangesByType = Nothing
 
                 myGlobalDataTO.SetDatos = updateRefRanges
                 myGlobalDataTO.HasError = False
