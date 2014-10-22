@@ -981,8 +981,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns></returns>
         ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management
         ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID
-        ''' AG 21/11/2014 BA-2011 sample class = patient or ctrl</remarks>
-        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As List(Of String), pNewValue As Boolean) As GlobalDataTO
+        ''' AG 21/10/2014 BA-2011 sample class = patient or ctrl
+        ''' AG 22/10/2014 BA-2011 by default applies for patient or ctrl except from results screen clicking on LIS header that applies only for patients</remarks>
+        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, pOrderID As List(Of String), pNewValue As Boolean, ByVal pOnlyPatientsFlag As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
                 If (pDBConnection Is Nothing) Then
@@ -990,8 +991,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
                     Dim cmdText As String = " UPDATE twksOrders " & vbCrLf & _
-                                           " SET    OrderToExport = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf & _
-                                           " WHERE  ( SampleClass = 'PATIENT' OR SampleClass = 'CTRL' )" & vbCrLf
+                                           " SET    OrderToExport = " & Convert.ToInt32(IIf(pNewValue, 1, 0)) & vbCrLf
+
+                    'AG 22/10/2014 - BA-2011
+                    '" WHERE  ( SampleClass = 'PATIENT' OR SampleClass = 'CTRL' )" & vbCrLf
+                    If Not pOnlyPatientsFlag Then
+                        cmdText &= " WHERE  ( SampleClass = 'PATIENT' OR SampleClass = 'CTRL' )" & vbCrLf
+                    Else
+                        cmdText &= " WHERE  ( SampleClass = 'PATIENT' )" & vbCrLf
+                    End If
 
                     'AG 17/10/2014 BA-2011
                     'If pOrderID <> "" Then

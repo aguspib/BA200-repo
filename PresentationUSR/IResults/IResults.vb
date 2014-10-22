@@ -5174,6 +5174,7 @@ Public Class IResults
     ''' Created by:  RH 04/06/2012
     ''' Modified by: AG 31/07/2014 - BT #1887 ==> Click on header select all / deselect all
     '''              WE 17/10/2014 - BA-2018 Req.7
+    ''' AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
     ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsSamplesListDataGridView.CellMouseClick
         Try
@@ -5181,7 +5182,7 @@ Public Class IResults
             Dim updateDSRequired As Boolean = False
 
             'Define variables common used for click on item and also on header
-            Dim updateColumnOrderToExport As Boolean = False
+            Dim updateColumnOrderToExport As Boolean = False 'OrderToExport column (True) or OrderToPrint (false)
 
             Dim myPatientID As String = "" 'Patient to refresh, "" all
             Dim myOrdersDelegate As New OrdersDelegate
@@ -5208,9 +5209,11 @@ Public Class IResults
                     linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
                     Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a.OrderID Distinct).ToList
 
+                    updateDSRequired = False
+
                     ' Check if all results are not valid/accepted or all related Tests not mapped to LIS.
                     Dim myResultsDlg As New ResultsDelegate
-                    If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(linqOrderID) Then
+                    If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID) Then
                         ' Display message "Results cannot be sent".
 
                         warningShown = True
@@ -5226,6 +5229,7 @@ Public Class IResults
 
                     Cursor = Cursors.WaitCursor
 
+                    'Inform DS refresh at the end is required
                     updateDSRequired = True
                     updateColumnOrderToExport = (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0)
 
@@ -5248,6 +5252,7 @@ Public Class IResults
 
                     Cursor = Cursors.WaitCursor
 
+                    'Inform DS refresh at the end is required
                     updateDSRequired = True
                     updateColumnOrderToExport = False
                     linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
@@ -5272,6 +5277,10 @@ Public Class IResults
                     'ORDER TO EXPORT
                     'Search new value: Some or All NOT selected -> SELECT ALL // All selected -> SELECT NONE
 
+                    'Inform DS refresh at the end of this procedure is not required. It will be done inside the main loop.
+                    updateDSRequired = False
+                    updateColumnOrderToExport = True
+
                     linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where a.SampleClass = "PATIENT" AndAlso a.OrderToExport = False Select a).ToList
                     If linqRes.Count > 0 Then
@@ -5295,9 +5304,23 @@ Public Class IResults
                                 linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
                                 Where a.SampleClass = "PATIENT" AndAlso a.PatientID = currentPatientID Select a.OrderID Distinct).ToList
 
+                                'Look for more orders related to the same patient as in linqOrder
+                                If linqOrderID.Count = 1 Then
+                                    Dim ordersDlg As New OrdersDelegate
+                                    resultData = ordersDlg.ReadRelatedOrdersByOrderID(Nothing, linqOrderID(0))
+                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+
+                                        For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders
+                                            If Not linqOrderID.Contains(row.OrderID) Then
+                                                linqOrderID.Add(row.OrderID)
+                                            End If
+                                        Next
+                                    End If
+                                End If
+
                                 ' Check if for Patient(i) all results are not valid/accepted or all related Tests not mapped to LIS.
                                 Dim myResultsDlg As New ResultsDelegate
-                                If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(linqOrderID) Then
+                                If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID) Then
                                     ' After processing of this loop display message "Results cannot be sent".
                                     ShowWarning = True
                                     ' Don´t allow State (OrderToExport) to change because current Patient Row does NOT comply with rule 7.
@@ -5309,16 +5332,27 @@ Public Class IResults
                                 End If
 
                                 ' Call UpdateOrderToExport for current Patient's Orders - inform only first element, UpdateOrderToExport seeks all related orders.
-                                resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, linqOrderID(0).ToString)
+                                resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, True, linqOrderID(0).ToString)
 
                                 ' Refresh the current row in the list.
                                 If Not resultData.HasError Then
                                     bsSamplesListDataGridView("OrderToExport", item).Value = myOrderToExportValue
                                 End If
 
-                                'Inform DS refresh will be required at the end of the loop
-                                updateDSRequired = True
-                                updateColumnOrderToExport = True
+                                'Update DS for the linqOrder elements
+                                If Not resultData.HasError Then
+                                    For Each myOrderID As String In linqOrderID
+                                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                                   Where a.SampleClass = "PATIENT" AndAlso a.OrderID = myOrderID Select a).ToList
+
+                                        For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
+                                            row.BeginEdit()
+                                            row.OrderToExport = myOrderToExportValue
+                                            row.EndEdit()
+                                        Next
+                                        ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
+                                    Next
+                                End If
 
                             Else
                                 ' Do nothing...
@@ -5347,7 +5381,7 @@ Public Class IResults
                         updateColumnOrderToExport = True
 
                         'Force the value for OrderToExport because it is the user desire!!
-                        resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue)
+                        resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, True)
 
                         'Refresh list
                         If Not resultData.HasError Then
@@ -5359,34 +5393,40 @@ Public Class IResults
                     End If
                 End If
 
-                'Finally update DS if required
-                If updateDSRequired Then
-                    If Not resultData Is Nothing AndAlso Not resultData.HasError Then
-                        If myPatientID <> "" Then 'Click on item
-                            linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                       Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a).ToList
-
-                        Else 'Click on header
-                            linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                       Where a.SampleClass = "PATIENT" Select a).ToList
-                        End If
-
-                        For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
-                            row.BeginEdit()
-                            If Not updateColumnOrderToExport Then
-                                row.OrderToPrint = myOrderToPrintValue
-                            Else
-                                row.OrderToExport = myOrderToExportValue
-                            End If
-                            row.EndEdit()
-                        Next
-
-                        ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
-                    End If
-                End If
-                linqRes = Nothing 'Release memory
-
             End If
+
+            'Finally update DS if required. Applies for:
+            'OrderToPrint: click on item
+            '                           click on header
+            '
+            'OrderToExport: click on item 
+            '               click on header only when new state = unselect all
+            '              (NOTE: click on header when new state = select all the DataSEt refresh will be done in previous loop)
+            If updateDSRequired Then
+                If Not resultData Is Nothing AndAlso Not resultData.HasError Then
+                    If myPatientID <> "" Then 'Click on item
+                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                   Where a.SampleClass = "PATIENT" AndAlso a.PatientID = myPatientID Select a).ToList
+
+                    Else 'Click on header
+                        linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
+                                   Where a.SampleClass = "PATIENT" Select a).ToList
+                    End If
+
+                    For Each row As ExecutionsDS.vwksWSExecutionsResultsRow In linqRes
+                        row.BeginEdit()
+                        If Not updateColumnOrderToExport Then
+                            row.OrderToPrint = myOrderToPrintValue
+                        Else
+                            row.OrderToExport = myOrderToExportValue
+                        End If
+                        row.EndEdit()
+                    Next
+
+                    ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
+                End If
+            End If
+            linqRes = Nothing 'Release memory
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

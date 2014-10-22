@@ -8710,6 +8710,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 02/04/2014 - #1564 add parameter pSetDateTime (when TRUE the DAO has to inform ExportDateTime, else leave as NULL)
         ''' AG 30/07/2014 - #1887 OrderToExport management
         ''' AG 21/10/2014 - BA-2011 remember the affected results
+        ''' AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
         ''' </remarks>
         Public Function UpdateExportStatusByMessageID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pLISMessageID As String, _
@@ -8740,7 +8741,7 @@ Namespace Biosystems.Ax00.BL
                                 resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
                             Else
                                 'Set OrderToExport = TRUE because some result sent to LIS has not been accepted!!!
-                                resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
+                                resultData = myOrder.UpdateOrderToExport(dbConnection, True, False, , , pLISMessageID)
                             End If
                             'AG 30/07/2014
 
@@ -8837,7 +8838,6 @@ Namespace Biosystems.Ax00.BL
                                 resultData.SetDatos = myNewDataSet
 
                                 'AG 21/10/2014 BA-2018 remove the error flag!!!
-                                resultData.HasError = False
                                 resultData.ErrorCode = ""
 
                             End If
@@ -8878,7 +8878,9 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pResultsDS"></param>
         ''' <param name="pAlternativeStatus"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 30/07/2014 creation #1887 - OrderToExport management</remarks>
+        ''' <remarks>AG 30/07/2014 creation #1887 - OrderToExport management
+        ''' AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
+        ''' </remarks>
         Private Function UpdateOrderToExportAfterChangesInExportStatus(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, ByVal pAlternativeStatus As String) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -8913,7 +8915,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Orders to set OrderToExport = FALSE
                         For Each tmpOrder As String In OrderToExportFALSE_OrderList
-                            myGlobalDataTO = myOrder.UpdateOrderToExport(dbConnection, False, tmpOrder)
+                            myGlobalDataTO = myOrder.UpdateOrderToExport(dbConnection, False, False, tmpOrder)
                         Next
 
                         'Release memory
@@ -8948,8 +8950,6 @@ Namespace Biosystems.Ax00.BL
             Return myGlobalDataTO
         End Function
 
-
-
         ''' <summary>
         ''' Check wether all results belonging to 1 Patient´s Order(s) are valid and accepted OR all related Tests are NOT mapped to LIS.
         ''' </summary>
@@ -8960,24 +8960,50 @@ Namespace Biosystems.Ax00.BL
         '''                         the rest have already been sent (without modifications of its related results afterwards), the checkbox 'To be sent to LIS'
         '''                         must be unchecked on screen Actual Results.
         ''' </remarks>
-        Public Function AllResultsNotAcceptedOrAllTestsNotMapped(ByVal pOrderID As List(Of String)) As Boolean
+        Public Function AllResultsNotAcceptedOrAllTestsNotMapped(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderID As List(Of String)) As Boolean
             ' IN:  List of Patients/OrderID (1 or more patients)
             '
             Dim result As Boolean = False
-            Dim resultData As GlobalDataTO
-            Dim resultsDlg As New ResultsDelegate
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = resultsDlg.GetAcceptedResultsByOrder(Nothing, pOrderID, True)
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
-                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                    Dim myResDS As New ResultsDS
-                    myResDS = DirectCast(resultData.SetDatos, ResultsDS)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
 
-                    If myResDS.vwksResults.Rows.Count > 0 Then
-                        result = False
-                    Else
-                        result = True
+                        'Look for other orders for the same sample
+                        If pOrderID.Count = 1 Then
+                            Dim ordersDlg As New OrdersDelegate
+                            resultData = ordersDlg.ReadRelatedOrdersByOrderID(dbConnection, pOrderID(0))
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+
+                                For Each row As OrdersDS.twksOrdersRow In DirectCast(resultData.SetDatos, OrdersDS).twksOrders
+                                    If Not pOrderID.Contains(row.OrderID) Then
+                                        pOrderID.Add(row.OrderID)
+                                    End If
+                                Next
+                            End If
+                        End If
+
+                        If Not resultData.HasError Then
+                            resultData = GetAcceptedResultsByOrder(dbConnection, pOrderID, True)
+
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim myResDS As New ResultsDS
+                                myResDS = DirectCast(resultData.SetDatos, ResultsDS)
+
+                                If myResDS.vwksResults.Rows.Count > 0 Then
+                                    result = False
+                                Else
+                                    result = True
+                                End If
+                            End If
+
+                        End If
+
                     End If
                 End If
 
@@ -8989,11 +9015,13 @@ Namespace Biosystems.Ax00.BL
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ResultsDelegate.AllResultsNotAcceptedOrAllTestsNotMapped", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
             End Try
             Return result
-
         End Function
-
 
 
 

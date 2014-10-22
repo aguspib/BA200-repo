@@ -1121,12 +1121,16 @@ Namespace Biosystems.Ax00.BL
         ''' Filter2: by LISMEssageID
         ''' </summary>
         ''' <param name="pDBConnection"></param>
-        ''' <param name="pOrderID"></param>
         ''' <param name="pNewValue"></param>
+        ''' <param name="pOnlyPatientsFlag"></param>
+        ''' <param name="pOrderID"></param>
+        ''' <param name="pOrderTestID"></param>
+        ''' <param name="pLISMessageID"></param>
         ''' <returns></returns>
         ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management
-        ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID</remarks>
-        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewValue As Boolean, Optional ByVal pOrderID As String = "", _
+        ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID
+        ''' AG 22/10/2014 BA-2011 by default applies for patient or ctrl except from results screen clicking on LIS header that applies only for patients</remarks>
+        Public Function UpdateOrderToExport(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewValue As Boolean, ByVal pOnlyPatientsFlag As Boolean, Optional ByVal pOrderID As String = "", _
                                             Optional ByVal pOrderTestID As Integer = -1, Optional ByVal pLISMessageID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -1170,7 +1174,7 @@ Namespace Biosystems.Ax00.BL
                                     If Not listOfAffectedOrderID.Contains(row.OrderID) Then listOfAffectedOrderID.Add(row.OrderID)
                                 Next
 
-                                resultData = myDAO.UpdateOrderToExport(dbConnection, listOfAffectedOrderID, pNewValue)
+                                resultData = myDAO.UpdateOrderToExport(dbConnection, listOfAffectedOrderID, pNewValue, pOnlyPatientsFlag)
                             End If
                             'AG 17/10/2014 BA-2011
 
@@ -1178,7 +1182,7 @@ Namespace Biosystems.Ax00.BL
                             '<Note: when user enables or disables all the LIS checkbox by clicking on list header>
                         ElseIf pOrderID = "" AndAlso pOrderTestID = -1 AndAlso pLISMessageID = "" Then
                             'AG 17/10/2014 BA-2011
-                            resultData = myDAO.UpdateOrderToExport(dbConnection, listOfAffectedOrderID, pNewValue)
+                            resultData = myDAO.UpdateOrderToExport(dbConnection, listOfAffectedOrderID, pNewValue, pOnlyPatientsFlag)
 
                         End If
                         listOfAffectedOrderID.Clear()
@@ -1225,7 +1229,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>AG 30/07/2014 - #1887 OrderToExport management
         ''' AG 15/10/2014 BA-2011 - When none of the results of the patient is accepted automatically the LIS checkbox in the list of patients becomes disabled
         '''                       - Do not update the field OrderToExport if no changes
-        ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID</remarks>
+        ''' AG 17/10/2014 BA-2011 change pOrderID parameter from String to List(Of String) due to patients with OFFS tests have more than 1 orderID
+        ''' AG 22/10/2014 - BA-2011 inform new parameter required pOnlyPatientsFlag = False (it can apply for both patients or controls)
+        ''' </remarks>
         Public Function SetNewOrderToExportValue(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pOrderID As String = "", _
                                                  Optional ByVal pF1OrderTestID As Integer = -1, Optional ByVal pF2LISMessageID As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -1314,8 +1320,8 @@ Namespace Biosystems.Ax00.BL
                                             Next
                                         End If
 
-                                        If requiredUpdateValue Then 'AG 15/10/2014 BA-2011 update only when changes
-                                            resultData = myDAO.UpdateOrderToExport(dbConnection, listOfAffectedOrderID, newOrderToExportValue)
+                                        If requiredUpdateValue Then 'AG 15/10/2014 BA-2011 update only when changes (AG 22/10/2014 BA-2011 set last parameter to FALSE, applies for patients or controls
+                                            resultData = myDAO.UpdateOrderToExport(dbConnection, listOfAffectedOrderID, newOrderToExportValue, False)
                                         End If
                                     End If
 
