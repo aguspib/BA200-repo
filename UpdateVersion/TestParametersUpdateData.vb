@@ -2993,7 +2993,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                                             myPredilutionMode)
 
                         'Update fields in the Customer DataSet ==> Fields PredilutedSampleVol, PredilutedSampleVolSteps, PredilutedDiluentVol and PreDiluentVolSteps are also affected
-                        pCustomerTestSampleRow.SetPredilutionModeNull()
+                        pCustomerTestSampleRow.SetPredilutionFactorNull()
                         pCustomerTestSampleRow.SetPredilutedSampleVolNull()
                         pCustomerTestSampleRow.SetPredilutedSampleVolStepsNull()
                         pCustomerTestSampleRow.SetPredilutedDiluentVolNull()
