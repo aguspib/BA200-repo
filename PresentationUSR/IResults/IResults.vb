@@ -5178,13 +5178,13 @@ Public Class IResults
     ''' </remarks>
     Private Sub bsSamplesListDataGridView_CellMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellMouseEventArgs) Handles bsSamplesListDataGridView.CellMouseClick
         Try
-            'AG 31/07/2014 - #1887
+            ' AG 31/07/2014 - #1887
             Dim updateDSRequired As Boolean = False
 
-            'Define variables common used for click on item and also on header
-            Dim updateColumnOrderToExport As Boolean = False 'OrderToExport column (True) or OrderToPrint (false)
+            ' Define variables common used for click on item and also on header.
+            Dim updateColumnOrderToExport As Boolean = False    ' OrderToExport column (True) or OrderToPrint (False).
 
-            Dim myPatientID As String = "" 'Patient to refresh, "" all
+            Dim myPatientID As String = ""  ' Patient to refresh, "" -> all.
             Dim myOrdersDelegate As New OrdersDelegate
             Dim myOrderToExportValue As Boolean = False
             Dim myOrderToPrintValue As Boolean = False
@@ -5196,12 +5196,12 @@ Public Class IResults
             Dim currentPatientID As String
 
             If e.RowIndex >= 0 Then
-                'Click on item
+                ' Click on item.
 
-                'TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
+                ' TR 02/12/2013 bt #1300, set the patientID to search instead the patient id.
                 myPatientID = dgv("PatientIDToSearch", e.RowIndex).Value.ToString()
 
-                ' Part below only execute for OrderToExport AND Only if Send to LIS checkbox has just been checked (from state unchecked to checked).
+                ' ## Part below only execute for OrderToExport AND Only if Send to LIS checkbox has just been checked (from state unchecked to checked).
                 If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 AndAlso Not CBool(dgv(e.ColumnIndex, e.RowIndex).Value) Then
 
                     ' Determine OrderID(s) for selected Patient.
@@ -5215,21 +5215,19 @@ Public Class IResults
                     Dim myResultsDlg As New ResultsDelegate
                     If myResultsDlg.AllResultsNotAcceptedOrAllTestsNotMapped(Nothing, linqOrderID, "PATIENT") Then
                         ' Display message "Results cannot be sent".
-
                         warningShown = True
                         CreateLogActivity("Results cannot be sent to LIS", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Warning, False)
                         ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me)
-
                     End If
                 End If
 
-                ' Execute part below for OrderToExport (but only in case "Results cannot be sent" message is not displayed) and for OrderToPrint.
+                ' ## Execute part below for OrderToExport (but only in case "Results cannot be sent" message is not displayed) and for OrderToPrint.
                 If (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 AndAlso Not warningShown) OrElse _
                      String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
 
                     Cursor = Cursors.WaitCursor
 
-                    'Inform DS refresh at the end is required
+                    ' DS refresh at the end is required.
                     updateDSRequired = True
                     updateColumnOrderToExport = (String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0)
 
@@ -5240,15 +5238,13 @@ Public Class IResults
                     myOrderToExportValue = Convert.ToBoolean(dgv("OrderToExport", e.RowIndex).Value)
                     myOrderToPrintValue = Convert.ToBoolean(dgv("OrderToPrint", e.RowIndex).Value)
                     resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrintValue, myOrderToExportValue)
-
                 End If
 
-
             Else
-                'Click on header
+                ' Click on header.
                 If String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToPrint", False) = 0 Then
-                    'ORDER TO PRINT
-                    'Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
+                    ' ORDER TO PRINT
+                    ' Search new value: some NOT selected -> SELECT ALL // all selected -> SELECT NONE
 
                     Cursor = Cursors.WaitCursor
 
@@ -5258,7 +5254,7 @@ Public Class IResults
                     linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where a.SampleClass = "PATIENT" AndAlso a.OrderToPrint = False Select a).ToList
                     If linqRes.Count > 0 Then
-                        'Some no selected
+                        ' Some not selected.
                         myOrderToPrintValue = True
                     Else
                         myOrderToPrintValue = False
@@ -5266,7 +5262,7 @@ Public Class IResults
 
                     resultData = myOrdersDelegate.UpdateOrderToPrint(Nothing, myOrderToPrintValue)
 
-                    'Refresh list
+                    ' Refresh list.
                     If Not resultData.HasError Then
                         For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
                             bsSamplesListDataGridView("OrderToPrint", i).Value = myOrderToPrintValue
@@ -5274,10 +5270,10 @@ Public Class IResults
                     End If
 
                 ElseIf String.Compare(bsSamplesListDataGridView.Columns(e.ColumnIndex).Name, "OrderToExport", False) = 0 Then
-                    'ORDER TO EXPORT
-                    'Search new value: Some or All NOT selected -> SELECT ALL // All selected -> SELECT NONE
+                    ' ORDER TO EXPORT
+                    ' Search new value: Some or All NOT selected -> SELECT ALL // All selected -> SELECT NONE
 
-                    'Inform DS refresh at the end of this procedure is not required. It will be done inside the main loop.
+                    ' Inform DS refresh at the end of this procedure is not required. It will be done inside the main loop.
                     updateDSRequired = False
                     updateColumnOrderToExport = True
 
@@ -5304,7 +5300,7 @@ Public Class IResults
                                 linqOrderID = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
                                 Where a.SampleClass = "PATIENT" AndAlso a.PatientID = currentPatientID Select a.OrderID Distinct).ToList
 
-                                'Look for more orders related to the same patient as in linqOrder
+                                ' Look for more orders related to the same patient as in linqOrder.
                                 If linqOrderID.Count = 1 Then
                                     Dim ordersDlg As New OrdersDelegate
                                     resultData = ordersDlg.ReadRelatedOrdersByOrderID(Nothing, linqOrderID(0), "PATIENT")
@@ -5339,7 +5335,7 @@ Public Class IResults
                                     bsSamplesListDataGridView("OrderToExport", item).Value = myOrderToExportValue
                                 End If
 
-                                'Update DS for the linqOrder elements
+                                ' Update DS for the linqOrder elements.
                                 If Not resultData.HasError Then
                                     For Each myOrderID As String In linqOrderID
                                         linqRes = (From a As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults _
@@ -5362,13 +5358,9 @@ Public Class IResults
 
                         ' Show warning if at least 1 Patient Row does NOT comply with rule 7 for sending to LIS.
                         If ShowWarning Then
-                            ' CreateLogActivity("UploadOrdersResults Method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                            '                   "ESWrapper.UploadOrdersResults", EventLogEntryType.Information, False)
                             CreateLogActivity("Results cannot be sent to LIS", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Warning, False)
                             ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me)
                         End If
-
-
 
                     Else
                         ' Previous state:   All checkboxes were selected
@@ -5380,10 +5372,10 @@ Public Class IResults
                         updateDSRequired = True
                         updateColumnOrderToExport = True
 
-                        'Force the value for OrderToExport because it is the user desire!!
+                        ' Force the value for OrderToExport because it is the user desire!!
                         resultData = myOrdersDelegate.UpdateOrderToExport(Nothing, myOrderToExportValue, True)
 
-                        'Refresh list
+                        ' Refresh list.
                         If Not resultData.HasError Then
                             For i As Integer = 0 To bsSamplesListDataGridView.Rows.Count - 1
                                 bsSamplesListDataGridView("OrderToExport", i).Value = myOrderToExportValue
@@ -5395,13 +5387,13 @@ Public Class IResults
 
             End If
 
-            'Finally update DS if required. Applies for:
-            'OrderToPrint: click on item
-            '                           click on header
+            ' Finally update DS if required. Applies for:
+            ' OrderToPrint: click on item
+            '               click on header
             '
-            'OrderToExport: click on item 
-            '               click on header only when new state = unselect all
-            '              (NOTE: click on header when new state = select all the DataSEt refresh will be done in previous loop)
+            ' OrderToExport: click on item 
+            '                click on header only when new state = unselect all
+            '               (NOTE: click on header when new state = select all the DataSEt refresh will be done in previous loop)
             If updateDSRequired Then
                 If Not resultData Is Nothing AndAlso Not resultData.HasError Then
                     If myPatientID <> "" Then 'Click on item
@@ -5426,14 +5418,14 @@ Public Class IResults
                     ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
                 End If
             End If
-            linqRes = Nothing 'Release memory
+            linqRes = Nothing ' Release memory.
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " bsSamplesListDataGridView_CellMouseClick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
-            'If Cursor <> Cursors.Default Then Cursor = Cursors.Default
+            ' If Cursor <> Cursors.Default Then Cursor = Cursors.Default
 
             Cursor = Cursors.Default
         End Try
