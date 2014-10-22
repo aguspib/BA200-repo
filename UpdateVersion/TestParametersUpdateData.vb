@@ -2758,7 +2758,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                                                                myReagentsDS, myTestReagentsDS, New CalibratorsDS, New TestCalibratorsDS, _
                                                                                New TestCalibratorValuesDS, New TestRefRangesDS, New List(Of DeletedCalibratorTO), _
                                                                                myDeletedTestReagentsVolsList, myDeletedTestProgramingList, _
-                                                                               New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
+                                                                               New TestSamplesMultirulesDS, New TestControlsDS, Nothing, String.Empty, False)
                         End If
 
                         'If an error has been raised, then the process is finished

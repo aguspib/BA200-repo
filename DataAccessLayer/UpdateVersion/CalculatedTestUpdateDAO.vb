@@ -231,9 +231,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT BiosystemsID FROM " & GlobalBase.TemporalDBName & ".[dbo].[tparCalculatedTests] " & vbCrLf & _
-                                                " WHERE  PreloadedCalculatedTest = 1 " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
-                                                " SELECT BiosystemsID FROM [Ax00].[dbo].[tparCalculatedTests] " & vbCrLf
+                                                " SELECT BiosystemsID FROM [Ax00].[dbo].[tparCalculatedTests] " & vbCrLf & _
+                                                " WHERE  PreloadedCalculatedTest = 1 " & vbCrLf
 
                         Dim newCalcTestsDS As New CalculatedTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
