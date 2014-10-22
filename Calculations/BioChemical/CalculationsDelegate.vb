@@ -7365,6 +7365,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' Created by AG 02/03/2010 (tested OK)
         ''' Modified by AG 10/09/2010 - add optional parameter ManualRecalculusFlag (default value FALSE)
+        ''' Modified AG: 21/10/2014 BA-2011 calculate CALC tests only for patients accepted
         ''' </remarks>
         Public Function CalculateExecution(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pExecutionID As Integer, _
@@ -7440,7 +7441,7 @@ Namespace Biosystems.Ax00.Calculations
                 'myLogAcciones.CreateLogActivity("Calculate & Save remarks: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "CalculationsDelegate.CalculateExecution", EventLogEntryType.Information, False)
 
                 'AG 12/07/2010 - Calculated Tests operations (if execution OrderTestID is related with aa calculated test orderTestID)
-                If preparation(0).SampleClass = "PATIENT" Then  'Calculated test only for patients
+                If preparation(0).SampleClass = "PATIENT" AndAlso preparation(0).AcceptedResult Then  'Calculated test only for patients (AG 21/10/2014 BA-2011 add condition ACCEPTED!!)
                     Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
                     myCalcTestsDelegate.AnalyzerID = myAnalyzerID
                     myCalcTestsDelegate.WorkSessionID = myWorkSessionID
@@ -8421,6 +8422,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' Created by:  SA 09/07/2012 - Optimization of function CalculateExecution
         ''' Modified by: SA 16/11/2012 - After calling function SaveExecutionResults, update ExecutionStatus = CLOSED for the replicate in process
+        ''' Modified AG: 21/10/2014 BA-2011 calculate CALC tests only for patients accepted
         ''' </remarks>
         Public Function CalculateExecutionNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                               ByVal pExecutionID As Integer, ByVal pRecalculusFlag As Boolean, ByVal pSampleClassRecalculated As String, _
@@ -8490,7 +8492,7 @@ Namespace Biosystems.Ax00.Calculations
                     End If
 
                     'Calculated Tests operations (if execution OrderTestID is related with a calculated test orderTestID)
-                    If (preparation(0).SampleClass = "PATIENT") Then  'Calculated test only for patients
+                    If (preparation(0).SampleClass = "PATIENT") AndAlso preparation(0).AcceptedResult Then  'Calculated test only for patients (AG 21/10/2014 BA-2011 add condition ACCEPTED!!)
                         Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
                         myCalcTestsDelegate.AnalyzerID = myAnalyzerID
                         myCalcTestsDelegate.WorkSessionID = myWorkSessionID

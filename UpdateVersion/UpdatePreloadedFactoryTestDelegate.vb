@@ -351,7 +351,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             resultData = mySTDTestsUpdate.UPDATEModifiedSTDTestSamples(dbConnection, pUpdateVersionChangesList)
                         End If
 
-                        '(8) Execute the Update Version Process for CONTAMINATIONS
+                        '(8) Recalculate Test Position for Preloaded and User STD TESTS
+                        If (Not resultData.HasError) Then
+                            resultData = mySTDTestsUpdate.UpdateTestSortByTestName(pDBConnection)
+                        End If
+
+                        '(9) Execute the Update Version Process for CONTAMINATIONS
                         If (Not resultData.HasError) Then
                             Dim myContaminationsUpdate As New ContaminationsUpdateData
                             resultData = myContaminationsUpdate.ProcessCONTAMINATIONS(dbConnection, pUpdateVersionChangesList)

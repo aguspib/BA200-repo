@@ -842,7 +842,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
                     Dim cmdText As String = " UPDATE thisTestSamples " & vbCrLf & _
-                                            " SET    TestName = N'" & pTestName.Replace("'", "''").Trim & "', " & vbCrLf & _
+                                            " SET    TestName = N'" & pTestName.Replace("'", "''").Trim & "' " & vbCrLf & _
                                             " WHERE  TestID   = " & pTestID.ToString & vbCrLf & _
                                             " AND    ClosedTestSample = 0 " & vbCrLf & _
                                             " AND    ClosedTestVersion = 0 " & vbCrLf

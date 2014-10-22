@@ -8709,6 +8709,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SG 10/04/2012
         ''' AG 02/04/2014 - #1564 add parameter pSetDateTime (when TRUE the DAO has to inform ExportDateTime, else leave as NULL)
         ''' AG 30/07/2014 - #1887 OrderToExport management
+        ''' AG 21/10/2014 - BA-2011 remember the affected results
         ''' </remarks>
         Public Function UpdateExportStatusByMessageID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pLISMessageID As String, _
@@ -8730,15 +8731,21 @@ Namespace Biosystems.Ax00.BL
                         'resultData = myDAO.UpdateExportStatusByMessageID(dbConnection, pLISMessageID, pNewExportStatus)
                         resultData = myDAO.UpdateExportStatusByMessageID(dbConnection, pLISMessageID, pNewExportStatus, pSetDateTime)
 
-                        'AG 30/07/2014 #1887 - OrderToExport management
-                        Dim myOrder As New OrdersDelegate
-                        If pNewExportStatus = "SENT" Then
-                            resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
-                        Else
-                            'Set OrderToExport = TRUE because some result sent to LIS has not been accepted!!!
-                            resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
+                        If Not resultData.HasError Then
+                            Dim myAffected As Integer = resultData.AffectedRecords 'AG 21/10/2014 BA-2011
+
+                            'AG 30/07/2014 #1887 - OrderToExport management
+                            Dim myOrder As New OrdersDelegate
+                            If pNewExportStatus = "SENT" Then
+                                resultData = myOrder.SetNewOrderToExportValue(dbConnection, , , pLISMessageID)
+                            Else
+                                'Set OrderToExport = TRUE because some result sent to LIS has not been accepted!!!
+                                resultData = myOrder.UpdateOrderToExport(dbConnection, True, , , pLISMessageID)
+                            End If
+                            'AG 30/07/2014
+
+                            resultData.AffectedRecords = myAffected 'AG 21/10/2014 BA-2011
                         End If
-                        'AG 30/07/2014
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -8828,6 +8835,11 @@ Namespace Biosystems.Ax00.BL
                                 ' Return dataset with all accepted results that have mapping with LIS.
                                 resultData.HasError = False
                                 resultData.SetDatos = myNewDataSet
+
+                                'AG 21/10/2014 BA-2018 remove the error flag!!!
+                                resultData.HasError = False
+                                resultData.ErrorCode = ""
+
                             End If
 
                         End If

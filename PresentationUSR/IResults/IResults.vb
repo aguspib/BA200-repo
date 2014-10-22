@@ -122,6 +122,7 @@ Public Class IResults
 
     Private LISSubHeaderImage As Byte() = Nothing
     Private LISHeadImage As Image = Nothing
+    Private LISHeadCheckImage As Image = Nothing 'IT 21/10/2014: BA-2036
     Private PrintHeadImage As Image = Nothing
     Private LISExperimentalHeadImage As Image = Nothing
     Private LISControlHeadImage As Image = Nothing
@@ -1708,7 +1709,8 @@ Public Class IResults
                         e.Handled = True
                     Else
                         'Not to draw the header icon - SGM 16/04/2013
-                        'e.Graphics.DrawImage(LISHeadImage, HeadRect)
+                        e.Graphics.DrawImage(LISHeadCheckImage, HeadRect) 'IT 21/10/2014: BA-2036
+                        e.Handled = True 'IT 21/10/2014: BA-2036
                     End If
                     'e.Handled = True SGM 16/04/2013
                 End If
@@ -2916,8 +2918,14 @@ Public Class IResults
                 'END RH 19/10/2011
 
                 LISHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
-
             End If
+
+            'IT 21/10/2014: INI BA-2036
+            auxIconName = GetIconName("EXPORTHEADCHECK")
+            If (auxIconName <> String.Empty) Then
+                LISHeadCheckImage = Image.FromFile(iconPath & GetIconName("EXPORTHEADCHECK"))
+            End If
+            'IT 21/10/2014: END BA-2036
 
 
             Const PicLeft As Integer = 7

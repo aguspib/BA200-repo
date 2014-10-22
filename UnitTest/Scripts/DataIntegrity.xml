@@ -2903,9 +2903,9 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.10</Version>
-    <Label>Count ALL new images (sort tests button, control's report)</Label>
+    <Label>Count ALL new images (sort tests button, control's report, export head check)</Label>
     <Script>
-      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND (ItemID = 'ORDER_TESTS' OR ItemId = 'COMPACTPRINTCTR')) = 2)
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'ICON_PATHS' AND (ItemID = 'ORDER_TESTS' OR ItemId = 'COMPACTPRINTCTR' OR ItemID = 'EXPORTHEADCHECK')) = 3)
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -2971,11 +2971,10 @@
     <Result>True</Result>
   </IntegrityValidation>
   <IntegrityValidation>
-    <Version>3.03</Version>
-    <Label>Data validation in tfmwVersions Table</Label>
+    <Version>3.10</Version>
+    <Label>Translate user manual for russian language</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.3'
-      AND ServiceSoftware = '1.2.3' AND FirmwareScripts = '1.1.0' AND Firmware = '2.12')= 1
+      IF (SELECT COUNT(*) FROM tfmwHelpFilesSetting WHERE TypeID = 'MANUAL_USR' AND Language = 'RUS' AND HelpFileName = 'HelpFiles\TEUS00048-01-RUS.pdf') = 1
       SELECT 'True'
       ELSE
       SELECT 'False'
