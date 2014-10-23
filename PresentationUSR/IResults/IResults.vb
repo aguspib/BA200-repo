@@ -5354,7 +5354,7 @@ Public Class IResults
                                 End If
 
                             Else
-                                ' For current Patient Row the checkbox was not selected:
+                                ' For current Patient Row the checkbox was selected:
                                 ' -> Do nothing...
                             End If
 
