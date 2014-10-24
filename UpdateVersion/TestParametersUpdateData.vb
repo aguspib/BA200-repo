@@ -3477,15 +3477,18 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Try
                 Dim myCustomerTestDS As New TestsDS
+                Dim myCustomerTestSampleDS As New TestSamplesDS
                 Dim myUpdatedReagentsVolsDS As New TestReagentsVolumesDS
                 Dim myFactoryReagentsVolsDS As New TestReagentsVolumesDS
                 Dim myCustomerReagentsVolsDS As New TestReagentsVolumesDS
 
                 Dim myTestsDelegate As New TestsDelegate
+                Dim myTestSamplesDelegate As New TestSamplesDelegate
                 Dim myReagentVolsDelegate As New TestReagentsVolumeDelegate
                 Dim myTestParametersUpdateDAO As New TestParametersUpdateDAO
 
                 Dim deleteBlkCalibResults As Boolean = False
+                Dim deleteOnlyCalibResults As Boolean = False
                 Dim myDeletedTestProgramingTO As New DeletedTestProgramingTO
                 Dim myDeletedTestProgramingList As New List(Of DeletedTestProgramingTO)
 
@@ -3519,6 +3522,17 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             Else
                                 'If a STD Test/SampleType has been informed, get the TestsDS received as entry parameter
                                 myCustomerTestDS = pCustomerTestDS
+                            End If
+
+                            'Get values for the STD Test/Sample Type in CUSTOMER DB
+                            If (Not myGlobalDataTO.HasError) Then
+                                myGlobalDataTO = myTestSamplesDelegate.GetDefinition(pDBConnection, myTestID, mySampleType, False)
+                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                    myCustomerTestSampleDS = DirectCast(myGlobalDataTO.SetDatos, TestSamplesDS)
+
+                                    'This case is not possible...
+                                    If (myCustomerTestSampleDS.tparTestSamples.Rows.Count = 0) Then myGlobalDataTO.HasError = True
+                                End If
                             End If
 
                             'Get values of Reagents Volumes for the STD Test/SampleType in FACTORY DB (to get Steps fields)
@@ -3588,24 +3602,44 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 'If previous Results of Blanks and Calibrators for the STD Tests have to be deleted, prepare the needed TO
                                 If (Not myGlobalDataTO.HasError) Then
                                     If (deleteBlkCalibResults) Then
-                                        'Add the TestID, SampleType and TestVersionNumber to the TO of Tests to delete, and mark DeleteBlankCalibResults = TRUE
-                                        myDeletedTestProgramingTO.TestID = myTestID
-                                        myDeletedTestProgramingTO.SampleType = mySampleType
-                                        myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
-                                        myDeletedTestProgramingTO.DeleteBlankCalibResults = False
-                                        myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = True
-                                        myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
+                                        If (myCustomerTestSampleDS.tparTestSamples.First.DefaultSampleType) Then
+                                            'If the SampleType is the default for the Test, Blank and Calibrator Results have to be deleted
+                                            deleteOnlyCalibResults = False
+                                            deleteBlkCalibResults = True
+                                        Else
+                                            If (myCustomerTestSampleDS.tparTestSamples.First.CalibratorType = "EXPERIMENT") Then
+                                                'If the SampleType is not the default for the Test, only the Calibrator Results have to be deleted, while the Blank Results remain
+                                                deleteOnlyCalibResults = True
+                                                deleteBlkCalibResults = False
+                                            Else
+                                                'If the Test/SampleType was calibrated with an Alternative Calibrator, or using a Factor, Blank and Calibrator
+                                                'Results do not have to be deleted although Sample and/or Reagents Volumes have changed
+                                                deleteOnlyCalibResults = False
+                                                deleteBlkCalibResults = False
+                                            End If
+                                        End If
 
-                                        'Call the function to delete previous results of Blank and Calibrator for the Test/SampleType
-                                        myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, _
-                                                                                           New TestReagentsVolumesDS, New ReagentsDS, New TestReagentsDS, New CalibratorsDS, _
-                                                                                           New TestCalibratorsDS, New TestCalibratorValuesDS, New TestRefRangesDS, _
-                                                                                           New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
-                                                                                           myDeletedTestProgramingList, New TestSamplesMultirulesDS, New TestControlsDS, _
-                                                                                           Nothing)
+                                        If (deleteBlkCalibResults OrElse deleteOnlyCalibResults) Then
+                                            'Add the TestID, SampleType and TestVersionNumber to the TO of Tests with programming values changed, and mark flags DeleteBlankCalibResults
+                                            'and DeleteOnlyCalibrationResult with the corresponding local variable value
+                                            myDeletedTestProgramingTO.TestID = myTestID
+                                            myDeletedTestProgramingTO.SampleType = IIf(deleteBlkCalibResults, String.Empty, mySampleType).ToString
+                                            myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
+                                            myDeletedTestProgramingTO.DeleteBlankCalibResults = deleteBlkCalibResults
+                                            myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = deleteOnlyCalibResults
+                                            myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
 
-                                        'If an error has happened, then the process finishes
-                                        If (myGlobalDataTO.HasError) Then Exit For
+                                            'Call the function to delete previous results of Blank and Calibrator for the Test/SampleType
+                                            myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, _
+                                                                                               New TestReagentsVolumesDS, New ReagentsDS, New TestReagentsDS, New CalibratorsDS, _
+                                                                                               New TestCalibratorsDS, New TestCalibratorValuesDS, New TestRefRangesDS, _
+                                                                                               New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
+                                                                                               myDeletedTestProgramingList, New TestSamplesMultirulesDS, New TestControlsDS, _
+                                                                                               Nothing)
+
+                                            'If an error has happened, then the process finishes
+                                            If (myGlobalDataTO.HasError) Then Exit For
+                                        End If
                                     End If
                                 End If
                             End If
@@ -3660,7 +3694,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myTestSamplesDelegate As New TestSamplesDelegate
                 Dim myTestParametersUpdateDAO As New TestParametersUpdateDAO
 
+                Dim deleteOnlyCalibResults As Boolean = False
                 Dim deleteBlankCalibResults As Boolean = False
+                Dim myCustomerCalibType As String = String.Empty
                 Dim myDeletedTestProgramingTO As New DeletedTestProgramingTO
                 Dim myDeletedTestProgramingList As New List(Of DeletedTestProgramingTO)
 
@@ -3676,6 +3712,9 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         myGlobalDataTO = myTestsDelegate.Read(pDBConnection, updatedTestSample.TestID)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             myCustomerTestDS = DirectCast(myGlobalDataTO.SetDatos, TestsDS)
+
+                            'This case is not possible...
+                            If (myCustomerTestDS.tparTests.Rows.Count = 0) Then myGlobalDataTO.HasError = True
                         End If
 
                         '(1.1.2) Get data of the SampleType for the STD Test in Customer DB
@@ -3683,11 +3722,18 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             myGlobalDataTO = myTestSamplesDelegate.GetDefinition(pDBConnection, updatedTestSample.TestID, updatedTestSample.SampleType, False)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 myCustomerTestSampleDS = DirectCast(myGlobalDataTO.SetDatos, TestSamplesDS)
+
+                                'This case is not possible...
+                                If (myCustomerTestSampleDS.tparTestSamples.Rows.Count = 0) Then myGlobalDataTO.HasError = True
                             End If
                         End If
 
                         '(1.1.3) Verify changed fields and update values in myCustomerTestSampleDS
                         If (Not myGlobalDataTO.HasError) Then
+                            'Before update fields in Customer DS, store in a local variable the current CalibrationType in CUSTOMER DB
+                            myCustomerCalibType = myCustomerTestSampleDS.tparTestSamples.First.CalibratorType
+
+                            'Verify changes in Test/SampleType fields 
                             myGlobalDataTO = UpdateCustomerTestSamples(updatedTestSample, myCustomerTestSampleDS.tparTestSamples.First, myCustomerTestDS.tparTests.First.TestName, _
                                                                        myCustomerTestDS.tparTests.First.ShortName, pUpdateVersionChangesList)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -3698,7 +3744,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         '(1.1.4) Verify if there are changes in Volumes of Reagents used for the STD Test/SampleType
                         If (Not myGlobalDataTO.HasError) Then
                             myCustomerReagentsVolsDS = New TestReagentsVolumesDS
-                            myGlobalDataTO = UPDATEModifiedReagentVols(pDBConnection, True, pUpdateVersionChangesList, updatedTestSample.TestID, updatedTestSample.SampleType, _
+                            myGlobalDataTO = UpdateModifiedReagentVols(pDBConnection, True, pUpdateVersionChangesList, updatedTestSample.TestID, updatedTestSample.SampleType, _
                                                                        myCustomerReagentsVolsDS, myCustomerTestDS)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 If (Not deleteBlankCalibResults) Then deleteBlankCalibResults = Convert.ToBoolean(myGlobalDataTO.SetDatos)
@@ -3708,13 +3754,33 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         '(1.1.5) If previous Results of Blanks and Calibrators for the STD Tests have to be deleted, prepare the needed TO
                         If (Not myGlobalDataTO.HasError) Then
                             If (deleteBlankCalibResults) Then
-                                'Add the TestID, SampleType and TestVersionNumber to the TO of Tests to delete, and mark DeleteBlankCalibResults = TRUE
-                                myDeletedTestProgramingTO.TestID = updatedTestSample.TestID
-                                myDeletedTestProgramingTO.SampleType = updatedTestSample.SampleType
-                                myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
-                                myDeletedTestProgramingTO.DeleteBlankCalibResults = False
-                                myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = True
-                                myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
+                                If (myCustomerTestSampleDS.tparTestSamples.First.DefaultSampleType) Then
+                                    'If the SampleType is the default for the Test, Blank and Calibrator Results have to be deleted
+                                    deleteOnlyCalibResults = False
+                                    deleteBlankCalibResults = True
+                                Else
+                                    If (myCustomerCalibType = "EXPERIMENT") Then
+                                        'If the SampleType is not the default for the Test, only the Calibrator Results have to be deleted, while the Blank Results remain
+                                        deleteOnlyCalibResults = True
+                                        deleteBlankCalibResults = False
+                                    Else
+                                        'If the Test/SampleType was calibrated with an Alternative Calibrator, or using a Factor, Blank and Calibrator
+                                        'Results do not have to be deleted although Sample and/or Reagents Volumes have changed
+                                        deleteOnlyCalibResults = False
+                                        deleteBlankCalibResults = False
+                                    End If
+                                End If
+
+                                If (deleteBlankCalibResults OrElse deleteOnlyCalibResults) Then
+                                    'Add the TestID, SampleType and TestVersionNumber to the TO of Tests with programming values changed, and mark flags DeleteBlankCalibResults
+                                    'and DeleteOnlyCalibrationResult with the corresponding local variable value
+                                    myDeletedTestProgramingTO.TestID = updatedTestSample.TestID
+                                    myDeletedTestProgramingTO.SampleType = IIf(deleteBlankCalibResults, String.Empty, updatedTestSample.SampleType).ToString
+                                    myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
+                                    myDeletedTestProgramingTO.DeleteBlankCalibResults = deleteBlankCalibResults
+                                    myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = deleteOnlyCalibResults
+                                    myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
+                                End If
                             End If
                         End If
 
