@@ -719,6 +719,74 @@ Namespace Biosystems.Ax00.Core.Entities
             InitStructures(True, False) 'Clear well base line parameters on RESET worksession
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub Initialize() Implements IBaseLineEntity.Initialize
+            Try
+                'Field limits and Sw parameters variables (default value based on SPEC document but they are initialized in method GetClassParameterValues)
+                'Adjust base line limits
+                DAC_LIMIT_MIN = (1 / 1.4)
+                DAC_LIMIT_MAX = 2
+                MAINLIGHT_COUNTS_LIMIT_MIN = 600000
+                MAINLIGHT_COUNTS_LIMIT_MAX = 930000
+                REFLIGHT_COUNTS_LIMIT_MIN = 100000
+                REFLIGHT_COUNTS_LIMIT_MAX = 930000
+                MAINDARK_COUNTS_LIMIT_MIN = 3000
+                MAINDARK_COUNTS_LIMIT_MAX = 6000
+                REFDARK_COUNTS_LIMIT_MIN = 3000
+                REFDARK_COUNTS_LIMIT_MAX = 6000
+                BL_WELLREJECT_INI_SD = 0.027
+                BL_WELLREJECT_INI_WELLNUMBER = 10
+
+                'Well base line initialization process limits
+                BL_WELLREJECT_INI_RANGE_LIMIT_MIN = -0.08
+                BL_WELLREJECT_INI_RANGE_LIMIT_MAX = 0.08
+                BL_WELLREJECT_INI_ABS_LIMIT_MIN = -0.08
+                BL_WELLREJECT_INI_ABS_LIMIT_MAX = 0.08
+                BL_WELLREJECTED_INI_LIMIT_MIN = 1
+                BL_WELLREJECTED_INI_LIMIT_MAX = 3
+                BL_WELLREJECT_ITEMS_NOTUSED = 7
+
+                'Well base line (running) process limits
+                BL_WELLREJECT_RANGE_LIMIT_MIN = -0.08
+                BL_WELLREJECT_RANGE_LIMIT_MAX = 0.08
+                BL_WELLREJECT_ABS_LIMIT_MIN = -0.08
+                BL_WELLREJECT_ABS_LIMIT_MAX = 0.08
+                BL_WELLREJECT_SD = 0.027
+
+                PATH_LENGHT = 6.11
+                LIMIT_ABS = 3.3
+                MAX_REJECTED_WELLS = 20 'Max rejected wells allowed in one reactions rotor
+                MAX_REACTROTOR_WELLS = 120 'Max wells in reactions rotor
+
+                WASHSTATION_BLW_LIMIT_MIN = -7 'BLW value - 7 ... BLW value: wells in washing station
+                WASHSTATION_BLW_LIMIT_MAX = 3 'BLW value ... BLW value + 3 : wells in washing station
+
+                myAnalyzerID = ""
+
+                fieldLimitsAttribute = New FieldLimitsDS
+                swParametersAttribute = New ParametersDS
+                instrumentAdjustments = New SRVAdjustmentsDS
+                validAlightAttribute = False
+                existsAlightResultsAttribute = False 'AG 20/06/2012
+
+                adjustBL = New AdjustBaseLine
+                wellBL = New wellBaseLine
+                rejectionParameters = New initializationParameters
+                InitializationComplete = False
+                myListOfRejectedWells = New List(Of Integer)
+
+                BL_CONSECUTIVEREJECTED_WELL = 30
+                consecutiveRejectedWells = 0
+                exitRunningTypeAttribute = 0
+
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
 #End Region
 
 #Region "Private Base Line Calculations Methods"

@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.IO
 Imports System.Drawing.Printing
+Imports Biosystems.Ax00.App
 
 
 Public Class AnalyzerInfo
@@ -184,7 +185,9 @@ Public Class AnalyzerInfo
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
     ''' <param name="pRefreshDS"></param>
-    ''' <remarks>Created by XBC 25/05/2011</remarks>
+    ''' <remarks>Created by XBC 25/05/2011
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         'Dim myGlobal As New GlobalDataTO
         Try
@@ -194,42 +197,42 @@ Public Class AnalyzerInfo
 
                 'SGM 17/09/2012
                 'ISE Monitor Data changed
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
-                    'Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS) = 0 'Once updated UI clear sensor
+                    'AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS) = 0 'Once updated UI clear sensor
                 End If
                 'end SGM 17/09/2012
 
                 'SGM 20/04/2012
                 'ISE initiated
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
                 If sensorValue >= 1 Then
                     ScreenWorkingProcess = False
 
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
 
                     MyBase.ActivateMDIMenusButtons(True)
 
                 End If
 
                 'ISE procedure finished
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
 
                 End If
                 'end SGM 20/04/2012
 
                 'SGM 10/10/2012 - Serial Number saved
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.SERIAL_NUMBER_SAVED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.SERIAL_NUMBER_SAVED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.SERIAL_NUMBER_SAVED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.SERIAL_NUMBER_SAVED) = 0 'Once updated UI clear sensor
 
-                    Select Case MyBase.myServiceMDI.MDIAnalyzerManager.SaveSNResult
+                    Select Case AnalyzerController.Instance.Analyzer.SaveSNResult
                         Case UTILSNSavedResults.OK : MyBase.CurrentMode = ADJUSTMENT_MODES.SAVED
                         Case UTILSNSavedResults.KO : MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                     End Select
@@ -525,7 +528,7 @@ Public Class AnalyzerInfo
                     MyClass.PrepareErrorMode()
             End Select
 
-            'If Not MyBase.SimulationMode And Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            'If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
             '    MyClass.PrepareErrorMode()
             'End If
 
@@ -562,7 +565,7 @@ Public Class AnalyzerInfo
                     MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
-                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                     End If
                     'Application.DoEvents()
@@ -590,7 +593,7 @@ Public Class AnalyzerInfo
     Private Sub WaitProcessSimulation()
         Try
             ' TEMPORAL FINS QUE FUNCIONI POLLFW !!!
-            'If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+            'If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
             '    Exit Sub
             'End If
 
@@ -616,9 +619,9 @@ Public Class AnalyzerInfo
     '            'the INFO data refreshing mode must be deactivated before reading adjustments
     '            'SGM 19/09/2011
     '            If Ax00ServiceMainMDI.MDIAnalyzerManager IsNot Nothing Then
-    '                If MyClass.myAnalyzerManager.Connected Then
+    '                If AnalyzerController.Instance.Analyzer.Connected Then
 
-    '                    myGlobal = Ax00ServiceMainMDI.MDIAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
+    '                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
     '                                                         True, _
     '                                                         Nothing, _
     '                                                         GlobalEnumerates.Ax00InfoInstructionModes.STP)
@@ -662,7 +665,7 @@ Public Class AnalyzerInfo
 
                 '' TO DELETE
                 'myScreenDelegate.ReadFWDone = True
-                'myScreenDelegate.myFwScriptDelegate.AnalyzerManager.IsFwSwCompatible = True
+                'myScreenDelegate.AnalyzerController.Instance.Analyzer.IsFwSwCompatible = True
                 'MyClass.CurrentMode = ADJUSTMENT_MODES.FW_READED
                 'PrepareArea()
                 'Exit Try
@@ -691,11 +694,11 @@ Public Class AnalyzerInfo
                     myResultData = myScreenDelegate.REQUEST_FW_INFO()
 
                     ''pending - stop connection process when E:21 (Recover needed)
-                    'If Not MyBase.myServiceMDI.MDIAnalyzerManager.IsInstructionAborted Then
+                    'If Not AnalyzerController.Instance.Analyzer.IsInstructionAborted Then
                     '    myResultData = myScreenDelegate.REQUEST_FW_INFO()
                     'Else
                     '    MyBase.myServiceMDI.IsAutoConnecting = False
-                    '    MyBase.myServiceMDI.MDIAnalyzerManager.IsAutoInfoActivated = True
+                    '    AnalyzerController.Instance.Analyzer.IsAutoInfoActivated = True
                     '    MyBase.myServiceMDI.SEND_INFO_STOP()
                     '    If wfPreload IsNot Nothing Then wfPreload.Close()
                     '    MyBase.ActivateMDIMenusButtons(True)
@@ -704,9 +707,9 @@ Public Class AnalyzerInfo
                 End If
 
 
-                    If myResultData.HasError Then
-                        Me.PrepareErrorMode()
-                    End If
+                If myResultData.HasError Then
+                    Me.PrepareErrorMode()
+                End If
             End If
 
         Catch ex As Exception
@@ -724,7 +727,7 @@ Public Class AnalyzerInfo
         Try
             If MyBase.SimulationMode Then
                 ' Condition just to test
-                myScreenDelegate.myFwScriptDelegate.AnalyzerManager.IsFwSwCompatible = True
+                AnalyzerController.Instance.Analyzer.IsFwSwCompatible = True '#REFACTORING
                 'myScreenDelegate.FwCompatible = True
             End If
 
@@ -789,8 +792,8 @@ Public Class AnalyzerInfo
     Private Sub PrepareStandByDoneMode()
         Try
             If MyBase.SimulationMode Then
-                MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY
-                MyBase.myServiceMDI.bsAnalyzerStatus.Text = MyClass.myAnalyzerManager.AnalyzerStatus.ToString
+                AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY '#REFACTORING
+                MyBase.myServiceMDI.bsAnalyzerStatus.Text = AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString '#REFACTORING
             End If
 
             MyBase.myServiceMDI.isWaitingForStandBy = False 'SGM 15/11/2011
@@ -838,7 +841,7 @@ Public Class AnalyzerInfo
                     myScreenDelegate.ReadAnalyzerInfoDone = True
                     PrepareAnalyzerInfoReadedMode()
                 Else
-                    If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then '#REFACTORING
                         myGlobal = myScreenDelegate.REQUEST_ANALYZER_INFO()
                     Else
                         Me.PrepareErrorMode()
@@ -923,7 +926,7 @@ Public Class AnalyzerInfo
                 MyClass.TestProcessTimer.Enabled = True
 
             Else
-                If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
 
                     ' XBC 13/10/2011 - wfPreload object not exist !
                     ''SGM 29/09/2011
@@ -932,11 +935,11 @@ Public Class AnalyzerInfo
                     'Me.wfPreload.Title = myText1
                     ''end SGM 29/09/2011
 
-                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = MyBase.myServiceMDI.SEND_STANDBY
                         CreateLogActivity("Send Standby ", Me.Name & ".PrepareInitiatingAnalyzerMode ", EventLogEntryType.Information, False)
                     End If
-                ElseIf Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                ElseIf AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then '#REFACTORING
                     MyClass.CurrentMode = ADJUSTMENT_MODES.STANDBY_DONE
                     PrepareArea()
                 Else
@@ -1072,7 +1075,7 @@ Public Class AnalyzerInfo
             Me.myServiceMDI.UpdatePreliminaryHomesMasterData(Nothing, myScreenDelegate.SerialNumber)
             ' Generate data content for adjustments before read them from the Instrument
             Dim myAdjustmentsDelegate As New DBAdjustmentsDelegate
-            myResultData = myAdjustmentsDelegate.CopyCurrentAdjustments(Nothing, Me.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer, myScreenDelegate.SerialNumber)
+            myResultData = myAdjustmentsDelegate.CopyCurrentAdjustments(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, myScreenDelegate.SerialNumber) '#REFACTORING
 
             If Not myResultData.HasError Then
                 MyClass.PrepareLoadingMode()
@@ -1158,6 +1161,10 @@ Public Class AnalyzerInfo
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>Modified by: IT 23/10/2014 - REFACTORING (BA-2016)</remarks>
     Private Sub WriteInfoToScreen()
         Dim myGlobal As New GlobalDataTO
         Dim validationOK As Boolean
@@ -1179,9 +1186,9 @@ Public Class AnalyzerInfo
             ' Analyzer Serial number
             ' XBC 07/06/2012
             'Me.bsSerialTextBox.Text = myScreenDelegate.InfoFirmware(GlobalEnumerates.POLL_IDs.CPU).AnalyzerSerialNumber.ToString
-            Me.bsModelTextBox.Text = Me.myServiceMDI.MDIAnalyzerManager.GetUpperPartSN(Me.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer)
-            Me.bsSerialTextBox.Text = Me.myServiceMDI.MDIAnalyzerManager.GetLowerPartSN(Me.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer)
-            Me.bsFwVersionLabel2.Text = Me.myServiceMDI.MDIAnalyzerManager.ActiveFwVersion
+            Me.bsModelTextBox.Text = AnalyzerController.Instance.Analyzer.GetUpperPartSN(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
+            Me.bsSerialTextBox.Text = AnalyzerController.Instance.Analyzer.GetLowerPartSN(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
+            Me.bsFwVersionLabel2.Text = AnalyzerController.Instance.Analyzer.ActiveFwVersion
             ' XBC 07/06/2012
 
             AppendRegularText(Me.BsRichTextBox1, "Initializating Program CPU " + vbCrLf)
@@ -2528,9 +2535,10 @@ Public Class AnalyzerInfo
             'Me.bsSerialTextBox.Text = "x.0000000000"
             'Me.bslModelLabel.Text = "842"
             'Me.bsSerialTextBox.Text = "000000000"
-            Me.bsModelTextBox.Text = Me.myServiceMDI.MDIAnalyzerManager.GetUpperPartSN(Me.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer)
-            Me.bsSerialTextBox.Text = Me.myServiceMDI.MDIAnalyzerManager.GetLowerPartSN(Me.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer)
-            Me.bsFwVersionLabel2.Text = Me.myServiceMDI.MDIAnalyzerManager.ActiveFwVersion
+            '#REFACTORING
+            Me.bsModelTextBox.Text = AnalyzerController.Instance.Analyzer.GetUpperPartSN(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
+            Me.bsSerialTextBox.Text = AnalyzerController.Instance.Analyzer.GetLowerPartSN(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
+            Me.bsFwVersionLabel2.Text = AnalyzerController.Instance.Analyzer.ActiveFwVersion
             ' XBC 07/06/2012
 
 
@@ -3018,7 +3026,7 @@ Public Class AnalyzerInfo
 
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal.ErrorCode = "ERROR_COMM"
                 myGlobal.HasError = True
             End If
@@ -3044,7 +3052,7 @@ Public Class AnalyzerInfo
     End Sub
 
     Private Sub AnalyzerInfo_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
-        If Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+        If AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
             Me.Hide()
             Me.PrepareLoadingMode()
         Else
@@ -3122,7 +3130,7 @@ Public Class AnalyzerInfo
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     mySwVersion = myGlobal.SetDatos.ToString
 
-                    myGlobal = MyBase.myServiceMDI.MDIAnalyzerManager.GetFwVersionNeeded(mySwVersion)
+                    myGlobal = AnalyzerController.Instance.Analyzer.GetFwVersionNeeded(mySwVersion) '#REFACTORING
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         Dim myNeededFwVersion As String = CStr(myGlobal.SetDatos)
 
@@ -3131,7 +3139,7 @@ Public Class AnalyzerInfo
 
                         Dim myMsgList As New List(Of String)
                         myMsgList.Add(Messages.FW_VERSION_NOT_VALID.ToString)
-                        If MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then
+                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                             myMsgList.Add("")
                             myMsgList.Add(Messages.FW_UPDATE_NEEDED.ToString)
                         End If
@@ -3318,7 +3326,7 @@ Public Class AnalyzerInfo
                     MyClass.CurrentMode = ADJUSTMENT_MODES.SAVED
                     PrepareArea()
                 Else
-                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
 
                         'SGM - 04/10/2012
                         Dim myUtilCommand As New UTILCommandTO()

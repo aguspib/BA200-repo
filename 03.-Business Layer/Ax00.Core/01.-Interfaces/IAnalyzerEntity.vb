@@ -13,26 +13,26 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property BaseLine As IBaseLineEntity
         Property ISEAnalyzer As IISEAnalyzerEntity
 
-        Property classInitializationError() As Boolean '15/07/2011 AG
-        Property ActiveWorkSession() As String '19/04/2010 AG
-        ReadOnly Property WorkSessionStatus() As String ' XBC 14/06/2012
-        Property ActiveAnalyzer() As String '19/04/2010 AG
-        Property ActiveFwVersion() As String 'SGM 28/11/2011    
-        Property ReadedFwVersion() As String 'SGM 28/11/2011
-        Property CommThreadsStarted() As Boolean '21/04/2010 AG
-        ReadOnly Property Connected() As Boolean '22/04/2010 AG
+        Property classInitializationError() As Boolean
+        Property ActiveWorkSession() As String
+        ReadOnly Property WorkSessionStatus() As String
+        Property ActiveAnalyzer() As String
+        Property ActiveFwVersion() As String
+        Property ReadedFwVersion() As String
+        Property CommThreadsStarted() As Boolean
+        ReadOnly Property Connected() As Boolean
         Property IsShutDownRequested() As Boolean
         Property IsUserConnectRequested() As Boolean
-        Property PortName() As String '22/04/2010 AG
-        Property Bauds() As String '22/04/2010 AG
-        Property AnalyzerIsReady() As Boolean '19/05/2010 AG
+        Property PortName() As String
+        Property Bauds() As String
+        Property AnalyzerIsReady() As Boolean
         Property AnalyzerStatus() As GlobalEnumerates.AnalyzerManagerStatus
-        Property AnalyzerCurrentAction() As GlobalEnumerates.AnalyzerManagerAx00Actions 'AG 01/06/2010
-        Property InstructionSent() As String '20/10/2010 AG
-        Property InstructionReceived() As String '20/10/2010 AG
-        Property InstructionTypeReceived() As GlobalEnumerates.AnalyzerManagerSwActionList '02/11/2010 AG
-        ReadOnly Property InstructionTypeSent() As GlobalEnumerates.AppLayerEventList '27/03/2012 AG
-        Property ISEModuleIsReady() As Boolean '18/01/2011 AG
+        Property AnalyzerCurrentAction() As GlobalEnumerates.AnalyzerManagerAx00Actions
+        Property InstructionSent() As String
+        Property InstructionReceived() As String
+        Property InstructionTypeReceived() As GlobalEnumerates.AnalyzerManagerSwActionList
+        ReadOnly Property InstructionTypeSent() As GlobalEnumerates.AppLayerEventList
+        Property ISEModuleIsReady() As Boolean
         ReadOnly Property Alarms() As List(Of GlobalEnumerates.Alarms)
         ReadOnly Property ErrorCodes() As String
         Property IsServiceAlarmInformed() As Boolean
@@ -41,21 +41,21 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property IsConfigGeneralProcess() As Boolean
         ReadOnly Property AnalyzerIsFreeze() As Boolean
         ReadOnly Property AnalyzerFreezeMode() As String
-        Property SessionFlag(ByVal pFlag As GlobalEnumerates.AnalyzerManagerFlags) As String '19/04/2010 AG
+        Property SessionFlag(ByVal pFlag As GlobalEnumerates.AnalyzerManagerFlags) As String
         ReadOnly Property GetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single
         WriteOnly Property SetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single
         ReadOnly Property MaxWaitTime() As Integer
         ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean
         ReadOnly Property ShowBaseLineParameterFailedMessage() As Boolean
         ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable
-        ReadOnly Property ValidALIGHT() As Boolean '20/05/2011 AG
-        ReadOnly Property ExistsALIGHT() As Boolean '20/06/2012 AG
+        ReadOnly Property ValidALIGHT() As Boolean
+        ReadOnly Property ExistsALIGHT() As Boolean
         ReadOnly Property CurrentWell() As Integer
-        Property BarCodeProcessBeforeRunning() As AnalyzerEntity.BarcodeWorksessionActions 'AG 04/08/2011
+        Property BarCodeProcessBeforeRunning() As AnalyzerEntity.BarcodeWorksessionActions
         ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
         ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String
         ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String
-        ReadOnly Property Ringing() As Boolean '26/10/2011 AG
+        ReadOnly Property Ringing() As Boolean
         Property IsAutoInfoActivated() As Boolean
         Property IsAlarmInfoRequested() As Boolean
         Property IsInstructionRejected() As Boolean
@@ -67,7 +67,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property RecoverInstructionSent() As Boolean
         ReadOnly Property PauseInstructionSent() As Boolean
         ReadOnly Property ContinueAlreadySentFlag() As Boolean
-        Property InfoActivated() As Integer 'AG 14/03/2012
+        Property InfoActivated() As Integer
         Property IsStressing() As Boolean
         Property IsFwSwCompatible() As Boolean
         Property IsFwReaded() As Boolean
@@ -83,9 +83,11 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property ErrorCodesDisplay() As List(Of AnalyzerEntity.ErrorCodesDisplayStruct)
         Property InfoRefreshFirstTime() As Boolean
         ReadOnly Property LastExportedResults() As ExecutionsDS
-        WriteOnly Property autoWSCreationWithLISMode() As Boolean 'AG 11/07/2013
+        WriteOnly Property autoWSCreationWithLISMode() As Boolean
         ReadOnly Property AllowScanInRunning() As Boolean
         Property BarcodeStartInstrExpected As Boolean
+        Property FWUpdateResponseData As FWUpdateResponseTO '#REFACTORING
+        Property AdjustmentsFilePath As String '#REFACTORING
 
 #End Region
 
@@ -95,6 +97,10 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                            ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean)
         Event SendEvent(ByVal pInstructionSent As String)
         Event WatchDogEvent(ByVal pEnable As Boolean)
+
+        Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
+                                                   ByVal pResponseValue As String, _
+                                                   ByVal pTreated As Boolean)
 
 #End Region
 

@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
 'Imports System.Runtime.InteropServices 'WIN32
 Imports DevExpress.XtraCharts
+Imports Biosystems.Ax00.App
 
 Public Class IPositionsAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -1213,7 +1214,7 @@ Public Class IPositionsAdjustments
 
                         ElseIf i = ISE_SAMPLE_ROW Then
                             ' XBC 28/03/2012
-                            If Not myAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                            If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then '#REFACTORING
                                 ' Specified for ISE
                                 ActivateCheckButton(i, False)
                             Else
@@ -1895,7 +1896,7 @@ Public Class IPositionsAdjustments
                              Optional ByVal pAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myScreenDelegate.NoneInstructionToSend = True
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode, pAdjustmentGroup)
                 If Not myGlobal.HasError Then
@@ -2072,7 +2073,7 @@ Public Class IPositionsAdjustments
                 Me.BsStirrer2Button.Visible = False
             End If
 
-            If Not MyBase.SimulationMode And MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 Me.PrepareErrorMode()
                 MyBase.DisplayMessage("")
             End If
@@ -2530,7 +2531,7 @@ Public Class IPositionsAdjustments
                 ' Populate results of the readed Counts into screen
 
                 'obtain data from the App Layer
-                'myGlobal = MyBase.myServiceMDI.MDIAnalyzerManager.GetAbsorbanceScanData() 
+                'myGlobal = AnalyzerController.Instance.Analyzer.GetAbsorbanceScanData() 
                 'If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                 Me.AbsorbanceData = myScreenDelegate.ReadedCountsResult ' CType(myGlobal.SetDatos, List(Of Double))
                 'Else
@@ -4728,7 +4729,7 @@ Public Class IPositionsAdjustments
                                         myScreenDelegate.pValueAdjust = pAdjuststr
 
                                         Me.Cursor = Cursors.WaitCursor
-                                        If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                             myGlobal = Me.myScreenDelegate.SendLoad_Adjustments()
                                             If Me.SelectedPage = ADJUSTMENT_PAGES.ARM_POSITIONS Then
                                                 Me.myScreenDelegate.ParkDone = True
@@ -5470,7 +5471,7 @@ Public Class IPositionsAdjustments
 
                                                 If i = ISE_SAMPLE_ROW Then
                                                     ' XBC 28/03/2012
-                                                    If Not myAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then '#REFACTORING
                                                         ' Specified for ISE
                                                         Me.BsGridSample.EnableButton1(i) = False
                                                     Else
@@ -7739,7 +7740,7 @@ Public Class IPositionsAdjustments
     ''' <param name="e"></param>
     ''' <remarks>Created by XBC 12/09/2011</remarks>
     Private Sub IPositionsAdjustments_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
-       
+
         Try
 
             If e.CloseReason = CloseReason.MdiFormClosing Then
@@ -7845,7 +7846,7 @@ Public Class IPositionsAdjustments
         Dim myGlobal As New GlobalDataTO
         Try
             ' Check communications with Instrument
-            If Not MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal.ErrorCode = "ERROR_COMM"
                 myGlobal.HasError = True
                 ' Prepare Error Mode Controls in GUI
@@ -7883,7 +7884,7 @@ Public Class IPositionsAdjustments
 
                     Else
                         'SendFwScript(Me.CurrentMode)
-                        If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                             myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                         End If
                     End If
@@ -7922,7 +7923,7 @@ Public Class IPositionsAdjustments
                 Dim dialogResultToReturn As DialogResult = MyBase.ShowMessage("", Messages.SRV_DISCARD_CHANGES.ToString)
 
                 If dialogResultToReturn = Windows.Forms.DialogResult.No Then
-                    
+
                     Me.ManageTabArms = False
                 Else
 
@@ -8151,7 +8152,7 @@ Public Class IPositionsAdjustments
         End Try
     End Sub
 
-  
+
 
     Private Sub SelectedValueEvent(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) Handles BsGridSample.SelectedValueEvent, _
                                                                                                    BsGridReagent1.SelectedValueEvent, _
@@ -9156,7 +9157,7 @@ Public Class IPositionsAdjustments
                     End If
                 End If
 
-                End If
+            End If
 
 
         Catch ex As Exception

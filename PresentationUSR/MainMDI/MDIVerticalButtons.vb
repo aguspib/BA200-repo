@@ -16,6 +16,7 @@ Imports System.Xml 'AG 25/02/2013 - for LIS communications
 Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 Imports System.Timers
 Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.App
 
 
 'Refactoring code in VericalButtons partial class inherits form MDI (specially method ActivateActionButtonBarOrSendNewAction)
@@ -34,16 +35,17 @@ Partial Public Class IAx00MainMDI
     '''              XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
     '''              AG 06/11/2013 - Task #1375
     '''              AG 09/01/2014 - refactoring code in VerticalButtons partial class inherits form
+    '''              IT 23/10/2014 - REFACTORING (BA-2016) 
     ''' </remarks>
     Private Sub ActivateActionButtonBarOrSendNewAction()
         Try
             Dim myGlobal As New GlobalDataTO
-            If Not MDIAnalyzerManager Is Nothing Then
-                If Not MDIAnalyzerManager.classInitializationError Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If Not AnalyzerController.Instance.Analyzer.classInitializationError Then
 
                     '1st differentiate if connection established or not
                     Dim myConnected As Boolean = False
-                    If MDIAnalyzerManager.CommThreadsStarted Then myConnected = MDIAnalyzerManager.Connected
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then myConnected = AnalyzerController.Instance.Analyzer.Connected
 
                     'Me.SetActionButtonsEnableProperty(False)    'All buttons are already disable. We only need to active the required ones
 
@@ -52,7 +54,7 @@ Partial Public Class IAx00MainMDI
                         bsTSConnectButton.Enabled = True 'But not the Connect button
 
                         'ShowStatus(Messages.NO_CONNECTED)
-                        If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS", False) = 0 Then
+                        If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS", False) = 0 Then
                             ShowStatus(Messages.CONNECTING)
                         Else
                             ShowStatus(Messages.NO_CONNECTED)
@@ -73,20 +75,20 @@ Partial Public Class IAx00MainMDI
                         Dim myAx00InstructionReceived As GlobalEnumerates.AnalyzerManagerSwActionList
                         'Dim myAx00CurrentAlarms As New List(Of GlobalEnumerates.Alarms) 'AG 01/12/11
 
-                        myAx00Status = MDIAnalyzerManager.AnalyzerStatus
-                        myAx00Ready = MDIAnalyzerManager.AnalyzerIsReady
-                        myAx00Action = MDIAnalyzerManager.AnalyzerCurrentAction
-                        myAx00InstructionReceived = MDIAnalyzerManager.InstructionTypeReceived
-                        'myAx00CurrentAlarms = MDIAnalyzerManager.Alarms 'AG 01/12/11
+                        myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
+                        myAx00Ready = AnalyzerController.Instance.Analyzer.AnalyzerIsReady
+                        myAx00Action = AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
+                        myAx00InstructionReceived = AnalyzerController.Instance.Analyzer.InstructionTypeReceived
+                        'myAx00CurrentAlarms = AnalyzerController.Instance.Analyzer.Alarms 'AG 01/12/11
 
                         'AG 31/03/2011 - If analyzer not is in FREEZE mode take care about status, alarms, user actions,...
-                        If Not MDIAnalyzerManager.AnalyzerIsFreeze Then
+                        If Not AnalyzerController.Instance.Analyzer.AnalyzerIsFreeze Then
                             bsTSConnectButton.Enabled = False 'AG 12/03/2012
                             bsTSRecover.Enabled = False 'AG 12/03/2012
 
                             'AG 20/06/2012 - If analyzer is in STANDBY  but there are no alight results and start instrument is NOT IN PROCESS -> activate button Start instrument 
-                            If myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso Not MDIAnalyzerManager.ExistsALIGHT AndAlso _
-                            (String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) <> 0 AndAlso String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "PAUSED", False) <> 0) Then
+                            If myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso Not AnalyzerController.Instance.Analyzer.ExistsALIGHT AndAlso _
+                            (String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) <> 0 AndAlso String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "PAUSED", False) <> 0) Then
                                 'Means we are in Standby from Service Sw or we have restore database and connected with an analyzer already started
                                 'Solution: Repeat the Start Instrument Process
                                 ApplyRulesStandByWithOutALIGHT(myAx00Ready)
@@ -105,7 +107,7 @@ Partial Public Class IAx00MainMDI
 
                                         'Instrument buttons
                                         If myAx00Ready Then
-                                            If Not MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then ' XBC 06/09/2012 - Fix : button is enabled while Connect process is in in process
+                                            If Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then ' XBC 06/09/2012 - Fix : button is enabled while Connect process is in in process
                                                 bsTSStartInstrumentButton.Enabled = True
                                                 bsTSStartInstrumentButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_INSTRUMENT) 'AG 12/03/2012
                                             End If
@@ -160,6 +162,7 @@ Partial Public Class IAx00MainMDI
     '''                                            ** If it is in PAUSE Mode but the Analyzer is FREEZE due to an Alarm: Barcode Button is disabled
     '''                                            ** Otherwise: Barcode Button is enabled  
     '''              AG 06/11/2013 - Task #1375 (take into account the start/continue WS is also allowed in running paused mode)
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Public Function ActivateButtonWithAlarms(ByVal pButton As GlobalEnumerates.ActionButton) As Boolean
         Dim myStatus As Boolean = True
@@ -172,8 +175,8 @@ Partial Public Class IAx00MainMDI
             Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.NONE
             ' AG+XBC 24/05/2012
 
-            myAlarms = MDIAnalyzerManager.Alarms
-            myAx00Status = MDIAnalyzerManager.AnalyzerStatus
+            myAlarms = AnalyzerController.Instance.Analyzer.Alarms
+            myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
             'AG 25/10/2011 - Before treat the cover alarms read if they are deactivated (0 disabled, 1 enabled)
             Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
@@ -181,7 +184,7 @@ Partial Public Class IAx00MainMDI
             Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
             Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
 
-            resultData = MDIAnalyzerManager.ReadFwAdjustmentsDS
+            resultData = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                 'Dim myAdjDS As SRVAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS) 'Causes system error in develop mode
                 Dim myAdjDS As New SRVAdjustmentsDS
@@ -223,8 +226,8 @@ Partial Public Class IAx00MainMDI
             'AG 02/04/2012
             '(ISE instaled and (initiated or not SwitchedON)) Or not instaled
             Dim iseInitiatedFinishedFlag As Boolean = True
-            If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso _
-               (MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating OrElse Not MDIAnalyzerManager.ISEAnalyzer.ConnectionTasksCanContinue) Then
+            If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso _
+               (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating OrElse Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.ConnectionTasksCanContinue) Then
                 iseInitiatedFinishedFlag = False
             End If
             'AG 02/04/2012
@@ -263,7 +266,7 @@ Partial Public Class IAx00MainMDI
                     'AG 06/11/2013 - Task #1375
                     'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                     'JV 23/01/2014 #1467
-                    'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso MDIAnalyzerManager.AllowScanInRunning) Then
+                    'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                     '    'AG 06/11/2013 - Task #1375
 
                     '    If mainCoverAlarm OrElse _
@@ -285,7 +288,7 @@ Partial Public Class IAx00MainMDI
                     '        myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
                     '        myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
                     '        myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
-                    '        Not MDIAnalyzerManager.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
+                    '        Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                     '        myStatus = False
                     '    End If
@@ -314,11 +317,11 @@ Partial Public Class IAx00MainMDI
                             myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
                             myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
                             myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
-                            Not MDIAnalyzerManager.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
+                            Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
                         End If
-                    ElseIf (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso MDIAnalyzerManager.AllowScanInRunning) Then
+                    ElseIf (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         If mainCoverAlarm OrElse _
                            reactionsCoverAlarm OrElse _
                            fridgeCoverAlarm OrElse _
@@ -338,7 +341,7 @@ Partial Public Class IAx00MainMDI
                             'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
                             'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
                             'myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
-                            'Not MDIAnalyzerManager.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
+                            'Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
                         End If
@@ -352,7 +355,7 @@ Partial Public Class IAx00MainMDI
                     'AG 06/11/2013 - Task #1375
                     'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                     'JV 23/01/2014 #1467
-                    'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso MDIAnalyzerManager.AllowScanInRunning) Then
+                    'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                     ''AG 06/11/2013 - Task #1375
                     If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                         If mainCoverAlarm OrElse _
@@ -374,12 +377,12 @@ Partial Public Class IAx00MainMDI
                             myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
                             myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
                             myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
-                            Not MDIAnalyzerManager.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
+                            Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
                         End If
 
-                    ElseIf (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso MDIAnalyzerManager.AllowScanInRunning) Then
+                    ElseIf (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         If mainCoverAlarm OrElse _
                             reactionsCoverAlarm OrElse _
                             fridgeCoverAlarm OrElse _
@@ -398,7 +401,7 @@ Partial Public Class IAx00MainMDI
                             'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse _
                             'myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
                             'myAlarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
-                            'Not MDIAnalyzerManager.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
+                            'Not AnalyzerController.Instance.Analyzer.ValidALIGHT OrElse iSEUtilitiesActiveFlag Then
 
                             myStatus = False
                         End If
@@ -413,12 +416,12 @@ Partial Public Class IAx00MainMDI
                     myStatus = False
                     'JV 23/01/2014 #1467
                     'If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                    If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso MDIAnalyzerManager.AllowScanInRunning) Then
+                    If myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         'JV 23/01/2014 #1467
                         'Depending the analyzer alarms activate or not the button (myStatus = True or False)
                         'If myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse _
                         '   myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) Then
-                        If MDIAnalyzerManager.ExistBottleAlarms Then
+                        If AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
                             myStatus = True
 
                         End If
@@ -434,11 +437,11 @@ Partial Public Class IAx00MainMDI
 
                         'SA 15/10/2013 - ADDED NEW CASES FOR BUTTON AVAILABILITY IN RUNNING 
                     ElseIf (myAx00Status = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
-                        If (Not MDIAnalyzerManager.AllowScanInRunning) Then
+                        If (Not AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                             myStatus = False
                         Else
                             'If Analyzer is in PAUSE during RUNNING, Barcode is available excepting when the Analyzer is FREEZE 
-                            myStatus = (Not MDIAnalyzerManager.AnalyzerIsFreeze)
+                            myStatus = (Not AnalyzerController.Instance.Analyzer.AnalyzerIsFreeze)
                         End If
                     Else
                         myStatus = False
@@ -516,6 +519,7 @@ Partial Public Class IAx00MainMDI
     ''' Modified by AG 30/10/2013 - in some cases we need set a specific icon without buttons activation (for example ResetWS) so use the optional parameter
     '''             XB 30/10/2013 - Pause button must disable when user press pause button while Auto WS process or auto ISE maintenance is processing
     ''' Modified by AG 05/11/2013 - modified during validation of task #1375
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ChangeStatusImageMultipleSessionButton(Optional ByVal pForceActionIcon As WorkSessionUserActions = WorkSessionUserActions.NO_WS)
         Try
@@ -544,8 +548,8 @@ Partial Public Class IAx00MainMDI
                 If Not pausingAutomateProcessFlag And Not StartSessionisPending AndAlso Not myLocalStartingSession Then
                     'AG 05/11/2013
 
-                    If Not MDIAnalyzerManager Is Nothing AndAlso _
-                       MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess) = "INPROCESS" Then ' XB 07/11/2013
+                    If (AnalyzerController.IsAnalyzerInstantiated) AndAlso _
+                       AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess) = "INPROCESS" Then ' XB 07/11/2013
                         ' Nothing to do 
                     Else
                         bsTSMultiFunctionSessionButton.Enabled = True
@@ -558,7 +562,7 @@ Partial Public Class IAx00MainMDI
                 bsTSMultiFunctionSessionButton.Enabled = False
 
                 'AG 22/10/2013 - Exception, change icon when
-                If MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso automateProcessCurrentState = LISautomateProcessSteps.notStarted Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso automateProcessCurrentState = LISautomateProcessSteps.notStarted Then
                     'STARTWS icon
                     bsTSMultiFunctionSessionButton.Image = imagePlay
                     bsTSMultiFunctionSessionButton.ToolTipText = tooltipPlay
@@ -589,7 +593,9 @@ Partial Public Class IAx00MainMDI
     ''' Solution: Repeat the Start Instrument Process
     ''' </summary>
     ''' <param name="myAx00Ready"></param>
-    ''' <remarks>AG 09/01/2014 - refactoring</remarks>
+    ''' <remarks>AG 09/01/2014 - refactoring
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub ApplyRulesStandByWithOutALIGHT(ByVal myAx00Ready As Boolean)
         Try
 
@@ -598,9 +604,9 @@ Partial Public Class IAx00MainMDI
 
             If myAx00Ready Then
                 ' XBC 04/07/2012
-                If Not MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
-                    If Not MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" Then
-                        If MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso Not MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating Then
+                If Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS" Then
+                    If Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                             If Not isStartInstrumentActivating Then
 
                                 bsTSStartInstrumentButton.Enabled = True
@@ -635,7 +641,9 @@ Partial Public Class IAx00MainMDI
     ''' <param name="myAx00Ready"></param>
     ''' <param name="myAx00Action"></param>
     ''' <param name="myAx00Status"></param>
-    ''' <remarks>AG 09/01/2013 - refactoring</remarks>
+    ''' <remarks>AG 09/01/2013 - refactoring
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub ApplyRulesForStandBy(ByVal myAx00Ready As Boolean, ByVal myAx00Action As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal myAx00Status As GlobalEnumerates.AnalyzerManagerStatus)
         Try
             Dim myGlobal As New GlobalDataTO
@@ -644,21 +652,21 @@ Partial Public Class IAx00MainMDI
             'If ElapsedTimeTimer.Enabled Then ElapsedTimeTimer.Stop() TR 18/052012 commented
 
             'AG 23/03/2012 - ISE initialitation not finished (connection in StandBy) 
-            If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS", False) = 0 Then
+            If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS", False) = 0 Then
                 'Do nothing
 
                 'AG 04/09/2012 - ABORT session button:
                 'Recovery results starts in Running and allow Abort but it must be disabled once the analyzer becomes in StandBy
                 'Note that recovery results will be closed once the complete connection finishes
-                If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 AndAlso bsTSAbortSessionButton.Enabled Then
+                If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 AndAlso bsTSAbortSessionButton.Enabled Then
                     bsTSAbortSessionButton.Enabled = False
                 End If
                 'AG 04/09/2012
 
-            ElseIf MDIAnalyzerManager.ISEAnalyzer IsNot Nothing AndAlso MDIAnalyzerManager.ISEAnalyzer.IsISEInitiating Then
+            ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                 '    'Do nothing, no activate buttons until the ISE initialitazion finishes
 
-            ElseIf String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
+            ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
                 'AG 27/08/2012 - STANDBY: All buttons Disabled | RUNNING: Abort button enabled
                 SetActionButtonsEnableProperty(False)
 
@@ -666,23 +674,23 @@ Partial Public Class IAx00MainMDI
 
                 'Recover wash NOT in process, and analyzer is in active mode
                 'If Abort NOT in process
-                If MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess) <> "INPROCESS" AndAlso _
-                   MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess) <> "PAUSED" AndAlso _
-                   MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) <> "INPROCESS" AndAlso _
-                   MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) <> "PAUSED" Then
+                If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess) <> "INPROCESS" AndAlso _
+                   AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess) <> "PAUSED" AndAlso _
+                   AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) <> "INPROCESS" AndAlso _
+                   AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) <> "PAUSED" Then
 
                     'AG 30/09/2011 - check if warm up has been canceled ... then activate start instrument and shut down
                     Dim warmUpPaused As Boolean = False
                     Dim abortPaused As Boolean = False
                     Dim shutDownPaused As Boolean = False
-                    If MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" AndAlso _
-                       (MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED" OrElse _
-                       String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED", False) = 0) Then
+                    If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" AndAlso _
+                       (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED" OrElse _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED", False) = 0) Then
                         warmUpPaused = True
-                    ElseIf String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) = 0 AndAlso _
-                       String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED", False) = 0 Then
+                    ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) = 0 AndAlso _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED", False) = 0 Then
                         abortPaused = True
-                    ElseIf String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "PAUSED", False) = 0 Then
+                    ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "PAUSED", False) = 0 Then
                         shutDownPaused = True
                     End If
                     'AG 30/09/2011
@@ -706,9 +714,9 @@ Partial Public Class IAx00MainMDI
                                     WarmUpFinishedAttribute = True
 
                                     'AG 22/03/2012
-                                    If MDIAnalyzerManager.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 Then
-                                        MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
-                                        MyClass.MDIAnalyzerManager.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
+                                    If AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 Then
+                                        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
+                                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
                                     End If
                                     'AG 22/03/2012
 
@@ -720,7 +728,7 @@ Partial Public Class IAx00MainMDI
 
                         'AG 14/03/2012- If not finished, not paused, not in process and analyzer ready maybe it has been aborted by freeze
                         If Not WarmUpFinished AndAlso Not warmUpPaused AndAlso myAx00Ready AndAlso _
-                           MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "" Then
+                           AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "" Then
                             myGlobal = myAnalyzerSettingsDelegate.GetAnalyzerSetting(Nothing, _
                                        AnalyzerIDAttribute, _
                                        GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString())
@@ -963,10 +971,10 @@ Partial Public Class IAx00MainMDI
                     'AG 03/10/2011 - Buttons over analyzer not in Vertical Buttons Bar
                     'Barcode button
                     Dim bcButtonStatus As Boolean = False 'bar code button status
-                    Dim sensorValue As Single = MDIAnalyzerManager.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
+                    Dim sensorValue As Single = AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
 
                     If myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso myAx00Ready AndAlso _
-                        MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
+                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
                         sensorValue = 1 Then
                         bcButtonStatus = ActivateButtonWithAlarms(ActionButton.READ_BARCODE) 'AG 28/03/2012 - buttonStatus = True
                     End If
@@ -1043,7 +1051,7 @@ Partial Public Class IAx00MainMDI
                             'AG 22/02/2012 - Update button in change rotor utility
                         ElseIf (TypeOf ActiveMdiChild Is IChangeRotor) Then
                             Dim CurrentMdiChild As IChangeRotor = CType(ActiveMdiChild, IChangeRotor)
-                            If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
+                            If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
                                 bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
                                 'AG 28/03/2012
                                 'CurrentMdiChild.bsChangeRotortButton.Enabled = Not bsTSChangeBottlesConfirm.Enabled
@@ -1062,8 +1070,8 @@ Partial Public Class IAx00MainMDI
                     'AG 03/10/2011
 
                 Else 'If recover wash in process
-                    If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess), "PAUSED", False) = 0 OrElse _
-                       String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) = 0 Then
+                    If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess), "PAUSED", False) = 0 OrElse _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) = 0 Then
                         'Activate the change bottle confirm
                         bsTSChangeBottlesConfirm.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_BOTTLES_CONFIRM)
                     End If
@@ -1082,7 +1090,8 @@ Partial Public Class IAx00MainMDI
     ''' Running activations action buttons rules
     ''' </summary>
     ''' <remarks>AG 09/01/2013 - refactoring
-    ''' AG 15/04/2014 - #1591 do not send START while analyzer is starting pause
+    ''' Modified by: AG 15/04/2014 - #1591 do not send START while analyzer is starting pause
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ApplyRulesForRunning(ByVal myAx00Action As GlobalEnumerates.AnalyzerManagerAx00Actions)
         Try
@@ -1092,11 +1101,11 @@ Partial Public Class IAx00MainMDI
             bsTSStartInstrumentButton.Enabled = False
             bsTSShutdownButton.Enabled = False
 
-            If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
+            If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess), "INPROCESS", False) = 0 Then
                 'AG 27/08/2012 - STANDBY: All buttons Disabled | RUNNING: Abort button enabled
                 SetActionButtonsEnableProperty(False)
-                If MDIAnalyzerManager.AbortInstructionSent OrElse _
-                   String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") Then
+                If AnalyzerController.Instance.Analyzer.AbortInstructionSent OrElse _
+                   String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") Then
                     bsTSAbortSessionButton.Enabled = False
 
                     'When analyzer finishes readings and the recovery results instructions flow starts disabled Abort button
@@ -1105,7 +1114,7 @@ Partial Public Class IAx00MainMDI
                        myAx00Action = AnalyzerManagerAx00Actions.NO_ACTION OrElse _
                        myAx00Action = AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED OrElse _
                        myAx00Action = AnalyzerManagerAx00Actions.PAUSE_START OrElse _
-                       (myAx00Action = AnalyzerManagerAx00Actions.SOUND_DONE AndAlso String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS")) OrElse _
+                       (myAx00Action = AnalyzerManagerAx00Actions.SOUND_DONE AndAlso String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess), "INPROCESS")) OrElse _
                        myAx00Action = AnalyzerManagerAx00Actions.POLLRD_RECEIVED Then
                     bsTSAbortSessionButton.Enabled = False
 
@@ -1117,7 +1126,7 @@ Partial Public Class IAx00MainMDI
             Else
                 'AG 21/03/2012 (add abort condition) + AG 02/09/2011
                 If (WSStatusAttribute <> "ABORTED") AndAlso (WSStatusAttribute <> "INPROCESS" OrElse Not ExecuteSessionAttribute) Then
-                    If Not MDIAnalyzerManager.AbortInstructionSent Then
+                    If Not AnalyzerController.Instance.Analyzer.AbortInstructionSent Then
                         SetWorkSessionUserCommandFlags(WorkSessionUserActions.START_WS)
                         WSStatusAttribute = "INPROCESS"
                     Else
@@ -1129,20 +1138,20 @@ Partial Public Class IAx00MainMDI
 
                 'AG 24/02/2012 - when enter in running mark process before running finished
                 'AG 13/02/2012 - Execute only when Sw enters in Running mode
-                'If processBeforeRunningFinished = "0" AndAlso MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING) = 1 Then
-                '    MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING) = 0 'clear sensor
+                'If processBeforeRunningFinished = "0" AndAlso AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING) = 1 Then
+                '    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BEFORE_ENTER_RUNNING) = 0 'clear sensor
                 '    processBeforeRunningFinished = "1" 'Finished ok
                 'End If
 
                 'AG 05/11/2013 - Task #1375 add new conditions required for the paused mode (in Running)
                 'If String.Compare(processingBeforeRunning, "0", False) = 0 Then
                 Dim finishFlag As Boolean = True
-                If MDIAnalyzerManager.AllowScanInRunning Then
+                If AnalyzerController.Instance.Analyzer.AllowScanInRunning Then
                     If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.subProcessEnterRunning Then
                         finishFlag = False
 
                         'AG 03/02/2014 - BT #1488 (in scenario barcode before running without LIS after leave PAUSE the menu remains disable)
-                    ElseIf Not MDIAnalyzerManager Is Nothing AndAlso MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess) = "INPROCESS" Then
+                    ElseIf (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess) = "INPROCESS" Then
                         finishFlag = False
                     End If
                 End If
@@ -1183,11 +1192,11 @@ Partial Public Class IAx00MainMDI
 
                 'AG + XB 15/10/2013 - BT #1333
                 'bsTSContinueSessionButton.Enabled = False
-                'bsTSContinueSessionButton.Enabled = MDIAnalyzerManager.AllowScanInRunning AndAlso Not MDIAnalyzerManager.ContinueAlreadySentFlag And _
-                '                                    Not (MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS")
+                'bsTSContinueSessionButton.Enabled = AnalyzerController.Instance.Analyzer.AllowScanInRunning AndAlso Not AnalyzerController.Instance.Analyzer.ContinueAlreadySentFlag And _
+                '                                    Not (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS")
                 'JV + AG 18/10/2013 revision task # 1341
-                Dim bReturn As Boolean = MDIAnalyzerManager.AllowScanInRunning AndAlso Not MDIAnalyzerManager.ContinueAlreadySentFlag And _
-                                                    Not (MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS")
+                Dim bReturn As Boolean = AnalyzerController.Instance.Analyzer.AllowScanInRunning AndAlso Not AnalyzerController.Instance.Analyzer.ContinueAlreadySentFlag And _
+                                                    Not (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS")
                 showSTARTWSiconFlag = (showSTARTWSiconFlag Or bReturn)
                 'JV + AG 18/10/2013 task # 1341
 
@@ -1198,19 +1207,19 @@ Partial Public Class IAx00MainMDI
 
                 ' XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - BT #1333
                 'Pause disable when pause or abort requested
-                'If (MDIAnalyzerManager.EndRunInstructionSent OrElse _
-                '    String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ENDprocess), "INPROCESS") OrElse _
-                '    MDIAnalyzerManager.AbortInstructionSent OrElse _
-                '    String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS")) Then bsTSPauseSessionButton.Enabled = False Else bsTSPauseSessionButton.Enabled = True
-                If (MDIAnalyzerManager.PauseInstructionSent OrElse _
-                    Not String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess), "") OrElse _
-                    MDIAnalyzerManager.AbortInstructionSent OrElse _
-                    String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS")) _
-                    Then showPAUSEWSiconFlag = False Else showPAUSEWSiconFlag = True 'bsTSPauseSessionButton.Enabled = True String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS")) Then bsTSPauseSessionButton.Enabled = False Else bsTSPauseSessionButton.Enabled = True
+                'If (AnalyzerController.Instance.Analyzer.EndRunInstructionSent OrElse _
+                '    String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ENDprocess), "INPROCESS") OrElse _
+                '    AnalyzerController.Instance.Analyzer.AbortInstructionSent OrElse _
+                '    String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS")) Then bsTSPauseSessionButton.Enabled = False Else bsTSPauseSessionButton.Enabled = True
+                If (AnalyzerController.Instance.Analyzer.PauseInstructionSent OrElse _
+                    Not String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess), "") OrElse _
+                    AnalyzerController.Instance.Analyzer.AbortInstructionSent OrElse _
+                    String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS")) _
+                    Then showPAUSEWSiconFlag = False Else showPAUSEWSiconFlag = True 'bsTSPauseSessionButton.Enabled = True String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS")) Then bsTSPauseSessionButton.Enabled = False Else bsTSPauseSessionButton.Enabled = True
                 ' XB 15/10/2013 - BT #1333
 
                 'AG 24/01/2014 - #1467 if automatic WS creation process is in course the pause button must be enabled in order to not return to normal running
-                If Not showPAUSEWSiconFlag AndAlso MDIAnalyzerManager.AllowScanInRunning Then
+                If Not showPAUSEWSiconFlag AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning Then
                     If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                         showSTARTWSiconFlag = False
                         If Not pausingAutomateProcessFlag AndAlso Not HQProcessByUserFlag Then showPAUSEWSiconFlag = True
@@ -1220,7 +1229,7 @@ Partial Public Class IAx00MainMDI
 
                 'AG 05/11/2013 - Task #1375 - new activation rule. In running paused mode once the STARTWS button has been clicked
                 'during the automatic WS creation with LIS the active button must be the PAUSEWS not the STARTWS
-                If showSTARTWSiconFlag AndAlso MDIAnalyzerManager.AllowScanInRunning Then
+                If showSTARTWSiconFlag AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning Then
                     If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                         showSTARTWSiconFlag = False
                         'showPAUSEWSiconFlag = True
@@ -1232,9 +1241,9 @@ Partial Public Class IAx00MainMDI
 
                         'AG 12/11/2013 - Task #1375 :Else read barcode before running functionality
                         'AG 19/11/2013 - Task #1396-e (add also flag StartRunning)
-                    ElseIf String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess), "INPROCESS") OrElse _
-                        String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess), "INPROCESS") OrElse _
-                        String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.StartRunning), "INI") Then
+                    ElseIf String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess), "INPROCESS") OrElse _
+                        String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess), "INPROCESS") OrElse _
+                        String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.StartRunning), "INI") Then
                         showSTARTWSiconFlag = False
 
                     End If
@@ -1244,7 +1253,7 @@ Partial Public Class IAx00MainMDI
                 'AG 24/01/2014 - comment this line JV 23/01/2014 #1467
                 'In pause mode analyzer do not freeze due cover opens, Sw evaluate the same conditions just before go running in method FinishAutomaticWSWithLIS - In automatic WS creation mode
                 '(In manual mode button must be disable if cover enabled and opened)
-                If (showSTARTWSiconFlag AndAlso MDIAnalyzerManager.AllowScanInRunning) Then
+                If (showSTARTWSiconFlag AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                     If Not autoWSCreationWithLISModeAttribute Then
                         showSTARTWSiconFlag = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CONTINUE_WS)
                     End If
@@ -1252,15 +1261,15 @@ Partial Public Class IAx00MainMDI
                 'JV 23/01/2014 #1467
 
                 'Abort disable when abort requested
-                If MDIAnalyzerManager.AbortInstructionSent OrElse _
-                   String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") Then
+                If AnalyzerController.Instance.Analyzer.AbortInstructionSent OrElse _
+                   String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") Then
                     bsTSAbortSessionButton.Enabled = False
                 Else
                     'AG 06/11/2013 - Task #1375 - new activation rule. In running paused mode once the STARTWS button has been clicked
                     'during the automatic WS creation with LIS the abort WS button must be disabled
                     'bsTSAbortSessionButton.Enabled = True
                     Dim enabledValue As Boolean = True 'By default ABORT is enabled in running but when in pause mode Sw has started the autoCreation WS with LIS process
-                    If MDIAnalyzerManager.AllowScanInRunning Then
+                    If AnalyzerController.Instance.Analyzer.AllowScanInRunning Then
                         If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                             enabledValue = False
 
@@ -1269,8 +1278,8 @@ Partial Public Class IAx00MainMDI
                             enabledValue = False
 
                             'AG 12/11/2013 - Task #1375 :Else read barcode before running functionality
-                        ElseIf String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess), "INPROCESS") OrElse _
-                            String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess), "INPROCESS") Then
+                        ElseIf String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess), "INPROCESS") OrElse _
+                            String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess), "INPROCESS") Then
                             enabledValue = False
 
                         End If
@@ -1287,16 +1296,16 @@ Partial Public Class IAx00MainMDI
                 'AG 06/03/2012 - remove condition "AndAlso myAx00InstructionReceived = AnalyzerManagerSwActionList.STATUS_RECEIVED" because now the reception event is triggered
                 'only with the photometric results instruction
                 'NOTE: (AG 06/11/2013) - Next code wont be executed (that's OK) in pause mode because in paused mode EndRunInstructionSent = FALSE!!!
-                'AG 19/11/2013 - #1396-d Do not start automatically in pause mode (condition: 'Not MDIAnalyzerManager.AllowScanInRunning')
+                'AG 19/11/2013 - #1396-d Do not start automatically in pause mode (condition: 'Not AnalyzerController.Instance.Analyzer.AllowScanInRunning')
                 'AG 15/04/2014 - #1591 do not send START while analyzer is starting pause (flag PAUSEprocess = INPROCESS)
-                If Not MDIAnalyzerManager.AllowScanInRunning AndAlso ExecuteSessionAttribute AndAlso MDIAnalyzerManager.EndRunInstructionSent AndAlso _
-                   Not String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ENDprocess), "INPROCESS") AndAlso _
-                   Not String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") AndAlso _
-                   Not String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess), "INPROCESS") Then
+                If Not AnalyzerController.Instance.Analyzer.AllowScanInRunning AndAlso ExecuteSessionAttribute AndAlso AnalyzerController.Instance.Analyzer.EndRunInstructionSent AndAlso _
+                   Not String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ENDprocess), "INPROCESS") AndAlso _
+                   Not String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") AndAlso _
+                   Not String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess), "INPROCESS") Then
 
                     'AG 30/11/2011 - check if no exists alarms whose treatment in RUNNING is sent ENDRUN instruction
                     Dim endRunDueAlarms As Boolean = False 'This variable takes TRUE value when exists alarms whose running treatment is send ENDRUN
-                    endRunDueAlarms = MDIAnalyzerManager.ExistSomeAlarmThatRequiresStopWS() 'endRunDueAlarms = ExistSomeAlarmThatRequiresSendENDRUN(myAx00CurrentAlarms)
+                    endRunDueAlarms = AnalyzerController.Instance.Analyzer.ExistSomeAlarmThatRequiresStopWS() 'endRunDueAlarms = ExistSomeAlarmThatRequiresSendENDRUN(myAx00CurrentAlarms)
 
                     If Not endRunDueAlarms AndAlso String.Compare(WorkSessionIDAttribute, "", False) <> 0 AndAlso Not String.Equals(AnalyzerIDAttribute, String.Empty) Then
                         Dim myWSDelegate As New WorkSessionsDelegate
@@ -1304,7 +1313,7 @@ Partial Public Class IAx00MainMDI
                         Dim executionsNumber As Integer = 0
                         myGlobal = myWSDelegate.StartedWorkSessionFlag(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, executionsNumber, pendingExecutionsLeft)
                         If pendingExecutionsLeft Then
-                            myGlobal = MDIAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.START, True, Nothing, Nothing, Nothing, Nothing)
+                            myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.START, True, Nothing, Nothing, Nothing, Nothing)
                         End If
                     End If 'If WorkSessionIDAttribute <> "" And AnalyzerIDAttribute <> "" Then
 
@@ -1323,7 +1332,9 @@ Partial Public Class IAx00MainMDI
     ''' Freeze activations action buttons rules
     ''' </summary>
     ''' <param name="myAx00Status"></param>
-    ''' <remarks>AG 09/01/2013 - refactoring</remarks>
+    ''' <remarks>AG 09/01/2013 - refactoring
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub ApplyRulesForFreeze(ByVal myAx00Status As GlobalEnumerates.AnalyzerManagerStatus)
         Try
 
@@ -1333,15 +1344,15 @@ Partial Public Class IAx00MainMDI
             flagExitWithShutDown = False 'DL 04/06/2012
 
             'Freeze RESET leave only connect button
-            If String.Equals(MDIAnalyzerManager.AnalyzerFreezeMode, "RESET") Then
+            If String.Equals(AnalyzerController.Instance.Analyzer.AnalyzerFreezeMode, "RESET") Then
                 SetActionButtonsEnableProperty(False)
                 bsTSConnectButton.Enabled = True
 
                 'If analyzer is in FREEZE mode recover and connect buttons are enabled in standy (when freeze mode <> AUTOrecover)
             ElseIf myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso _
-                   Not String.Equals(MDIAnalyzerManager.AnalyzerFreezeMode, "AUTO") AndAlso _
-                   Not String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess), "INPROCESS") AndAlso _
-                   Not String.Equals(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess), "PAUSED") Then
+                   Not String.Equals(AnalyzerController.Instance.Analyzer.AnalyzerFreezeMode, "AUTO") AndAlso _
+                   Not String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess), "INPROCESS") AndAlso _
+                   Not String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess), "PAUSED") Then
 
                 'bsTSPauseSessionButton.Enabled = False 'AG 01/10/2012 - force disable this button
                 'JV + AG 18/10/2013 task # 1341
@@ -1352,18 +1363,18 @@ Partial Public Class IAx00MainMDI
                 'bsTSConnectButton.Enabled = True    ' XB 07/11/2013 - Don't enable Connect button, just  Recover button must Enable - BT #1155
                 bsTSRecover.Enabled = True
 
-            ElseIf String.Equals(MDIAnalyzerManager.AnalyzerFreezeMode, "AUTO") Then
+            ElseIf String.Equals(AnalyzerController.Instance.Analyzer.AnalyzerFreezeMode, "AUTO") Then
                 SetActionButtonsEnableProperty(False)
                 'bsTSConnectButton.Enabled = True
                 If myAx00Status <> AnalyzerManagerStatus.RUNNING Then bsTSConnectButton.Enabled = True
 
-            ElseIf String.Equals(MDIAnalyzerManager.AnalyzerFreezeMode, "PARTIAL") Then
+            ElseIf String.Equals(AnalyzerController.Instance.Analyzer.AnalyzerFreezeMode, "PARTIAL") Then
                 SetActionButtonsEnableProperty(False)
                 'AG 16/05/2012 - when freeze the connect button only if not running
                 'bsTSConnectButton.Enabled = True
-                If MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
-                    If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) <> 0 AndAlso _
-                       String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) <> 0 Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
+                    If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) <> 0 AndAlso _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) <> 0 Then
 
                         bsTSAbortSessionButton.Enabled = True 'AG 19/04/2012 - Abort (with out wash) is allowed while Partial Freeze
 
@@ -1381,7 +1392,7 @@ Partial Public Class IAx00MainMDI
 
             'Total freeze means WS is aborted
             If myAx00Status = AnalyzerManagerStatus.RUNNING AndAlso _
-               String.Equals(MDIAnalyzerManager.AnalyzerFreezeMode, "TOTAL") Then
+               String.Equals(AnalyzerController.Instance.Analyzer.AnalyzerFreezeMode, "TOTAL") Then
 
                 WSStatusAttribute = "ABORTED"
                 'TR 15/05/2012 -Commented because time is previously stopped.
@@ -1390,7 +1401,7 @@ Partial Public Class IAx00MainMDI
 
             'AG 24/01/2014 - #1467 If analyzer freezes during process set all variables to their original value
             If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
-                MDIAnalyzerManager.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE
+                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE
                 SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
                 InitializeAutoWSFlags()
             End If

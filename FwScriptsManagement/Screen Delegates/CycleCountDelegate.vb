@@ -4,6 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -341,7 +342,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendREAD_CYCLES(ByVal pQueryMode As GlobalEnumerates.Ax00Adjustsments) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READCYCLES, True, Nothing, pQueryMode)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READCYCLES, True, Nothing, pQueryMode) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -358,7 +359,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendWRITE_CYCLES(ByVal pQueryMode As GlobalEnumerates.Ax00Adjustsments) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WRITECYCLES, True, Nothing, pQueryMode)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WRITECYCLES, True, Nothing, pQueryMode) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True

@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 Public Class IDemoMode
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -133,7 +134,7 @@ Public Class IDemoMode
         Return True
     End Function
 
-    
+
 
 #End Region
 
@@ -317,7 +318,7 @@ Public Class IDemoMode
                 PrepareArea()
             Else
                 'SendFwScript(Me.CurrentMode)
-                If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                     myGlobal = myScreenDelegate.SendSDPOLL()
                 End If
             End If
@@ -343,7 +344,7 @@ Public Class IDemoMode
                     Me.RequestStatusStressTimer.Enabled = True
                     MyBase.DisplayMessage(Messages.SRV_TEST_IN_PROCESS.ToString)
                 Case STRESS_STATUS.FINISHED_OK  ' , STRESS_STATUS.FINISHED_ERR ' XBC 25/10/2012
-                    MyBase.myServiceMDI.MDIAnalyzerManager.IsStressing = False
+                    AnalyzerController.Instance.Analyzer.IsStressing = False '#REFACTORING
                     Me.RequestStatusStressTimer.Enabled = False
                     MyBase.myServiceMDI.SEND_INFO_START()
                     System.Threading.Thread.Sleep(500)
@@ -352,7 +353,7 @@ Public Class IDemoMode
 
                     ' XBC 25/10/2012 - Difference Error/Alarms end
                 Case STRESS_STATUS.FINISHED_ERR
-                    MyBase.myServiceMDI.MDIAnalyzerManager.IsStressing = False
+                    AnalyzerController.Instance.Analyzer.IsStressing = False '#REFACTORING
                     Me.RequestStatusStressTimer.Enabled = False
                     MyBase.myServiceMDI.SEND_INFO_START()
                     System.Threading.Thread.Sleep(500)
@@ -491,9 +492,9 @@ Public Class IDemoMode
             ' Buttons Area
             Me.BsTestButton.Enabled = False
             Me.BsExitButton.Enabled = True ' Just Exit button is enabled in error case
-
-            If Ax00ServiceMainMDI.MDIAnalyzerManager.IsStressing Then
-                Ax00ServiceMainMDI.MDIAnalyzerManager.IsStressing = False
+            '#REFACTORING
+            If AnalyzerController.Instance.Analyzer.IsStressing Then
+                AnalyzerController.Instance.Analyzer.IsStressing = False
                 myScreenDelegate.InsertReport("UTIL", "DEMO")
             End If
         Catch ex As Exception
@@ -619,7 +620,7 @@ Public Class IDemoMode
             myGlobal = GetParameters()
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
             Else
@@ -712,7 +713,7 @@ Public Class IDemoMode
                             MyBase.CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
                             PrepareArea()
                         Else
-                            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myGlobal = myScreenDelegate.SendDEMO_STOP()
                             End If
                         End If
@@ -724,7 +725,7 @@ Public Class IDemoMode
 
                 ' START DEMO 
 
-                Ax00ServiceMainMDI.MDIAnalyzerManager.IsStressing = True
+                AnalyzerController.Instance.Analyzer.IsStressing = True '#REFACTORING
 
                 myGlobal = MyBase.Test
                 If myGlobal.HasError Then
@@ -744,7 +745,7 @@ Public Class IDemoMode
                             MyBase.CurrentMode = ADJUSTMENT_MODES.TESTING
                             PrepareTestingMode()
                         Else
-                            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myGlobal = myScreenDelegate.SendDEMO_TEST()
                             End If
                         End If
@@ -864,7 +865,7 @@ Public Class IDemoMode
     End Sub
 
     Private Sub Buttons_MouseLeave(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsTestButton.MouseLeave, BsExitButton.MouseLeave
-        If MyBase.myServiceMDI.MDIAnalyzerManager.IsStressing Then
+        If AnalyzerController.Instance.Analyzer.IsStressing Then '#REFACTORING
             Me.Cursor = Cursors.WaitCursor
         Else
             Me.Cursor = Cursors.Default
@@ -896,5 +897,5 @@ Public Class IDemoMode
     End Sub
 
 #End Region
-    
+
 End Class

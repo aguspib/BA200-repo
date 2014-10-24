@@ -4402,7 +4402,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             ElseIf ISEAnalyzer.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL Then
                                 If ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                     For Each E As ISEErrorTO In ISEAnalyzer.LastISEResult.Errors
-                                        If myCurrentProcedure = ISEManager.ISEProcedures.CalibrateElectrodes Then
+                                        If myCurrentProcedure = ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes Then
                                             MyClass.BlockISEPreparationByElectrode(dbConnection, ISEAnalyzer.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                         End If
                                     Next
@@ -5061,8 +5061,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
 
                         ' XBC 23/03/2012
-                        If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.ActivateReagentsPack And _
-                           ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.WriteConsumption Then
+                        If ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.ActivateReagentsPack And _
+                           ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.WriteConsumption Then
                             myGlobal = ISEAnalyzer.SendISECommand()
                         End If
                         ' XBC 23/03/2012
@@ -5070,7 +5070,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                     'Special case for cheking before installing ISE Module
-                ElseIf ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.ActivateModule Then
+                ElseIf ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.ActivateModule Then
                     If ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
                         Select Case ISEAnalyzer.CurrentCommandTO.ISECommandID
 

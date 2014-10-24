@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
 
 Public Class IConfigLISMapping
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -22,7 +23,7 @@ Public Class IConfigLISMapping
     Private EditingConfigLISMappingDS As LISMappingsDS 'local copy for validation to preserve unique LIS value for each type
     Private EditingTestsLISMappingDS As AllTestsByTypeDS 'local copy for validation to preserve unique LIS value for all test types
 
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
 
     Private IsRowEditing As Boolean = False ' a row in the datagrid is being edited
 
@@ -54,8 +55,9 @@ Public Class IConfigLISMapping
             End If
 
             If Not res Then
-                If Not mdiAnalyzerCopy Is Nothing Then
-                    If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                '#REFACTORING
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
+                    If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                         res = True
                     End If
                 End If
@@ -137,13 +139,13 @@ Public Class IConfigLISMapping
     Private AnalyzerIDAttr As String = ""
     Private ReadOnly Property ActiveAnalyzer() As String
         Get
-            Return mdiAnalyzerCopy.ActiveAnalyzer
+            Return AnalyzerController.Instance.Analyzer.ActiveAnalyzer '#REFACTORING
         End Get
     End Property
 
     Public ReadOnly Property ActiveWorkSession() As String
         Get
-            Return mdiAnalyzerCopy.ActiveWorkSession
+            Return AnalyzerController.Instance.Analyzer.ActiveWorkSession '#REFACTORING
         End Get
     End Property
 
@@ -349,7 +351,8 @@ Public Class IConfigLISMapping
     ''' Load all data needed for the screen
     ''' </summary>
     ''' <remarks>
-    ''' Created by XB 01/03/2013
+    ''' Created by:  XB 01/03/2013
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
@@ -361,11 +364,6 @@ Public Class IConfigLISMapping
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
-            End If
-
 
             'Load the multilanguage texts for all Screen Labels
             MyClass.GetScreenLabels()

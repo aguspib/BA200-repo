@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -66,7 +67,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Event Handlers"
-        
+
 
         ''' <summary>
         ''' manages the responses of the Analyzer
@@ -113,7 +114,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         Select Case pResponse
                             Case RESPONSE_TYPES.START
                                 ''reset E:550 is informed flag
-                                'myFwScriptDelegate.AnalyzerManager.IsServiceRotorMissingInformed = False
+                                'AnalyzerController.Instance.Analyzer.IsServiceRotorMissingInformed = False
 
                             Case RESPONSE_TYPES.OK
                                 MyClass.IsWashingStationUpAttr = False
@@ -158,8 +159,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
 
                 CurrentOperation = OPERATIONS.NEW_ROTOR
-                
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True)
+
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -181,7 +182,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case Ax00WashStationControlModes.DOWN
                         MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
                 End Select
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True

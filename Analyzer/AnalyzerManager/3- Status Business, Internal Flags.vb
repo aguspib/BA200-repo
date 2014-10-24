@@ -13,7 +13,7 @@ Imports System.Globalization
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
-    Partial Public Class AnalyzerManager
+    Partial Public Class AnalyzerManagerOLD
 
 #Region "STATUS Business Logic"
 

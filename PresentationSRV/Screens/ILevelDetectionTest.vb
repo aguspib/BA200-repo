@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 Public Class ILevelDetectionTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -48,7 +49,7 @@ Public Class ILevelDetectionTest
         End Set
     End Property
 
-    
+
 #End Region
 
 #Region "Constructor"
@@ -123,7 +124,7 @@ Public Class ILevelDetectionTest
                     End If
                     If pResponse = RESPONSE_TYPES.OK Then
                         If pData IsNot Nothing Then
-                            Dim myDetected As Boolean = Ax00ServiceMainMDI.MDIAnalyzerManager.LevelDetected
+                            Dim myDetected As Boolean = AnalyzerController.Instance.Analyzer.LevelDetected '#REFACTORING
                             If myDetected Then
                                 MyClass.myScreenDelegate.DetectionTestResult = LevelDetectionTestDelegate.HISTORY_RESULTS.DETECTED
                                 Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status._ON
@@ -133,7 +134,7 @@ Public Class ILevelDetectionTest
                                 Me.BsDetectionMonitorLED.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status._OFF
                                 MyBase.DisplayMessage(Messages.SRV_LEVEL_NOT_DETECTED.ToString)
                             End If
-                            Ax00ServiceMainMDI.MDIAnalyzerManager.LevelDetected = False
+                            AnalyzerController.Instance.Analyzer.LevelDetected = False '#REFACTORING
                             MyBase.CurrentMode = ADJUSTMENT_MODES.LEVEL_DETECTED
                             MyClass.PrepareArea()
 
@@ -246,7 +247,7 @@ Public Class ILevelDetectionTest
                     End If
                 Next
 
-                
+
             End If
 
         Catch ex As Exception
@@ -293,7 +294,7 @@ Public Class ILevelDetectionTest
     Private Sub SendFwScript(ByVal pMode As ADJUSTMENT_MODES)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
                 If Not myGlobal.HasError Then
                     ' Send FwScripts
@@ -472,7 +473,7 @@ Public Class ILevelDetectionTest
                     PrepareErrorMode()
             End Select
 
-            If Not MyBase.SimulationMode And Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyClass.PrepareErrorMode()
                 MyBase.DisplayMessage("")
             End If
@@ -511,7 +512,7 @@ Public Class ILevelDetectionTest
                     MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
-                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                     End If
                 End If
@@ -978,7 +979,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-   
+
     Private Sub PrepareDetectedMode()
 
         Try
@@ -1022,7 +1023,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-   
+
 #End Region
 
 
@@ -1198,7 +1199,7 @@ Public Class ILevelDetectionTest
             Me.BsDetectionArmComboBox.SelectedIndex = 0
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal.ErrorCode = "ERROR_COMM"
                 myGlobal.HasError = True
             Else
@@ -1252,7 +1253,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-   
+
 
     Private Sub BsDetectionArmComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsDetectionArmComboBox.SelectedIndexChanged
 
@@ -1281,7 +1282,7 @@ Public Class ILevelDetectionTest
 
             End Select
 
-            
+
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsDetectionArmComboBox_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1363,7 +1364,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-    
+
     ''' <summary>
     ''' When the  ESC key is pressed, the screen is closed 
     ''' </summary>
@@ -1389,8 +1390,8 @@ Public Class ILevelDetectionTest
 
 #End Region
 
-   
-   
-    
-    
+
+
+
+
 End Class

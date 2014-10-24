@@ -26,14 +26,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private ReadOnly myISEModuleErrorHT As New Hashtable()
         Private ReadOnly myResultErrorDescHT As New Hashtable() 'SGM 20/07/2012
 
-        Private myAnalyzer As AnalyzerManager 'SGM 23/07/2012
+        Private myAnalyzer As AnalyzerManagerOLD 'SGM 23/07/2012
         Private myISEManager As ISEManager 'SGM 23/07/2012
 
 #End Region
 
 
 #Region "Constructor"
-        Public Sub New(ByVal pAnalyzer As AnalyzerManager) '!!!! QUITAR OPCIONAL
+        Public Sub New(ByVal pAnalyzer As AnalyzerManagerOLD) '!!!! QUITAR OPCIONAL
             MyClass.LoadISEErrorsDataHT()
             MyClass.FillAffectedElementHT()
             MyClass.FillISECancelErrorDescHT()
@@ -1436,7 +1436,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'end SGM 08/02/2012
 
-                
+
 
                 'SGM 11/01/2012
 
@@ -2658,7 +2658,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
 
-        
+
 
 #End Region
 

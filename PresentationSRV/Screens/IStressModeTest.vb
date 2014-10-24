@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 Public Class IStressModeTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -176,7 +177,9 @@ Public Class IStressModeTest
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
     ''' <param name="pRefreshDS"></param>
-    ''' <remarks>Created by XBC 23/05/2011</remarks>
+    ''' <remarks>Created by XBC 23/05/2011
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         'Dim myGlobal As New GlobalDataTO
         Try
@@ -207,11 +210,11 @@ Public Class IStressModeTest
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
                 Dim sensorValue As Single = 0
 
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) 
                 If sensorValue >= 1 Then
                     ScreenWorkingProcess = False
 
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
 
                     Me.IsInitiating = False
                     MyBase.ActivateMDIMenusButtons(True)
@@ -219,11 +222,11 @@ Public Class IStressModeTest
                 End If
 
                 'ISE procedure finished
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
 
                 End If
 
@@ -232,7 +235,7 @@ Public Class IStressModeTest
                 End If
             End If
 
-            If Not MyBase.myServiceMDI.MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+            If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then
                 Me.ReadStressStatus()
             End If
 
@@ -421,7 +424,7 @@ Public Class IStressModeTest
     Private Sub SendFwScript(ByVal pMode As ADJUSTMENT_MODES)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
                 If Not myGlobal.HasError Then
                     ' Send FwScripts
@@ -622,7 +625,7 @@ Public Class IStressModeTest
             'Me.BsResultsGroupBox.Enabled = False
 
             ' Disable Area Buttons
-            If Not myServiceMDI.MDIAnalyzerManager.IsStressing Then
+            If Not AnalyzerController.Instance.Analyzer.IsStressing Then '#REFACTORING
                 Me.BsTestButton.Enabled = False
                 Me.BsExitButton.Enabled = False
             End If
@@ -671,7 +674,7 @@ Public Class IStressModeTest
                     PrepareErrorMode()
             End Select
 
-            If Not MyBase.SimulationMode And Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyClass.PrepareErrorMode()
                 MyBase.DisplayMessage("")
             End If
@@ -710,7 +713,7 @@ Public Class IStressModeTest
                     MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
-                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                     End If
                 End If
@@ -777,7 +780,7 @@ Public Class IStressModeTest
                 PrepareArea()
             Else
                 'SendFwScript(Me.CurrentMode)
-                If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                     myGlobal = myScreenDelegate.SendSDPOLL()
                 End If
             End If
@@ -1022,6 +1025,12 @@ Public Class IStressModeTest
         Return myGlobalDataTO
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub ReadStressStatus()
         Try
             Select Case myScreenDelegate.StatusStressMode
@@ -1035,14 +1044,14 @@ Public Class IStressModeTest
                     Me.RequestStatusStressTimer.Enabled = True
                     MyBase.DisplayMessage(Messages.SRV_TEST_IN_PROCESS.ToString)
                 Case STRESS_STATUS.FINISHED_OK
-                    MyBase.myServiceMDI.MDIAnalyzerManager.IsStressing = False
+                    AnalyzerController.Instance.Analyzer.IsStressing = False
                     If Not MyClass.myServiceMDI.AdjustmentsReaded Then
                         Me.IsInitiating = True
                         PrepareAdjustReadingMode()
                         Debug.Print(" - " & Date.Now.ToString & " - READ ADJUSTMENTS ")
                     Else
                         Me.DisableAll()
-                        If Not MyBase.myServiceMDI.MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled Then
+                        If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then 
                             Me.IsInitiating = False
                         End If
                         Me.GenerateReportsOutput()
@@ -1058,7 +1067,7 @@ Public Class IStressModeTest
                         MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
                     End If
                 Case STRESS_STATUS.FINISHED_ERR
-                    MyBase.myServiceMDI.MDIAnalyzerManager.IsStressing = False
+                    AnalyzerController.Instance.Analyzer.IsStressing = False
                     If Not MyClass.myServiceMDI.AdjustmentsReaded Then
                         Me.DisableAll()
                         Me.IsInitiating = True
@@ -1264,11 +1273,11 @@ Public Class IStressModeTest
             MyClass.InitializeHomes()
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
             Else
-                If Ax00ServiceMainMDI.MDIAnalyzerManager.IsStressing Then
+                If AnalyzerController.Instance.Analyzer.IsStressing Then '#REFACTORING
                     PrepareLoadingMode()
                 Else
                     PrepareAdjustReadingMode()
@@ -1398,7 +1407,7 @@ Public Class IStressModeTest
     '                Else
     '                    ' Manage FwScripts must to be sent to testing
     '                    'SendFwScript(Me.CurrentMode)
-    '                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+    '                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
     '                        myGlobal = myScreenDelegate.SendSTRESS_TEST()
     '                    End If
     '                End If
@@ -1452,7 +1461,7 @@ Public Class IStressModeTest
                         Else
                             ' Manage FwScripts must to be sent to testing
                             'SendFwScript(Me.CurrentMode)
-                            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myGlobal = myScreenDelegate.SendSTRESS_STOP()
                             End If
                         End If
@@ -1464,7 +1473,7 @@ Public Class IStressModeTest
 
                 ' START STRESS
 
-                Ax00ServiceMainMDI.MDIAnalyzerManager.IsStressing = True
+                AnalyzerController.Instance.Analyzer.IsStressing = True
 
                 myGlobal = MyBase.Test
                 If myGlobal.HasError Then
@@ -1509,7 +1518,7 @@ Public Class IStressModeTest
                         Else
                             ' Manage FwScripts must to be sent to testing
                             'SendFwScript(Me.CurrentMode)
-                            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myGlobal = myScreenDelegate.SendSDMODE()
                             End If
                         End If
@@ -1792,7 +1801,7 @@ Public Class IStressModeTest
     End Sub
 
     Private Sub Buttons_MouseLeave(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsTestButton.MouseLeave, BsExitButton.MouseLeave
-        If MyBase.myServiceMDI.MDIAnalyzerManager.IsStressing Then
+        If AnalyzerController.Instance.Analyzer.IsStressing Then '#REFACTORING
             Me.Cursor = Cursors.WaitCursor
         Else
             Me.Cursor = Cursors.Default

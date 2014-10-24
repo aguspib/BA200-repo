@@ -4,6 +4,7 @@ Option Strict On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 Public Class IErrorCodes
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -62,7 +63,7 @@ Public Class IErrorCodes
 
             ' For Tooltips...
             MyBase.bsScreenToolTips.SetToolTip(bsClearButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SRV_ClearResults", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -75,22 +76,23 @@ Public Class IErrorCodes
     ''' </summary>
     ''' <remarks>
     ''' Created by: XBC 07/11/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub DisplayErrorCodes()
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager Is Nothing Then
-                If Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay.Count > 0 Then
-                    For i As Integer = 0 To Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay.Count - 1
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If AnalyzerController.Instance.Analyzer.ErrorCodesDisplay.Count > 0 Then
+                    For i As Integer = 0 To AnalyzerController.Instance.Analyzer.ErrorCodesDisplay.Count - 1
                         Dim newText As String = ""
 
-                        newText += "[" & Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay(i).ErrorDateTime.ToString & "]"
-                        If Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay(i).ErrorCode <> "-1" Then
+                        newText += "[" & AnalyzerController.Instance.Analyzer.ErrorCodesDisplay(i).ErrorDateTime.ToString & "]"
+                        If AnalyzerController.Instance.Analyzer.ErrorCodesDisplay(i).ErrorCode <> "-1" Then
                             newText += " " & myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ERROR", currentLanguage)
-                            newText += " : " & Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay(i).ErrorCode.ToString
+                            newText += " : " & AnalyzerController.Instance.Analyzer.ErrorCodesDisplay(i).ErrorCode.ToString
                         End If
-                        newText += " (" & myMultiLangResourcesDelegate.GetResourceText(Nothing, Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay(i).ResourceID, currentLanguage) & ")"
-                        If Ax00ServiceMainMDI.MDIAnalyzerManager.ErrorCodesDisplay(i).Solved Then
+                        newText += " (" & myMultiLangResourcesDelegate.GetResourceText(Nothing, AnalyzerController.Instance.Analyzer.ErrorCodesDisplay(i).ResourceID, currentLanguage) & ")"
+                        If AnalyzerController.Instance.Analyzer.ErrorCodesDisplay(i).Solved Then
                             newText += " - " & UCase(myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SOLVED", currentLanguage))
                         End If
                         newText += vbCrLf
@@ -142,7 +144,7 @@ Public Class IErrorCodes
                 'End If
 
                 'RH 04/07/2011 Escape key should do exactly the same operations as bsExitButton_Click()
-                BsExitButton.PerformClick()
+                bsExitButton.PerformClick()
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -154,8 +156,8 @@ Public Class IErrorCodes
     Private Sub bsClearButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsClearButton.Click
         Try
             Dim myGlobal As New GlobalDataTO
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager Is Nothing Then
-                myGlobal = Ax00ServiceMainMDI.MDIAnalyzerManager.RemoveErrorCodesToDisplay()
+            If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
+                myGlobal = AnalyzerController.Instance.Analyzer.RemoveErrorCodesToDisplay()
 
                 If Not myGlobal.HasError Then
                     Me.BsRichTextBox1.Clear()

@@ -30,6 +30,9 @@ Imports Biosystems.Ax00.InfoAnalyzer
 Imports System.Xml
 
 Imports System.Runtime.CompilerServices
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Entities
 
 Public Class FormSergio
     Inherits BSAdjustmentBaseForm
@@ -43,9 +46,9 @@ Public Class FormSergio
         ' Add any initialization after the InitializeComponent() call.
         myServiceMDI = pMDI
         myMDI = pMDI
-        myAnalyzerManager = pMDI.MDIAnalyzerManager
+        'myAnalyzerManager = pMDI.MDIAnalyzerManager
     End Sub
-    
+
 
     Private myMDI As Ax00ServiceMainMDI
 
@@ -58,7 +61,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-   
+
 
     Private Sub FormSergio_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Dim myGlobal As New GlobalDataTO
@@ -96,7 +99,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-   
+
 
     Private Sub BsExceptionsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExceptionsButton.Click
         Try
@@ -121,7 +124,7 @@ Public Class FormSergio
 
     Private WithEvents myScreenDelegate As FwScriptsEditionDelegate
 
-   
+
 
     Private Function ChangeScripts() As GlobalDataTO
 
@@ -255,7 +258,7 @@ Public Class FormSergio
 
             myGlobal.SetDatos = ResultText
 
-           
+
 
 
         Catch ex As Exception
@@ -423,7 +426,7 @@ Public Class FormSergio
             Select Case myUtil.TaskBarState
                 Case Utilities.TaskBarStates.AUTOHIDE, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP, Utilities.TaskBarStates.AUTOHIDE_CLOCK, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
                     myUtil.TaskBarAutoHide = False
-                   
+
                 Case Else
                     myUtil.TaskBarAutoHide = True
 
@@ -454,7 +457,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-   
+
     Private Sub RefreshTaskbarState()
         Try
             Dim myUtil As New Utilities
@@ -476,9 +479,9 @@ Public Class FormSergio
         End Try
     End Sub
 
-    
 
-   
+
+
 
     Private Sub BsButton9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton9.Click
         Dim myGlobal As New GlobalDataTO
@@ -531,10 +534,11 @@ Public Class FormSergio
 
             Dim myISEResultTO As New ISEResultTO
             myISEResultTO.ReceivedResults = myISEResult
-            Dim myAnalyzer As New AnalyzerManager("", "")
-            myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
-            Dim myISEResultsDelegate As New ISEReception(myAnalyzer)
-            myGlobal = myISEResultsDelegate.ProcessISETESTResults(Nothing, 22, myISEResultTO, "SimpleMode", "2012032701", "SN0000099999_Ax400")
+            '#REFACTORING
+            'Dim myAnalyzer As New AnalyzerManager("", "") 
+            'myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
+            'Dim myISEResultsDelegate As New ISEReception(myAnalyzer)
+            'myGlobal = myISEResultsDelegate.ProcessISETESTResults(Nothing, 22, myISEResultTO, "SimpleMode", "2012032701", "SN0000099999_Ax400")
 
         Catch ex As Exception
             Throw ex
@@ -628,11 +632,12 @@ Public Class FormSergio
             myInstruction.Add(myPar4)
 
             Dim myUtil As New Utilities
-            Dim myAnalyzer As New AnalyzerManager("", "")
-            myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
+            '#REFACTORING
+            Dim myAnalyzer As IAnalyzerEntity = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, String.Empty, String.Empty, False, String.Empty, String.Empty, String.Empty) '#REFACTORING
+
             myGlobal = myAnalyzer.ProcessRecivedISEResult(myInstruction)
             Dim myISEResultData As New ISEResultsDataTO
-            Dim myISEResult As ISEResultTO = myAnalyzer.ISE_Manager.LastISEResult
+            Dim myISEResult As ISEResultTO = myAnalyzer.ISEAnalyzer.LastISEResult
             If myISEResult IsNot Nothing Then
                 Dim str As New System.Text.StringBuilder
                 With myISEResult
@@ -729,7 +734,7 @@ Public Class FormSergio
                 FS.Dispose()
             End If
 
-           
+
         Catch ex As Exception
             Throw ex
         End Try
@@ -925,23 +930,23 @@ Public Class FormSergio
 
     Private Sub BsButton16_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton16.Click
         Try
-            myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
+            AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
 
             Application.DoEvents()
 
-            Dim R As Boolean = myAnalyzerManager.SynchronizeComm
+            Dim R As Boolean = AnalyzerController.Instance.Analyzer.SynchronizeComm
 
-            'myAnalyzerManager.StopComm()
+            'AnalyzerController.Instance.Analyzer.StopComm()
 
             'Application.DoEvents()
 
-            'myAnalyzerManager.RestartComm(False)
+            'AnalyzerController.Instance.Analyzer.RestartComm(False)
 
-            'myAnalyzerManager.RestartComm(False)
+            'AnalyzerController.Instance.Analyzer.RestartComm(False)
 
             Application.DoEvents()
 
-            myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
+            AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
 
         Catch ex As Exception
             Throw ex
@@ -1031,10 +1036,10 @@ Public Class FormSergio
             myInstruction.Add(myPar6)
 
             Dim myUtil As New Utilities
-            Dim myAnalyzer As New AnalyzerManager("", "")
-            myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
+            '#REFACTORING
+            Dim myAnalyzer As IAnalyzerEntity = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, String.Empty, String.Empty, False, String.Empty, String.Empty, String.Empty)
             myGlobal = myAnalyzer.ProcessANSUTILReceived(myInstruction)
-            
+
 
         Catch ex As Exception
             Throw ex
@@ -1055,7 +1060,7 @@ Public Class FormSergio
 
                 'TODO - implementar en el managereception del MDI
                 'ALARM RECEIVED
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE)
                 If sensorValue > 0 Then
                     Dim myManageAlarmType As GlobalEnumerates.ManagementAlarmTypes = ManagementAlarmTypes.NONE
                     myManageAlarmType = CType(sensorValue, GlobalEnumerates.ManagementAlarmTypes)
@@ -1074,15 +1079,15 @@ Public Class FormSergio
 
                     '6- Enable Exit option
 
-                    
+
                     ScreenWorkingProcess = False
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE) = 0 'Once updated UI clear sensor
                 End If
 
 
             End If
 
-           
+
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -1177,7 +1182,7 @@ Public Class FormSergio
             If myMessage.Length > 0 Then
 
                 'Get current Alarms Codes
-                Dim myErrorsString As String = myAnalyzerManager.ErrorCodes
+                Dim myErrorsString As String = AnalyzerController.Instance.Analyzer.ErrorCodes
 
                 myErrorsString = "E34, E456, E51" 'QUITAR
 
@@ -1230,7 +1235,7 @@ Public Class FormSergio
 #End Region
 
     Private Sub BsButton19_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton19.Click
-       
+
         ShowAlarmOrSensorsWarningMessages(ManagementAlarmTypes.SIMPLE_ERROR)
     End Sub
 

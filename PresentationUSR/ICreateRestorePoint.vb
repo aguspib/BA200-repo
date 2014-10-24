@@ -13,13 +13,14 @@ Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
+Imports Biosystems.Ax00.App
 
 Public Class ICreateRestorePoint
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Properties"
 
-    
+
 
 #End Region
 
@@ -38,7 +39,7 @@ Public Class ICreateRestorePoint
     Private RestorePointPath As String
 
     Private CurrentLanguage As String
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
 
 #End Region
 
@@ -231,7 +232,7 @@ Public Class ICreateRestorePoint
         Try
 
             Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", MyClass.mdiAnalyzerCopy.AdjustmentsFilePath)
+            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) '#REFACTORING
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 RestorePointCreated = CBool(myGlobal.SetDatos)
             End If
@@ -259,9 +260,9 @@ Public Class ICreateRestorePoint
 
             'Ax00 allow load RSAT / Restore Point when: No connection or (sleeping + no working) or (standby + no working)
             'NOTE in Ax5 the condition was more secure (no connection or sleeping)
-
-            If Not mdiAnalyzerCopy Is Nothing Then
-                If Not mdiAnalyzerCopy.Connected Then 'AG 06/02/2012 - add Connected to the acitvation rule
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If Not AnalyzerController.Instance.Analyzer.Connected Then 'AG 06/02/2012 - add Connected to the acitvation rule
                     returnValue = True
 
                     'DL 02/07/2012. Begin
@@ -318,7 +319,8 @@ Public Class ICreateRestorePoint
     ''' Load SAT data
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SG 30/11/2012
+    ''' Created by:  SG 30/11/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ICreateRestorePoint_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
@@ -329,10 +331,6 @@ Public Class ICreateRestorePoint
 
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 13/07/2011 - Use the same AnalyzerManager as the MDI
-            End If
 
             PrepareButtons()
 
@@ -450,5 +448,5 @@ Public Class ICreateRestorePoint
 
 #End Region
 
-   
+
 End Class

@@ -21,7 +21,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #Region "Constructor"
 
-        Public Sub New(ByRef pAnalyzerManager As AnalyzerManager, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
+        Public Sub New(ByRef pAnalyzerManager As AnalyzerManagerOLD, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
             Try
                 MyClass.IsAnalyzerDisconnectedAttr = pDisconnectedMode
                 MyClass.myAnalyzerManager = pAnalyzerManager
@@ -132,7 +132,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #End Region
 
 #Region "Declarations"
-        Private myAnalyzerManager As AnalyzerManager 'Instance of Analyzer Manager class that creates ISE manager
+        Private myAnalyzerManager As AnalyzerManagerOLD 'Instance of Analyzer Manager class that creates ISE manager
         Private myISEInfoDelegate As New ISEDelegate 'Delegate for accessing tinfoISE table
         Private myISECalibHistory As New ISECalibHistoryDelegate 'Delegate for calibration history 'JB 30/07/2012
         Private myISEInfoDS As ISEInformationDS 'Data obtained from tinfoISE table

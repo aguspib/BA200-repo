@@ -11,6 +11,7 @@ Imports System.Threading
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Text
+Imports Biosystems.Ax00.App
 
 Public Class IConfigLIS
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -32,7 +33,7 @@ Public Class IConfigLIS
     Private ChangesMadeLIS As Boolean
     Private EditionMode As Boolean
     Private LanguageID As String
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
     Private mdiESWrapperCopy As ESWrapper
     Private ValidationError As Boolean = False
     Protected wfPreload As Biosystems.Ax00.PresentationCOM.WaitScreen
@@ -73,14 +74,10 @@ Public Class IConfigLIS
     ''' </summary>
     ''' <remarks>
     ''' Created by:  XB 04/03/2013
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
-            'Get the Analyzer Manager
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
-
             ChangesMade = False
             ChangesMadeLIS = False
 
@@ -136,17 +133,19 @@ Public Class IConfigLIS
     ''' </summary>
     ''' <remarks>
     ''' Created by: XB 24/04/2013 - This function is called when the form loads and every Refresh
-    ''' AG 10/02/2014 - #1496</remarks>
+    ''' AG 10/02/2014 - #1496
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub EnableScreen()
         Try
             If isClosingFlag Then Return 'AG 10/02/2014 - #1496 do not refresh screen when closing it
 
             'Verify if the screen has to be opened in READ-ONLY mode
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'If the connection process is in process, disable all screen fields (changes are not allowed) ORELSE
                 'If the Analyzer is connected and its status is RUNNING, disable all screen fields (changes are not allowed)
-                If (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
-                   (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
+                If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
+                   (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
 
                     For Each myControl As Control In SessionSettingsTab.Controls
                         myControl.Enabled = False

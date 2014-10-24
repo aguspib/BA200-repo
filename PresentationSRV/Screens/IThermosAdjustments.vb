@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
+
 'Imports DevExpress.XtraCharts
 'Imports Biosystems.Ax00.Controls.UserControls
 
@@ -772,7 +774,7 @@ Public Class IThermosAdjustments
     Private Sub SendFwScript(ByVal pMode As ADJUSTMENT_MODES)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myScreenDelegate.NoneInstructionToSend = True
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
                 If Not myGlobal.HasError Then
@@ -1342,7 +1344,7 @@ Public Class IThermosAdjustments
 
             End Select
 
-            If Not MyBase.SimulationMode And Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyClass.PrepareErrorMode()
                 MyBase.DisplayMessage("")
             End If
@@ -1380,7 +1382,7 @@ Public Class IThermosAdjustments
                     MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
-                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                     End If
                 End If
@@ -1693,7 +1695,7 @@ Public Class IThermosAdjustments
                                 If Not myScreenDelegate.IsKeepRotating Then
                                     ' Activate Sound !
                                     If Not MyBase.SimulationMode Then
-                                        If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                             myGlobal = myScreenDelegate.SendSOUND()
                                         End If
                                         If myGlobal.HasError Then
@@ -1736,7 +1738,7 @@ Public Class IThermosAdjustments
 
                                     If Not MyBase.SimulationMode Then
                                         ' Deactivate Sound !
-                                        If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                             myGlobal = myScreenDelegate.SendENDSOUND()
                                         End If
                                         If myGlobal.HasError Then
@@ -1907,7 +1909,7 @@ Public Class IThermosAdjustments
 
                                                 ' instruction for Washing Station DOWN
                                                 If Not MyBase.SimulationMode Then
-                                                    If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                                         myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.DOWN)
                                                     End If
                                                 End If
@@ -1939,7 +1941,7 @@ Public Class IThermosAdjustments
 
                                             ' instruction for Washing Station UP
                                             If Not MyBase.SimulationMode Then
-                                                If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                                     myScreenDelegate.SendWASH_STATION_CTRL(Ax00WashStationControlModes.UP)
                                                 End If
                                             End If
@@ -3281,7 +3283,7 @@ Public Class IThermosAdjustments
             MyClass.DisableAll()
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
             Else
@@ -3565,7 +3567,7 @@ Public Class IThermosAdjustments
                             End With
                             PrepareArea()
                         Else
-                            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myGlobal = myScreenDelegate.SendLOAD_ADJUSTMENTS()
                             End If
                         End If

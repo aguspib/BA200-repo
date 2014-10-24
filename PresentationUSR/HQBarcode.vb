@@ -12,6 +12,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Timers
+Imports Biosystems.Ax00.App
 
 Public Class HQBarcode
 
@@ -31,7 +32,6 @@ Public Class HQBarcode
     'Global variable used to control the screen closing
     Private continueClosing As Boolean = True
 
-    Private mdiAnalyzerCopy As AnalyzerManager
     Private mdiESWrapperCopy As ESWrapper 'AG 26/04/2013
 
     'JCID 25/03/2013 -Load the icons used for STAT and Normal  
@@ -1070,6 +1070,7 @@ Public Class HQBarcode
     ''' Modified by: AG 26/04/2013 - Activation rules have been moved to ESBusiness class
     '''              SA 24/07/2013 - Button is disabled if the status of the active WS is ABORTED, or if the user has clicked in HQ 
     '''                              button and the screen is waiting for the LIS answer
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Public Sub LIMSImportButtonEnabled()
         Try
@@ -1107,10 +1108,10 @@ Public Class HQBarcode
                     allRowCheckedAreOkForLIMS = True
                 End If
 
-                If (allRowCheckedAreOkForLIMS AndAlso Not mdiAnalyzerCopy Is Nothing AndAlso Not mdiESWrapperCopy Is Nothing) Then
+                If (allRowCheckedAreOkForLIMS AndAlso Not AnalyzerController.IsAnalyzerInstantiated AndAlso Not mdiESWrapperCopy Is Nothing) Then
                     Dim myESBusinessDlg As New ESBusiness
-                    Dim runningFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
-                    Dim connectingFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
+                    Dim runningFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
+                    Dim connectingFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
 
                     bsLIMSImportButton.Enabled = myESBusinessDlg.AllowLISAction(Nothing, LISActions.HostQuery, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
                 Else
@@ -1598,6 +1599,7 @@ Public Class HQBarcode
     '''              JC 25/03/2013 - Get the icons used for STAT and Normal  
     '''              AG 08/07/2013 - When the screen is opened during the automatic WS creation process, all rows in the grid are selected
     '''              SA 24/07/2013 - Added changes to disable all action buttons if the Status of the active WorkSession is ABORTED
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -1610,10 +1612,9 @@ Public Class HQBarcode
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             MyClass.currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
-                mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS) = 0
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS) = 0
             End If
 
             If (Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing) Then

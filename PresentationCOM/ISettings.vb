@@ -12,6 +12,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 
 Imports System.Drawing
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.App
 
 
 Public Class ISettings
@@ -63,7 +64,7 @@ Public Class ISettings
 
     Private AllAnalyzerModels As String = "Common"
 
-    Private mdiAnalyzerCopy As AnalyzerManager 'DL 09/09/2011
+    'Private mdiAnalyzerCopy As AnalyzerManager 'DL 09/09/2011
 
     Private FirmwareVersionChanged As Boolean  ' XBC 14/09/2012
     Private myPackageVersion As String   ' XBC 14/09/2012
@@ -739,6 +740,7 @@ Public Class ISettings
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 11/07/2011 
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
@@ -747,12 +749,6 @@ Public Class ISettings
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
-
-            'DL 09/09/2011
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 13/07/2011 - Use the same AnalyzerManager as the MDI
-            End If
-            'DL 09/09/2011
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()
@@ -775,8 +771,9 @@ Public Class ISettings
             End If
 
             'DL 09/09/2011
-            If Not mdiAnalyzerCopy Is Nothing Then
-                If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                     bsLoadSaveGroupBox.Enabled = False
                 End If
             End If

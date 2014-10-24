@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 
 Imports System.IO
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -147,7 +148,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                myGlobal = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RESET_ANALYZER, True, Nothing, Nothing)
+                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RESET_ANALYZER, True, Nothing, Nothing) '#REFACTORING
 
 
             Catch ex As Exception
@@ -785,9 +786,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 'MyClass.RestoringAdjustmentsTextAttr = "ISEINS:1;" 'QUITAR
                 If MyClass.RestoringAdjustmentsTextAttr.Length > 0 Then
-                    myGlobal = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, _
+                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, _
                                                                                      True, Nothing, _
-                                                                                     MyClass.RestoringAdjustmentsTextAttr)
+                                                                                     MyClass.RestoringAdjustmentsTextAttr) '#REFACTORING
                 End If
 
             Catch ex As Exception
@@ -813,7 +814,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                myGlobal = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADFACTORYADJ, True, Nothing, Nothing)
+                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADFACTORYADJ, True, Nothing, Nothing) '#REFACTORING
 
 
             Catch ex As Exception
@@ -1019,9 +1020,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     End With
 
-                    myGlobal = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.FW_UTIL, _
+                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.FW_UTIL, _
                                                                                      True, Nothing, _
-                                                                                     myFWUpdateRequest)
+                                                                                     myFWUpdateRequest) '#REFACTORING
                 End If
 
             Catch ex As Exception
@@ -1090,7 +1091,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         '3- Calculate CRC32 of all Repository File
                         If Not myGlobal.HasError Then
-                            myGlobal = myFwScriptDelegate.AnalyzerManager.CalculateFwFileCRC32(myBytesData)
+                            myGlobal = AnalyzerController.Instance.Analyzer.CalculateFwFileCRC32(myBytesData) '#REFACTORING
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 myCRC32Hex = CStr(myGlobal.SetDatos)
                             End If
@@ -1234,7 +1235,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal = myUtil.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim SwVersion As String = myGlobal.SetDatos.ToString
-                    myGlobal = MyClass.myFwScriptDelegate.AnalyzerManager.ValidateFwSwCompatibility(pFWFileVersion, SwVersion)
+                    myGlobal = AnalyzerController.Instance.Analyzer.ValidateFwSwCompatibility(pFWFileVersion, SwVersion) '#REFACTORING
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         iscompatible = CBool(myGlobal.SetDatos)
                     End If

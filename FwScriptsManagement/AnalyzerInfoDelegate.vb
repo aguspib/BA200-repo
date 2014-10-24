@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.TO
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -78,7 +79,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Public ReadOnly Property FwCompatible() As Boolean
             Get
-                Return myFwScriptDelegate.AnalyzerManager.IsFwSwCompatible
+                Return AnalyzerController.Instance.Analyzer.IsFwSwCompatible '#REFACTORING
             End Get
         End Property
 
@@ -406,7 +407,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     'myLocalRefreshDS.AcceptChanges()
                     ' TODO - PENDING when FW ready to manage this !!!
 
-                   
+
 
                     For Each S As UIRefreshDS.FirmwareValueChangedRow In pRefreshDS.FirmwareValueChanged
                         Select Case S.ElementID
@@ -841,7 +842,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myParams.Add("1")
         '        myParams.Add(MyClass.SerialNumberAttr)
 
-        '        myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.UTIL, True, Nothing, Nothing, "", myParams)
+        '        myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.UTIL, True, Nothing, Nothing, "", myParams)
 
         '    Catch ex As Exception
         '        myResultData.HasError = True
@@ -968,7 +969,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myResultData = MyBase.SendPOLLHW(POLL_IDs.SF1)
 
                     ' CPU
-                ElseIf Not ReadcpuInfoDoneAttr Then
+                ElseIf Not ReadCPUInfoDoneAttr Then
                     Me.NumPOLLHWAttr += 1
                     myResultData = MyBase.SendPOLLHW(POLL_IDs.CPU)
 

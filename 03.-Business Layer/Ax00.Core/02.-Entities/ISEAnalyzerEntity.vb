@@ -14,10 +14,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #Region "Constructor"
 
-        Public Sub New()
-
-        End Sub
-
         Public Sub New(ByRef pAnalyzer As IAnalyzerEntity, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
             Try
                 MyClass.IsAnalyzerDisconnectedAttr = pDisconnectedMode
@@ -137,9 +133,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Private myISELimitsDS As FieldLimitsDS 'Data obtained from SwLimits
         ' XBC 26/03/2012
         Private myAlarms() As Boolean 'array of current ISE alarms
-
-        'Public IsPendingToInitializeAfterActivation As Boolean = False 'SGM 14/06/2012 #REFACTORING
-
         ' XBC 02/07/2012
         Private SIPcycles As Single
         Private SIPIntervalConsumption As Single     ' interval of time that a SIP cycle is consumed (in minutes)
@@ -148,9 +141,6 @@ Namespace Biosystems.Ax00.Core.Entities
         Private ForceConsumptionsInitialize As Boolean = False
         Private ISE_EXECUTION_TIME_SER As Single = 0
         Private ISE_EXECUTION_TIME_URI As Single = 0
-
-        'Public IsCommErrorDetected As Boolean = False 'SGM 01/08/2012 #REFACTORING
-
 #End Region
 
 #Region "Public Events"
@@ -2348,8 +2338,6 @@ Namespace Biosystems.Ax00.Core.Entities
 #Region "Private Methods"
 
 #Region "Common"
-
-
 
         ''' <summary>
         ''' 
@@ -6607,21 +6595,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #End Region
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #End Region
 
 #Region "Public Methods"
@@ -6726,7 +6699,6 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return resultData
         End Function
-
 
         Public Function SetElectrodesInstallDates(ByVal pRef As DateTime, ByVal pNa As DateTime, _
                                                   ByVal pK As DateTime, ByVal pCl As DateTime, _
@@ -7979,6 +7951,186 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub Initialize() Implements IISEAnalyzerEntity.Initialize
+            Try
+                MyClass.IsAnalyzerDisconnectedAttr = False
+
+                Dim myGlobal As New GlobalDataTO
+                myGlobal = MyClass.RefreshAllDatabaseInformation
+
+                If myGlobal.HasError Then
+                    Throw New Exception(myGlobal.ErrorMessage)
+                End If
+
+                myISEInfoDelegate = New ISEDelegate
+                myISECalibHistory = New ISECalibHistoryDelegate
+                myISEInfoDS = Nothing
+                myISESwParametersDS = Nothing
+                myISELimitsDS = Nothing
+                myAlarms = Nothing
+                SIPcycles = Nothing
+                SIPIntervalConsumption = Nothing
+                Interval1forPurgeACompletedbyFW = Nothing
+                Interval2forPurgeACompletedbyFW = Nothing
+                ForceConsumptionsInitialize = False
+                ISE_EXECUTION_TIME_SER = 0
+                ISE_EXECUTION_TIME_URI = 0
+
+                'Analyzer
+                IsAnalyzerDisconnectedAttr = False
+                IsAnalyzerWarmUpAttr = False
+                AnalyzerIDAttr = ""
+                AnalyzerModelAttr = ""
+                WorkSessionIDAttr = ""
+
+                'Procedures & results management
+                CurrentProcedureAttr = ISEProcedures.None
+                CurrentCommandTOAttr = Nothing
+                LastISEResultAttr = Nothing
+                LastProcedureResultAttr = ISEProcedureResult.None
+                CurrentProcedureIsFinishedAttr = False
+
+                'Monitor
+                MonitorDataTOAttr = Nothing
+
+                'Status
+                IsISEModuleInstalledAttr = False
+                IsISESwitchONAttr = False
+                IsISEInitializationDoneAttr = False
+                IsISEInitiatedOKAttr = False
+                IsISEOnceInitiatedOKAttr = False
+                IsISECommsOkAttr = False
+                IsISEModuleReadyAttr = False
+                IsLongTermDeactivationAttr = False
+                isISEStatusUnknownAttr = True
+
+                'Reagents Pack
+                ISEDallasSNAttr = Nothing
+                ISEDallasPage00Attr = Nothing
+                ISEDallasPage01Attr = Nothing
+                ReagentsPackInstallationDateAttr = Nothing
+                IsReagentsPackInstalledAttr = False
+                ReagentsPackExpirationDateAttr = Nothing
+                BiosystemsCodeAttr = ""
+                ReagentsPackInitialVolCalAAttr = 0
+                ReagentsPackInitialVolCalBAttr = 0
+                IsReagentsPackReadyAttr = False
+                IsCleanPackInstalledAttr = False
+                IsEnoughCalibratorAAttr = False
+                IsEnoughCalibratorBAttr = False
+                IsCalAUpdateRequiredAttr = False
+                IsCalBUpdateRequiredAttr = False
+
+                'Electrodes
+                IsElectrodesReadyAttr = False
+                IsLiEnabledByUserAttr = True
+
+                IsLiMountedAttr = False
+                IsNaMountedAttr = False
+                IsKMountedAttr = False
+                IsClMountedAttr = False
+
+                IsRefExpiredAttr = False
+                IsLiExpiredAttr = False
+                IsNaExpiredAttr = False
+                IsKExpiredAttr = False
+                IsClExpiredAttr = False
+
+                IsRefOverUsedAttr = False
+                IsLiOverUsedAttr = False
+                IsNaOverUsedAttr = False
+                IsKOverUsedAttr = False
+                IsClOverUsedAttr = False
+
+                RefInstallDateAttr = Nothing
+                LiInstallDateAttr = Nothing
+                NaInstallDateAttr = Nothing
+                KInstallDateAttr = Nothing
+                ClInstallDateAttr = Nothing
+
+                RefTestCountAttr = -1
+                LiTestCountAttr = -1
+                NaTestCountAttr = -1
+                KTestCountAttr = -1
+                ClTestCountAttr = -1
+
+                PumpTubingInstallDateAttr = Nothing
+                FluidicTubingInstallDateAttr = Nothing
+                PumpTubingExpireDateAttr = Nothing
+                FluidicTubingExpireDateAttr = Nothing
+
+                'recommended Procedures
+                IsCalibrationNeededAttr = False
+                IsPumpCalibrationNeededAttr = False
+                IsBubbleCalibrationNeededAttr = False
+                IsCleanNeededAttr = False
+
+                'last calibrations and clean
+                LastElectrodesCalibrationResult1Attr = ""
+                LastElectrodesCalibrationResult2Attr = ""
+                LastElectrodesCalibrationDateAttr = Nothing
+                LastElectrodesCalibrationErrorAttr = ""
+                LastPumpsCalibrationResultAttr = ""
+                LastPumpsCalibrationDateAttr = Nothing
+                LastPumpsCalibrationErrorAttr = ""
+                LastBubbleCalibrationResultAttr = ""
+                LastBubbleCalibrationDateAttr = Nothing
+                LastBubbleCalibrationErrorAttr = ""
+                LastCleanDateAttr = Nothing
+                LastCleanErrorAttr = ""
+                TestsCountSinceLastCleanAttr = -1
+
+                'Consumptions
+                ConsumptionCalAbySerumAttr = 0
+                ConsumptionCalBbySerumAttr = 0
+                ConsumptionCalAbyUrine1Attr = 0
+                ConsumptionCalBbyUrine1Attr = 0
+                ConsumptionCalAbyUrine2Attr = 0
+                ConsumptionCalBbyUrine2Attr = 0
+                ConsumptionCalAbyElectrodesCalAttr = 0
+                ConsumptionCalBbyElectrodesCalAttr = 0
+                ConsumptionCalAbyPumpsCalAttr = 0
+                ConsumptionCalBbyPumpsCalAttr = 0
+                ConsumptionCalAbyBubblesCalAttr = 0
+                ConsumptionCalBbyBubblesCalAttr = 0
+                ConsumptionCalAbyCleanCycleAttr = 0
+                ConsumptionCalBbyCleanCycleAttr = 0
+                ConsumptionCalAbyPurgeAAttr = 0
+                ConsumptionCalBbyPurgeAAttr = 0
+                ConsumptionCalAbyPurgeBAttr = 0
+                ConsumptionCalBbyPurgeBAttr = 0
+                ConsumptionCalAbyPrimeAAttr = 0
+                ConsumptionCalBbyPrimeAAttr = 0
+                ConsumptionCalAbyPrimeBAttr = 0
+                ConsumptionCalBbyPrimeBAttr = 0
+                ConsumptionCalAbySippingAttr = 0
+                ConsumptionCalBbySippingAttr = 0
+
+                Const CteVolumeToSaveDallasData = 1
+                MinConsumptionVolToSaveDallasData_CalA = 0
+                MinConsumptionVolToSaveDallasData_CalB = 0
+                CountConsumptionToSaveDallasData_CalA = 0
+                CountConsumptionToSaveDallasData_CalB = 0
+
+                PurgeAbyFirmwareAttr = 0
+                PurgeBbyFirmwareAttr = 0
+                WorkSessionOverallTimeAttr = 0
+                WorkSessionIsRunningAttr = False
+                WorkSessionTestsByTypeAttr = ""
+
+                IsReagentsPackSerialNumberMatchAttr = False
+                IsInUtilitiesAttr = False
+                ISEWSCancelErrorCounterAttr = 0
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
 #End Region
 
 #Region "ISE Sendings"

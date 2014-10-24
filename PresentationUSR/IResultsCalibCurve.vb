@@ -73,7 +73,7 @@ Public Class IResultsCalibCurve
     Private labelCurveCalibRerunNumber As String = String.Empty
     Private labelCalibCurveNotCalculated As String = String.Empty
 
-    Private mdiAnalyzerCopy As AnalyzerManager 'AG 22/06/2012
+    'Private mdiAnalyzerCopy As AnalyzerManager 'AG 22/06/2012 '#REFACTORING
 
 #End Region
 
@@ -772,16 +772,13 @@ Public Class IResultsCalibCurve
     ''' Modified by: PG 14/10/2010 - Get current Language
     '''              RH 20/10/2010 - Removed the currentLanguage local variable/parameter.
     '''                              Initialized the LanguageID new class property. 
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 22/06/2012 - Use the same AnalyzerManager as the MDI
-            End If
 
             GetScreenLabels()
             PrepareButtons()

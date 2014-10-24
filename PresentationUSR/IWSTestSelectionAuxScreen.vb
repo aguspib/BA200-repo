@@ -89,7 +89,7 @@ Public Class IWSTestSelectionAuxScreen
     Private shiftKeyIsPressedOffSystem As Boolean = False
 
     'To get data of the Analyzer
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
 
     'To avoid the screen movement
     Dim myNewLocation As Point
@@ -2382,6 +2382,7 @@ Public Class IWSTestSelectionAuxScreen
     '''                              (needed to verify ISE Controls partially selected)
     '''              XB 27/07/2012 - ISE Tests Disabled by volume not enough functionallity is canceled
     '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub FillAndMarkISETestListGridView(ByVal pISETestsDS As ISETestsDS)
         Try
@@ -2506,11 +2507,6 @@ Public Class IWSTestSelectionAuxScreen
                             End If
                         Next iseTestROW
                     Next selTestRow
-                End If
-
-                'Get the object needed to get the Analyzer properties
-                If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                    mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
                 End If
 
                 ' XB 27/07/2012 - This functionallity is canceled - spec 20/07/2012

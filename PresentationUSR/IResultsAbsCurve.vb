@@ -14,6 +14,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports DevExpress
 Imports DevExpress.XtraGrid.Columns
 Imports Biosystems.Ax00.Types.vwksWSAbsorbanceDS
+Imports Biosystems.Ax00.App
 
 
 Public Class IResultsAbsCurve
@@ -2534,18 +2535,23 @@ Public Class IResultsAbsCurve
 
 #End Region
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton2.Click
         'Simulate instruction reception
         If TextBox5.Text.Trim <> "" Then
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then '#REFACTORING
                     'Short instructions
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
-
-                    'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(TextBox5.Text.Trim)
                 End If
             End If
 

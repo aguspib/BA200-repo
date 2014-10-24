@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -18,7 +20,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Declarations"
         'Communication's Application's Layer
-        Private WithEvents myAnalyzer As AnalyzerManager
+        Private WithEvents analyzer As IAnalyzerEntity '#REFACTORING
 
         'Item of the Script's Queue that is currently being processed by the Analyzer
         Private WithEvents CurrentFwScriptQueueItem As FwScriptQueueItem
@@ -36,10 +38,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Constructor"
-        Public Sub New(ByVal pAnalyzer As AnalyzerManager)
+        'Public Sub New(ByVal pAnalyzer As AnalyzerManager) '#REFACTORING
+        Public Sub New()
             Dim myGlobal As New GlobalDataTO
-            myAnalyzer = pAnalyzer
-            myGlobal = myAnalyzer.ReadFwScriptData()
+
+            analyzer = AnalyzerController.Instance.Analyzer '#REFACTORING
+            myGlobal = AnalyzerController.Instance.Analyzer.ReadFwScriptData() '#REFACTORING
             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                 ActiveFwScriptsData = CType(myGlobal.SetDatos, FwScriptsDataTO)
             End If
@@ -113,14 +117,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '    End Set
         'End Property
 
-        Public Property AnalyzerManager() As AnalyzerManager
-            Get
-                Return myAnalyzer
-            End Get
-            Set(ByVal value As AnalyzerManager)
-                myAnalyzer = value
-            End Set
-        End Property
+        'Public Property AnalyzerManager() As AnalyzerManager
+        '    Get
+        '        Return AnalyzerController.Instance.Analyzer
+        '    End Get
+        '    Set(ByVal value As AnalyzerManager)
+        '        AnalyzerController.Instance.Analyzer = value
+        '    End Set
+        'End Property
 
         Public ReadOnly Property CurrentFwScriptItem() As FwScriptQueueItem
             Get
@@ -246,7 +250,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myLogAcciones As New ApplicationLogManager()
             Try
-                If myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then   ' XBC 19/10/2012
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then   ' XBC 19/10/2012 '#REFACTORING
                     If Not IsWaitingForResponse Then
                         ' XBC 02/11/2011 - Deactivate ANSINF before Command operations have started
                         If INFOManagementEnabledAttribute Then
@@ -301,12 +305,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 IsWaitingForResponse = True
 
 
-                myResultData = myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
                                                          True, _
                                                          Nothing, _
                                                          Nothing, _
                                                          pFwScriptQueueItem.FwScriptID, _
-                                                         pFwScriptQueueItem.ParamList)
+                                                         pFwScriptQueueItem.ParamList) '#REFACTORING
 
 
             Catch ex As Exception
@@ -337,12 +341,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 IsWaitingForResponse = True
 
-                myResultData = myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
                                                          True, _
                                                          Nothing, _
                                                          pInstructions, _
                                                          "", _
-                                                         pParams)
+                                                         pParams) '#REFACTORING
 
 
             Catch ex As Exception
@@ -369,12 +373,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
 
-                myResultData = myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, _
                                                          True, _
                                                          Nothing, _
                                                          "", _
                                                          pFwScriptQueueItem.FwScriptID, _
-                                                         pFwScriptQueueItem.ParamList)
+                                                         pFwScriptQueueItem.ParamList) '#REFACTORING
 
 
             Catch ex As Exception
@@ -398,14 +402,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 MyClass.IsWaitingForResponse = False
 
-                If myAnalyzer.IsAutoInfoActivated Then Return myResultData
+                If AnalyzerController.Instance.Analyzer.IsAutoInfoActivated Then Return myResultData
 
-                myResultData = myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
                                                          True, _
                                                          Nothing, _
-                                                         GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                                                         GlobalEnumerates.Ax00InfoInstructionModes.STR) '#REFACTORING
                 If Not myResultData.HasError Then
-                    myAnalyzer.IsAutoInfoActivated = True
+                    AnalyzerController.Instance.Analyzer.IsAutoInfoActivated = True '#REFACTORING
                 End If
 
             Catch ex As Exception
@@ -426,15 +430,15 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SEND_INFO_STOP() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                If Not myAnalyzer.IsAutoInfoActivated Then Return myResultData
+                If Not AnalyzerController.Instance.Analyzer.IsAutoInfoActivated Then Return myResultData
 
-                myResultData = myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
                                                          True, _
                                                          Nothing, _
-                                                         GlobalEnumerates.Ax00InfoInstructionModes.STP)
+                                                         GlobalEnumerates.Ax00InfoInstructionModes.STP) '#REFACTORING
 
                 If Not myResultData.HasError Then
-                    myAnalyzer.IsAutoInfoActivated = False
+                    AnalyzerController.Instance.Analyzer.IsAutoInfoActivated = False '#REFACTORING
                 End If
 
             Catch ex As Exception
@@ -613,7 +617,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     myNextFwScriptQueueItem = CurrentFwScriptQueueItem.NextOnError
 
                                 Case RESPONSE_TYPES.START
-                                    CurrentFwScriptQueueItem.TimeExpected = myAnalyzer.MaxWaitTime
+                                    CurrentFwScriptQueueItem.TimeExpected = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
 
                             End Select
 
@@ -773,22 +777,22 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
                                           ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), _
-                                          ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzer.ReceptionEvent
+                                          ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles analyzer.ReceptionEvent
             Try
                 If pTreated Then
                     'Refresh button bar the Ax00 and the connection Status 
-                    Select Case myAnalyzer.InstructionTypeReceived
+                    Select Case AnalyzerController.Instance.Analyzer.InstructionTypeReceived '#REFACTORING
 
                         Case AnalyzerManagerSwActionList.STATUS_RECEIVED
                             '
                             ' STATUS RECEIVED
                             '
-                            Select Case myAnalyzer.AnalyzerCurrentAction
+                            Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction '#REFACTORING
 
                                 Case AnalyzerManagerAx00Actions.COMMAND_START
 
                                     If CurrentFwScriptQueueItem IsNot Nothing Then
-                                        CurrentFwScriptQueueItem.TimeExpected = myAnalyzer.MaxWaitTime
+                                        CurrentFwScriptQueueItem.TimeExpected = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                     End If
 
                                     RaiseEvent DataReceivedEvent(RESPONSE_TYPES.START, Nothing)
@@ -800,7 +804,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     '    RaiseEvent DataReceivedEvent(RESPONSE_TYPES.EXCEPTION, Nothing)
                                     'Else
                                     '    'Dim myLogAcciones As New ApplicationLogManager()
-                                    '    'myLogAcciones.CreateLogActivity("AnalyzerManagerAx00Actions.COMMAND_END [myAnalyzer.ReceptionEvent]", "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Information, False)
+                                    '    'myLogAcciones.CreateLogActivity("AnalyzerManagerAx00Actions.COMMAND_END [AnalyzerController.Instance.Analyzer.ReceptionEvent]", "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Information, False)
 
                                     RaiseEvent DataReceivedEvent(RESPONSE_TYPES.OK, Nothing)
                                     'End If
@@ -808,7 +812,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Case AnalyzerManagerAx00Actions.LOADADJ_START
 
                                     If CurrentFwScriptQueueItem IsNot Nothing Then
-                                        CurrentFwScriptQueueItem.TimeExpected = myAnalyzer.MaxWaitTime
+                                        CurrentFwScriptQueueItem.TimeExpected = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                     End If
 
                                     RaiseEvent DataReceivedEvent(RESPONSE_TYPES.START, Nothing)
@@ -826,7 +830,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Case AnalyzerManagerAx00Actions.BARCODE_ACTION_RECEIVED
 
                                     If CurrentFwScriptQueueItem IsNot Nothing Then
-                                        CurrentFwScriptQueueItem.TimeExpected = myAnalyzer.MaxWaitTime
+                                        CurrentFwScriptQueueItem.TimeExpected = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                     End If
 
                                     RaiseEvent DataReceivedEvent(RESPONSE_TYPES.START, Nothing)
@@ -841,7 +845,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     'Case AnalyzerManagerAx00Actions.UTIL_START
 
                                     '    If CurrentFwScriptQueueItem IsNot Nothing Then
-                                    '        CurrentFwScriptQueueItem.TimeExpected = myAnalyzer.MaxWaitTime
+                                    '        CurrentFwScriptQueueItem.TimeExpected = AnalyzerController.Instance.Analyzer.MaxWaitTime
                                     '    End If
 
                                     '    RaiseEvent DataReceivedEvent(RESPONSE_TYPES.START, Nothing)
@@ -862,7 +866,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Case AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START
 
                                     If CurrentFwScriptQueueItem IsNot Nothing Then
-                                        CurrentFwScriptQueueItem.TimeExpected = myAnalyzer.MaxWaitTime
+                                        CurrentFwScriptQueueItem.TimeExpected = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                     End If
 
                                     RaiseEvent DataReceivedEvent(RESPONSE_TYPES.START, Nothing)
@@ -921,7 +925,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Try
         End Sub
 
-        Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles myAnalyzer.SendEvent
+        Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles analyzer.SendEvent
             Dim myResultData As New GlobalDataTO
             Try
                 ' XBC 05/05/2011 - timeout limit repetitions
@@ -961,14 +965,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Public Sub OnManageReceptionEvent(ByVal pResponseData As String, _
                                           ByVal pResponseValue As String, _
-                                          ByVal pTreated As Boolean) Handles myAnalyzer.ReceptionFwScriptEvent
+                                          ByVal pTreated As Boolean) Handles analyzer.ReceptionFwScriptEvent
             Dim myResultData As New GlobalDataTO
             Try
 
                 If IsWaitingForResponse Then
                     If pTreated Then '(1)
 
-                        If myAnalyzer.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND_RECEIVED Then  '(2)
+                        If AnalyzerController.Instance.Analyzer.InstructionTypeReceived = GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND_RECEIVED Then  '(2) '#REFACTORING
 
                             myResultData = MyClass.ManageFwScriptsQueueReceiving(pResponseValue)
 

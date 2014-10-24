@@ -14,6 +14,8 @@ Imports System.IO
 Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
 Imports Biosystems.Ax00.InfoAnalyzer
+Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.App
 
 'PENDING:
 'Add Information XPS Docs for each Action
@@ -100,8 +102,8 @@ Public Class IISEResultsHistory
 #End Region
 
 #Region "Declarations"
-    Private myISEManager As ISEManager
-    Private WithEvents mdiAnalyzerCopy As AnalyzerManager
+    'Private myISEManager As ISEAnalyzerEntity '#REFACTORING
+    'Private WithEvents mdiAnalyzerCopy As AnalyzerManager '#REFACTORING 
     Private myCultureInfo As CultureInfo
     Private myISEHistory As New ISECalibHistoryDelegate
 
@@ -268,7 +270,7 @@ Public Class IISEResultsHistory
     Private Function DecodeERCErrors(ByVal pErrorStr As String) As String
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myRecepcionDecoder As New ISEReception(mdiAnalyzerCopy)
+            Dim myRecepcionDecoder As New ISEReceptionEntity(AnalyzerController.Instance.Analyzer) '#REFACTORING
             Dim myISEResultTO As ISEResultTO
             Dim strRes As String = ""
 
@@ -308,7 +310,7 @@ Public Class IISEResultsHistory
     Private Function DecodeResultsAndErrorsForElectrodes(ByVal pResultStr As String, ByVal pErrorStr As String, ByVal pLiEnabled As Boolean) As String
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myRecepcionDecoder As New ISEReception(mdiAnalyzerCopy)
+            Dim myRecepcionDecoder As New ISEReceptionEntity(AnalyzerController.Instance.Analyzer) '#REFACTORING
             Dim myISEResultTO As ISEResultTO
             Dim strRes As String = DecodeERCErrors(pErrorStr)
 
@@ -346,7 +348,7 @@ Public Class IISEResultsHistory
                 'JB 20/09/2012 - Added validation only if no error in message
                 If Not bDecodedError AndAlso str <> pErrorStr Then
 
-                    myGlobal = myISEManager.ValidateElectrodesCalibration(str, trLiEnabled)
+                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ValidateElectrodesCalibration(str, trLiEnabled) '#REFACTORING
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         If Not DirectCast(myGlobal.SetDatos, Boolean) Then
                             If Not String.IsNullOrEmpty(strRes) Then strRes &= vbCrLf
@@ -1090,13 +1092,14 @@ Public Class IISEResultsHistory
     ''' </summary>
     ''' <remarks>
     ''' Created by: JB 27/07/2012 - Adapted from BSISEMonitorPanel.RefreshFieldsData
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub FillLastResults()
         Me.CleanLastResults()
-        If myISEManager Is Nothing OrElse myISEManager.MonitorDataTO Is Nothing Then Exit Sub
+        If AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing OrElse AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO Is Nothing Then Exit Sub
 
         Try
-            With myISEManager.MonitorDataTO
+            With AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO
 
                 ' ELECTRODES 
                 Dim CheckRecommended As Boolean = False
@@ -1419,7 +1422,7 @@ Public Class IISEResultsHistory
     Private Function DecodeResultToLiNaKClValues(ByVal pResultStr As String) As ISEResultTO.LiNaKCl?
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myReceptionDecoder As New ISEReception(mdiAnalyzerCopy)
+            Dim myReceptionDecoder As New ISEReceptionEntity(AnalyzerController.Instance.Analyzer) '#REFACTORING
             myGlobal = myReceptionDecoder.GetLiNaKClValues(pResultStr)
 
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
@@ -1612,15 +1615,17 @@ Public Class IISEResultsHistory
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub IISEResultsHistory_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             If Me.DesignMode Then Exit Sub
-
-            'Get an instance of the ISE manager class
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
-                myISEManager = mdiAnalyzerCopy.ISE_Manager
-            End If
 
             InitializeScreen()
 

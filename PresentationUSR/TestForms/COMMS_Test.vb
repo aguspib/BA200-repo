@@ -9,13 +9,17 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Calculations
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Xml
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Interfaces
 
 Public Class bsReception
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Definitions"
-    Private WithEvents myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+
+    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
     Private mdiESWrapperCopy As ESWrapper = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 15/03/2013
+
 #End Region
 
 #Region "AG Initial Generate Instructions Testings"
@@ -167,19 +171,24 @@ Public Class bsReception
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceive.Click
         'Try
         'Simulate instruction reception
         If String.Compare(TextBox5.Text.Trim, "", False) <> 0 Then
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then '#REFACTORING
                     'Short instructions
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
-
-                    'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(TextBox5.Text.Trim)
                 End If
             End If
         End If
@@ -194,7 +203,7 @@ Public Class bsReception
 #Region "Communications Board Testings & Simulate Send Next Preparation"
 
     Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzerManager.ReceptionEvent
+                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles analyzer.ReceptionEvent
         Try
             If pTreated Then
                 BsReceivedTextBox.Text += ">> " & pInstructionReceived & vbCrLf
@@ -209,7 +218,7 @@ Public Class bsReception
         End Try
     End Sub
 
-    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles myAnalyzerManager.SendEvent
+    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles analyzer.SendEvent
         Try
             BsReceivedTextBox.Text += pInstructionSent & vbCrLf
 
@@ -219,13 +228,19 @@ Public Class bsReception
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsCommTestings_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsCommTestings.Click
         Try
             Me.Cursor = Cursors.WaitCursor
 
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-
+            If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
                 Dim myGlobal As New GlobalDataTO
 
                 'Software testings
@@ -238,55 +253,56 @@ Public Class bsReception
                     myInstruction = ""
                 End If
 
+                '#REFACTORING
                 Select Case myInstruction
                     Case "CONNECT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT, True) 'CONNECT
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT, True) 'CONNECT
 
                     Case "STATE"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'STATE
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'STATE
 
                     Case "STANDBY"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True) 'STANDBY
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True) 'STANDBY
 
                     Case "SLEEP"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
 
                     Case "RUNNING"
-                        myAnalyzerManager.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
-                        myAnalyzerManager.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
+                        AnalyzerController.Instance.Analyzer.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
+                        AnalyzerController.Instance.Analyzer.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
 
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
 
                     Case "START"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START, True) 'START
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START, True) 'START
 
                     Case "TEST"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True) 'START
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True) 'START
 
                     Case "ENDRUN"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True) 'ENDRUN
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True) 'ENDRUN
 
                     Case "INFO OFF"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP)
 
                     Case "INFO ON"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR)
 
                     Case "CONFIG"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True) 'CONFIG
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True) 'CONFIG
 
                     Case "POLLRD"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLRD, True, Nothing, 3) 'POLLRD
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLRD, True, Nothing, 3) 'POLLRD
 
                         'Case "ABORT"
-                        '    myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True) 'ENDRUN
+                        '    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True) 'ENDRUN
 
                     Case Else
                 End Select
 
                 Dim myTitle As String = ""
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    If Not myAnalyzerManager.Connected Then
+                    If Not AnalyzerController.Instance.Analyzer.Connected Then
                         myGlobal.ErrorCode = "ERROR_COMM"
                         myTitle = "Warning"
                     End If
@@ -298,7 +314,7 @@ Public Class bsReception
                 If String.Compare(myTitle, "", False) <> 0 Then
                     Me.ShowMessage(myTitle, myGlobal.ErrorCode)
                     'Else
-                    'BsReceivedTextBox.Text += myAnalyzerManager.InstructionSent & vbCrLf
+                    'BsReceivedTextBox.Text += AnalyzerController.Instance.Analyzer.InstructionSent & vbCrLf
                 End If
 
             End If
@@ -325,15 +341,19 @@ Public Class bsReception
         End Try
     End Sub
 
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsSendNext_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsSendNext.Click
         Try
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-
+            If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
                 Dim ResultData As New GlobalDataTO
-                ResultData = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True, Nothing, 1, "")
-
+                ResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True, Nothing, 1, "")
             End If
 
         Catch ex As Exception

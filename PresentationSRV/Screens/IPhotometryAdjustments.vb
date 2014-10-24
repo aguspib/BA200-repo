@@ -11,6 +11,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.IO
+Imports Biosystems.Ax00.App
 
 Public Class IPhotometryAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -280,7 +281,7 @@ Public Class IPhotometryAdjustments
         Return True
     End Function
 
-   
+
 
 #End Region
 
@@ -411,7 +412,7 @@ Public Class IPhotometryAdjustments
                              Optional ByVal pAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myScreenDelegate.NoneInstructionToSend = True
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode, pAdjustmentGroup)
                 If Not myGlobal.HasError Then
@@ -728,7 +729,7 @@ Public Class IPhotometryAdjustments
                 myWarningImage = Nothing
             End If
 
-            
+
             '' XBC 20/02/2012
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
@@ -862,7 +863,7 @@ Public Class IPhotometryAdjustments
                     MyClass.PrepareErrorMode()
             End Select
 
-            If Not MyBase.SimulationMode And Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyClass.PrepareErrorMode()
                 MyBase.DisplayMessage("")
             End If
@@ -1007,7 +1008,7 @@ Public Class IPhotometryAdjustments
                     ' Manage results of the readed WaveLengths from the Instrument
                     If myScreenDelegate.TestBaseLineDone Then
                         ' Instrument returns leds currents in conjunction with BL & DC readings
-                        myResultData = myAnalyzerManager.ReadPhotometryData()
+                        myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData() '#REFACTORING
                         If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                             myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
 
@@ -1165,7 +1166,7 @@ Public Class IPhotometryAdjustments
                                             PrepareArea()
                                         Else
                                             ' Fill Rotor is already filled by user and then proceed to send Read Photometric Counts to Instrument
-                                            If Not myResultData.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                            If Not myResultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                                 Me.Cursor = Cursors.WaitCursor
                                                 myResultData = myScreenDelegate.SendREAD_COUNTS(ADJUSTMENT_GROUPS.PHOTOMETRY)
                                             End If
@@ -1263,7 +1264,7 @@ Public Class IPhotometryAdjustments
                                         MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
                                         PrepareArea()
                                     Else
-                                        If Not myResultData.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                        If Not myResultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                             Me.Cursor = Cursors.WaitCursor
 
                                             ' XBC 30/10/2012
@@ -1309,7 +1310,7 @@ Public Class IPhotometryAdjustments
                                 Me.BsStep1UpDownWSButton.Enabled = True
                                 Me.BsStep2UpDownWSButton.Enabled = True
 
-                                'myResultData = myAnalyzerManager.ReadPhotometryData()
+                                'myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData()
                                 'If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                                 '    myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
 
@@ -1361,7 +1362,7 @@ Public Class IPhotometryAdjustments
                                         MyBase.CurrentMode = ADJUSTMENT_MODES.TESTED
                                         PrepareArea()
                                     Else
-                                        If Not myResultData.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                        If Not myResultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                             Me.Cursor = Cursors.WaitCursor
 
                                             ' XBC 21/02/2012
@@ -2644,7 +2645,7 @@ Public Class IPhotometryAdjustments
             'Me.BsphMainBLListView.View = View.Tile
             'Me.BsphRefBLListView.View = View.Tile
             'Me.BsWLsListView.View = View.Tile
-            'myResultData = myAnalyzerManager.ReadPhotometryData()
+            'myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData()
             'If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
             '    myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
 
@@ -3305,7 +3306,7 @@ Public Class IPhotometryAdjustments
             DisableAll()
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
             Else
@@ -3326,7 +3327,7 @@ Public Class IPhotometryAdjustments
                         MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                         PrepareArea()
                     Else
-                        If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                             myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                         End If
                     End If
@@ -3631,7 +3632,7 @@ Public Class IPhotometryAdjustments
                                 myScreenDelegate.CurrentTest = myAdjustmentGroup
                                 PrepareArea()
                             Else
-                                If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                     Me.Cursor = Cursors.WaitCursor
                                     myGlobal = myScreenDelegate.SendREAD_COUNTS(myAdjustmentGroup)
                                 End If
@@ -3741,7 +3742,7 @@ Public Class IPhotometryAdjustments
                                 MyBase.CurrentMode = ADJUSTMENT_MODES.SAVED
                                 PrepareArea()
                             Else
-                                If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+                                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                     Me.Cursor = Cursors.WaitCursor
                                     myGlobal = myScreenDelegate.SendLOAD_ADJUSTMENTS(ADJUSTMENT_GROUPS.IT_EDITION)
                                 End If
@@ -4511,5 +4512,5 @@ Public Class IPhotometryAdjustments
 
 #End Region
 
-    
+
 End Class

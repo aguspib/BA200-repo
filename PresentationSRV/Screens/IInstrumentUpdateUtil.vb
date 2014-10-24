@@ -13,6 +13,7 @@ Imports System.Runtime.InteropServices 'WIN32
 Imports System.IO
 Imports System.Drawing.Printing
 Imports System.Xml.Serialization
+Imports Biosystems.Ax00.App
 
 'Pendiente
 '**************************
@@ -280,7 +281,7 @@ Public Class IInstrumentUpdateUtil
                     MyClass.PrepareArea()
                     Me.BsFwUpdateButton.Enabled = False
                 End If
-                MyBase.myServiceMDI.MDIAnalyzerManager.IsFwUpdateInProcess = value
+                AnalyzerController.Instance.Analyzer.IsFwUpdateInProcess = value '#REFACTORING
             End If
         End Set
     End Property
@@ -519,7 +520,7 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
 
         Try
-            myGlobal = MyBase.myServiceMDI.MDIAnalyzerManager.LoadFwAdjustmentsMasterData(MyBase.SimulationMode)
+            myGlobal = AnalyzerController.Instance.Analyzer.LoadFwAdjustmentsMasterData(MyBase.SimulationMode) '#REFACTORING
             If Not myGlobal.HasError OrElse myGlobal.SetDatos IsNot Nothing Then
                 myAdjustmentsMasterDataDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
             End If
@@ -992,7 +993,7 @@ Public Class IInstrumentUpdateUtil
                 'MyBase.DisplaySimulationMessage("Request Adjustments from Instrument...")
                 Me.Cursor = Cursors.WaitCursor
 
-                myGlobal = MyBase.myServiceMDI.MDIAnalyzerManager.ReadFwAdjustmentsDS()
+                myGlobal = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS() '#REFACTORING
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 
                     MyClass.StartProgress(4 * SimulationProcessTime)
@@ -1011,7 +1012,7 @@ Public Class IInstrumentUpdateUtil
                 End If
 
             Else
-                If Not myGlobal.HasError AndAlso MyClass.myAnalyzerManager.Connected Then
+                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                     MyBase.myServiceMDI.SEND_INFO_STOP()
                     myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                 End If
@@ -1063,7 +1064,7 @@ Public Class IInstrumentUpdateUtil
     '        If res <> Windows.Forms.DialogResult.Cancel Then
     '            'export to a file
     '            Dim myPath As String = Me.BackupFileDialog.FileName
-    '            myGlobal = MyBase.myAdjustmentsDelegate.ExportDSToFile(MyClass.myAnalyzerManager.ActiveAnalyzer, MyClass.myAnalyzerManager.ActiveFwVersion, myPath, True)
+    '            myGlobal = MyBase.myAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveFwVersion, myPath, True)
 
     '            If Not myGlobal.HasError Then
     '                MyClass.IsAlreadySaved = True
@@ -1095,7 +1096,9 @@ Public Class IInstrumentUpdateUtil
     ''' from the internal factory adjustments set
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created by SGM 24/06/2011</remarks>
+    ''' <remarks>Created by SGM 24/06/2011
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function RequestRestoreAction() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
@@ -1142,7 +1145,7 @@ Public Class IInstrumentUpdateUtil
 
                         'update text file
                         MyClass.myAdjustmentsDelegate = New FwAdjustmentsDelegate(MyClass.CurrentAdjustmentsDS)
-                        myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(MyClass.myAnalyzerManager.ActiveAnalyzer)
+                        myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
 
                     End If
 
@@ -1157,7 +1160,7 @@ Public Class IInstrumentUpdateUtil
                 End If
 
                 '2-check if is inn STANDBY before sending
-                If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.STANDBY Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.STANDBY Then
 
                     MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.SRV_RESTOREADJ_MUST_STANDBY.ToString)
                     Dim res As DialogResult = MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.SRV_STANDBY_ASK.ToString)
@@ -1182,7 +1185,7 @@ Public Class IInstrumentUpdateUtil
 
                         Else
                             'restart info
-                            If Not myGlobal.HasError AndAlso MyClass.myAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
                                 MyBase.myServiceMDI.SEND_INFO_START()
                             End If
 
@@ -1224,7 +1227,7 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
         Try
 
-            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
 
                 MyBase.DisplayMessage(Messages.SRV_RESTORE_ADJUSTMENTS.ToString)
 
@@ -1278,7 +1281,7 @@ Public Class IInstrumentUpdateUtil
     Private Function RestoreFactoryAdjustments() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
 
                 MyBase.DisplayMessage(Messages.SRV_RESTORE_DEF_ADJUSTMENTS.ToString)
 
@@ -1371,7 +1374,7 @@ Public Class IInstrumentUpdateUtil
             If Me.SimulationMode Then
                 myGlobal = MyClass.UpdateFirmware()
             Else
-                If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                     MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.SRV_UPDATEFW_MUST_SLEEP.ToString)
                     MyBase.DisplayMessage("")
                     MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
@@ -1776,7 +1779,7 @@ Public Class IInstrumentUpdateUtil
                     Me.BsFileNameTextBox.Enabled = True
 
                     If MyClass.IsFwFileReadyToSend Then
-                        If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then
+                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                             MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.SRV_UPDATEFW_MUST_SLEEP.ToString)
                             MyBase.DisplayMessage("")
                         Else
@@ -1806,7 +1809,7 @@ Public Class IInstrumentUpdateUtil
 
             'update MDI buttons and menus
 
-            If myAnalyzerManager.IsFwSwCompatible Then
+            If AnalyzerController.Instance.Analyzer.IsFwSwCompatible Then '#REFACTORING
                 MyBase.ActivateMDIMenusButtons(True, False, True)
             End If
 
@@ -2000,14 +2003,14 @@ Public Class IInstrumentUpdateUtil
         Try
 
             'SGM 25/10/2012
-            If Not MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 MyClass.StopCurrentOperation(ManagementAlarmTypes.NONE)
                 Exit Sub
             End If
 
             'MyBase.DisplayMessage(Messages.SRV_FW_UPDATED.ToString)
 
-            Dim myFWResponseData As FWUpdateResponseTO = MyBase.myServiceMDI.MDIAnalyzerManager.FWUpdateResponseData
+            Dim myFWResponseData As FWUpdateResponseTO = AnalyzerController.Instance.Analyzer.FWUpdateResponseData '#REFACTORING
 
             'Me.ProgressBar1.Visible = False
 
@@ -2183,7 +2186,7 @@ Public Class IInstrumentUpdateUtil
 
                     MyBase.CreateLogActivity("Firmware Version " & MyClass.myScreenDelegate.FWFileHeaderVersion & " updated Ok", Me.Name & ".PrepareFirmwareUpdatedMode ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
-                    myAnalyzerManager.IsFwSwCompatible = True
+                    AnalyzerController.Instance.Analyzer.IsFwSwCompatible = True '#REFACTORING
                     MyBase.ActivateMDIMenusButtons(True, False, True)
 
 
@@ -2536,13 +2539,13 @@ Public Class IInstrumentUpdateUtil
 
             MyBase.myServiceMDI.SEND_INFO_START()
 
-            myGlobal = MyBase.myServiceMDI.MDIAnalyzerManager.ReadFwAdjustmentsDS()
+            myGlobal = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS() '#REFACTORING
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 MyClass.CurrentAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
 
                 With MyClass.CurrentAdjustmentsDS
-                    '.AnalyzerModel = MyBase.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer
-                    '.FirmwareVersion = MyBase.myServiceMDI.MDIAnalyzerManager.ActiveFwVersion
+                    '.AnalyzerModel = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
+                    '.FirmwareVersion = AnalyzerController.Instance.Analyzer.ActiveFwVersion
                     If MyBase.SimulationMode Then
                         .ReadedDatetime = DateTime.Now
                     End If
@@ -2550,8 +2553,8 @@ Public Class IInstrumentUpdateUtil
 
                 'MyClass.CurrentAdjustmentsHeader = New AdjustmentsHeader
                 'With MyClass.CurrentAdjustmentsHeader
-                '    .AnalyzerModel = MyBase.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer
-                '    .FirmwareVersion = MyBase.myServiceMDI.MDIAnalyzerManager.ActiveFwVersion
+                '    .AnalyzerModel = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
+                '    .FirmwareVersion = AnalyzerController.Instance.Analyzer.ActiveFwVersion
                 'End With
 
 
@@ -2708,7 +2711,7 @@ Public Class IInstrumentUpdateUtil
         'End Try
     End Sub
 
-  
+
 
 #End Region
 
@@ -3056,7 +3059,7 @@ Public Class IInstrumentUpdateUtil
 
 
             ' Check communications with Instrument
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
                 ManageTabPages = False
@@ -3202,9 +3205,9 @@ Public Class IInstrumentUpdateUtil
                 Me.Refresh()
 
                 Application.DoEvents()
-
-                If MyBase.myServiceMDI.MDIAnalyzerManager.ReadedFwVersion.Length > 0 Then
-                    Me.BsFwCurrentVersionLabel.Text = MyBase.myServiceMDI.MDIAnalyzerManager.ReadedFwVersion
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.ReadedFwVersion.Length > 0 Then
+                    Me.BsFwCurrentVersionLabel.Text = AnalyzerController.Instance.Analyzer.ReadedFwVersion
                 Else
                     Me.BsFwCurrentVersionLabel.Text = "_.__"
                 End If
@@ -3494,9 +3497,9 @@ Public Class IInstrumentUpdateUtil
                 If CBool(myGlobal.SetDatos) Then
                     MyClass.CurrentAdjustmentsDS = New SRVAdjustmentsDS
                     With MyClass.CurrentAdjustmentsDS
-                        .AnalyzerModel = "A400" ' MyBase.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer
-                        .AnalyzerID = MyBase.myServiceMDI.MDIAnalyzerManager.ActiveAnalyzer
-                        .FirmwareVersion = MyBase.myServiceMDI.MDIAnalyzerManager.ActiveFwVersion
+                        .AnalyzerModel = "A400"
+                        .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer '#REFACTORING
+                        .FirmwareVersion = AnalyzerController.Instance.Analyzer.ActiveFwVersion '#REFACTORING
                         .ReadedDatetime = Nothing
                     End With
 
@@ -3738,7 +3741,7 @@ Public Class IInstrumentUpdateUtil
 
         Try
 
-            If Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then
+            If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyBase.ShowMessage(MyBase.myServiceMDI.Text, Messages.SRV_UPDATEFW_MUST_SLEEP.ToString)
                 MyBase.DisplayMessage("")
             Else
@@ -3808,7 +3811,7 @@ Public Class IInstrumentUpdateUtil
                 Case ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     If pResponse = RESPONSE_TYPES.OK Then
 
-                        myGlobal = MyBase.myServiceMDI.MDIAnalyzerManager.ReadFwAdjustmentsDS()
+                        myGlobal = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS() '#REFACTORING
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READED.ToString)
                             MyBase.myServiceMDI.AdjustmentsReaded = True
@@ -3871,16 +3874,18 @@ Public Class IInstrumentUpdateUtil
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
     ''' <param name="pRefreshDS"></param>
-    ''' <remarks>Created by SGM 30/06/2011</remarks>
+    ''' <remarks>Created by SGM 30/06/2011
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
         Static myCPUUpdateResponseData As FWUpdateResponseTO
         Try
 
             If Not MyClass.IsFwUpdateRequested Then
-                Select Case MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerCurrentAction
+                Select Case AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction
                     Case AnalyzerManagerAx00Actions.SLEEP_START
-                        MyClass.TimeForWait = MyBase.myServiceMDI.MDIAnalyzerManager.MaxWaitTime
+                        MyClass.TimeForWait = AnalyzerController.Instance.Analyzer.MaxWaitTime
                         MyBase.CurrentMode = ADJUSTMENT_MODES.SLEEP_DOING
                         MyClass.PrepareArea()
 
@@ -3889,7 +3894,7 @@ Public Class IInstrumentUpdateUtil
                         MyClass.PrepareArea()
 
                     Case AnalyzerManagerAx00Actions.STANDBY_START
-                        MyClass.TimeForWait = MyBase.myServiceMDI.MDIAnalyzerManager.MaxWaitTime
+                        MyClass.TimeForWait = AnalyzerController.Instance.Analyzer.MaxWaitTime
                         MyBase.CurrentMode = ADJUSTMENT_MODES.STANDBY_DOING
                         MyClass.PrepareArea()
 
@@ -3898,7 +3903,7 @@ Public Class IInstrumentUpdateUtil
                         MyClass.PrepareArea()
 
                     Case AnalyzerManagerAx00Actions.LOADADJ_START
-                        MyClass.TimeForWait = MyBase.myServiceMDI.MDIAnalyzerManager.MaxWaitTime
+                        MyClass.TimeForWait = AnalyzerController.Instance.Analyzer.MaxWaitTime
                         MyBase.CurrentMode = ADJUSTMENT_MODES.SAVING
                         MyClass.PrepareArea()
 
@@ -3907,7 +3912,7 @@ Public Class IInstrumentUpdateUtil
                         MyClass.PrepareArea()
 
                         'Case AnalyzerManagerAx00Actions.FACTORYADJ_START
-                        '    MyClass.TimeForWait = MyBase.myServiceMDI.MDIAnalyzerManager.MaxWaitTime
+                        '    MyClass.TimeForWait = AnalyzerController.Instance.Analyzer.MaxWaitTime
                         '    MyBase.CurrentMode = ADJUSTMENT_MODES.SAVING
                         '    MyClass.PrepareArea()
 
@@ -3916,7 +3921,7 @@ Public Class IInstrumentUpdateUtil
                         '    MyClass.PrepareArea()
 
                     Case AnalyzerManagerAx00Actions.RESET_START
-                        MyClass.TimeForWait = MyBase.myServiceMDI.MDIAnalyzerManager.MaxWaitTime
+                        MyClass.TimeForWait = AnalyzerController.Instance.Analyzer.MaxWaitTime
                         MyBase.CurrentMode = ADJUSTMENT_MODES.ANALYZER_RESETING
                         MyClass.PrepareArea()
 
@@ -3927,9 +3932,9 @@ Public Class IInstrumentUpdateUtil
                 End Select
 
             Else
-                If MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.FWUTIL_START Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction = AnalyzerManagerAx00Actions.FWUTIL_START Then
 
-                    MyClass.TimeForWait = MyBase.myServiceMDI.MDIAnalyzerManager.MaxWaitTime
+                    MyClass.TimeForWait = AnalyzerController.Instance.Analyzer.MaxWaitTime
                     MyClass.IsFwUpdateRequested = True
                     If myScreenDelegate.FWUpdateCurrentAction > FwUpdateActions.QueryNeeded Then
                         MyClass.StartProgress()
@@ -3937,7 +3942,7 @@ Public Class IInstrumentUpdateUtil
                 End If
             End If
 
-            MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerCurrentAction = GlobalEnumerates.AnalyzerManagerAx00Actions.NO_ACTION
+            AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction = GlobalEnumerates.AnalyzerManagerAx00Actions.NO_ACTION
 
             'FWUTIL
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
@@ -3945,16 +3950,16 @@ Public Class IInstrumentUpdateUtil
 
                 'FW Util received
                 sensorValue = 0
-                sensorValue = MyBase.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FW_UPDATE_UTIL_RECEIVED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FW_UPDATE_UTIL_RECEIVED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    MyBase.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.FW_UPDATE_UTIL_RECEIVED) = 0
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.FW_UPDATE_UTIL_RECEIVED) = 0
 
                     'In case of step:Update CPU, when receive response
                     If myScreenDelegate.FWUpdateCurrentAction = FwUpdateActions.UpdateCPU Then
                         If myCPUUpdateResponseData Is Nothing Then
-                            myCPUUpdateResponseData = MyBase.myServiceMDI.MDIAnalyzerManager.FWUpdateResponseData
+                            myCPUUpdateResponseData = AnalyzerController.Instance.Analyzer.FWUpdateResponseData
                             If myCPUUpdateResponseData.ActionResult = FW_GENERIC_RESULT.OK Then
 
                                 'System.Threading.Thread.Sleep(8000)
@@ -3966,7 +3971,7 @@ Public Class IInstrumentUpdateUtil
                                 ''Stop/Start method
                                 ''1-Stop communications
                                 Dim stopCommOK As Boolean = False
-                                stopCommOK = myAnalyzerManager.StopComm
+                                stopCommOK = AnalyzerController.Instance.Analyzer.StopComm
                                 If Not stopCommOK Then
                                     myGlobal.HasError = True
                                 Else
@@ -3976,7 +3981,7 @@ Public Class IInstrumentUpdateUtil
 
                                     '3-Sart again communications
                                     Dim startCommOK As Boolean = False
-                                    startCommOK = myAnalyzerManager.StartComm()
+                                    startCommOK = AnalyzerController.Instance.Analyzer.StartComm()
                                     If Not startCommOK Then
                                         myGlobal.HasError = True
                                     End If
@@ -3987,10 +3992,10 @@ Public Class IInstrumentUpdateUtil
                                 MyClass.PrepareArea()
                                 myCPUUpdateResponseData = Nothing
                             End If
-                            Else
-                                'In case of second time received ignore it
-                                Exit Sub
-                            End If
+                        Else
+                            'In case of second time received ignore it
+                            Exit Sub
+                        End If
                     Else
 
                         MyBase.CurrentMode = ADJUSTMENT_MODES.FW_UTIL_RECEIVED
@@ -4006,13 +4011,13 @@ Public Class IInstrumentUpdateUtil
                 'FW CPU Update reset Disconection SGM 10/07/2012
                 If myScreenDelegate.FWUpdateCurrentAction = FwUpdateActions.UpdateCPU Then
                     sensorValue = 0
-                    sensorValue = MyBase.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.CONNECTED)
+                    sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.CONNECTED)
                     If sensorValue = 1 Then
-                        MyBase.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.CONNECTED) = 0
+                        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.CONNECTED) = 0
 
                         'finalize process
                         If myCPUUpdateResponseData IsNot Nothing Then
-                            MyBase.myServiceMDI.MDIAnalyzerManager.FWUpdateResponseData = myCPUUpdateResponseData
+                            AnalyzerController.Instance.Analyzer.FWUpdateResponseData = myCPUUpdateResponseData
                             MyBase.CurrentMode = ADJUSTMENT_MODES.FW_UTIL_RECEIVED
                             MyClass.PrepareArea()
                             myCPUUpdateResponseData = Nothing
@@ -4027,14 +4032,14 @@ Public Class IInstrumentUpdateUtil
 
 
                 sensorValue = 0
-                sensorValue = MyBase.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ANALYZER_STATUS_CHANGED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ANALYZER_STATUS_CHANGED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    MyBase.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ANALYZER_STATUS_CHANGED) = 0
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ANALYZER_STATUS_CHANGED) = 0
 
                     If myScreenDelegate.FWUpdateCurrentAction = FwUpdateActions.UpdateCPU Then
-                        If MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
                             MyBase.CurrentMode = ADJUSTMENT_MODES.FW_UTIL_RECEIVED
                             MyClass.PrepareArea()
                         End If

@@ -8,6 +8,8 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.App
+
 'Imports Biosystems.Ax00.CommunicationsSwFw
 'Imports System.Configuration
 'Imports System.Xml.Serialization
@@ -281,7 +283,7 @@ Public Class FwScriptsEdition
         bsInstructionsListDataGridView.Rows.Clear()
     End Sub
 
-   
+
 
     Private Function GetCurrentAuthorID() As GlobalDataTO
         Dim myResultData As New GlobalDataTO
@@ -369,7 +371,7 @@ Public Class FwScriptsEdition
             MyClass.LoadScreensTreeView()
             MyClass.SelectedFwScript = New FwScriptTO
 
-            If Not Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 BsTestButton.Enabled = False
             End If
 
@@ -1223,8 +1225,8 @@ Public Class FwScriptsEdition
             End With
 
             Me.bsInstructionsListDataGridView.SelectionMode = DataGridViewSelectionMode.FullRowSelect
-
-            Me.BsTestButton.Enabled = Ax00ServiceMainMDI.MDIAnalyzerManager.Connected And _
+            '#REFACTORING
+            Me.BsTestButton.Enabled = AnalyzerController.Instance.Analyzer.Connected And _
                                         Not MyClass.SimulationMode And _
                                         (Me.bsInstructionsListDataGridView.Rows.Count > 0) And _
                                         MyClass.IsSyntaxOK
@@ -1993,7 +1995,7 @@ Public Class FwScriptsEdition
                         myRow.Cells("SyntaxOK").Value = False
                         myRow.Cells("TestedOK").Value = False
                         myRow.Cells("EnableEdition").Value = Instr.EnableEdition.ToString
-                        cont += 1 
+                        cont += 1
                     Next
                 End If
 
@@ -2672,6 +2674,7 @@ Public Class FwScriptsEdition
     ''' <remarks>
     ''' Created by SG 28/09/2010
     ''' modified by XBC 08/11/2010
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Function TestScriptInstructions(ByVal pInstructions As List(Of InstructionTO)) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
@@ -2680,8 +2683,7 @@ Public Class FwScriptsEdition
         Dim value As String = ""
         Dim values As List(Of String) = Nothing
         Try
-            'If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-            If Ax00ServiceMainMDI.MDIAnalyzerManager.Connected Then
+            If AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
 
                 If pInstructions IsNot Nothing Then
                     myGlobal = MyClass.CheckGrid(True)
@@ -3001,8 +3003,7 @@ Public Class FwScriptsEdition
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
 
                 ' XBC 02/11/2011 - error multiples threads 
-                'myGlobal = MyClass.myAnalyzer.LoadAppFwScriptsData()
-                myGlobal = Ax00ServiceMainMDI.MDIAnalyzerManager.LoadAppFwScriptsData()
+                myGlobal = AnalyzerController.Instance.Analyzer.LoadAppFwScriptsData() '#REFACTORING
                 ' XBC 02/11/2011 - error multiples threads 
 
                 If Not myGlobal.HasError And Not myGlobal Is Nothing Then
@@ -3207,8 +3208,7 @@ Public Class FwScriptsEdition
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
 
                     ' XBC 02/11/2011 - error multiples threads 
-                    'myGlobal = MyClass.myAnalyzer.LoadAppFwScriptsData()
-                    myGlobal = Ax00ServiceMainMDI.MDIAnalyzerManager.LoadAppFwScriptsData()
+                    myGlobal = AnalyzerController.Instance.Analyzer.LoadAppFwScriptsData() '#REFACTORING
                     ' XBC 02/11/2011 - error multiples threads 
 
                 End If
@@ -4461,6 +4461,6 @@ Public Class FwScriptsEdition
 
 #End Region
 
-   
+
 
 End Class

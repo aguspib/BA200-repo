@@ -14,6 +14,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
+Imports Biosystems.Ax00.App
 
 Public Class ISATReportLoad
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -67,7 +68,7 @@ Public Class ISATReportLoad
     Private RestoreDBFilePath As String
 
     Private CurrentLanguage As String
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
 
     Private mdiESWrapperCopy As ESWrapper   ' XB 07/05/2013
 
@@ -485,7 +486,7 @@ Public Class ISATReportLoad
         Try
 
             Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", MyClass.mdiAnalyzerCopy.AdjustmentsFilePath)
+            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) '#REFACTORING
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 SATReportCreated = CBool(myGlobal.SetDatos)
             End If
@@ -505,7 +506,9 @@ Public Class ISATReportLoad
     ''' </summary>
     ''' <param name="pFilePath"></param>
     ''' <returns></returns>
-    ''' <remarks>Created by: SG 08/10/2010</remarks>
+    ''' <remarks>Created by: SG 08/10/2010
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function LoadSATReport(ByVal pFilePath As String) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
 
@@ -533,9 +536,9 @@ Public Class ISATReportLoad
                         Me.RestorePointPath = pFilePath
 
                         'AG 25/10/2011 - Stop ANSINF
-                        If Not mdiAnalyzerCopy Is Nothing Then
-                            If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                        If (AnalyzerController.IsAnalyzerInstantiated) Then
+                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
                             End If
                         End If
                         'AG 25/10/2011
@@ -545,9 +548,9 @@ Public Class ISATReportLoad
                         End If
 
                         'AG 25/10/2011 - Start ANSINF
-                        If Not myGlobal.HasError AndAlso Not mdiAnalyzerCopy Is Nothing Then
-                            If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                        If Not myGlobal.HasError AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
+                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
                             End If
 
                         End If
@@ -582,17 +585,17 @@ Public Class ISATReportLoad
 
             'Ax00 allow load RSAT / Restore Point when: No connection or (sleeping + no working) or (standby + no working)
             'NOTE in Ax5 the condition was more secure (no connection or sleeping)
-
-            If Not mdiAnalyzerCopy Is Nothing Then
-                If Not mdiAnalyzerCopy.Connected Then 'AG 06/02/2012 - add Connected to the acitvation rule
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If Not AnalyzerController.Instance.Analyzer.Connected Then 'AG 06/02/2012 - add Connected to the acitvation rule
                     returnValue = True
 
                     'DL 02/07/2012. Begin
                 Else
                     returnValue = False
-                    'ElseIf mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING _
-                    'OrElse (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY AndAlso Not mdiAnalyzerCopy.AnalyzerIsReady) _
-                    'OrElse (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING AndAlso Not mdiAnalyzerCopy.AnalyzerIsReady) Then
+                    'ElseIf AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING _
+                    'OrElse (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY AndAlso Not AnalyzerController.Instance.Analyzer.AnalyzerIsReady) _
+                    'OrElse (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING AndAlso Not AnalyzerController.Instance.Analyzer.AnalyzerIsReady) Then
                     'returnValue = False
                     'DL 02/07/2012. End 
 
@@ -641,6 +644,7 @@ Public Class ISATReportLoad
     ''' Created by  : SG 08/10/2010
     ''' Modified by : XB 07/05/2013 - Instantiate Wrapper LIS into mdiESWrapperCopy 
     '''               XB 17/06/2013 - Also v1.0 restore points must be displayed
+    '''               IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub LoadSATReportData_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
@@ -651,10 +655,6 @@ Public Class ISATReportLoad
 
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 13/07/2011 - Use the same AnalyzerManager as the MDI
-            End If
 
             '  XB 07/05/2013
             If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
@@ -891,7 +891,7 @@ Public Class ISATReportLoad
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
+                    myGlobal = myLogAcciones.ExportLogToXml(AnalyzerController.Instance.Analyzer.ActiveWorkSession, myLogMaxDays) '#REFACTORING
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
                         myGlobal = myLogAcciones.DeleteAll()
@@ -1013,8 +1013,9 @@ Public Class ISATReportLoad
             End If
 
             'SGM 03/05/2012
-            If mdiAnalyzerCopy.ISE_Manager IsNot Nothing Then
-                mdiAnalyzerCopy.ISE_Manager.RefreshAllDatabaseInformation()
+            '#REFACTORING
+            If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
+                AnalyzerController.Instance.Analyzer.ISEAnalyzer.RefreshAllDatabaseInformation()
             End If
 
             'RH 07/02/2012

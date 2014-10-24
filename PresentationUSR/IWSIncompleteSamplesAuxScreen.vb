@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
 
 
 Public Class IWSIncompleteSamplesAuxScreen
@@ -31,7 +32,7 @@ Public Class IWSIncompleteSamplesAuxScreen
     'Global variable used to control the screen closing
     Private continueClosing As Boolean = True
 
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager
 #End Region
 
 #Region "Attributes"
@@ -983,6 +984,7 @@ Public Class IWSIncompleteSamplesAuxScreen
     ''' </summary>
     ''' <remarks>
     ''' Modified by: SA 29/08/2012 - Inform the AnalyzerID when calling function GetOrderTestsForWS in WorkSessionsDelegate
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -991,8 +993,7 @@ Public Class IWSIncompleteSamplesAuxScreen
             Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
 
-            mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
-            mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS) = 0
+            AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS) = 0 '#REFACTORING
 
             'Load buttons images
             PrepareButtons()

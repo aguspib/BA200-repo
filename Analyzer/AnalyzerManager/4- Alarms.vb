@@ -16,7 +16,7 @@ Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by 
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
-    Partial Public Class AnalyzerManager
+    Partial Public Class AnalyzerManagerOLD
 
 #Region "Main Manage Alarms treatment"
 

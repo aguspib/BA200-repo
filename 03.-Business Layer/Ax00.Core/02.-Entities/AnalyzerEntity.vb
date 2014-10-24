@@ -28,10 +28,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity, iseAnalyzer As IISEAnalyzerEntity)
+
+        Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             Me.New(assemblyName, analyzerModel)
             _baseLine = baseLine
-            _iseAnalyzer = iseAnalyzer
         End Sub
 
     End Class

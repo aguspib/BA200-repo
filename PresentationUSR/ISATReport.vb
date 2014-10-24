@@ -12,6 +12,7 @@ Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
 
 
 Public Class ISATReport
@@ -23,7 +24,7 @@ Public Class ISATReport
     Private checkAllItems As Boolean = True
     Private processing As Boolean = False
 
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
     Private currentLanguage As String = ""
 
     Private SATFilePath As String = ""
@@ -55,6 +56,14 @@ Public Class ISATReport
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub SATReportData_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -90,9 +99,6 @@ Public Class ISATReport
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
 
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 25/10/2011 - Use the same AnalyzerManager as the MDI
-            End If
             EditonMode = True ' TR 14/02/2012
 
 
@@ -476,7 +482,8 @@ Public Class ISATReport
     ''' New function for CreateRSAT with process for encrypt/decrypt Patient names optimized
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 11/02/2014 
+    ''' Created by: SA 11/02/2014
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016) 
     ''' </remarks>
     Private Sub CreateReportSAT_NEW()
         Dim myGlobal As New GlobalDataTO
@@ -509,7 +516,7 @@ Public Class ISATReport
             End If
 
             'XBC 02/08/2012 - If WS status is Running mark this into a flag
-            If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
+            If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
                 Dim pFlagsDS As New AnalyzerManagerFlagsDS
 
                 'Add row into Dataset to Update
@@ -517,7 +524,7 @@ Public Class ISATReport
                 flagRow = pFlagsDS.tcfgAnalyzerManagerFlags.NewtcfgAnalyzerManagerFlagsRow
                 With flagRow
                     .BeginEdit()
-                    .AnalyzerID = mdiAnalyzerCopy.ActiveAnalyzer
+                    .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
                     .FlagID = GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING.ToString
                     .Value = "INPROCESS"
                     .EndEdit()
@@ -534,7 +541,7 @@ Public Class ISATReport
             SATFilePath = FolderPathTextBox.Text
 
             Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, MyClass.mdiAnalyzerCopy.AdjustmentsFilePath, SATFilePath, SATFileName)
+            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName)
 
             If (Not myGlobal.HasError) Then
                 'Restore original values of First and Last Names in tparPatients
@@ -551,7 +558,7 @@ Public Class ISATReport
             End If
 
             'XBC 02/08/2012 - If WS status is Running mark this into a flag
-            If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
+            If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
                 Dim pFlagsDS As New AnalyzerManagerFlagsDS
 
                 'Add row into Dataset to Update
@@ -559,7 +566,7 @@ Public Class ISATReport
                 flagRow = pFlagsDS.tcfgAnalyzerManagerFlags.NewtcfgAnalyzerManagerFlagsRow
                 With flagRow
                     .BeginEdit()
-                    .AnalyzerID = mdiAnalyzerCopy.ActiveAnalyzer
+                    .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
                     .FlagID = GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING.ToString
                     .Value = "CLOSED"
                     .EndEdit()
@@ -788,8 +795,8 @@ Public Class ISATReport
     '        Dim myGlobal As New GlobalDataTO
     '        'TR-AG 05/01/2012 -Commented because cause functional error on RUNTIME
     '        'If Not mdiAnalyzerCopy Is Nothing Then
-    '        '    If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-    '        '        myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+    '        '    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+    '        '        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
     '        '    End If
     '        'End If
     '        'AG 25/10/2011
@@ -855,14 +862,14 @@ Public Class ISATReport
     '            'TR 21/12/2011 -END.
 
     '            ' XBC 02/08/2012 - If WS status is Running mark this into a flag
-    '            If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+    '            If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
     '                Dim pFlagsDS As New AnalyzerManagerFlagsDS
     '                'Add row into Dataset to Update
     '                Dim flagRow As AnalyzerManagerFlagsDS.tcfgAnalyzerManagerFlagsRow
     '                flagRow = pFlagsDS.tcfgAnalyzerManagerFlags.NewtcfgAnalyzerManagerFlagsRow
     '                With flagRow
     '                    .BeginEdit()
-    '                    .AnalyzerID = mdiAnalyzerCopy.ActiveAnalyzer
+    '                    .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
     '                    .FlagID = GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING.ToString
     '                    .Value = "INPROCESS"
     '                    .EndEdit()
@@ -879,7 +886,7 @@ Public Class ISATReport
     '            'TR 02/02/2012 -Set the result value of CreateSatReport mothod to GlobalDataTO, to 
     '            '               Validate if there's any error on the process.
     '            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, "", _
-    '                                      MyClass.mdiAnalyzerCopy.AdjustmentsFilePath, SATFilePath, SATFileName)
+    '                                      MyClass.AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName)
 
     '            '-----------
     '            'Restore confidential Data After Export data to ReportSat
@@ -905,14 +912,14 @@ Public Class ISATReport
     '        End If
 
     '        ' XBC 02/08/2012 - If WS status is Running mark this into a flag
-    '        If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+    '        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
     '            Dim pFlagsDS As New AnalyzerManagerFlagsDS
     '            'Add row into Dataset to Update
     '            Dim flagRow As AnalyzerManagerFlagsDS.tcfgAnalyzerManagerFlagsRow
     '            flagRow = pFlagsDS.tcfgAnalyzerManagerFlags.NewtcfgAnalyzerManagerFlagsRow
     '            With flagRow
     '                .BeginEdit()
-    '                .AnalyzerID = mdiAnalyzerCopy.ActiveAnalyzer
+    '                .AnalyzerID = AnalyzerController.Instance.Analyzer.ActiveAnalyzer
     '                .FlagID = GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING.ToString
     '                .Value = "CLOSED"
     '                .EndEdit()
@@ -929,8 +936,8 @@ Public Class ISATReport
     '        'TR-AG 05/01/2012 -Commented because cause functional error on RUNTIME
     '        ''AG 25/10/2011 - Start ANSINF
     '        'If Not myGlobal.HasError AndAlso Not mdiAnalyzerCopy Is Nothing Then
-    '        '    If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-    '        '        myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+    '        '    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+    '        '        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
     '        '    End If
     '        'End If
     '        'AG 25/10/2011

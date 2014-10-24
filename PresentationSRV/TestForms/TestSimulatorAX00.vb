@@ -8,6 +8,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Interfaces
 
 Public Class TestSimulatorAX00
 
@@ -19,11 +21,11 @@ Public Class TestSimulatorAX00
         ' Add any initialization after the InitializeComponent() call.
 
     End Sub
-   
+
 
 #Region "Definitions"
-    Private WithEvents myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
 
+    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
 
 #End Region
 
@@ -32,7 +34,7 @@ Public Class TestSimulatorAX00
 #Region "Communications Board Testings"
 
     Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzerManager.ReceptionEvent
+                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles analyzer.ReceptionEvent
         Try
             If Not pTreated Then
                 If BsReceivedTextBox.Text.Length > 5000 Then BsReceivedTextBox.Clear()
@@ -45,9 +47,9 @@ Public Class TestSimulatorAX00
         End Try
     End Sub
 
-  
 
-    'Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles myAnalyzerManager.SendEvent
+
+    'Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles AnalyzerController.Instance.Analyzer.SendEvent
 
 
 
@@ -68,7 +70,7 @@ Public Class TestSimulatorAX00
     '    End Try
     'End Sub
 
-   
+
     'Private Sub SimulationTest(ByVal pInstructionSent As String)
 
     '    Dim myGlobal As New GlobalDataTO
@@ -155,12 +157,12 @@ Public Class TestSimulatorAX00
     '        Throw ex
     '    End Try
     'End Sub
-    
+
 
 
 #End Region
 
-    
+
 
     'FOR SIMULATING
     Private myLastWSValue As Double = 512
@@ -181,7 +183,7 @@ Public Class TestSimulatorAX00
     '            Dim myGlobal As New GlobalDataTO
 
 
-    '            If myAnalyzerManager.CommThreadsStarted Then
+    '            If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
     '                'build simulated monitor data values
     '                Dim mySensors As String = ""
     '                Dim myValues As String = ""
@@ -253,7 +255,7 @@ Public Class TestSimulatorAX00
     '                                '    Case 6 : myAnswer = "A400;TANKTESTTRANSFER_OK;S:2;AC:6;T:0;C:6;W:0;R:0;E:0;"
     '                                'End Select
     '                                'If myAnswer.Length > 0 Then
-    '                                '    myGlobal = myAnalyzerManager.SimulateInstructionReception(myAnswer)
+    '                                '    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(myAnswer)
     '                                '    TanksTestFase = 0
     '                                '    TanksTestON = False
     '                                '    Exit Sub
@@ -369,7 +371,7 @@ Public Class TestSimulatorAX00
     '                    mySensors = mySensors.Substring(0, mySensors.Length - 1)
     '                    myValues = myValues.Substring(0, myValues.Length - 1).Replace(",", ".")
 
-    '                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;SENSORS_RECEIVED;SENSORS:" & mySensors & ";VALUES:" & myValues & ";S:2;AC:6;T:0;C:6;W:0;R:0;E:0;")
+    '                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;SENSORS_RECEIVED;SENSORS:" & mySensors & ";VALUES:" & myValues & ";S:2;AC:6;T:0;C:6;W:0;R:0;E:0;")
     '                End If
 
     '            End If
@@ -467,7 +469,7 @@ Public Class TestSimulatorAX00
 
     '        If myAbs.Length > 1 Then
     '            Dim myGlobal As New GlobalDataTO
-    '            myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ABSORBANCE_RECEIVED;ABSORBANCE:" & myAbs & ";S:2;AC:6;T:0;C:6;W:0;R:0;E:0;")
+    '            myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ABSORBANCE_RECEIVED;ABSORBANCE:" & myAbs & ";S:2;AC:6;T:0;C:6;W:0;R:0;E:0;")
     '        End If
 
     '    Catch ex As Exception
@@ -477,20 +479,27 @@ Public Class TestSimulatorAX00
 
     'End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub AnswerButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AnswerButton.Click
         Try
             'Simulate instruction reception
 
             If BsTextWrite_Endw.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
                     Me.Enabled = False
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then '#REFACTORING
                         'Short instructions
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(BsTextWrite_Endw.Text.Trim)
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite_Endw.Text.Trim)
 
                         'tanks test
                         Select Case TanksTestFase
@@ -530,7 +539,7 @@ Public Class TestSimulatorAX00
     '    Try
     '        Dim myGlobal As New GlobalDataTO
 
-    '        myGlobal = myAnalyzerManager.SimulateInstructionReception(BsTextWrite_Endw.Text.Trim)
+    '        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite_Endw.Text.Trim)
 
     '        Application.DoEvents()
 

@@ -142,9 +142,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ' XBC 24/05/2012 - Declare this flag Private for the class
         Private ISEAlreadyStarted As Boolean = False 'provisional flag for starting ISE just the first time 
 
-        'SGM 29/05/2012
-        Public FWUpdateResponseData As FWUpdateResponseTO
-
         ' XBC 13/06/2012
         Private myTmpConnectedAnalyzerDS As New AnalyzersDS
 
@@ -260,7 +257,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         'SGM 28/11/2011
         Private FwVersionAttribute As String = ""
-        Public AdjustmentsFilePath As String = ""
 
         'SGM 11/01/2012
         'Private LastISECommandAttr As ISECommandTO
@@ -1204,6 +1200,10 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        'SGM 29/05/2012
+        Public Property FWUpdateResponseData As FWUpdateResponseTO Implements IAnalyzerEntity.FWUpdateResponseData '#REFACTORING
+        Public Property AdjustmentsFilePath As String Implements IAnalyzerEntity.AdjustmentsFilePath '#REFACTORING
+
 #End Region
 
 #Region "Events definition & methods"
@@ -1217,16 +1217,13 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pTreated"></param>
         ''' <remarks>AG 29/10/2010</remarks>
         Public Event ReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                           ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Implements IAnalyzerEntity.ReceptionEvent
-        'Public Shared Event ReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) '#REFACTORING
-
+                                           ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Implements IAnalyzerEntity.ReceptionEvent '#REFACTORING
         ''' <summary>
         ''' Event with the instruction sent
         ''' </summary>
         ''' <param name="pInstructionSent"></param>
         ''' <remarks>AG 29/10/2010</remarks>
-        Public Event SendEvent(ByVal pInstructionSent As String) Implements IAnalyzerEntity.SendEvent
-        'Public Shared Event SendEvent(ByVal pInstructionSent As String) '#REFACTORING
+        Public Event SendEvent(ByVal pInstructionSent As String) Implements IAnalyzerEntity.SendEvent '#REFACTORING
 
         ''' <summary>
         ''' Event to activate/deactivate WatchDog timer - Task #1438
@@ -1234,9 +1231,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pEnable"></param>
         ''' <remarks>XB 29/01/2014</remarks>
 
-        Public Event WatchDogEvent(ByVal pEnable As Boolean) Implements IAnalyzerEntity.WatchDogEvent
-        'Public Shared Event WatchDogEvent(ByVal pEnable As Boolean) '#REFACTORING 
-
+        Public Event WatchDogEvent(ByVal pEnable As Boolean) Implements IAnalyzerEntity.WatchDogEvent '#REFACTORING
 
         'AG 20/04/2010
         ''' <summary>
@@ -1383,9 +1378,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
         ' SERVICE SOFTWARE
         ' XBC 16/11/2010
-        Public Shared Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
+        Public Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
                                                    ByVal pResponseValue As String, _
-                                                   ByVal pTreated As Boolean)
+                                                   ByVal pTreated As Boolean) Implements IAnalyzerEntity.ReceptionFwScriptEvent
 
         ' XBC 17/05/2011 - delete redundant Events replaced using AnalyzerManager.ReceptionEvent
         ' SGM 15/04/2011 
@@ -1509,7 +1504,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'SGM 12/04/2012 Update ISE conssumption flag in case of Session ended, paused or aborted
-                If ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.WriteConsumption Then
+                If ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.WriteConsumption Then
 
                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
@@ -1664,6 +1659,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 AddHandler thermoR2ArmWarningTimer.Elapsed, AddressOf thermoR2ArmWarningTimer_Timer
                 'END AG 05/01/2012
 
+                AdjustmentsFilePath = String.Empty '#REFACTORING
 
             Catch ex As Exception
                 classInitializationErrorAttribute = True
@@ -1691,8 +1687,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (Not dbConnection Is Nothing) Then
 
                         'AG 25/10/2011 - When a ReportSAT is loaded or a RestorePoint is restored the baseline calc must to be created again
-                        'If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then '#REFACTORING
-                        If Not pStartingApplication Then
+                        If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then
                             'BaseLine = Nothing '#REFACTORING
 
                             'AG 09/03/2012 - when load a reportsat and no connection remove all previous refresh information
@@ -1709,74 +1704,71 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             resultData = InitClassStructuresFromDataBase(dbConnection)
-                        Else
-                            If Not BaseLine Is Nothing Then BaseLine = Nothing 'AG 30/08/2013 - When the analyzer is different from the last connected we must rebuild this structure
+                            'Else '#REFACTORING
+                            '    If Not BaseLine Is Nothing Then BaseLine = Nothing 'AG 30/08/2013 - When the analyzer is different from the last connected we must rebuild this structure
                         End If
                         'AG 25/10/2011
 
                         'If BaseLine Is Nothing Then '#REFACTORING
-                            'baselineCalcs = New BaseLineCalculations '#REFACTORING
-                        If pStartingApplication Then
+                        'baselineCalcs = New BaseLineCalculations '#REFACTORING
+                        BaseLine.Initialize() '#REFACTORING
 
-                            BaseLine.fieldLimits = myClassFieldLimitsDS
+                        BaseLine.fieldLimits = myClassFieldLimitsDS
 
-                            Dim mySwParameterDelegate As New SwParametersDelegate
-                            resultData = mySwParameterDelegate.ReadByAnalyzerModel(Nothing, myAnalyzerModel)
+                        Dim mySwParameterDelegate As New SwParametersDelegate
+                        resultData = mySwParameterDelegate.ReadByAnalyzerModel(Nothing, myAnalyzerModel)
+                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                            Dim myParamDS As New ParametersDS
+                            myParamDS = CType(resultData.SetDatos, ParametersDS)
+                            BaseLine.SwParameters = myParamDS
+
+                            validALIGHTAttribute = False
+                            resultData = BaseLine.GetLatestBaseLines(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myAnalyzerModel)
+                            validALIGHTAttribute = BaseLine.validALight
+                            existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
+
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim myParamDS As New ParametersDS
-                                myParamDS = CType(resultData.SetDatos, ParametersDS)
-                                BaseLine.SwParameters = myParamDS
+                                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                'Update internal alarm list if exists alarm but not saved it into database!!!
+                                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                    If Not myAlarmListAttribute.Contains(myAlarm) Then
+                                        myAlarmListAttribute.Add(myAlarm)
 
-                                validALIGHTAttribute = False
-                                resultData = BaseLine.GetLatestBaseLines(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myAnalyzerModel)
-                                validALIGHTAttribute = BaseLine.validALight
-                                existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
-
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                                    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
-                                    'Update internal alarm list if exists alarm but not saved it into database!!!
-                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                                        If Not myAlarmListAttribute.Contains(myAlarm) Then
-                                            myAlarmListAttribute.Add(myAlarm)
-
-                                            'AG 12/09/2012 - If base line error when app is starting set the attribute baselineInitializationFailuresAttribute to value in order to show the alarm globe in monitor
-                                            'Wup not in process 
-                                            If pStartingApplication AndAlso myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                                                Dim showGlobeFlag As Boolean = False
-                                                If (String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
-                                                    String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
-                                                    If Not IgnoreAlarmWhileWarmUp(myAlarm) Then
-                                                        showGlobeFlag = True
-                                                    End If
-                                                Else
+                                        'AG 12/09/2012 - If base line error when app is starting set the attribute baselineInitializationFailuresAttribute to value in order to show the alarm globe in monitor
+                                        'Wup not in process 
+                                        If pStartingApplication AndAlso myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                            Dim showGlobeFlag As Boolean = False
+                                            If (String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
+                                                String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
+                                                If Not IgnoreAlarmWhileWarmUp(myAlarm) Then
                                                     showGlobeFlag = True
                                                 End If
-
-                                                If showGlobeFlag Then
-                                                    'Set this attribute to limit in order the alarm will be shown as monitor globe
-                                                    baselineInitializationFailuresAttribute = BASELINE_INIT_FAILURES
-                                                End If
-
+                                            Else
+                                                showGlobeFlag = True
                                             End If
-                                            'AG 12/09/2012
 
-                                            'AG 13/02/2012
-                                            'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
-                                            resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
-                                            If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then
-                                                InstructionReceivedAttribute = ""
-                                                RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                                            If showGlobeFlag Then
+                                                'Set this attribute to limit in order the alarm will be shown as monitor globe
+                                                baselineInitializationFailuresAttribute = BASELINE_INIT_FAILURES
                                             End If
-                                            'AG 13/02/2012
+
                                         End If
+                                        'AG 12/09/2012
 
+                                        'AG 13/02/2012
+                                        'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
+                                        resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
+                                        If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then
+                                            InstructionReceivedAttribute = ""
+                                            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                                        End If
+                                        'AG 13/02/2012
                                     End If
                                 End If
-
                             End If
                         End If
-
+                        'End If
                     End If
                 End If
 
@@ -3178,7 +3170,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ResRecoverISE.ToString) = "END") Then
                                     ' XB 09/01/2014
 
-                                    If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                    If ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                                         myGlobal = Me.ProcessRecivedISEResult(pInstructionReceived)
                                         'SGM 07/03/2012
                                         myGlobal = MyClass.ProcessISEManagerProcedures

@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Microsoft.Win32
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
 
 Public Class ILISUtilities
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -17,7 +18,7 @@ Public Class ILISUtilities
     Private MainMDI As IAx00MainMDI
     Private OKImage As String
     Private WrongImage As String
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
     Private mdiESWrapperCopy As ESWrapper
 #End Region
 
@@ -182,23 +183,20 @@ Public Class ILISUtilities
     ''' Set the screen status enable or disable.
     ''' </summary>
     ''' <remarks>CREATED BY: TR 23/04/2013
-    ''' AG 26/04/2013 - lis actions activation rules moved to ESBusiness class</remarks>
+    ''' Modified by: AG 26/04/2013 - lis actions activation rules moved to ESBusiness class
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub LoadScreenStatus()
         Try
             If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
                 mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) ' Use the same ESWrapper as the MDI
             End If
 
-            'Get the Analyzer Manager
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
-
             'If (Not mdiAnalyzerCopy Is Nothing) Then
             '    'If the connection process is in process, disable all screen fields (changes are not allowed) ORELSE
             '    'If the Analyzer is connected and its status is RUNNING, disable all screen fields (changes are not allowed)
-            '    If (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
-            '       (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) _
+            '    If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
+            '       (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) _
             '       OrElse (mdiESWrapperCopy.Status <> GlobalEnumerates.LISStatus.connectionAccepted.ToString().ToUpper() AndAlso _
             '               mdiESWrapperCopy.Status <> GlobalEnumerates.LISStatus.connectionEnabled.ToString().ToUpper()) Then
             '        DeleteLISOrdersRB.Enabled = False
@@ -207,8 +205,8 @@ Public Class ILISUtilities
             'End If
             'If (Not mdiAnalyzerCopy Is Nothing AndAlso Not mdiESWrapperCopy Is Nothing) Then
             '    Dim myESBusiness As New ESBusiness
-            '    Dim runningFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
-            '    Dim connectingFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
+            '    Dim runningFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
+            '    Dim connectingFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
             '    DeleteLISOrdersRB.Enabled = myESBusiness.AllowLISAction(Nothing, LISActions.LISUtilities_DeleteLISSavedWS, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
             '    DeleteInternalQueue.Enabled = myESBusiness.AllowLISAction(Nothing, LISActions.LISUtilities_ClearQueue, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
             '    TracinLevelRB.Enabled = myESBusiness.AllowLISAction(Nothing, LISActions.LISUtilities_TracesEnabling, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
@@ -234,13 +232,15 @@ Public Class ILISUtilities
     ''' <summary>
     ''' Refreshes the ability of the screen elements according to the current LIS status
     ''' </summary>
-    ''' <remarks>Created by SG 15/05/2013</remarks>
+    ''' <remarks>Created by SG 15/05/2013
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Sub RefreshElementsEnabled()
         Try
-            If (Not mdiAnalyzerCopy Is Nothing AndAlso Not mdiESWrapperCopy Is Nothing) Then
+            If ((AnalyzerController.IsAnalyzerInstantiated) AndAlso Not mdiESWrapperCopy Is Nothing) Then
                 Dim myESBusiness As New ESBusiness
-                Dim runningFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
-                Dim connectingFlag As Boolean = CBool(IIf(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
+                Dim runningFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING, True, False))
+                Dim connectingFlag As Boolean = CBool(IIf(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS", True, False))
                 DeleteLISOrdersRB.Enabled = myESBusiness.AllowLISAction(Nothing, LISActions.LISUtilities_DeleteLISSavedWS, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
                 DeleteInternalQueue.Enabled = myESBusiness.AllowLISAction(Nothing, LISActions.LISUtilities_ClearQueue, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)
                 TracinLevelRB.Enabled = myESBusiness.AllowLISAction(Nothing, LISActions.LISUtilities_TracesEnabling, runningFlag, connectingFlag, mdiESWrapperCopy.Status, mdiESWrapperCopy.Storage)

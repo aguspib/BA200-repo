@@ -10,6 +10,8 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
+Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.App
 
 Public Class IWSSampleRequest
 
@@ -88,7 +90,7 @@ Public Class IWSSampleRequest
     'TR 15/09/2011
     'Dim isScanningProcess As Boolean = False
 
-    Private mdiAnalyzerCopy As AnalyzerManager 'AG 23/09/2011
+    'Private mdiAnalyzerCopy As AnalyzerManager 'AG 23/09/2011 '#REFACTORING
 
     Private RowPostPaintEnabled As Boolean = True 'RH 08/05/2012 Bugtracking 544
 
@@ -288,7 +290,7 @@ Public Class IWSSampleRequest
             End If
 
             'When FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
-            If mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then
+            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then '#REFACTORING
                 ScreenWorkingProcess = False 'Process finished
                 Me.Enabled = True
                 IAx00MainMDI.EnableButtonAndMenus(True)
@@ -4861,7 +4863,7 @@ Public Class IWSSampleRequest
     '''              TR 16/09/2011 - Get Barcode Warnings Icon for the new button to opening the auxiliary screen to check incomplete Patient Samples
     '''              AG 03/10/2011 - Added code to enabling/disabling the Scanning Button depending on the Analyzer status
     '''              AG 25/11/2011 - Get value of Analyzer Setting SAMPLE_BARCODE_DISABLED to verify if the Barcode is enabled for the Analyzer
-    '''              AG 06/02/2012 - Added condition mdiAnalyzerCopy.Connected to the group of conditions that have to be fulfilled to enabling
+    '''              AG 06/02/2012 - Added condition AnalyzerController.Instance.Analyzer.Connected to the group of conditions that have to be fulfilled to enabling
     '''                              the Scanning Button
     '''              SA 12/03/2012 - Code to enabling/disabling the Scanning Button moved to a new sub ValidateScanningButtonEnabled; this function is 
     '''                              only to load images for graphical buttons
@@ -5065,7 +5067,7 @@ Public Class IWSSampleRequest
                     SetPropertyThreadSafe("Cursor", Cursors.Default)
                     ErrorOnSavingWS = String.Format("{0}|{1}", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
                 End If
-                End If
+            End If
 
         Catch ex As Exception
             SetPropertyThreadSafe("Cursor", Cursors.Default)
@@ -5718,6 +5720,7 @@ Public Class IWSSampleRequest
     ''' <remarks>
     ''' Created by:
     ''' Modified by: AG 12/07/2011 - Disable all vertical actions ButtonBar and initialize Barcode read with NO running involved
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScanningBarCode()
         Try
@@ -5735,12 +5738,12 @@ Public Class IWSSampleRequest
             BarCodeDS.AcceptChanges()
 
             'Send the Barcode Scanning instruction
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 ScreenWorkingProcess = True
 
-                mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.NO_RUNNING_REQUEST
-                resultdata = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
-                If (resultdata.HasError OrElse Not mdiAnalyzerCopy.Connected) Then
+                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                resultdata = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
+                If (resultdata.HasError OrElse Not AnalyzerController.Instance.Analyzer.Connected) Then
                     ScreenWorkingProcess = False
                 End If
             End If
@@ -5774,6 +5777,7 @@ Public Class IWSSampleRequest
     '''                               PrepareButtons but has been moved to a new sub). When Status of the current WS is ABORTED, call function 
     '''                               DisableFieldsForAbortedWS to disable all fields in bsOrderDetailsGroupBox (excepting the SampleClass ComboBox)
     '''              SA  28/08/2012 - Inform parameter AnalyzerID when calling function GetOrderTestsForWS in OrderTestsDelegate
+    '''              IT  23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Dim myGlobalDataTO As GlobalDataTO
@@ -5781,10 +5785,6 @@ Public Class IWSSampleRequest
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
 
             'SA-TR 30/05/2012 - Get the WorkSession status
             Dim myWSAnalyzersDelegate As New WSAnalyzersDelegate
@@ -6886,6 +6886,7 @@ Public Class IWSSampleRequest
     '''                              can be available not only when the Analyzer is in STAND BY, but also when it is in RUNNING but it is currently 
     '''                              in PAUSE mode - NOTE: this change has not been tested due to the option for LIS with files has been disabled 
     '''                              from version 2.0.0
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
@@ -6894,9 +6895,9 @@ Public Class IWSSampleRequest
             If (LISWithFilesMode) Then
                 Dim statusScanningButton As Boolean = False
 
-                If (Not mdiAnalyzerCopy Is Nothing) Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     'Verify the Analyzer is not Warming Up
-                    Dim sensorValue As Single = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
+                    Dim sensorValue As Single = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
 
                     'Get value of the Analyzer Setting indicating if the Samples Barcode is enabled or not
                     Dim resultData As New GlobalDataTO
@@ -6913,12 +6914,12 @@ Public Class IWSSampleRequest
                     End If
 
                     'If the Analyzer is Connected and Ready, the WarmUp maneuvers have finished, the Barcode Reader is available and not disabled....
-                    If (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerIsReady AndAlso sensorValue = 1 AndAlso _
-                        mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
+                    If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso sensorValue = 1 AndAlso _
+                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
                        (Not sampleBarcodeReaderOFF)) Then
                         'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
-                        If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                           (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                        If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                           (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
                             If (Not IAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
                                 'Verify if the Scanning Button can be available by checking Alarms and another Analyzer states
                                 statusScanningButton = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
@@ -7810,17 +7811,18 @@ Public Class IWSSampleRequest
     '''              SA 16/10/2013 - BT #1334 ==> Changes due to new Analyzer mode PAUSE in RUNNING: the Scanning process will be called not only
     '''                              when the Analyzer is in STAND BY, but also when it is in RUNNING but stopped (PAUSE) - NOTE: this change has
     '''                              not been tested due to the option for LIS with files has been disabled from version 2.0.0
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub bsScanningButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsScanningButton.Click
         Try
             CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
             IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 10/07/2013
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'Call the Barcode read process only if the Analyzer is connected and the Barcode is available
-                If (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
+                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
                     'Call the Barcode read process only if the Analyzer Status is STANDBY or if it is PAUSE in RUNNING
-                    If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY) OrElse _
-                       (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning) Then
+                    If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY) OrElse _
+                       (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         Cursor = Cursors.WaitCursor
 
                         IAx00MainMDI.DisabledMdiForms = Me
@@ -7881,7 +7883,7 @@ Public Class IWSSampleRequest
     Private Sub bsBarcodeWarningButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsBarcodeWarningButton.Click
         Try
             'AG 07/01/2013 - BT #1436 - put all code inside this IF
-            If mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" Then
+            If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" Then '#REFACTORING
                 'Verify if changes are needed in table of Incomplete Patient Samples
                 Dim resultData As GlobalDataTO = Nothing
                 Dim myBCPosWithNoRequestDelegate As New BarcodePositionsWithNoRequestsDelegate

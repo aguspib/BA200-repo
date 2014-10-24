@@ -14,7 +14,7 @@ Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an 
 Imports Biosystems.Ax00.DAL.DAO
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
-    Partial Public Class AnalyzerManager
+    Partial Public Class AnalyzerManagerOLD
 
 #Region "Background Worker events"
 

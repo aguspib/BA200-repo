@@ -8,6 +8,9 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.PresentationCOM
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.Core.Interfaces
 
 Public Class ISE_Test
     Private mOnlyTreated As Boolean = False
@@ -20,19 +23,24 @@ Public Class ISE_Test
         txtProcessedData.Clear()
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub butProcess_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butProcess.Click
         Try
             'Simulate instruction reception
             If txtReceivedData.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                         'Short instructions
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(txtReceivedData.Text.Trim)
-
-                        'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(txtReceivedData.Text.Trim)
                     End If
                 End If
 
@@ -55,10 +63,11 @@ Public Class ISE_Test
         End If
     End Sub
 #Region "Communications Board Testings & Simulate Send Next Preparation"
-    Private WithEvents myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+
+    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
 
     Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzerManager.ReceptionEvent
+                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles analyzer.ReceptionEvent
         Try
             If mOnlyTreated AndAlso pTreated Then
                 UpdateResponse(pInstructionReceived)
@@ -72,7 +81,7 @@ Public Class ISE_Test
         End Try
     End Sub
 
-    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles myAnalyzerManager.SendEvent
+    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles analyzer.SendEvent
         Try
             txtProcessedData.Text &= pInstructionSent & vbCrLf
 
@@ -83,38 +92,45 @@ Public Class ISE_Test
     End Sub
 #End Region
 
-    Private Function GetISEAction() As ISEManager.ISEProcedures
-        If myAnalyzerManager.ISE_Manager.CurrentCommandTO Is Nothing Then myAnalyzerManager.ISE_Manager.CurrentCommandTO = New ISECommandTO
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
+    Private Function GetISEAction() As ISEAnalyzerEntity.ISEProcedures
+        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO Is Nothing Then AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO = New ISECommandTO
 
-        If cmbISEAction.SelectedItem Is Nothing Then Return ISEManager.ISEProcedures.None
+        If cmbISEAction.SelectedItem Is Nothing Then Return ISEAnalyzerEntity.ISEProcedures.None
 
         'Retrieve value of the selected item. 
-        Dim enumType As Type = GetType(ISEManager.ISEProcedures)
+        Dim enumType As Type = GetType(ISEAnalyzerEntity.ISEProcedures)
         Dim selection As String = DirectCast(cmbISEAction.SelectedItem, String)
-        Dim value As ISEManager.ISEProcedures = DirectCast([Enum].Parse(enumType, selection), ISEManager.ISEProcedures)
-        myAnalyzerManager.ISE_Manager.CurrentProcedure = value
+        Dim value As ISEAnalyzerEntity.ISEProcedures = DirectCast([Enum].Parse(enumType, selection), ISEAnalyzerEntity.ISEProcedures)
+        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = value
 
-        If value = ISEManager.ISEProcedures.CalibrateBubbles Then
-            myAnalyzerManager.ISE_Manager.CurrentProcedure = ISEManager.ISEProcedures.SingleReadCommand
-            myAnalyzerManager.ISE_Manager.CurrentCommandTO.ISECommandID = GlobalEnumerates.ISECommands.BUBBLE_CAL
-            'myAnalyzerManager.ISE_Manager.LastISEResult = New ISEResultTO With {.ISEResultType = ISEResultTO.ISEResultTypes.BBC}
-            'myAnalyzerManager.ISE_Manager.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BBC
+        If value = ISEAnalyzerEntity.ISEProcedures.CalibrateBubbles Then
+            AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.SingleReadCommand
+            AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO.ISECommandID = GlobalEnumerates.ISECommands.BUBBLE_CAL
+            'AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult = New ISEResultTO With {.ISEResultType = ISEResultTO.ISEResultTypes.BBC}
+            'AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.BBC
         End If
-        If value = ISEManager.ISEProcedures.Clean Then
-            myAnalyzerManager.ISE_Manager.CurrentCommandTO.ISECommandID = GlobalEnumerates.ISECommands.CLEAN
+        If value = ISEAnalyzerEntity.ISEProcedures.Clean Then
+            AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO.ISECommandID = GlobalEnumerates.ISECommands.CLEAN
         End If
 
         Return value
     End Function
     Private Sub cmbISEAction_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmbISEAction.SelectedIndexChanged
-        Dim value As ISEManager.ISEProcedures = GetISEAction()
+        Dim value As ISEAnalyzerEntity.ISEProcedures = GetISEAction()
 
-        grpCalib1.Visible = (value = ISEManager.ISEProcedures.CalibrateElectrodes)
-        grpCalib2.Visible = (value = ISEManager.ISEProcedures.CalibrateElectrodes)
+        grpCalib1.Visible = (value = ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes)
+        grpCalib2.Visible = (value = ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes)
 
-        grpPumps.Visible = (value = ISEManager.ISEProcedures.CalibratePumps)
+        grpPumps.Visible = (value = ISEAnalyzerEntity.ISEProcedures.CalibratePumps)
 
-        grpBubbles.Visible = (value = ISEManager.ISEProcedures.CalibrateBubbles)
+        grpBubbles.Visible = (value = ISEAnalyzerEntity.ISEProcedures.CalibrateBubbles)
 
         chkERC.Checked = False
     End Sub
@@ -159,13 +175,13 @@ Public Class ISE_Test
 
     Private Function GetERCOperationString() As String
         Select Case GetISEAction()
-            Case ISEManager.ISEProcedures.Clean
+            Case ISEAnalyzerEntity.ISEProcedures.Clean
                 Return "CLE"
-            Case ISEManager.ISEProcedures.CalibrateBubbles
+            Case ISEAnalyzerEntity.ISEProcedures.CalibrateBubbles
                 Return "BBC"
-            Case ISEManager.ISEProcedures.CalibrateElectrodes
+            Case ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes
                 Return "CAL"
-            Case ISEManager.ISEProcedures.CalibratePumps
+            Case ISEAnalyzerEntity.ISEProcedures.CalibratePumps
                 Return "PMC"
         End Select
         Return ""
@@ -190,16 +206,16 @@ Public Class ISE_Test
     Private Function GetMessageToSend() As String
         Dim msg As String = "A400;ANSISE;P:0;R:"
         Select Case GetISEAction()
-            Case ISEManager.ISEProcedures.Clean
+            Case ISEAnalyzerEntity.ISEProcedures.Clean
                 If Not chkERC.Checked Then msg &= "<ISE!>"
 
-            Case ISEManager.ISEProcedures.CalibrateBubbles
+            Case ISEAnalyzerEntity.ISEProcedures.CalibrateBubbles
                 msg &= GetBubblesString()
 
-            Case ISEManager.ISEProcedures.CalibrateElectrodes
+            Case ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes
                 msg &= GetCalibrationsString()
 
-            Case ISEManager.ISEProcedures.CalibratePumps
+            Case ISEAnalyzerEntity.ISEProcedures.CalibratePumps
                 msg &= GetPumpsString()
 
         End Select
@@ -221,7 +237,7 @@ Public Class ISE_Test
         cmbERCCode.Enabled = chkERC.Checked
         lblERCRes.Enabled = chkERC.Checked AndAlso (GetERCCode() = "0")
         txtERCRes.Enabled = chkERC.Checked AndAlso (GetERCCode() = "0")
-        If GetISEAction() = ISEManager.ISEProcedures.CalibrateBubbles Then
+        If GetISEAction() = ISEAnalyzerEntity.ISEProcedures.CalibrateBubbles Then
             chkBubbles.Checked = Not chkERC.Checked
         End If
     End Sub
@@ -242,7 +258,7 @@ Public Class ISE_Test
         lblCalib1Res.Enabled = chkCalib1.Checked
         txtCalib1Res.Enabled = chkCalib1.Checked
 
-        If Not chkCalib1.Checked AndAlso GetISEAction() = ISEManager.ISEProcedures.CalibrateElectrodes Then
+        If Not chkCalib1.Checked AndAlso GetISEAction() = ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes Then
             chkCalib2.Checked = False
             chkERC.Checked = True
         End If
@@ -260,7 +276,7 @@ Public Class ISE_Test
         txtCalib2Cl.Enabled = chkCalib2.Checked
         lblCalib2Res.Enabled = chkCalib2.Checked
         txtCalib2Res.Enabled = chkCalib2.Checked
-        If Not chkCalib2.Checked AndAlso GetISEAction() = ISEManager.ISEProcedures.CalibrateElectrodes Then
+        If Not chkCalib2.Checked AndAlso GetISEAction() = ISEAnalyzerEntity.ISEProcedures.CalibrateElectrodes Then
             chkERC.Checked = True
         End If
     End Sub
@@ -288,7 +304,7 @@ Public Class ISE_Test
         txtBubblesA.Enabled = chkBubbles.Checked
         txtBubblesL.Enabled = chkBubbles.Checked
         txtBubblesM.Enabled = chkBubbles.Checked
-        If GetISEAction() = ISEManager.ISEProcedures.CalibrateBubbles Then
+        If GetISEAction() = ISEAnalyzerEntity.ISEProcedures.CalibrateBubbles Then
             chkERC.Checked = Not chkBubbles.Checked
         End If
     End Sub
@@ -300,7 +316,7 @@ Public Class ISE_Test
         txtPumpsA.Enabled = chkPumps.Checked
         txtPumpsB.Enabled = chkPumps.Checked
         txtPumpsW.Enabled = chkPumps.Checked
-        If Not chkPumps.Checked AndAlso GetISEAction() = ISEManager.ISEProcedures.CalibratePumps Then
+        If Not chkPumps.Checked AndAlso GetISEAction() = ISEAnalyzerEntity.ISEProcedures.CalibratePumps Then
             chkERC.Checked = True
         End If
     End Sub

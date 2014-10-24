@@ -16,11 +16,11 @@ Imports System.Text
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
-    Partial Public Class AnalyzerManager
+    Partial Public Class AnalyzerManagerOLD
 
 #Region "Level1 Private Methods"
 
-      
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -383,7 +383,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'instantiate the delegate
                     Dim myAdjustmentDelegate As New FwAdjustmentsDelegate(readAdjustmentsDS)
 
-                    
+
 
                     'convert the data reeived to the DS
                     For i As Integer = 2 To pInstructionReceived.Count - 1
@@ -687,7 +687,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-               
+
                 ' Status
                 myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
@@ -994,9 +994,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         End Function
 
-        
 
-      
+
+
 
         ''' <summary>
         ''' SW has received and ANSCPU instruction for real time monitoring
@@ -1238,12 +1238,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA)
-                
+
 
                 'Samples Arm Pump-----------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D)
-                
+
 
                 'Reagent1/Mixer2 Arm Pump------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2)
@@ -1268,7 +1268,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Washing Station needle 4,5 Pump--------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D)
-                
+
 
                 'Washing Station needle 6 Pump---------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8)
@@ -1277,26 +1277,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Washing Station needle 7 Pump--------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D)
-                
+
                 'Washing Station needle 1 Pump-----------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D)
-                
+
 
                 ''Dispensation ElectroValves Group-----------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1D)
-               
+
 
                 'Purified Water (from external source) Valve---------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1D)
-               
+
 
                 'Purified Water (from external tank) Valve----------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2D)
-                
+
                 'EV3----------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV3)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV3D)
@@ -1308,7 +1308,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Washing Station Heater---------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSH)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSHD)
-                
+
                 'Washing Solution Weight----------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSW)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSWD)
@@ -1316,7 +1316,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'High Contamination Weight------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_HCW)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_HCWD)
-                
+
 
                 'Waste sensor (boyas)----------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WAS)
@@ -1326,16 +1326,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'System liquid sensor (boyas)-----------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_SLS)
-                
+
                 'operation state
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_STS)
 
                 'stirrer 1-------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_ST1)
-                
+
                 'stirrer 2-------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_ST2)
-                
+
 
 
 
@@ -1377,7 +1377,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Board temperature------------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP)
-                
+
 
                 'Reactions Rotor Motor------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MR)
@@ -1385,45 +1385,45 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRA)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRE)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRED)
-               
+
 
 
                 'Washing Station Vertical Motor (Pinta)---------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MW)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MWH)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MWA)
-                
+
 
 
                 'Washing Station Collision Detector-----------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_CD)
-                
+
 
 
                 'Rotor Thermistor--------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PTH)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PTHD)
-               
+
 
                 'Rotor Peltier------------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PH)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PHD)
-                
+
 
                 'Peltier Fan 1--------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF1)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF1D)
-                
+
 
                 'Peltier Fan 2--------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF2)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF2D)
-               
+
 
                 'Peltier Fan 3--------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF3)
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF3D)
-                
+
 
                 'Peltier Fan 4--------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF4)
@@ -1431,11 +1431,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Rotor Cover---------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_RC)
-                
+
 
                 'Photometry------------------------------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PHT)
-                
+
 
                 'Photometry Flash Memory State----------------------------------------
                 myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PHFM)
@@ -2666,7 +2666,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return myGlobal
         End Function
 
-       
+
 
         ''' <summary>
         ''' SW has received ANSUTIL
@@ -2935,7 +2935,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return myGlobal
         End Function
-       
+
         ''' <summary>
         ''' Validates compatibility between Software and Firmware
         ''' </summary>
@@ -3188,12 +3188,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Function
 
 
-      
+
 #End Region
 
 #Region "Level2 Private Methods"
 
-       
+
         ''' <summary>
         ''' Prepare the data for the UI refreh due a cpu instruction reception
         ''' </summary>

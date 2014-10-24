@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Timers
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -1222,8 +1223,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Set
         End Property
 
-       
-        
+
+
         ''SGM 01/12/2011
         'Public Property Reagent1ParkingZ() As Single
         '    Get
@@ -1855,7 +1856,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         End Select
 
-                       
+
                 End Select
             Catch ex As Exception
                 myResultData.HasError = True
@@ -2050,7 +2051,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 MyClass.CurrentOperation = OPERATIONS.SAVE_ADJUSTMENT
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, MyClass.pValueAdjustAttr)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, MyClass.pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -2077,7 +2078,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case Ax00WashStationControlModes.DOWN
                         MyClass.CurrentOperation = OPERATIONS.CONDITIONING_MANUAL_DOWN
                 End Select
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -2104,7 +2105,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case Ax00WashStationControlModes.DOWN
                         MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
                 End Select
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -3450,7 +3451,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         .NextOnTimeOut = Nothing
                         .NextOnError = Nothing
 
-                        
+
 
                     End With
 

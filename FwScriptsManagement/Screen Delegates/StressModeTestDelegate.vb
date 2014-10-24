@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -444,7 +445,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myParams.Add(Now.Minute.ToString)
                 myParams.Add(Now.Second.ToString)
 
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SDMODE, True, Nothing, Nothing, "", myParams)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SDMODE, True, Nothing, Nothing, "", myParams) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -466,7 +467,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 CurrentOperation = OPERATIONS.READ_STRESS
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SDPOLL, True)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SDPOLL, True) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -503,7 +504,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myParams.Add(Now.Second.ToString)
 
                 CurrentOperation = OPERATIONS.STOP_STRESS
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SDMODE, True, Nothing, Nothing, "", myParams)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SDMODE, True, Nothing, Nothing, "", myParams) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -667,7 +668,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Private Function ManageResultsStress() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadStressModeData
+                myResultData = AnalyzerController.Instance.Analyzer.ReadStressModeData '#REFACTORING
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     MyClass.MyResultsStressTest = CType(myResultData.SetDatos, StressDataTO)
 

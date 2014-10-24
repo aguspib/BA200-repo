@@ -88,6 +88,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property FluidicTubingInstallDate() As DateTime
         ReadOnly Property HasPumpTubingInstallDate() As Boolean
         ReadOnly Property HasFluidicTubingInstallDate() As Boolean
+        ReadOnly Property IsWaitingForInstructionStart() As Boolean
 
 #End Region
 
@@ -133,7 +134,6 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function DoBubblesCalibration() As GlobalDataTO
         Function GetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As String
         Function UpdateAnalyzerInformation(ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
-        ReadOnly Property IsWaitingForInstructionStart() As Boolean
         Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO
         Sub StopInstructionStartedTimer()
         Function PrepareDataToSend(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pApplicationName As String, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pISEMode As ISEModes, ByVal pCmd As ISECommands, Optional ByVal pParameter1 As String = "0", Optional ByVal pParameter2 As String = "0", Optional ByVal pParameter3 As String = "0", Optional ByVal pTubePosition As Integer = 1) As GlobalDataTO
@@ -163,6 +163,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function PrepareDataToSend_WRITE_INSTALL_YEAR(ByVal pYear As Integer) As GlobalDataTO
         Function PrepareDataToSend_R2_TO_WASH() As GlobalDataTO
         Function PrepareDataToSend_R2_TO_PARK() As GlobalDataTO
+        Sub Initialize()
 
 #End Region
 

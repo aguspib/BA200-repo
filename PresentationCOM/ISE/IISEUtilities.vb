@@ -12,12 +12,14 @@ Imports System.Drawing
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.IO
 Imports System.Runtime.InteropServices 'WIN32
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Entities
 
 Public Class IISEUtilities
 
 #Region "Declarations"
-    Private WithEvents mdiAnalyzerCopy As AnalyzerManager
-    Private myISEManager As ISEManager
+    'Private WithEvents mdiAnalyzerCopy As AnalyzerManagerOLD '#REFACTORING
+    'Private myISEManager As ISEManager '#REFACTORING
 
     ' Language
     Private currentLanguage As String
@@ -177,32 +179,33 @@ Public Class IISEUtilities
             If Me.SimulationMode Then
                 isAvailable = True
             Else
-                If MyClass.mdiAnalyzerCopy.Connected Then
-                    If MyClass.mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.Connected Then
+                    If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
 
-                        If MyClass.mdiAnalyzerCopy.ISE_Manager.IsAnalyzerWarmUp Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp Then
                             isAvailable = False
                         Else
                             'SGM 20/09/2012 - not to check flags in Service sw
                             If ThisIsService Then
                                 isAvailable = True
                             Else
-                                isAvailable = Not (MyClass.mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS" _
-                                                         OrElse String.Compare(Me.mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "PAUSED", False) = 0)
+                                isAvailable = Not (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS" _
+                                                         OrElse String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "PAUSED", False) = 0)
                             End If
                             'end SGM 20/09/2012
                         End If
 
                     Else
-                            If MyClass.mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
-                                bsScreenErrorProvider.ShowError(MSG_EndProcess)
-                            Else
-                                bsScreenErrorProvider.ShowError(MSG_StartInstrument)
-                            End If
-                            isAvailable = False
+                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
+                            bsScreenErrorProvider.ShowError(MSG_EndProcess)
+                        Else
+                            bsScreenErrorProvider.ShowError(MSG_StartInstrument)
+                        End If
+                        isAvailable = False
                     End If
 
-                ElseIf MyClass.myISEManager.IsAnalyzerDisconnected Then
+                ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerDisconnected Then
                     isAvailable = False
                 Else
                     Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
@@ -230,15 +233,16 @@ Public Class IISEUtilities
             If Me.SimulationMode Then
                 isAvailable = True
             Else
-                If MyClass.CurrentActionNode IsNot Nothing AndAlso (CStr(MyClass.CurrentActionNode.Tag) = "ACT_ISE" And Not MyClass.myISEManager.IsISEModuleInstalled) Then
+                If MyClass.CurrentActionNode IsNot Nothing AndAlso (CStr(MyClass.CurrentActionNode.Tag) = "ACT_ISE" And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled) Then
                     isAvailable = True
                 Else
-                    If Not MyClass.myISEManager.IsAnalyzerWarmUp Then
-                        If Not MyClass.myISEManager.IsISEInitiating And MyClass.myISEManager.IsISEInitializationDone Then
+                    '#REFACTORING
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp Then
+                        If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitializationDone Then
                             'when initialization finished
-                            isAvailable = MyClass.myISEManager.IsISESwitchON
+                            isAvailable = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
 
-                        ElseIf MyClass.myISEManager.IsISESwitchON Then
+                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                             'when switch on but initialization is pending
                             isAvailable = True
                         Else
@@ -257,7 +261,7 @@ Public Class IISEUtilities
 
     Private ReadOnly Property IsLongTermDeactivated() As Boolean
         Get
-            Return MyClass.myISEManager.IsLongTermDeactivation
+            Return AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation '#REFACTORING
         End Get
     End Property
 
@@ -449,15 +453,15 @@ Public Class IISEUtilities
 
 #Region "Public Methods"
 
-    'Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles mdiAnalyzerCopy.SendEvent
+    'Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles AnalyzerController.Instance.Analyzer.SendEvent
     '    Try
     '        If pInstructionSent = AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString Then
 
     '            'SGM 11/05/2012
-    '            If mdiAnalyzerCopy.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
+    '            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None Then
     '                Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
     '                myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-    '                mdiAnalyzerCopy.ISE_Manager.LastISEResult = myISEResultWithComErrors
+    '                AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult = myISEResultWithComErrors
     '            End If
 
     '            MyClass.PrepareErrorMode()
@@ -492,12 +496,13 @@ Public Class IISEUtilities
             ' XBC 13/07/2012
             Dim disableScreen As Boolean = False
             If Not ThisIsService Then 'SGM 20/09/2012 - not treat if Service Sw
-                If Not mdiAnalyzerCopy Is Nothing Then
-                    If mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                       String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
-                       String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
-                       String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 Then
-                        ' OrElse _ mdiAnalyzerCopy.AnalyzerIsFreeze Then    ' XB 01/12/2013 - Freeze case is managed above - Task #1410
+                '#REFACTORING
+                If Not AnalyzerController.Instance.Analyzer Is Nothing Then
+                    If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
+                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 Then
+                        ' OrElse _ AnalyzerController.Instance.Analyzer.AnalyzerIsFreeze Then    ' XB 01/12/2013 - Freeze case is managed above - Task #1410
 
                         disableScreen = True
 
@@ -513,7 +518,7 @@ Public Class IISEUtilities
             End If
             ' XBC 13/07/2012
 
-            MyClass.myISEManager = mdiAnalyzerCopy.ISE_Manager
+            'MyClass.myISEManager = AnalyzerController.Instance.Analyzer.ISEAnalyzer '#REFACTORING
 
             RefreshDoneField = False 'RH 28/03/2012
 
@@ -521,26 +526,27 @@ Public Class IISEUtilities
                 Dim sensorValue As Single = 0
 
                 'ISE switch on changed
-                sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED)
+                '#REFACTORING
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED) = 0 'Once updated UI clear sensor
 
                     'SGM 29/06/2012 - Inform that ISE is Switch OFF
                     Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                    If Not myISEManager.IsISESwitchON AndAlso Not MyClass.IsSwitchOffInformed Then
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON AndAlso Not MyClass.IsSwitchOffInformed Then
                         Dim myISEOffText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_OFF_ERR", currentLanguage) + vbCrLf
                         Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEOffText)
                         MyClass.IsSwitchOffInformed = True
-                    ElseIf myISEManager.IsISESwitchON And MyClass.IsSwitchOffInformed Then
-                        If myISEManager.CurrentProcedure <> ISEManager.ISEProcedures.GeneralCheckings Then
+                    ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON And MyClass.IsSwitchOffInformed Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
 
                             'Dim myISEOnText As String = vbCrLf + myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_ON_WRN", currentLanguage) + " - " + myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_CONNECT_PDT", currentLanguage) + vbCrLf + vbCrLf SGM 26/10/2012
 
                             'SGM 26/10/2012
                             Dim myISEOnText As String = vbCrLf + myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_ON_WRN", currentLanguage) + vbCrLf + vbCrLf
-                            Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEOnText, ISEManager.ISEProcedureResult.NOK)
+                            Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEOnText, ISEAnalyzerEntity.ISEProcedureResult.NOK)
                             'Show current Alarms
                             MyClass.CurrentOperation = OPERATIONS.CHECK_ALARMS
                             MyClass.PrepareTestedMode()
@@ -554,33 +560,36 @@ Public Class IISEUtilities
                 End If
 
                 'ISE initiated
-                sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
+                '#REFACTORING
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
                 If sensorValue > 0 Then
                     ScreenWorkingProcess = False
 
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
 
                 End If
 
                 'ISE ready changed
-                sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED)
+                '#REFACTORING
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED) = 0 'Once updated UI clear sensor
 
                 End If
 
 
                 'ISE procedure finished
-                sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
+                '#REFACTORING
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED) = 0
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED) = 0
 
-                    If Not MyClass.myISEManager.IsLongTermDeactivation Then
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                         If Me.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE Then
                             MyClass.IsInitialPollSent = True
                         End If
@@ -595,19 +604,20 @@ Public Class IISEUtilities
                 Else
 
                     'ANSISE received
-                    sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED)
+                    '#REFACTORING
+                    sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED)
                     If sensorValue = 1 Then
                         ScreenWorkingProcess = False
 
-                        mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED) = 0 'Once updated UI clear sensor
+                        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED) = 0 'Once updated UI clear sensor
 
-                        If Not MyClass.myISEManager.IsLongTermDeactivation Then
+                        If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                             If MyClass.IsInitialPollSent Then
-                                If myISEManager.CurrentProcedure <> ISEManager.ISEProcedures.GeneralCheckings AndAlso myISEManager.CurrentProcedure <> ISEManager.ISEProcedures.ActivateReagentsPack Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.GeneralCheckings AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.ActivateReagentsPack Then
                                     MyClass.DisplayISEInfo()
                                 End If
                             ElseIf Not MyClass.IsScreenCloseRequested Then
-                                If myISEManager.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
                                     If Me.CurrentOperation <> OPERATIONS.INITIALIZE_ISE_MODULE Then
                                         MyClass.DisableAll()
                                         Dim myText As String = ""
@@ -618,7 +628,7 @@ Public Class IISEUtilities
                                     End If
                                 End If
                             End If
-                        ElseIf Not MyClass.myISEManager.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
+                        ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
                             MyClass.DisplayISEInfo()
                         End If
 
@@ -640,7 +650,7 @@ Public Class IISEUtilities
 
 
             'AG 15/03/2012 - when FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
-            If mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then
+            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then '#REFACTORING
                 ScreenWorkingProcess = False 'Process finished
                 Me.PrepareErrorMode()
                 RefreshDoneField = True 'RH 28/03/2012
@@ -764,13 +774,15 @@ Public Class IISEUtilities
     ''' Send ISE command High Level Instruction
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created by XBC 23/01/2012</remarks>
+    ''' <remarks>Created by XBC 23/01/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function SendISEInstruction() As GlobalDataTO
         Dim myResultData As New GlobalDataTO
         Dim myScreenIseCmdTo As New ISECommandTO
         Try
-            'If mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-            '    myResultData = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+            'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+            '    myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
             'End If
 
             MyClass.IsSwitchOffInformed = False
@@ -778,74 +790,74 @@ Public Class IISEUtilities
             If Not myResultData.HasError Then
                 Select Case Me.myISEAction
                     Case ISECommands.POLL
-                        myResultData = myISEManager.PrepareDataToSend_POLL()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_POLL()
 
                     Case ISECommands.VERSION_CHECKSUM
-                        myResultData = myISEManager.PrepareDataToSend_VERSION_CHECKSUM()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_VERSION_CHECKSUM()
 
                     Case ISECommands.SHOW_BUBBLE_CAL
-                        myResultData = myISEManager.PrepareDataToSend_SHOW_BUBBLE_CAL()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_SHOW_BUBBLE_CAL()
 
                     Case ISECommands.SHOW_PUMP_CAL
-                        myResultData = myISEManager.PrepareDataToSend_SHOW_PUMP_CAL()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_SHOW_PUMP_CAL()
 
                     Case ISECommands.LAST_SLOPES
-                        myResultData = myISEManager.PrepareDataToSend_LAST_SLOPES()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_LAST_SLOPES()
 
                     Case ISECommands.READ_mV
-                        myResultData = myISEManager.PrepareDataToSend_READ_mV()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_READ_mV()
 
                     Case ISECommands.READ_PAGE_0_DALLAS
                         ' by the moment read the page 0 by default
-                        myResultData = myISEManager.PrepareDataToSend_READ_PAGE_DALLAS(0)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(0)
 
                     Case ISECommands.READ_PAGE_1_DALLAS
                         ' by the moment read the page 0 by default
-                        myResultData = myISEManager.PrepareDataToSend_READ_PAGE_DALLAS(1)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_READ_PAGE_DALLAS(1)
 
                     Case ISECommands.MAINTENANCE
-                        myResultData = myISEManager.PrepareDataToSend_MAINTENANCE()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_MAINTENANCE()
 
                     Case ISECommands.DSPA
-                        myResultData = myISEManager.PrepareDataToSend_DSPA(Me.BsVolumeUpDown.Value.ToString)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_DSPA(Me.BsVolumeUpDown.Value.ToString)
 
                     Case ISECommands.DSPB
-                        myResultData = myISEManager.PrepareDataToSend_DSPB(Me.BsVolumeUpDown.Value.ToString)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_DSPB(Me.BsVolumeUpDown.Value.ToString)
 
                     Case ISECommands.PURGEA
-                        myResultData = myISEManager.PrepareDataToSend_PURGEA()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_PURGEA()
 
                     Case ISECommands.PURGEB
-                        myResultData = myISEManager.PrepareDataToSend_PURGEB()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_PURGEB()
 
                     Case ISECommands.PRIME_CALA
-                        myResultData = myISEManager.PrepareDataToSend_PRIME_CALA()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_PRIME_CALA()
 
                     Case ISECommands.PRIME_CALB
-                        myResultData = myISEManager.PrepareDataToSend_PRIME_CALB()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_PRIME_CALB()
 
                     Case ISECommands.CLEAN 'it is sent as a procedure SGM 09/05/2012
                         '' Nota : Fw no envia primer ISE! 
-                        'myResultData = myISEManager.PrepareDataToSend_CLEAN(CInt(Me.BsPositionUpDown.Value), mdiAnalyzerCopy.ActiveAnalyzer)
+                        'myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_CLEAN(CInt(Me.BsPositionUpDown.Value), AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
 
                     Case ISECommands.CALB
-                        myResultData = myISEManager.PrepareDataToSend_CALB()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_CALB()
 
                     Case ISECommands.BUBBLE_CAL
-                        myResultData = myISEManager.PrepareDataToSend_BUBBLE_CAL()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_BUBBLE_CAL()
 
                     Case ISECommands.PUMP_CAL
                         ' Nota : Fw no envia primer ISE! 
-                        myResultData = myISEManager.PrepareDataToSend_PUMP_CAL(CInt(Me.BsPositionUpDown.Value), mdiAnalyzerCopy.ActiveAnalyzer)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_PUMP_CAL(CInt(Me.BsPositionUpDown.Value), AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
 
                     Case ISECommands.DEBUG_mV_ONE
-                        myResultData = myISEManager.PrepareDataToSend_DEBUG_mV(ISECommands.DEBUG_mV_ONE)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_DEBUG_mV(ISECommands.DEBUG_mV_ONE)
 
                     Case ISECommands.DEBUG_mV_TWO
-                        myResultData = myISEManager.PrepareDataToSend_DEBUG_mV(ISECommands.DEBUG_mV_TWO)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_DEBUG_mV(ISECommands.DEBUG_mV_TWO)
 
                     Case ISECommands.DEBUG_mV_OFF
-                        myResultData = myISEManager.PrepareDataToSend_DEBUG_mV(ISECommands.DEBUG_mV_OFF)
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_DEBUG_mV(ISECommands.DEBUG_mV_OFF)
 
                 End Select
             End If
@@ -859,20 +871,20 @@ Public Class IISEUtilities
                     ISECommands.BUBBLE_CAL, ISECommands.SHOW_BUBBLE_CAL, ISECommands.READ_mV, ISECommands.READ_PAGE_0_DALLAS, _
                     ISECommands.READ_PAGE_1_DALLAS, ISECommands.VERSION_CHECKSUM
 
-                        myISEManager.CurrentProcedure = ISEManager.ISEProcedures.SingleReadCommand
-                        myISEManager.CurrentCommandTO = myScreenIseCmdTo
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.SingleReadCommand
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO = myScreenIseCmdTo
 
                     Case Else
 
-                        myISEManager.CurrentProcedure = ISEManager.ISEProcedures.SingleCommand
-                        myISEManager.CurrentCommandTO = myScreenIseCmdTo
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.SingleCommand
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO = myScreenIseCmdTo
 
                 End Select
 
                 'update the flag for maintenance exit SGM 19/03/2012
                 MyClass.UpdateMaintenanceExitIsNeeded()
 
-                myResultData = myISEManager.SendISECommand
+                myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SendISECommand
 
                 'SGM 17/10/2012 - Log ISE Operation
                 If myScreenIseCmdTo.ISECommandID <> ISECommands.NONE Then
@@ -883,7 +895,7 @@ Public Class IISEUtilities
 
             End If
 
-            If (myResultData.HasError) OrElse Not mdiAnalyzerCopy.Connected Then
+            If (myResultData.HasError) OrElse Not AnalyzerController.Instance.Analyzer.Connected Then
                 ShowMessage("Error", myResultData.ErrorCode, myResultData.ErrorMessage)
                 Me.PrepareErrorMode()
             End If
@@ -906,13 +918,14 @@ Public Class IISEUtilities
     ''' Created by XBC 07/03/2012
     ''' Modified by XBC 21/01/2013 - RaiseEvent ActivateScreenEvent cause problems (‘Operación no válida a través de subprocesos’) 
     '''                              if is called from here. This operation is placed on Sub ExecuteISEAction, like other ones (Bugs tracking #1108)
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Function SendISEAction() As GlobalDataTO
         Dim myResultData As New GlobalDataTO
         Dim myScreenIseCmdTo As New ISECommandTO
         Try
-            'If mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-            '    myResultData = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+            'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+            '    myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
             'End If
 
             MyClass.IsSwitchOffInformed = False
@@ -922,25 +935,25 @@ Public Class IISEUtilities
 
                     Case OPERATIONS.R2_TO_WASHING 'move away SGM 04/07/2012
                         MyClass.CurrentActionNode = Nothing
-                        myResultData = myISEManager.PrepareDataToSend_R2_TO_WASH
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_R2_TO_WASH
 
                     Case OPERATIONS.R2_TO_PARKING 'move back SGM 04/07/2012
                         MyClass.CurrentActionNode = Nothing
-                        myResultData = myISEManager.PrepareDataToSend_R2_TO_PARK
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PrepareDataToSend_R2_TO_PARK
 
                     Case OPERATIONS.INITIALIZE_ISE_MODULE
                         ' XBC 22/01/2013
                         'SGM 04/04/2012
-                        'If myISEManager.IsISECommsOk Then
+                        'If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk Then
                         '    RaiseEvent ActivateScreenEvent(False, Messages.INITIALIZING_ISE)
                         'End If
                         ' XBC 22/01/2013
 
-                        myResultData = myISEManager.DoGeneralCheckings
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoGeneralCheckings
                         'end SGM 04/04/2012
 
                     Case OPERATIONS.INSTALL_ISE_MODULE
-                        'myResultData = myISEManager.InstallISEModule()
+                        'myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.InstallISEModule()
 
                         'SGM 14/06/2012
                         Application.DoEvents()
@@ -948,21 +961,21 @@ Public Class IISEUtilities
 
                     Case OPERATIONS.INSTALL_REAGENT_PACK
                         'SGM 16/01/2013 Bug #1108
-                        myResultData = myISEManager.ActivateReagentsPack()
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ActivateReagentsPack()
 
                         'Commented SGM 16/01/2013
                         '' XBC 04/05/2012
-                        'If myISEManager.ReagentsPackInstallationDate <> Nothing Then
-                        '    myISEManager.IsCleanPackInstalled = False
-                        '    myResultData = myISEManager.ActivateReagentsPack()
+                        'If AnalyzerController.Instance.Analyzer.ISEAnalyzer.ReagentsPackInstallationDate <> Nothing Then
+                        '    AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsCleanPackInstalled = False
+                        '    myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ActivateReagentsPack()
                         'Else
                         '    ' XBC 02/04/2012 - Refresh Changes
-                        '    myResultData = myISEManager.SetReagentsPackInstallDate(DateTime.Now, True)
+                        '    myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetReagentsPackInstallDate(DateTime.Now, True)
                         '    If myResultData.HasError Then
                         '        Me.PrepareErrorMode()
                         '    Else
                         '        'SGM 12/03/2012
-                        '        myResultData = myISEManager.ActivateReagentsPack()
+                        '        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ActivateReagentsPack()
                         '        'end SGM 12/03/2012
                         '    End If
                         '    ' XBC 02/04/2012 - Refresh Changes
@@ -971,15 +984,15 @@ Public Class IISEUtilities
                     Case OPERATIONS.INSTALL_ELECTRODES
 
                         ' XBC 30/03/2012 - Refresh Changes
-                        myISEManager.IsLiEnabledByUser = Me.UserLiSelectedAttr
-                        myResultData = myISEManager.SetElectrodesInstallDates(Me.UserDateTimeElement1Attr, Me.UserDateTimeElement2Attr, Me.UserDateTimeElement3Attr, Me.UserDateTimeElement4Attr, Me.UserDateTimeElement5Attr)
+                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser = Me.UserLiSelectedAttr
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetElectrodesInstallDates(Me.UserDateTimeElement1Attr, Me.UserDateTimeElement2Attr, Me.UserDateTimeElement3Attr, Me.UserDateTimeElement4Attr, Me.UserDateTimeElement5Attr)
                         If myResultData.HasError Then
                             Me.PrepareErrorMode()
                         Else
                             'SGM 12/03/2012
-                            myResultData = myISEManager.ActivateElectrodes()
+                            myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ActivateElectrodes()
                             'Update ISE Tests table
-                            myResultData = MyClass.UpdateLithiumTestEnabled(myISEManager.IsLiEnabledByUser)
+                            myResultData = MyClass.UpdateLithiumTestEnabled(AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser)
                             'end SGM 12/03/2012
                         End If
                         ' XBC 30/03/2012 - Refresh Changes
@@ -992,19 +1005,19 @@ Public Class IISEUtilities
                         'MyClass.PrepareTestedMode()
 
                     Case OPERATIONS.ENABLE_ISE_PREPARATIONS
-                        myResultData = myISEManager.DoGeneralCheckings
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoGeneralCheckings
 
                     Case OPERATIONS.CHECK_CLEAN_PACK
-                        myResultData = myISEManager.CheckCleanPackInstalled
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckCleanPackInstalled
 
                     Case OPERATIONS.CLEANING
-                        myResultData = myISEManager.DoCleaning(CInt(Me.BsPositionUpDown.Value))
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoCleaning(CInt(Me.BsPositionUpDown.Value))
 
                     Case OPERATIONS.PRIME_CALIBRATION  'SGM 11/06/2012
-                        myResultData = myISEManager.DoPrimeAndCalibration
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoPrimeAndCalibration
 
                     Case OPERATIONS.PRIME_X2_CALIBRATION  'SGM 11/06/2012
-                        myResultData = myISEManager.DoPrimeX2AndCalibration
+                        myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoPrimeX2AndCalibration
 
                 End Select
             End If
@@ -1019,7 +1032,7 @@ Public Class IISEUtilities
 
             End If
 
-            If (myResultData.HasError) OrElse Not mdiAnalyzerCopy.Connected Then
+            If (myResultData.HasError) OrElse Not AnalyzerController.Instance.Analyzer.Connected Then
                 ShowMessage("Error", myResultData.ErrorCode, myResultData.ErrorMessage)
                 Me.PrepareErrorMode()
             Else
@@ -1103,8 +1116,9 @@ Public Class IISEUtilities
         Try
             Dim isNeeded As Boolean = False
 
-            If myISEManager.CurrentCommandTO IsNot Nothing Then
-                Select Case myISEManager.CurrentCommandTO.ISECommandID  ' MyClass.CurrentISECommand.ISECommandID
+            '#REFACTORING
+            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
+                Select Case AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO.ISECommandID  ' MyClass.CurrentISECommand.ISECommandID
                     Case ISECommands.BUBBLE_CAL, ISECommands.CALB, ISECommands.CLEAN, ISECommands.DSPA, ISECommands.DSPB, _
                     ISECommands.MAINTENANCE, ISECommands.PRIME_CALA, ISECommands.PRIME_CALB, ISECommands.PUMP_CAL, ISECommands.PURGEA, _
                     ISECommands.PURGEB
@@ -1130,6 +1144,7 @@ Public Class IISEUtilities
     ''' Created by XBC 06/03/2012
     ''' Modified by XBC 21/01/2013 - RaiseEvent ActivateScreenEvent cause problems (‘Operación no válida a través de subprocesos’) 
     '''                              if is called from SendISEAction Function. This operation is placed here, like other ones (Bugs tracking #1108)
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ExecuteISEAction(ByVal pNode As TreeNode)
         Dim myGlobal As New GlobalDataTO
@@ -1164,7 +1179,7 @@ Public Class IISEUtilities
                 Case "DEACT_ISE"
                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ISE_DeactivateModule", currentLanguage)
                     Me.AppendPcSendText(Me.BsRichTextBox1, myText)
-                    myGlobal = myISEManager.DeactivateISEModule(True)
+                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DeactivateISEModule(True)
                     Me.CurrentOperation = OPERATIONS.SET_LONG_TERM_DEACTIVATION
                     Application.DoEvents()
                     MyClass.PrepareTestedMode()
@@ -1176,45 +1191,45 @@ Public Class IISEUtilities
                     'verify if there is any Li+ Test in use
                     Dim InUse As Boolean = MyClass.LithiumTestInUse()
 
-                    Using myForm As New IISEDateElementSelection(myISEManager.IsLiEnabledByUser, InUse)
+                    Using myForm As New IISEDateElementSelection(AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser, InUse)
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallElectrodes", currentLanguage)
 
                         myForm.Element1Name = "Ref:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RefElectrode", currentLanguage)
                         myForm.Element1Selected = True
-                        If myISEManager.HasRefInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element1DateTime = myISEManager.RefInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasRefInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element1DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.RefInstallDate
                         Else
                             myForm.Element1DateTime = Now.Date
                         End If
 
                         myForm.Element2Name = "Na+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_NaElectrode", currentLanguage)
                         myForm.Element2Selected = True
-                        If myISEManager.HasNaInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element2DateTime = myISEManager.NaInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasNaInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element2DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.NaInstallDate
                         Else
                             myForm.Element2DateTime = Now.Date
                         End If
 
                         myForm.Element3Name = "K+:"     ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_KElectrode", currentLanguage)
                         myForm.Element3Selected = True
-                        If myISEManager.HasKInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element3DateTime = myISEManager.KInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasKInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element3DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.KInstallDate
                         Else
                             myForm.Element3DateTime = Now.Date
                         End If
 
                         myForm.Element4Name = "Cl-:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ClElectrode", currentLanguage)
                         myForm.Element4Selected = True
-                        If myISEManager.HasClInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element4DateTime = myISEManager.ClInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasClInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element4DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.ClInstallDate
                         Else
                             myForm.Element4DateTime = Now.Date
                         End If
 
                         myForm.Element5Name = "Li+:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LiElectrode", currentLanguage)
                         myForm.Element5Selected = True
-                        If myISEManager.HasLiInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element5DateTime = myISEManager.LiInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasLiInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element5DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.LiInstallDate
                         Else
                             myForm.Element5DateTime = Now.Date
                         End If
@@ -1232,7 +1247,7 @@ Public Class IISEUtilities
                             Me.UserLiSelectedAttr = myForm.Element5Selected
 
                             If Me.SimulationMode Then   ' XBC 29/06/2012 
-                                myISEManager.IsLiEnabledByUser = Me.UserLiSelectedAttr
+                                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser = Me.UserLiSelectedAttr
                             End If
 
                             myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ISE_ActivateElectrodes", currentLanguage)
@@ -1278,8 +1293,8 @@ Public Class IISEUtilities
                         myForm.Element1Name = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallPumpTubing", currentLanguage)
                         myForm.Element1Selected = True
 
-                        If myISEManager.HasPumpTubingInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element1DateTime = myISEManager.PumpTubingInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasPumpTubingInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element1DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.PumpTubingInstallDate
                         Else
                             myForm.Element1DateTime = Now.Date
                         End If
@@ -1312,8 +1327,8 @@ Public Class IISEUtilities
                         myForm.Element1Name = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallFluidTubing", currentLanguage)
                         myForm.Element1Selected = True
 
-                        If myISEManager.HasFluidicTubingInstallDate Then   ' XBC 29/06/2012
-                            myForm.Element1DateTime = myISEManager.FluidicTubingInstallDate
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.HasFluidicTubingInstallDate Then   ' XBC 29/06/2012
+                            myForm.Element1DateTime = AnalyzerController.Instance.Analyzer.ISEAnalyzer.FluidicTubingInstallDate
                         Else
                             myForm.Element1DateTime = Now.Date
                         End If
@@ -1735,7 +1750,9 @@ Public Class IISEUtilities
     ''' REMARK
     ''' All Tools screens (CHANGE ROTOR, CONDITIONING, ISE and futures) 
     ''' must have the same logic about Open and Close functionalities
+    ''' 
     '''            XB 06/11/2013 - Add protection against more performing operations (Shutting down, aborting WS) - BT #1115
+    '''            IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Public Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
@@ -1749,11 +1766,11 @@ Public Class IISEUtilities
             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
             If GlobalBase.IsServiceAssembly Then
                 Me.LoadAdjustmentGroupData()
-                MyClass.myFwScriptDelegate = New SendFwScriptsDelegate(mdiAnalyzerCopy)
+                MyClass.myFwScriptDelegate = New SendFwScriptsDelegate() '#REFACTORING
             End If
 
             ' Get common Parameters
-            'myResultData = GetParams(mdiAnalyzerCopy.GetModelValue)
+            'myResultData = GetParams(AnalyzerController.Instance.Analyzer.GetModelValue)
 
             ' XB 27/09/2013 - Set the value by default
             'Me.BsPositionUpDown.Value = 1
@@ -1788,20 +1805,20 @@ Public Class IISEUtilities
 
                     ' XBC 11/07/2012 - First of all - check availabilty of the Intrument
                     Dim disableScreen As Boolean = False
-                    If Not mdiAnalyzerCopy Is Nothing Then
-                        If mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                           String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
-                           String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
-                           String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 OrElse _
-                           mdiAnalyzerCopy.AnalyzerIsFreeze OrElse _
-                           Not mdiAnalyzerCopy.AnalyzerIsReady Then
+                    If Not AnalyzerController.Instance.Analyzer Is Nothing Then
+                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                           String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
+                           String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
+                           String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 OrElse _
+                           AnalyzerController.Instance.Analyzer.AnalyzerIsFreeze OrElse _
+                           Not AnalyzerController.Instance.Analyzer.AnalyzerIsReady Then
                             ' XB 06/11/2013 - ABORTprocess and SDOWNprocess added 
 
                             disableScreen = True
 
                             Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                             'JV 05/11/2013 issue #1156: only the MSG_StartInstrument if the Analyzer is not ShuttingDown
-                            If mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" Then
+                            If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS" Then
                                 bsScreenErrorProvider.ShowError(MSG_StartInstrument)
                             End If
                             'bsScreenErrorProvider.ShowError(MSG_StartInstrument)
@@ -1828,26 +1845,26 @@ Public Class IISEUtilities
                         If MyClass.ValidateISEAvailability(True) Then
                             ' XBC 31/08/2102
 
-                            If Not myISEManager.IsLongTermDeactivation Then
+                            If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
 
                                 'SGM 04/04/2012 If the ISE Module is pending to connect, start connection process
-                                If Not myISEManager.IsISEOnceInitiatedOK OrElse Not myISEManager.IsISEInitiatedOK Then
+                                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEOnceInitiatedOK OrElse Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
 
                                     Dim myText As String = ""
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_INITIALIZING_ISE", currentLanguage) + vbCrLf
                                     Me.AppendPcSendText(Me.BsRichTextBox1, myText)
                                     Me.BsExitButton.Enabled = False
                                     Me.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE
-                                    If Not myISEManager.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
+                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
                                         MyClass.SendISEAction()
                                     End If
 
-                                ElseIf Not myISEManager.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings And Not myISEManager.IsISEInitiatedOK Then
+                                ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                     'else, send poll
                                     MyClass.IsInitialPollSent = True
                                     MyClass.SendISECMD(ISECommands.POLL)
 
-                                ElseIf myISEManager.IsISEInitiatedOK Then
+                                ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                     'Start moving arm to washing if already initiated
                                     MyClass.IsInitialPollSent = True
                                     MyClass.PrepareTestingMode()
@@ -1858,7 +1875,7 @@ Public Class IISEUtilities
                                     MyClass.myParentMDI.Refresh()
                                     RaiseEvent ActivateScreenEvent(False, Messages.PERFORMING_ISE)
                                     Application.DoEvents()
-                                    myResultData = myISEManager.MoveR2ArmAway
+                                    myResultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.MoveR2ArmAway
                                     If myResultData.HasError Then
                                         Me.PrepareErrorMode()
                                     End If
@@ -1868,7 +1885,7 @@ Public Class IISEUtilities
                                 MyClass.EnableAll()
                             End If
 
-                        ElseIf myISEManager.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings Then
+                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.GeneralCheckings Then
                             'if the Initializing process is being performed
                             Dim myText As String = ""
                             myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_INITIALIZING_ISE", currentLanguage) + vbCrLf
@@ -1876,13 +1893,13 @@ Public Class IISEUtilities
                             Me.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE
 
                         Else
-                            If Not myISEManager.IsLongTermDeactivation Then
-                                If myISEManager.IsISEInitializationDone Then
+                            If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitializationDone Then
                                     MyClass.EnableAll()
                                 Else
                                     MyClass.EnableAll()
                                     Me.BsExitButton.Enabled = True
-                                    If MyClass.mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                                    If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
                                         RaiseEvent ActivateVerticalButtonsEvent(True)
                                     End If
                                 End If
@@ -1890,7 +1907,7 @@ Public Class IISEUtilities
                                 MyClass.EnableAll()
                             End If
 
-                            If Not myISEManager.IsISESwitchON Then
+                            If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                                 MyClass.IsSwitchOffInformed = True
                             End If
 
@@ -1917,7 +1934,9 @@ Public Class IISEUtilities
     ''' <summary>
     ''' refresh the ability of the Analyzer for testing
     ''' </summary>
-    ''' <remarks>SGM 23/03/2012</remarks>
+    ''' <remarks>SGM 23/03/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function ValidateAnalyzerReadiness() As Boolean
         Dim myGlobal As New GlobalDataTO
         Try
@@ -1926,9 +1945,9 @@ Public Class IISEUtilities
             isReady = MyClass.IsAnalyzerAvailable
 
             If isReady Then
-                If String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
-                   String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
-                   String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 Then
+                If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
+                   String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
+                   String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 Then
                     isReady = False
                 End If
             End If
@@ -1937,9 +1956,9 @@ Public Class IISEUtilities
                 'Disable buttons
                 Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
 
-                If String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
-                   String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
-                   String.Compare(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 Then
+                If String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) = 0 OrElse _
+                   String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS", False) = 0 OrElse _
+                   String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS", False) = 0 Then
                     ' Nothing to do ' XB 06/11/2013 - Don't change the label warning if there are processing operations
                 Else
                     RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
@@ -2023,6 +2042,7 @@ Public Class IISEUtilities
     ''' Created by:  XB 24/01/2012
     ''' Modified by: XB 27/09/2013 - BT #1294 ==> Set the value by default to ISE Washing solution position tube
     '''              XB 28/04/2014 - Disable screen when saving consumptions
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub PrepareTestedMode(Optional ByVal pResponse As RESPONSE_TYPES = RESPONSE_TYPES.OK)
         Try
@@ -2050,11 +2070,11 @@ Public Class IISEUtilities
 
                 Select Case CurrentOperation
                     Case OPERATIONS.INSTALL_PUMP_TUBING
-                        myGlobal = myISEManager.SetPumpTubingInstallDate(Me.UserDateTimeElement1Attr)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetPumpTubingInstallDate(Me.UserDateTimeElement1Attr)
                     Case OPERATIONS.INSTALL_FLUID_TUBING
-                        myGlobal = myISEManager.SetFluidicTubingInstallDate(Me.UserDateTimeElement1Attr)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetFluidicTubingInstallDate(Me.UserDateTimeElement1Attr)
                     Case OPERATIONS.INSTALL_ELECTRODES
-                        myGlobal = myISEManager.SetElectrodesInstallDates(Me.UserDateTimeElement1Attr, _
+                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetElectrodesInstallDates(Me.UserDateTimeElement1Attr, _
                                                                           Me.UserDateTimeElement2Attr, _
                                                                           Me.UserDateTimeElement3Attr, _
                                                                           Me.UserDateTimeElement4Attr, _
@@ -2097,7 +2117,7 @@ Public Class IISEUtilities
 
             Else
 
-                If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.Exception Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.Exception Then
 
                     'SERVICE: In case of alarm not to treat
                     If ThisIsService Then
@@ -2115,7 +2135,7 @@ Public Class IISEUtilities
 
                     Me.BsAdjustButton.Enabled = ValidateNodeByBlock(MyClass.CurrentActionNode)
 
-                    MyClass.mdiAnalyzerCopy.RefreshISEAlarms()
+                    AnalyzerController.Instance.Analyzer.RefreshISEAlarms()
 
                     Me.NumRepetitionsSelectedByUser = 0
                     Me.BsAdjustButton.Visible = True
@@ -2123,8 +2143,8 @@ Public Class IISEUtilities
 
                     'SGM 26/10/2012 - ISE Alarms
                     If MyClass.CurrentOperation = OPERATIONS.CHECK_ALARMS Then
-                        Dim myPendingCal As New List(Of ISEManager.MaintenanceOperations)
-                        myGlobal = myISEManager.GetISEAlarmsForUtilities(myPendingCal)
+                        Dim myPendingCal As New List(Of ISEAnalyzerEntity.MaintenanceOperations)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEAlarmsForUtilities(myPendingCal)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             Dim myAlarms As List(Of Alarms) = CType(myGlobal.SetDatos, List(Of Alarms))
                             Me.AppendISEAlarmsText(Me.BsRichTextBox1, myAlarms, myPendingCal)
@@ -2138,15 +2158,15 @@ Public Class IISEUtilities
                     Select Case MyClass.CurrentOperation
                         Case OPERATIONS.ISECMD
 
-                            If myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 myGlobal.HasError = True
 
-                                MyClass.mdiAnalyzerCopy.RefreshISEAlarms()
+                                AnalyzerController.Instance.Analyzer.RefreshISEAlarms()
                                 Me.DisplayISEInfo() 'JB 19/09/2012 : Show ISE Info when errors too
                             Else
                                 If Me.CurrentISECommand.ISECommandID <> ISECommands.NONE Then
                                     Me.DisplayISEInfo()
-                                    'ElseIf (myISEManager.CurrentProcedure <> Nothing AndAlso myISEManager.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings) And myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                                    'ElseIf (AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure = ISEManager.ISEProcedures.GeneralCheckings) And AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
                                     '    MyClass.IsInitialPollSent = True
                                 End If
 
@@ -2163,12 +2183,12 @@ Public Class IISEUtilities
 
                                     'SGM 15/10/2012 - in case of LongTermDeactivation, if not Initiated yet, launch initialization
                                 ElseIf Me.CurrentISECommand.ISECommandID = ISECommands.READ_PAGE_1_DALLAS Then
-                                    If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
-                                        If MyClass.IsInstallGroupNodeActive And myISEManager.IsLongTermDeactivation And Not myISEManager.IsISEInitiatedOK Then
+                                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
+                                        If MyClass.IsInstallGroupNodeActive And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                             Application.DoEvents()
                                             Me.CurrentISECommand.ISECommandID = ISECommands.NONE
                                             MyClass.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE
-                                            myISEManager.DoGeneralCheckings(True)
+                                            AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoGeneralCheckings(True)
                                             RaiseEvent ActivateScreenEvent(False, Messages.INITIALIZING_ISE)
                                             Exit Try
                                         End If
@@ -2229,7 +2249,7 @@ Public Class IISEUtilities
                             End If
 
                         Case OPERATIONS.R2_TO_WASHING ' moved away SGM 04/07/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 IsActionCompleted = True
                                 MyClass.IsR2ArmAwayFromParking = True
                                 Me.Cursor = Cursors.Default
@@ -2239,7 +2259,7 @@ Public Class IISEUtilities
                             End If
 
                         Case OPERATIONS.R2_TO_PARKING ' moved back SGM 04/07/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 IsActionCompleted = True
                                 MyClass.IsR2ArmAwayFromParking = False
 
@@ -2257,7 +2277,7 @@ Public Class IISEUtilities
                             End If
 
                         Case OPERATIONS.INITIALIZE_ISE_MODULE 'SGM 04/04/2012 initialize (Connect) after ISE is previously switched on
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 System.Threading.Thread.Sleep(1000)
                                 MyClass.IsInitialPollSent = True
                                 IsActionCompleted = True
@@ -2273,16 +2293,16 @@ Public Class IISEUtilities
                             If pResponse = RESPONSE_TYPES.OK Then
                                 ' Ise is succesfully installed so save it into Adjustments of the Analyzer
                                 Me.CurrentOperation = OPERATIONS.SAVE_ISE_INSTALLATION
-                                If ThisIsService And Not myISEManager.IsISEModuleInstalled Then
+                                If ThisIsService And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then
                                     myGlobal = Me.SaveAdjustments(True)
                                     If Not myGlobal.HasError Then
                                         Exit Sub
                                     End If
                                 Else
-                                    myGlobal = myISEManager.DeactivateISEModule(False)
+                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DeactivateISEModule(False)
                                 End If
 
-                                myGlobal = mdiAnalyzerCopy.RefreshISEAlarms()
+                                myGlobal = AnalyzerController.Instance.Analyzer.RefreshISEAlarms()
 
                                 IsActionCompleted = True
                                 RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
@@ -2296,12 +2316,12 @@ Public Class IISEUtilities
                         Case OPERATIONS.SAVE_ISE_INSTALLATION
                             myGlobal = MyClass.UpdateAdjustments()
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                MyClass.myISEManager.IsISEModuleInstalled = True
-                                myISEManager.DeactivateISEModule(False)
+                                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled = True
+                                AnalyzerController.Instance.Analyzer.ISEAnalyzer.DeactivateISEModule(False)
 
                                 IsActionCompleted = True 'SGM 30/03/2012
 
-                                myGlobal = mdiAnalyzerCopy.RefreshISEAlarms()
+                                myGlobal = AnalyzerController.Instance.Analyzer.RefreshISEAlarms()
 
                                 RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
                                 MyClass.PrepareReadyForTestingMode()
@@ -2315,11 +2335,11 @@ Public Class IISEUtilities
                         Case OPERATIONS.INSTALL_ELECTRODES
 
                             'SGM 12/03/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 ''SGM 17/05/2012
-                                'myISEManager.IsLiEnabledByUser = Me.UserLiSelectedAttr
+                                'AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLiEnabledByUser = Me.UserLiSelectedAttr
                                 ''Update Installation dates
-                                'myGlobal = myISEManager.SetElectrodesInstallDates(Me.UserDateTimeElement1Attr, Me.UserDateTimeElement2Attr, Me.UserDateTimeElement3Attr, Me.UserDateTimeElement4Attr, Me.UserDateTimeElement5Attr)
+                                'myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetElectrodesInstallDates(Me.UserDateTimeElement1Attr, Me.UserDateTimeElement2Attr, Me.UserDateTimeElement3Attr, Me.UserDateTimeElement4Attr, Me.UserDateTimeElement5Attr)
 
                             Else
                                 Me.DisplayISEInfo() 'SGM 21/09/2012 - show received string
@@ -2333,9 +2353,9 @@ Public Class IISEUtilities
                         Case OPERATIONS.INSTALL_REAGENT_PACK
 
                             'SGM 12/03/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 ' XBC 02/04/2012 - Refresh Changes
-                                'myGlobal = myISEManager.SetReagentsPackInstallDate(DateTime.Now, True)
+                                'myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetReagentsPackInstallDate(DateTime.Now, True)
                                 ' XBC 02/04/2012 - Refresh Changes
                             Else
                                 myGlobal.HasError = True
@@ -2345,14 +2365,14 @@ Public Class IISEUtilities
 
                             'SGM 17/01/2012 Bug #1108 initialize after install rp
                             If IsActionCompleted Then
-                                If Not MyClass.myISEManager.IsISEInitiatedOK Then
+                                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                     Me.PrepareTestingMode()
                                     MyClass.DisplayMessage("")
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_INITIALIZING_ISE", currentLanguage) + vbCrLf
                                     Me.AppendPcSendText(Me.BsRichTextBox1, myText)
                                     MyClass.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE
                                     MyClass.myISEAction = ISECommands.POLL
-                                    myGlobal = myISEManager.DoGeneralCheckings
+                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoGeneralCheckings
                                     If myGlobal.HasError Then
                                         Me.PrepareErrorMode()
                                     End If
@@ -2367,13 +2387,13 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.INSTALL_FLUID_TUBING
-                            myGlobal = myISEManager.SetFluidicTubingInstallDate(Me.UserDateTimeElement1Attr)
+                            myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetFluidicTubingInstallDate(Me.UserDateTimeElement1Attr)
                             IsActionCompleted = Not myGlobal.HasError 'SGM 30/03/2012
                             MyClass.PrepareReadyForTestingMode()
 
 
                         Case OPERATIONS.INSTALL_PUMP_TUBING
-                            myGlobal = myISEManager.SetPumpTubingInstallDate(Me.UserDateTimeElement1Attr)
+                            myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SetPumpTubingInstallDate(Me.UserDateTimeElement1Attr)
                             IsActionCompleted = Not myGlobal.HasError 'SGM 30/03/2012
                             MyClass.PrepareReadyForTestingMode()
 
@@ -2385,14 +2405,14 @@ Public Class IISEUtilities
                             'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                             If Not GlobalBase.IsServiceAssembly Then
                                 ' Sw User
-                                If Not myISEManager.IsISEModuleReady AndAlso Not MyClass.WorkSessionIDAttribute.Trim = "" Then
+                                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady AndAlso Not MyClass.WorkSessionIDAttribute.Trim = "" Then
                                     Dim myExecutionDelegate As New ExecutionsDelegate
-                                    myGlobal = myExecutionDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, MyClass.mdiAnalyzerCopy.ActiveAnalyzer, "PREP_ISE", "PENDING", "LOCKED")
+                                    myGlobal = myExecutionDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, "PREP_ISE", "PENDING", "LOCKED")
                                 End If
                             End If
                             ' XBC 07/05/2012
 
-                            myGlobal = mdiAnalyzerCopy.RefreshISEAlarms() 'SGM 07/06/2012
+                            myGlobal = AnalyzerController.Instance.Analyzer.RefreshISEAlarms() 'SGM 07/06/2012
 
                             IsActionCompleted = True
                             RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
@@ -2400,7 +2420,7 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.CHECK_CLEAN_PACK
-                            If myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 myGlobal.HasError = True
                             Else
                                 ' XBC 07/05/2012 - disable ISE preparations
@@ -2408,9 +2428,9 @@ Public Class IISEUtilities
                                 'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 If Not GlobalBase.IsServiceAssembly Then
                                     ' Sw User
-                                    If Not myISEManager.IsISEModuleReady AndAlso Not MyClass.WorkSessionIDAttribute.Trim = "" Then
+                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady AndAlso Not MyClass.WorkSessionIDAttribute.Trim = "" Then
                                         Dim myExecutionDelegate As New ExecutionsDelegate
-                                        myGlobal = myExecutionDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, MyClass.mdiAnalyzerCopy.ActiveAnalyzer, "PREP_ISE", "PENDING", "LOCKED")
+                                        myGlobal = myExecutionDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, "PREP_ISE", "PENDING", "LOCKED")
                                     End If
                                 End If
                                 ' XBC 07/05/2012
@@ -2420,7 +2440,7 @@ Public Class IISEUtilities
 
                         Case OPERATIONS.CLEANING
                             'SGM 12/03/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
 
                             Else
                                 Me.DisplayISEInfo() 'SGM 21/09/2012 - show received string
@@ -2431,14 +2451,14 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.ENABLE_ISE_PREPARATIONS
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
 
                                 ' XBC 20/03/2012 
-                                'myISEManager.ActivateISEPreparations()
+                                'AnalyzerController.Instance.Analyzer.ISEAnalyzer.ActivateISEPreparations()
                                 Dim myExecutionDelegate As New ExecutionsDelegate
 
                                 ' Verify if exist any work session
-                                If MyClass.myISEManager.IsISEModuleReady AndAlso _
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady AndAlso _
                                     Not String.Compare(WorkSessionIDAttribute.Trim, "", False) = 0 AndAlso _
                                    String.Compare(Me.WSStatusAttribute, "EMPTY", False) <> 0 And _
                                    String.Compare(Me.WSStatusAttribute, "OPEN", False) <> 0 Then
@@ -2447,21 +2467,21 @@ Public Class IISEUtilities
                                     'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (running mode and pause mode in different flags)
                                     Dim createWSInRunning As Boolean = False
                                     Dim pauseMode As Boolean = False
-                                    If (Not mdiAnalyzerCopy Is Nothing) Then
-                                        createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
-                                        pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+                                    If (Not AnalyzerController.Instance.Analyzer Is Nothing) Then
+                                        createWSInRunning = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                                        pauseMode = AnalyzerController.Instance.Analyzer.AllowScanInRunning
                                     End If
 
 
                                     'SGM 25/09/2012 - check if any calibration is needed
                                     Dim isReady As Boolean = False
                                     Dim myAffectedElectrodes As List(Of String)
-                                    myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
+                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                                     End If
                                     CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".PrepareTestedMode", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
-                                    myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, MyClass.mdiAnalyzerCopy.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                                    myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
                                                                                   createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
                                     If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
                                     'end SGM 25/09/2012
@@ -2482,7 +2502,7 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.PRIME_CALIBRATION 'SGM 11/06/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
 
                             Else
                                 myGlobal.HasError = True
@@ -2492,7 +2512,7 @@ Public Class IISEUtilities
                             MyClass.PrepareReadyForTestingMode()
 
                         Case OPERATIONS.PRIME_X2_CALIBRATION 'SGM 11/06/2012
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
 
                             Else
                                 myGlobal.HasError = True
@@ -2502,7 +2522,7 @@ Public Class IISEUtilities
                             MyClass.PrepareReadyForTestingMode()
 
                         Case OPERATIONS.QUIT_UTILITIES
-                            If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 '    SendISECMD(ISECommands.DEBUG_mV_OFF)
                                 'End If
@@ -2526,7 +2546,7 @@ Public Class IISEUtilities
                                 Me.AppendPcSendText(Me.BsRichTextBox1, myText)
                                 MyClass.CurrentOperation = OPERATIONS.R2_TO_PARKING
                                 MyClass.myISEAction = ISECommands.R2_TO_PARKING
-                                myGlobal = myISEManager.MoveR2ArmBack
+                                myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.MoveR2ArmBack
                                 If myGlobal.HasError Then
                                     Me.PrepareErrorMode()
                                 End If
@@ -2539,8 +2559,8 @@ Public Class IISEUtilities
 
 
                         Case OPERATIONS.CHECK_ALARMS 'SGM 26/10/2012
-                            Dim myPendingCal As New List(Of ISEManager.MaintenanceOperations)
-                            myGlobal = myISEManager.GetISEAlarmsForUtilities(myPendingCal)
+                            Dim myPendingCal As New List(Of ISEAnalyzerEntity.MaintenanceOperations)
+                            myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEAlarmsForUtilities(myPendingCal)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 Dim myAlarms As List(Of Alarms) = CType(myGlobal.SetDatos, List(Of Alarms))
                                 Me.AppendISEAlarmsText(Me.BsRichTextBox1, myAlarms, myPendingCal)
@@ -2552,7 +2572,7 @@ Public Class IISEUtilities
                     End Select
 
                     'SGM 29/06/2012
-                    If myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
+                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.Exception Then
                         MyClass.PrepareReadyForTestingMode()
                     End If
 
@@ -2568,17 +2588,17 @@ Public Class IISEUtilities
                     If Me.CurrentOperation <> OPERATIONS.INSTALL_REAGENT_PACK Then
 
                         ' XBC 27/08/2012 - Correction : Save consumptions after Current Procedure is finished
-                        If myISEManager.CurrentProcedureIsFinished And _
-                           myISEManager.IsISEInitiatedOK And _
-                           myISEManager.IsReagentsPackReady Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedureIsFinished And _
+                           AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK And _
+                           AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsReagentsPackReady Then
 
                             ' XBC 04/04/2012
-                            If myISEManager.IsCalAUpdateRequired Or myISEManager.IsCalBUpdateRequired Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsCalAUpdateRequired Or AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsCalBUpdateRequired Then
                                 Me.DisableAll() ' XB 28/04/2014 - Disable screen when saving consumptions
                                 myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SavingData", currentLanguage) + vbCrLf
                                 Me.AppendPcSendText(Me.BsRichTextBox1, myText)
 
-                                myGlobal = myISEManager.SaveConsumptions()
+                                myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.SaveConsumptions()
                                 If myGlobal.HasError Then
                                     Me.PrepareErrorMode()
                                 End If
@@ -2594,8 +2614,8 @@ Public Class IISEUtilities
                     If MyClass.CurrentOperation = OPERATIONS.INITIALIZE_ISE_MODULE Then
                         'If MyClass.CurrentOperation <> OPERATIONS.SAVE_ISE_INSTALLATION Then
                         If Not MyClass.IsR2ArmAwayFromParking Then
-                            If myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
-                                If myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.CancelError Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.Exception Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.CancelError Then
                                     Me.PrepareTestingMode()
                                     MyClass.DisplayMessage("")
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ISE_R2_OUT", currentLanguage) + vbCrLf
@@ -2605,7 +2625,7 @@ Public Class IISEUtilities
                                     MyClass.myParentMDI.Refresh()
                                     RaiseEvent ActivateScreenEvent(False, Messages.PERFORMING_ISE)
                                     Application.DoEvents()
-                                    myGlobal = myISEManager.MoveR2ArmAway
+                                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.MoveR2ArmAway
                                     If myGlobal.HasError Then
                                         Me.PrepareErrorMode()
                                     End If
@@ -2623,14 +2643,14 @@ Public Class IISEUtilities
             If Me.CurrentOperation <> OPERATIONS.QUIT_UTILITIES And Me.CurrentOperation <> OPERATIONS.R2_TO_PARKING Then
                 RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
             Else
-                If MyClass.myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.Exception Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.Exception Then
                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage) + vbCrLf + vbCrLf
-                    If Not myISEManager.IsISECommsOk Then
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk Then
                         Dim myISEnoAnswerText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_NO_ANSWER", currentLanguage)
                         myText = myText.Trim + " - " + myISEnoAnswerText + vbCrLf
                     End If
                     If myText.Length > 0 Then
-                        Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myText, ISEManager.ISEProcedureResult.Exception, True)
+                        Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myText, ISEAnalyzerEntity.ISEProcedureResult.Exception, True)
                     End If
 
                     RaiseEvent ActivateScreenEvent(True, Messages.STANDBY)
@@ -2659,42 +2679,42 @@ Public Class IISEUtilities
                 'SGM 30/03/2012
                 If Me.CurrentOperation <> OPERATIONS.NONE And Me.CurrentOperation <> OPERATIONS.QUIT_UTILITIES Then
                     If IsActionCompleted Then
-                        If MyClass.myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.None Then
-                            Dim isCalibration As Boolean = (MyClass.myISEManager.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
-                            Select Case MyClass.myISEManager.LastProcedureResult
-                                Case ISEManager.ISEProcedureResult.OK : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
-                                Case ISEManager.ISEProcedureResult.NOK
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.None Then
+                            Dim isCalibration As Boolean = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL)
+                            Select Case AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult
+                                Case ISEAnalyzerEntity.ISEProcedureResult.OK : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
+                                Case ISEAnalyzerEntity.ISEProcedureResult.NOK
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage)
-                                    If MyClass.myISEManager.LastISEResult.Errors.Count > 0 Then
+                                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
                                         myText = myText & ":"
 
-                                        For Each E As ISEErrorTO In MyClass.myISEManager.LastISEResult.Errors
+                                        For Each E As ISEErrorTO In AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors
                                             If E.IsCancelError Then
                                                 'If E.CancelErrorDesc.Length > 0 Then 'QUITAR cuando se implemente tratamiento errores ERC
-                                                Dim myDesc = MyClass.myISEManager.GetISEErrorDescription(E, False, isCalibration)
+                                                Dim myDesc = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEErrorDescription(E, False, isCalibration)
                                                 myText = myText & vbCrLf & myDesc
                                                 Exit For
                                                 'End If
                                             Else
-                                                Dim myDesc = MyClass.myISEManager.GetISEErrorDescription(E, False, isCalibration)
+                                                Dim myDesc = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEErrorDescription(E, False, isCalibration)
                                                 myText = myText & vbCrLf & myDesc & " (" & ISEErrorTO.FormatAffected(E.Affected) & ")"
                                             End If
                                         Next
                                     End If
 
-                                Case ISEManager.ISEProcedureResult.CancelError
+                                Case ISEAnalyzerEntity.ISEProcedureResult.CancelError
                                     myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage)
-                                    If MyClass.myISEManager.LastISEResult.IsCancelError AndAlso MyClass.myISEManager.LastISEResult.Errors.Count > 0 Then
-                                        For Each E As ISEErrorTO In MyClass.myISEManager.LastISEResult.Errors
+                                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.IsCancelError AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors.Count > 0 Then
+                                        For Each E As ISEErrorTO In AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.Errors
                                             If E.IsCancelError Then
-                                                Dim myDesc = MyClass.myISEManager.GetISEErrorDescription(E, False, isCalibration)
+                                                Dim myDesc = AnalyzerController.Instance.Analyzer.ISEAnalyzer.GetISEErrorDescription(E, False, isCalibration)
                                                 myText = myText & ":" & vbCrLf & myDesc
                                                 Exit For
                                             End If
                                         Next
                                     End If
 
-                                Case ISEManager.ISEProcedureResult.Exception : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
+                                Case ISEAnalyzerEntity.ISEProcedureResult.Exception : myText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_NOT_COMPLETED", currentLanguage) '+ vbCrLf '+ vbCrLf
                             End Select
                         Else
                             If pResponse = RESPONSE_TYPES.OK Then
@@ -2716,13 +2736,13 @@ Public Class IISEUtilities
             End If
 
             If myText.Length > 0 Then
-                If Not myISEManager.IsISESwitchON Then
+                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                     If Not MyClass.IsSwitchOffInformed Then
                         Dim myISEOffText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_OFF_ERR", currentLanguage)
                         myText = myText + " - " + myISEOffText + vbCrLf
                         MyClass.IsSwitchOffInformed = True
                     End If
-                ElseIf Not myISEManager.IsISECommsOk Then
+                ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk Then
                     If Me.CurrentOperation <> OPERATIONS.SAVE_ISE_INSTALLATION Then 'SGM 21/09/2012
                         Dim myISEnoAnswerText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_NO_ANSWER", currentLanguage)
                         myText = myText + " - " + myISEnoAnswerText + vbCrLf
@@ -2735,7 +2755,7 @@ Public Class IISEUtilities
 
             If Me.CurrentOperation <> OPERATIONS.SAVE_ISE_INSTALLATION Then 'SGM 21/09/2012
                 'SGM 05/09/2012 - not to stop the sequence when cancel error occured
-                If MyClass.myISEManager.LastISEResult IsNot Nothing AndAlso MyClass.myISEManager.LastISEResult.IsCancelError Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult IsNot Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult.IsCancelError Then
                     If Me.NumRepetitionsSelectedByUser >= 1 Then
                         Me.NumRepetitionsSelectedByUser -= 1
                         If Me.NumRepetitionsSelectedByUser > 0 Then
@@ -2754,10 +2774,10 @@ Public Class IISEUtilities
             If (MyClass.CurrentBlockNode IsNot Nothing AndAlso MyClass.CurrentBlockNode.Tag IsNot Nothing) Then
                 IsInInstallActivateBlock = (CStr(MyClass.CurrentBlockNode.Tag) = "ISE_ACT_USR_ACT" Or CStr(MyClass.CurrentBlockNode.Tag) = "ISE_ACT_SRV_ACT")
             End If
-            If (MyClass.CurrentOperation = OPERATIONS.ENABLE_ISE_PREPARATIONS Or IsInInstallActivateBlock) And Not myISEManager.IsISEInitiatedOK Then
-                'If MyClass.CurrentOperation = OPERATIONS.ENABLE_ISE_PREPARATIONS And Not myISEManager.IsISEInitiatedOK Then
+            If (MyClass.CurrentOperation = OPERATIONS.ENABLE_ISE_PREPARATIONS Or IsInInstallActivateBlock) And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
+                'If MyClass.CurrentOperation = OPERATIONS.ENABLE_ISE_PREPARATIONS And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                 Dim myISEPdtText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_CONNECT_PDT", currentLanguage) + vbCrLf + vbCrLf
-                Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEPdtText, ISEManager.ISEProcedureResult.NOK)
+                Me.AppendAnalyzerResponseText(Me.BsRichTextBox1, myISEPdtText, ISEAnalyzerEntity.ISEProcedureResult.NOK)
             End If
             'end SGM 15/10/2012
 
@@ -2765,11 +2785,11 @@ Public Class IISEUtilities
             If Not MyClass.CurrentActionNode Is Nothing AndAlso Me.BSActionsTreeImageList IsNot Nothing AndAlso Me.BsActionsTreeView IsNot Nothing Then
 
                 'SGM 11/06/2012
-                If myISEManager.LastProcedureResult = ISEManager.ISEProcedureResult.OK Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.OK Then
                     MyClass.CurrentActionNode.ImageKey = "DONE"
                     MyClass.CurrentActionNode.SelectedImageKey = "DONE"
                     MyClass.CurrentActionNode.ForeColor = MyClass.CurrentActionNode.Parent.ForeColor
-                ElseIf myISEManager.LastProcedureResult <> ISEManager.ISEProcedureResult.None Then
+                ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult <> ISEAnalyzerEntity.ISEProcedureResult.None Then
                     MyClass.CurrentActionNode.ImageKey = "ACTION"
                     MyClass.CurrentActionNode.SelectedImageKey = "ACTION"
                     MyClass.CurrentActionNode.ForeColor = Color.Black
@@ -2933,7 +2953,9 @@ Public Class IISEUtilities
     ''' Stops the operation currently being performed due to an incoming alarm
     ''' </summary>
     ''' <param name="pAlarmType"></param>
-    ''' <remarks>Created by SGM 19/10/2012</remarks>
+    ''' <remarks>Created by SGM 19/10/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Sub StopCurrentOperation(Optional ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes = ManagementAlarmTypes.NONE)
         Try
             MyClass.PrepareErrorMode(pAlarmType)
@@ -2941,8 +2963,8 @@ Public Class IISEUtilities
             MyClass.CurrentAlarmType = pAlarmType
 
             If MyClass.CurrentOperation <> OPERATIONS.NONE Then
-                If MyClass.myISEManager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
-                    MyClass.myISEManager.AbortCurrentProcedureDueToException()
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.None Then
+                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.AbortCurrentProcedureDueToException()
                 End If
                 MyClass.CurrentOperation = OPERATIONS.NONE
             End If
@@ -2963,6 +2985,7 @@ Public Class IISEUtilities
     ''' </summary>
     ''' <remarks>
     ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub DisplayISEInfo()
         Dim myText As String
@@ -3008,7 +3031,7 @@ Public Class IISEUtilities
 
             Else
 
-                myISEResult = mdiAnalyzerCopy.ISE_Manager.LastISEResult
+                myISEResult = AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastISEResult
 
             End If
 
@@ -3025,10 +3048,10 @@ Public Class IISEUtilities
                             myResultsToDisplay = "************************"
                         ElseIf myISEAction = ISECommands.READ_PAGE_1_DALLAS Then
                             myResultsToDisplay = "************************"
-                        ElseIf MyClass.myISEManager.CurrentCommandTO IsNot Nothing Then
-                            If MyClass.myISEManager.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_0_DALLAS Then
+                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO IsNot Nothing Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_0_DALLAS Then
                                 myResultsToDisplay = "************************"
-                            ElseIf MyClass.myISEManager.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS Then
+                            ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.CurrentCommandTO.ISECommandID = ISECommands.READ_PAGE_1_DALLAS Then
                                 myResultsToDisplay = "************************"
                             End If
                         End If
@@ -3074,7 +3097,7 @@ Public Class IISEUtilities
         End Try
     End Sub
 
-    Private Sub AppendAnalyzerResponseText(ByVal RTC As RichTextBox, ByVal text As String, Optional ByVal pForcedResult As ISEManager.ISEProcedureResult = ISEManager.ISEProcedureResult.None, Optional ByVal pForceWrite As Boolean = False)
+    Private Sub AppendAnalyzerResponseText(ByVal RTC As RichTextBox, ByVal text As String, Optional ByVal pForcedResult As ISEAnalyzerEntity.ISEProcedureResult = ISEAnalyzerEntity.ISEProcedureResult.None, Optional ByVal pForceWrite As Boolean = False)
         Try
 
             If Not pForceWrite And Me.IsScreenCloseRequested Then Exit Sub
@@ -3086,19 +3109,20 @@ Public Class IISEUtilities
                 myColor = Color.DarkOliveGreen
             Else
 
-                Dim myResult As ISEManager.ISEProcedureResult
-                If pForcedResult <> ISEManager.ISEProcedureResult.None Then
+                Dim myResult As ISEAnalyzerEntity.ISEProcedureResult
+                If pForcedResult <> ISEAnalyzerEntity.ISEProcedureResult.None Then
                     myResult = pForcedResult
                 Else
-                    myResult = MyClass.myISEManager.LastProcedureResult
+                    myResult = AnalyzerController.Instance.Analyzer.ISEAnalyzer.LastProcedureResult '#REFACTORING
                 End If
 
                 myColor = Color.DarkOliveGreen
+                '#REFACTORING
                 Select Case myResult
-                    Case ISEManager.ISEProcedureResult.OK : myColor = Color.DarkOliveGreen
-                    Case ISEManager.ISEProcedureResult.NOK : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.RESULT_ERROR.ToString) ': text += myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_RESULT_ERROR", currentLanguage)
-                    Case ISEManager.ISEProcedureResult.CancelError : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
-                    Case ISEManager.ISEProcedureResult.Exception : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
+                    Case ISEAnalyzerEntity.ISEProcedureResult.OK : myColor = Color.DarkOliveGreen
+                    Case ISEAnalyzerEntity.ISEProcedureResult.NOK : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.RESULT_ERROR.ToString) ': text += myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_RESULT_ERROR", currentLanguage)
+                    Case ISEAnalyzerEntity.ISEProcedureResult.CancelError : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
+                    Case ISEAnalyzerEntity.ISEProcedureResult.Exception : myColor = Color.OrangeRed : Me.DisplayMessage(Messages.SRV_NOT_COMPLETED.ToString)
                 End Select
 
 
@@ -3125,7 +3149,7 @@ Public Class IISEUtilities
     ''' <param name="pAlarmsList"></param>
     ''' <remarks></remarks>
     Private Sub AppendISEAlarmsText(ByVal RTC As RichTextBox, ByVal pAlarmsList As List(Of GlobalEnumerates.Alarms), _
-                                    ByVal pPendingCalibrations As List(Of ISEManager.MaintenanceOperations))
+                                    ByVal pPendingCalibrations As List(Of ISEAnalyzerEntity.MaintenanceOperations))
         Try
 
             Dim myTextList As New List(Of String)
@@ -3159,12 +3183,12 @@ Public Class IISEUtilities
             'get pending calibrations
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             If pPendingCalibrations IsNot Nothing AndAlso pPendingCalibrations.Count > 0 Then
-                For Each C As ISEManager.MaintenanceOperations In pPendingCalibrations
+                For Each C As ISEAnalyzerEntity.MaintenanceOperations In pPendingCalibrations
                     Dim myCalText As String = ""
                     Select Case C
-                        Case ISEManager.MaintenanceOperations.ElectrodesCalibration : myCalText = "CALB: "
-                        Case ISEManager.MaintenanceOperations.PumpsCalibration : myCalText = "PMCL: "
-                        Case ISEManager.MaintenanceOperations.BubbleCalibration : myCalText = "BBCL: "
+                        Case ISEAnalyzerEntity.MaintenanceOperations.ElectrodesCalibration : myCalText = "CALB: "
+                        Case ISEAnalyzerEntity.MaintenanceOperations.PumpsCalibration : myCalText = "PMCL: "
+                        Case ISEAnalyzerEntity.MaintenanceOperations.BubbleCalibration : myCalText = "BBCL: "
                     End Select
 
                     If myCalText.Length > 0 Then
@@ -3484,7 +3508,7 @@ Public Class IISEUtilities
 
                 ' general validations
                 If Not Me.SimulationMode Then
-                    If Not myISEManager.IsISESwitchON Then
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then '#REFACTORING
                         .ISECommandID = ISECommands.NONE
                     End If
                 End If
@@ -3591,6 +3615,7 @@ Public Class IISEUtilities
 
     ''' Modified by SA 14/05/2012 - Call to function IsThereAnyISETest changed by call to new function IsThereAnyTestByType 
     '''                             informing TestType parameter as ISE
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
     Private Function ValidateISEAction(ByVal pNode As TreeNode) As Boolean
 
         Dim resultValue As Boolean = True
@@ -3605,7 +3630,7 @@ Public Class IISEUtilities
                 resultValue = (myAction.Length > 0)
 
             Else
-                Dim isInstalled As Boolean = myISEManager.IsISEModuleInstalled
+                Dim isInstalled As Boolean = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled
 
                 Dim myBlockNode As TreeNode = pNode.Parent
                 If myBlockNode IsNot Nothing Then
@@ -3617,10 +3642,10 @@ Public Class IISEUtilities
                 Select Case myAction
 
                     Case "INIT_ISE"
-                        resultValue = resultValue And isInstalled And Not myISEManager.IsISEInitiatedOK And (MyClass.IsInstallGroupNodeActive Or Not myISEManager.IsLongTermDeactivation) 'SGM 15/10/2012
-                        'resultValue = resultValue And isInstalled And Not myISEManager.IsISEInitiatedOK And Not myISEManager.IsLongTermDeactivation 'SGM 13/06/2012
+                        resultValue = resultValue And isInstalled And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK And (MyClass.IsInstallGroupNodeActive Or Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation) 'SGM 15/10/2012
+                        'resultValue = resultValue And isInstalled And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation 'SGM 13/06/2012
                     Case "ACT_ISE"
-                        resultValue = resultValue And (myISEManager.IsLongTermDeactivation Or Not myISEManager.IsISEModuleInstalled) ' SGM 20/04/2012
+                        resultValue = resultValue And (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Or Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled) ' SGM 20/04/2012
                     Case "DEACT_ISE"
                         resultValue = resultValue And isInstalled ' XBC 19/04/2012
                     Case "NOT_DEACT_ISE"
@@ -3628,13 +3653,13 @@ Public Class IISEUtilities
                     Case "ACT_ELE"
                         resultValue = resultValue And isInstalled ' XBC 19/04/2012
                     Case "ACT_REA"
-                        'resultValue = (myISEManager.ReagentsPackInstallationDate = Nothing)    ' XBC 04/05/2012
+                        'resultValue = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.ReagentsPackInstallationDate = Nothing)    ' XBC 04/05/2012
                         resultValue = resultValue And isInstalled ' XBC 19/04/2012
                     Case "WASH_PACK_INST"
                         resultValue = resultValue And isInstalled ' XBC 19/04/2012
                     Case "ACT_PREP"
                         'SGM 10/05/2012
-                        If MyClass.myISEManager.IsISEModuleReady Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady Then
                             If Not WorkSessionIDAttribute.Trim = "" Then
                                 If MyClass.WSStatusAttribute <> "EMPTY" And MyClass.WSStatusAttribute <> "OPEN" Then
                                     Dim myOrderTestsDelegate As New OrderTestsDelegate
@@ -3644,7 +3669,7 @@ Public Class IISEUtilities
                                             'SGM 25/09/2012 - check if calibrations are ok
                                             Dim isReady As Boolean = False
                                             Dim myAffectedElectrodes As List(Of String)
-                                            myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
+                                            myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
 
                                             resultValue = isReady
@@ -3689,10 +3714,10 @@ Public Class IISEUtilities
                 End Select
 
                 ' general validations
-                If myISEManager.IsISEModuleInstalled Then ' XBC 19/04/2012 
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then ' XBC 19/04/2012 
 
-                    'resultValue = resultValue And myISEManager.IsISECommsOk
-                    resultValue = resultValue And myISEManager.IsISESwitchON
+                    'resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk
+                    resultValue = resultValue And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
                 End If
 
             End If
@@ -3711,6 +3736,14 @@ Public Class IISEUtilities
         Return resultValue
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pNode"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function ValidateNodeByBlock(ByVal pNode As TreeNode) As Boolean
         Dim resultValue As Boolean = False
         Try
@@ -3724,7 +3757,7 @@ Public Class IISEUtilities
                         If myBlockNode IsNot Nothing Then
 
                             ' XBC + SG 30/10/2012
-                            If ThisIsService And Not MyClass.myISEManager.IsISEModuleInstalled Then
+                            If ThisIsService And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then
                                 If myBlockNode.Tag.ToString = PreloadedMasterDataEnum.ISE_ACT_SRV_ACT.ToString Then
                                     If pNode.Tag.ToString = "ACT_ISE" Then
                                         resultValue = True
@@ -3734,9 +3767,9 @@ Public Class IISEUtilities
                             End If
                             ' XBC + SG 30/10/2012
 
-                            If MyClass.myISEManager.IsLongTermDeactivation Then
+                            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                                 If myBlockNode.Tag.ToString = PreloadedMasterDataEnum.ISE_ACT_USR_ACT.ToString Or myBlockNode.Tag.ToString = PreloadedMasterDataEnum.ISE_ACT_SRV_ACT.ToString Then
-                                    If Not ThisIsService And Not MyClass.myISEManager.IsISEModuleInstalled Then
+                                    If Not ThisIsService And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then
                                         resultValue = False
                                     Else
                                         resultValue = True
@@ -3747,7 +3780,7 @@ Public Class IISEUtilities
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                 If GlobalBase.IsServiceAssembly Then
-                                    If Not MyClass.myISEManager.IsISEInitiatedOK Then
+                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK Then
                                         If pNode.Tag.ToString = "INIT_ISE" Then
                                             resultValue = True
                                         Else
@@ -3757,7 +3790,7 @@ Public Class IISEUtilities
                                         resultValue = True
                                     End If
                                 Else
-                                    If mdiAnalyzerCopy.Alarms.Contains(Alarms.ISE_CONNECT_PDT_ERR) Then
+                                    If AnalyzerController.Instance.Analyzer.Alarms.Contains(Alarms.ISE_CONNECT_PDT_ERR) Then
                                         If pNode.Tag.ToString = "INIT_ISE" Then
                                             resultValue = True
                                         Else
@@ -3773,7 +3806,7 @@ Public Class IISEUtilities
 
 
 
-                    If Not MyClass.myISEManager.IsISESwitchON Then
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                         resultValue = False
                     End If
 
@@ -3788,7 +3821,7 @@ Public Class IISEUtilities
                     ''SGM 21/09/2012 - special case for Ragents Pack is already activated
                     'If resultValue Then
                     '    If pNode.Tag.ToString = "ACT_REA" Then
-                    '        If myISEManager.ReagentsPackInstallationDate = Nothing Then
+                    '        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.ReagentsPackInstallationDate = Nothing Then
                     '            resultValue = True
                     '        Else
                     '            resultValue = False
@@ -3820,6 +3853,7 @@ Public Class IISEUtilities
     ''' Modified by XBC 31/08/2012 - Add special case from PrepareLoadingMode 
     '''                              managed with the Optional parameter (pLoadingScreen). 
     '''                              For the case when Initialization ISE module is required
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Function ValidateISEAvailability(Optional ByVal pLoadingScreen As Boolean = False) As Boolean
         Dim resultValue As Boolean = False
@@ -3832,10 +3866,10 @@ Public Class IISEUtilities
                 Else
                     If pLoadingScreen Then
                         ' Comming from loading screen
-                        If MyClass.myISEManager.IsISEInitiating Then
+                        If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                             resultValue = False
                         Else
-                            resultValue = MyClass.myISEManager.IsISESwitchON
+                            resultValue = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
 
                             ' XBC 27/07/2012 - While User is intalling the module all functions under its Node must be Enable
                             If MyClass.IsInstallGroupNodeActive Then
@@ -3844,9 +3878,9 @@ Public Class IISEUtilities
                         End If
                     Else
                         ' Comming form Enable/Disable Action validation
-                        If Not MyClass.myISEManager.IsISEInitiating And MyClass.myISEManager.IsISEInitializationDone Then
+                        If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitializationDone Then
                             'when initialization finished
-                            resultValue = MyClass.myISEManager.IsISESwitchON
+                            resultValue = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON
                         Else
                             resultValue = False
 
@@ -3902,14 +3936,16 @@ Public Class IISEUtilities
     ''' </summary>
     ''' <param name="pButton"></param>
     ''' <returns></returns>
-    ''' <remarks>AG 29/03/2012</remarks>
+    ''' <remarks>AG 29/03/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Function ActivateButtonWithAlarms(ByVal pButton As GlobalEnumerates.ActionButton) As Boolean
         Dim myStatus As Boolean = True
         Try
 
             If Me.SimulationMode Then Return True
 
-            If Not mdiAnalyzerCopy Is Nothing Then
+            If Not AnalyzerController.Instance.Analyzer Is Nothing Then
 
                 'Dim resultData As New GlobalDataTO
                 Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
@@ -3919,8 +3955,8 @@ Public Class IISEUtilities
                 Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.NONE
                 ' AG+XBC 24/05/2012
 
-                myAlarms = mdiAnalyzerCopy.Alarms
-                myAx00Status = mdiAnalyzerCopy.AnalyzerStatus
+                myAlarms = AnalyzerController.Instance.Analyzer.Alarms
+                myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
                 ''AG 25/10/2011 - Before treat the cover alarms read if they are deactivated (0 disabled, 1 enabled)
                 'Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
@@ -3928,7 +3964,7 @@ Public Class IISEUtilities
                 'Dim fridgeCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN), 1, 0), Boolean)
                 'Dim samplesCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.S_COVER_WARN), 1, 0), Boolean)
 
-                'resultData = mdiAnalyzerCopy.ReadFwAdjustmentsDS
+                'resultData = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
                 'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                 '    'Dim myAdjDS As SRVAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS) 'Causes system error in develop mode
                 '    Dim myAdjDS As New SRVAdjustmentsDS
@@ -3965,8 +4001,8 @@ Public Class IISEUtilities
                 'AG 02/04/2012
                 '(ISE instaled and (initiated or not SwitchedON)) Or not instaled
                 Dim iseInitiatedFinishedFlag As Boolean = True
-                If mdiAnalyzerCopy.ISE_Manager IsNot Nothing AndAlso _
-                   (mdiAnalyzerCopy.ISE_Manager.IsISEInitiating OrElse Not mdiAnalyzerCopy.ISE_Manager.ConnectionTasksCanContinue) Then
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso _
+                   (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating OrElse Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.ConnectionTasksCanContinue) Then
                     iseInitiatedFinishedFlag = False
                 End If
                 'AG 02/04/2012
@@ -3990,7 +4026,7 @@ Public Class IISEUtilities
 
                 'XBC 03/04/2012
                 If ThisIsService Then
-                    If myISEManager.IsISEModuleInstalled And Not myISEManager.IsISESwitchON Then
+                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                         myStatus = False
                     End If
                 Else
@@ -4012,19 +4048,21 @@ Public Class IISEUtilities
     ''' Gets the Dataset that corresponds to the editing adjustments
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created by XBC 07/03/2012</remarks>
+    ''' <remarks>Created by XBC 07/03/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function LoadAdjustmentGroupData() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Dim myAllAdjustmentsDS As New SRVAdjustmentsDS
         Dim CopyOfSelectedAdjustmentsDS As SRVAdjustmentsDS = MyClass.SelectedAdjustmentsDS
         Dim myAdjustmentsGroups As New List(Of String)
         Try
-            myGlobal = MyClass.mdiAnalyzerCopy.ReadFwAdjustmentsDS
+            myGlobal = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
             If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                 Dim resultDS As SRVAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                 'if the global dataset is empty the force to load again from the db
                 If resultDS Is Nothing OrElse resultDS.srv_tfmwAdjustments.Count = 0 Then
-                    myGlobal = MyClass.mdiAnalyzerCopy.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
+                    myGlobal = AnalyzerController.Instance.Analyzer.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         resultDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                     End If
@@ -4053,12 +4091,19 @@ Public Class IISEUtilities
         Return myGlobal
     End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function UpdateAdjustments() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
             If MyClass.SelectedAdjustmentsDS IsNot Nothing Then
                 'update the dataset
-                myGlobal = MyClass.myFwAdjustmentsDelegate.UpdateAdjustments(MyClass.SelectedAdjustmentsDS, MyClass.mdiAnalyzerCopy.ActiveAnalyzer)
+                myGlobal = MyClass.myFwAdjustmentsDelegate.UpdateAdjustments(MyClass.SelectedAdjustmentsDS, AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
 
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     'update DDBB
@@ -4067,7 +4112,7 @@ Public Class IISEUtilities
 
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         'update Adjustments File
-                        myGlobal = MyClass.myFwAdjustmentsDelegate.ExportDSToFile(MyClass.mdiAnalyzerCopy.ActiveAnalyzer)
+                        myGlobal = MyClass.myFwAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
                     End If
                 End If
             End If
@@ -4086,7 +4131,9 @@ Public Class IISEUtilities
     ''' Store adjustments for ISE installed
     ''' </summary>
     ''' <returns></returns>
-    ''' <remarks>Created by XBC 07/03/2012</remarks>
+    ''' <remarks>Created by XBC 07/03/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Function SaveAdjustments(ByVal pIseInstalled As Boolean) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Dim exMessage As String = ""
@@ -4131,7 +4178,7 @@ Public Class IISEUtilities
                         Me.DisplayMessage(Messages.SRV_TEST_READY.ToString)
                         MyClass.PrepareReadyForTestingMode()
                     Else
-                        If Not myGlobal.HasError AndAlso MyClass.mdiAnalyzerCopy.Connected Then
+                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
                             myGlobal = MyClass.SendLOAD_ADJUSTMENTS(pAdjuststr)
                         End If
 
@@ -4165,7 +4212,7 @@ Public Class IISEUtilities
     Public Function SendLOAD_ADJUSTMENTS(ByVal pValueAdjustAttr As String) As GlobalDataTO
         Dim myResultData As New GlobalDataTO
         Try
-            myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, pValueAdjustAttr)
+            myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, pValueAdjustAttr) '#REFACTORING
 
         Catch ex As Exception
             myResultData.HasError = True
@@ -4236,6 +4283,14 @@ Public Class IISEUtilities
 
 #Region "Events"
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub IISEUtilities_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
         Try
 
@@ -4252,8 +4307,8 @@ Public Class IISEUtilities
                     MyClass.IsCompletelyClosed = True
                     MyClass.myParentMDI.Close()
                 Else
-                    If Not MyClass.myISEManager.IsISESwitchON Then
-                        MyClass.mdiAnalyzerCopy.RefreshISEAlarms()
+                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
+                        AnalyzerController.Instance.Analyzer.RefreshISEAlarms()
                     End If
                     If MyClass.myParentMDI IsNot Nothing Then MyClass.myParentMDI.Text = My.Application.Info.ProductName
                 End If
@@ -4261,8 +4316,8 @@ Public Class IISEUtilities
             ' END SGM 10/05/2010
 
             'SGM 30/07/2012
-            If myISEManager IsNot Nothing Then
-                myISEManager.IsInUtilities = False
+            If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
+                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsInUtilities = False
             End If
 
             'RaiseEvent ActivateVerticalButtonsEvent(True) 'Enable Vertical Buttons bar while ISE Utilities is open SGM 14/05/2012
@@ -4279,9 +4334,9 @@ Public Class IISEUtilities
     '''' </summary>
     '''' <param name="pResult"></param>
     '''' <remarks>Created by SGM 07/03/2012</remarks>
-    'Private Sub OnISEOperationFinished(ByVal pResult As ISEManager.ISEOperationResult) Handles mdiAnalyzerCopy.ISEOperationFinished
+    'Private Sub OnISEOperationFinished(ByVal pResult As ISEManager.ISEOperationResult) Handles AnalyzerController.Instance.Analyzer.ISEOperationFinished
     '    Try
-    '        If mdiAnalyzerCopy.ISE_Manager IsNot Nothing Then
+    '        If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
     '            PrepareTestedMode()
     '        End If
     '    Catch ex As Exception
@@ -4290,6 +4345,14 @@ Public Class IISEUtilities
     '    End Try
     'End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Protected Sub IIseAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
 
@@ -4297,10 +4360,8 @@ Public Class IISEUtilities
             Dim myGlobalbase As New GlobalBase
 
             'Get an instance of the ISE manager class
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
-                myISEManager = mdiAnalyzerCopy.ISE_Manager
-                myISEManager.IsInUtilities = True
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsInUtilities = True '#REFACTORING
             End If
 
             'Get the current user level SGM 07/06/2012
@@ -4434,12 +4495,12 @@ Public Class IISEUtilities
             'Else
             '    'SGM 12/06/2012
             '    ''AG 04/04/2012
-            '    'If mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+            '    'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
 
             '    '    If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
             '    '        'Nothing
             '    '    Else
-            '    '        If mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then  'DL 01/06/2012
+            '    '        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then  'DL 01/06/2012
             '    '            bsScreenErrorProvider.ShowError(MSG_EndProcess)                     'DL 01/06/2012
             '    '        Else
             '    '            bsScreenErrorProvider.ShowError(MSG_StartInstrument)
@@ -4465,6 +4526,14 @@ Public Class IISEUtilities
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExitButton.Click
 
         Dim myGlobal As New GlobalDataTO
@@ -4478,20 +4547,20 @@ Public Class IISEUtilities
 
             MyClass.IsScreenCloseRequested = True 'SGM 13/06/2012
 
-            If myISEManager Is Nothing Or _
-               Not MyClass.mdiAnalyzerCopy.Connected Or _
-               mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+            If AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing Or _
+               Not AnalyzerController.Instance.Analyzer.Connected Or _
+               AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
                 MyClass.CurrentOperation = OPERATIONS.NONE ' XBC 11/07/2012
                 Me.Close()
             Else
-                If Not myISEManager.IsLongTermDeactivation AndAlso myISEManager.IsISECommsOk AndAlso myISEManager.IsISESwitchON Then
+                If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
 
                     ' XBC 31/08/2012 - CreateWSExecutions consumes 1 second or more - Screen must be disabled from begining
                     MyClass.PrepareTestingMode()
                     MyClass.DisplayMessage("")
 
                     'SGM 14/05/2012  Verify if exist any work session
-                    If MyClass.myISEManager.IsISEModuleReady AndAlso _
+                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady AndAlso _
                         Not WorkSessionIDAttribute.Trim = "" AndAlso _
                        MyClass.WSStatusAttribute <> "EMPTY" And _
                        MyClass.WSStatusAttribute <> "OPEN" Then
@@ -4500,16 +4569,16 @@ Public Class IISEUtilities
                         'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (running mode and pause mode in different flags)
                         Dim createWSInRunning As Boolean = False
                         Dim pauseMode As Boolean = False
-                        If (Not mdiAnalyzerCopy Is Nothing) Then
-                            createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
-                            pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+                        If (Not AnalyzerController.Instance.Analyzer Is Nothing) Then
+                            createWSInRunning = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                            pauseMode = AnalyzerController.Instance.Analyzer.AllowScanInRunning
                         End If
 
 
                         'SGM 25/09/2012 - check if any calibration is needed
                         Dim isReady As Boolean = False
                         Dim myAffectedElectrodes As List(Of String)
-                        myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
                         End If
@@ -4517,7 +4586,7 @@ Public Class IISEUtilities
                         If isReady Then ' XBC 15/04/2013 - if ISE still Not Ready, is no need re-generate executions because there no changes and it is long time process
                             CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".BsExitButton.Click ", EventLogEntryType.Information, False) 'AG 31/03/2014 - #1565
                             Dim myExecutionDelegate As New ExecutionsDelegate
-                            myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, MyClass.mdiAnalyzerCopy.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
+                            myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, AnalyzerController.Instance.Analyzer.ActiveAnalyzer, MyClass.WorkSessionIDAttribute, _
                                                                               createWSInRunning, -1, String.Empty, isReady, myAffectedElectrodes, pauseMode) 'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks (new parameter pauseMode)
                         End If
                         If Not isReady Then Me.DisplayMessage(Messages.ISE_NOT_READY.ToString)
@@ -4528,7 +4597,7 @@ Public Class IISEUtilities
                     'end SGM 14/05/2012
 
 
-                    If MyClass.MaintenanceExitNeeded And Not MyClass.myISEManager.IsLongTermDeactivation Then
+                    If MyClass.MaintenanceExitNeeded And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                         RaiseEvent ActivateScreenEvent(False, Messages.ENDING_ISE)
 
                         Dim myText As String
@@ -4540,7 +4609,7 @@ Public Class IISEUtilities
                         MyClass.DisplayMessage("")
                         Me.PrepareTestingMode()
                         Me.CurrentOperation = OPERATIONS.QUIT_UTILITIES
-                        myGlobal = myISEManager.DoMaintenanceExit
+                        myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.DoMaintenanceExit
 
                         Exit Sub
                     Else
@@ -4552,7 +4621,7 @@ Public Class IISEUtilities
 
                 'SGM 04/07/2012
                 If MyClass.IsR2ArmAwayFromParking And MyClass.CurrentOperation <> OPERATIONS.R2_TO_PARKING And _
-                    myISEManager.IsISESwitchON And myISEManager.IsISECommsOk Then
+                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISECommsOk Then
 
                     RaiseEvent ActivateScreenEvent(False, Messages.ENDING_ISE)
                     MyClass.PrepareTestingMode()
@@ -4563,7 +4632,7 @@ Public Class IISEUtilities
                     MyClass.CurrentOperation = OPERATIONS.R2_TO_PARKING
                     MyClass.myISEAction = ISECommands.R2_TO_PARKING
                     BsExitButton.Enabled = False
-                    myGlobal = myISEManager.MoveR2ArmBack
+                    myGlobal = AnalyzerController.Instance.Analyzer.ISEAnalyzer.MoveR2ArmBack
                     If myGlobal.HasError Then
                         Me.PrepareErrorMode()
                     End If
@@ -4615,7 +4684,14 @@ Public Class IISEUtilities
     End Sub
 
 
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsScreenActionsTreeView_NodeMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles BsActionsTreeView.NodeMouseClick
         Try
 
@@ -4641,7 +4717,7 @@ Public Class IISEUtilities
 
                 If currNode.Tag.ToString = "ISE_ALMS" Then
                     MyClass.CurrentActionNode = currNode
-                    Me.BsAdjustButton.Enabled = (MyClass.IsAnalyzerAvailable And MyClass.myISEManager.IsISEModuleInstalled)
+                    Me.BsAdjustButton.Enabled = (MyClass.IsAnalyzerAvailable And AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled)
                 Else
                     If MyClass.ValidateNodeByBlock(currNode) Then
                         myGlobal = MyClass.ValidateActionNode(currNode.Tag.ToString)
@@ -4657,7 +4733,7 @@ Public Class IISEUtilities
                                 'COMPLEX ACTION NODE
 
                                 ' XBC + SG 30/10/2012
-                                If ThisIsService And Not MyClass.myISEManager.IsISEModuleInstalled Then
+                                If ThisIsService And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled Then
                                     If currNode.Tag.ToString = "ACT_ISE" Then
                                         MyClass.CurrentActionNode = currNode
                                         Me.BsAdjustButton.Enabled = True
@@ -4670,7 +4746,7 @@ Public Class IISEUtilities
                                 Me.BsTimesUpDown.Value = 1
                                 If MyClass.ValidateISEAction(currNode) Then
                                     MyClass.CurrentActionNode = currNode
-                                    If Not myISEManager.IsLongTermDeactivation Then
+                                    If Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                                         Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
                                     Else
                                         Me.BsAdjustButton.Enabled = True

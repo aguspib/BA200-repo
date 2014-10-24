@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
 Imports System.Globalization
+Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.App
 
 Public Class IWSRotorPositions
     'RH 14/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
@@ -65,7 +67,7 @@ Public Class IWSRotorPositions
     Dim isCheckRotorVolumeAllowed As Boolean = False
     Dim isSingleCheckPosAllowed As Boolean = True   'AG 25/01/2010    
     Dim isSingleRefillPosAllowed As Boolean = True  'AG 25/01/2010
-    Dim isManualBarcodeAllowed As Boolean = True 
+    Dim isManualBarcodeAllowed As Boolean = True
 
 
     'Global variables needed to manage the Load/Save of Virtual Rotors
@@ -226,7 +228,7 @@ Public Class IWSRotorPositions
 
     Private setControlPosToNothing As Boolean = False 'AG 09/12/2010
     Private ErrorOnCreateWSExecutions As String = String.Empty 'RH 09/02/2011
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
 
     'RH 28/07/2011
     Private ReadOnly COLOR_NOPOS As Color = Color.Black
@@ -3702,8 +3704,9 @@ Public Class IWSRotorPositions
 
                 'TR 07/11/2013 -BT#1358 Validate if analyzer is in Pause Mode.
                 'TR 26/11/2013 -BT #1404 Validate the Analyzer status Running to apply rule.
-                If mdiAnalyzerCopy.AllowScanInRunning OrElse _
-                    mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.AllowScanInRunning OrElse _
+                    AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                     AllowedActionInPause = VerifyActionsAllowedInSampleRotor(mySelectedElementInfo, False)
                 End If
 
@@ -3756,8 +3759,9 @@ Public Class IWSRotorPositions
 
                 'TR 15/11/2013 -BT #1358(2) Validate if analyzer is in Pause Mode.
                 'TR 26/11/2013 -BT #1404 Validate the Analyzer status Running to apply rule.
-                If mdiAnalyzerCopy.AllowScanInRunning OrElse _
-                    mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.AllowScanInRunning OrElse _
+                    AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                     'Validate if action is allowed on pause mode.
                     AllowedActionInPause = VerifyActionsAllowedInReagentsRotor()
                 End If
@@ -3864,7 +3868,7 @@ Public Class IWSRotorPositions
             'Validate DS is not null to continue
             If Not pSelectedElementInfo Is Nothing Then
 
-                If mdiAnalyzerCopy.AllowScanInRunning Then
+                If AnalyzerController.Instance.Analyzer.AllowScanInRunning Then '#REFACTORING
                     'pause mode to validate the allowed action on pause
                     'Go throught all element and set the Allowed action property value.
                     For Each mySelectedElementInfoRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
@@ -3904,7 +3908,7 @@ Public Class IWSRotorPositions
                         myResult = False
                     End If
 
-                ElseIf mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                ElseIf AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                     'Status in Running mode to validate the allowed action on  running.
                     If mySelectedElementInfo.twksWSRotorContentByPosition.Where(Function(a) a.RotorType = "SAMPLES" AndAlso _
                                                                                   (a.Status = "INPROCESS" OrElse _
@@ -4961,7 +4965,7 @@ Public Class IWSRotorPositions
             'BT#1358 - Verify if warning message "Action will be performed only on Elements no needed by the worksession" has to be shown. 
             '          Pass flag AllowScanInRunning when calling function CompleteDeletePositionSelected.
             ShowActionMessageifApply()
-            myGlobalDataTo = myRotorContentByPosDelegate.CompleteDeletePositionSeleted(Nothing, mySelectedElementInfo, myMessageID, mdiAnalyzerCopy.AllowScanInRunning)
+            myGlobalDataTo = myRotorContentByPosDelegate.CompleteDeletePositionSeleted(Nothing, mySelectedElementInfo, myMessageID, AnalyzerController.Instance.Analyzer.AllowScanInRunning) '#REFACTORING
             If (Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing) Then
                 Dim myResultDialog As DialogResult
                 If (myMessageID = String.Empty) Then
@@ -5233,7 +5237,7 @@ Public Class IWSRotorPositions
 
             If (pAppStatus = "RUNNING") Then
                 'Verify if the Analyzer is in PAUSE during RUNNING
-                If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.AllowScanInRunning) Then pAppStatus = "RUNNINGPAUSE"
+                If ((AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then pAppStatus = "RUNNINGPAUSE" '#REFACTORING
             ElseIf (pAppStatus = "OPEN") Then
                 pAppStatus = "EMPTY"
             End If
@@ -5946,7 +5950,7 @@ Public Class IWSRotorPositions
                 If (thrownIWSNotPosWarning) Then
                     'AG 22/07/2013 - Activate the Buzzer is the process of automatic WS creation with LIS is active
                     If (AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute) Then
-                        If (Not mdiAnalyzerCopy Is Nothing) Then mdiAnalyzerCopy.StartAnalyzerRinging()
+                        If (AnalyzerController.IsAnalyzerInstantiated) Then AnalyzerController.Instance.Analyzer.StartAnalyzerRinging() '#REFACTORING
                     End If
 
                     Dim StartTime As DateTime = Now 'AG 18/02/2014 - #1505
@@ -5966,7 +5970,7 @@ Public Class IWSRotorPositions
 
                     'AG 22/07/2013 - Stop the Buzzer is the process of automatic WS creation with LIS is active
                     If (AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute) Then
-                        If (Not mdiAnalyzerCopy Is Nothing) Then mdiAnalyzerCopy.StopAnalyzerRinging()
+                        If (AnalyzerController.IsAnalyzerInstantiated) Then AnalyzerController.Instance.Analyzer.StopAnalyzerRinging() '#REFACTORING
                     End If
                 End If
             Else
@@ -6290,6 +6294,7 @@ Public Class IWSRotorPositions
     '''                                           during the Pause
     '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
     '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6303,12 +6308,12 @@ Public Class IWSRotorPositions
             'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks
             'Verify is the current Analyzer Status is RUNNING ==> BT #1584: ...and it is not in PAUSE
             Dim createWSInRunning As Boolean = False
-            'If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
-            '                                                              Not mdiAnalyzerCopy.AllowScanInRunning)
+            'If (Not mdiAnalyzerCopy Is Nothing) Then createWSInRunning = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso _
+            '                                                              Not AnalyzerController.Instance.Analyzer.AllowScanInRunning)
             Dim pauseMode As Boolean = False
-            If (Not mdiAnalyzerCopy Is Nothing) Then
-                createWSInRunning = (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
-                pauseMode = mdiAnalyzerCopy.AllowScanInRunning
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                createWSInRunning = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
+                pauseMode = AnalyzerController.Instance.Analyzer.AllowScanInRunning
             End If
             'AG 30/05/2014 #1644
 
@@ -6323,29 +6328,29 @@ Public Class IWSRotorPositions
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 If (CType(resultData.SetDatos, Boolean)) Then
                     'Verify if the Analyzer has an ISE Module installed and if it is available and ready
-                    If (Not mdiAnalyzerCopy Is Nothing) Then
-                        iseModuleReady = (Not mdiAnalyzerCopy.ISE_Manager Is Nothing AndAlso mdiAnalyzerCopy.ISE_Manager.IsISEModuleReady)
+                    If (AnalyzerController.IsAnalyzerInstantiated) Then
+                        iseModuleReady = (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady)
                         If iseModuleReady Then
-                            iseModuleReady = (mdiAnalyzerCopy.ISE_Manager.ISEWSCancelErrorCounter < 3)
+                            iseModuleReady = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.ISEWSCancelErrorCounter < 3)
                             If iseModuleReady Then
-                                resultData = mdiAnalyzerCopy.ISE_Manager.CheckAnyCalibrationIsNeeded(AffectedISEElectrodes)
+                                resultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckAnyCalibrationIsNeeded(AffectedISEElectrodes)
                                 If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                                     Dim isNeeded As Boolean = CBool(resultData.SetDatos)
                                     If isNeeded Then
 
                                         ' XB 23/05/2014 - BT #1639
-                                        If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                                           (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                        If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                                           (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
                                             iseModuleReady = False
                                         End If
                                         ' XB 23/05/2014 - BT #1639
 
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
-                                        If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                        If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                                             ' Check if ISE Pumps calibration is required
                                             Dim PumpsCalibrationRequired As Boolean = False
-                                            resultData = mdiAnalyzerCopy.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                                            resultData = AnalyzerController.Instance.Analyzer.ISEAnalyzer.CheckPumpsCalibrationIsNeeded
                                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                                 PumpsCalibrationRequired = CType(resultData.SetDatos, Boolean)
                                             End If
@@ -6483,10 +6488,11 @@ Public Class IWSRotorPositions
     ''' </summary>
     ''' <remarks>
     ''' Created by:  AG 28/03/2012 - Moved form LoadScreenStatus
-    ''' Modified by: AG 06/02/2012 - Added mdiAnalyzerCopy.Connected to the button activation rule 
+    ''' Modified by: AG 06/02/2012 - Added AnalyzerController.Instance.Analyzer.Connected to the button activation rule 
     '''              AG 03/04/2012 - Check if Barcode button should be enabled or disabled by calling function ActivateButtonWithAlarms in the MainMDI
     '''              SA 15/10/2013 - BT #1334 ==> Changes in button activation rule due to new Analyzer mode PAUSE in RUNNING: the Scanning button can 
     '''                              be available not only when the Analyzer is in STAND BY, but also when it is in RUNNING but it is currently in PAUSE mode
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ValidateScanningButtonEnabled()
         Try
@@ -6494,7 +6500,7 @@ Public Class IWSRotorPositions
 
             Dim statusScanningButton As Boolean = False
 
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'Check if the Barcode Reader for the Rotor Type has been deactivated in Barcode Configuration Screen 
                 Dim barcodeReaderDisabled As Boolean = False
                 If (myRotorTypeForm = "SAMPLES") Then
@@ -6504,15 +6510,15 @@ Public Class IWSRotorPositions
                 End If
 
                 'Check if WarmUp maneuvers have finished
-                Dim sensorValue As Single = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
+                Dim sensorValue As Single = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
 
                 'If the Analyzer is Connected and Ready, the WarmUp maneuvers have finished, the Barcode Reader is available and not disabled....
-                If (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerIsReady AndAlso sensorValue = 1 AndAlso _
-                    mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
+                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso sensorValue = 1 AndAlso _
+                    AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
                     (Not barcodeReaderDisabled)) Then
                     'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
-                    If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                       (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                    If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                       (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning)) Then
                         If (Not IAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
                             'Verify if the Scanning Button can be available by checking Alarms and another Analyzer states
                             statusScanningButton = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
@@ -6543,7 +6549,7 @@ Public Class IWSRotorPositions
             'If Not mdiAnalyzerCopy Is Nothing Then
             '    'Place the correct condition when implement this functionality
             '    'TODO
-            '    If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY AndAlso mdiAnalyzerCopy.AnalyzerIsReady Then
+            '    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady Then
             '        'No cover enabled and opened (the nothing condition is to avoid create a new MDI instance)
             '        If Not IAx00MainMDI Is Nothing Then
             '            bsCheckRotorVolumeButton.Enabled = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHECK_BOTTLE_VOLUME)  'AG 28/03/2012 bsCheckRotorVolumeButton.Enabled = True
@@ -6580,7 +6586,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub ShowActionMessageifApply()
         Try
-            If (mdiAnalyzerCopy.AllowScanInRunning) Then
+            If (AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then '#REFACTORING
                 'Exclude all the elements that do not allow this action on pause
                 Dim lstPositions As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                 lstPositions = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In mySelectedElementInfo.twksWSRotorContentByPosition _
@@ -6883,7 +6889,7 @@ Public Class IWSRotorPositions
             End If
 
             'AG 15/03/2012 - when FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
-            If mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then
+            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then '#REFACTORING
                 ScreenWorkingProcess = False 'Process finished
                 IAx00MainMDI.EnableButtonAndMenus(True)
                 IAx00MainMDI.SetActionButtonsEnableProperty(True)
@@ -7204,7 +7210,7 @@ Public Class IWSRotorPositions
         Try
             If isClosingFlag Then Return actionAllowed 'AG 10/02/2014 - #1496 No refresh is screen is closing
             If Not mySelectedElementInfo Is Nothing Then
-                If mdiAnalyzerCopy.AllowScanInRunning Then
+                If AnalyzerController.Instance.Analyzer.AllowScanInRunning Then '#REFACTORING
                     'Go through  the recived results related to each position.
                     For Each mySelectedElement As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
                                                                 mySelectedElementInfo.twksWSRotorContentByPosition.Rows
@@ -7220,7 +7226,7 @@ Public Class IWSRotorPositions
                         actionAllowed = False
                     End If
 
-                ElseIf mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                ElseIf AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then '#REFACTORING
                     'Go through  the recived results related to each position.
                     For Each mySelectedElement As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
                                                                 mySelectedElementInfo.twksWSRotorContentByPosition.Rows
@@ -7295,6 +7301,7 @@ Public Class IWSRotorPositions
     '''              SA 15/10/2013 - BT #1334 ==> Changes due to new Analyzer mode PAUSE in RUNNING: the Scanning process will be called not only
     '''                              when the Analyzer is in STAND BY, but also when it is in RUNNING but stopped (PAUSE)
     '''              XB 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub bsScanningButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsScanningButton.Click
         Try
@@ -7302,12 +7309,12 @@ Public Class IWSRotorPositions
             IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted) 'AG 10/07/2013
 
             'AG 26/09/2011 - Use progress bar thread as in WSPrep screen
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'Call the Barcode read process only if the Analyzer is connected and the Barcode is available
-                If (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
+                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
                     'Call the Barcode read process only if the Analyzer Status is STANDBY or if it is PAUSE in RUNNING
-                    If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY) OrElse _
-                       (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning) Then
+                    If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY) OrElse _
+                       (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                         Cursor = Cursors.WaitCursor
 
                         'DL 14/07/2011 Disable interface application
@@ -7339,7 +7346,7 @@ Public Class IWSRotorPositions
 
                                 ' XB 29/01/2014 - Task #1438
                                 Debug.Print("******************************* WATCHDOG INTERVAL FROM DB [" & watchDogTimer.Interval.ToString & "]")
-                                mdiAnalyzerCopy.BarcodeStartInstrExpected = True
+                                AnalyzerController.Instance.Analyzer.BarcodeStartInstrExpected = True
                                 ' XB 29/01/2014
 
                                 watchDogTimer.Enabled = True
@@ -7395,6 +7402,12 @@ Public Class IWSRotorPositions
         Cursor = Cursors.Default
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub ScanningBarCode()
         Try
             'Get the available Rotor Types for the Analyzer according its model
@@ -7467,17 +7480,17 @@ Public Class IWSRotorPositions
             BarCodeDS.AcceptChanges()
 
             'Send the bar code instruction
-            If Not mdiAnalyzerCopy Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
 
                 ScreenWorkingProcess = True
                 'AG 22/03/2012 - Do not call IAx00MainMDI from a thread ... a New MDI is created and causes system error
                 'IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
                 'IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.BARCODE_READING)
 
-                mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.NO_RUNNING_REQUEST    'Initialize barcode read with NO running involved!!
-                resultdata = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
+                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST    'Initialize barcode read with NO running involved!!
+                resultdata = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
 
-                If resultdata.HasError OrElse Not mdiAnalyzerCopy.Connected Then
+                If resultdata.HasError OrElse Not AnalyzerController.Instance.Analyzer.Connected Then
                     ScreenWorkingProcess = False
                     'AG 22/03/2012 - Do not call IAx00MainMDI from a thread ... a New MDI is created and causes system error
                     'IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE)
@@ -7563,7 +7576,7 @@ Public Class IWSRotorPositions
     Public Sub RefreshwatchDogTimer_Enable(ByVal pEnableValue As Boolean)
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
-            If pEnableValue Then mdiAnalyzerCopy.BarcodeStartInstrExpected = True
+            If pEnableValue Then AnalyzerController.Instance.Analyzer.BarcodeStartInstrExpected = True '#REFACTORING
 
             MyClass.watchDogTimer.Enabled = pEnableValue
             Debug.Print("******************************* WATCHDOG ENABLE CHANGED TO [" & pEnableValue.ToString & "]")
@@ -7582,7 +7595,7 @@ Public Class IWSRotorPositions
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE
+            AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE '#REFACTORING
             LoadScreenStatus(WorkSessionStatusAttribute)
             Me.Enabled = True 'Enable the screen
 
@@ -7626,6 +7639,7 @@ Public Class IWSRotorPositions
     '''                                           to avoid recursive searching through all screen Controls Collections
     '''              AG 24/02/2014 - BT #1520 ==> Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters and shown a warning 
     '''                                           message if at least one of them has been exceeded
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ReagentSamplePositioning_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
@@ -7647,11 +7661,6 @@ Public Class IWSRotorPositions
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
-
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
 
             Dim validationOK As Boolean = (AnalyzerIDAttribute <> "" AndAlso WorkSessionIDAttribute <> "" AndAlso WorkSessionStatusAttribute <> "")
             If (validationOK) Then
@@ -7971,6 +7980,7 @@ Public Class IWSRotorPositions
     '''                              is informed), the ComboBox that allow changing the Bottle Size has to be disabled 
     '''              TR 08/11/2013 - BT #1358 Set the sample rotor functionality on pause mode.
     '''              TR 15/11/2013 - BT #1358(2) Set the reagent rotor functionality on pause mode.
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub PositionControl_MouseDown(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Sam19.MouseDown, Sam18.MouseDown, Sam17.MouseDown, Sam16.MouseDown, Sam15.MouseDown, Sam145.MouseDown, Sam144.MouseDown, Sam143.MouseDown, Sam142.MouseDown, Sam141.MouseDown, Sam140.MouseDown, Sam14.MouseDown, Sam139.MouseDown, Sam138.MouseDown, Sam137.MouseDown, Sam136.MouseDown, Sam135.MouseDown, Sam134.MouseDown, Sam133.MouseDown, Sam132.MouseDown, Sam131.MouseDown, Sam130.MouseDown, Sam13.MouseDown, Sam129.MouseDown, Sam128.MouseDown, Sam127.MouseDown, Sam126.MouseDown, Sam125.MouseDown, Sam124.MouseDown, Sam123.MouseDown, Sam122.MouseDown, Sam121.MouseDown, Sam120.MouseDown, Sam12.MouseDown, Sam119.MouseDown, Sam118.MouseDown, Sam117.MouseDown, Sam116.MouseDown, Sam115.MouseDown, Sam114.MouseDown, Sam113.MouseDown, Sam112.MouseDown, Sam111.MouseDown, Sam110.MouseDown, Sam11.MouseDown, Sam399.MouseDown, Sam398.MouseDown, Sam397.MouseDown, Sam396.MouseDown, Sam395.MouseDown, Sam394.MouseDown, Sam393.MouseDown, Sam392.MouseDown, Sam391.MouseDown, Sam3135.MouseDown, Sam3134.MouseDown, Sam3133.MouseDown, Sam3132.MouseDown, Sam3131.MouseDown, Sam3130.MouseDown, Sam3129.MouseDown, Sam3128.MouseDown, Sam3127.MouseDown, Sam3126.MouseDown, Sam3125.MouseDown, Sam3124.MouseDown, Sam3123.MouseDown, Sam3122.MouseDown, Sam3121.MouseDown, Sam3120.MouseDown, Sam3119.MouseDown, Sam3118.MouseDown, Sam3117.MouseDown, Sam3116.MouseDown, Sam3115.MouseDown, Sam3114.MouseDown, Sam3113.MouseDown, Sam3112.MouseDown, Sam3111.MouseDown, Sam3110.MouseDown, Sam3109.MouseDown, Sam3108.MouseDown, Sam3107.MouseDown, Sam3106.MouseDown, Sam3105.MouseDown, Sam3104.MouseDown, Sam3103.MouseDown, Sam3102.MouseDown, Sam3101.MouseDown, Sam3100.MouseDown, Reag288.MouseDown, Reag287.MouseDown, Reag286.MouseDown, Reag285.MouseDown, Reag284.MouseDown, Reag14.MouseDown, Reag13.MouseDown, Reag12.MouseDown, Reag11.MouseDown, Sam260.MouseDown, Sam259.MouseDown, Sam258.MouseDown, Sam257.MouseDown, Sam256.MouseDown, Sam255.MouseDown, Sam254.MouseDown, Sam253.MouseDown, Sam252.MouseDown, Sam251.MouseDown, Sam250.MouseDown, Sam249.MouseDown, Sam248.MouseDown, Sam247.MouseDown, Sam246.MouseDown, Sam280.MouseDown, Sam279.MouseDown, Sam278.MouseDown, Sam277.MouseDown, Sam276.MouseDown, Sam275.MouseDown, Sam274.MouseDown, Sam273.MouseDown, Sam272.MouseDown, Sam271.MouseDown, Sam270.MouseDown, Sam269.MouseDown, Sam268.MouseDown, Sam267.MouseDown, Sam266.MouseDown, Sam265.MouseDown, Sam264.MouseDown, Sam263.MouseDown, Sam262.MouseDown, Sam261.MouseDown, Sam290.MouseDown, Sam289.MouseDown, Sam288.MouseDown, Sam287.MouseDown, Sam286.MouseDown, Sam285.MouseDown, Sam284.MouseDown, Sam283.MouseDown, Sam282.MouseDown, Sam281.MouseDown, Reag19.MouseDown, Reag18.MouseDown, Reag17.MouseDown, Reag16.MouseDown, Reag15.MouseDown, Reag119.MouseDown, Reag118.MouseDown, Reag117.MouseDown, Reag116.MouseDown, Reag115.MouseDown, Reag114.MouseDown, Reag113.MouseDown, Reag112.MouseDown, Reag111.MouseDown, Reag110.MouseDown, Reag130.MouseDown, Reag129.MouseDown, Reag128.MouseDown, Reag127.MouseDown, Reag126.MouseDown, Reag125.MouseDown, Reag124.MouseDown, Reag123.MouseDown, Reag122.MouseDown, Reag121.MouseDown, Reag120.MouseDown, Reag140.MouseDown, Reag139.MouseDown, Reag138.MouseDown, Reag137.MouseDown, Reag136.MouseDown, Reag135.MouseDown, Reag134.MouseDown, Reag133.MouseDown, Reag132.MouseDown, Reag131.MouseDown, Reag144.MouseDown, Reag143.MouseDown, Reag142.MouseDown, Reag141.MouseDown, Reag255.MouseDown, Reag254.MouseDown, Reag253.MouseDown, Reag252.MouseDown, Reag251.MouseDown, Reag250.MouseDown, Reag249.MouseDown, Reag248.MouseDown, Reag247.MouseDown, Reag246.MouseDown, Reag245.MouseDown, Reag270.MouseDown, Reag269.MouseDown, Reag268.MouseDown, Reag267.MouseDown, Reag266.MouseDown, Reag265.MouseDown, Reag264.MouseDown, Reag263.MouseDown, Reag262.MouseDown, Reag261.MouseDown, Reag260.MouseDown, Reag259.MouseDown, Reag258.MouseDown, Reag257.MouseDown, Reag256.MouseDown, Reag280.MouseDown, Reag279.MouseDown, Reag278.MouseDown, Reag277.MouseDown, Reag276.MouseDown, Reag275.MouseDown, Reag274.MouseDown, Reag273.MouseDown, Reag272.MouseDown, Reag271.MouseDown, Reag283.MouseDown, Reag282.MouseDown, Reag281.MouseDown
         Try
@@ -7997,8 +8007,8 @@ Public Class IWSRotorPositions
                         mySelectedElementInfo = GetLocalPositionInfo(myRingNumber, myCellNumber, False)
 
                         'TR 08/11/2013 - BT#1358 validate if analyser is pause
-                        If mdiAnalyzerCopy.AllowScanInRunning OrElse _
-                            mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                        If AnalyzerController.Instance.Analyzer.AllowScanInRunning OrElse _
+                            AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
 
                             If myRotorTypeForm = "SAMPLES" Then
                                 ActionAllowed = VerifyActionsAllowedInSampleRotor(mySelectedElementInfo, True)
@@ -8038,8 +8048,8 @@ Public Class IWSRotorPositions
                             If (myRotorTypeForm = "SAMPLES") Then
                                 currentBottleSize = CType(bsTubeSizeComboBox.SelectedValue, String)
                                 'TR 08/11/2013 -BT #1358 '26/11/2013 -BT #1404 Validate the running time 
-                                If mdiAnalyzerCopy.AllowScanInRunning OrElse _
-                                   mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                If AnalyzerController.Instance.Analyzer.AllowScanInRunning OrElse _
+                                   AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                                     'Set the function value to canchange variable.
                                     CanChange = VerifyActionsAllowedInSampleRotor(mySelectedElementInfo, False)
                                 End If
@@ -8054,7 +8064,7 @@ Public Class IWSRotorPositions
                                     mySelectedElementInfo.twksWSRotorContentByPosition.First.BarcodeStatus = "OK") Then
                                     CanChange = False
                                 Else
-                                    If (mdiAnalyzerCopy.AllowScanInRunning) Then
+                                    If (AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
                                         CanChange = VerifyActionsAllowedInReagentsRotor()
                                     Else
                                         CanChange = bsBottleSizeComboBox.Enabled
@@ -9075,7 +9085,7 @@ Public Class IWSRotorPositions
             If (ShowHostQueryScreenAttribute) Then ShowHostQueryScreenAttribute = False
 
             'AG 07/01/2013 - BT #1436 - put all code inside this IF
-            If mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" Then
+            If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" Then '#REFACTORING
 
                 Dim createAutoWS As Boolean = False
                 Dim lisWithFilesMode As Boolean = IsLisWithFilesMode()

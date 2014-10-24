@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.App
 
 'Imports Biosystems.Ax00.Types
 
@@ -18,7 +19,7 @@ Public Class IConditioning
 #End Region
 
 #Region "Declarations"
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
     Private statusMDIChangedFlag As Boolean = False
     Protected IsConditioning As Boolean = False
     Private DefaultConditioningTime As Integer
@@ -97,6 +98,7 @@ Public Class IConditioning
     ''' All Tools screens (CHANGE ROTOR, CONDITIONING, ISE and futures) 
     ''' must have the same logic about Open and Close functionalities
     ''' Modified by: XB 06/11/2013 - Add protection against more performing operations (Shutting down, aborting WS) - BT #1150 + #1151
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
@@ -104,11 +106,6 @@ Public Class IConditioning
             Dim mySize As Size = Me.Parent.Size
 
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 70)
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                'Use the same AnalyzerManager as the MDI
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
 
             Dim swParams As New SwParametersDelegate
             Dim resultData As GlobalDataTO
@@ -140,36 +137,36 @@ Public Class IConditioning
             Dim disableButtons As Boolean = False
 
             'AG 22/11/2012 - v055 Button disabled when NO reactions rotor alarm!!! (not temperarture alarms)
-            If Not mdiAnalyzerCopy Is Nothing And _
-               Not (mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR)) Then
+            If (AnalyzerController.IsAnalyzerInstantiated) And _
+               Not (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR)) Then
 
                 'If Not mdiAnalyzerCopy Is Nothing And _
-                '   Not (mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                '   mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
+                '   Not (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                '   AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
                 '    '    If Not mdiAnalyzerCopy Is Nothing And Not _
-                '    '         (mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                '    '         mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
-                '    '        mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
+                '    '         (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                '    '         AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
+                '    '        AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
 
-                If mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                     disableButtons = True
 
-                    If String.Equals(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS") Then
+                    If String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS") Then
                         'Show MDI message
                         bsScreenErrorProvider.ShowError(MSG_StartInstrument)
                     End If
                 End If
 
-            ElseIf Not mdiAnalyzerCopy Is Nothing Then
+            ElseIf (AnalyzerController.IsAnalyzerInstantiated) Then
                 'AG 22/11/2012 - v055 Button disabled when NO reactions rotor alarm!!! (not temperarture alarms)
-                If mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
+                If AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) Then
 
                     ''DL 31/07/2012. Begin
-                    'If (mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                    '    mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
-                    '    '    If (mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
-                    '    '    mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
-                    '    '    mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
+                    'If (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)) Then
+                    '    '    If (AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_ERR) Or _
+                    '    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR) Or _
+                    '    '    AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)) Then
                     '    'DL 31/07/2012. End
 
                     disableButtons = True
@@ -183,11 +180,11 @@ Public Class IConditioning
             End If
 
             ' XBC 11/07/2012
-            If String.Equals(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS") OrElse _
-               String.Equals(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") OrElse _
-               String.Equals(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS") OrElse _
-               Not mdiAnalyzerCopy.AnalyzerIsReady OrElse _
-               mdiAnalyzerCopy.AnalyzerIsFreeze Then
+            If String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS") OrElse _
+               String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "INPROCESS") OrElse _
+               String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess), "INPROCESS") OrElse _
+               Not AnalyzerController.Instance.Analyzer.AnalyzerIsReady OrElse _
+               AnalyzerController.Instance.Analyzer.AnalyzerIsFreeze Then
                 ' XB 06/11/2013 - ABORTprocess and SDOWNprocess added 
                 disableButtons = True
             End If
@@ -271,7 +268,7 @@ Public Class IConditioning
 
             If IsConditioning Then
                 If Not pRefreshEventType Is Nothing AndAlso pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
-                    If String.Equals(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONDITIONINGprocess), "CLOSED") Then
+                    If String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONDITIONINGprocess), "CLOSED") Then '#REFACTORING
 
                         ScreenWorkingProcess = True
                         IAx00MainMDI.EnableButtonAndMenus(True)
@@ -339,7 +336,14 @@ Public Class IConditioning
         End Try
     End Sub
 
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub bsConditioningButton_Click(ByVal sender As System.Object, _
                                            ByVal e As System.EventArgs) Handles bsConditioningButton.Click
 
@@ -348,17 +352,17 @@ Public Class IConditioning
         bsStatusImage.Visible = False
         Try
             CreateLogActivity("Btn Conditioning", Me.Name & ".bsConditioningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            If Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.ExistBottleAlarms Then
+            If (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
                 'Show message
                 ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-                mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED"
-                mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "CANCELED"
-                mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED"
+                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED"
+                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "CANCELED"
+                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED"
 
             Else
-                If Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.Connected Then
+                If (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.Connected Then
                     'Turn off Sound alarm
-                    mdiAnalyzerCopy.StopAnalyzerRinging()
+                    AnalyzerController.Instance.Analyzer.StopAnalyzerRinging()
                     ExistConditioningError = False
 
                     IsConditioning = True
@@ -370,13 +374,13 @@ Public Class IConditioning
                     bsConditioningButton.Enabled = False
                     bsCancelButton.Enabled = False
 
-                    resultData = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
-                    mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONDITIONINGprocess) = "INPROCESS"
+                    resultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONDITIONINGprocess) = "INPROCESS"
 
-                    If Not resultData.HasError AndAlso mdiAnalyzerCopy.Connected Then
+                    If Not resultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
                         IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.SRV_CONDITIONING)
                         statusMDIChangedFlag = True
-                        'mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
+                        'AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
 
                         dxProgressBar.Position = 0
                         dxProgressBar.Visible = True

@@ -15,6 +15,7 @@ Imports System.Text
 Imports System.ComponentModel
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Threading
+Imports Biosystems.Ax00.App
 
 'Imports System.Runtime.InteropServices
 'Imports Biosystems.Ax00.DAL
@@ -170,7 +171,7 @@ Public Class IResults
 
     Private UpdateSubHeaders As Boolean = False
     Private XtraSamplesCollapsed As Boolean = False
-    Private mdiAnalyzerCopy As AnalyzerManager 'AG 19/01/2012
+    'Private mdiAnalyzerCopy As AnalyzerManager 'AG 19/01/2012 '#REFACTORING
     'Private mdiESWrapperCopy As ESWrapper 'AG 11/03/2013
 
     Private Shared OpenForms As Integer = 0 'RH 11/04/2012
@@ -339,6 +340,14 @@ Public Class IResults
         If OpenForms > 1 Then Close()
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub ResultForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'startTime = Now 'AG 04/06/2012
@@ -360,9 +369,6 @@ Public Class IResults
             AnalyzerIDField = IAx00MainMDI.ActiveAnalyzer
             'AnalyzerModelField = IAx00MainMDI.AnalyzerModel 'AG 03/07/2012 - comment because causes AnalyzerModelField = ""
 
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 19/01/2012 - Use the same AnalyzerManager as the MDI
-            End If
 
             'If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
             '    mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) 'AG 11/03/2013 - Use the same ESWrapper as the MDI
@@ -758,7 +764,7 @@ Public Class IResults
                     If (e.RowIndex >= 0) Then
                         If e.ColumnIndex = dgv.Columns("Factor").Index AndAlso IsSubHeader(dgv, e.RowIndex) Then
                             'AG 22/06/2012 - TO CONFIRM
-                            'If Not HasCurve AndAlso mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'bsCurveButton.Visible Then 'AG note - Allow manual factor only when calibrator 1 point
+                            'If Not HasCurve AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'bsCurveButton.Visible Then 'AG note - Allow manual factor only when calibrator 1 point
                             If dgv("Graph", e.RowIndex).Tag <> "CURVE" Then 'bsCurveButton.Visible Then 
 
                                 dgv.CurrentCell.Style.BackColor = Color.White
@@ -961,13 +967,13 @@ Public Class IResults
                 Case dgv.Columns("Ok").Index
                     If Not IsSubHeader(dgv, e.RowIndex) Then
                         'AG 22/06/2012 - TO CONFIRM
-                        'If mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
+                        'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
                         changeInUseValue = True
                     Else
                         resultRow = CType(dgv.Rows(e.RowIndex).Tag, ResultsDS.vwksResultsRow)
                         If Not resultRow.AcceptedResultFlag Then
                             'AG 22/06/2012 - TO CONFIRM
-                            'If mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then ChangeAcceptedResult(dgv, resultRow, myGridSampleClass) 'AG 22/06/2012 - Do not allow change accepted results in RUNNING
+                            'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then ChangeAcceptedResult(dgv, resultRow, myGridSampleClass) 'AG 22/06/2012 - Do not allow change accepted results in RUNNING
                             'ChangeAcceptedResult(dgv, resultRow, myGridSampleClass)
                             'ChangeAcceptedResult(resultRow, myGridSampleClass)
                             ChangeAcceptedResultNEW(resultRow)
@@ -983,7 +989,7 @@ Public Class IResults
                 Case Else
                     If Not IsSubHeader(dgv, e.RowIndex) Then
                         'AG 22/06/2012 - TO CONFIRM
-                        'If mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
+                        'If AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then changeInUseValue = True 'AG 22/06/2012 - change replicate inuse allowed only out of Running
                         changeInUseValue = True
                     End If
             End Select
@@ -1005,7 +1011,7 @@ Public Class IResults
             'AG 09/11/2010
             Dim recoverExperimentalFactor As Boolean = False
             'AG 22/06/2012 - TO CONFIRM
-            'If Not changeInUseValue AndAlso mdiAnalyzerCopy.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'AG 22/06/2012 - recover experimental factor allowed only out of Running
+            'If Not changeInUseValue AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then 'AG 22/06/2012 - recover experimental factor allowed only out of Running
             If Not changeInUseValue Then
                 If dgv.Name = bsCalibratorsDataGridView.Name AndAlso IsSubHeader(dgv, e.RowIndex) AndAlso e.ColumnIndex <> dgv.Columns("Ok").Index Then
                     resultRow = CType(dgv.Rows(e.RowIndex).Tag, ResultsDS.vwksResultsRow)
@@ -1438,7 +1444,9 @@ Public Class IResults
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    ''' <remarks>AG 11/05/2011</remarks>
+    ''' <remarks>AG 11/05/2011
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub bsXlsresults_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsXlsresults.Click
 
         Try
@@ -1456,10 +1464,8 @@ Public Class IResults
 
             Cursor = Cursors.WaitCursor
             'Get the analyzer status due this method is only allowed in StandBy or Sleep
-            Dim myAnalyzerManager As AnalyzerManager
-            myAnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
 
-            If myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY OrElse myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse Not myAnalyzerManager.Connected Then
+            If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY OrElse AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 bsXlsresults.Enabled = False
                 IAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
 
@@ -1673,6 +1679,7 @@ Public Class IResults
     '''              SA 26/07/2012 - Before calling the function to add requested Reruns, verify if the ISE Module is ready to inform the optional parameter
     '''                              that will allow blocking all ISE Executions when the module is not ready
     '''              XB 04/09/2012 - Correction : add 'iseModuleReady' parameter to the function call 'AddManualRepetitions'
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub SendManRepButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SendManRepButton.Click
         Try
@@ -1689,15 +1696,15 @@ Public Class IResults
             If (String.Compare(AnalyzerIDField, "", False) <> 0 AndAlso WorkSessionIDField <> "") Then
                 'Verify if the Analyzer is connected, has an ISE Module installed, and if it is available and ready
                 Dim iseModuleReady As Boolean = False
-                If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.Connected) Then
-                    iseModuleReady = (Not mdiAnalyzerCopy.ISE_Manager Is Nothing AndAlso mdiAnalyzerCopy.ISE_Manager.IsISEModuleReady)
+                If ((AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.Connected) Then
+                    iseModuleReady = (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady)
                 End If
 
                 Dim myGlobal As GlobalDataTO
                 Dim myRep As New RepetitionsDelegate
 
                 'Verify is the current Analyzer Status is RUNNING
-                Dim runningMode As Boolean = (mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING)
+                Dim runningMode As Boolean = (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING)
 
                 'AG 31/03/2014 - #1565 inform new runningmode parameter in the proper position
                 myGlobal = myRep.AddManualRepetitions(Nothing, AnalyzerIDField, WorkSessionIDField, runningMode, iseModuleReady)
@@ -1707,8 +1714,8 @@ Public Class IResults
                     ShowMessage(Me.Name & ".SendManRepButton_Click ", myGlobal.ErrorCode, myGlobal.ErrorCode, Me)
                 Else
                     ''If there is an Analyzer connected...
-                    'If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.Connected) Then
-                    '    If (mdiAnalyzerCopy.ISE_Manager Is Nothing OrElse Not mdiAnalyzerCopy.ISE_Manager.IsISEModuleReady) Then
+                    'If (Not mdiAnalyzerCopy Is Nothing AndAlso AnalyzerController.Instance.Analyzer.Connected) Then
+                    '    If (AnalyzerController.Instance.Analyzer.ISE_Manager Is Nothing OrElse Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleReady) Then
                     '        'ISE Module cannot be used; all pending ISE Preparations are LOCKED
                     '        Dim myExecutionDelegate As New ExecutionsDelegate
                     '        myGlobal = myExecutionDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDField, AnalyzerIDField, _
@@ -1720,10 +1727,10 @@ Public Class IResults
                     'End If
 
                     ''AG 19/01/2012 - If ISE not installed lock all pending ISE executions after add manual repetitions
-                    'If Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.Connected Then
+                    'If Not mdiAnalyzerCopy Is Nothing AndAlso AnalyzerController.Instance.Analyzer.Connected Then
                     '    Dim adjustValue As String = ""
                     '    Dim iseInstalledFlag As Boolean = False
-                    '    adjustValue = mdiAnalyzerCopy.ReadAdjustValue(GlobalEnumerates.Ax00Adjustsments.ISEINS)
+                    '    adjustValue = AnalyzerController.Instance.Analyzer.ReadAdjustValue(GlobalEnumerates.Ax00Adjustsments.ISEINS)
                     '    If adjustValue <> "" AndAlso IsNumeric(adjustValue) Then
                     '        iseInstalledFlag = CType(adjustValue, Boolean)
                     '        If Not iseInstalledFlag Then

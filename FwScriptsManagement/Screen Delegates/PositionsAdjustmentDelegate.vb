@@ -10,6 +10,7 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Calculations
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -991,38 +992,38 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         End If
 
                     Case OPERATIONS.SAVE_ADJUSMENTS
-                            Select Case pResponse
-                                Case RESPONSE_TYPES.START
-                                    ' Nothing by now
-                                Case RESPONSE_TYPES.OK
-                                    Me.LoadAdjDoneAttr = True
-                            End Select
+                        Select Case pResponse
+                            Case RESPONSE_TYPES.START
+                                ' Nothing by now
+                            Case RESPONSE_TYPES.OK
+                                Me.LoadAdjDoneAttr = True
+                        End Select
 
                     Case OPERATIONS.SAVE_EXITING
-                            Select Case pResponse
-                                Case RESPONSE_TYPES.START
-                                    ' Nothing by now
-                                Case RESPONSE_TYPES.OK
-                                    Me.ParkDoneAttr = True
-                            End Select
+                        Select Case pResponse
+                            Case RESPONSE_TYPES.START
+                                ' Nothing by now
+                            Case RESPONSE_TYPES.OK
+                                Me.ParkDoneAttr = True
+                        End Select
 
-                            ' XBC 30/11/2011
+                        ' XBC 30/11/2011
                     Case OPERATIONS.WASHING_STATION_UP
-                            Select Case pResponse
-                                Case RESPONSE_TYPES.START
-                                    ' Nothing by now
-                                Case RESPONSE_TYPES.OK
-                                    MyClass.IsWashingStationUpAttr = True
-                            End Select
+                        Select Case pResponse
+                            Case RESPONSE_TYPES.START
+                                ' Nothing by now
+                            Case RESPONSE_TYPES.OK
+                                MyClass.IsWashingStationUpAttr = True
+                        End Select
 
-                            ' XBC 30/11/2011
+                        ' XBC 30/11/2011
                     Case OPERATIONS.WASHING_STATION_DOWN
-                            Select Case pResponse
-                                Case RESPONSE_TYPES.START
-                                    ' Nothing by now
-                                Case RESPONSE_TYPES.OK
-                                    MyClass.IsWashingStationUpAttr = False
-                            End Select
+                        Select Case pResponse
+                            Case RESPONSE_TYPES.START
+                                ' Nothing by now
+                            Case RESPONSE_TYPES.OK
+                                MyClass.IsWashingStationUpAttr = False
+                        End Select
 
 
                 End Select
@@ -1428,7 +1429,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myResultData.HasError = True
                     Exit Try
                 End If
-              
+
                 ' ZRef Offset for Safety position Mixer2
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_REFZ_A2SV_OFFSET.ToString, pAnalyzerModel)
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
@@ -1543,7 +1544,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Me.CurrentOperation = OPERATIONS.SAVE_ADJUSMENTS
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -1708,7 +1709,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case Ax00WashStationControlModes.DOWN
                         MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
                 End Select
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -3944,7 +3945,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Protected Friend Function SendQueueForABSORBANCE_PREPARE() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Dim myFwScript1 As New FwScriptQueueItem
-             Try
+            Try
                 If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
@@ -4198,7 +4199,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myOpticCenterDataTO As OpticCenterDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadOpticCenterData
+                myResultData = AnalyzerController.Instance.Analyzer.ReadOpticCenterData '#REFACTORING
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myOpticCenterDataTO = CType(myResultData.SetDatos, OpticCenterDataTO)
                     myOpticCenterDataTO.Steps = ReadedCountsAttr.Count + 1
@@ -5800,7 +5801,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Try
             Return myResultData
         End Function
-       
+
 #End Region
 
 #Region "Private"
@@ -6413,7 +6414,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
                 res = CInt(pPos).ToString("00")
-               
+
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.EncodeHistoryArmPos", EventLogEntryType.Error, False)

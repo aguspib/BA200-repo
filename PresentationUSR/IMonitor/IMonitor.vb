@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 Imports DevExpress.XtraGrid.Views.Grid 'DL 24/07/2012
 Imports System.Timers 'AG 31/01/2014 - BT #1486
+Imports Biosystems.Ax00.App
 
 
 ' Remarks
@@ -22,7 +23,7 @@ Public Class IMonitor
 #Region "Declaration"
 
     Private LanguageID As String
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager
     Private MainMDI As IAx00MainMDI
     Private myMultiLangResourcesDelegate As MultilanguageResourcesDelegate
     Private Shared IsFirstLoading = True
@@ -312,7 +313,7 @@ Public Class IMonitor
                                     Dim prevRemainingTime As Single = IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds
                                     'TR 21/05/2012 Valida if time is disable, and de WS is not pauset by the user or by Alarm.
                                     If Not IAx00MainMDI.ElapsedTimeTimer.Enabled AndAlso Not IAx00MainMDI.UserPauseWS AndAlso _
-                                       mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM) = 0 Then
+                                       AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM) = 0 Then '#REFACTORING 
                                         IAx00MainMDI.ElapsedTimeTimer.Start()
                                     End If
                                     'TR 21/05/2012 -END.
@@ -490,14 +491,14 @@ Public Class IMonitor
             Dim changesInWS As Boolean = False
             Dim runningStatus As Boolean = False
             Dim initializeRotor As Boolean = False
-
-            If (Not mdiAnalyzerCopy Is Nothing) Then
-                If (mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING) Then
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING) Then
                     runningStatus = True
-                    'initializeRotor = (mdiAnalyzerCopy.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_START) AndAlso _
-                    '                  (mdiAnalyzerCopy.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_END) AndAlso _
-                    '                  (mdiAnalyzerCopy.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.START_INSTRUCTION_START AndAlso _
-                    '                   mdiAnalyzerCopy.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.END_RUN_START)
+                    'initializeRotor = (AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_START) AndAlso _
+                    '                  (AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.RUNNING_END) AndAlso _
+                    '                  (AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.START_INSTRUCTION_START AndAlso _
+                    '                   AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.END_RUN_START)
 
                     'TR 18/05/2012 commente and take out the if 
                     'changesInWS = WorkSessionChange
@@ -511,7 +512,7 @@ Public Class IMonitor
 
             'TR Test on running time this is to avoid break points.
             'Debug.Print("Refresh area")
-            'Debug.Print(mdiAnalyzerCopy.AnalyzerCurrentAction.ToString())
+            'Debug.Print(AnalyzerController.Instance.Analyzer.AnalyzerCurrentAction.ToString())
             'Debug.Print("INICIALIZACION:" & initializeRotor.ToString())
             'Debug.Print("running status:" & runningStatus.ToString())
             'Debug.Print("changes in WS :" & changesInWS.ToString())
@@ -531,12 +532,12 @@ Public Class IMonitor
             UpdateContainerLevels()
 
             'Warming Up AREA
-            If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) Then
+            If ((AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) Then '#REFACTORING
                 'UpdateWarmUpProgressBar()
                 If Not IAx00MainMDI.WarmUpFinished Then
                     UpdateWarmUpProgressBar()
                 Else
-                    If mdiAnalyzerCopy.ExistsALIGHT Then    ' XBC 05/07/2012
+                    If AnalyzerController.Instance.Analyzer.ExistsALIGHT Then    ' XBC 05/07/2012 '#REFACTORING
                         'TR 25/04/2012
                         TimeWarmUpProgressBar.Position = 100
                         bsEndWarmUp.Visible = False
@@ -776,7 +777,13 @@ Public Class IMonitor
         End Try
     End Sub
 
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pRefreshDS"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Sub RefreshAlarmsGlobes(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             'Forces all globe alarms to show up
@@ -852,7 +859,7 @@ Public Class IMonitor
 
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            If Not mdiAnalyzerCopy Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
 
                 'AG 21/02/2012- do not use the conditional compilation (we always develop in debug mode .. use the REAL_DEVELOPMENT_MODE (global Setting)
                 'when we want analyzer reportsats and simulate alarms we must change this settings to a value <> 0
@@ -862,15 +869,15 @@ Public Class IMonitor
 
                 Else
                     'SGM 11/04/2012
-                    If mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Or mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) Then
-                        If mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
-                            mdiAnalyzerCopy.Alarms.Remove(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
+                    If AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Or AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR) Then
+                        If AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) Then
+                            AnalyzerController.Instance.Analyzer.Alarms.Remove(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR)
                         End If
                     End If
 
                 End If
 
-                UpdateGlobesInMainTab(mdiAnalyzerCopy.Alarms) 'Get the current alarms in analyzer
+                UpdateGlobesInMainTab(AnalyzerController.Instance.Analyzer.Alarms) 'Get the current alarms in analyzer
             End If
             'END Real code
 
@@ -892,6 +899,7 @@ Public Class IMonitor
     ''' <param name="pRefreshDS"></param>
     ''' <remarks>
     ''' Modified by AG 05/03/2014 - #1524, inform UpdateWSState when new results are calculated
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
@@ -915,7 +923,7 @@ Public Class IMonitor
 
                 'AG 14/03/2014 - #1524
                 Dim newRerunAdded As Boolean = False
-                If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) AndAlso mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.AUTO_RERUN_ADDED) = 1 Then newRerunAdded = True
+                If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) AndAlso AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.AUTO_RERUN_ADDED) = 1 Then newRerunAdded = True
                 'AG 14/03/2014 - #1524
 
                 UpdateWSState(pRefreshDS, newResultsFlag, newRerunAdded)
@@ -980,14 +988,14 @@ Public Class IMonitor
 
                 'SGM 09/03/2012
                 'ISE Monitor Data changed
-                Dim sensorValue As Integer = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED)
+                Dim sensorValue As Integer = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED)
                 If sensorValue = 1 Then
                     'StartTime = Now 'AG 05/06/2012 - time estimation
 
                     ScreenWorkingProcess = False
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
-                    Me.BsIseMonitor.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
-                    BsISELongTermDeactivated.Visible = (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEModuleInstalled AndAlso MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation)
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
+                    Me.BsIseMonitor.RefreshFieldsData(AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO)
+                    BsISELongTermDeactivated.Visible = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation)
 
                     Me.ISETab.Refresh()
 
@@ -996,10 +1004,10 @@ Public Class IMonitor
                 End If
                 'end SGM 09/03/2012
 
-                sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
                     IAx00MainMDI.ISEProcedureFinished = True
                 End If
 
@@ -1443,6 +1451,7 @@ Public Class IMonitor
     '''                             - Added Try/Catch to the function
     '''               SA 23/03/2012 - Changes in ISE Status LED: if IsISESwitchedON=False, the LED is set to RED color instead of GRAY
     '''               AG 29/03/2012
+    '''               IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub UpdateLeds()
         Try
@@ -1455,18 +1464,18 @@ Public Class IMonitor
 
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            If (Not mdiAnalyzerCopy Is Nothing) Then
-                Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = mdiAnalyzerCopy.AnalyzerStatus
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
                 'Get the current alarms in analyzer
                 Dim myAlarms As List(Of GlobalEnumerates.Alarms)
-                myAlarms = mdiAnalyzerCopy.Alarms
+                myAlarms = AnalyzerController.Instance.Analyzer.Alarms
 
                 '********************
                 '* PC connected LED *
                 '********************
                 Dim myConnectedValue As Single = 0
-                myConnectedValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.CONNECTED)
+                myConnectedValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.CONNECTED)
                 If (CBool(myConnectedValue)) Then
                     'The Analyzer is connected; the LED Color is set to GREEN
                     bsConnectedLed.StateIndex = bsLed.LedColors.GREEN
@@ -1493,7 +1502,7 @@ Public Class IMonitor
                     If (myAx00Status = AnalyzerManagerStatus.SLEEPING) Then 'Sleeping, fridge status unknown (keep gray)
                         bsFridgeStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                    ElseIf (CInt(mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS)) <= 0) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN) Then 'Fridge status unknown or OFF
+                    ElseIf (CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS)) <= 0) OrElse myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN) Then 'Fridge status unknown or OFF
                         bsFridgeStatusLed.StateIndex = bsLed.LedColors.GRAY
 
                     ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)) Then 'damaged
@@ -1525,7 +1534,7 @@ Public Class IMonitor
                     Dim adjustValue As String = ""
                     Dim iseInstalledFlag As Boolean = False
 
-                    adjustValue = mdiAnalyzerCopy.ReadAdjustValue(Ax00Adjustsments.ISEINS) 'Verify if the Analyzer has ISE Module 
+                    adjustValue = AnalyzerController.Instance.Analyzer.ReadAdjustValue(Ax00Adjustsments.ISEINS) 'Verify if the Analyzer has ISE Module 
                     If (adjustValue <> "" AndAlso IsNumeric(adjustValue)) Then iseInstalledFlag = CType(adjustValue, Boolean)
 
                     If (Not iseInstalledFlag) Then
@@ -1537,25 +1546,25 @@ Public Class IMonitor
                         If (myAx00Status = AnalyzerManagerStatus.SLEEPING) Then 'Sleeping, ise status unknown (keep gray)
                             bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                        ElseIf CInt(mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) < 0 Then 'ISE status unknown (=-1)
+                        ElseIf CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) < 0 Then 'ISE status unknown (=-1)
                             bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                        ElseIf CInt(mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) = 0 Then 'ISE Switch OFF
+                        ElseIf CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) = 0 Then 'ISE Switch OFF
                             bsISEStatusLed.StateIndex = bsLed.LedColors.RED
 
                         ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.ISE_FAILED_ERR)) Then 'error after trying ise connection
                             bsISEStatusLed.StateIndex = bsLed.LedColors.RED
 
-                        ElseIf MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation Then
+                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation Then
                             bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                        ElseIf MyClass.mdiAnalyzerCopy.ISE_Manager.IsISESwitchON Then 'ISE Switch ON
-                            If (Not MyClass.mdiAnalyzerCopy.ISE_Manager Is Nothing) Then
-                                If MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEInitiating Then
+                        ElseIf AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then 'ISE Switch ON
+                            If (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing) Then
+                                If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                                     bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
-                                ElseIf (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEInitiatedOK = False) Then
+                                ElseIf (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK = False) Then
                                     bsISEStatusLed.StateIndex = bsLed.LedColors.RED
-                                ElseIf (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEInitiatedOK = True) Then
+                                ElseIf (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiatedOK = True) Then
                                     bsISEStatusLed.StateIndex = bsLed.LedColors.GREEN
                                 End If
                             Else
@@ -1574,7 +1583,7 @@ Public Class IMonitor
                     'Dim adjustValue As String = ""
                     'Dim iseInstalledFlag As Boolean = False
 
-                    'adjustValue = mdiAnalyzerCopy.ReadAdjustValue(Ax00Adjustsments.ISEINS)
+                    'adjustValue = AnalyzerController.Instance.Analyzer.ReadAdjustValue(Ax00Adjustsments.ISEINS)
                     'If (adjustValue <> "" AndAlso IsNumeric(adjustValue)) Then iseInstalledFlag = CType(adjustValue, Boolean)
 
                     'If (Not iseInstalledFlag) Then
@@ -1586,29 +1595,29 @@ Public Class IMonitor
                     '    If (myAx00Status = AnalyzerManagerStatus.SLEEPING) Then 'Sleeping, ise status unknown (keep gray)
                     '        bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                    '    ElseIf CInt(mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) < 0 Then 'ISE status unknown
+                    '    ElseIf CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) < 0 Then 'ISE status unknown
                     '        bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
 
-                    '    ElseIf CInt(mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) = 0 Then 'ISE status OFF
+                    '    ElseIf CInt(AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_STATUS)) = 0 Then 'ISE status OFF
                     '        bsISEStatusLed.StateIndex = bsLed.LedColors.RED 'GRAY
 
                     '    ElseIf (myAlarms.Contains(GlobalEnumerates.Alarms.ISE_STATUS_ERR)) Then 'damaged
                     '        bsISEStatusLed.StateIndex = bsLed.LedColors.RED
 
                     '    Else 'ON
-                    '        If (Not MyClass.mdiAnalyzerCopy.ISE_Manager Is Nothing) Then
-                    '            If MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEInitializationDone Then
+                    '        If (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing) Then
+                    '            If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitializationDone Then
                     '                'For first connection
-                    '                If (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISESwitchON) Then
+                    '                If (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON) Then
                     '                    'ISE Module is Switched ON 
                     '                    bsISEStatusLed.StateIndex = bsLed.LedColors.GREEN
                     '                Else
                     '                    'ISE Module is Switched OFF 
                     '                    bsISEStatusLed.StateIndex = bsLed.LedColors.RED 'GRAY
                     '                End If
-                    '            ElseIf Not MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEInitiating Then
+                    '            ElseIf Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating Then
                     '                'For reconnection
-                    '                If (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISESwitchON) Then
+                    '                If (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON) Then
                     '                    'ISE Module is Switched ON 
                     '                    bsISEStatusLed.StateIndex = bsLed.LedColors.GREEN
                     '                Else
@@ -1616,13 +1625,13 @@ Public Class IMonitor
                     '                    bsISEStatusLed.StateIndex = bsLed.LedColors.RED 'GRAY
                     '                End If
                     '            End If
-                    '            'BsISELongTermDeactivated.Visible = MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation
+                    '            'BsISELongTermDeactivated.Visible = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation
                     '        Else
                     '            'If an instance of ISE Manager has not been created, then the Led color is GRAY
                     '            bsISEStatusLed.StateIndex = bsLed.LedColors.GRAY
                     '            'BsISELongTermDeactivated.Visible = False
                     '        End If
-                    '        'BsISELongTermDeactivated.Visible = MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation
+                    '        'BsISELongTermDeactivated.Visible = AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation
                     '    End If
                     '    'AG 29/03/2012
                     'End If
@@ -1637,10 +1646,10 @@ Public Class IMonitor
                     Dim reactioncoverFlag As Boolean
                     Dim reagentscoverFlag As Boolean
 
-                    adjustValue = mdiAnalyzerCopy.ReadAdjustValue(Ax00Adjustsments.PHCOV)   'Reactions cover activate (1), deactivate (0)
+                    adjustValue = AnalyzerController.Instance.Analyzer.ReadAdjustValue(Ax00Adjustsments.PHCOV)   'Reactions cover activate (1), deactivate (0)
                     If (Not String.Equals(adjustValue, String.Empty) AndAlso IsNumeric(adjustValue)) Then reactioncoverFlag = CType(adjustValue, Boolean)
 
-                    adjustValue = mdiAnalyzerCopy.ReadAdjustValue(Ax00Adjustsments.RCOV)    'Reagents cover activate (1), deactivate (0)
+                    adjustValue = AnalyzerController.Instance.Analyzer.ReadAdjustValue(Ax00Adjustsments.RCOV)    'Reagents cover activate (1), deactivate (0)
                     If (Not String.Equals(adjustValue, String.Empty) AndAlso IsNumeric(adjustValue)) Then reagentscoverFlag = CType(adjustValue, Boolean)
 
                     'Reactions Rotor Temperature LED
@@ -1741,7 +1750,9 @@ Public Class IMonitor
     ''' <summary>
     ''' Update the warmup common area in monitor screen
     ''' </summary>
-    ''' <remarks>DL 12/09/2011</remarks>
+    ''' <remarks>DL 12/09/2011
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub UpdateWarmUpProgressBar()
         Dim myDate As String = ""
 
@@ -1764,10 +1775,10 @@ Public Class IMonitor
             If myDate.Trim = "" Then
                 bsEndWarmUp.Visible = False
 
-                Dim sensorValue As Single = mdiAnalyzerCopy.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
+                Dim sensorValue As Single = AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
                 If sensorValue = 0 Then
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
-                    mdiAnalyzerCopy.ISE_Manager.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
+                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
                 End If
 
             Else
@@ -1786,12 +1797,12 @@ Public Class IMonitor
                         If String.Equals(myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue, "1") Then
                             bsEndWarmUp.Visible = True
 
-                            mdiAnalyzerCopy.ISE_Manager.IsAnalyzerWarmUp = False 'SGM 13/04/2012 for enabling IE utilities
+                            AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = False 'SGM 13/04/2012 for enabling IE utilities
 
-                            Dim sensorValue As Single = mdiAnalyzerCopy.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
+                            Dim sensorValue As Single = AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
                             If sensorValue = 0 Then
-                                mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
-                                mdiAnalyzerCopy.ISE_Manager.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
+                                AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 'set sensor to 1
+                                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - Ise alarms ready to be shown
                             End If
 
                         Else
@@ -1953,14 +1964,20 @@ Public Class IMonitor
 
 #Region "Events"
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub Monitor_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
         Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-
 
         'Get the current Language from the current Application Session
         Dim currentLanguageGlobal As New GlobalBase
@@ -1970,8 +1987,6 @@ Public Class IMonitor
         myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate()
 
         MainMDI = CType(Me.MdiParent, IAx00MainMDI)
-
-        mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
 
         GetMonitorLabels() 'RH 14/10/2011
 
@@ -2031,8 +2046,9 @@ Public Class IMonitor
         'AG 21/03/2012
 
         'for refreshing ISE deactivated Lock Icon SGM 07/06/2012
-        BsISELongTermDeactivated.Visible = (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEModuleInstalled AndAlso MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation)
-
+        If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
+            BsISELongTermDeactivated.Visible = (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled AndAlso AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsLongTermDeactivation)
+        End If
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         myLogAcciones.CreateLogActivity("IMonitor LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                         "IMonitor.Monitor_Load", EventLogEntryType.Information, False)
@@ -2040,6 +2056,14 @@ Public Class IMonitor
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub MonitorTabs_SelectedPageChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MonitorTabs.SelectedPageChanged
         Application.DoEvents()
         UpdateRotorType()
@@ -2049,9 +2073,9 @@ Public Class IMonitor
         If MonitorTabs.SelectedTabPage.Name = AlarmsTab.Name Then
             AlarmsXtraGrid.Focus()
         ElseIf MonitorTabs.SelectedTabPage.Name = ISETab.Name Then
-            If mdiAnalyzerCopy.ISE_Manager IsNot Nothing Then
-                If Not mdiAnalyzerCopy.Connected Then mdiAnalyzerCopy.ISE_Manager.RefreshMonitorDataTO() 'refresh in case of disconnected SGM 03/04/2012
-                Me.BsIseMonitor.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
+            If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
+                If Not AnalyzerController.Instance.Analyzer.Connected Then AnalyzerController.Instance.Analyzer.ISEAnalyzer.RefreshMonitorDataTO() 'refresh in case of disconnected SGM 03/04/2012
+                Me.BsIseMonitor.RefreshFieldsData(AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO)
             End If
         End If
     End Sub
@@ -2142,10 +2166,10 @@ Public Class IMonitor
     '    Try
     '        If OverallTimeTextEdit.Text.Length > 0 Then
     '            If IsNumeric(remainingTime) Then
-    '                If (Not MyClass.mdiAnalyzerCopy.ISE_Manager Is Nothing) Then
-    '                    If Not (MyClass.mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess) = "INPROCESS" Or _
-    '                            MyClass.mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS") Then
-    '                        mdiAnalyzerCopy.ISE_Manager.WorkSessionOverallTime = remainingTime
+    '                If (Not AnalyzerController.Instance.Analyzer.ISEAnalyzer Is Nothing) Then
+    '                    If Not (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess) = "INPROCESS" Or _
+    '                            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS") Then
+    '                        AnalyzerController.Instance.Analyzer.ISEAnalyzer.WorkSessionOverallTime = remainingTime
     '                    End If
     '                End If
     '            End If

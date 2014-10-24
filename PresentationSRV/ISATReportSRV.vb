@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
 
 Public Class ISATReportSRV
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -18,7 +19,7 @@ Public Class ISATReportSRV
     Private checkAllItems As Boolean = True
     Private processing As Boolean = False
 
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING 
     Private currentLanguage As String = ""
 
     Private SATFilePath As String = ""
@@ -50,6 +51,14 @@ Public Class ISATReportSRV
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub SATReportData_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'Get the current Language from the current Application Session
@@ -80,9 +89,6 @@ Public Class ISATReportSRV
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
 
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 25/10/2011 - Use the same AnalyzerManager as the MDI
-            End If
             EditonMode = True ' TR 14/02/2012
 
         Catch ex As Exception
@@ -160,7 +166,7 @@ Public Class ISATReportSRV
     ''' </remarks>
     Private Sub bsSaveSATRepButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSaveSATRepButton.Click
         Try
-             'TR 22/12/2011 - Validate if file name exists on the selected folder before starting the ReportSAT creation
+            'TR 22/12/2011 - Validate if file name exists on the selected folder before starting the ReportSAT creation
             If (FileNameExist(FileNameTextBox.Text)) Then
                 ShowMessage("Warning", GlobalEnumerates.Messages.FILE_EXIST.ToString())
                 FileNameTextBox.Focus()
@@ -248,7 +254,7 @@ Public Class ISATReportSRV
             ExitButton.Enabled = True
             FolderButton.Enabled = True
             bsSATDirListBox.Enabled = True
-            
+
             'TR 09/01/2012 - Indicate RSAT END on Application LOG.
             CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try
@@ -451,7 +457,7 @@ Public Class ISATReportSRV
             SATFilePath = FolderPathTextBox.Text
 
             Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, MyClass.mdiAnalyzerCopy.AdjustmentsFilePath, SATFilePath, SATFileName)
+            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, String.Empty, AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName) '#REFACTORING
 
             If (Not myGlobal.HasError) Then
                 'Restore original values of First and Last Names in tparPatients
@@ -739,7 +745,7 @@ Public Class ISATReportSRV
     '            'TR 02/02/2012 -Set the result value of CreateSatReport mothod to GlobalDataTO, to 
     '            '               Validate if there's any error on the process.
     '            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_REPORT, False, "", _
-    '                                      MyClass.mdiAnalyzerCopy.AdjustmentsFilePath, SATFilePath, SATFileName)
+    '                                      AnalyzerController.Instance.Analyzer.AdjustmentsFilePath, SATFilePath, SATFileName)
 
     '            '-----------
     '            'Restore confidential Data After Export data to ReportSat

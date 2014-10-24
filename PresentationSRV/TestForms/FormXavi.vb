@@ -8,6 +8,8 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Core.Interfaces
 
 Public Class FormXavi
 
@@ -48,7 +50,7 @@ Public Class FormXavi
         Try
             MyClass.SimulatedResponseToSend = MyClass.SimulatedResponse
             If MyClass.SimulatedResponseToSend.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(MyClass.SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(MyClass.SimulatedResponse)
                 MyClass.SimulatedResponse = ""
             End If
         Catch ex As Exception
@@ -84,7 +86,7 @@ Public Class FormXavi
         Try
             If MyClass.SimulatedResponseToSend.Length > 0 Then
 
-                myGlobal = myAnalyzerManager.SimulateInstructionReception(MyClass.SimulatedResponseToSend)
+                myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(MyClass.SimulatedResponseToSend)
 
                 Application.DoEvents()
 
@@ -140,7 +142,7 @@ Public Class FormXavi
 
         Try
             If SimulatedResponse2.Length > 0 Then
-                myGlobal = myAnalyzerManager.SimulateInstructionReception(SimulatedResponse2)
+                myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse2)
                 SimulatedResponse2 = ""
             End If
 
@@ -286,12 +288,12 @@ Public Class FormXavi
 
 
 #Region "Definitions"
-    Private WithEvents myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
 
+    'Private WithEvents myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) '#REFACTORING 
+    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer
     Private AnalyzerAdjustmentsDS As SRVAdjustmentsDS
     Private myFwAdjustmentsDelegate As FwAdjustmentsDelegate
     Private myDbAdjustmentsDelegate As New DBAdjustmentsDelegate
-
 
 #End Region
 
@@ -371,7 +373,7 @@ Public Class FormXavi
         Try
 
             'FW Adjustments Master Data
-            myGlobal = myAnalyzerManager.LoadFwAdjustmentsMasterData(True)
+            myGlobal = AnalyzerController.Instance.Analyzer.LoadFwAdjustmentsMasterData(True)
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 MyClass.AnalyzerAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                 If MyClass.AnalyzerAdjustmentsDS IsNot Nothing Then
@@ -407,13 +409,13 @@ Public Class FormXavi
     '        If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
     '            Dim myGlobal As New GlobalDataTO
 
-    '            Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-    '            If myAnalyzerManager.CommThreadsStarted Then
+    '            'Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+    '            If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
     '                'Test INIT COMMS
-    '                'myGlobal = myAnalyzerManager.ManageAnalyzer(Biosystems.Ax00.CommunicationsSwFw.AnalyzerManager.ClassActionList.INIT_COMMS)
+    '                'myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(Biosystems.Ax00.CommunicationsSwFw.AnalyzerManager.ClassActionList.INIT_COMMS)
 
     '                'Test NEW_PREPARATION
-    '                myGlobal = myAnalyzerManager.ManageAnalyzer(Biosystems.Ax00.CommunicationsSwFw.AnalyzerManager.ClassActionList.NEW_PREPARATION)
+    '                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(Biosystems.Ax00.CommunicationsSwFw.AnalyzerManager.ClassActionList.NEW_PREPARATION)
 
     '            End If
     '        End If
@@ -481,10 +483,10 @@ Public Class FormXavi
     '        If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
     '            Dim myGlobal As New GlobalDataTO
 
-    '            Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-    '            If myAnalyzerManager.CommThreadsStarted Then
+    '            'Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+    '            If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
     '                'Read registred ports
-    '                myGlobal = myAnalyzerManager.ReadRegistredPorts
+    '                myGlobal = AnalyzerController.Instance.Analyzer.ReadRegistredPorts
 
     '            End If
     '        End If
@@ -502,18 +504,18 @@ Public Class FormXavi
     '        If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
     '            Dim myGlobal As New GlobalDataTO
 
-    '            Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-    '            If myAnalyzerManager.CommThreadsStarted Then
-    '                myAnalyzerManager.ActiveWorkSession = BsWorkSessionText.Text.ToString.Trim
-    '                myAnalyzerManager.ActiveAnalyzer = "SN0000099999_Ax400"
-    '                myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManager.ClassActionList.NEW_PREPARATION)
+    '            'Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+    '            If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
+    '                AnalyzerController.Instance.Analyzer.ActiveWorkSession = BsWorkSessionText.Text.ToString.Trim
+    '                AnalyzerController.Instance.Analyzer.ActiveAnalyzer = "SN0000099999_Ax400"
+    '                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManager.ClassActionList.NEW_PREPARATION)
 
     '                'Dim executionIDSent As Integer = 0
     '                'If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
     '                'executionIDSent = DirectCast(myGlobal.SetDatos, Integer)
     '                'End If
 
-    '                myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManager.ClassActionList.PREPARATION_ACCEPTED)
+    '                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManager.ClassActionList.PREPARATION_ACCEPTED)
 
     '            End If
     '        End If
@@ -527,6 +529,14 @@ Public Class FormXavi
 
 #Region "AG Initial Generate Instructions Testings"
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsShortAction_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsShortAction.Click
         Try
             Dim myGlobal As New GlobalDataTO
@@ -551,36 +561,30 @@ Public Class FormXavi
             If myGlobal.HasError Or myGlobal.SetDatos Is Nothing Then Exit Try
             BsTextWrite.Text = DirectCast(myGlobal.SetDatos, String)
 
-            ''Test use AnalyzerManager class (Step by step until communications with analyzer)
-            'If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-            '    Dim myGlobal As New GlobalDataTO
-
-            ''Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            '    If myAnalyzerManager.CommThreadsStarted Then
-            '        'Short instructions
-            '        myGlobal = myAnalyzerManager.ManageAnalyzer(Biosystems.Ax00.CommunicationsSwFw.AnalyzerManager.ClassActionList.ABORT)
-
-            '    End If
-            'End If
-
         Catch ex As Exception
 
         End Try
 
     End Sub
 
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsReceptionButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton.Click
         Try
             'Simulate instruction reception
             If BsTextWrite.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then '#REFACTORING
                         'Short instructions
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(BsTextWrite.Text.Trim)
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite.Text.Trim)
 
                     End If
                 End If
@@ -591,18 +595,25 @@ Public Class FormXavi
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsReceptionButton_End_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton_End.Click
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then '#REFACTORING
                         'Short instructions
 
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(BsTextWrite_End.Text.Trim)
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite_End.Text.Trim)
 
                     End If
                 End If
@@ -613,19 +624,25 @@ Public Class FormXavi
         End Try
     End Sub
 
-
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsReceptionButton_Sleeping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton_Sleeping.Click
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then '#REFACTORING
                         'Short instructions
 
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(BsTextWrite_Sleeping.Text.Trim)
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite_Sleeping.Text.Trim)
 
                     End If
                 End If
@@ -697,9 +714,9 @@ Public Class FormXavi
             'If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
             '    Dim myGlobal As New GlobalDataTO
 
-            '    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            '    If myAnalyzerManager.CommThreadsStarted Then
-            '        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BASE_LIGHT, True, Nothing, BsExecution.Text.Trim)
+            '    'Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+            '    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
+            '        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BASE_LIGHT, True, Nothing, BsExecution.Text.Trim)
             '        BsTextWrite.Text = DirectCast(myGlobal.SetDatos, String)
             '    End If
             'End If
@@ -765,19 +782,24 @@ Public Class FormXavi
 
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
         Try
             'Simulate instruction reception
             If TextBox5.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                         'Short instructions
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
-
-                        'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(TextBox5.Text.Trim)
                     End If
                 End If
 
@@ -793,7 +815,7 @@ Public Class FormXavi
 #Region "Communications Board Testings"
 
     Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzerManager.ReceptionEvent
+                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles analyzer.ReceptionEvent
         Try
             'If Not pTreated Then
             If BsReceivedTextBox.Text.Length > 10000 Then BsReceivedTextBox.Clear()
@@ -812,7 +834,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles myAnalyzerManager.SendEvent
+    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles analyzer.SendEvent
 
         Dim myglobal As New GlobalDataTO
 
@@ -834,7 +856,7 @@ Public Class FormXavi
                     If IsNumeric(b) Then
                         MyClass.myFWUpdateAction = CType(CInt(b), FwUpdateActions)
 
-                        myAnalyzerManager.SimulateInstructionReception(BsTextWrite.Text.Trim)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite.Text.Trim)
 
                         'data blocks
                         If MyClass.myFWUpdateAction = FwUpdateActions.SendRepository Then
@@ -948,7 +970,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSCPU_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -959,7 +981,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSBXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -969,7 +991,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSBXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -979,7 +1001,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSBXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -989,7 +1011,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSBXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -999,7 +1021,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSBXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1011,7 +1033,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSDXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1021,7 +1043,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSDXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1031,7 +1053,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSDXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1043,7 +1065,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSRXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1053,7 +1075,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSRXX_Generator()
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1063,7 +1085,7 @@ Public Class FormXavi
                 If pInstructionSent.Contains("ID:13;") Then 'JE1
                     SimulatedResponse = ANSJEX_Generator()
                     If SimulatedResponse.Length > 0 Then
-                        myglobal = myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        myglobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                     'StartReadingTimer()
@@ -1074,7 +1096,7 @@ Public Class FormXavi
                 If pInstructionSent.Contains("ID:14;") Then 'SF1
                     SimulatedResponse = ANSSFX_Generator()
                     If SimulatedResponse.Length > 0 Then
-                        myglobal = myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        myglobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                     'StartReadingTimer()
@@ -1084,7 +1106,7 @@ Public Class FormXavi
                 If pInstructionSent.Contains("ID:12;") Then 'GLF
                     SimulatedResponse = ANSGLF_Generator()
                     If SimulatedResponse.Length > 0 Then
-                        myglobal = myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        myglobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                     'StartReadingTimer()
@@ -1113,7 +1135,7 @@ Public Class FormXavi
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         'StartAutoResponseTimer()
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1125,7 +1147,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.BM1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1136,7 +1158,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.BR1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1147,7 +1169,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.BR2)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1158,7 +1180,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.AG1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1169,7 +1191,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.AG2)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1181,7 +1203,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.DR1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1192,7 +1214,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.DR2)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1203,7 +1225,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.DM1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1215,7 +1237,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.RR1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1226,7 +1248,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.RM1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1238,7 +1260,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.GLF)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1250,7 +1272,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.JE1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1262,7 +1284,7 @@ Public Class FormXavi
                     SimulatedResponse = ANSF_Generator(POLL_IDs.SF1)
                     System.Threading.Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
-                        myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                        AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
                     End If
                 End If
@@ -1311,7 +1333,7 @@ Public Class FormXavi
                 System.Threading.Thread.Sleep(1000) ' 1 second
                 If SimulatedResponse.Length > 0 Then
                     'StartAutoResponseTimer()
-                    myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                    AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                     SimulatedResponse = ""
                 End If
             End If
@@ -1325,7 +1347,7 @@ Public Class FormXavi
                 System.Threading.Thread.Sleep(1000) ' 1 second
                 If SimulatedResponse.Length > 0 Then
                     'StartAutoResponseTimer()
-                    myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                    AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                     SimulatedResponse = ""
                 End If
             End If
@@ -1381,56 +1403,55 @@ Public Class FormXavi
         Try
             Me.Cursor = Cursors.WaitCursor
 
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
 
                 Dim myGlobal As New GlobalDataTO
                 Dim myInstruction As String = BsInstruction.Text.ToUpper.Trim
 
                 Select Case myInstruction
                     Case "CONNECT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT, True) 'CONNECT
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT, True) 'CONNECT
 
                     Case "STATE"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'STATE
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'STATE
 
                     Case "STANDBY"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True) 'STANDBY
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True) 'STANDBY
 
                     Case "SLEEP"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
 
                     Case "PAUSE"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.PAUSE, True) 'PAUSE
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.PAUSE, True) 'PAUSE
 
                     Case "RUNNING"
-                        'myAnalyzerManager.ActiveAnalyzer = Ax00MainMDI.ActiveAnalyzer
-                        'myAnalyzerManager.ActiveWorkSession = Ax00MainMDI.ActiveWorkSession
+                        'AnalyzerController.Instance.Analyzer.ActiveAnalyzer = Ax00MainMDI.ActiveAnalyzer
+                        'AnalyzerController.Instance.Analyzer.ActiveWorkSession = Ax00MainMDI.ActiveWorkSession
 
-                        'myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
+                        'myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
 
                     Case "START"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START, True) 'START
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START, True) 'START
 
                     Case "TEST"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True) 'START
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True) 'START
 
                     Case "ENDRUN"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True) 'ENDRUN
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True) 'ENDRUN
 
                     Case "ABORT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True) 'ENDRUN
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True) 'ENDRUN
 
 
                     Case "SCRIPT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, True, Nothing, "", Me.BsAction.Text)
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, True, Nothing, "", Me.BsAction.Text)
 
                     Case Else
                 End Select
 
                 Dim myTitle As String = ""
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                    If Not myAnalyzerManager.Connected Then
+                    If Not AnalyzerController.Instance.Analyzer.Connected Then
                         myGlobal.ErrorCode = "ERROR_COMM"
                         myTitle = "Warning"
                     End If
@@ -1442,7 +1463,7 @@ Public Class FormXavi
                 If myTitle <> "" Then
                     Me.ShowMessage(myTitle, myGlobal.ErrorCode)
                 Else
-                    'BsReceivedTextBox.Text += myAnalyzerManager.InstructionSent & vbCrLf
+                    'BsReceivedTextBox.Text += AnalyzerController.Instance.Analyzer.InstructionSent & vbCrLf
                 End If
 
             End If
@@ -1471,10 +1492,9 @@ Public Class FormXavi
 
     Private Sub BsRestore_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsRestore.Click
         Try
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
 
-                myAnalyzerManager.ClearQueueToSend()
+                AnalyzerController.Instance.Analyzer.ClearQueueToSend()
 
             End If
 
@@ -1548,7 +1568,7 @@ Public Class FormXavi
                 myData = myDataBuilder.ToString
                 'myData = myData.Replace(";", "|") 'TESTING!!! para que pase el filtro de sintaxis
                 'myData = myData.Replace(":", ">") 'TESTING!!! para que pase el filtro de sintaxis
-                myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;" & GlobalEnumerates.AppLayerInstrucionReception.ANSADJ.ToString & _
+                myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;" & GlobalEnumerates.AppLayerInstrucionReception.ANSADJ.ToString & _
                                                                           ";" & myData)
                 If Me.BsANSADJCheckbox.Checked Then
                     BsReceivedTextBox.Text += Now.ToString("hh:mm:ss") & vbTab & "<< " & "A400;ANSADJ;" & myData & vbCrLf
@@ -1694,7 +1714,7 @@ Public Class FormXavi
 
             If myData.Length > 1 Then
                 Dim myGlobal As New GlobalDataTO
-                myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSINF;" & myData)
+                myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSINF;" & myData)
 
                 If Me.BsANSINFOCheckbox.Checked Then
                     BsReceivedTextBox.Text += Now.ToString("hh:mm:ss") & vbTab & "<< " & "A400;ANSINF;" & myData & vbCrLf
@@ -1993,7 +2013,7 @@ Public Class FormXavi
                 Return ""
             End If
 
-            'myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSJEX;ID:JE1;TMP:27.3;M1:2106;M2:897;M3:1506;B1:0;B2:0;B3:1;E1:0;E2:0;E3:0;E4:0;E5:0;GE:0;GEM1:2000;")
+            'myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSJEX;ID:JE1;TMP:27.3;M1:2106;M2:897;M3:1506;B1:0;B2:0;B3:1;E1:0;E2:0;E3:0;E4:0;E5:0;GE:0;GEM1:2000;")
 
         Catch ex As Exception
             Throw ex
@@ -2237,7 +2257,7 @@ Public Class FormXavi
             End If
 
 
-            'myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSSFX;ID:SF1;TMP:27.3;M1:1998;B1:0;B2:0;B3:0;B4:0;B5:0;B6:0;B7:0;B8:0;B9:0;B10:0;E1:0;E2:0;")
+            'myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSSFX;ID:SF1;TMP:27.3;M1:1998;B1:0;B2:0;B3:0;B4:0;B5:0;B6:0;B7:0;B8:0;B9:0;B10:0;E1:0;E2:0;")
 
         Catch ex As Exception
             Throw ex
@@ -3028,11 +3048,10 @@ Public Class FormXavi
     Private Sub GenerateCommandAnswerData()
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
                     Dim Rnd As New Random()
@@ -3041,7 +3060,7 @@ Public Class FormXavi
                     Dim EncoderCounts As Integer = CInt(Rnd.Next(0, 2))
                     Dim LevelDetected As Integer = CInt(Rnd.Next(0, 2))
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSCMD;END:1;" & _
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSCMD;END:1;" & _
                                                                               "MP:" & PhMain.ToString & ";" & _
                                                                               "RP:" & PhRef.ToString & ";" & _
                                                                               "ENC:" & EncoderCounts.ToString & ";" & _
@@ -3232,14 +3251,13 @@ Public Class FormXavi
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                         'Short instructions
 
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception(BsTextWrite_Error.Text.Trim)
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(BsTextWrite_Error.Text.Trim)
 
                     End If
                 End If
@@ -3253,14 +3271,13 @@ Public Class FormXavi
     Private Sub Btn_ANSCMD_OK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Btn_ANSCMD_OK.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSCMD;END:1;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSCMD;END:1;")
 
                 End If
             End If
@@ -3272,14 +3289,13 @@ Public Class FormXavi
     Private Sub Btn_ANSCMD_ERR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Btn_ANSCMD_ERR.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSCMD;END:0;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSCMD;END:0;")
 
                 End If
             End If
@@ -3295,14 +3311,13 @@ Public Class FormXavi
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
                     Dim strOperation As String
                     strOperation = "A400;ANSBLD;BLW:1;P:1;MP:2001;RP:100121;MD:4032;RD:4010;IT:12;DAC:100;P:2;MP:30005;RP:401025;MD:4510;RD:4050;IT:12;DAC:250;P:3;MP:8008;RP:92028;MD:4802;RD:4704;IT:12;DAC:100;P:4;MP:100066;RP:10426;MD:4602;RD:4060;IT:12;DAC:0;P:5;MP:104;RP:900004;MD:4032;RD:4000;IT:12;DAC:200;P:6;MP:1033;RP:80023;MD:4032;RD:4030;IT:12;DAC:15;P:7;MP:17;RP:7327;MD:4702;RD:4030;IT:12;DAC:100;P:8;MP:9202;RP:20022;MD:4002;RD:4000;IT:12;DAC:70;P:11;MP:8209;RP:92019;MD:4812;RD:4714;IT:11;DAC:101;"
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception(strOperation)
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(strOperation)
 
                 End If
             End If
@@ -3316,17 +3331,16 @@ Public Class FormXavi
     Private Sub BsButton6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton6.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
                     Dim strOperation As String
                     strOperation = "A400;ANSBLD;BLW:1;P:1;MP:908001;RP:920120;MD:4132;RD:4012;IT:12;DAC:180;P:8;MP:908202;RP:930020;MD:4232;RD:4020;IT:12;DAC:80;P:6;MP:908033;RP:920022;MD:4332;RD:4033;IT:12;DAC:10;P:5;MP:908004;RP:920021;MD:4432;RD:4060;IT:12;DAC:200;P:2;MP:908005;RP:923020;MD:4512;RD:4070;IT:12;DAC:255;P:4;MP:908066;RP:920420;MD:4622;RD:4062;IT:12;DAC:0;P:7;MP:908707;RP:920320;MD:4742;RD:4032;IT:12;DAC:110;P:3;MP:998008;RP:922020;MD:4862;RD:4794;IT:12;DAC:109;P:11;MP:998009;RP:922022;MD:4860;RD:4792;IT:10;DAC:129;"
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception(strOperation)
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception(strOperation)
 
                 End If
             End If
@@ -3340,14 +3354,13 @@ Public Class FormXavi
     Private Sub BsButton5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton5.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:0;NC:0;NCP:0;DH:12;DM:20;DS:32;T:0;NR:0;CR:0;NE:0;CE:0;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:0;NC:0;NCP:0;DH:12;DM:20;DS:32;T:0;NR:0;CR:0;NE:0;CE:0;")
 
                 End If
             End If
@@ -3361,14 +3374,13 @@ Public Class FormXavi
     Private Sub BsButton11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton11.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:1;NC:5;NCP:1;DH:12;DM:20;DS:32;T:0;NR:2;CR:1;NE:0;CE:0;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:1;NC:5;NCP:1;DH:12;DM:20;DS:32;T:0;NR:2;CR:1;NE:0;CE:0;")
 
                 End If
             End If
@@ -3381,14 +3393,13 @@ Public Class FormXavi
     Private Sub BsButton10_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton10.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:2;NC:5;NCP:5;DH:12;DM:20;DS:32;T:0;NR:2;CR:2;NE:0;CE:0;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:2;NC:5;NCP:5;DH:12;DM:20;DS:32;T:0;NR:2;CR:2;NE:0;CE:0;")
 
                 End If
             End If
@@ -3401,14 +3412,13 @@ Public Class FormXavi
     Private Sub BsButton9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton9.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:3;NC:5;NCP:5;DH:12;DM:20;DS:32;T:0;NR:2;CR:3;NE:1;CE:3;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSSDM;S:2;AC:6;ST:3;NC:5;NCP:5;DH:12;DM:20;DS:32;T:0;NR:2;CR:3;NE:1;CE:3;")
 
                 End If
             End If
@@ -3422,11 +3432,10 @@ Public Class FormXavi
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
-                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     Dim myGlobal As New GlobalDataTO
 
-                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                    If myAnalyzerManager.CommThreadsStarted Then
+                    If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                         'Short instructions
 
                         'If AdjustmentsRequested Then
@@ -3442,7 +3451,7 @@ Public Class FormXavi
                         'End If
 
 
-                        myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;STATUS;S:2;A:1;T:0;C:1;W:0;R:0;E:0;I:1;")
+                        myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;STATUS;S:2;A:1;T:0;C:1;W:0;R:0;E:0;I:1;")
 
                     End If
                 End If
@@ -3469,14 +3478,13 @@ Public Class FormXavi
     Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
         Try
             'Simulate instruction reception
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
+                If AnalyzerController.Instance.Analyzer.CommThreadsStarted Then
                     'Short instructions
 
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSERR;N:5;E:111;E:110;E:121;E:120;E:131;")
+                    myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSERR;N:5;E:111;E:110;E:121;E:120;E:131;")
 
                 End If
             End If
@@ -3491,7 +3499,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSJEX_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3506,7 +3514,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSSFX_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3521,7 +3529,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSFCP_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3536,7 +3544,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSF_Generator(POLL_IDs.CPU)
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3551,7 +3559,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSBXX_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3589,7 +3597,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSDXX_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3621,7 +3629,7 @@ Public Class FormXavi
             'Simulate instruction reception
             SimulatedResponse = ANSRXX_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 
@@ -3811,9 +3819,9 @@ Public Class FormXavi
 
             'Dim myUtil As New Utilities
 
-            'myGlobal = myAnalyzerManager.ProcessRecivedISEResult(myInstruction)
+            'myGlobal = AnalyzerController.Instance.Analyzer.ProcessRecivedISEResult(myInstruction)
             'Dim myISEResultData As New ISEResultsDataTO
-            'Dim myISEResult As ISEResultTO = myAnalyzerManager.LastISEResult
+            'Dim myISEResult As ISEResultTO = AnalyzerController.Instance.Analyzer.LastISEResult
             'If myISEResult IsNot Nothing Then
             '    Dim str As New System.Text.StringBuilder
             '    With myISEResult
@@ -4024,7 +4032,7 @@ Public Class FormXavi
 
 
                             If myData.Length > 1 Then
-                                'myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;ANSISE;" & myData)
+                                'myGlobal = AnalyzerController.Instance.Analyzer.SimulateInstructionReception("A400;ANSISE;" & myData)
                             End If
 
                         End If
@@ -4079,7 +4087,7 @@ Public Class FormXavi
             If myFWUpdateAction = FwUpdateActions.None Then myFWUpdateAction = FwUpdateActions.StartUpdate
             SimulatedResponse = MyClass.ANSFWU_Generator()
             If SimulatedResponse.Length > 0 Then
-                myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
+                AnalyzerController.Instance.Analyzer.SimulateInstructionReception(SimulatedResponse)
                 SimulatedResponse = ""
             End If
 

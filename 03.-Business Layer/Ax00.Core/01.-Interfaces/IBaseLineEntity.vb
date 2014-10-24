@@ -25,10 +25,11 @@ Namespace Biosystems.Ax00.Core.Interfaces
                                             ByVal pClassInitialization As Boolean, _
                                             ByVal pWellBaseLine As BaseLinesDS) As GlobalDataTO
 
-        Sub ResetWS()
-
         Function GetLatestBaseLines(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
+
+        Sub ResetWS()
+        Sub Initialize()
 
 #End Region
 

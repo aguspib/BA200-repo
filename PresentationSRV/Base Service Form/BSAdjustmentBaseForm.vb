@@ -13,6 +13,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
 
 
 Public Class BSAdjustmentBaseForm
@@ -22,13 +23,13 @@ Public Class BSAdjustmentBaseForm
 
     Protected Friend myServiceMDI As Ax00ServiceMainMDI
 
-    Protected Friend myAnalyzerManager As AnalyzerManager
+    'Protected Friend myAnalyzerManager As AnalyzerManager '#REFACTORING 
     Public WithEvents myFwScriptDelegate As SendFwScriptsDelegate 'delegate for sending/receiving to/from the Communications Layer
     Public WithEvents myBaseScreenDelegate As BaseFwScriptDelegate
     Protected Friend myAllAdjustmentsDS As SRVAdjustmentsDS 'SGM 27/01/11
     'Protected Friend SelectedAdjustmentsDS As SRVAdjustmentsDS 'SGM 22/09/2011
     Protected Friend myAdjustmentsDelegate As FwAdjustmentsDelegate 'SGM 27/01/11
-    
+
 
     Protected Friend CurrentUserNumericalLevel As Integer = -1   'Initial value when NO userlevel exists
 
@@ -69,17 +70,14 @@ Public Class BSAdjustmentBaseForm
 
 #Region "Constructor"
 
-   
-
     Protected Friend Sub New()
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
-        If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-            myAnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            MyClass.myFwScriptDelegate = New SendFwScriptsDelegate(myAnalyzerManager)
+        If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
+            MyClass.myFwScriptDelegate = New SendFwScriptsDelegate()
 
             'SGM 02/03/11
             MyClass.myBaseScreenDelegate = New BaseFwScriptDelegate()
@@ -95,8 +93,8 @@ Public Class BSAdjustmentBaseForm
             'MyClass.mySensorsScreenDelegate.myFwScriptDelegate = MyClass.mySensorsFwScriptDelegate
 
         End If
-        If Ax00ServiceMainMDI.MDIAnalyzerManager IsNot Nothing Then
-            MyClass.myFwScriptDelegate = New SendFwScriptsDelegate(Ax00ServiceMainMDI.MDIAnalyzerManager)
+        If (AnalyzerController.IsAnalyzerInstantiated) Then
+            MyClass.myFwScriptDelegate = New SendFwScriptsDelegate()
         End If
 
 
@@ -1640,7 +1638,7 @@ Public Class BSAdjustmentBaseForm
         End Try
     End Sub
 
-    
+
 
 #Region "MustOverride Methods"
 
@@ -1677,16 +1675,23 @@ Public Class BSAdjustmentBaseForm
 #End Region
 
 #Region "Fw Adjustments"
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Protected Friend Function RequestAdjustmentsMasterData() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
 
-            myGlobal = myAnalyzerManager.ReadFwAdjustmentsDS
+            myGlobal = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
             If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                 Dim resultDS As SRVAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                 'if the global dataset is empty the force to load again from the db
                 If resultDS Is Nothing OrElse resultDS.srv_tfmwAdjustments.Count = 0 Then
-                    myGlobal = myAnalyzerManager.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
+                    myGlobal = AnalyzerController.Instance.Analyzer.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         resultDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
 
@@ -1698,7 +1703,7 @@ Public Class BSAdjustmentBaseForm
 
                         'update text file
                         MyClass.myAdjustmentsDelegate = New FwAdjustmentsDelegate(MyClass.myAllAdjustmentsDS)
-                        myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(MyClass.myAnalyzerManager.ActiveAnalyzer)
+                        myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
 
                     End If
                 End If
@@ -1755,13 +1760,21 @@ Public Class BSAdjustmentBaseForm
     '    Return myGlobal
     'End Function
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pUpdateTextFile"></param>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Protected Friend Function SimulateRequestAdjustmentsFromAnalyzer(Optional ByVal pUpdateTextFile As Boolean = False) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
 
         Try
 
-            myGlobal = myAnalyzerManager.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
+            myGlobal = AnalyzerController.Instance.Analyzer.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
 
             If myGlobal.SetDatos IsNot Nothing And Not myGlobal.HasError Then
 
@@ -1771,7 +1784,7 @@ Public Class BSAdjustmentBaseForm
                     If pUpdateTextFile Then
                         'update text file
                         MyClass.myAdjustmentsDelegate = New FwAdjustmentsDelegate(MyClass.myAllAdjustmentsDS)
-                        myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(MyClass.myAnalyzerManager.ActiveAnalyzer)
+                        myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer)
                     End If
 
                     'update DB

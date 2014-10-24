@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
 
 Public Class IBarCodeAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
@@ -333,7 +334,7 @@ Public Class IBarCodeAdjustments
                              Optional ByVal pAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myScreenDelegate.NoneInstructionToSend = True
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode, pAdjustmentGroup)
                 If Not myGlobal.HasError Then
@@ -867,7 +868,7 @@ Public Class IBarCodeAdjustments
             End Select
 
             If MyBase.myServiceMDI IsNot Nothing Then
-                If Not MyBase.SimulationMode And MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                     MyClass.PrepareErrorMode()
                     MyBase.DisplayMessage("")
                 End If
@@ -936,7 +937,7 @@ Public Class IBarCodeAdjustments
                     MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                     PrepareArea()
                 Else
-                    If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                     End If
                 End If
@@ -1443,7 +1444,7 @@ Public Class IBarCodeAdjustments
 
                                 myScreenDelegate.AdjustmentBCPoint = EditedValue.NewValue
 
-                                If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                     myGlobal = Me.myScreenDelegate.SendLoad_Adjustments()
                                 End If
 
@@ -1980,7 +1981,7 @@ Public Class IBarCodeAdjustments
             MyClass.Initializations()
 
             ' Check communications with Instrument
-            If Not MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
             Else

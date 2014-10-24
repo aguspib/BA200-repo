@@ -3,6 +3,7 @@
 'Imports System.Text
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.App
 
 Partial Public Class IMonitor
 
@@ -27,7 +28,14 @@ Partial Public Class IMonitor
         End Try
     End Sub
 
-    'RH
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="CanHide"></param>
+    ''' <remarks>RH
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Sub ShowActiveAlerts(Optional ByVal CanHide As Boolean = True)
         If ChangingTab Then Return
         If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
@@ -64,13 +72,13 @@ Partial Public Class IMonitor
                 Next
 
                 'AG 20/07/2012
-                If Not mdiAnalyzerCopy Is Nothing AndAlso (Not mdiAnalyzerCopy.Connected OrElse _
-                   (Not mdiAnalyzerCopy.Alarms Is Nothing AndAlso mdiAnalyzerCopy.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_ERR))) Then
+                If (AnalyzerController.IsAnalyzerInstantiated) AndAlso (Not AnalyzerController.Instance.Analyzer.Connected OrElse _
+                   (Not AnalyzerController.Instance.Analyzer.Alarms Is Nothing AndAlso AnalyzerController.Instance.Analyzer.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_ERR))) Then
                     'Leave globe alarms empty 
                     Dim globeAlarmsList As New List(Of GlobalEnumerates.Alarms)
                     UpdateCoverImages(globeAlarmsList)
                 Else
-                    UpdateCoverImages(mdiAnalyzerCopy.Alarms)
+                    UpdateCoverImages(AnalyzerController.Instance.Analyzer.Alarms)
                 End If
                 'AG 20/07/2012
 
@@ -118,14 +126,21 @@ Partial Public Class IMonitor
         End If
     End Sub
 
-    'RH
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="pAlarms"></param>
+    ''' <remarks>RH
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Sub UpdateGlobesInMainTab(ByVal pAlarms As List(Of GlobalEnumerates.Alarms))
         Try
 
             'AG 21/05/2012 - if not communications do not remove analyzermanager alarms, only do not show them
             Dim globeAlarmsList As New List(Of GlobalEnumerates.Alarms)
             If (Not pAlarms Is Nothing AndAlso pAlarms.Contains(GlobalEnumerates.Alarms.COMMS_ERR)) OrElse _
-               (Not mdiAnalyzerCopy Is Nothing AndAlso Not mdiAnalyzerCopy.Connected) Then
+               ((AnalyzerController.IsAnalyzerInstantiated) AndAlso Not AnalyzerController.Instance.Analyzer.Connected) Then
                 'If no comms leave globe alarms empty 
             Else
                 'Sleeping status DOES NOT SHOW globes
@@ -158,16 +173,16 @@ Partial Public Class IMonitor
 
                 For Each Alarm As GlobalEnumerates.Alarms In AlertAlarms
                     If globeAlarmsList.Contains(Alarm) Then 'AG 23/05/2012 use local list, not the parameter list (pAlarms)
-                        If Alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR AndAlso Not mdiAnalyzerCopy Is Nothing Then
+                        If Alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
                             'AG 06/09/2012 - The property ShowBaseLineInitializationFailedMessage has to be used only in StandBy
                             '                in others status as Running the globe must appear
-                            'If mdiAnalyzerCopy.ShowBaseLineInitializationFailedMessage Then
+                            'If AnalyzerController.Instance.Analyzer.ShowBaseLineInitializationFailedMessage Then
                             '    appendFlag = True 'All ALGIHT temptatives have failed show alert
                             'Else
                             '    appendFlag = False 'Temptative pending NO show alert
                             'End If
-                            If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                                If mdiAnalyzerCopy.ShowBaseLineInitializationFailedMessage Then
+                            If AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                                If AnalyzerController.Instance.Analyzer.ShowBaseLineInitializationFailedMessage Then
                                     appendFlag = True 'All ALGIHT temptatives have failed show alert
                                 Else
                                     appendFlag = False 'Temptative pending NO show alert
@@ -282,7 +297,7 @@ Partial Public Class IMonitor
                     CoverOffPicture.Visible = True
                     CoverOnPicture.Visible = True
                 End If
-                UpdateCoverImages(mdiAnalyzerCopy.Alarms) 'AG 18/05/2012
+                UpdateCoverImages(AnalyzerController.Instance.Analyzer.Alarms) 'AG 18/05/2012 '#REFACTORING
             End If
 
         Catch ex As Exception
@@ -291,6 +306,12 @@ Partial Public Class IMonitor
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Sub UpdateContainerLevels() 'Pass a list of levels
         'Simulation Code
         'chart2.Series("Series1").Points(1).YValues(0) = rnd.Next Mod 101
@@ -302,14 +323,14 @@ Partial Public Class IMonitor
         If (IsDisposed) Then Return 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
         Dim myAlarms As List(Of GlobalEnumerates.Alarms)
-        myAlarms = mdiAnalyzerCopy.Alarms 'Get the current alarms in analyzer
+        myAlarms = AnalyzerController.Instance.Analyzer.Alarms 'Get the current alarms in analyzer
 
         Dim sensorValue As Single = 0
-        sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_WASHSOLUTION)
+        sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_WASHSOLUTION)
         chart2.Series("Series1").Points(1).YValues(0) = sensorValue
         WashingLabel.Text = sensorValue.ToStringWithPercent(0) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) 'RH 20/10/2011
 
-        sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
+        sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
         chart2.Series("Series1").Points(2).YValues(0) = sensorValue
         WasteLabel.Text = sensorValue.ToStringWithPercent(0) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) 'RH 20/10/2011
 

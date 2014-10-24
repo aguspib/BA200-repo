@@ -13,6 +13,7 @@ Imports Biosystems.Ax00.BL
 Imports System.IO
 Imports System.Threading
 Imports Biosystems.Ax00.PresentationCOM
+Imports Biosystems.Ax00.App
 
 Public Class TestForm
 
@@ -59,7 +60,7 @@ Public Class TestForm
     Private Sub BsButton8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton8.Click
         Dim myGlobal As New GlobalDataTO
         Dim myFWUtil As New FWUpdateRequestTO(GlobalEnumerates.FwUpdateActions.QueryNeeded)
-        myGlobal = myMDI.MDIAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.FW_UTIL, True, Nothing, myFWUtil)
+        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.FW_UTIL, True, Nothing, myFWUtil)
     End Sub
 
 End Class

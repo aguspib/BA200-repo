@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
+Imports Biosystems.Ax00.App
 
 
 
@@ -21,7 +22,7 @@ Public Class IChangeRotorSRV
 
 #Region "Declarations"
 
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager
     'Private instructionALIGHTInProcess As Boolean = False
     Private MSG_StartInstrument As String 'RH 14/02/2012
 
@@ -110,12 +111,14 @@ Public Class IChangeRotorSRV
         End Try
     End Sub
 
-   
+
 
     ''' <summary>
     ''' 
     ''' </summary>
-    ''' <remarks>Created by SGM 13/11/2012</remarks>
+    ''' <remarks>Created by SGM 13/11/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub InitializeScreen()
         Try
 
@@ -126,10 +129,6 @@ Public Class IChangeRotorSRV
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), _
                                     myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 70)
             'END DL 28/07/2011
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
-            End If
 
             'Get Icons for Screen Buttons
             PrepareButtons()
@@ -235,7 +234,7 @@ Public Class IChangeRotorSRV
             PrepareErrorMode()
 
             If Me.BsProgressBar.Visible Then
-                If MyBase.myServiceMDI.MDIAnalyzerManager.Connected And pAlarmType <> ManagementAlarmTypes.UPDATE_FW And pAlarmType <> ManagementAlarmTypes.FATAL_ERROR Then
+                If AnalyzerController.Instance.Analyzer.Connected And pAlarmType <> ManagementAlarmTypes.UPDATE_FW And pAlarmType <> ManagementAlarmTypes.FATAL_ERROR Then '#REFACTORING
                     MyClass.PrepareLoadedMode()
                 End If
                 ScreenWorkingProcess = False
@@ -497,7 +496,7 @@ Public Class IChangeRotorSRV
             ScreenWorkingProcess = False
             MyBase.ActivateMDIMenusButtons(True)
 
-            If MyBase.myServiceMDI.MDIAnalyzerManager.ErrorCodes.Contains("550") Then 'Reactions rotor missing
+            If AnalyzerController.Instance.Analyzer.ErrorCodes.Contains("550") Then 'Reactions rotor missing '#REFACTORING
                 Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
             Else
                 Me.bsStatusImage.Image = Image.FromFile(OKIconName)
@@ -572,7 +571,7 @@ Public Class IChangeRotorSRV
                 Me.BsProgressBar.Visible = False
                 Me.BsProgressBar.Value = 0
 
-                If Not mdiAnalyzerCopy Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
 
                     MyClass.DisableAll()
 
@@ -602,7 +601,7 @@ Public Class IChangeRotorSRV
                 bsStatusImage.Visible = False
                 Me.BsProgressBar.Value = 0
 
-                If Not mdiAnalyzerCopy Is Nothing Then
+                If (AnalyzerController.IsAnalyzerInstantiated) Then '#REFACTORING
 
                     MyClass.DisableAll()
 
@@ -623,7 +622,7 @@ Public Class IChangeRotorSRV
             Exit Sub
 
 
-           
+
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

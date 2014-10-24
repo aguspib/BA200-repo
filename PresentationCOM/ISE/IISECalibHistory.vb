@@ -12,6 +12,7 @@ Imports System.Drawing
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.IO
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
 
 'PENDING:
 'Add Information XPS Docs for each Action
@@ -19,8 +20,9 @@ Imports Biosystems.Ax00.Controls.UserControls
 Public Class IISECalibHistory
 
 #Region "Declarations"
-    Private WithEvents mdiAnalyzerCopy As AnalyzerManager
-    Private myISEManager As ISEManager
+
+    'Private WithEvents mdiAnalyzerCopy As AnalyzerManager '#REFACTORING
+    'Private myISEManager As ISEAnalyzerEntity '#REFACTORING
 
     ' Language
     Private currentLanguage As String
@@ -46,7 +48,7 @@ Public Class IISECalibHistory
 #End Region
 
 #Region "Attributes"
-   
+
 #End Region
 
 #Region "Properties"
@@ -61,7 +63,7 @@ Public Class IISECalibHistory
 #End Region
 
 #Region "Enumerations"
-    
+
 #End Region
 
 #Region "Public Methods"
@@ -464,8 +466,8 @@ Public Class IISECalibHistory
     Public Function ActivateButtonWithAlarms(ByVal pButton As GlobalEnumerates.ActionButton) As Boolean
         Dim myStatus As Boolean = True
         Try
-
-            If Not mdiAnalyzerCopy Is Nothing Then
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
 
                 'Dim resultData As New GlobalDataTO
                 Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
@@ -475,8 +477,8 @@ Public Class IISECalibHistory
                 Dim myAx00Status As GlobalEnumerates.AnalyzerManagerStatus = GlobalEnumerates.AnalyzerManagerStatus.NONE
                 ' AG+XBC 24/05/2012
 
-                myAlarms = mdiAnalyzerCopy.Alarms
-                myAx00Status = mdiAnalyzerCopy.AnalyzerStatus
+                myAlarms = AnalyzerController.Instance.Analyzer.Alarms
+                myAx00Status = AnalyzerController.Instance.Analyzer.AnalyzerStatus
 
                 ''AG 25/10/2011 - Before treat the cover alarms read if they are deactivated (0 disabled, 1 enabled)
                 'Dim mainCoverAlarm As Boolean = CType(IIf(myAlarms.Contains(GlobalEnumerates.Alarms.MAIN_COVER_WARN), 1, 0), Boolean)
@@ -521,8 +523,9 @@ Public Class IISECalibHistory
                 'AG 02/04/2012
                 '(ISE instaled and (initiated or not SwitchedON)) Or not instaled
                 Dim iseInitiatedFinishedFlag As Boolean = True
-                If mdiAnalyzerCopy.ISE_Manager IsNot Nothing AndAlso _
-                   (mdiAnalyzerCopy.ISE_Manager.IsISEInitiating OrElse Not mdiAnalyzerCopy.ISE_Manager.ConnectionTasksCanContinue) Then
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing AndAlso _
+                   (AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEInitiating OrElse Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.ConnectionTasksCanContinue) Then
                     iseInitiatedFinishedFlag = False
                 End If
                 'AG 02/04/2012
@@ -546,7 +549,7 @@ Public Class IISECalibHistory
 
                 'XBC 03/04/2012
                 If ThisIsService Then
-                    If myISEManager.IsISEModuleInstalled And Not myISEManager.IsISESwitchON Then
+                    If AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISEModuleInstalled And Not AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsISESwitchON Then
                         myStatus = False
                     End If
                 Else
@@ -567,17 +570,19 @@ Public Class IISECalibHistory
 
 #Region "Events"
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Protected Sub IISECalibHistory_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
 
             'Dim myGlobal As New GlobalDataTO
             Dim myGlobalbase As New GlobalBase
-
-            'Get an instance of the ISE manager class
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
-                myISEManager = mdiAnalyzerCopy.ISE_Manager
-            End If
 
             'Get the current user level SGM 07/06/2012
             MyBase.CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel

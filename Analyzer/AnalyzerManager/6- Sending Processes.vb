@@ -15,7 +15,7 @@ Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an 
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
-    Partial Public Class AnalyzerManager
+    Partial Public Class AnalyzerManagerOLD
 
 #Region "Connection process"
 

@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
 
 #Region "Comments"
 'PREGUNTAS:
@@ -4086,7 +4087,7 @@ Public Class IMotorsPumpsValvesTest
             End Select
 
             If MyBase.myServiceMDI IsNot Nothing Then
-                If Not MyBase.SimulationMode And MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                     MyClass.PrepareErrorMode()
                     MyBase.DisplayMessage("")
                 End If
@@ -4531,7 +4532,7 @@ Public Class IMotorsPumpsValvesTest
                     'SGM 18/05/2012 Continuous switch must stop at default state
                 ElseIf MyClass.CurrentActivationMode = ACTIVATION_MODES.CONTINUOUS AndAlso MyClass.StopContinuousSwitchingRequested Then
                     'SGM 06/11/2012
-                    If MyClass.myServiceMDI.MDIAnalyzerManager.IsAlarmInfoRequested Then
+                    If AnalyzerController.Instance.Analyzer.IsAlarmInfoRequested Then '#REFACTORING
                         System.Threading.Thread.Sleep(1000)
                     End If
 
@@ -5014,7 +5015,7 @@ Public Class IMotorsPumpsValvesTest
         End Try
     End Sub
 
-    
+
 
 #End Region
 
@@ -5269,13 +5270,13 @@ Public Class IMotorsPumpsValvesTest
             End If
             ' XBC 11/11/2011
 
-            If MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyClass.PrepareErrorMode()
                 MyBase.DisplayMessage("")
                 Exit Sub
             End If
 
-            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
                 If Not myGlobal.HasError Then
                     ' Send FwScripts
@@ -5612,7 +5613,7 @@ Public Class IMotorsPumpsValvesTest
     Private Function StartReadingTimer() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            
+
             If MyBase.SimulationMode Then
                 Dim myExcept As BsScadaControl = Nothing
                 If MyClass.IsContinuousSwitching Then
@@ -5832,7 +5833,7 @@ Public Class IMotorsPumpsValvesTest
     '        MyBase.DisplaySimulationMessage("Manifold Elements readed")
     '        'SIMULATE RECEIVE MANIFOLD
     '        'Else
-    '        '    If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+    '        '    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
     '        '        myGlobal = myScreenDelegate.SendPOLLHW(POLL_IDs.JE1)
     '        '    End If
     '        'End If
@@ -5868,7 +5869,7 @@ Public Class IMotorsPumpsValvesTest
     '        MyBase.DisplaySimulationMessage("Fluidic Elements readed")
     '        'SIMULATE RECEIVE FLUIDICS
     '        'Else
-    '        '    If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+    '        '    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
     '        '        myGlobal = myScreenDelegate.SendPOLLHW(POLL_IDs.SF1)
     '        '    End If
     '        'End If
@@ -5906,7 +5907,7 @@ Public Class IMotorsPumpsValvesTest
     '        MyBase.DisplaySimulationMessage("Photometrics Elements readed")
     '        'SIMULATE RECEIVE Photometrics
     '        'Else
-    '        '    If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+    '        '    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
     '        '        myGlobal = myScreenDelegate.SendPOLLHW(POLL_IDs.GLF)
     '        '    End If
     '        'End If
@@ -6486,7 +6487,7 @@ Public Class IMotorsPumpsValvesTest
 
             Else
 
-                If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
 
                     Dim myUtilCommand As New UTILCommandTO()
                     With myUtilCommand
@@ -6537,7 +6538,7 @@ Public Class IMotorsPumpsValvesTest
                 MyBase.CurrentMode = ADJUSTMENT_MODES.LOADED
             Else
 
-                If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
 
                     Dim myUtilCommand As New UTILCommandTO()
                     With myUtilCommand
@@ -6559,7 +6560,7 @@ Public Class IMotorsPumpsValvesTest
                     MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                 End If
 
-                End If
+            End If
 
         Catch ex As Exception
             myGlobal.HasError = True
@@ -6607,7 +6608,7 @@ Public Class IMotorsPumpsValvesTest
     End Sub
 
 
-   
+
 #End Region
 
 #Region "Encoder Test Methods"
@@ -7041,7 +7042,7 @@ Public Class IMotorsPumpsValvesTest
             Me.BsExitButton.Enabled = False 'SGM 23/10/2012
 
             ' Check communications with Instrument
-            If Not MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 PrepareErrorMode()
                 MyBase.ActivateMDIMenusButtons(True)
             Else
@@ -7067,7 +7068,7 @@ Public Class IMotorsPumpsValvesTest
                         MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                         PrepareArea()
                     Else
-                        If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                             myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                         End If
                     End If
@@ -7093,7 +7094,7 @@ Public Class IMotorsPumpsValvesTest
                 'MyClass.InitializeEncoder()
                 'PROTO 5
 
-                If Not MyBase.SimulationMode And MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                     MyClass.PrepareErrorMode()
                     MyBase.DisplayMessage("")
                 End If
@@ -7595,7 +7596,7 @@ Public Class IMotorsPumpsValvesTest
 #End Region
 
 
-    
+
 #Region "Refresh Event Handler"
 
     ''' <summary>
@@ -7606,6 +7607,7 @@ Public Class IMotorsPumpsValvesTest
     ''' <remarks>
     ''' Created by SGM 23/05/2011
     ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+    '''             IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
@@ -7633,14 +7635,14 @@ Public Class IMotorsPumpsValvesTest
                             'SGM 10/10/2012 - Collision detected
                         Case AnalyzerSensors.TESTING_NEEDLE_COLLIDED.ToString
                             Dim sensorValue As Single = 0
-                            sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.TESTING_NEEDLE_COLLIDED)
+                            sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.TESTING_NEEDLE_COLLIDED)
                             If sensorValue = 1 Then
                                 ScreenWorkingProcess = False
-                                Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.TESTING_NEEDLE_COLLIDED) = 0 'Once updated UI clear sensor
+                                AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.TESTING_NEEDLE_COLLIDED) = 0 'Once updated UI clear sensor
 
                                 'Refresh Needle Collided presentation
                                 If MyClass.IsCollisionTestEnabled Then
-                                    MyClass.CollidedNeedle = MyBase.myServiceMDI.MDIAnalyzerManager.TestingCollidedNeedle
+                                    MyClass.CollidedNeedle = AnalyzerController.Instance.Analyzer.TestingCollidedNeedle
                                 End If
 
                             End If

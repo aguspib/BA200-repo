@@ -492,14 +492,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     'SGM 17/02/2012 Initialization of ISE Manager
-                    If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.IsAnalyzerDisconnected Then
+                    '#REFACTORING 
+                    'If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.IsAnalyzerDisconnected Then
+                    If ISEAnalyzer.IsAnalyzerDisconnected Then
                         'MyClass.ISE_Manager.Dispose() 'SGM 13/09/2012 clear all resources 
-                        ISEAnalyzer = Nothing 'kill instance of when disconnected mode
+                        'ISEAnalyzer = Nothing 'kill instance of when disconnected mode
+                        ISEAnalyzer.Initialize()
                     End If
 
-                    If ISEAnalyzer Is Nothing Then
-                        '#TODO REFACTORING MyClass.ISE_Manager = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
-                    End If
+                    '#REFACTORING 
+                    'If ISEAnalyzer Is Nothing Then
+                    'MyClass.ISE_Manager = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
+                    'End If
 
                     'update ISE is installed
                     If ISEAnalyzer IsNot Nothing Then

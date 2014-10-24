@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.Windows.Forms
 Imports System.Drawing
+Imports Biosystems.Ax00.App
 
 Public Class IBarCodesConfig
 
@@ -51,7 +52,7 @@ Public Class IBarCodesConfig
     Private myLeft As Integer
 
     'For Analyzer management
-    Private mdiAnalyzerCopy As AnalyzerManager 'DL 09/09/2011
+    'Private mdiAnalyzerCopy As AnalyzerManager 'DL 09/09/2011
     Private entryValueForReagentsBarcodeDisable As Boolean 'AG 23/11/2011
     Private entryValueForSamplesBarcodeDisable As Boolean 'AG 23/11/2011
 
@@ -197,11 +198,12 @@ Public Class IBarCodesConfig
 
             'Send the CONFIGURATION instruction with new values when: Instrument is connecte and ready, and the Instrument Status is Sleep or StandBy 
             If (Not resultData.HasError) Then
-                If (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerIsReady AndAlso _
-                   (mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY)) Then
+                '#REFACTORING
+                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso _
+                   (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY)) Then
                     'Send the CONFIGURATION instruction if changes in Reagent or Sample Barcode activation have been made
                     If (entryValueForReagentsBarcodeDisable <> bsReagentsCheckBox.Checked OrElse entryValueForSamplesBarcodeDisable <> bsSamplesCheckBox.Checked) Then
-                        resultData = mdiAnalyzerCopy.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True, Nothing, Nothing)
+                        resultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True, Nothing, Nothing)
                     End If
 
                     If (Me.BarcodeConfigChangesToSend) Then
@@ -220,7 +222,7 @@ Public Class IBarCodesConfig
                         BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                         BarCodeDS.AcceptChanges()
 
-                        resultData = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+                        resultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS) '#REFACTORING
                         'TR 24/07/2013 Bug #1245  When screen close does not become enable 
                         'start button due analyzer does not respond on time. wait before close 
                         System.Threading.Thread.Sleep(250)
@@ -476,14 +478,10 @@ Public Class IBarCodesConfig
     '''                              in process
     '''              XB+JC 09/10/2013 - Improve Usability #1273 Bugs tracking
     '''              XB 06/11/2013 - Add protection against more performing operations (Starting Instrument, Shutting down, aborting WS) - BT #1150 + #1151
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
-            'Get the Analyzer Manager
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
-
             'Center the screen
             Dim mySize As Size = Me.Parent.Size
             Dim myLocation As Point = Me.Parent.Location
@@ -529,14 +527,15 @@ Public Class IBarCodesConfig
             ScreenStatusByUserLevel() 'TR 20/04/2012
 
             'Verify if the screen has to be opened in READ-ONLY mode
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'If the connection process is in process, disable all screen fields (changes are not allowed) ORELSE
                 'If the Analyzer is connected and its status is RUNNING, disable all screen fields (changes are not allowed)
-                If (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
-                   (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS") OrElse _
-                   (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS") OrElse _
-                   Not mdiAnalyzerCopy.AnalyzerIsReady OrElse _
-                   (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
+                If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
+                   (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS") OrElse _
+                   (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS") OrElse _
+                   Not AnalyzerController.Instance.Analyzer.AnalyzerIsReady OrElse _
+                   (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
                     ' XB 06/11/2013 - WUPprocess, ABORTprocess and SDOWNprocess added 
                     bsReagentsGroupBox.Enabled = False
                     bsSamplesGroupBox.Enabled = False
@@ -1581,5 +1580,5 @@ Public Class IBarCodesConfig
 
     End Sub
 
-   
+
 End Class

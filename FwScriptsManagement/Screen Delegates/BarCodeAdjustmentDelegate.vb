@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -312,7 +313,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case OPERATIONS.TEST
                         Select Case pResponse
                             Case RESPONSE_TYPES.START
-                                CurrentTimeOperationAttr = myFwScriptDelegate.AnalyzerManager.MaxWaitTime
+                                CurrentTimeOperationAttr = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                             Case RESPONSE_TYPES.OK
                                 Me.TestDoneAttr = True
                         End Select
@@ -435,7 +436,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Me.CurrentOperation = OPERATIONS.SAVE_ADJUSMENTS
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -457,7 +458,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Me.CurrentOperation = pOperation
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, pBarCodeDS, "")
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, pBarCodeDS, "") '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True

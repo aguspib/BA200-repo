@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 
 Namespace Biosystems.Ax00.FwScriptsManagement
@@ -115,7 +116,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Private Properties"
 
-       
+
 
 #End Region
 
@@ -214,7 +215,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Set
         End Property
 
-       
+
 
         'SCALES
         'Adjustments
@@ -392,7 +393,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             Case ADJUSTMENT_GROUPS.TANKS_EMPTY_LC
                                 Select Case pResponse
                                     Case RESPONSE_TYPES.START
-                                        CurrentTimeOperationAttr = myFwScriptDelegate.AnalyzerManager.MaxWaitTime
+                                        CurrentTimeOperationAttr = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                         Me.EmptyLcDoingAttr = True
                                     Case RESPONSE_TYPES.OK
                                         Me.EmptyLcDoneAttr = True
@@ -401,7 +402,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             Case ADJUSTMENT_GROUPS.TANKS_FILL_DW
                                 Select Case pResponse
                                     Case RESPONSE_TYPES.START
-                                        CurrentTimeOperationAttr = myFwScriptDelegate.AnalyzerManager.MaxWaitTime
+                                        CurrentTimeOperationAttr = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                         Me.FillDwDoingAttr = True
                                     Case RESPONSE_TYPES.OK
                                         Me.FillDwDoneAttr = True
@@ -410,7 +411,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             Case ADJUSTMENT_GROUPS.TANKS_TRANSFER_DW_LC
                                 Select Case pResponse
                                     Case RESPONSE_TYPES.START
-                                        CurrentTimeOperationAttr = myFwScriptDelegate.AnalyzerManager.MaxWaitTime
+                                        CurrentTimeOperationAttr = AnalyzerController.Instance.Analyzer.MaxWaitTime '#REFACTORING
                                         Me.TransferDwLcDoingAttr = True
                                     Case RESPONSE_TYPES.OK
                                         Me.TransferDwLcDoneAttr = True
@@ -494,7 +495,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 Me.CurrentTestAttr = pAdjustment
                 Me.CurrentOperation = OPERATIONS.SAVE_ADJUSMENTS
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, Me.pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -517,7 +518,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 Me.CurrentTestAttr = pAdjustment
                 Me.CurrentOperation = OPERATIONS.TANKS_TEST
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.TANKS_TEST, True, Nothing, Me.pValueAdjustAttr)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.TANKS_TEST, True, Nothing, Me.pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True

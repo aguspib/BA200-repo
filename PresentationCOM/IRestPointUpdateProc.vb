@@ -15,6 +15,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports System.Drawing
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.App
 
 
 Public Class IRestPointUpdateProc
@@ -69,7 +70,7 @@ Public Class IRestPointUpdateProc
     Private RestoreDBFilePath As String
 
     Private CurrentLanguage As String
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager
 
 
 #End Region
@@ -462,7 +463,7 @@ Public Class IRestPointUpdateProc
         Try
 
             Dim mySATUtil As New SATReportUtilities
-            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", MyClass.mdiAnalyzerCopy.AdjustmentsFilePath)
+            myGlobal = mySATUtil.CreateSATReport(GlobalEnumerates.SATReportActions.SAT_RESTORE, False, "", AnalyzerController.Instance.Analyzer.AdjustmentsFilePath) '#REFACTORING
             If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                 SATReportCreated = CBool(myGlobal.SetDatos)
             End If
@@ -510,9 +511,10 @@ Public Class IRestPointUpdateProc
                         Me.RestorePointPath = pFilePath
 
                         'AG 25/10/2011 - Stop ANSINF
-                        If Not mdiAnalyzerCopy Is Nothing Then
-                            If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
+                        '#REFACTORING
+                        If (AnalyzerController.IsAnalyzerInstantiated) Then
+                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
                             End If
                         End If
                         'AG 25/10/2011
@@ -522,9 +524,9 @@ Public Class IRestPointUpdateProc
                         End If
 
                         'AG 25/10/2011 - Start ANSINF
-                        If Not myGlobal.HasError AndAlso Not mdiAnalyzerCopy Is Nothing Then
-                            If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                                myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                        If (Not myGlobal.HasError) AndAlso (AnalyzerController.IsAnalyzerInstantiated) Then
+                            If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
                             End If
 
                         End If
@@ -559,9 +561,9 @@ Public Class IRestPointUpdateProc
 
             'Ax00 allow load RSAT / Restore Point when: No connection or (sleeping + no working) or (standby + no working)
             'NOTE in Ax5 the condition was more secure (no connection or sleeping)
-
-            If Not mdiAnalyzerCopy Is Nothing Then
-                If Not mdiAnalyzerCopy.Connected Then 'AG 06/02/2012 - add Connected to the acitvation rule
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
+                If Not AnalyzerController.Instance.Analyzer.Connected Then 'AG 06/02/2012 - add Connected to the acitvation rule
                     returnValue = True
 
                     'DL 02/07/2012. Begin
@@ -617,6 +619,7 @@ Public Class IRestPointUpdateProc
     ''' <remarks>
     ''' Created by  : SG 08/10/2010
     ''' Modified by : XB 07/05/2013 - Instantiate Wrapper LIS into mdiESWrapperCopy 
+    '''               IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub LoadSATReportData_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
@@ -627,10 +630,6 @@ Public Class IRestPointUpdateProc
 
             'Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
-
-            'If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-            '    mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 13/07/2011 - Use the same AnalyzerManager as the MDI
-            'End If
 
             '  XB 07/05/2013
             'If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
@@ -831,7 +830,7 @@ Public Class IRestPointUpdateProc
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
+                    myGlobal = myLogAcciones.ExportLogToXml(AnalyzerController.Instance.Analyzer.ActiveWorkSession, myLogMaxDays) '#REFACTORING
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
                         myGlobal = myLogAcciones.DeleteAll()

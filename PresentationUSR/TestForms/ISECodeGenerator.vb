@@ -24,6 +24,7 @@ Imports Biosystems.Ax00
 'Imports History.Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Core.Entities
 
 
 
@@ -551,7 +552,7 @@ Public Class ISECodeGenerator
                                 myDallas00 = CType(myGlobal.SetDatos, ISEDallasPage00TO)
                             End If
                         End If
-                        myGlobal = ISEManager.BiosystemsValidationAlgorithm(myISEDallasSN, myDallas00)
+                        myGlobal = ISEAnalyzerEntity.BiosystemsValidationAlgorithm(myISEDallasSN, myDallas00)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             result = CBool(myGlobal.SetDatos)
                         End If
@@ -589,7 +590,7 @@ Public Class ISECodeGenerator
                             myDallas00 = CType(myGlobal.SetDatos, ISEDallasPage00TO)
                         End If
                     End If
-                    myGlobal = ISEManager.BiosystemsValidationAlgorithm(myISEDallasSN, myDallas00)
+                    myGlobal = ISEAnalyzerEntity.BiosystemsValidationAlgorithm(myISEDallasSN, myDallas00)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         result = CBool(myGlobal.SetDatos)
                     End If

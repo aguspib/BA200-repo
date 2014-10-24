@@ -2,7 +2,7 @@
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 
-Namespace Biosystems.Ax00.Application
+Namespace Biosystems.Ax00.App
 
     Public Class BA400AnalyzerFactory
         Implements IAnalyzerFactory
@@ -28,12 +28,14 @@ Namespace Biosystems.Ax00.Application
             Dim iseAnalyzer As ISEAnalyzerEntity
 
             baseLine = New StaticBaseLineEntity()
-            iseAnalyzer = New ISEAnalyzerEntity()
-
-            analyzer = New BA400AnalyzerEntity(assemblyName, analyzerModel, baseLine, iseAnalyzer) With {.StartingApplication = startingApplication, _
+            analyzer = New BA400AnalyzerEntity(assemblyName, analyzerModel, baseLine) With {.StartingApplication = startingApplication, _
                                                                             .ActiveWorkSession = workSessionIDAttribute, _
                                                                             .ActiveAnalyzer = analyzerIDAttribute, _
                                                                             .ActiveFwVersion = fwVersionAttribute}
+
+            iseAnalyzer = New ISEAnalyzerEntity(analyzer, analyzerIDAttribute, analyzerModel, False)
+            analyzer.ISEAnalyzer = iseAnalyzer
+
             Return analyzer
 
         End Function

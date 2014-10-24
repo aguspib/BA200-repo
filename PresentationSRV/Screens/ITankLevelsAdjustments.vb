@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.App
+
 'Imports System.Runtime.InteropServices 'WIN32
 
 Public Class ITankLevelsAdjustments
@@ -55,7 +57,7 @@ Public Class ITankLevelsAdjustments
     '    OK = 1
     '    NOK = 2
     'End Enum
-   
+
 #End Region
 
 #Region "Declarations"
@@ -1188,7 +1190,7 @@ Public Class ITankLevelsAdjustments
             MyClass.PrepareButtonsVisibility()
 
             If MyBase.myServiceMDI IsNot Nothing Then
-                If Not MyBase.SimulationMode And MyBase.myServiceMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                     MyClass.PrepareErrorMode()
                     MyBase.DisplayMessage("")
                 End If
@@ -1849,7 +1851,7 @@ Public Class ITankLevelsAdjustments
         End Try
     End Sub
 
-    
+
 
 #Region "History Methods"
 
@@ -3247,7 +3249,7 @@ Public Class ITankLevelsAdjustments
                              Optional ByVal pAdjustmentGroup As ADJUSTMENT_GROUPS = Nothing)
         Dim myGlobal As New GlobalDataTO
         Try
-            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal = myScreenDelegate.SendFwScriptsQueueList(pMode)
                 If Not myGlobal.HasError Then
                     Me.Cursor = Cursors.WaitCursor
@@ -3638,7 +3640,7 @@ Public Class ITankLevelsAdjustments
                             MyBase.CurrentMode = ADJUSTMENT_MODES.SAVED
                             PrepareArea()
                         Else
-                            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 Me.Cursor = Cursors.WaitCursor
                                 myGlobal = myScreenDelegate.SendLoad_Adjustments(ADJUSTMENT_GROUPS.IT_EDITION)
                             End If
@@ -3830,19 +3832,19 @@ Public Class ITankLevelsAdjustments
 
                     Else
                         If Not myScreenDelegate.EmptyLcDone Then
-                            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myScreenDelegate.pValueAdjust = "1" ' PDT to specified !!!
                                 myGlobal = myScreenDelegate.SendTanksTest_Adjustments(ADJUSTMENT_GROUPS.TANKS_EMPTY_LC)
                                 PrepareTestEmptyLCMode()
                             End If
                         ElseIf Not myScreenDelegate.FillDwDone Then
-                            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myScreenDelegate.pValueAdjust = "2"
                                 myGlobal = myScreenDelegate.SendTanksTest_Adjustments(ADJUSTMENT_GROUPS.TANKS_FILL_DW)
                                 PrepareTestFillDWMode()
                             End If
                         ElseIf Not myScreenDelegate.TransferDwLcDone Then
-                            If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                            If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                                 myScreenDelegate.pValueAdjust = "3"
                                 myGlobal = myScreenDelegate.SendTanksTest_Adjustments(ADJUSTMENT_GROUPS.TANKS_TRANSFER_DW_LC)
                                 PrepareTestTransferDWLCMode()
@@ -3900,7 +3902,7 @@ Public Class ITankLevelsAdjustments
                         MyBase.CurrentMode = ADJUSTMENT_MODES.TEST_EXITED
                         PrepareArea()
                     Else
-                        If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                             myScreenDelegate.pValueAdjust = "4" ' PDT to specified !!!
                             myGlobal = myScreenDelegate.SendTanksTest_Adjustments(ADJUSTMENT_GROUPS.TANKS_EMPTY_LC)
 
@@ -4574,7 +4576,7 @@ Public Class ITankLevelsAdjustments
             ' TO DELETE
 
             ' Check communications with Instrument
-            If Not MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+            If Not AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                 myGlobal.ErrorCode = "ERROR_COMM"
                 myGlobal.HasError = True
                 ' Prepare Error Mode Controls in GUI
@@ -4603,7 +4605,7 @@ Public Class ITankLevelsAdjustments
                         'MyClass.CurrentMode = ADJUSTMENT_MODES.ADJUSTMENTS_READED
                         'PrepareArea()
                     Else
-                        If Not myGlobal.HasError AndAlso MyBase.myServiceMDI.MDIAnalyzerManager.Connected Then
+                        If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                             myGlobal = myScreenDelegate.SendREAD_ADJUSTMENTS(GlobalEnumerates.Ax00Adjustsments.ALL)
                         End If
                     End If
@@ -5183,5 +5185,5 @@ Public Class ITankLevelsAdjustments
 
 #End Region
 
-    
+
 End Class

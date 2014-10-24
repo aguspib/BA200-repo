@@ -9,6 +9,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Math
 Imports System.Drawing
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -1472,7 +1473,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                             PositionLEDsxSimulation.Add(qLeds(i).LedPosition)
                         Next
-                        myFwScriptDelegate.AnalyzerManager.SetPhotometryData(myPhotometryDataTO)
+                        AnalyzerController.Instance.Analyzer.SetPhotometryData(myPhotometryDataTO) '#REFACTORING
 
                         CommonParameters.MaxWaveLengths = qLeds.Count ' myAnalyzerLedPosDS.tcfgAnalyzerLedPositions.Rows.Count
 
@@ -1707,9 +1708,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 '    MyClass.ResultsBL(i).Counts = 0
                 'Next
 
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData
+                myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
-                    myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO)
+                    myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO) '#REFACTORING
 
                     ' Initialize variables
                     ReDim MyClass.ResultsRepeatabilityTest(qLeds.Count - 1)
@@ -1748,7 +1749,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Dim myUtility As New Utilities()
 
                 ' Serialize PhotometryDataTO / save value of the current test executed
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData()
+                myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData() '#REFACTORING
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
                     myPhotometryDataTO.AnalyzerID = pAnalyzerID
@@ -1780,7 +1781,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myPhotometryDataTO As PhotometryDataTO = Nothing
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData()
+                myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData() '#REFACTORING
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
 
@@ -1827,7 +1828,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData = myUtility.DeSerialize(myPhotometryDataTO, pPath)
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
-                    myResultData = myFwScriptDelegate.AnalyzerManager.SetPhotometryData(myPhotometryDataTO)
+                    myResultData = AnalyzerController.Instance.Analyzer.SetPhotometryData(myPhotometryDataTO) '#REFACTORING
 
                     If Not myResultData.HasError Then
                         myResultData.SetDatos = myPhotometryDataTO
@@ -1857,7 +1858,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 MyClass.CurrentTestAttr = pAdjustment
                 MyClass.CurrentOperation = OPERATIONS.SAVE_ADJUSMENTS
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, MyClass.pValueAdjustAttr)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, MyClass.pValueAdjustAttr) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -1884,7 +1885,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case Ax00WashStationControlModes.DOWN
                         MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
                 End Select
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -2817,10 +2818,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 ' XBC 20/02/2012
                 If pAdjustmentGroup = ADJUSTMENT_GROUPS.PHOTOMETRY Then
                     'Once the well is ready to adjust Photometric values the Sw send an ALIGHT instruction 
-                    myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, Nothing, "", myParams)
+                    myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, Nothing, "", myParams) '#REFACTORING
                 Else
                     'Once the well is ready to read Photometric Counts the Sw send an BLIGHT instruction 
-                    myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_BLIGHT, True, Nothing, Nothing, "", myParams)
+                    myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_BLIGHT, True, Nothing, Nothing, "", myParams) '#REFACTORING
                 End If
                 ' XBC 20/02/2012
 
@@ -2876,7 +2877,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myPhotometryDataTO As PhotometryDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData
+                myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData '#REFACTORING
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO)
 
@@ -2911,7 +2912,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myPhotometryDataTO As PhotometryDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData
+                myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData '#REFACTORING
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO)
 
@@ -2946,7 +2947,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myPhotometryDataTO As PhotometryDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData
+                myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData '#REFACTORING
                 If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                     myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO)
 
@@ -3005,7 +3006,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '    Dim myPhotometryDataTO As PhotometryDataTO
         '    Try
 
-        '        myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData
+        '        myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData
         '        If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
         '            myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO)
 
@@ -3323,7 +3324,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myCalc As New CalculationsDelegate()
             Try
                 If Not SimulateTest Then
-                    myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData
+                    myResultData = AnalyzerController.Instance.Analyzer.ReadPhotometryData '#REFACTORING
                     If Not myResultData.HasError And Not myResultData.SetDatos Is Nothing Then
                         myPhotometryDataTO = CType(myResultData.SetDatos, PhotometryDataTO)
 
@@ -3883,7 +3884,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Next
             ' TEST WITH RANDOM 
 
-            myFwScriptDelegate.AnalyzerManager.SetPhotometryData(PhotometryData)
+            AnalyzerController.Instance.Analyzer.SetPhotometryData(PhotometryData) '#REFACTORING
             AcceptBLResults()
             ManageResultsBL()
             'MeasureCurrentLEDSReaded()

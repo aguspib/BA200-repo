@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports System.Configuration
 Imports Biosystems.Ax00.DAL
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 
@@ -31,7 +32,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             MyClass.AnalyzerIdAttr = pAnalyzerID
         End Sub
 #End Region
-        
+
 
         Public Overloads Sub Dispose() Implements IDisposable.Dispose
             Try
@@ -570,7 +571,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendREAD_ADJUSTMENTS(ByVal pQueryMode As GlobalEnumerates.Ax00Adjustsments) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, pQueryMode)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, pQueryMode) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -609,7 +610,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
                                     (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where  a.Done = False Select a).ToList
+                                    Where a.Done = False Select a).ToList
 
                     For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
                         Dim myFwScript As New FwScriptQueueItem
@@ -660,7 +661,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
 
 
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLFW, True, Nothing, ID)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLFW, True, Nothing, ID) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -676,8 +677,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendINFO_START() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                If myFwScriptDelegate.AnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
-                    myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
                                                              True, _
                                                              Nothing, _
                                                              GlobalEnumerates.Ax00InfoInstructionModes.STR)
@@ -696,8 +698,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendINFO_STOP() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                If myFwScriptDelegate.AnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
-                    myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, _
                                                              True, _
                                                              Nothing, _
                                                              GlobalEnumerates.Ax00InfoInstructionModes.STP)
@@ -722,7 +725,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function SendPOLLHW(ByVal ID As POLL_IDs) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLHW, True, Nothing, ID)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.POLLHW, True, Nothing, ID) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -743,7 +746,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'Public Function SendENABLE_EVENTS() As GlobalDataTO
         '    Dim myResultData As New GlobalDataTO
         '    Try
-        '        myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENABLE_FW_EVENTS, True, Nothing, Nothing)
+        '        myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENABLE_FW_EVENTS, True, Nothing, Nothing)
 
         '    Catch ex As Exception
         '        myResultData.HasError = True
@@ -764,7 +767,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'Public Function SendDISABLE_EVENTS() As GlobalDataTO
         '    Dim myResultData As New GlobalDataTO
         '    Try
-        '        myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.DISABLE_FW_EVENTS, True, Nothing, Nothing)
+        '        myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.DISABLE_FW_EVENTS, True, Nothing, Nothing)
 
         '    Catch ex As Exception
         '        myResultData.HasError = True
@@ -780,7 +783,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Overridable Function SendSOUND() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True, Nothing, Nothing)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SOUND, True, Nothing, Nothing) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -796,7 +799,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Overridable Function SendENDSOUND() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
             Try
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND, True, Nothing, Nothing)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDSOUND, True, Nothing, Nothing) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -819,7 +822,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myGlobal As New GlobalDataTO
             Try
 
-                myGlobal = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.UTIL, True, Nothing, pUTILCommand)
+                myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.UTIL, True, Nothing, pUTILCommand) '#REFACTORING
 
 
             Catch ex As Exception

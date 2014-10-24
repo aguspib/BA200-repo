@@ -687,6 +687,14 @@
     </PublishFile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\02.-Application Layer\Ax00.Application\Ax00.Application.vbproj">
+      <Project>{724aaebf-5914-4fd8-90b6-bea43c325ee1}</Project>
+      <Name>Ax00.Application</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\03.-Business Layer\Ax00.Core\Ax00.Core.vbproj">
+      <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
+      <Name>Ax00.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Analyzer\Analyzer.vbproj">
       <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
       <Name>Analyzer</Name>

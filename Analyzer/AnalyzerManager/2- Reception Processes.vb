@@ -18,7 +18,7 @@ Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by 
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
-    Partial Public Class AnalyzerManager
+    Partial Public Class AnalyzerManagerOLD
 
 #Region "Private Reception Methods"
 
@@ -3815,7 +3815,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'AG 18/11/2013 - (#1385) Increment the number of tests that will be used positions for arm R2 washing
                         If Not resultData.HasError Then
-                            Debug.print("Step 3 - MarkWashWellContaminationRunningAccepted -> LastPreparationInstructionSent = " & applayer.LastPreparationInstructionSent)
+                            Debug.Print("Step 3 - MarkWashWellContaminationRunningAccepted -> LastPreparationInstructionSent = " & applayer.LastPreparationInstructionSent)
 
                             Dim inProcessDlg As New WSRotorPositionsInProcessDelegate
                             resultData = inProcessDlg.IncrementInProcessTestsNumber(Nothing, AnalyzerIDAttribute, AppLayer.LastPreparationInstructionSent)

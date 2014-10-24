@@ -1,6 +1,6 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.Application
+Namespace Biosystems.Ax00.App
 
     Public Interface IAnalyzerFactory
 

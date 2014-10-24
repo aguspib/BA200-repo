@@ -21,6 +21,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -42,6 +43,27 @@
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>Biosystems.Ax00.Core.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,15 +90,15 @@
     <Compile Include="01.-Interfaces\IBaseLineEntity.vb" />
     <Compile Include="01.-Interfaces\IISEAnalyzerEntity.vb" />
     <Compile Include="02.-Entities\AnalyzerEntity.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\1-Declarations, Properties, Services.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\2- Reception Processes - Service.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\2- Reception Processes.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\3- Status Business, Internal Flags.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\4- Alarms.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\5- Well base line calculations.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\6- Sending Processes.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\7- Recovery Results.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity\SN- Temporal Testing and Old Methods.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2801.-Declarations, Properties, Services%29.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2802.-Reception Processes - Service.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2802.-Reception Processes.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2803.-Status Business, Internal Flags.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2804.-Alarms.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2805.-Well base line calculations.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2806.-Sending Processes.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2807.-Recovery Results.vb" />
+    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2808.-Temporal Testing and Old Methods.vb" />
     <Compile Include="02.-Entities\BA200AnalyzerEntity.vb" />
     <Compile Include="02.-Entities\BA400AnalyzerEntity.vb" />
     <Compile Include="02.-Entities\BaseLineEntity.vb" />

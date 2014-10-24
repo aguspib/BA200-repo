@@ -24,7 +24,7 @@ Imports DevExpress.XtraEditors
 Public Class Ax00MainForm
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
-    Private WithEvents MDIAnalyzerManager As AnalyzerManager
+    'Private WithEvents MDIAnalyzerManager As AnalyzerManager
 
     Dim LocalAnalizerDS As New AnalyzersDS
 

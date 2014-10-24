@@ -11,6 +11,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.Configuration
+Imports Biosystems.Ax00.App
 
 
 Public Class ICycleCountScreen
@@ -33,7 +34,7 @@ Public Class ICycleCountScreen
 
     Private LanguageID As String
 
-    Private myAnalyzer As AnalyzerManager
+    'Private myAnalyzer As AnalyzerManager
 
     Private WithEvents mySendFwScriptDelegate As SendFwScriptsDelegate
     Private WithEvents myScreenDelegate As CycleCountDelegate
@@ -282,7 +283,7 @@ Public Class ICycleCountScreen
         End Try
     End Sub
 
-   
+
 
     ''' <summary>
     ''' Loads the icons and tooltips used for painting the buttons
@@ -439,31 +440,23 @@ Public Class ICycleCountScreen
     ''' <summary>
     ''' Manages screen loading operation
     ''' </summary>
-    ''' <remarks>Created: SGM 26/07/2011</remarks>
+    ''' <remarks>Created: SGM 26/07/2011
+    ''' Modified by:      IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub LoadScreen()
 
         Dim myGlobal As New GlobalDataTO
 
         Try
             MyClass.IsLocallySaved = False
-
             MyClass.CurrentScreenMode = ScreenModes.INITIATING
-
             MyClass.PrepareButtons()
             MyClass.GetScreenLabels()
-
             Me.BsSelectAllCheckbox.Text = MyClass.mySelectAllCaption
-
             MyClass.InitializeCyclesGrid()
-
-            MyClass.myAnalyzer = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            MyClass.mySendFwScriptDelegate = New SendFwScriptsDelegate(myAnalyzer)
-
+            MyClass.mySendFwScriptDelegate = New SendFwScriptsDelegate() '#REFACTORING
             'MyClass.CurrentCyclesData = CyclesDS
-
             MyClass.CurrentScreenMode = ScreenModes.INITIATED
-
-            
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -635,7 +628,7 @@ Public Class ICycleCountScreen
 
 #Region "UI Prepare Methods"
 
-   
+
 
     ''' <summary>
     ''' Prepares User Interface according to the screen's status
@@ -670,7 +663,7 @@ Public Class ICycleCountScreen
 
             End Select
 
-            If Not MyBase.SimulationMode And Ax00ServiceMainMDI.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+            If Not MyBase.SimulationMode And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then '#REFACTORING
                 MyClass.PrepareUIOnError()
                 MyBase.DisplayMessage("")
             End If
@@ -1987,7 +1980,7 @@ Public Class ICycleCountScreen
     Public Overrides Sub PrepareErrorMode(Optional ByVal pAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.NONE)
         Try
 
-           
+
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

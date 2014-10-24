@@ -27,20 +27,19 @@ Namespace Biosystems.Ax00.Core.Entities
         Private ReadOnly myResultErrorDescHT As New Hashtable() 'SGM 20/07/2012
 
         Private myAnalyzer As IAnalyzerEntity 'SGM 23/07/2012 '#REFACTORING
-        Private myISEManager As IISEAnalyzerEntity 'SGM 23/07/2012    '#REFACTORING
+        'Private myISEManager As IISEAnalyzerEntity 'SGM 23/07/2012 '#REFACTORING
 
 #End Region
 
 #Region "Constructor"
-        'Public Sub New(ByVal pAnalyzer As AnalyzerManager) '!!!! QUITAR OPCIONAL
+
         Public Sub New(ByVal pAnalyzer As IAnalyzerEntity) '#REFACTORING
             MyClass.LoadISEErrorsDataHT()
             MyClass.FillAffectedElementHT()
             MyClass.FillISECancelErrorDescHT()
 
-            MyClass.myAnalyzer = pAnalyzer '#REFACTORING
-            MyClass.myISEManager = MyClass.myAnalyzer.ISEAnalyzer '#REFACTORING
-
+            MyClass.myAnalyzer = pAnalyzer
+            'MyClass.myISEManager = MyClass.myAnalyzer.ISEAnalyzer '#REFACTORING
         End Sub
 #End Region
 
@@ -134,7 +133,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'JB 20/09/2012 -  Added parameter pForcedLiEnabledValue (to historical validations)
                                 'If MyClass.myISEManager IsNot Nothing AndAlso Not MyClass.myISEManager.IsLiEnabledByUser Then
                                 If pForcedLiEnabledValue = TriState.False OrElse _
-                                  (pForcedLiEnabledValue = TriState.UseDefault AndAlso MyClass.myISEManager IsNot Nothing AndAlso Not MyClass.myISEManager.IsLiEnabledByUser) Then
+                                  (pForcedLiEnabledValue = TriState.UseDefault AndAlso MyClass.myAnalyzer.ISEAnalyzer IsNot Nothing AndAlso Not MyClass.myAnalyzer.ISEAnalyzer.IsLiEnabledByUser) Then
 
                                     If myResultError.Affected.Contains("Li") Then
                                         If String.Equals(CStr(posValue), "1") Then
@@ -392,12 +391,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If (pISEResult.IsCancelError) Then
                                     Select Case myResultErrors(0).CancelErrorCode
                                         Case ISEErrorTO.ISECancelErrorCodes.A, ISEErrorTO.ISECancelErrorCodes.B, ISEErrorTO.ISECancelErrorCodes.S, ISEErrorTO.ISECancelErrorCodes.F
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter += 1
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter += 1
                                         Case ISEErrorTO.ISECancelErrorCodes.N
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter = 3
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 3
                                     End Select
                                 Else
-                                    MyClass.myISEManager.ISEWSCancelErrorCounter = 0
+                                    MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 0
                                 End If
                             End If
 
@@ -2732,13 +2731,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                     'SGM 01/08/2012
                                     Select Case myResultErrors(0).CancelErrorCode
                                         Case ISEErrorTO.ISECancelErrorCodes.A, ISEErrorTO.ISECancelErrorCodes.B, ISEErrorTO.ISECancelErrorCodes.S, ISEErrorTO.ISECancelErrorCodes.F
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter += 1
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter += 1
                                         Case ISEErrorTO.ISECancelErrorCodes.N
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter = 3
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 3
                                     End Select
 
                                 Else
-                                    MyClass.myISEManager.ISEWSCancelErrorCounter = 0
+                                    MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 0
                                 End If
                             End If
                             'SG 23/01/2012 -END.

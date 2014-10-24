@@ -4,6 +4,7 @@ Imports Biosystems.Ax00.BL
 'Imports Biosystems.Ax00.PresentationCOM
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 05/06/2012
+Imports Biosystems.Ax00.App
 
 Public NotInheritable Class IInstrumentInfo
     Inherits BSBaseForm
@@ -11,7 +12,7 @@ Public NotInheritable Class IInstrumentInfo
 #Region "Declarations"
 
     Private LanguageID As String
-    Private mdiAnalyzerCopy As AnalyzerManager ' XBC 05/06/2012
+    'Private mdiAnalyzerCopy As AnalyzerManager ' XBC 05/06/2012 '#REFACTORING
 
 #End Region
 
@@ -36,6 +37,14 @@ Public NotInheritable Class IInstrumentInfo
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub IInstrumentInfo_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'DL 28/07/2011
@@ -44,12 +53,6 @@ Public NotInheritable Class IInstrumentInfo
 
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
             'END DL 28/07/2011
-
-            ' XBC 05/06/2012
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
-            ' XBC 05/06/2012
 
             'Get the current Language from the current Application Session
             Dim LanguageIDGlobal As New GlobalBase
@@ -91,7 +94,7 @@ Public NotInheritable Class IInstrumentInfo
 
             ' XBC 05/06/2012
             'Me.SerialNumberLabel.Text = String.Format("{0}: {1}", Me.SerialNumberLabel.Text, "1234-567-890")
-            Me.SerialNumberLabel.Text = String.Format("{0}: {1}", Me.SerialNumberLabel.Text, mdiAnalyzerCopy.ActiveAnalyzer)
+            Me.SerialNumberLabel.Text = String.Format("{0}: {1}", Me.SerialNumberLabel.Text, AnalyzerController.Instance.Analyzer.ActiveAnalyzer) '#REFACTORING
             ' XBC 05/06/2012
 
             'ToDo: Get the actual value
@@ -99,7 +102,7 @@ Public NotInheritable Class IInstrumentInfo
 
             ' XBC 05/06/2012
             'FirmwareLabel.Text = String.Format("{0}: {1}", FirmwareLabel.Text, GlobalBase.FirmwareVersion)
-            FirmwareLabel.Text = String.Format("{0}: {1}", FirmwareLabel.Text, mdiAnalyzerCopy.ActiveFwVersion)
+            FirmwareLabel.Text = String.Format("{0}: {1}", FirmwareLabel.Text, AnalyzerController.Instance.Analyzer.ActiveFwVersion) '#REFACTORING
             ' XBC 05/06/2012
 
         Catch ex As Exception

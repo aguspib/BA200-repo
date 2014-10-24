@@ -12,12 +12,13 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Runtime.InteropServices 'WIN32
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.App
 
 
 Public Class TestISEMonitor
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
-    Private mdiAnalyzerCopy As AnalyzerManager
+    'Private mdiAnalyzerCopy As AnalyzerManager '#REFACTORING 
 
     Public SimulationMode As Boolean = False
 
@@ -76,7 +77,7 @@ Public Class TestISEMonitor
         End Try
     End Sub
 
-  
+
     Private Sub GetISEMonitorLabels(ByVal pLanguageID As String)
 
         Dim myGlobal As New GlobalDataTO
@@ -147,14 +148,18 @@ Public Class TestISEMonitor
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks>
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Private Sub TestISEMonitor_1_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             MyClass.PrepareISEMonitorIcons()
             MyClass.GetISEMonitorLabels("SPA")
-
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 13/07/2011 - Use the same AnalyzerManager as the MDI
-            End If
 
             If MyClass.SimulationMode Then
                 Dim myGlobal As GlobalDataTO = MyClass.SimulateMonitorData
@@ -163,8 +168,9 @@ Public Class TestISEMonitor
                     Me.BsiseMonitorPanel1.RefreshFieldsData(myMonitorData)
                 End If
             Else
-                If mdiAnalyzerCopy.ISE_Manager IsNot Nothing Then
-                    Me.BsiseMonitorPanel1.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.ISEAnalyzer IsNot Nothing Then
+                    Me.BsiseMonitorPanel1.RefreshFieldsData(AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO)
                 End If
             End If
 
@@ -300,7 +306,9 @@ Public Class TestISEMonitor
     ''' </summary>
     ''' <param name="pRefreshEventType"></param>
     ''' <param name="pRefreshDS"></param>
-    ''' <remarks>Created by SGM 09/03/2012</remarks>
+    ''' <remarks>Created by SGM 09/03/2012
+    ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Dim myGlobal As New GlobalDataTO
         Try
@@ -308,16 +316,16 @@ Public Class TestISEMonitor
                 Dim sensorValue As Single = 0
 
                 'Monitor Data changed
-                sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED)
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
 
-                    mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED) = 0 'Once updated UI clear sensor
 
-                    Me.BsiseMonitorPanel1.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
+                    Me.BsiseMonitorPanel1.RefreshFieldsData(AnalyzerController.Instance.Analyzer.ISEAnalyzer.MonitorDataTO)
 
-                    If mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                        myGlobal = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
+                    If AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus <> GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STR) 'Start ANSINF
                     End If
                 End If
 

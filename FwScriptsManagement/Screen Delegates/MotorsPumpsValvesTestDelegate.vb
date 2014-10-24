@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.App
 
 Namespace Biosystems.Ax00.FwScriptsManagement
     Public Class MotorsPumpsValvesTestDelegate
@@ -800,7 +801,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case Ax00WashStationControlModes.DOWN
                         MyClass.CurrentOperation = OPERATIONS.WASHING_STATION_DOWN
                 End Select
-                myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction)
+                myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, pAction) '#REFACTORING
 
             Catch ex As Exception
                 myResultData.HasError = True
@@ -3358,7 +3359,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #End Region
 
-       
+
     End Class
 
 End Namespace

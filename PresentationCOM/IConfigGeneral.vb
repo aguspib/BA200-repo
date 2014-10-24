@@ -13,6 +13,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 06/09/2011
 
 Imports Biosystems.Ax00.FwScriptsManagement 'SGM 28/10/2011
 Imports System.IO
+Imports Biosystems.Ax00.App
 
 Public Class IConfigGeneral
 
@@ -74,7 +75,7 @@ Public Class IConfigGeneral
     ' XBC 07/09/2011
     Private testResult As Boolean
     Private testExecuted As Boolean
-    Private mdiAnalyzerCopy As AnalyzerManager 'DL 09/09/2011
+    'Private mdiAnalyzerCopy As AnalyzerManager 'DL 09/09/2011
 
     'TR 28/10/2011 
     Private StopRinging As Boolean = False
@@ -229,14 +230,10 @@ Public Class IConfigGeneral
     '''                              in process
     '''              XB 04/03/2013 - Hide LIMS Tabs for User Application
     '''              XB 06/11/2013 - Add protection against more performing operations (Starting Instrument, Shutting down, aborting WS) - BT #1150 + #1151
+    '''              IT 23/10/2014 - REFACTORING (BA-2016)
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
-            'Get the Analyzer Manager
-            If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
-                mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-            End If
-
             'Center the screen
             Dim myLocation As Point = Me.Parent.Location
             Dim mySize As Size = Me.Parent.Size
@@ -286,13 +283,13 @@ Public Class IConfigGeneral
                 LIMSTab.Visible = False
 
                 'Creathe the FW Scripts Class
-                MyClass.myFwScriptDelegate = New SendFwScriptsDelegate(mdiAnalyzerCopy)
+                MyClass.myFwScriptDelegate = New SendFwScriptsDelegate()
 
                 'Show GroupBox of Disabled Elements in Analyzer Tab
                 bsDisabledElementsGroupBox.Visible = True
 
                 ' XBC 25/10/2012
-                mdiAnalyzerCopy.IsConfigGeneralProcess = True
+                AnalyzerController.Instance.Analyzer.IsConfigGeneralProcess = True '#REFACTORING
             Else
                 'Show WorkSession
                 SessionSettingsTab.Visible = True
@@ -312,14 +309,15 @@ Public Class IConfigGeneral
             End If
 
             'Verify if the screen has to be opened in READ-ONLY mode
-            If (Not mdiAnalyzerCopy Is Nothing) Then
+            '#REFACTORING
+            If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'If the connection process is in process, disable all screen fields (changes are not allowed) ORELSE
                 'If the Analyzer is connected and its status is RUNNING, disable all screen fields (changes are not allowed)
-                If (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
-                   (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS") OrElse _
-                   (mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS") OrElse _
-                   Not mdiAnalyzerCopy.AnalyzerIsReady OrElse _
-                   (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
+                If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess) = "INPROCESS") OrElse _
+                   (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS") OrElse _
+                   (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "INPROCESS") OrElse _
+                   Not AnalyzerController.Instance.Analyzer.AnalyzerIsReady OrElse _
+                   (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING) Then
                     ' XB 06/11/2013 - WUPprocess, ABORTprocess and SDOWNprocess added 
 
                     For Each myControl As Control In CommunicationSettingsTab.Controls
@@ -342,8 +340,9 @@ Public Class IConfigGeneral
                 End If
 
                 'If the Analyzer is Connected, select the PORT in the Ports ComboBox in Communications Tab
-                If (mdiAnalyzerCopy.Connected) Then
-                    bsPortComboBox.SelectedItem = mdiAnalyzerCopy.PortName
+                '#REFACTORING
+                If (AnalyzerController.Instance.Analyzer.Connected) Then
+                    bsPortComboBox.SelectedItem = AnalyzerController.Instance.Analyzer.PortName
                 End If
             End If
             EditionMode = True
@@ -714,7 +713,8 @@ Public Class IConfigGeneral
                 '    End If
                 'End If
 
-                If (Not mdiAnalyzerCopy Is Nothing) Then
+                '#REFACTORING
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
                     'Define default values
                     Dim mainCoverDisabled As Boolean = True
                     Dim reagentsCoverDisabled As Boolean = True
@@ -723,7 +723,7 @@ Public Class IConfigGeneral
                     Dim clotDetectionDisabled As Boolean = True
 
                     'Read current Analyzer Adjustments
-                    resultData = mdiAnalyzerCopy.ReadFwAdjustmentsDS
+                    resultData = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         Dim myAdjDS As SRVAdjustmentsDS = DirectCast(resultData.SetDatos, SRVAdjustmentsDS)
                         Dim linqRes As List(Of SRVAdjustmentsDS.srv_tfmwAdjustmentsRow)
@@ -805,7 +805,7 @@ Public Class IConfigGeneral
 
             Dim myGlobalDataTO As GlobalDataTO
             'TR 24/10/2011 -Call the read Register ports to update every time the form is open.
-            myGlobalDataTO = mdiAnalyzerCopy.ReadRegistredPorts()
+            myGlobalDataTO = AnalyzerController.Instance.Analyzer.ReadRegistredPorts() '#REFACTORING
             If Not myGlobalDataTO.HasError Then
                 Dim myPortsList As List(Of String) = DirectCast(myGlobalDataTO.SetDatos, List(Of String))
                 If myPortsList IsNot Nothing Then
@@ -1178,7 +1178,7 @@ Public Class IConfigGeneral
             'TR 28/10/2011 -Validate if the sound is on then Desactivate. if the value for bsAlarmSoundDisabledCheckbox has change for false to true.
             If Not resultData.HasError Then
                 If StopRinging Then
-                    resultData = mdiAnalyzerCopy.StopAnalyzerRinging()
+                    resultData = AnalyzerController.Instance.Analyzer.StopAnalyzerRinging() '#REFACTORING
                     If resultData.HasError Then
                         ShowMessage("Error", resultData.ErrorMessage)
                     End If
@@ -1316,7 +1316,8 @@ Public Class IConfigGeneral
             Else
 
                 'SGM 23/02/2012
-                If Not mdiAnalyzerCopy Is Nothing Then 'Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                '#REFACTORING
+                If (AnalyzerController.IsAnalyzerInstantiated) Then
 
                     'SGM 23/02/2012
                     Dim myCommObject As Object = Nothing
@@ -1328,10 +1329,10 @@ Public Class IConfigGeneral
                         manualSettings.Add(CStr(Me.bsSpeedComboBox.SelectedItem))
                         myCommObject = manualSettings
                     End If
-                    myGlobal = mdiAnalyzerCopy.ManageAnalyzer(AnalyzerManagerSwActionList.CONNECT, True, Nothing, myCommObject)
+                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.CONNECT, True, Nothing, myCommObject)
 
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                        Me.testResult = mdiAnalyzerCopy.Connected
+                        Me.testResult = AnalyzerController.Instance.Analyzer.Connected
                     End If
 
                 End If
@@ -1366,8 +1367,9 @@ Public Class IConfigGeneral
 
             'TR 22/02/2012 -Validate if is connected to selecte 
             'connected port on manual connection combo list.
-            If mdiAnalyzerCopy.Connected Then
-                bsPortComboBox.SelectedItem = mdiAnalyzerCopy.PortName
+            '#REFACTORING
+            If AnalyzerController.Instance.Analyzer.Connected Then
+                bsPortComboBox.SelectedItem = AnalyzerController.Instance.Analyzer.PortName
             End If
             'TR 22/02/2012 -END.
 
@@ -1513,9 +1515,10 @@ Public Class IConfigGeneral
 
                         ' XBC 13/03/2012
                         'Instrument is ready, Instrument is in Sleep or StandBy and changes in Water Supply Selection have been made
-                        If mdiAnalyzerCopy.Connected AndAlso (mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) _
-                           AndAlso mdiAnalyzerCopy.AnalyzerIsReady AndAlso entryValueForExternalTankWaterCheck <> bsExtWaterTankRadioButton.Checked Then
-                            myGlobal = mdiAnalyzerCopy.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
+                        '#REFACTORING
+                        If AnalyzerController.Instance.Analyzer.Connected AndAlso (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) _
+                           AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso entryValueForExternalTankWaterCheck <> bsExtWaterTankRadioButton.Checked Then
+                            myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
                             If myGlobal.HasError Then
                                 ShowMessage("Error", myGlobal.ErrorMessage)
                                 Exit Try
@@ -1550,10 +1553,11 @@ Public Class IConfigGeneral
                 If (ChangesMade) Then SaveChanges()
                 'AG 23/11/2011 - Send the CONFIGURATION instruction with new values when:
                 'Instrument is ready, Instrument is in Sleep or StandBy and changes in Water Supply Selection have been made
-                If mdiAnalyzerCopy.Connected AndAlso (mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) _
-                   AndAlso mdiAnalyzerCopy.AnalyzerIsReady AndAlso entryValueForExternalTankWaterCheck <> bsExtWaterTankRadioButton.Checked Then
+                '#REFACTORING
+                If AnalyzerController.Instance.Analyzer.Connected AndAlso (AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) _
+                   AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso entryValueForExternalTankWaterCheck <> bsExtWaterTankRadioButton.Checked Then
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = mdiAnalyzerCopy.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
+                    myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True)
                     If myGlobal.HasError Then
                         ShowMessage("Error", myGlobal.ErrorMessage)
                     End If
@@ -1711,7 +1715,7 @@ Public Class IConfigGeneral
     Private Sub bsAlarmSoundDisabledCheckbox_CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsAlarmSoundDisabledCheckbox.CheckedChanged
         Try
             'TR 28/10/2011 -Validate if Analyzer is ringing. to disable sound when save is ok.
-            If EditionMode AndAlso mdiAnalyzerCopy.Ringing AndAlso bsAlarmSoundDisabledCheckbox.Checked Then
+            If EditionMode AndAlso AnalyzerController.Instance.Analyzer.Ringing AndAlso bsAlarmSoundDisabledCheckbox.Checked Then '#REFACTORING
                 StopRinging = True
             ElseIf Not bsAlarmSoundDisabledCheckbox.Checked Then
                 StopRinging = False
@@ -1961,12 +1965,12 @@ Public Class IConfigGeneral
         Dim CopyOfSelectedAdjustmentsDS As SRVAdjustmentsDS = MyClass.SelectedAdjustmentsDS
         Dim myAdjustmentsGroups As New List(Of String)
         Try
-            myGlobal = MyClass.mdiAnalyzerCopy.ReadFwAdjustmentsDS
+            myGlobal = AnalyzerController.Instance.Analyzer.ReadFwAdjustmentsDS '#REFACTORING
             If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                 Dim resultDS As SRVAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                 'if the global dataset is empty the force to load again from the db
                 If resultDS Is Nothing OrElse resultDS.srv_tfmwAdjustments.Count = 0 Then
-                    myGlobal = MyClass.mdiAnalyzerCopy.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
+                    myGlobal = AnalyzerController.Instance.Analyzer.LoadFwAdjustmentsMasterData(MyClass.SimulationMode) '#REFACTORING
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         resultDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
 
@@ -1978,7 +1982,7 @@ Public Class IConfigGeneral
 
                         ''update text file
                         'MyClass.myAdjustmentsDelegate = New FwAdjustmentsDelegate(myAllAdjustmentsDS)
-                        'myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(MyClass.mdiAnalyzerCopy.ActiveAnalyzer, MyClass.mdiAnalyzerCopy.ActiveFwVersion)
+                        'myGlobal = MyClass.myAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer, AnalyzerController.Instance.Analyzer.ActiveFwVersion)
 
                     End If
                 End If
@@ -2012,7 +2016,7 @@ Public Class IConfigGeneral
             End If
 
             'SGM 21/11/2012 Set checkboxes disabled in case of Service Adjustments not loaded and sleep
-            If MyClass.IsService And MyClass.mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING And Not MyClass.IsServiceAdjustmentsLoaded Then
+            If MyClass.IsService And AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING And Not MyClass.IsServiceAdjustmentsLoaded Then '#REFACTORING
                 Me.bsGralAnalyzerCvrCheckbox.Checked = False
                 Me.bsReactionRotorCvrCheckbox.Checked = False
                 Me.bsReagentsRotorCvrCheckbox.Checked = False
@@ -2034,7 +2038,7 @@ Public Class IConfigGeneral
         Try
             If MyClass.SelectedAdjustmentsDS IsNot Nothing Then
                 'update the dataset
-                myGlobal = MyClass.myFwAdjustmentsDelegate.UpdateAdjustments(MyClass.SelectedAdjustmentsDS, MyClass.mdiAnalyzerCopy.ActiveAnalyzer)
+                myGlobal = MyClass.myFwAdjustmentsDelegate.UpdateAdjustments(MyClass.SelectedAdjustmentsDS, AnalyzerController.Instance.Analyzer.ActiveAnalyzer) '#REFACTORING
 
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     'update DDBB
@@ -2043,7 +2047,7 @@ Public Class IConfigGeneral
 
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         'update Adjustments File
-                        myGlobal = MyClass.myFwAdjustmentsDelegate.ExportDSToFile(MyClass.mdiAnalyzerCopy.ActiveAnalyzer)
+                        myGlobal = MyClass.myFwAdjustmentsDelegate.ExportDSToFile(AnalyzerController.Instance.Analyzer.ActiveAnalyzer) '#REFACTORING
                     End If
                 End If
             End If
@@ -2104,7 +2108,7 @@ Public Class IConfigGeneral
                     Me.Cursor = Cursors.Default
 
                 Else
-                    If Not myGlobal.HasError AndAlso MyClass.mdiAnalyzerCopy.Connected Then
+                    If Not myGlobal.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then '#REFACTORING
                         myGlobal = MyClass.SendLOAD_ADJUSTMENTS(pAdjuststr)
                     End If
 
@@ -2142,7 +2146,7 @@ Public Class IConfigGeneral
             Me.bsCancelButton.Enabled = False
             Me.bsAcceptButton.Enabled = False
             Me.bsAnalyzersConfigTabControl.Enabled = False
-            myResultData = myFwScriptDelegate.AnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, pValueAdjustAttr)
+            myResultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.LOADADJ, True, Nothing, pValueAdjustAttr) '#REFACTORING
 
         Catch ex As Exception
             myResultData.HasError = True
@@ -2289,7 +2293,7 @@ Public Class IConfigGeneral
 
 #End Region
 
-    
+
     Private Sub bsFreqComboBox_SelectionChangeCommitted(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsFreqComboBox.SelectionChangeCommitted
         If EditionMode Then
             ChangesMade = True

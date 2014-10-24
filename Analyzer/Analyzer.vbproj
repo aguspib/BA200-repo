@@ -118,24 +118,11 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnalyzerManager\1-Declarations, Properties, Services.vb" />
-    <Compile Include="AnalyzerManager\2- Reception Processes - Service.vb" />
-    <Compile Include="AnalyzerManager\2- Reception Processes.vb" />
-    <Compile Include="AnalyzerManager\3- Status Business, Internal Flags.vb" />
-    <Compile Include="AnalyzerManager\4- Alarms.vb" />
-    <Compile Include="AnalyzerManager\5- Well base line calculations.vb" />
-    <Compile Include="AnalyzerManager\6- Sending Processes.vb" />
-    <Compile Include="AnalyzerManager\7- Recovery Results.vb" />
-    <Compile Include="AnalyzerManager\SN- Temporal Testing and Old Methods.vb" />
-    <Compile Include="AnalyzerManager\ToIntegrate.vb" />
     <Compile Include="AnalyzerComms\ApplicationLayer.vb" />
     <Compile Include="AnalyzerComms\Instructions.vb" />
     <Compile Include="AnalyzerComms\LAX00Interpreter.vb" />
     <Compile Include="AnalyzerComms\InstructionTypesList.vb" />
     <Compile Include="AnalyzerComms\FwScripts.vb" />
-    <Compile Include="ISE\ISEManager.vb" />
-    <Compile Include="ISE\ISEReception.vb" />
-    <Compile Include="ISE\ToIntegrate.vb" />
     <Compile Include="LinkLayer.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
