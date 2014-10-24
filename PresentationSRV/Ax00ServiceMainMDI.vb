@@ -29,7 +29,7 @@ Public Class Ax00ServiceMainMDI
     Private AutoConnectFailsTitle As String = ""
     Private AutoConnectFailsErrorCode As String = ""
 
-    Private WithEvents analyzer As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
+    Private WithEvents MDIAnalyzerManager As IAnalyzerEntity = AnalyzerController.Instance.Analyzer '#REFACTORING
 
     'Monitor Sensors
     'Private Const MONITOR_INTERVAL As Integer = 2000
@@ -575,7 +575,7 @@ Public Class Ax00ServiceMainMDI
     ''' </remarks>
     Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
                                       ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) _
-                                      Handles analyzer.ReceptionEvent
+                                      Handles MDIAnalyzerManager.ReceptionEvent
 
         Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread))
 
@@ -2318,7 +2318,7 @@ Public Class Ax00ServiceMainMDI
     ''' </summary>
     ''' <param name="pInstructionSent"></param>
     ''' <remarks>Created by XBC 10/11/2010</remarks>
-    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles analyzer.SendEvent
+    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles MDIAnalyzerManager.SendEvent
         Try
             ' XBC 16/11/2011 - Topmost functionality 
             '' XBC 05/05/2011 - timeout
@@ -6232,7 +6232,7 @@ Public Class Ax00ServiceMainMDI
             'AG 22/04/0210 - Moved from BSBaseServiceForm_Load
             If (Not AnalyzerController.IsAnalyzerInstantiated) Then
                 '#REFACTORING
-                AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, My.Application.Info.AssemblyName, Me.AnalyzerModel, False, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, My.Application.Info.AssemblyName, Me.AnalyzerModel, True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Dim blnStartComm As Boolean = False
                 blnStartComm = AnalyzerController.Instance.Analyzer.Start(False)   'AG 21/04/2010 Start the CommAx00 process'blnStartComm = GlobalAnalyzerManager.Start(False)   'AG 21/04/2010 Start the CommAx00 process
