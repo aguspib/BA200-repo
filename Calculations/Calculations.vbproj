@@ -121,7 +121,6 @@
   <ItemGroup>
     <Compile Include="BioChemical\ResultsExcelTest.vb" />
     <Compile Include="CalculatedTests\TestOperateCalculatedTestDelegate.vb" />
-    <Compile Include="BioChemical\BaseLineCalculations.vb" />
     <Compile Include="BioChemical\CalculationsDelegate.vb" />
     <Compile Include="BioChemical\RecalculateResultsDelegate.vb" />
     <Compile Include="BioChemical\ResultsFileDelegate.vb" />
