@@ -546,6 +546,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 myCustomerISETestDS.tparISETests.First.ISE_ResultID = myISEResultID
                             End If
 
+                            'If field LIS Value is empty in CUSTOMER DB, set its value to NULL (due to the NULL value read from DB is changed to 
+                            'an empty string when it is loaded in the DataSet)
+                            If (Not myCustomerISETestDS.tparISETests.First.IsLISValueNull AndAlso myCustomerISETestDS.tparISETests.First.LISValue = String.Empty) Then
+                                myCustomerISETestDS.tparISETests.First.SetLISValueNull()
+                            End If
+
                             'If at least one of the relevant fields have changed, then update the ISETest in CUSTOMER DB
                             If (executeUpdate) Then
                                 myCustomerISETestDS.tparISETests.AcceptChanges()
@@ -671,6 +677,27 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                     executeUpdate = True
                                     myCustomerISETestSampleDS.tparISETestSamples.First.SetISE_DilutionFactorNull()
                                 End If
+                            End If
+
+                            'If field ActiveRangeType is empty in CUSTOMER DB, set its value to NULL (due to the NULL value read from DB is changed to 
+                            'an empty string when it is loaded in the DataSet)
+                            If (Not myCustomerISETestSampleDS.tparISETestSamples.First.IsActiveRangeTypeNull AndAlso _
+                                myCustomerISETestSampleDS.tparISETestSamples.First.ActiveRangeType = String.Empty) Then
+                                myCustomerISETestSampleDS.tparISETestSamples.First.SetActiveRangeTypeNull()
+                            End If
+
+                            'If field CalculationMode is empty in CUSTOMER DB, set its value to NULL (due to the NULL value read from DB is changed to 
+                            'an empty string when it is loaded in the DataSet)
+                            If (Not myCustomerISETestSampleDS.tparISETestSamples.First.IsCalculationModeNull AndAlso _
+                                myCustomerISETestSampleDS.tparISETestSamples.First.CalculationMode = String.Empty) Then
+                                myCustomerISETestSampleDS.tparISETestSamples.First.SetCalculationModeNull()
+                            End If
+
+                            'If field TestLongName is empty in CUSTOMER DB, set its value to NULL (due to the NULL value read from DB is changed to 
+                            'an empty string when it is loaded in the DataSet)
+                            If (Not myCustomerISETestSampleDS.tparISETestSamples.First.IsTestLongNameNull AndAlso _
+                                myCustomerISETestSampleDS.tparISETestSamples.First.TestLongName = String.Empty) Then
+                                myCustomerISETestSampleDS.tparISETestSamples.First.SetTestLongNameNull()
                             End If
 
                             'If at least one of the relevant fields have changed, then update the ISETest/SampleType in CUSTOMER DB
