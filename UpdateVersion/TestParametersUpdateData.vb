@@ -3607,40 +3607,35 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                             deleteOnlyCalibResults = False
                                             deleteBlkCalibResults = True
                                         Else
-                                            If (myCustomerTestSampleDS.tparTestSamples.First.CalibratorType = "EXPERIMENT") Then
-                                                'If the SampleType is not the default for the Test, only the Calibrator Results have to be deleted, while the Blank Results remain
-                                                deleteOnlyCalibResults = True
-                                                deleteBlkCalibResults = False
-                                            Else
-                                                'If the Test/SampleType was calibrated with an Alternative Calibrator, or using a Factor, Blank and Calibrator
-                                                'Results do not have to be deleted although Sample and/or Reagents Volumes have changed
-                                                deleteOnlyCalibResults = False
-                                                deleteBlkCalibResults = False
-                                            End If
+                                            'If the SampleType is not the default for the Test, only the Calibrator Results have to be deleted, while the Blank Results remain
+                                            'This is valid for all Calibrator Types due to when it is ALTERNATIV or FACTOR, it is also possible that exist previous results of 
+                                            'the last Experimental Calibrator assigned to the Test/Sample Type
+                                            deleteOnlyCalibResults = True
+                                            deleteBlkCalibResults = False
                                         End If
 
-                                        If (deleteBlkCalibResults OrElse deleteOnlyCalibResults) Then
-                                            'Add the TestID, SampleType and TestVersionNumber to the TO of Tests with programming values changed, and mark flags DeleteBlankCalibResults
-                                            'and DeleteOnlyCalibrationResult with the corresponding local variable value
-                                            myDeletedTestProgramingTO.TestID = myTestID
-                                            myDeletedTestProgramingTO.SampleType = IIf(deleteBlkCalibResults, String.Empty, mySampleType).ToString
-                                            myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
-                                            myDeletedTestProgramingTO.DeleteBlankCalibResults = deleteBlkCalibResults
-                                            myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = deleteOnlyCalibResults
-                                            myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
+                                    If (deleteBlkCalibResults OrElse deleteOnlyCalibResults) Then
+                                        'Add the TestID, SampleType and TestVersionNumber to the TO of Tests with programming values changed, and mark flags DeleteBlankCalibResults
+                                        'and DeleteOnlyCalibrationResult with the corresponding local variable value
+                                        myDeletedTestProgramingTO.TestID = myTestID
+                                        myDeletedTestProgramingTO.SampleType = IIf(deleteBlkCalibResults, String.Empty, mySampleType).ToString
+                                        myDeletedTestProgramingTO.TestVersion = myCustomerTestDS.tparTests.First.TestVersionNumber
+                                        myDeletedTestProgramingTO.DeleteBlankCalibResults = deleteBlkCalibResults
+                                        myDeletedTestProgramingTO.DeleteOnlyCalibrationResult = deleteOnlyCalibResults
+                                        myDeletedTestProgramingList.Add(myDeletedTestProgramingTO)
 
-                                            'Call the function to delete previous results of Blank and Calibrator for the Test/SampleType
-                                            myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, _
-                                                                                               New TestReagentsVolumesDS, New ReagentsDS, New TestReagentsDS, New CalibratorsDS, _
-                                                                                               New TestCalibratorsDS, New TestCalibratorValuesDS, New TestRefRangesDS, _
-                                                                                               New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
-                                                                                               myDeletedTestProgramingList, New TestSamplesMultirulesDS, New TestControlsDS, _
-                                                                                               Nothing)
+                                        'Call the function to delete previous results of Blank and Calibrator for the Test/SampleType
+                                        myGlobalDataTO = myTestsDelegate.PrepareTestToSave(pDBConnection, String.Empty, String.Empty, New TestsDS, New TestSamplesDS, _
+                                                                                           New TestReagentsVolumesDS, New ReagentsDS, New TestReagentsDS, New CalibratorsDS, _
+                                                                                           New TestCalibratorsDS, New TestCalibratorValuesDS, New TestRefRangesDS, _
+                                                                                           New List(Of DeletedCalibratorTO), New List(Of DeletedTestReagentsVolumeTO), _
+                                                                                           myDeletedTestProgramingList, New TestSamplesMultirulesDS, New TestControlsDS, _
+                                                                                           Nothing)
 
-                                            'If an error has happened, then the process finishes
-                                            If (myGlobalDataTO.HasError) Then Exit For
-                                        End If
+                                        'If an error has happened, then the process finishes
+                                        If (myGlobalDataTO.HasError) Then Exit For
                                     End If
+                                End If
                                 End If
                             End If
                         Next
@@ -3759,16 +3754,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                     deleteOnlyCalibResults = False
                                     deleteBlankCalibResults = True
                                 Else
-                                    If (myCustomerCalibType = "EXPERIMENT") Then
-                                        'If the SampleType is not the default for the Test, only the Calibrator Results have to be deleted, while the Blank Results remain
-                                        deleteOnlyCalibResults = True
-                                        deleteBlankCalibResults = False
-                                    Else
-                                        'If the Test/SampleType was calibrated with an Alternative Calibrator, or using a Factor, Blank and Calibrator
-                                        'Results do not have to be deleted although Sample and/or Reagents Volumes have changed
-                                        deleteOnlyCalibResults = False
-                                        deleteBlankCalibResults = False
-                                    End If
+                                    'If the SampleType is not the default for the Test, only the Calibrator Results have to be deleted, while the Blank Results remain
+                                    'This is valid for all Calibrator Types due to when it is ALTERNATIV or FACTOR, it is also possible that exist previous results of 
+                                    'the last Experimental Calibrator assigned to the Test/Sample Type
+                                    deleteOnlyCalibResults = True
+                                    deleteBlankCalibResults = False
                                 End If
 
                                 If (deleteBlankCalibResults OrElse deleteOnlyCalibResults) Then
