@@ -51,7 +51,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         ReadOnly Property ValidALIGHT() As Boolean
         ReadOnly Property ExistsALIGHT() As Boolean
         ReadOnly Property CurrentWell() As Integer
-        Property BarCodeProcessBeforeRunning() As AnalyzerEntity.BarcodeWorksessionActions
+        Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum
         ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
         ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String
         ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String
@@ -164,7 +164,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function StartAnalyzerRinging(Optional ByVal pForceSound As Boolean = False) As GlobalDataTO
         Function StopAnalyzerInfo() As GlobalDataTO
         Function ReadAdjustValue(ByVal pAdjust As GlobalEnumerates.Ax00Adjustsments) As String
-        Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As AnalyzerEntity.BarcodeWorksessionActions) As GlobalDataTO
+        Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO
         Function ExistBottleAlarms() As Boolean
         Function ProcessUpdateWSByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
         Function ProcessToMountTheNewSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSAnalyzerID As String) As GlobalDataTO

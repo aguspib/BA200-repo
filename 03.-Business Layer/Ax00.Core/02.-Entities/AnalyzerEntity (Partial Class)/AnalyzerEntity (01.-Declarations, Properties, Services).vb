@@ -90,17 +90,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private wellContaminatedWithWashSent As Integer = 0 'AG 07/06/2011
         Private myBarcodeRequestDS As New AnalyzerManagerDS 'AG 03/08/2011 - When barcode request has several records. Sw has to send: 1st row ... wait results, 2on row ... wait results and so on
-
-        Public Enum BarcodeWorksessionActions
-            BARCODE_AVAILABLE = 0 'Barcode has not pending work to performe
-            NO_RUNNING_REQUEST = 1 'User press read barcode from RotorPosition screen
-            BEFORE_RUNNING_REQUEST = 2 'User press START o CONTINUE worksession button
-            REAGENTS_REQUEST_BEFORE_RUNNING = 3 'After (1) ... the Reagents barcode request has been sent. Waiting for results
-            SAMPLES_REQUEST_BEFORE_RUNNING = 4 'After (2) ... the Samples barcode request has been sent. Waiting for results
-            ENTER_RUNNING = 5 'Barcode read management performed ... ready to enter in Running
-            FORCE_ENTER_RUNNING = 6 'AG 08/03/2013 - Force enter running although exists samples without requests assigned
-            FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS = 7 'AG 01/04/2014 - #1565 Force enter running when autoWSCreation process finishes adding new rquests to WS, in this case the executions have already created, it is not necessary created them again
-        End Enum
         Private readBarCodeBeforeRunningPerformedFlag As Boolean = False 'AG 09/05/2012
 
         'AG 12/06/2012 - The photometric instructions are treated in a different threat in order to attend quickly to the analyzer requests in Running
@@ -215,7 +204,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '1) Reagents Request + manage results
         '2) Samples Request + manage results
         '3) If warnings -> User solution are required Else Go to Running
-        Private BarCodeBeforeRunningProcessStatusAttribute As BarcodeWorksessionActions = BarcodeWorksessionActions.BARCODE_AVAILABLE
+        Private BarCodeBeforeRunningProcessStatusAttribute As BarcodeWorksessionActionsEnum = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE
 
         Private endRunAlreadySentFlagAttribute As Boolean = False 'AG 05/12/2011 - Remember the ENDRUN instruction has been sent and do not send it again
         '                                                This flag gets TRUE value when instrument sent action ENDRUN_START and is set to FALSE again when action is START_RUNNING_START
@@ -804,11 +793,11 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
-        Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActions Implements IAnalyzerEntity.BarCodeProcessBeforeRunning 'AG 04/08/2011
+        Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum Implements IAnalyzerEntity.BarCodeProcessBeforeRunning 'AG 04/08/2011
             Get
                 Return BarCodeBeforeRunningProcessStatusAttribute
             End Get
-            Set(ByVal value As BarcodeWorksessionActions)
+            Set(ByVal value As BarcodeWorksessionActionsEnum)
                 BarCodeBeforeRunningProcessStatusAttribute = value
             End Set
         End Property
@@ -3119,7 +3108,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'TODO
 
                                     Else
-                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.NO_RUNNING_REQUEST Then 'Barcode read requests from RotorPosition Screen
+                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST Then 'Barcode read requests from RotorPosition Screen
                                             'AG 03/08/2011 - When several individual position to read ... Sw has to manage the send/receive results one by one
                                             If myBarcodeRequestDS.barCodeRequests.Rows.Count > 1 Then
                                                 myBarcodeRequestDS.barCodeRequests(0).Delete() 'Remove the 1st row (already sent and with results treated)
@@ -3127,7 +3116,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
                                             Else
                                                 myBarcodeRequestDS.Clear()
-                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BARCODE_AVAILABLE 'Barcode free for more work
+                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE 'Barcode free for more work
 
                                                 'When barcode finish reading the sample rotor ... Sw inform if some critical warnings exists
                                                 If myBarCodeRotorTypeRead = "SAMPLES" Then
@@ -3143,7 +3132,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             End If
                                             'AG 03/08/2011
 
-                                        ElseIf BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.ENTER_RUNNING Then 'Barcode read requests from START or CONTINUE worksession
+                                        ElseIf BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActionsEnum.ENTER_RUNNING Then 'Barcode read requests from START or CONTINUE worksession
                                             myGlobal = ManageBarCodeRequestBeforeRUNNING(Nothing, BarCodeBeforeRunningProcessStatusAttribute)
 
                                         End If
@@ -4249,7 +4238,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                                           Status is Running. This is to allow block/unblock Executions when elements have been positioned/unpositioned 
         '''                                           during the Pause
         ''' </remarks>
-        Public Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActions) As GlobalDataTO Implements IAnalyzerEntity.ManageBarCodeRequestBeforeRUNNING
+        Public Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO Implements IAnalyzerEntity.ManageBarCodeRequestBeforeRUNNING
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -4261,7 +4250,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
                         'When user press START or CONTINUE buttons ... check the configuration status as first step
-                        If (pBarcodeProcessCurrentStep = BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST) Then
+                        If (pBarcodeProcessCurrentStep = BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST) Then
                             'Read barcode before RUNNING is enabled?
                             '** If YES: send active barcode requests for read + apply results business
                             '** If NO: go to running
@@ -4280,54 +4269,54 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 If (Not barcodeReadBeforeRunningFlag) Then
                                     'BARCODE_BEFORE_START_WS not active: go to Running directly
-                                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.FORCE_ENTER_RUNNING  'AG 08/03/2013 change ENTER_RUNNING for the new enum value
+                                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING  'AG 08/03/2013 change ENTER_RUNNING for the new enum value
                                 Else
                                     'BARCODE_BEFORE_START_WS active
                                     '1st) If Reagents Barcode is active -> send a request for full Reagents Rotor scanning
                                     Dim barcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
                                     If (Not barcodeDisabled) Then
-                                        BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.REAGENTS_REQUEST_BEFORE_RUNNING
+                                        BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING
                                     Else
                                         '2nd) If Samples Barcode is active -> send a request for full Samples Rotor scanning
                                         barcodeDisabled = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
                                         If (Not barcodeDisabled) Then
-                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING
+                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                                         Else
-                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.ENTER_RUNNING
+                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.ENTER_RUNNING
                                         End If
                                     End If
                                 End If
                             End If
 
-                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActions.REAGENTS_REQUEST_BEFORE_RUNNING) Then
+                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING) Then
                             'After receive Reagents Barcode results, evaluate if Samples Barcode is active
                             'If Samples Barcode is active -> send a request for full Samples Rotor scanning
                             readBarCodeBeforeRunningPerformedFlag = True
                             Dim samplesBarcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
                             If (Not samplesBarcodeDisabled) Then
-                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING
+                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                             Else
-                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.ENTER_RUNNING
+                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.ENTER_RUNNING
                             End If
 
-                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING) Then
+                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING) Then
                             'After receive Samples Barcode results go to Running
                             readBarCodeBeforeRunningPerformedFlag = True
-                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.ENTER_RUNNING
+                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.ENTER_RUNNING
                         End If
 
                         If (Not resultData.HasError) Then
                             Select Case BarCodeBeforeRunningProcessStatusAttribute
-                                Case BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST, BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                                Case BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST, BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST
                                     'Do nothing
 
-                                Case BarcodeWorksessionActions.REAGENTS_REQUEST_BEFORE_RUNNING, BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING
+                                Case BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING, BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                                     'Send read FULL REAGENTS / SAMPLES ROTOR request
                                     Dim BarCodeDS As New AnalyzerManagerDS
                                     Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
 
                                     Dim rotorType As String = "REAGENTS"
-                                    If (BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING) Then rotorType = "SAMPLES"
+                                    If (BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING) Then rotorType = "SAMPLES"
 
                                     'All positions
                                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
@@ -4348,7 +4337,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'AG 08/03/2013 - add FORCE_ENTER_RUNNING
                                     'AG 01/04/2014 - #1565 add FORCE_ENTER_RUNNING_AUTO_WS_CREATION 
-                                Case BarcodeWorksessionActions.ENTER_RUNNING, BarcodeWorksessionActions.FORCE_ENTER_RUNNING, BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
+                                Case BarcodeWorksessionActionsEnum.ENTER_RUNNING, BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING, BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
                                     'START WorkSession process finished. Barcodes are available
                                     'BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BARCODE_AVAILABLE 'AG 08/03/2013
 
@@ -4360,15 +4349,15 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'AG 12/07/2013 - Special case for automate the WS creation with LIS (force the HQ monitor screen to be open)
                                         'AG 01/04/2014 - #1565 add also FORCE_ENTER_RUNNING_AUTO_WS_CREATION
                                         'If autoWSCreationWithLISModeAttribute AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING Then
-                                        If autoWSCreationWithLISModeAttribute AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING _
-                                            AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
+                                        If autoWSCreationWithLISModeAttribute AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING _
+                                            AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
                                             resultData.SetDatos = True
                                         End If
                                         'AG 12/07/2013
 
                                         'AG 08/03/2013 - case FORCE_ENTER_RUNNING do not stops process instead there are barcode warnings
-                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.FORCE_ENTER_RUNNING Then resultData.SetDatos = False
-                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then resultData.SetDatos = False 'AG 01/04/2014 - #1565
+                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING Then resultData.SetDatos = False
+                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then resultData.SetDatos = False 'AG 01/04/2014 - #1565
 
                                         If (CType(resultData.SetDatos, Boolean) = False) Then 'No critical errors ... Sw can send the go to running instruction
                                             'AG 09/05/2012 - When barcode is read before running call the method to create WS Executions again with the real rotor contents
@@ -4378,7 +4367,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 'AG 01/04/2014 - #1565 Do not execute CreateWSExecutions when we are in the AutoWSCreation case
                                                 'and the WS has been modified (executions have been created on close rotor positions screen)
                                                 '(put previous code inside the next IF - ENDIF block)
-                                                If BarCodeProcessBeforeRunning <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
+                                                If BarCodeProcessBeforeRunning <> BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
 
                                                     Dim iseModuleReady As Boolean = (Not ISEAnalyzer Is Nothing AndAlso ISEAnalyzer.IsISEModuleReady)
 
@@ -4454,7 +4443,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             'AG 19/01/2012
 
                                             If (enterInRunningModeFlag) Then
-                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BARCODE_AVAILABLE 'AG 11/03/2013
+                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE 'AG 11/03/2013
 
                                                 'TODO
                                                 'Evaluate if auto ISE maintenance is required or not and update flag ISEConditioningProcess

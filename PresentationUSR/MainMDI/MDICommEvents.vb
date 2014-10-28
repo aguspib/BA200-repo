@@ -2335,10 +2335,10 @@ Partial Public Class IAx00MainMDI
                     'AG 07/01/2014
 
                 Else 'Normal code (code before add condition for recovery results)
-                    Dim myAction As AnalyzerEntity.BarcodeWorksessionActions = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                    Dim myAction As BarcodeWorksessionActionsEnum = BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST
                     myAction = AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning
 
-                    If myAction = AnalyzerEntity.BarcodeWorksessionActions.ENTER_RUNNING Then
+                    If myAction = BarcodeWorksessionActionsEnum.ENTER_RUNNING Then
                         'Ask question only in start ws process
                         'userAns = ShowMessage("Question", GlobalEnumerates.Messages.CONFIRM_BARCODE_WARNING.ToString)
                         'AG 09/07/2013 - In automate mode do not ask the user
@@ -2358,7 +2358,7 @@ Partial Public Class IAx00MainMDI
                                 AnalyzerController.Instance.Analyzer.StopAnalyzerRinging()
                             End If
                         End If
-                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE
+                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE
                     End If
 
                     If (userAns = Windows.Forms.DialogResult.Yes) Then

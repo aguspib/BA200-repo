@@ -7051,13 +7051,13 @@ Partial Public Class IAx00MainMDI
             'AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST   'Initialize barcode read before running process
             'myGlobal = AnalyzerController.Instance.Analyzer.ManageBarCodeRequestBeforeRUNNING(Nothing, AnalyzerManager.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST)
 
-            Dim myAction As AnalyzerEntity.BarcodeWorksessionActions = AnalyzerEntity.BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST 'Enter running but, if configured, perform the barcode read before
+            Dim myAction As BarcodeWorksessionActionsEnum = BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST 'Enter running but, if configured, perform the barcode read before
             If Not readBarcodeIfConfigured Then
-                myAction = AnalyzerEntity.BarcodeWorksessionActions.FORCE_ENTER_RUNNING    'Force enter running and skip incomplete sampes if any
+                myAction = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING    'Force enter running and skip incomplete sampes if any
 
                 'AG 01/04/2014 - #1565 if Sw is executing the automaticWS creation process AND finishes OK assign new action that not creates executions again!!
                 'else (an exception stops the process but user decides continue) leave action = FORCE_ENTER_RUNNING and create executions for security!!!
-                If automateProcessCurrentState = LISautomateProcessSteps.subProcessEnterRunning AndAlso Not autoWSNotFinishedButGoRunningAttribute Then myAction = AnalyzerEntity.BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
+                If automateProcessCurrentState = LISautomateProcessSteps.subProcessEnterRunning AndAlso Not autoWSNotFinishedButGoRunningAttribute Then myAction = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
 
             End If
             AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = myAction
@@ -9500,7 +9500,7 @@ Partial Public Class IAx00MainMDI
 
                     ' XB 06/02/2014 - When Barcode no works fine, must initialize all corresponding falgs - Task #1438
                     AnalyzerController.Instance.Analyzer.SetSessionFlags(AnalyzerManagerFlags.BarcodeSTARTWSProcess, "CLOSED")
-                    AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                    AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST
                     SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
 
                 Case Else

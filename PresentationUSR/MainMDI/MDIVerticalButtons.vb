@@ -974,7 +974,7 @@ Partial Public Class IAx00MainMDI
                     Dim sensorValue As Single = AnalyzerController.Instance.Analyzer.GetSensorValue(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED)
 
                     If myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso myAx00Ready AndAlso _
-                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
+                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE AndAlso _
                         sensorValue = 1 Then
                         bcButtonStatus = ActivateButtonWithAlarms(ActionButton.READ_BARCODE) 'AG 28/03/2012 - buttonStatus = True
                     End If
@@ -1401,7 +1401,7 @@ Partial Public Class IAx00MainMDI
 
             'AG 24/01/2014 - #1467 If analyzer freezes during process set all variables to their original value
             If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
-                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE
+                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE
                 SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
                 InitializeAutoWSFlags()
             End If

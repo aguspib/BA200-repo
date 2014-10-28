@@ -6514,7 +6514,7 @@ Public Class IWSRotorPositions
 
                 'If the Analyzer is Connected and Ready, the WarmUp maneuvers have finished, the Barcode Reader is available and not disabled....
                 If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso sensorValue = 1 AndAlso _
-                    AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
+                    AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE AndAlso _
                     (Not barcodeReaderDisabled)) Then
                     'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
                     If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
@@ -7311,7 +7311,7 @@ Public Class IWSRotorPositions
             'AG 26/09/2011 - Use progress bar thread as in WSPrep screen
             If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'Call the Barcode read process only if the Analyzer is connected and the Barcode is available
-                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
+                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE) Then
                     'Call the Barcode read process only if the Analyzer Status is STANDBY or if it is PAUSE in RUNNING
                     If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY) OrElse _
                        (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
@@ -7487,7 +7487,7 @@ Public Class IWSRotorPositions
                 'IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
                 'IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.BARCODE_READING)
 
-                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST    'Initialize barcode read with NO running involved!!
+                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST    'Initialize barcode read with NO running involved!!
                 resultdata = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
 
                 If resultdata.HasError OrElse Not AnalyzerController.Instance.Analyzer.Connected Then
@@ -7595,7 +7595,7 @@ Public Class IWSRotorPositions
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE '#REFACTORING
+            AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE '#REFACTORING
             LoadScreenStatus(WorkSessionStatusAttribute)
             Me.Enabled = True 'Enable the screen
 

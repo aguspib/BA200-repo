@@ -2259,7 +2259,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess.ToString) = "INPROCESS" Then
                     'In this case the Sw must starts the process, read the barcode of reagents and samples rotor
                     'Call method ManageBarCodeRequestBeforeRUNNING in AnalyzerManager 
-                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST
+                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST
                     myGlobal = ManageBarCodeRequestBeforeRUNNING(dbConnection, BarCodeBeforeRunningProcessStatusAttribute)
 
 

@@ -5741,7 +5741,7 @@ Public Class IWSSampleRequest
             If (AnalyzerController.IsAnalyzerInstantiated) Then
                 ScreenWorkingProcess = True
 
-                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST
                 resultdata = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS, "")
                 If (resultdata.HasError OrElse Not AnalyzerController.Instance.Analyzer.Connected) Then
                     ScreenWorkingProcess = False
@@ -6915,7 +6915,7 @@ Public Class IWSSampleRequest
 
                     'If the Analyzer is Connected and Ready, the WarmUp maneuvers have finished, the Barcode Reader is available and not disabled....
                     If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.AnalyzerIsReady AndAlso sensorValue = 1 AndAlso _
-                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE AndAlso _
+                        AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE AndAlso _
                        (Not sampleBarcodeReaderOFF)) Then
                         'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
                         If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
@@ -7819,7 +7819,7 @@ Public Class IWSSampleRequest
             IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 10/07/2013
             If (AnalyzerController.IsAnalyzerInstantiated) Then
                 'Call the Barcode read process only if the Analyzer is connected and the Barcode is available
-                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = AnalyzerEntity.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
+                If (AnalyzerController.Instance.Analyzer.Connected AndAlso AnalyzerController.Instance.Analyzer.BarCodeProcessBeforeRunning = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE) Then
                     'Call the Barcode read process only if the Analyzer Status is STANDBY or if it is PAUSE in RUNNING
                     If (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY) OrElse _
                        (AnalyzerController.Instance.Analyzer.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso AnalyzerController.Instance.Analyzer.AllowScanInRunning) Then
