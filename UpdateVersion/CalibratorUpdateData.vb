@@ -389,7 +389,6 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Try
                 Dim myCalibratorsDS As New CalibratorsDS
                 Dim myFactoryCalibratorDS As New CalibratorsDS
-                Dim myCustomerCalibratorDS As New CalibratorsDS
                 Dim myCalibratorsDelegate As New CalibratorsDelegate
                 Dim myCalibratorUpdateDAO As New CalibratorUpdateDAO
                 Dim myUpdateVersionAddedElementsRow As UpdateVersionChangesDS.AddedElementsRow
@@ -409,16 +408,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                         '(2.2) Verify if there is a Calibrator in Customer DB with the same Name, and in this case, rename it
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = myCalibratorsDelegate.ReadByCalibratorName(pDBConnection, newCalib.CalibratorName)
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myCustomerCalibratorDS = DirectCast(myGlobalDataTO.SetDatos, CalibratorsDS)
-
-                                If (myCustomerCalibratorDS.tparCalibrators.Rows.Count > 0) Then
-                                    'Rename the Calibrator in Customer DB
-                                    myGlobalDataTO = UpdateRenamedCalibrator(pDBConnection, myCustomerCalibratorDS.tparCalibrators.First.CalibratorName, _
-                                                                             pUpdateVersionChangesList)
-                                End If
-                            End If
+                            myGlobalDataTO = UpdateRenamedCalibrator(pDBConnection, newCalib.CalibratorName, _
+                                                                     pUpdateVersionChangesList)
                         End If
 
                         '(2.3) Save the FACTORY Calibrator in CUSTOMER DB 

@@ -426,9 +426,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
 #Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS"
         ''' <summary>
-        ''' Execute the process to search in FACTORY DB all STD TESTS that exists in CUSTOMER DB but for which at least one of the relevant Test fields 
-        ''' have changed and modify data in CUSTOMER DB (tables tparTests, tparReagents and tparTestReagents; additionally, depending on the modified 
-        ''' fields, previous results of Blanks and Calibrators for the STD Test can be deleted)
+        ''' Execute the process to search in FACTORY DB all ISE TESTS that exists in CUSTOMER DB but for which at least one of the relevant Test fields 
+        ''' have changed and modify data in CUSTOMER DB (tables tparISETests and tparISETestSamples)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
