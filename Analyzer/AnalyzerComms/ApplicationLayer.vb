@@ -1331,6 +1331,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'TR 03/03/2011 -END.
                         Exit Select
 
+                        'IT 29/10/2014 - Send a adjustment of IT and DAC
+                    Case GlobalEnumerates.AppLayerEventList.FLIGHT
+                        If Not pParams Is Nothing Then
+                            myGlobal = Me.SendFLIGHTInstruction(pParams)
+                        End If
+                        Exit Select
+
                     Case GlobalEnumerates.AppLayerEventList.INFO
                         If Not pSwEntry Is Nothing Then
                             myGlobal = Me.SendINFOInstruction(CInt(pSwEntry).ToString) 'AG 11/12/2012 - add use 'CInt(pSwEntry).ToString' instead of pSwEntry.ToString
@@ -1356,7 +1363,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         ' XBC 18/10/2011
                     Case GlobalEnumerates.AppLayerEventList.SOUND
-                        myGlobal = Me.SendSoundInstruction(True)
+                        myGlobal = Me.SendSOUNDInstruction(True)
                         Exit Select
 
                         ' XBC 18/10/2011
@@ -1416,7 +1423,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ' XBC 20/09/2011
                         Exit Select
 
-                        
+
 
                         ' XBC 03/05/2011
                     Case GlobalEnumerates.AppLayerEventList.LOADADJ
@@ -3312,6 +3319,76 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return myGlobal
         End Function
+
+        ''' <summary>
+        ''' Send FLIGHT instruction.
+        ''' </summary>
+        ''' <param name="pParams"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by:  IT 29/10/2014: BA-2061
+        ''' </remarks>
+        Private Function SendFLIGHTInstruction(ByVal pParams As List(Of String)) As GlobalDataTO
+            Dim myGlobal As New GlobalDataTO
+            Try
+                'FIRST: Generate FLIGHT instruction
+                Dim myInstruction As New Instructions
+                Dim paramInstructionList As New List(Of InstructionParameterTO)
+                Dim action As Integer
+                Dim led As Integer
+
+                If IsNumeric(pParams(0)) Then
+                    action = CInt(pParams(0))
+                Else
+                    myGlobal.HasError = True
+                    Exit Try
+                End If
+
+                If IsNumeric(pParams(1)) Then
+                    led = CInt(pParams(1))
+                Else
+                    myGlobal.HasError = True
+                    Exit Try
+                End If
+
+                myGlobal = myInstruction.GenerateFLIGHTInstruction(action, led)
+
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    paramInstructionList = CType(myGlobal.SetDatos, List(Of InstructionParameterTO))
+                Else
+                    Exit Try
+                End If
+
+                'SECOND: Convert InstructionParameterTO into LAX00 string to send
+                Dim myInstructionToSend As String = ""
+                myGlobal = Me.TransformToStringInstruction(paramInstructionList)
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    myInstructionToSend = CType(myGlobal.SetDatos, String)
+                Else
+                    Exit Try
+                End If
+
+                'THIRD: Send generical instruction!!
+                myGlobal = Me.SendGenericalInstructions(myInstructionToSend)
+
+                'FINALLY: If instruction sent inform the properties last instruction data sent
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    lastInstructionTypeSentAttribute = GlobalEnumerates.AppLayerEventList.FLIGHT
+                End If
+
+
+            Catch ex As Exception
+                myGlobal.HasError = True
+                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SendFLIGHTInstruction", EventLogEntryType.Error, False)
+
+            End Try
+            Return myGlobal
+        End Function
+
 
         ''' <summary>
         ''' Send READADJ instruction.

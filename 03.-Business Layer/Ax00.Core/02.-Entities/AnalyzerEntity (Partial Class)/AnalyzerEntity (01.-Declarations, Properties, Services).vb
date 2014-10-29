@@ -2516,6 +2516,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
                                 Exit Select
 
+
+                                'IT 29/10/2014: BA-2061
+                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT
+                                If ConnectedAttribute Then
+                                    If Not pParams Is Nothing Then
+                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FLIGHT, Nothing, String.Empty, String.Empty, pParams)
+                                    End If
+                                End If
+                                Exit Select
+
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.INFO
 
                                 If ConnectedAttribute Then
