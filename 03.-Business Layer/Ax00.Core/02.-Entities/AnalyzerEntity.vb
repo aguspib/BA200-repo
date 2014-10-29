@@ -2,6 +2,7 @@
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Calculations
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -29,11 +30,13 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        Property Calculations As CalculationsDelegate Implements IAnalyzerEntity.calculations
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             Me.New(assemblyName, analyzerModel)
             _baseLine = baseLine
         End Sub
+
 
 
 #Region "Abstract methods"

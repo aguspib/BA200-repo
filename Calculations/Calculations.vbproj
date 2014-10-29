@@ -119,6 +119,8 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BioChemical\CalculationsBA200Delegate.vb" />
+    <Compile Include="BioChemical\CalculationsBA400Delegate.vb" />
     <Compile Include="BioChemical\ResultsExcelTest.vb" />
     <Compile Include="CalculatedTests\TestOperateCalculatedTestDelegate.vb" />
     <Compile Include="BioChemical\CalculationsDelegate.vb" />

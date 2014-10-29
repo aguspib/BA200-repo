@@ -814,9 +814,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'Apply calculations only if all Readings for the Execution are complete and valid; otherwise mark the Execution as Closed by NOK
                                 executionCLOSEDNOK = True
                                 If (validAndCompleteReadings) Then
-                                    Dim myCalc As New CalculationsDelegate() '!!Declare this variable inside the loop. Otherwise, some structures keep information of previous Executions calculated
+                                    'Dim myCalc As New CalculationsDelegate() '!!Declare this variable inside the loop. Otherwise, some structures keep information of previous Executions calculated
                                     'myGlobal = myCalc.CalculateExecution(Nothing, readingsRow.ExecutionID, readingsRow.AnalyzerID, readingsRow.WorkSessionID, False, "")
-                                    myGlobal = myCalc.CalculateExecutionNEW(Nothing, readingsRow.AnalyzerID, readingsRow.WorkSessionID, readingsRow.ExecutionID, False, "")
+                                    myGlobal = Calculations.CalculateExecutionNEW(Nothing, readingsRow.AnalyzerID, readingsRow.WorkSessionID, readingsRow.ExecutionID, False, "")
 
                                     If (Not myGlobal.HasError) Then
                                         myGlobal = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED, readingsRow.ExecutionID, _

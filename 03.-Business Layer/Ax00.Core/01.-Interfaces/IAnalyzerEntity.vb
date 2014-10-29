@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Calculations
 
 Namespace Biosystems.Ax00.Core.Interfaces
 
@@ -12,6 +13,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
 
         Property BaseLine As IBaseLineEntity
         Property ISEAnalyzer As IISEAnalyzerEntity
+
+        Property Calculations As CalculationsDelegate
 
         Property classInitializationError() As Boolean
         Property ActiveWorkSession() As String

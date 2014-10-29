@@ -1,6 +1,7 @@
 ﻿Imports Biosystems.Ax00.Core
 Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
+Imports Biosystems.Ax00.Calculations
 
 Namespace Biosystems.Ax00.App
 
@@ -35,6 +36,9 @@ Namespace Biosystems.Ax00.App
 
             iseAnalyzer = New ISEAnalyzerEntity(analyzer, analyzerIDAttribute, analyzerModel, False)
             analyzer.ISEAnalyzer = iseAnalyzer
+
+            'Delegates
+            analyzer.Calculations = New CalculationsBA400Delegate()
 
             Return analyzer
 
