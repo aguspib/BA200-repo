@@ -979,6 +979,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:  TR 21/05/2010
+        ''' AG 29/10/2014 BA-2062 new instruction ANSFBLD
         ''' </remarks>
         Public Function GenerateReception(ByVal pParameterList As List(Of ParametersTO)) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -1008,7 +1009,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Case GlobalEnumerates.AppLayerInstrucionReception.ANSBLD.ToString, _
                             GlobalEnumerates.AppLayerInstrucionReception.ANSISE.ToString, _
                             GlobalEnumerates.AppLayerInstrucionReception.ANSERR.ToString, _
-                            GlobalEnumerates.AppLayerInstrucionReception.ANSFWU.ToString
+                            GlobalEnumerates.AppLayerInstrucionReception.ANSFWU.ToString, _
+                            GlobalEnumerates.AppLayerInstrucionReception.ANSFBLD.ToString
 
                             'GenerateBaseLineTypeInstruction(myParameterValue, pParameterList, myIndexedList)
                             GenerateGenericalDinamicInstruction(myParameterValue, pParameterList, myIndexedList)
