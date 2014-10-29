@@ -3105,6 +3105,17 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Exit Select
                                 'END AG 18/05/2010 
 
+                                'AG 29/10/2014 BA-2062 - Dynamic base line results
+                            Case AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                If GlobalBase.IsServiceAssembly Then
+
+                                Else
+
+                                End If
+                                'AG 29/10/2014 BA-2062
+
+
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED
                                 Dim myBarCodeRotorTypeRead As String = ""
                                 InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED

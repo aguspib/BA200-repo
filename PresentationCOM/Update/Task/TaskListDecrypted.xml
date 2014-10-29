@@ -2155,4 +2155,38 @@
       GO
     </UpdateScript>
   </AppVersion >
+  <AppVersion>
+    <Version>3.04</Version>
+    <StructureScript>
+      GO
+    </StructureScript>
+    <UpdateScript>
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '2.12'
+      GO
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSBLines' AND sc.name = 'Type') = 0
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].twksWSBLines ADD Type [nvarchar](15) NOT NULL DEFAULT 'STATIC'
+      END
+      
+      SET ANSI_PADDING ON
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_twksWSBLines') = 1)
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].twksWSBLines DROP CONSTRAINT [PK_twksWSBLines]
+      END
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_twksWSBLines') = 0)
+      BEGIN
+      ALTER TABLE [Ax00].[dbo].twksWSBLines ADD  CONSTRAINT [PK_twksWSBLines] PRIMARY KEY CLUSTERED
+      (
+      [AnalyzerID] ASC,
+      [BaseLineID] ASC,
+      [Wavelength] ASC,
+      [WellUsed] ASC
+      )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+      END
+
+      SET ANSI_PADDING OFF
+      GO
+    </UpdateScript>
+  </AppVersion >  
 </TaskListDS>

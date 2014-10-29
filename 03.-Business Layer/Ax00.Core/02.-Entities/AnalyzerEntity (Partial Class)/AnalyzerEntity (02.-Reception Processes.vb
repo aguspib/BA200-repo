@@ -963,6 +963,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' CREATE BY:AG
         ''' Modifies BY: TR -Add the functionally to process the base line reception.
         ''' Modified by AG 01/03/2011 - ANSAL is rename as ANSBLD (ANSBL and ANSDL are removed) - Tested PENDING
+        ''' AG 28/10/2014 - BA-2057
         ''' </remarks>
         Private Function ProcessBaseLineReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1044,6 +1045,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myBaseLineRow.WellUsed = myWell
                                 myBaseLineRow.WorkSessionID = Me.WorkSessionIDAttribute
                                 myBaseLineRow.AnalyzerID = Me.AnalyzerIDAttribute
+                                myBaseLineRow.Type = "STATIC" 'AG 28/10/2014 BA-2057
                                 myBaseLineRow.DateTime = DateTime.Now
 
                                 'Get the Wavelenght

@@ -2305,6 +2305,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns>GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
         ''' Creation AG 20/04/2010
+        ''' AG 28/10/2014 - BA-2062 (new instruction ANSFBLD reception)
         ''' </remarks>
         Private Function ProcessResponse(ByVal pFwInstruction As List(Of ParametersTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2409,6 +2410,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         RaiseEvent ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ANSTIN_RECEIVED, myIndexedParameters)
                         Exit Select
 
+                        'AG 28/10/2014 - BA-2062 - raise event when a valid ANSFBLD instruction is received
+                    Case GlobalEnumerates.AppLayerInstrucionReception.ANSFBLD.ToString().Trim
+                        RaiseEvent ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED, myIndexedParameters)
+                        Exit Select
 
                         ''''''''''''''''''''''
                         'SERVICE INSTRUCTIONS

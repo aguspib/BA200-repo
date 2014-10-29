@@ -22,6 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by: GDS 21/05/2010
         ''' Modified by: AG 29/04/2011 - WorkSessionID is removed from table twksWSBLines
+        ''' AG 28/10/2014 - BA-2057 new column Type (not allow NULLs)
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -48,6 +49,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                               "  , RefDark" & vbCrLf & _
                               "  , IT" & vbCrLf & _
                               "  , DAC" & vbCrLf & _
+                              "  , Type " & vbCrLf & _
                               "  , DateTime) " & vbCrLf & _
                               "VALUES" & vbCrLf & _
                               "  ( '" & myRow.AnalyzerID.Replace("'", "''").ToString & "'" & vbCrLf & _
@@ -60,6 +62,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                               "  ,  " & myRow.RefDark.ToString & vbCrLf & _
                               "  ,  " & myRow.IT.ToString & vbCrLf & _
                               "  ,  " & myRow.DAC.ToString & vbCrLf & _
+                              "  ,  " & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf & _
                               "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
 
                         cmd.CommandText = cmdText

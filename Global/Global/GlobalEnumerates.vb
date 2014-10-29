@@ -1840,6 +1840,7 @@ Namespace Biosystems.Ax00.Global
             READINGS_RECEIVED '(READ instruction reception)
             WAITING_TIME_EXPIRED
             BASELINE_RECEIVED 'AG 18/05/2010 (ANSAL, ANSBL, ANSDL instructions reception)
+            ANSFBLD_RECEIVED 'AG 28/10/2014 - BA-2062 (results dynamic base line)
             ISE_RESULT_RECEIVED 'TR 03/01/2010 -ISE RESULTS.
             ARM_STATUS_RECEIVED 'AG 14/03/2011 - Arm status instruction received (R1, S or R2)
             ANSERR_RECEIVED 'AG 07/04/2011 - Alarms code details
@@ -2153,6 +2154,7 @@ Namespace Biosystems.Ax00.Global
             'ANSDL    'AG 18/05/2010
 
             ANSBLD 'AG 01/03/2011 - rename (ANSAL --> ANSBLD) 'ANSAL    'AG 18/05/2010
+            ANSFBLD 'AG 28/10/2014 BA-2062
             ANSISE 'AG 03/01/2011 - ise results answer
             ANSINF 'AG 14/03/2011 - Fw sends detailed status for real time monitoring
             ANSERR 'Fw send alarms info
