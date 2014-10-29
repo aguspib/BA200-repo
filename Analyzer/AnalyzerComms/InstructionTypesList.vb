@@ -701,6 +701,33 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'myInstructionTO.ParameterIndex = 3
                 'Instructions.Add(myInstructionTO)
 
+
+                'FLIGHT INSTRUCTION (Sw -> Fw) adjustment of IT and DAC
+                ''''''''''''''''''''''''''''''
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "FLIGHT"
+                myInstructionTO.Parameter = "" 'Analyzer Model and Number
+                myInstructionTO.ParameterIndex = 1
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "FLIGHT"
+                myInstructionTO.Parameter = "" 'Instruction Code
+                myInstructionTO.ParameterIndex = 2
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "FLIGHT"
+                myInstructionTO.Parameter = "A" 'Action
+                myInstructionTO.ParameterIndex = 3
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "FLIGHT"
+                myInstructionTO.Parameter = "LED" 'LED Number
+                myInstructionTO.ParameterIndex = 4
+                Instructions.Add(myInstructionTO)
+
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
 
             Catch ex As Exception

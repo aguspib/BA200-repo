@@ -1809,6 +1809,7 @@ Namespace Biosystems.Ax00.Global
             'other actions
             NEXT_PREPARATION   'Next preparation
             ADJUST_LIGHT    'AG 18/05/2010 (ALIGHT instruction)
+            ADJUST_FLIGHT 'IT 29/10/2014: BA-2061
             WRUN 'Washings during Running
             WASH_STATION_CTRL 'Washing Station Ctrol
             BARCODE_REQUEST 'Code bar reader request
@@ -2072,6 +2073,7 @@ Namespace Biosystems.Ax00.Global
             ENDRUN  'end running :AG 05/01/2011 - Ax00 instrucment uses the 'END' instruction but this string is reserved for the VS program so Sw has to define another 'ENDRUN'
             STATE 'Ask for status 'ASKSTATUS
             ALIGHT  'AG 18/05/2010 - adjustment of IT and DAC
+            FLIGHT  'IT 29/10/2014: BA-2061
             SKIP 'AG 03/03/2011 - Sw rejects a well, Fw implements a Dummy
             INFO 'AG 07/04/2011
             NROTOR  'new rotor

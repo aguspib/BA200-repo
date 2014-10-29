@@ -1302,6 +1302,53 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Function
 
         ''' <summary>
+        '''  Generate a FLIGHT parameter with corresponding values.
+        ''' </summary>
+        ''' <param name="action"></param>
+        ''' <param name="led"></param>
+        ''' <returns></returns>
+        ''' <remarks> Created by:  IT 29/10/2014: BA-2061</remarks>
+        Public Function GenerateFLIGHTInstruction(ByVal action As Integer, ByVal led As Integer) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                'Get the instruction on the Instruction list.
+                Dim myFLIGHTInstruction As New List(Of InstructionParameterTO)
+                myFLIGHTInstruction = GetInstructionParameter("FLIGHT")
+                'Fill all the instruccion.
+                For Each myInstructionTO As InstructionParameterTO In myFLIGHTInstruction
+                    Select Case myInstructionTO.ParameterIndex
+                        Case 1 'Analyzer Model and Number.
+                            myInstructionTO.ParameterValue = "A400"
+                            Exit Select
+                        Case 2 'Instruction Code.
+                            myInstructionTO.ParameterValue = "FLIGHT"
+                            Exit Select
+                        Case 3 'Action
+                            myInstructionTO.ParameterValue = action.ToString()
+                            Exit Select
+                        Case 4 'Led number
+                            myInstructionTO.ParameterValue = led.ToString()
+                            Exit Select
+
+                        Case Else
+                            Exit Select
+
+                    End Select
+                Next
+                myGlobalDataTO.SetDatos = myFLIGHTInstruction
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "Instructions.GenerateFLIGHTInstruction", EventLogEntryType.Error, False)
+            End Try
+
+            Return myGlobalDataTO
+        End Function
+
+        ''' <summary>
         ''' Generate a READADJ parameter with corresponding values.
         ''' </summary>
         ''' <param name="pQueryMode "></param>
