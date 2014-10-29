@@ -2021,17 +2021,20 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' NOTE: Dont use connection TEMPLATE in order to avoid circular references (DataAccessLayer uses Global proyect)!!
         ''' </summary>
+        ''' <param name="pdbConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <param name="pWorkSessionID"></param>
         ''' <param name="pWell"></param>
         ''' <param name="pBaseLineWithAdjust"></param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO indicating if error. If no error returns and integer with the current BaseLineID</returns>
         ''' <remarks>
         ''' Created by AG ?
         ''' Modified by AG 03/01/2011 - if pBaseLineWithAdjust = true (if ANSAL get current baselineid from twksWSBLines, else (FALSE) get from twksWSBLinesByWell
+        ''' AG 29/10/2014 BA-2062 adapt method to read the static or dynamic base line (add pType parameter)
         ''' </remarks>
-        Private Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                             ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        Public Function GetCurrentBaseLineIDByType(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                             ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -2044,7 +2047,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If pBaseLineWithAdjust Then 'Base line with adjust (ANSAL instruction received)
                             'Option1: Using table WSBLinesDelegate (adjustment base line)
                             Dim myDelegate As New WSBLinesDelegate
-                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWell, pType)
 
                         Else 'base line without adjust (ANSBL or ANSDL instruction received)
                             ''Option2: Using table WSBLinesByWellDelegate (1 base line in every well during washing cycles)
@@ -2085,6 +2088,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG 20/05/2010
         ''' AG 03/01/2011 - new parameter pBaseLineWithAdjust if ANSAL then save into twksWSBLines, else save into twksWSBLinesByWell
+        ''' AG 29/10/2014 BA-2057 inform as STATIC the new parameter type in method blDelegate.Exists
         ''' </remarks>
         Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -2102,7 +2106,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If pBaseLineWithAdjust Then '(1) Base line with adjust ("ANSAL" instruction received)
                                     'Option1 using table twksBLines
                                     Dim blDelegate As New WSBLinesDelegate
-                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, pBaseLineDS.twksWSBaseLines(0).BaseLineID)
+                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, pBaseLineDS.twksWSBaseLines(0).BaseLineID, "STATIC")
                                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                         If DirectCast(myGlobal.SetDatos, Boolean) = True Then
                                             'Update
@@ -2180,9 +2184,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG 21/05/2010
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
+        ''' AG 29/10/2014 BA-2057 define new optional parameter and inform it as part of the new parameters in myDelegate.GetCurrentBaseLineID
         ''' </remarks>
         Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                           ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+                                           ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean, Optional ByVal pType As String = "STATIC") As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -2198,7 +2203,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If pBaseLineWithAdjust Then 'Base line with adjust (ansal instruction received)
                             ''Option1: Using table WSBLinesDelegate (adjustment base line)
                             Dim myDelegate As New WSBLinesDelegate
-                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWellUsed, pType) 'AG 29/10/2014 BA-2057
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                 currBaseLineID = DirectCast(resultData.SetDatos, Integer)
                             Else

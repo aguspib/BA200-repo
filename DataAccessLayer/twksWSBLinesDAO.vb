@@ -61,9 +61,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                               "  ,  " & myRow.MainDark.ToString & vbCrLf & _
                               "  ,  " & myRow.RefDark.ToString & vbCrLf & _
                               "  ,  " & myRow.IT.ToString & vbCrLf & _
-                              "  ,  " & myRow.DAC.ToString & vbCrLf & _
-                              "  ,  " & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf & _
-                              "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
+                              "  ,  " & myRow.DAC.ToString & vbCrLf
+
+                        'AG 29/10/2014 BA-2057
+                        '     "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
+                        If Not myRow.IsTypeNull Then
+                            cmdText &= "  ,  " & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf
+                        Else 'Default value
+                            cmdText &= "  ,  'STATIC' "
+                        End If
+                        cmdText &= "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
+                        'AG 29/10/2014
 
                         cmd.CommandText = cmdText
                         resultData.AffectedRecords = cmd.ExecuteNonQuery()
@@ -239,6 +247,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">NOT USED!!</param>
         ''' <param name="pBaseLineID">Identifier of the adjustment Base Line</param>
+        ''' <param name="pType" >STATIC or DYNAMIC. If "" do not take into account</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all data for the informed BaseLine</returns>
         ''' <remarks>
         ''' Created by:  DL 19/02/2010
@@ -246,9 +255,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 14/05/2010 - Added ORDER BY clause
         '''              AG 20/05/2010 - Added parameters AnalyzerID and WorkSessionID
         '''              AG 29/04/2011 - WorkSessionID is removed from table twksWSBLines
+        ''' AG 29/10/2014 BA-2057 parameter pType
         ''' </remarks>
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                             ByVal pBaseLineID As Integer) As GlobalDataTO
+                             ByVal pBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -257,12 +267,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AG 29/10/2014 BA-2057 select also the Type column
                         Dim cmdText As String = " SELECT AnalyzerID, BaseLineID, Wavelength, WellUsed, MainLight, MainDark, " & vbCrLf & _
-                                                       " RefLight, RefDark, IT, DAC, DateTime " & vbCrLf & _
+                                                       " RefLight, RefDark, IT, DAC, DateTime, Type " & vbCrLf & _
                                                 " FROM   twksWSBLines " & vbCrLf & _
                                                 " WHERE  BaseLineID = " & pBaseLineID.ToString & vbCrLf & _
-                                                " AND    AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                " ORDER BY Wavelength " & vbCrLf
+                                                " AND    AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                        'AG 29/10/2014 BA-2057
+                        If pType <> "" Then
+                            cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
+                        End If
+
+                        cmdText &= " ORDER BY Wavelength " & vbCrLf
 
                         Dim myBaseLinesDS As New BaseLinesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -270,7 +287,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 dbDataAdapter.Fill(myBaseLinesDS.twksWSBaseLines)
                             End Using
                         End Using
-                        
+
                         resultData.SetDatos = myBaseLinesDS
                         resultData.HasError = False
                     End If
@@ -426,12 +443,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">NOT USED!!</param>
+        ''' <param name="pWellUsed"></param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO containing an integer value with the adjustment BaseLine Identifier</returns>
         ''' <remarks>
-        ''' Created by:  AG 17/05/2010 
-        ''' Modified by: AG 29/04/2011 - WorkSessionID is removed from table twksWSBLines
+        ''' AG 17/05/2010 
+        ''' AG 29/04/2011 - WorkSessionID is removed from table twksWSBLines
+        ''' AG 29/10/2014 BA-20562 adapt method to read the static or dynamic base line (parameter pWellUsed, pType)
         ''' </remarks>
-        Public Function GetCurrentBaseLineID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetCurrentBaseLineID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                             ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -442,6 +463,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT MAX(BaseLineID) AS CurrentBaseLineID FROM twksWSBLines " & vbCrLf & _
                                                 " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                        'AG 29/10/2014 - BA-2062
+                        If pType <> "" Then
+                            cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                            If pType = "DYNAMIC" Then
+                                cmdText &= " AND WellUsed = " & pWellUsed
+                            End If
+                        End If
+                        'AG 29/10/2014 - BA-2062
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             Dim dbDataReader As SqlClient.SqlDataReader

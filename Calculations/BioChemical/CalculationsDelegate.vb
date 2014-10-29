@@ -8782,9 +8782,13 @@ Namespace Biosystems.Ax00.Calculations
                 If (Not pExecToCalculateRow.IsAdjustBaseLineIDNull) Then common(pDimension).AdjustBaseLineID = pExecToCalculateRow.AdjustBaseLineID
 
                 If (Not pExecToCalculateRow.IsBaseLineIDNull AndAlso Not pExecToCalculateRow.IsAdjustBaseLineIDNull) Then
-                    Dim myWSBLinesDelegate As New WSBLinesDelegate
-                    resultData = myWSBLinesDelegate.ReadValuesForCalculations(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, _
-                                                                              myExecutionWell, common(pDimension).AdjustBaseLineID)
+
+                    'AG 29/10/2014 BA-2057
+                    'Dim myWSBLinesDelegate As New WSBLinesDelegate
+                    'resultData = myWSBLinesDelegate.ReadValuesForCalculations(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, _
+                    '                                                          myExecutionWell, common(pDimension).AdjustBaseLineID)
+                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID)
+                    'AG 29/10/2014 BA-2057
 
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         Dim myBaseLineDS As BaseLinesDS = DirectCast(resultData.SetDatos, BaseLinesDS)

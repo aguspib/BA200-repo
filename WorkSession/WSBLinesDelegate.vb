@@ -67,12 +67,14 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
         ''' <param name="pBaseLineID">Identifier of an adjustment Base Line</param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO containing a boolean value: TRUE if the adjustment BL exists; otherwise FALSE</returns>
         ''' <remarks>
         ''' Created by:  AG 20/05/2010 
+        ''' AG 29/10/2014 BA-2057 parameter pType
         ''' </remarks>
         Public Function Exists(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                               ByVal pBaseLineID As Integer) As GlobalDataTO
+                               ByVal pBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -86,7 +88,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.Read(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID)
+                        resultData = myDAO.Read(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pType)
 
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim myBaseLineDS As BaseLinesDS = DirectCast(resultData.SetDatos, BaseLinesDS)
@@ -206,11 +208,15 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">NOT USED!!</param>
+        ''' <param name="pWellUsed"></param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO containing an integer value with the adjustment BaseLine Identifier</returns>
         ''' <remarks>
-        ''' Created by:  AG 17/05/2010 
+        ''' Created by:  AG 17/05/2010
+        ''' AG 29/10/2014 BA-20562 adapt method to read the static or dynamic base line(parameter pWellUsed, pType)
         ''' </remarks>
-        Public Function GetCurrentBaseLineID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetCurrentBaseLineID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                             ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -220,7 +226,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID)
+                        resultData = myDAO.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWellUsed, pType)
                     End If
                 End If
             Catch ex As Exception
@@ -274,67 +280,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-        ''' <summary>
-        ''' Read the informed BaseLineID and return True/False depending on if the data is completed (all fields informed) or not
-        ''' </summary>
-        '''<param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pBaseLineID">Identifier of an adjustment Base Line</param>
-        ''' <returns>GlobalDataTO containing a boolean value: TRUE if the adjustment BL is complete; otherwise FALSE</returns>
-        ''' <remarks>
-        ''' Created by:  AG 21/05/2010
-        ''' </remarks>
-        Public Function IsComplete(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                   ByVal pBaseLineID As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData.SetDatos = False
-
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.Read(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID)
-
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myBaseLineDS As BaseLinesDS = DirectCast(resultData.SetDatos, BaseLinesDS)
-
-                            Dim blComplete As Boolean = True
-                            For Each row As BaseLinesDS.twksWSBaseLinesRow In myBaseLineDS.twksWSBaseLines
-                                If (row.IsAnalyzerIDNull) Then blComplete = False
-                                If (row.IsBaseLineIDNull) Then blComplete = False
-                                If (row.IsWavelengthNull) Then blComplete = False
-                                If (row.IsWellUsedNull) Then blComplete = False
-                                If (row.IsMainLightNull) Then blComplete = False
-                                If (row.IsRefLightNull) Then blComplete = False
-                                If (row.IsMainDarkNull) Then blComplete = False
-                                If (row.IsRefDarkNull) Then blComplete = False
-                                If (row.IsITNull) Then blComplete = False
-                                If (row.IsDACNull) Then blComplete = False
-
-                                If (Not blComplete) Then Exit For
-                            Next
-                            resultData.SetDatos = blComplete
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.IsComplete", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
 
         ''' <summary>
         ''' Get values for all WaveLengths for the specified adjustment Base Line
@@ -343,14 +288,16 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">NOT USED!!</param>
         ''' <param name="pBaseLineID">Identifier of the adjustment Base Line</param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all data for the informed BaseLine</returns>
         ''' <remarks>
         ''' Created by:  DL 19/02/2010
         ''' Modified by: AG 13/05/2010 - Changed the method name to READ and some field names 
         '''              AG 20/05/2010 - Added parameters AnalyzerID and WorkSessionID
+        ''' AG 29/10/2014 BA-2057 parameter pType
         ''' </remarks>
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                             ByVal pBaseLineID As Integer) As GlobalDataTO
+                             ByVal pBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -360,7 +307,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim mytwksWSBaseLines As New twksWSBLinesDAO
-                        resultData = mytwksWSBaseLines.Read(pDBConnection, pAnalyzerID, pWorkSessionID, pBaseLineID)
+                        resultData = mytwksWSBaseLines.Read(pDBConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pType)
                     End If
                 End If
             Catch ex As Exception

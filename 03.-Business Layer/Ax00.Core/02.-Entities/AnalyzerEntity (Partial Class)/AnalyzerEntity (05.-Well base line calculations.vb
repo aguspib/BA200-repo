@@ -400,7 +400,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                              new ByRef parameter, and inform the Pause status when saving the received Readings
         '''              AG 22/11/2013 - #1397 During 'Recovery Results' in pause mode call method SaveReadings instead of SaverReadingsNEW (it checks if exists before call 
         '''                              the insert in DAO)
-        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)       
         ''' </remarks>
         Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                        ByVal pInstructionReceived As List(Of InstructionParameterTO), _
@@ -539,12 +539,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                                 'Get the BaseLineID for the base lines without adjust (from table twksWSBLinesByWell)
-                                myGlobal = Me.GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
+                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 localBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
                                 'Get the BaseLineID for the base lines with adjust (from table twksWSBLines)
-                                myGlobal = Me.GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
+                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 myAdjustBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 

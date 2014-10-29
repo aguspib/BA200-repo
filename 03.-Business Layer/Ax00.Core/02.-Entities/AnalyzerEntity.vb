@@ -1,6 +1,7 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -34,6 +35,13 @@ Namespace Biosystems.Ax00.Core.Entities
             _baseLine = baseLine
         End Sub
 
+
+#Region "Abstract methods"
+        Public MustOverride Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                     ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+
+
+#End Region
     End Class
 
 End Namespace
