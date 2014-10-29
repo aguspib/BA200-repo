@@ -2521,6 +2521,39 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.04</Version>
+    <Label>New subTableID and items in table tfmwPreloadedMasterData</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwPreloadedMasterData WHERE SubTableID = 'BASELINE_TYPES') = 2)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>New column Type in table twksWSBLines</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'twksWSBLines' AND sc.name = 'Type') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.0</Version>
+    <Label>PRIMARY KEY OF twksWSBLines IS CREATED</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_twksWSBLines') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
     <Label>Data validation in tfmwVersions Table for package 3.0.4</Label>
     <Script>
       IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.4'
