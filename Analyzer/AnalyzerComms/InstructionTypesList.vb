@@ -152,6 +152,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 GetDetailsPOLLSNInstruction(Instructions) ' XBC 30/07/2012
                 GetDetailsPOLLRDInstruction(Instructions) 'AG 31/07/2012
 
+                GetANSFBLDInstruction(Instructions) 'AG 28/10/2014 BA-2062
+
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetInstructionParameterList", EventLogEntryType.Error, False)
@@ -836,7 +838,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Sub
 
         ''' <summary>
-        ''' 
+        ''' Definition instruction ANSBLD
         ''' </summary>
         ''' <param name="Instructions"></param>
         ''' <remarks>
@@ -5009,6 +5011,93 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Definition instruction ANSFBLD (based on rev47)
+        ''' </summary>
+        ''' <param name="Instructions"></param>
+        ''' <remarks>
+        ''' Created by AG 28/10/2014 BA-2062
+        ''' </remarks>
+        Private Sub GetANSFBLDInstruction(ByRef Instructions As List(Of InstructionParameterTO))
+            Try
+                Dim myInstructionTO As New InstructionParameterTO
+
+                'ANSFBLD INSTRUCTION (Fw -> Sw) (dynamic base line results)
+                ''''''''''''''''''''''''''''''
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "" 'myInstructionTO.Parameter = "Axxx"
+                myInstructionTO.ParameterIndex = 1
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                'AG 30/04/2010 - Instruction type
+                myInstructionTO.Parameter = "" 'myInstructionTO.Parameter = "ANSFBLD" instruction name
+                myInstructionTO.ParameterIndex = 2
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "P"    'Led position
+                myInstructionTO.ParameterIndex = 3
+                Instructions.Add(myInstructionTO)
+
+                'IMPORTANT NOTE: On receive an ANSFBLD instruction the following fields are repeated for each well (x120 wells in reactions rotor)
+                ''''''''''''''''''''
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "BLW" 'Base line well
+                myInstructionTO.ParameterIndex = 4
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "MP"    'main led ligth counts
+                myInstructionTO.ParameterIndex = 5
+                Instructions.Add(myInstructionTO)
+
+                'END LOOP FOR 120 WELLS
+                ''''''''''''''''''''
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "RP"    'reference led ligth counts
+                myInstructionTO.ParameterIndex = 6
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "MD"    'main led dark counts
+                myInstructionTO.ParameterIndex = 7
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "RD" 'reference led dark counts
+                myInstructionTO.ParameterIndex = 8
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "IT" 'led integration time
+                myInstructionTO.ParameterIndex = 9
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "DAC" 'led DAC
+                myInstructionTO.ParameterIndex = 10
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "InstructionTypesList.GetANSBLDInstruction", EventLogEntryType.Error, False)
+
+            End Try
+        End Sub
 
 #End Region
 
