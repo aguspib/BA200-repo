@@ -66,11 +66,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 29/10/2014 BA-2057
                         '     "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
                         If Not myRow.IsTypeNull Then
-                            cmdText &= "  ,  " & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf
+                            cmdText &= " ,  " & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf
                         Else 'Default value
-                            cmdText &= "  ,  'STATIC' "
+                            cmdText &= " , 'STATIC' "
                         End If
-                        cmdText &= "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
+                        cmdText &= " , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
                         'AG 29/10/2014
 
                         cmd.CommandText = cmdText
@@ -567,13 +567,15 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pBaseLineWellID">Identifier of a BaseLine by Well</param>
         ''' <param name="pWell">Rotor Well Number</param>
         ''' <param name="pBaseLineAdjustID">Identifier of an adjustment Base Line</param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLineDS</returns>
         ''' <remarks>
         ''' Created by:  AG 04/01/2011
         ''' Modified by: AG 29/04/2011 - WorkSessionID was removed from table twksWSBLines; query changed
+        ''' AG 29/10/2014 BA-2064 adapt for static or dynamic base lines (new parameter pType)
         ''' </remarks>
         Public Function ReadValuesForCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                                  ByVal pBaseLineWellID As Integer, ByVal pWell As Integer, ByVal pBaseLineAdjustID As Integer) As GlobalDataTO
+                                                  ByVal pBaseLineWellID As Integer, ByVal pWell As Integer, ByVal pBaseLineAdjustID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -584,25 +586,31 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
 
-                        'cmdText = "SELECT BL.Wavelength , BLW.MainLight , BLW.RefLight, BL.MainDark , BL.RefDark, BL.IT, BL.DAC " & vbCrLf & _
-                        '          " , BLW.DateTime, BLW.WellUsed FROM twksWSBLines BL INNER JOIN twksWSBLinesByWell BLW ON " & vbCrLf & _
-                        '          " BL.AnalyzerID = BLW.AnalyzerID AND BL.WorkSessionID = BLW.WorkSessionID  AND BL.Wavelength = BLW.Wavelenght " & vbCrLf & _
-                        '          " WHERE BL.AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "'" & vbCrLf & _
-                        '          " AND BL.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "'" & vbCrLf & _
-                        '          " AND BL.BaseLineID = " & pBaseLineAdjustID & vbCrLf & _
-                        '          " AND BLW.BaseLineID = " & pBaseLineWellID & vbCrLf & _
-                        '          " AND BLW.WellUsed = " & pWell & vbCrLf & _
-                        '          " ORDER BY BL.Wavelength"
+                        'AG 29/10/2014 BA-2064 select also BL.Type
                         cmdText = " SELECT BL.Wavelength , BLW.MainLight , BLW.RefLight, BL.MainDark , BL.RefDark, BL.IT, BL.DAC, " & vbCrLf & _
-                                         " BLW.DateTime, BLW.WellUsed " & vbCrLf & _
+                                         " BLW.DateTime, BLW.WellUsed, BL.Type " & vbCrLf & _
                                   " FROM   twksWSBLines BL INNER JOIN twksWSBLinesByWell BLW ON BL.AnalyzerID = BLW.AnalyzerID " & vbCrLf & _
-                                                                                          " AND BL.Wavelength = BLW.Wavelenght " & vbCrLf & _
-                                  " WHERE BL.AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                                                          " AND BL.Wavelength = BLW.Wavelenght " & vbCrLf
+
+                        'AG 29/10/2014 BA-2062
+                        If pType <> "" Then
+                            cmdText &= " AND BL.WellUsed = BLW.WellUsed " & vbCrLf
+                        End If
+                        'AG 29/10/2014 BA-2062
+
+                        cmdText &= " WHERE BL.AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                   " AND   BLW.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                   " AND   BL.BaseLineID = " & pBaseLineAdjustID.ToString & vbCrLf & _
                                   " AND   BLW.BaseLineID = " & pBaseLineWellID.ToString & vbCrLf & _
-                                  " AND   BLW.WellUsed = " & pWell.ToString & vbCrLf & _
-                                  " ORDER BY BL.Wavelength "
+                                  " AND   BLW.WellUsed = " & pWell.ToString & vbCrLf
+
+                        'AG 29/10/2014 BA-2062
+                        If pType <> "" Then
+                            cmdText &= " AND   BL.Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
+                        End If
+                        'AG 29/10/2014 BA-2062
+
+                        cmdText &= " ORDER BY BL.Wavelength "
 
                         Dim myBaseLinesDS As New BaseLinesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

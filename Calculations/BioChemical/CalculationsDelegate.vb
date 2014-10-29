@@ -4497,10 +4497,11 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' Created AG 18/05/2010 (Tested ok)
         ''' Modified AG 03/11/2011 - add pAdjustBaseLineID
+        ''' AG 29/10/2014 BA-2064 adapt for static or dynamic base lines (new parameter pType)
         ''' </remarks>
-        Private Function GetBaseLineValues(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function GetBaseLineValues(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pBaseLineID As Integer, _
-                                           ByVal pWellUsed As Integer, ByVal pAdjustBaseLineID As Integer) As GlobalDataTO
+                                           ByVal pWellUsed As Integer, ByVal pAdjustBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -4516,7 +4517,7 @@ Namespace Biosystems.Ax00.Calculations
 
                 'AG 04/01/2011 - Read ligth values from twksWSBLinesByWell, read dark & adjust (TI, DAC) values from twksWSBLines
                 Dim mydelegate As New WSBLinesDelegate
-                myGlobal = mydelegate.ReadValuesForCalculations(pdbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pAdjustBaseLineID)
+                myGlobal = mydelegate.ReadValuesForCalculations(pdbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pAdjustBaseLineID, pType)
 
 
             Catch ex As Exception
@@ -7966,7 +7967,7 @@ Namespace Biosystems.Ax00.Calculations
                 ' Get baseline values
                 'Dark values are get from twksWSBLines
                 'Light values are get from twksWSBLinesByWell
-                resultData = Me.GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID)
+                resultData = GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID, "STATIC")
 
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     Dim myBaseLineDS As New BaseLinesDS
@@ -8783,12 +8784,12 @@ Namespace Biosystems.Ax00.Calculations
 
                 If (Not pExecToCalculateRow.IsBaseLineIDNull AndAlso Not pExecToCalculateRow.IsAdjustBaseLineIDNull) Then
 
-                    'AG 29/10/2014 BA-2057
+                    'AG 29/10/2014 BA-2064
                     'Dim myWSBLinesDelegate As New WSBLinesDelegate
                     'resultData = myWSBLinesDelegate.ReadValuesForCalculations(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, _
                     '                                                          myExecutionWell, common(pDimension).AdjustBaseLineID)
-                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID)
-                    'AG 29/10/2014 BA-2057
+                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID, "STATIC")
+                    'AG 29/10/2014 BA-2064
 
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         Dim myBaseLineDS As BaseLinesDS = DirectCast(resultData.SetDatos, BaseLinesDS)
