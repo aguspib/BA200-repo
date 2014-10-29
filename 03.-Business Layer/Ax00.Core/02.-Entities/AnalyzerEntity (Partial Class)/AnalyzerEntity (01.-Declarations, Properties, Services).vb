@@ -17,7 +17,7 @@ Imports Biosystems.Ax00.Core.Interfaces
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerEntity
+    Partial Public MustInherit Class AnalyzerEntity
 
 #Region "Declarations"
         'General use Class variables
