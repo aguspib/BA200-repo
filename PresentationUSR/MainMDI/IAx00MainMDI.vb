@@ -11704,4 +11704,7 @@ Partial Public Class IAx00MainMDI
 #End Region
 
 
+    Private Sub AuxBA200ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AuxBA200ToolStripMenuItem.Click
+        BA200TestForm.Show()
+    End Sub
 End Class

@@ -158,8 +158,8 @@ Partial Class IAx00MainMDI
         Me.bsTSSoundOff = New System.Windows.Forms.ToolStripButton()
         Me.InstrumentToolStripLabel = New System.Windows.Forms.ToolStripLabel()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
-        Me.bsTSAbortSessionButton = New System.Windows.Forms.ToolStripButton()
         Me.bsTSMultiFunctionSessionButton = New System.Windows.Forms.ToolStripButton()
+        Me.bsTSAbortSessionButton = New System.Windows.Forms.ToolStripButton()
         Me.SessionToolStripLabel = New System.Windows.Forms.ToolStripLabel()
         Me.BsStatusStrip1 = New Biosystems.Ax00.Controls.UserControls.BSStatusStrip()
         Me.ErrorStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
@@ -176,6 +176,7 @@ Partial Class IAx00MainMDI
         Me.ElapsedTimeTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer()
         Me.BsLoadDefaultReportTemplates = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker()
         Me.BsUpdateGlobesTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer()
+        Me.AuxBA200ToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.BsAx00MenuStrip.SuspendLayout()
         CType(Me.ProgressBar.Properties, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.LedsPanel.SuspendLayout()
@@ -521,7 +522,7 @@ Partial Class IAx00MainMDI
         '
         'HelpToolStripMenuItem
         '
-        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.WhatsNewToolStripMenuItem, Me.QuickToolStripMenuItem, Me.UserManualToolStripMenuItem, Me.ToolStripMenuItem10, Me.TutorialsToolStripMenuItem, Me.UserMaintenancePlanToolStripMenuItem, Me.ApplicationNotesToolStripMenuItem, Me.TroubleshooterToolStripMenuItem, Me.OnlineHelpToolStripMenuItem, Me.ToolStripSeparator8, Me.InstrumentInfoToolStripMenuItem, Me.AboutToolStripMenuItem, Me.BorrameToolStripMenuItem})
+        Me.HelpToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.WhatsNewToolStripMenuItem, Me.QuickToolStripMenuItem, Me.UserManualToolStripMenuItem, Me.ToolStripMenuItem10, Me.TutorialsToolStripMenuItem, Me.UserMaintenancePlanToolStripMenuItem, Me.ApplicationNotesToolStripMenuItem, Me.TroubleshooterToolStripMenuItem, Me.OnlineHelpToolStripMenuItem, Me.ToolStripSeparator8, Me.InstrumentInfoToolStripMenuItem, Me.AboutToolStripMenuItem, Me.BorrameToolStripMenuItem, Me.AuxBA200ToolStripMenuItem})
         resources.ApplyResources(Me.HelpToolStripMenuItem, "HelpToolStripMenuItem")
         Me.HelpToolStripMenuItem.ForeColor = System.Drawing.Color.Black
         Me.HelpToolStripMenuItem.Name = "HelpToolStripMenuItem"
@@ -997,19 +998,19 @@ Partial Class IAx00MainMDI
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
         Me.ToolStripSeparator7.TextDirection = System.Windows.Forms.ToolStripTextDirection.Vertical270
         '
-        'bsTSAbortSessionButton
-        '
-        resources.ApplyResources(Me.bsTSAbortSessionButton, "bsTSAbortSessionButton")
-        Me.bsTSAbortSessionButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.bsTSAbortSessionButton.Margin = New System.Windows.Forms.Padding(0, 1, 0, 1)
-        Me.bsTSAbortSessionButton.Name = "bsTSAbortSessionButton"
-        '
         'bsTSMultiFunctionSessionButton
         '
         resources.ApplyResources(Me.bsTSMultiFunctionSessionButton, "bsTSMultiFunctionSessionButton")
         Me.bsTSMultiFunctionSessionButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.bsTSMultiFunctionSessionButton.Margin = New System.Windows.Forms.Padding(0, 1, 0, 1)
         Me.bsTSMultiFunctionSessionButton.Name = "bsTSMultiFunctionSessionButton"
+        '
+        'bsTSAbortSessionButton
+        '
+        resources.ApplyResources(Me.bsTSAbortSessionButton, "bsTSAbortSessionButton")
+        Me.bsTSAbortSessionButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.bsTSAbortSessionButton.Margin = New System.Windows.Forms.Padding(0, 1, 0, 1)
+        Me.bsTSAbortSessionButton.Name = "bsTSAbortSessionButton"
         '
         'SessionToolStripLabel
         '
@@ -1107,6 +1108,11 @@ Partial Class IAx00MainMDI
         'BsUpdateGlobesTimer
         '
         Me.BsUpdateGlobesTimer.Interval = 500
+        '
+        'AuxBA200ToolStripMenuItem
+        '
+        Me.AuxBA200ToolStripMenuItem.Name = "AuxBA200ToolStripMenuItem"
+        resources.ApplyResources(Me.AuxBA200ToolStripMenuItem, "AuxBA200ToolStripMenuItem")
         '
         'IAx00MainMDI
         '
@@ -1305,5 +1311,6 @@ Partial Class IAx00MainMDI
     Friend WithEvents LISMappingToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents LISUtilitiesToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
     Friend WithEvents bsTSMultiFunctionSessionButton As System.Windows.Forms.ToolStripButton
+    Friend WithEvents AuxBA200ToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class
