@@ -1017,7 +1017,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'AG 29/10/2014 BA-2062
                         Case GlobalEnumerates.AppLayerInstrucionReception.ANSFBLD.ToString
                             'GenerateBaseLineTypeInstruction(myParameterValue, pParameterList, myIndexedList)
-                            GenerateANSFBLDInstruction(myParameterValue, pParameterList, myIndexedList)
+                            GenerateANSFBLDInstructionReception(myParameterValue, pParameterList, myIndexedList)
                             Exit Select
 
 
@@ -2634,6 +2634,35 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Function
 
 
+#End Region
+
+#Region "Public Methods for decode"
+
+        Public Function DecodeANSFBLDReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Try
+                Dim myUtilities As New Utilities
+                Dim myInstParamTO As New InstructionParameterTO
+
+                'Get Instruction field (parameter index 2)
+                Dim myInst As String = String.Empty
+                resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 2)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                Else
+                    Exit Try
+                End If
+                myInst = myInstParamTO.ParameterValue
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = "SYSTEM_ERROR"
+                resultData.ErrorMessage = ex.Message
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "Instructions.DecodeANSFBLDReceived", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "Private Methods"
@@ -4688,7 +4717,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by:  AG 30/10/2014 BA-2062 (based on GenerateANSPHRInstruction)
         ''' </remarks>
-        Public Function GenerateANSFBLDInstruction(ByVal pParameterValue As String, ByVal pParameterList As List(Of ParametersTO), _
+        Private Function GenerateANSFBLDInstructionReception(ByVal pParameterValue As String, ByVal pParameterList As List(Of ParametersTO), _
                                                  ByVal pIndexedList As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Try
@@ -4797,7 +4826,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Instructions.GenerateANSPHRInstruction", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "Instructions.GenerateANSFBLDInstructionReception", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

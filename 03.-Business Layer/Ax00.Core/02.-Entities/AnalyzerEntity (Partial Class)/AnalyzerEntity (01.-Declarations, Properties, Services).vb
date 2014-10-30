@@ -3111,7 +3111,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If GlobalBase.IsServiceAssembly Then
 
                                 Else
-
+                                    myGlobal = ProcessANSFBLDReceived(pInstructionReceived)
                                 End If
                                 'AG 29/10/2014 BA-2062
 

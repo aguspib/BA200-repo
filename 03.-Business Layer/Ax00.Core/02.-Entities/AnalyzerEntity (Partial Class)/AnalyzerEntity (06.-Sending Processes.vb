@@ -2084,13 +2084,15 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pdbConnection"></param>
         ''' <param name="pBaseLineDS"></param>
         ''' <param name="pBaseLineWithAdjust"></param>
+        ''' <param name="pType"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by AG 20/05/2010
         ''' AG 03/01/2011 - new parameter pBaseLineWithAdjust if ANSAL then save into twksWSBLines, else save into twksWSBLinesByWell
-        ''' AG 29/10/2014 BA-2057 inform as STATIC the new parameter type in method blDelegate.Exists
+        ''' AG 29/10/2014 BA-2057 inform new parameter pType in method blDelegate.Exists
+        ''' 
         ''' </remarks>
-        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean, ByVal pType As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -2106,7 +2108,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If pBaseLineWithAdjust Then '(1) Base line with adjust ("ANSAL" instruction received)
                                     'Option1 using table twksBLines
                                     Dim blDelegate As New WSBLinesDelegate
-                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, pBaseLineDS.twksWSBaseLines(0).BaseLineID, "STATIC")
+                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, pBaseLineDS.twksWSBaseLines(0).BaseLineID, ptype)
                                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                         If DirectCast(myGlobal.SetDatos, Boolean) = True Then
                                             'Update
@@ -2184,10 +2186,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG 21/05/2010
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
-        ''' AG 29/10/2014 BA-2057 define new optional parameter and inform it as part of the new parameters in myDelegate.GetCurrentBaseLineID
+        ''' AG 29/10/2014 BA-2057 and BA-2062 define new optional parameter and inform it as part of the new parameters in myDelegate.GetCurrentBaseLineID
         ''' </remarks>
         Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                           ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean, Optional ByVal pType As String = "STATIC") As GlobalDataTO
+                                           ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean, _
+                                           Optional ByVal pType As String = "STATIC", Optional ByVal pLed As Integer = -1) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -2198,26 +2201,43 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     If (Not dbConnection Is Nothing) Then
                         Dim currBaseLineID As Integer = 0
-                        Dim baselineComplete As Boolean = False
+                        Dim incrementIDFlag As Boolean = False
 
                         If pBaseLineWithAdjust Then 'Base line with adjust (ansal instruction received)
                             ''Option1: Using table WSBLinesDelegate (adjustment base line)
                             Dim myDelegate As New WSBLinesDelegate
-                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWellUsed, pType) 'AG 29/10/2014 BA-2057
+                            'AG 29/10/2014 BA-2062 - We are saving a new value, so get the maximum independent of the Type
+                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWellUsed, "")
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                 currBaseLineID = DirectCast(resultData.SetDatos, Integer)
                             Else
                                 Exit Try
                             End If
 
-                            'AG 20/04/2011 - not required
-                            'resultData = myDelegate.IsComplete(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID)
-                            'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '    baselineComplete = DirectCast(resultData.SetDatos, Boolean)
-                            'Else
-                            '    Exit Try
-                            'End If
-                            baselineComplete = True
+                            incrementIDFlag = True
+
+                            'If saving STATIC then next baseline ID is current+1 (code does it)
+                            'If DYNAMIC:
+                            '- Read base line with ID = currBaseLineID
+                            '    - If the type is STATIC then next ID = current+1
+                            '    - Else: If already exists for well, led then nextId = current+1
+                            If currBaseLineID > 0 AndAlso pType = "DYNAMIC" Then
+                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, "")
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    Dim auxDS As New BaseLinesDS
+                                    auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)
+
+                                    If auxDS.twksWSBaseLines.Rows.Count > 0 AndAlso auxDS.twksWSBaseLines(0).Type = "DYNAMIC" Then
+                                        Dim linqRes As List(Of BaseLinesDS.twksWSBaseLinesRow)
+                                        linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDS.twksWSBaseLines _
+                                                   Where a.WellUsed = pWellUsed AndAlso a.Wavelength = pLed Select a).ToList
+                                        If linqRes.Count = 0 Then
+                                            incrementIDFlag = False
+                                        End If
+                                    End If
+
+                                End If
+                            End If
 
                         Else 'ANSBL or ANSDL base line without adjust
                             'Option2: Using table WSBLinesByWellDelegate (1 base line in every well during washing cycles)
@@ -2228,20 +2248,12 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 Exit Try
                             End If
-
-                            'AG 20/04/2011 - not required
-                            'resultData = myDelegate2.IsComplete(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pWellUsed)
-                            'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '    baselineComplete = DirectCast(resultData.SetDatos, Boolean)
-                            'Else
-                            '    Exit Try
-                            'End If
-                            baselineComplete = True
+                            incrementIDFlag = True
 
                         End If
 
                         'Return the next baselineid depending if the current is completed or not
-                        If baselineComplete Then
+                        If incrementIDFlag = True Then
                             resultData.SetDatos = currBaseLineID + 1  'Next BaseLine = Current + 1
                         Else
                             resultData.SetDatos = currBaseLineID    'Next BaseLine = Current 
