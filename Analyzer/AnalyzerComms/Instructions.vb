@@ -1009,12 +1009,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Case GlobalEnumerates.AppLayerInstrucionReception.ANSBLD.ToString, _
                             GlobalEnumerates.AppLayerInstrucionReception.ANSISE.ToString, _
                             GlobalEnumerates.AppLayerInstrucionReception.ANSERR.ToString, _
-                            GlobalEnumerates.AppLayerInstrucionReception.ANSFWU.ToString, _
-                            GlobalEnumerates.AppLayerInstrucionReception.ANSFBLD.ToString
-
+                            GlobalEnumerates.AppLayerInstrucionReception.ANSFWU.ToString
                             'GenerateBaseLineTypeInstruction(myParameterValue, pParameterList, myIndexedList)
                             GenerateGenericalDinamicInstruction(myParameterValue, pParameterList, myIndexedList)
                             Exit Select
+
+                            'AG 29/10/2014 BA-2062
+                        Case GlobalEnumerates.AppLayerInstrucionReception.ANSFBLD.ToString
+                            'GenerateBaseLineTypeInstruction(myParameterValue, pParameterList, myIndexedList)
+                            GenerateANSFBLDInstruction(myParameterValue, pParameterList, myIndexedList)
+                            Exit Select
+
 
                         Case GlobalEnumerates.AppLayerInstrucionReception.ANSBR1.ToString, _
                              GlobalEnumerates.AppLayerInstrucionReception.ANSBR2.ToString, _
@@ -4669,6 +4674,131 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myLogAcciones.CreateLogActivity(ex.Message, "Instructions.GeneratePOLLRDInstruction", EventLogEntryType.Error, False)
             End Try
 
+            Return myGlobalDataTO
+        End Function
+
+
+        ''' <summary>
+        ''' Generate the ANSFBLD (dynamic base line results) type Instruction.
+        ''' </summary>
+        ''' <param name="pParameterValue"></param>
+        ''' <param name="pParameterList"></param>
+        ''' <param name="pIndexedList"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by:  AG 30/10/2014 BA-2062 (based on GenerateANSPHRInstruction)
+        ''' </remarks>
+        Public Function GenerateANSFBLDInstruction(ByVal pParameterValue As String, ByVal pParameterList As List(Of ParametersTO), _
+                                                 ByVal pIndexedList As List(Of InstructionParameterTO)) As GlobalDataTO
+            Dim myGlobalDataTO As New GlobalDataTO
+            Try
+                Dim myID As String = ""
+                Dim myIndexNumber As Integer = -1
+                Dim iteration As Integer = 0 'AG 11/05/2010
+                Dim numberOfWells As Integer = 0
+                Dim insertIndex As Integer = 0
+                Dim query As New List(Of ParametersTO)
+                Dim myTemIndexedList As New List(Of InstructionParameterTO)
+
+                'A400;ANSFBLD;P:<diode position>;BLW:<well read>;MP:<Mainlight>;RP:<Reflight>; repeat these tags 120 times ...;MD:<mainDark>;RD:<refdark>;TI:<intTime>;DAC:<value>;
+
+                For Each myIndexTO As InstructionParameterTO In pIndexedList
+                    'Linq the ParameterID and when found assign the ParameterValue
+                    myID = myIndexTO.Parameter 'for the 2 first items it is not informed
+
+                    'set the index number
+                    myIndexNumber = myIndexTO.ParameterIndex
+                    query = (From a In pParameterList Where a.ParameterID = myID Select a).ToList
+
+                    'Index 4 belongs BLW tag, query count inform us the number of wells read in instruction
+                    If myIndexNumber = 4 And query.Count > 0 Then
+                        numberOfWells = query.Count
+                    End If
+
+                    'If found ... assign value
+                    'AG 11/05/2010 - The 2 first parameters hasnt ParameterID (A400;instructiontype;...)
+                    If iteration <= 1 Then
+                        myIndexTO.Parameter = pParameterList(iteration).ParameterID
+                        myIndexTO.ParameterValue = pParameterList(iteration).ParameterID
+                    ElseIf query.Count > 0 Then
+                        myIndexTO.ParameterValue = query.First().ParameterValues
+                        'remove from parameters the 1st values of: BLW, MP, RP
+                        pParameterList.Remove(query.First())
+                    End If
+                    myIndexTO.ParameterIndex = iteration + 1 ' TR 25/05/2010 -Set the secuential index value.
+                    iteration = iteration + 1
+
+                Next
+
+
+                'Search and INSERT the rest of wells read (insert fields BLW, MP, RP)
+                If numberOfWells - 1 > 0 Then
+                    insertIndex = 6
+                    myTemIndexedList = GetInstructionParameter(pParameterValue)
+
+                    If myTemIndexedList.Count > 0 Then '(1) AG 28/10/2010
+                        Dim qResultStructure As New List(Of InstructionParameterTO)
+
+                        For res As Integer = 1 To numberOfWells - 1
+                            'The fields in loop are BLW, MP and BP with parameter index 4,5,6
+                            qResultStructure = (From a In myTemIndexedList Where a.ParameterIndex >= 4 AndAlso a.ParameterIndex <= 6 Select a).ToList()
+                            Dim myID2 As String = ""
+
+                            Dim myIntructionParameterTO As New InstructionParameterTO()
+                            'go throught each intstruction on the result structure and fill it.
+                            For Each myIntrucRow As InstructionParameterTO In qResultStructure
+                                'fill the intruccion with the required parameters
+                                myIntructionParameterTO.InstructionType = myIntrucRow.InstructionType
+                                myIntructionParameterTO.Parameter = myIntrucRow.Parameter
+                                myIntructionParameterTO.ParameterIndex = iteration + 1 ' TR 25/05/2010 -Set the secuential index value.
+
+                                myID2 = myIntrucRow.Parameter
+                                'Get the parameter value onthe ParameterList Structure.
+                                query = (From a In pParameterList Where a.ParameterID.Trim = myID2.Trim _
+                                         Select a).ToList
+
+                                If query.Count > 0 Then
+                                    myIntructionParameterTO.ParameterValue = query.First().ParameterValues
+                                    ' after adding value remove for the parameter list.
+                                    pParameterList.Remove(query.First())
+
+                                    'Insert values in my intructions list.
+                                    pIndexedList.Insert(insertIndex, myIntructionParameterTO)
+                                    insertIndex += 1
+                                    myIntructionParameterTO = New InstructionParameterTO()
+                                End If
+                                iteration += 1
+                            Next
+
+                        Next
+                        qResultStructure = Nothing 'AG 02/08/2012 - free memory
+
+                        'Finally renumerate properly the ParameterIndex value
+                        iteration = 1
+                        For Each itemList As InstructionParameterTO In pIndexedList
+                            itemList.ParameterIndex = iteration
+                            iteration += 1
+                        Next
+
+                    Else '(1)
+                        myGlobalDataTO.HasError = True
+                        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.WRONG_DATATYPE.ToString
+                    End If '(1)
+
+                    'myGlobalDataTO.SetDatos = pIndexedList 'AG 28/10/2010
+                End If
+                query = Nothing 'AG 02/08/2012 - free memory
+                myTemIndexedList = Nothing 'AG 02/08/2012 - free memory
+
+                myGlobalDataTO.SetDatos = pIndexedList
+            Catch ex As Exception
+                myGlobalDataTO.HasError = True
+                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "Instructions.GenerateANSPHRInstruction", EventLogEntryType.Error, False)
+            End Try
             Return myGlobalDataTO
         End Function
 
