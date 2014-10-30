@@ -22,21 +22,13 @@ Partial Class BA200TestForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
-        Me.TextCommand1 = New DevExpress.CodeRush.Core.TextCommand(Me.components)
         Me.searchGroup = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.btnPerformBL = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.btnEmptyRotor = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.subtitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.btnFillRotor = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        CType(Me.TextCommand1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.searchGroup.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'TextCommand1
-        '
-        Me.TextCommand1.CommandName = Nothing
-        Me.TextCommand1.Description = Nothing
         '
         'searchGroup
         '
@@ -113,12 +105,10 @@ Partial Class BA200TestForm
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "BA200TestForm"
         Me.Text = "BA200 Test Form"
-        CType(Me.TextCommand1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.searchGroup.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents TextCommand1 As DevExpress.CodeRush.Core.TextCommand
     Friend WithEvents searchGroup As Biosystems.Ax00.Controls.UserControls.BSGroupBox
     Friend WithEvents subtitleLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents btnFillRotor As Biosystems.Ax00.Controls.UserControls.BSButton
