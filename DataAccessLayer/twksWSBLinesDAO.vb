@@ -66,7 +66,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 29/10/2014 BA-2057
                         '     "  , '" & myRow.DateTime.ToString("yyyyMMdd HH:mm:ss") & "')"
                         If Not myRow.IsTypeNull Then
-                            cmdText &= " ,  " & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf
+                            cmdText &= " , '" & myRow.Type.Replace("'", "''").ToString & "'" & vbCrLf
                         Else 'Default value
                             cmdText &= " , 'STATIC' "
                         End If
@@ -593,7 +593,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                           " AND BL.Wavelength = BLW.Wavelenght " & vbCrLf
 
                         'AG 29/10/2014 BA-2062
-                        If pType <> "" Then
+                        If pType = "DYNAMIC" Then
                             cmdText &= " AND BL.WellUsed = BLW.WellUsed " & vbCrLf
                         End If
                         'AG 29/10/2014 BA-2062
