@@ -30,7 +30,8 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
-        Property Calculations As CalculationsDelegate Implements IAnalyzerEntity.calculations
+        'AG 30/10/2014 BA-2064 comment new code temporally
+        'Property Calculations As CalculationsDelegate Implements IAnalyzerEntity.calculations
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
             Me.New(assemblyName, analyzerModel)

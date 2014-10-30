@@ -38,7 +38,8 @@ Namespace Biosystems.Ax00.App
             analyzer.ISEAnalyzer = iseAnalyzer
 
             'Delegates
-            analyzer.Calculations = New CalculationsBA400Delegate()
+            'AG 30/10/2014 BA-2064 comment new code temporally
+            'analyzer.Calculations = New CalculationsBA400Delegate()
 
             Return analyzer
 
