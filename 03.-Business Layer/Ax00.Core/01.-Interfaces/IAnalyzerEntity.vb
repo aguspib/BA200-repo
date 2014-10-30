@@ -14,7 +14,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property BaseLine As IBaseLineEntity
         Property ISEAnalyzer As IISEAnalyzerEntity
 
-        Property Calculations As CalculationsDelegate
+        'AG 30/10/2014 BA-2064 comment new code temporally
+        'Property Calculations As CalculationsDelegate
 
         Property classInitializationError() As Boolean
         Property ActiveWorkSession() As String
