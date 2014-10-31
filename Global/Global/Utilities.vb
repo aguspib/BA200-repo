@@ -2366,7 +2366,57 @@ Namespace Biosystems.Ax00.Global
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
+        ''' Calculate standar deviation for a list of single values
+        ''' </summary>
+        ''' <param name="pCollection"></param>
+        ''' <returns>SD as single</returns>
+        ''' <remarks>AG 03/05/2011 creation
+        ''' AG 31/10/2014 moved from BaseLineEntity</remarks>
+        Public Function CalculateStandardDeviation(ByVal pCollection As List(Of Single)) As Single
+            Dim myResult As Single = 0
+            Try
+                ''Formula initial: WRONG
+                'Dim myAverage As Single = pCollection.Average
+                'Dim items As Integer = pCollection.Count
 
+                'Dim sum As Single = 0
+                'For i As Integer = 0 To pCollection.Count - 1
+                '    sum += (pCollection(i) - myAverage)
+                'Next
+
+                'If items > 0 Then
+                '    sum = sum / items
+                'End If
+
+                'If sum > 0 Then
+                '    myResult = CSng(Math.Sqrt(CDbl(sum)))
+                'End If
+
+                'Formula final: OK (STortosa 06/07/2011)
+                Dim myAverage As Single = pCollection.Average
+                Dim items As Integer = pCollection.Count - 1
+
+                Dim sum As Single = 0
+                For i As Integer = 0 To pCollection.Count - 1
+                    sum += CSng((pCollection(i) - myAverage) ^ 2)
+                Next
+
+                If items > 0 Then
+                    sum = sum / items
+                End If
+
+                If sum > 0 Then
+                    myResult = CSng(Math.Sqrt(CDbl(sum)))
+                End If
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CalculateStandardDeviation", EventLogEntryType.Error, False)
+            End Try
+            Return myResult
+
+        End Function
 
 #End Region
 
