@@ -816,7 +816,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If (validAndCompleteReadings) Then
                                     'AG 30/10/2014 BA-2064 comment new code temporally
                                     Dim myCalc As New CalculationsDelegate() '!!Declare this variable inside the loop. Otherwise, some structures keep information of previous Executions calculated
-                                    myGlobal = myCalc.CalculateExecution(Nothing, readingsRow.ExecutionID, readingsRow.AnalyzerID, readingsRow.WorkSessionID, False, "")
+                                    myGlobal = myCalc.CalculateExecutionNEW(Nothing, readingsRow.AnalyzerID, readingsRow.WorkSessionID, readingsRow.ExecutionID, False, "")
                                     'myGlobal = Calculations.CalculateExecutionNEW(Nothing, readingsRow.AnalyzerID, readingsRow.WorkSessionID, readingsRow.ExecutionID, False, "")
 
                                     If (Not myGlobal.HasError) Then
