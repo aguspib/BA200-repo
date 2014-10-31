@@ -1015,7 +1015,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             '                                                                           else the Alight repetition can be perform in the same well another time)
                         End If
                         '1st Get the next baselineID
-                        myGlobalDataTO = Me.GetNextBaseLineID(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myWell, baseLineWithAdjust)
+                        myGlobalDataTO = GetNextBaseLineIDForSave(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myWell, baseLineWithAdjust)
                         If Not myGlobalDataTO.HasError Or Not myGlobalDataTO.SetDatos Is Nothing Then
                             nextBaseLineID = DirectCast(myGlobalDataTO.SetDatos, Integer)
                         Else
@@ -3888,35 +3888,39 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim nextBaseLineID As Integer = 0
                         Dim baseLineRow As BaseLinesDS.twksWSBaseLinesRow
 
-                        For index As Integer = 0 To myResults.WellUsed.Count - 1
-                            'Get the baseLineID
-                            resultData = GetNextBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myResults.WellUsed(index), True, "DYNAMIC", myResults.Wavelength)
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                nextBaseLineID = DirectCast(resultData.SetDatos, Integer)
-                            Else
-                                Exit For
-                            End If
+                        If Not resultData.HasError Then
+                            For index As Integer = 0 To myResults.WellUsed.Count - 1
+                                'Get the baseLineID
+                                resultData = GetNextBaseLineIDForSave(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myResults.WellUsed(index), True, "DYNAMIC", myResults.Wavelength)
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    nextBaseLineID = DirectCast(resultData.SetDatos, Integer)
+                                Else
+                                    Exit For
+                                End If
 
-                            baseLineRow = myBaseLineDS.twksWSBaseLines.NewtwksWSBaseLinesRow
-                            baseLineRow.BeginEdit()
-                            baseLineRow.AnalyzerID = AnalyzerIDAttribute
-                            baseLineRow.BaseLineID = nextBaseLineID
-                            baseLineRow.WorkSessionID = WorkSessionIDAttribute
-                            baseLineRow.WellUsed = myResults.WellUsed(index)
-                            baseLineRow.MainLight = myResults.MainLight(index)
-                            baseLineRow.RefLight = myResults.RefLight(index)
-                            baseLineRow.MainDark = myResults.MainDark
-                            baseLineRow.IT = myResults.IntegrationTime
-                            baseLineRow.DAC = myResults.DAC
-                            baseLineRow.DateTime = DateTime.Now
-                            baseLineRow.Type = "DYNAMIC" 'AG 28/10/2014 BA-2062
-                            baseLineRow.EndEdit()
-                            myBaseLineDS.twksWSBaseLines.AddtwksWSBaseLinesRow(baseLineRow)
-                        Next
-                        myBaseLineDS.AcceptChanges()
+                                baseLineRow = myBaseLineDS.twksWSBaseLines.NewtwksWSBaseLinesRow
+                                baseLineRow.BeginEdit()
+                                baseLineRow.AnalyzerID = AnalyzerIDAttribute
+                                baseLineRow.BaseLineID = nextBaseLineID
+                                baseLineRow.WorkSessionID = WorkSessionIDAttribute
+                                baseLineRow.Wavelength = myResults.Wavelength
+                                baseLineRow.WellUsed = myResults.WellUsed(index)
+                                baseLineRow.MainLight = myResults.MainLight(index)
+                                baseLineRow.RefLight = myResults.RefLight(index)
+                                baseLineRow.MainDark = myResults.MainDark
+                                baseLineRow.RefDark = myResults.RefDark
+                                baseLineRow.IT = myResults.IntegrationTime
+                                baseLineRow.DAC = myResults.DAC
+                                baseLineRow.DateTime = DateTime.Now
+                                baseLineRow.Type = "DYNAMIC" 'AG 28/10/2014 BA-2062
+                                baseLineRow.EndEdit()
+                                myBaseLineDS.twksWSBaseLines.AddtwksWSBaseLinesRow(baseLineRow)
+                            Next
+                            myBaseLineDS.AcceptChanges()
 
-                        'Save baseline results into database
-                        resultData = Me.SaveBaseLineResults(Nothing, myBaseLineDS, True, "DYNAMIC")
+                            'Save baseline results into database
+                            resultData = Me.SaveBaseLineResults(Nothing, myBaseLineDS, True, "DYNAMIC")
+                        End If
 
                     Else
                         'Error, invalid structure for the instruction

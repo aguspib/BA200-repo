@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 #Region "Abstract methods"
-        Public MustOverride Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public MustOverride Function GetCurrentBaseLineIDForCalculations(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                           ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
 #End Region

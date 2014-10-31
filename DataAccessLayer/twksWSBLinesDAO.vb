@@ -247,6 +247,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">NOT USED!!</param>
         ''' <param name="pBaseLineID">Identifier of the adjustment Base Line</param>
+        ''' <param name="pLed"></param>
         ''' <param name="pType" >STATIC or DYNAMIC. If "" do not take into account</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all data for the informed BaseLine</returns>
         ''' <remarks>
@@ -255,10 +256,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 14/05/2010 - Added ORDER BY clause
         '''              AG 20/05/2010 - Added parameters AnalyzerID and WorkSessionID
         '''              AG 29/04/2011 - WorkSessionID is removed from table twksWSBLines
-        ''' AG 29/10/2014 BA-2057 parameter pType
+        ''' AG 29/10/2014 BA-2057 parameter pWellUsed, pType
         ''' </remarks>
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                             ByVal pBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
+                             ByVal pBaseLineID As Integer, ByVal pLed As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -277,6 +278,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 29/10/2014 BA-2057
                         If pType <> "" Then
                             cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                            If pType = "DYNAMIC" Then
+                                cmdText &= " AND Wavelength = " & pLed
+                            End If
+
                         End If
 
                         cmdText &= " ORDER BY Wavelength " & vbCrLf

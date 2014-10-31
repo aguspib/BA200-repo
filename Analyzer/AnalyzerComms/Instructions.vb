@@ -2643,16 +2643,93 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
+                Dim myResults As New DynamicBaseLineTO
 
-                'Get Instruction field (parameter index 2)
+                'Get LED field (parameter index 3)
                 Dim myInst As String = String.Empty
-                resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 2)
+                Dim index As Integer = 3
+                resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
                 Else
                     Exit Try
                 End If
-                myInst = myInstParamTO.ParameterValue
+                myResults.Wavelength = CInt(myInstParamTO.ParameterValue)
+
+                'Loop: Get wellused, mainlight, reflight
+                Do Until index >= pInstructionReceived.Count - 4 'do not take into account the last 4 items (maindark, refdark, IT, DAC)
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Do
+                    End If
+                    myResults.WellUsed.Add(CInt(myInstParamTO.ParameterValue))
+
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Do
+                    End If
+                    myResults.MainLight.Add(CInt(myInstParamTO.ParameterValue))
+
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Do
+                    End If
+                    myResults.RefLight.Add(CInt(myInstParamTO.ParameterValue))
+                Loop
+
+                If Not resultData.HasError Then
+                    'Get maindark
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Try
+                    End If
+                    myResults.MainDark = CInt(myInstParamTO.ParameterValue)
+
+                    'Get refdark
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Try
+                    End If
+                    myResults.RefDark = CInt(myInstParamTO.ParameterValue)
+
+                    'Get IT
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Try
+                    End If
+                    myResults.IntegrationTime = CSng(myInstParamTO.ParameterValue)
+
+                    'Get DAC
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Try
+                    End If
+                    myResults.DAC = CSng(myInstParamTO.ParameterValue)
+
+                    resultData.SetDatos = myResults
+                End If
+
 
             Catch ex As Exception
                 resultData.HasError = True

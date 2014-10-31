@@ -2033,7 +2033,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by AG 03/01/2011 - if pBaseLineWithAdjust = true (if ANSAL get current baselineid from twksWSBLines, else (FALSE) get from twksWSBLinesByWell
         ''' AG 29/10/2014 BA-2062 adapt method to read the static or dynamic base line (add pType parameter)
         ''' </remarks>
-        Public Function GetCurrentBaseLineIDByType(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function GetCurrentBaseLineIDForCalculationsByType(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                              ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -2064,7 +2064,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineIDByType", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineIDForCalculationsByType", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2108,7 +2108,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If pBaseLineWithAdjust Then '(1) Base line with adjust ("ANSAL" instruction received)
                                     'Option1 using table twksBLines
                                     Dim blDelegate As New WSBLinesDelegate
-                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, pBaseLineDS.twksWSBaseLines(0).BaseLineID, ptype)
+                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, _
+                                                                 pBaseLineDS.twksWSBaseLines(0).BaseLineID, pBaseLineDS.twksWSBaseLines(0).Wavelength, pType)
                                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                         If DirectCast(myGlobal.SetDatos, Boolean) = True Then
                                             'Update
@@ -2188,7 +2189,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
         ''' AG 29/10/2014 BA-2057 and BA-2062 define new optional parameter and inform it as part of the new parameters in myDelegate.GetCurrentBaseLineID
         ''' </remarks>
-        Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function GetNextBaseLineIDForSave(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean, _
                                            Optional ByVal pType As String = "STATIC", Optional ByVal pLed As Integer = -1) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2222,7 +2223,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             '    - If the type is STATIC then next ID = current+1
                             '    - Else: If already exists for well, led then nextId = current+1
                             If currBaseLineID > 0 AndAlso pType = "DYNAMIC" Then
-                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, "")
+                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "")
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     Dim auxDS As New BaseLinesDS
                                     auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)
@@ -2268,7 +2269,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextBaseLineIDForSave", EventLogEntryType.Error, False)
             Finally
 
             End Try

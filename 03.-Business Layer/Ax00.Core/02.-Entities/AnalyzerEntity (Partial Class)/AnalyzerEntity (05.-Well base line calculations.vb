@@ -252,7 +252,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
                     myBaseLineWell = CType(myInstParamTO.ParameterValue, Integer)
 
-                    resultData = GetNextBaseLineID(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBaseLineWell, False)
+                    resultData = GetNextBaseLineIDForSave(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBaseLineWell, False)
                     If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                         newID = CType(resultData.SetDatos, Integer)
                     End If
@@ -539,12 +539,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                                 'Get the BaseLineID for the base lines without adjust (from table twksWSBLinesByWell)
-                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
+                                myGlobal = GetCurrentBaseLineIDForCalculations(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 localBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
                                 'Get the BaseLineID for the base lines with adjust (from table twksWSBLines)
-                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
+                                myGlobal = GetCurrentBaseLineIDForCalculations(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 myAdjustBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
