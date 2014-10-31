@@ -2015,7 +2015,7 @@ Namespace Biosystems.Ax00.Core.Entities
         End Function
 
         ''' <summary>
-        ''' Get the current baseline ID in order to inform every execution with his correct base line
+        ''' Get the Current (last) baseline ID in order to inform every execution with his correct base line
         ''' 
         ''' If pBaseLineWithAdjust = TRUE is ANSAL get the ID from twksWSBLines table, else get from twksWSBLinesByWell table
         ''' 
@@ -2031,9 +2031,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by AG ?
         ''' Modified by AG 03/01/2011 - if pBaseLineWithAdjust = true (if ANSAL get current baselineid from twksWSBLines, else (FALSE) get from twksWSBLinesByWell
-        ''' AG 29/10/2014 BA-2062 adapt method to read the static or dynamic base line (add pType parameter)
+        ''' AG 29/10/2014 BA-2064 adapt method to read the static or dynamic base line (add pType parameter)
         ''' </remarks>
-        Public Function GetCurrentBaseLineIDForCalculationsByType(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function GetCurrentBaseLineIDByType(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                              ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -2064,7 +2064,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineIDForCalculationsByType", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineIDByType", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

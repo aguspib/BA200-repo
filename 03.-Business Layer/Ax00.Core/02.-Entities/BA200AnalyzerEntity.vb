@@ -22,12 +22,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pBaseLineWithAdjust"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' AG 29/10/2014 BA-2052 adapt method to read the static or dynamic base line
+        ''' AG 29/10/2014 BA-2064 adapt method to read the static or dynamic base line
         ''' </remarks>
-        Public Overrides Function GetCurrentBaseLineIDForCalculations(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Overrides Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                      ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
-            Return MyBase.GetCurrentBaseLineIDForCalculationsByType(pdbConnection, pAnalyzerID, pWorkSessionID, pWell, pBaseLineWithAdjust, "DYNAMIC")
+            Return MyBase.GetCurrentBaseLineIDByType(pdbConnection, pAnalyzerID, pWorkSessionID, pWell, pBaseLineWithAdjust, "DYNAMIC")
         End Function
 
 #End Region

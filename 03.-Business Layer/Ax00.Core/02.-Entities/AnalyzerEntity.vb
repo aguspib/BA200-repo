@@ -41,8 +41,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
 #Region "Abstract methods"
-        Public MustOverride Function GetCurrentBaseLineIDForCalculations(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                          ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        ''' <summary>
+        ''' Get the urrent (last) base line ID. It must be override because different model may use a different type of base line (STATIC or DYNAMIC)
+        ''' </summary>
+        ''' <param name="pdbConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pWell"></param>
+        ''' <param name="pBaseLineWithAdjust"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public MustOverride Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                                      ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
 #End Region
     End Class

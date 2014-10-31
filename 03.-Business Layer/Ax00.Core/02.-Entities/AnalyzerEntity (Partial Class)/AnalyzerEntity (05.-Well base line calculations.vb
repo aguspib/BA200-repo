@@ -539,12 +539,12 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                                 'Get the BaseLineID for the base lines without adjust (from table twksWSBLinesByWell)
-                                myGlobal = GetCurrentBaseLineIDForCalculations(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
+                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 localBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
                                 'Get the BaseLineID for the base lines with adjust (from table twksWSBLines)
-                                myGlobal = GetCurrentBaseLineIDForCalculations(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
+                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 myAdjustBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
