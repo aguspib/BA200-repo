@@ -2499,7 +2499,10 @@ Public Class IPositionsAdjustments
     ''' <summary>
     ''' Prepare GUI for Optical centering final absorbance reading Prepared Mode
     ''' </summary>
-    ''' <remarks>Created by XBC 23/09/2011</remarks>
+    ''' <remarks>
+    ''' Created by XBC 23/09/2011
+    ''' Modified by XB 31/10/2014 - Correction - BA-2058
+    ''' </remarks>
     Private Sub PrepareAbsorbancePreparedMode()
         Try
             Dim myGlobal As New GlobalDataTO
@@ -2601,7 +2604,7 @@ Public Class IPositionsAdjustments
                 ' XBC 03/01/2012 - Add Encoder functionality
                 .LastEncoderValue = CSng(ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ENCODER).Value)
                 .CurrentEncoderValue = .LastEncoderValue
-                .NewEncoderValue = .LastEncoderValue
+                '.NewEncoderValue = .LastEncoderValue           ' XB 31/10/2014 - BA-2058
                 ' XBC 03/01/2012 - Add Encoder functionality
 
                 .homePolarID = Nothing

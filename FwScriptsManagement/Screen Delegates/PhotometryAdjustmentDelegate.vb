@@ -2488,6 +2488,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <remarks>
         ''' Created by XBC 28/02/2011
         ''' Modified by XB 13/10/2014 - new photometry adjustment maneuver (use REAGENTS_ABS_ROTOR (with parameter = current value of GFWR1) instead of REACTIONS_ROTOR_HOME_WELL1) - BA-1953
+        '''             XB 31/10/2014 - Use FAC because Firmware makes the fine auto-adjustment - BA-2058
         ''' </remarks>
         Private Function SendQueueForTESTING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
@@ -2567,16 +2568,18 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                         ' After home move abs to the current value of adjustment GFWR1
                         With myFwScript1
-                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString
+                            .FwScriptID = FwSCRIPTS_IDS.REACTIONS_ROTOR_HOME_WELL1.ToString    ' FwSCRIPTS_IDS.REACTIONS_ABS_ROTOR.ToString ' XB 31/10/2014 - BA-2058
                             .EvaluateType = EVALUATE_TYPES.NUM_VALUE
                             .EvaluateValue = 1
                             .NextOnResultOK = Nothing
                             .NextOnResultNG = Nothing
                             .NextOnTimeOut = Nothing
                             .NextOnError = Nothing
-                            ' expects 1 param
-                            .ParamList = New List(Of String)
-                            .ParamList.Add(Me.pValueAdjustAttr)
+                            ' XB 31/10/2014 - BA-2058
+                            '' expects 1 param
+                            '.ParamList = New List(Of String)
+                            '.ParamList.Add(Me.pValueAdjustAttr)
+                            .ParamList = Nothing
                         End With
 
                         ' Send Preliminary Homes
