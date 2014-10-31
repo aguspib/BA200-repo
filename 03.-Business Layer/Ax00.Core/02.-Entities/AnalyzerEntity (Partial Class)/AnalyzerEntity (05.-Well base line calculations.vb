@@ -252,7 +252,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
                     myBaseLineWell = CType(myInstParamTO.ParameterValue, Integer)
 
-                    resultData = GetNextBaseLineIDForSave(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBaseLineWell, False)
+                    resultData = GetNextBaseLineID(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myBaseLineWell, False)
                     If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                         newID = CType(resultData.SetDatos, Integer)
                     End If

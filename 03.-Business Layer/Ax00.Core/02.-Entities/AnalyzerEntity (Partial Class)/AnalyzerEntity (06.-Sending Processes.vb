@@ -2189,7 +2189,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
         ''' AG 29/10/2014 BA-2057 and BA-2062 define new optional parameter and inform it as part of the new parameters in myDelegate.GetCurrentBaseLineID
         ''' </remarks>
-        Private Function GetNextBaseLineIDForSave(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean, _
                                            Optional ByVal pType As String = "STATIC", Optional ByVal pLed As Integer = -1) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2269,7 +2269,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextBaseLineIDForSave", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextBaseLineID", EventLogEntryType.Error, False)
             Finally
 
             End Try
