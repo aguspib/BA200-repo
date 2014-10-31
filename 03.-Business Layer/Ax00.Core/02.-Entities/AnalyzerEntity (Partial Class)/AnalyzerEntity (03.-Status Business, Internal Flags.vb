@@ -812,7 +812,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Before send ALIGHT process ... delete the all ALIGHT results
                             If Not myGlobal.HasError Then
                                 Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                 If Not myGlobal.HasError Then
                                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                     baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
@@ -916,7 +916,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 'Before send ALIGHT process ... delete the all ALIGHT results
                                 If Not myGlobal.HasError Then
                                     Dim ALightDelg As New WSBLinesDelegate
-                                    myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                                    myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                     If Not myGlobal.HasError Then
                                         'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                         baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter

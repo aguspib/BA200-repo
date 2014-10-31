@@ -4402,7 +4402,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                 'Before send ALIGHT in wup process ... delete the all ALIGHT results
                                 Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                 If Not myGlobal.HasError Then
                                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                     baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter

@@ -649,13 +649,15 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pType">IF ="" delete ALL, if different delete by all by Type</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: GDS 21/04/2010
         ''' Modified by: AG 29/04/2011 - Due to field WorkSessionID was removed from table twksWSBLines, method is renamed from ResetWS to 
         '''                              ResetAdjustsBLines, parameter pWorkSessionID is also removed, and the query is changed to remove the filter
+        ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
         ''' </remarks>
-        Public Function ResetAdjustsBLines(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function ResetAdjustsBLines(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -664,6 +666,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " DELETE twksWSBLines WHERE AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+
+                    'AG 31/10/2014 BA-2057
+                    If pType <> "" Then
+                        cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' "
+                    End If
+                    'AG 31/10/2014 BA-2057
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.SetDatos = dbCmd.ExecuteNonQuery()
