@@ -2657,7 +2657,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myResults.Wavelength = CInt(myInstParamTO.ParameterValue)
 
                 'Loop: Get wellused, mainlight, reflight
-                Do Until index >= pInstructionReceived.Count - 4 'do not take into account the last 4 items (maindark, refdark, IT, DAC)
+                Do Until index >= pInstructionReceived.Count - 6 'do not take into account the last 6 items (maindark, refdark, IT, DAC)
                     index += 1
                     resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -2706,6 +2706,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Exit Try
                     End If
                     myResults.RefDark = CInt(myInstParamTO.ParameterValue)
+
+                    'Get mainbaseline
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Try
+                    End If
+                    myResults.MainBaseLine = CInt(myInstParamTO.ParameterValue)
+
+                    'Get refbaseline
+                    index += 1
+                    resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, index)
+                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                        myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
+                    Else
+                        Exit Try
+                    End If
+                    myResults.RefBaseLine = CInt(myInstParamTO.ParameterValue)
 
                     'Get IT
                     index += 1

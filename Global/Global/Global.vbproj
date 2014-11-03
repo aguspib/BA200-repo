@@ -132,7 +132,7 @@
     <Compile Include="PerformanceCounters\AXPerformanceCounters.vb" />
     <Compile Include="PerformanceCounters\SystemCounter.vb" />
     <Compile Include="TO\AllowedLIMSValuesTO.vb" />
-    <Compile Include="TO\DynamicBaseLineTO.vb" />
+    <Compile Include="TO\InstructionsDecode\DynamicBaseLineTO.vb" />
     <Compile Include="TO\FWUpdateRequestTO.vb" />
     <Compile Include="TO\FWUpdateResponseTO.vb" />
     <Compile Include="TO\ISE\ISEMonitorTO.vb" />

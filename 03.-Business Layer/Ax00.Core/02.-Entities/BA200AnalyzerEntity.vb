@@ -7,7 +7,7 @@ Namespace Biosystems.Ax00.Core.Entities
         Inherits AnalyzerEntity
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)
-            MyBase.New(assemblyName, analyzerModel)
+            MyBase.New(assemblyName, analyzerModel, baseLine)
         End Sub
 
 #Region "Overridden methods"

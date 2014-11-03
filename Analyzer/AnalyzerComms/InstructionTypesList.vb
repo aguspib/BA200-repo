@@ -5084,37 +5084,49 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myInstructionTO.ParameterIndex = 5
                 Instructions.Add(myInstructionTO)
 
-                'END LOOP FOR 120 WELLS
-                ''''''''''''''''''''
-
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "ANSFBLD"
                 myInstructionTO.Parameter = "RP"    'reference led ligth counts
                 myInstructionTO.ParameterIndex = 6
                 Instructions.Add(myInstructionTO)
 
+                'END LOOP FOR 120 WELLS
+                ''''''''''''''''''''
+
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "ANSFBLD"
-                myInstructionTO.Parameter = "MD"    'main led dark counts
+                myInstructionTO.Parameter = "MPDK"    'main led dark counts (from well used in ALIGHT)
                 myInstructionTO.ParameterIndex = 7
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "ANSFBLD"
-                myInstructionTO.Parameter = "RD" 'reference led dark counts
+                myInstructionTO.Parameter = "RPDK" 'reference led dark counts (from well used in ALIGHT)
                 myInstructionTO.ParameterIndex = 8
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "ANSFBLD"
-                myInstructionTO.Parameter = "IT" 'led integration time
+                myInstructionTO.Parameter = "MPBL"    'main led light counts (from well used in ALIGHT)
                 myInstructionTO.ParameterIndex = 9
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = New InstructionParameterTO
                 myInstructionTO.InstructionType = "ANSFBLD"
-                myInstructionTO.Parameter = "DAC" 'led DAC
+                myInstructionTO.Parameter = "RPBL" 'reference led light counts (from well used in ALIGHT)
                 myInstructionTO.ParameterIndex = 10
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "IT" 'led integration time (from well used in ALIGHT)
+                myInstructionTO.ParameterIndex = 11
+                Instructions.Add(myInstructionTO)
+
+                myInstructionTO = New InstructionParameterTO
+                myInstructionTO.InstructionType = "ANSFBLD"
+                myInstructionTO.Parameter = "DAC" 'led DAC (from well used in ALIGHT)
+                myInstructionTO.ParameterIndex = 12
                 Instructions.Add(myInstructionTO)
 
                 myInstructionTO = Nothing   ' XB 19/02/2014 - release memory - task #1496

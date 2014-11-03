@@ -9,6 +9,8 @@
         Private RefLightAttr As New List(Of Integer)
         Private MainDarkAttr As Integer
         Private RefDarkAttr As Integer
+        Private MainBaseLineAttr As Integer 'Defined in instruction but not used by software
+        Private RefBaseLineAttr As Integer 'Defined in instruction but not used by software
         Private IntegrationTimeAttr As Single
         Private DACAttr As Single
 
@@ -71,6 +73,24 @@
             End Set
         End Property
 
+        Public Property MainBaseLine() As Integer
+            Get
+                Return MainBaseLineAttr
+            End Get
+            Set(ByVal value As Integer)
+                MainBaseLineAttr = value
+            End Set
+        End Property
+
+        Public Property RefBaseLine() As Integer
+            Get
+                Return RefBaseLineAttr
+            End Get
+            Set(ByVal value As Integer)
+                RefBaseLineAttr = value
+            End Set
+        End Property
+
         Public Property IntegrationTime() As Single
             Get
                 Return IntegrationTimeAttr
@@ -114,6 +134,8 @@
             RefLightAttr.Clear()
             MainDarkAttr = 0
             RefDarkAttr = 0
+            MainBaseLineAttr = 0
+            RefBaseLineAttr = 0
             IntegrationTimeAttr = 0
             DACAttr = 0
         End Sub
