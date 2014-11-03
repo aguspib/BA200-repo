@@ -3870,6 +3870,12 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
         End Sub
 
+        ''' <summary>
+        ''' Process reception of ANSFBLD instruction
+        ''' </summary>
+        ''' <param name="pInstructionReceived"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 31/10/2014 BA-2062</remarks>
         Private Function ProcessANSFBLDReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
