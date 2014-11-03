@@ -8567,7 +8567,7 @@ Partial Public Class IAx00MainMDI
                 'AG 06/09/2012 - Analyzer manager initialization requires WorkSessionID to be informed before AnalyzerID
 
                 '#REFACTORING
-                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA200, My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Application.DoEvents()
 

@@ -2068,7 +2068,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     tempSetPoint = myUtil.FormatToSingle(adjustValue)
                                 Else
                                     Dim myLogAcciones2 As New ApplicationLogManager()
-                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    'myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
                                 End If
 
                                 'Verify the R2 Arm Temperature is inside the allowed limits: 

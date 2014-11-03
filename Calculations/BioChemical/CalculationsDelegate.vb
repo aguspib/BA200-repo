@@ -7967,7 +7967,7 @@ Namespace Biosystems.Ax00.Calculations
                 ' Get baseline values
                 'Dark values are get from twksWSBLines
                 'Light values are get from twksWSBLinesByWell
-                resultData = GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID, "STATIC")
+                resultData = GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID, "DYNAMIC")
 
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     Dim myBaseLineDS As New BaseLinesDS
@@ -8788,7 +8788,7 @@ Namespace Biosystems.Ax00.Calculations
                     'Dim myWSBLinesDelegate As New WSBLinesDelegate
                     'resultData = myWSBLinesDelegate.ReadValuesForCalculations(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, _
                     '                                                          myExecutionWell, common(pDimension).AdjustBaseLineID)
-                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID, "STATIC")
+                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID, "DYNAMIC")
                     'AG 29/10/2014 BA-2064
 
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then

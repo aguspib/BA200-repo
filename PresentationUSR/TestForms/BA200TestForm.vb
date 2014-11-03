@@ -30,12 +30,12 @@ Public Class BA200TestForm
     End Sub
 
     Private Sub btnPerformBL_Click(sender As Object, e As EventArgs) Handles btnPerformBL.Click
-        Dim myParams As New List(Of String)(New String() {"2", "0"})
+        Dim myParams As New List(Of String)(New String() {"3", "0"})
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
     End Sub
 
     Private Sub btnEmptyRotor_Click(sender As Object, e As EventArgs) Handles btnEmptyRotor.Click
-        Dim myParams As New List(Of String)(New String() {"3", "0"})
+        Dim myParams As New List(Of String)(New String() {"2", "0"})
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
     End Sub
 End Class
