@@ -1650,7 +1650,7 @@
           <Sequence>1</Sequence>
           <Timer>0</Timer>
           <Code>GLF.MR.MPV</Code>
-          <Params>1000.5000</Params>
+          <Params>12000.100000</Params>
           <EnableEdition>true</EnableEdition>
         </InstructionTO>
         <InstructionTO>
