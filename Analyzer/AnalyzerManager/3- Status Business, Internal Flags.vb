@@ -2501,13 +2501,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInterval"></param>
         ''' <remarks>
         ''' Created by XBC 28/10/2011 - timeout limit repetitions for Start Tasks
+        ''' Modified by XB 03/11/2014 - add pNotUseOffset param - BA-1872
         ''' </remarks>
-        Private Sub InitializeTimerStartTaskControl(ByVal pInterval As Integer)
+        Private Sub InitializeTimerStartTaskControl(ByVal pInterval As Integer, Optional ByVal pNotUseOffset As Boolean = False)
             Try
                 'Warning: pInterval most be greater than 0
 
                 If pInterval > 0 Then
-                    pInterval = pInterval + SYSTEM_TIME_OFFSET
+                    If Not pNotUseOffset Then
+                        pInterval = pInterval + SYSTEM_TIME_OFFSET
+                    Else
+                        pInterval = pInterval
+                    End If
                 Else
                     pInterval = WAITING_TIME_OFF
                 End If

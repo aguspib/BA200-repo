@@ -298,23 +298,31 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.ISE_ACTION_START Then
                             MyClass.sendingRepetitions = True
-                            Debug.Print("sendingRepetitions = TRUE 1")
                             MyClass.numRepetitionsTimeout += 1
                             Dim myLogAcciones As New ApplicationLogManager()
                             If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                                ' PDT !!!
-                                Debug.Print(" SEND MESSAGE ERROR !!!")
                                 myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                 waitingStartTaskTimer.Enabled = False
                                 MyClass.sendingRepetitions = False
-                                Debug.Print("sendingRepetitions = FALSE 2")
 
-                                'RaiseEvent ISEProcedureFinished()   ????
+                                ' Activates Alarm begin
+                                Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                Dim myAlarmStatusList As New List(Of Boolean)
+                                Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                Dim alarmStatus As Boolean = False
+
+                                alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmStatus = True
+
+                                PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                If myAlarmList.Count > 0 Then
+                                    myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                End If
+                                ' Activates Alarm end
 
                                 RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                             Else
                                 ' Instruction has not started by Fw, so is need to send it again
-                                Debug.Print("Repeat Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]")
                                 myLogAcciones.CreateLogActivity("Repeat Start Task Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                 myGlobal = MyClass.SendStartTaskinQueue()
                             End If
@@ -327,7 +335,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'MyClass.ISE_Manager.StopInstructionStartedTimer()
 
                         MyClass.sendingRepetitions = False
-                        Debug.Print("sendingRepetitions = FALSE 3")
                         MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
                         MyClass.ClearStartTaskQueueToSend()
                     End If
@@ -435,23 +442,31 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 ' XB 26/09/2014 - BA-1872
                                 MyClass.sendingRepetitions = True
-                                Debug.Print("sendingRepetitions = TRUE 4")
                                 MyClass.numRepetitionsTimeout += 1
                                 Dim myLogAcciones As New ApplicationLogManager()
                                 If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                                    ' PDT !!!
-                                    Debug.Print(" SEND MESSAGE ERROR !!!")
                                     myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                     waitingStartTaskTimer.Enabled = False
                                     MyClass.sendingRepetitions = False
-                                    Debug.Print("sendingRepetitions = FALSE 5")
 
-                                    'RaiseEvent ISEProcedureFinished()   ????
+                                    ' Activates Alarm begin
+                                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                    Dim myAlarmStatusList As New List(Of Boolean)
+                                    Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                    Dim alarmStatus As Boolean = False
+
+                                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                    alarmStatus = True
+
+                                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                    If myAlarmList.Count > 0 Then
+                                        myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                    End If
+                                    ' Activates Alarm end
 
                                     RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                 Else
                                     ' Instruction has not started by Fw, so is need to send it again
-                                    Debug.Print("Repeat Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]")
                                     myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                     myGlobal = MyClass.SendStartTaskinQueue()
                                 End If
@@ -4585,6 +4600,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 myGlobalDataTO = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobalDataTO.HasError Then
+
+                    ' Deactivates Alarm begin
+                    Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                    Dim alarmStatus As Boolean = False
+
+                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                    alarmStatus = False
+
+                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                    ' Deactivates Alarm end
 
                     For i As Integer = 0 To myAlarmListTmp.Count - 1
                         PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)
