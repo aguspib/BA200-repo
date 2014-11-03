@@ -170,8 +170,9 @@ Namespace Biosystems.Ax00.BL
         '''          of the informed Analyzer and WorkSession</returns>
         ''' <remarks>
         ''' Created by:  DL 19/02/2010
+        ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
-        Public Function GetByWorkSession(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetByWorkSession(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pBaseLineType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -183,9 +184,9 @@ Namespace Biosystems.Ax00.BL
                         Dim myWSBLines As New twksWSBLinesDAO
 
                         If (pWorkSessionID.Trim <> "") Then
-                            resultData = myWSBLines.GetByWorkSession(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myWSBLines.GetByWorkSession(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineType) 'BA-2067
                         Else
-                            resultData = myWSBLines.GetByAnalyzer(dbConnection, pAnalyzerID)
+                            resultData = myWSBLines.GetByAnalyzer(dbConnection, pAnalyzerID, pBaseLineType) 'BA-2067
                         End If
                     End If
                 End If

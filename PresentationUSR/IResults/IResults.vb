@@ -5869,6 +5869,12 @@ Public Class IResults
         copyRefreshDS = Nothing 'AG 21/06/2012
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
+    ''' </remarks>
     Public Sub ExportResults()
         Try
             Dim resultData As GlobalDataTO
@@ -5900,7 +5906,7 @@ Public Class IResults
 
                 If String.Compare(filename, "", False) <> 0 AndAlso String.Compare(pathname, "", False) <> 0 Then
                     Dim xlsResults As New ResultsFileDelegate
-                    resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
+                    resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField, BaseLineType.DYNAMIC.ToString()) 'BA-2067
 
                     If resultData.HasError Then
                         Dim myLogAcciones As New ApplicationLogManager()
@@ -5934,7 +5940,7 @@ Public Class IResults
 
             If String.Compare(pFileName, "", False) <> 0 AndAlso String.Compare(pPath, "", False) <> 0 Then
                 Dim xlsResults As New ResultsFileDelegate
-                resultData = xlsResults.ExportXLS(pWorkSessionID, pPath, pFileName, AnalyzerIDField)
+                resultData = xlsResults.ExportXLS(pWorkSessionID, pPath, pFileName, AnalyzerIDField, BaseLineType.STATIC.ToString()) 'BA-2067
             End If
 
         Catch ex As Exception

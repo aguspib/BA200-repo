@@ -14,6 +14,7 @@ Imports System.Reflection
 'Imports System.Xml ' to remove
 Imports System.IO
 Imports System.ComponentModel
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 
 
@@ -59,8 +60,9 @@ Namespace Biosystems.Ax00.BL
         ''' AG 04/01/2011 - copied and adapted from ExcelWaitForm
         ''' RH 12/07/2011 - Some code optimization and corrections
         ''' AG 28/07/2011 - add parameter pAnalyzerIDwhenWSNoExists for case generate excel with no worksession (only adjust base line)
+        ''' IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
-        Public Function ExportXLS(ByVal pWorkSessionID As String, ByVal pPathName As String, ByVal pFileName As String, ByVal pAnalyzerIDwhenWSNoExists As String) As GlobalDataTO
+        Public Function ExportXLS(ByVal pWorkSessionID As String, ByVal pPathName As String, ByVal pFileName As String, ByVal pAnalyzerIDwhenWSNoExists As String, ByVal pBaseLineType As String) As GlobalDataTO
             'Dim resultdata As New GlobalDataTO
             Dim resultdata As GlobalDataTO = Nothing
             Dim DateIniProcess As Date = Now
@@ -77,7 +79,7 @@ Namespace Biosystems.Ax00.BL
 
             Try
                 ' Create xls document and sheets
-                resultdata = Me.NewExcelFile(pFileName, myTypeExcel, myExcel, myWorkSheets, myBook)
+                resultdata = Me.NewExcelFile(pFileName, myTypeExcel, myExcel, myWorkSheets, myBook, pBaseLineType) 'BA-2067
                 If Not resultdata.HasError Then
                     ' Get data from work session
                     'Dim dbConnection As New SqlClient.SqlConnection
@@ -105,7 +107,11 @@ Namespace Biosystems.Ax00.BL
                                     Dim myAnalyzerDS As WSAnalyzersDS
                                     myAnalyzerDS = DirectCast(resultdata.SetDatos, WSAnalyzersDS)
 
-                                    resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists)
+                                    resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists, 1, BaseLineType.STATIC.ToString()) 'BA-2067
+                                    'BA-2067
+                                    If pBaseLineType = BaseLineType.DYNAMIC.ToString() Then
+                                        resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists, 2, BaseLineType.DYNAMIC.ToString())
+                                    End If
 
                                     If Not resultdata.HasError AndAlso myWorkSessionsDS.twksWorkSessions.Rows.Count > 0 Then
 
@@ -316,12 +322,14 @@ Namespace Biosystems.Ax00.BL
         '''' <returns>GlobalDataTO containing sucess/error information</returns>
         '''' <remarks>
         '''' Created By: DL 08/06/2010
+        ''''             IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function NewExcelFile(ByVal pFileName As String, _
                                      ByRef ptypeExcel As Type, _
                                      ByRef pExcel As Object, _
                                      ByRef pWorkSheets As Object, _
-                                     ByRef pBook As Object) As GlobalDataTO
+                                     ByRef pBook As Object,
+                                     ByVal pBaseLineType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
 
@@ -352,6 +360,9 @@ Namespace Biosystems.Ax00.BL
                 'RH 13/07/2011 Add page Results
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+
+                WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
                 ' end add pages
 
                 ' Rename Pages
@@ -360,20 +371,30 @@ Namespace Biosystems.Ax00.BL
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"BaseLine"})
                 ' Rename page 2
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
-                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Base Line by Well"})
+                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Dynamic BaseLine"})
                 ' Rename page 3
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
-                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Counts"})
+                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Base Line by Well"})
                 ' Rename page 4
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
-                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Absorbances"})
+                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Counts"})
                 ' Rename page 5
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {5})
-                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Complete"})
-                'RH 13/07/2011 Rename page 6
+                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Absorbances"})
+                ' Rename page 6
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Complete"})
+                'RH 13/07/2011 Rename page 7
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Results"})
 
+                'IT 03/11/2014: INI BA-2067
+                'Visibilty of Pages
+                If pBaseLineType = "STATIC" Then
+                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
+                    myPage.GetType.InvokeMember("Visible", BindingFlags.SetProperty, Nothing, myPage, New Object() {False})
+                End If
+                'IT 03/11/2014: END BA-2067
 
             Catch ex As Exception 'General Error
                 resultdata.HasError = True
@@ -416,7 +437,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet base line by well sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
 
                 ' Ini Header 
                 myHeader = "Base lines by well (without adjustments)"
@@ -596,13 +617,16 @@ Namespace Biosystems.Ax00.BL
         '''' Created By: DL 08/06/2010
         '''' Modified AG 28/07/2011 - generate base lines sheet although no worksession exists (use pAnalyzerIDwhenWSNoExists)
         ''''                          parameter pAnalyzerDS ... byRef
-        ''''          RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        ''''          RH 02/01/2011 - Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        ''''          IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetBaseLine(ByVal pDBConnection As SqlConnection, _
                                       ByRef pAnalyzerDS As WSAnalyzersDS, _
                                       ByVal pWorkSessionDS As WorkSessionsDS, _
                                       ByVal pWorksheets As Object, _
-                                      ByVal pAnalyzerIDwhenWSNoExists As String) As GlobalDataTO
+                                      ByVal pAnalyzerIDwhenWSNoExists As String,
+                                      ByVal pSheetNumber As Integer,
+                                      ByVal pBaseLineType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = ""
@@ -614,7 +638,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myWSStatus As String = ""
 
                 ' Selecet base line sheet
-                myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {1})
+                myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {pSheetNumber})
 
                 ' Ini Header 
                 myHeader = "Base lines with adjustments of integration time and DAC"
@@ -675,7 +699,7 @@ Namespace Biosystems.Ax00.BL
                     SetCellColor(myPage, myRango, 19)
 
                     myCellRow += 2
-                    resultdata = myWSBLinesDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID)
+                    resultdata = myWSBLinesDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID, pBaseLineType) 'BA-2067
 
                     If Not resultdata.HasError Then
                         Dim myBaseLinesDS As New BaseLinesDS
@@ -696,92 +720,96 @@ Namespace Biosystems.Ax00.BL
                                          Where a.BaseLineID = myBaseLineID _
                                          Select a.WellUsed Distinct).ToList
 
-                            Dim qDate As New List(Of twksWSBaseLinesRow)
-                            qDate = (From a In myBaseLinesDS.twksWSBaseLines Where a.BaseLineID = myBaseLineID Order By a.DateTime Take 1 Select a).ToList
+                            For Each well As Integer In qWellUsed
 
-                            ' Base line header
+                                Dim qDate As New List(Of twksWSBaseLinesRow)
+                                qDate = (From a In myBaseLinesDS.twksWSBaseLines Where a.BaseLineID = myBaseLineID Order By a.DateTime Take 1 Select a).ToList
 
-                            If qDate.Count > 0 Then
-                                myHeader = "BaseLineID: " & qBaseLineID.Item(indexGroupBaseLine).ToString & " Well used: " & qWellUsed.Item(0).ToString & " Date: " & qDate(0).DateTime
-                            Else
-                                myHeader = "BaseLineID: " & qBaseLineID.Item(indexGroupBaseLine).ToString & " Well used: " & qWellUsed.Item(0).ToString & " Date: "
-                            End If
+                                ' Base line header
 
-                            myRango = "A" & myCellRow & ":H" & myCellRow
+                                If qDate.Count > 0 Then
+                                    myHeader = "BaseLineID: " & qBaseLineID.Item(indexGroupBaseLine).ToString & " Well used: " & well.ToString & " Date: " & qDate(0).DateTime
+                                Else
+                                    myHeader = "BaseLineID: " & qBaseLineID.Item(indexGroupBaseLine).ToString & " Well used: " & well.ToString & " Date: "
+                                End If
 
-                            SetCellValue(myPage, "A" & myCellRow, myHeader)
-                            MergeCells(myPage, myRango)
-                            SetCellColor(myPage, myRango, 6)
+                                myRango = "A" & myCellRow & ":H" & myCellRow
 
-                            myCellRow += 1
+                                SetCellValue(myPage, "A" & myCellRow, myHeader)
+                                MergeCells(myPage, myRango)
+                                SetCellColor(myPage, myRango, 6)
 
-                            SetCellValue(myPage, "A" & myCellRow, "Diode (POS)")
-                            SetCellValue(myPage, "B" & myCellRow, "WaveLength")
-                            SetCellValue(myPage, "C" & myCellRow, "Main Light")
-                            SetCellValue(myPage, "D" & myCellRow, "Main Dark")
-                            SetCellValue(myPage, "E" & myCellRow, "Reference Light")
-                            SetCellValue(myPage, "F" & myCellRow, "Reference Dark")
-                            SetCellValue(myPage, "G" & myCellRow, "  IT   ")
-                            SetCellValue(myPage, "H" & myCellRow, "  DAC  ")
+                                myCellRow += 1
 
-                            myRango = "A" & myCellRow & ":H" & myCellRow
+                                SetCellValue(myPage, "A" & myCellRow, "Diode (POS)")
+                                SetCellValue(myPage, "B" & myCellRow, "WaveLength")
+                                SetCellValue(myPage, "C" & myCellRow, "Main Light")
+                                SetCellValue(myPage, "D" & myCellRow, "Main Dark")
+                                SetCellValue(myPage, "E" & myCellRow, "Reference Light")
+                                SetCellValue(myPage, "F" & myCellRow, "Reference Dark")
+                                SetCellValue(myPage, "G" & myCellRow, "  IT   ")
+                                SetCellValue(myPage, "H" & myCellRow, "  DAC  ")
 
-                            SetCellColor(myPage, myRango, 15)
+                                myRango = "A" & myCellRow & ":H" & myCellRow
 
-                            If bAutoFit Then
-                                SetHorizontalAlignment(myPage, myRango, 3, True)
-                                bAutoFit = False
-                            Else
-                                SetHorizontalAlignment(myPage, myRango, 3)
-                            End If
+                                SetCellColor(myPage, myRango, 15)
 
-                            myCellRow += 1
+                                If bAutoFit Then
+                                    SetHorizontalAlignment(myPage, myRango, 3, True)
+                                    bAutoFit = False
+                                Else
+                                    SetHorizontalAlignment(myPage, myRango, 3)
+                                End If
 
-                            ' Base line records
-                            Dim qBaseLine As New List(Of twksWSBaseLinesRow)
-                            qBaseLine = (From a In myBaseLinesDS.twksWSBaseLines _
-                                         Where a.BaseLineID = myBaseLineID _
-                                         Select a).ToList
+                                myCellRow += 1
 
-                            For indexBaseLine As Integer = 0 To qBaseLine.Count - 1
-                                Dim myAnalyzerLedPositions As New AnalyzerLedPositionsDelegate
-                                resultdata = myAnalyzerLedPositions.GetByLedPosition(pDBConnection, _
-                                                                                     myRowAnalyzer.AnalyzerID, _
-                                                                                     qBaseLine(indexBaseLine).Wavelength)
+                                ' Base line records
+                                Dim qBaseLine As New List(Of twksWSBaseLinesRow)
+                                qBaseLine = (From a In myBaseLinesDS.twksWSBaseLines _
+                                             Where a.BaseLineID = myBaseLineID _
+                                             And a.WellUsed = well
+                                             Select a).ToList
 
-                                If Not resultdata.HasError Then
-                                    Dim myAnalyzerLedPositionsDS As New AnalyzerLedPositionsDS
-                                    myAnalyzerLedPositionsDS = CType(resultdata.SetDatos, AnalyzerLedPositionsDS)
+                                For indexBaseLine As Integer = 0 To qBaseLine.Count - 1
+                                    Dim myAnalyzerLedPositions As New AnalyzerLedPositionsDelegate
+                                    resultdata = myAnalyzerLedPositions.GetByLedPosition(pDBConnection, _
+                                                                                         myRowAnalyzer.AnalyzerID, _
+                                                                                         qBaseLine(indexBaseLine).Wavelength)
 
-                                    If myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions.Rows.Count > 0 Then
-                                        'SetCellValue(myPage, "A" & myCellRow, CType(myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).LedPosition, String))
-                                        'SetCellValue(myPage, "B" & myCellRow, CType(myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).WaveLength, String))
-                                        'SetCellValue(myPage, "C" & myCellRow, CType(qBaseLine(indexBaseLine).MainLight, String))
-                                        'SetCellValue(myPage, "D" & myCellRow, CType(qBaseLine(indexBaseLine).MainDark, String))
-                                        'SetCellValue(myPage, "E" & myCellRow, CType(qBaseLine(indexBaseLine).RefLight, String))
-                                        'SetCellValue(myPage, "F" & myCellRow, CType(qBaseLine(indexBaseLine).RefDark, String))
+                                    If Not resultdata.HasError Then
+                                        Dim myAnalyzerLedPositionsDS As New AnalyzerLedPositionsDS
+                                        myAnalyzerLedPositionsDS = CType(resultdata.SetDatos, AnalyzerLedPositionsDS)
 
-                                        'If Not qBaseLine(indexBaseLine).IsITNull Then SetCellValue(myPage, "G" & myCellRow, CType(qBaseLine(indexBaseLine).IT, String))
-                                        'If Not qBaseLine(indexBaseLine).IsDACNull Then SetCellValue(myPage, "H" & myCellRow, CType(qBaseLine(indexBaseLine).DAC, String))
+                                        If myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions.Rows.Count > 0 Then
+                                            'SetCellValue(myPage, "A" & myCellRow, CType(myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).LedPosition, String))
+                                            'SetCellValue(myPage, "B" & myCellRow, CType(myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).WaveLength, String))
+                                            'SetCellValue(myPage, "C" & myCellRow, CType(qBaseLine(indexBaseLine).MainLight, String))
+                                            'SetCellValue(myPage, "D" & myCellRow, CType(qBaseLine(indexBaseLine).MainDark, String))
+                                            'SetCellValue(myPage, "E" & myCellRow, CType(qBaseLine(indexBaseLine).RefLight, String))
+                                            'SetCellValue(myPage, "F" & myCellRow, CType(qBaseLine(indexBaseLine).RefDark, String))
 
-                                        SetCellValue(myPage, "A" & myCellRow, myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).LedPosition)
-                                        SetCellValue(myPage, "B" & myCellRow, myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).WaveLength)
-                                        SetCellValue(myPage, "C" & myCellRow, qBaseLine(indexBaseLine).MainLight)
-                                        SetCellValue(myPage, "D" & myCellRow, qBaseLine(indexBaseLine).MainDark)
-                                        SetCellValue(myPage, "E" & myCellRow, qBaseLine(indexBaseLine).RefLight)
-                                        SetCellValue(myPage, "F" & myCellRow, qBaseLine(indexBaseLine).RefDark)
+                                            'If Not qBaseLine(indexBaseLine).IsITNull Then SetCellValue(myPage, "G" & myCellRow, CType(qBaseLine(indexBaseLine).IT, String))
+                                            'If Not qBaseLine(indexBaseLine).IsDACNull Then SetCellValue(myPage, "H" & myCellRow, CType(qBaseLine(indexBaseLine).DAC, String))
 
-                                        If Not qBaseLine(indexBaseLine).IsITNull Then SetCellValue(myPage, "G" & myCellRow, qBaseLine(indexBaseLine).IT)
-                                        If Not qBaseLine(indexBaseLine).IsDACNull Then SetCellValue(myPage, "H" & myCellRow, qBaseLine(indexBaseLine).DAC)
+                                            SetCellValue(myPage, "A" & myCellRow, myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).LedPosition)
+                                            SetCellValue(myPage, "B" & myCellRow, myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions(0).WaveLength)
+                                            SetCellValue(myPage, "C" & myCellRow, qBaseLine(indexBaseLine).MainLight)
+                                            SetCellValue(myPage, "D" & myCellRow, qBaseLine(indexBaseLine).MainDark)
+                                            SetCellValue(myPage, "E" & myCellRow, qBaseLine(indexBaseLine).RefLight)
+                                            SetCellValue(myPage, "F" & myCellRow, qBaseLine(indexBaseLine).RefDark)
 
-                                        If indexBaseLine = qBaseLine.Count - 1 Then
-                                            myCellRow += 2
-                                        Else
-                                            myCellRow += 1
+                                            If Not qBaseLine(indexBaseLine).IsITNull Then SetCellValue(myPage, "G" & myCellRow, qBaseLine(indexBaseLine).IT)
+                                            If Not qBaseLine(indexBaseLine).IsDACNull Then SetCellValue(myPage, "H" & myCellRow, qBaseLine(indexBaseLine).DAC)
+
+                                            If indexBaseLine = qBaseLine.Count - 1 Then
+                                                myCellRow += 2
+                                            Else
+                                                myCellRow += 1
+                                            End If
                                         End If
                                     End If
-                                End If
-                            Next indexBaseLine
+                                Next indexBaseLine
+                            Next well
                         Next indexGroupBaseLine
                     End If
                 Next myRowAnalyzer
@@ -826,7 +854,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet count sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
 
                 ' Ini Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1089,9 +1117,9 @@ Namespace Biosystems.Ax00.BL
                 Dim myHeader As String
                 Dim myRango As String
 
-                ' Selecet Absorbance Sheet ( 4 )
+                ' Selecet Absorbance Sheet ( 5 )
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, _
-                                                            Nothing, pWorkSheets, New Object() {4})
+                                                            Nothing, pWorkSheets, New Object() {5})
 
                 ' Write Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1416,7 +1444,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet complete sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {5})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
 
                 ' Ini Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1852,9 +1880,9 @@ Namespace Biosystems.Ax00.BL
                 Dim WSData As WorkSessionsDS.twksWorkSessionsRow = pWorkSessionDS.twksWorkSessions(0)
                 Dim ExecutionsResultsDS As ExecutionsDS
 
-                ' Select Results By Replicates Sheet ( 6 )
+                ' Select Results By Replicates Sheet ( 7 )
                 XlsPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, _
-                                                            Nothing, pWorkSheets, New Object() {6})
+                                                            Nothing, pWorkSheets, New Object() {7})
 
                 ' Write Header 
                 XlsPageHeader = String.Format("Results WorkSessionID: {0} Creation Date: {1} by {2}", _

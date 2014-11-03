@@ -137,7 +137,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT AnalyzerID, WorkSessionID, BaseLineID, Wavelenght AS Wavelength, WellUsed, MainLight, " & vbCrLf & _
-                                                       " RefLight, ABSvalue, IsMean, DateTime " & vbCrLf & _
+                                                       " RefLight, ABSvalue, IsMean, DateTime, Type " & vbCrLf & _
                                                 " FROM   twksWSBLinesByWell" & vbCrLf & _
                                                 " WHERE  BaseLineID    = " & pBaseLineID.ToString & vbCrLf & _
                                                 " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _

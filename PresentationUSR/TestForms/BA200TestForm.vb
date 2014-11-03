@@ -20,22 +20,23 @@ Imports DevExpress.XtraReports.UI
 Imports DevExpress.XtraPrinting
 Imports DevExpress.XtraEditors
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class BA200TestForm
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     Private Sub btnFillRotor_Click(sender As Object, e As EventArgs) Handles btnFillRotor.Click
-        Dim myParams As New List(Of String)(New String() {"1", "0"})
+        Dim myParams As New List(Of String)(New String() {Ax00FlightAction.FillRotor.ToString(), "0"})
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
     End Sub
 
     Private Sub btnPerformBL_Click(sender As Object, e As EventArgs) Handles btnPerformBL.Click
-        Dim myParams As New List(Of String)(New String() {"2", "0"})
+        Dim myParams As New List(Of String)(New String() {Ax00FlightAction.Perform.ToString(), "0"})
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
     End Sub
 
     Private Sub btnEmptyRotor_Click(sender As Object, e As EventArgs) Handles btnEmptyRotor.Click
-        Dim myParams As New List(Of String)(New String() {"3", "0"})
+        Dim myParams As New List(Of String)(New String() {Ax00FlightAction.EmptyRotor.ToString(), "0"})
         AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
     End Sub
 End Class

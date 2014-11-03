@@ -178,8 +178,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  DL 19/02/2010
         ''' Modified by: AG 29/04/2011 - WorkSessionID is removed from table twksWSBLines
         '''              AG 06/07/2011 - Changed the query
+        '''              IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
-        Public Function GetByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pBaseLineType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -207,11 +208,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'cmdText &= "   AND    EX.WorkSessionID = '" & pWorkSessionID.Trim & "'" & vbCrLf
                         'cmdText &= " ORDER BY BaselineID, Wavelength"
 
+                        'BA-2067
                         cmdText &= " SELECT DISTINCT BL.BaseLineID, BL.AnalyzerID, EX.WorkSessionID, BL.Wavelength, BL.WellUsed, BL.MainLight, BL.MainDark,  " & vbCrLf
-                        cmdText &= "                 BL.RefLight, BL.RefDark, BL.IT, BL.DAC, BL.DateTime " & vbCrLf
+                        cmdText &= "                 BL.RefLight, BL.RefDark, BL.IT, BL.DAC, BL.DateTime, BL.Type " & vbCrLf
                         cmdText &= " FROM   twksWSExecutions EX INNER JOIN twksWSBLines BL ON EX.AnalyzerID = BL.AnalyzerID " & vbCrLf
                         cmdText &= " WHERE  EX.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
                         cmdText &= " AND    EX.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf
+                        cmdText &= " AND    BL.TYPE = '" & pBaseLineType.Trim & "' " & vbCrLf
                         cmdText &= " ORDER BY BaselineID, Wavelength "
 
                         Dim myBaseLinesDS As New BaseLinesDS
@@ -402,8 +405,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS</returns>
         ''' <remarks>
         ''' Created by: AG 28/07/2011 - Used when the results EXCEL file is generated 
+        ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
-        Public Function GetByAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function GetByAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pBaseLineType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -412,10 +416,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'BA-2067
                         Dim cmdText As String = " SELECT AnalyzerID, BaseLineID, Wavelength, WellUsed, MainLight, MainDark, " & vbCrLf & _
                                                        " RefLight, RefDark, IT, DAC, DateTime " & vbCrLf & _
                                                 " FROM   twksWSBLines " & vbCrLf & _
                                                 " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " AND Type = N'" & pBaseLineType.Trim & "' " & vbCrLf & _
                                                 " ORDER BY BaselineID, Wavelength "
 
                         Dim myBaseLinesDS As New BaseLinesDS

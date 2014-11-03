@@ -1905,7 +1905,6 @@ Namespace Biosystems.Ax00.Global
 
         End Enum
 
-
         ''''''''''''''''''''''''''''''''
         'RECEPTION (DIRECTION FW --> SW)
         ''''''''''''''''''''''''''''''''
@@ -1917,7 +1916,6 @@ Namespace Biosystems.Ax00.Global
             RUNNING = 3
             'SAMPLINGSTOP = 4 'AG 21/02/2012 - this state does not exists in BAx00
         End Enum
-
 
         ''''''''''''''''''''''''''''''''
         'RECEPTION (DIRECTION FW --> SW)
@@ -2058,6 +2056,17 @@ Namespace Biosystems.Ax00.Global
             MULTIPLE_ERROR_CODE
             'JV 17/09/2013
             AUTO_REPORT
+        End Enum
+
+        ''' <summary>
+        ''' BaseLine Types
+        ''' </summary>
+        ''' <remarks>
+        ''' IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        ''' </remarks>
+        Public Enum BaseLineType
+            [STATIC] = 1
+            DYNAMIC = 2
         End Enum
 
 #End Region
@@ -4422,6 +4431,20 @@ Namespace Biosystems.Ax00.Global
             Peripherals = 2
             Maneuvers = 3
             Adjustments = 4
+        End Enum
+
+        ''' <summary>
+        ''' Actions for FLIGHT
+        ''' </summary>
+        ''' <remarks>
+        ''' IT 03/11/2014 - BA-2060: Instruction FLIGHT
+        ''' </remarks>
+        Public Enum Ax00FlightAction
+            FillRotor = 1
+            EmptyRotor = 2
+            Perform = 3
+            FillRotor_Perform = 4
+            FillRotor_Perform_EmptyRotor = 5
         End Enum
 
 #End Region
