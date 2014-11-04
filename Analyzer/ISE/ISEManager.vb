@@ -127,7 +127,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             LongTermDeactivated = 8
             ReagentsPack_DateInstall = 9
             Switch_Off = 10
-            'Timeout = 11        ' XB 31/10/2014 - BA-1872
+            Timeout = 11        ' XB 04/11/2014 - BA-1872
         End Enum
 
 #End Region
@@ -330,6 +330,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'SGM 01/08/2012
         Private ISEWSCancelErrorCounterAttr As Integer
 
+        ' XB 04/11/2014 - BA-1872
+        Private IsTimeoutAttr As Boolean
 #End Region
 
 #Region "Properties"
@@ -536,6 +538,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Set(ByVal value As Boolean)
                 If IsAnalyzerWarmUpAttr <> value Then
                     IsAnalyzerWarmUpAttr = value
+                End If
+            End Set
+        End Property
+
+        ' XB 04/11/2014 - BA-1872
+        Public Property IsTimeOut As Boolean
+            Get
+                Return IsTimeoutAttr
+            End Get
+            Set(value As Boolean)
+                If IsTimeoutAttr <> value Then
+                    IsTimeoutAttr = value
                 End If
             End Set
         End Property
@@ -3444,7 +3458,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 ' XBC 26/03/2012
-                ReDim myAlarms(10)
+                ReDim myAlarms(11)
                 myAlarms(Alarms.ReagentsPack_Invalid) = False
                 myAlarms(Alarms.ReagentsPack_Depleted) = False
                 myAlarms(Alarms.ReagentsPack_Expired) = False
@@ -3456,6 +3470,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myAlarms(Alarms.LongTermDeactivated) = False
                 myAlarms(Alarms.ReagentsPack_DateInstall) = False
                 myAlarms(Alarms.Switch_Off) = False 'SGM 18/06/2012
+                myAlarms(Alarms.Timeout) = False ' XB 04/11/2014 - BA-1872
                 ' XBC 26/03/2012
 
 
@@ -3732,8 +3747,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If MyClass.myAlarms(Alarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
                             If MyClass.myAlarms(Alarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
 
-                            ' XB 31/10/2014 - BA-1872
-                            'If MyClass.myAlarms(Alarms.Timeout) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                            ' XB 04/11/2014 - BA-1872
+                            If MyClass.myAlarms(Alarms.Timeout) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
 
                             pPendingCalibrations = New List(Of MaintenanceOperations)
                             If MyClass.IsCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.ElectrodesCalibration)
@@ -7270,7 +7285,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by XBC 26/03/2012
-        ''' Modified by XB 31/10/2014 - Add ISE Timeout Alarm - BA-1872
+        ''' Modified by XB 04/11/2014 - Add ISE Timeout Alarm - BA-1872
         ''' </remarks>
         Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -7372,11 +7387,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         pAlarmStatusList.Add(alarmStatus)
                         'SGM 14/06/2012
 
-                        ''Timeout    XB 31/10/2014 - BA-1872
-                        'myAlarms(Alarms.Timeout) = False
-                        'alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-                        'pAlarmList.Add(alarmID)
-                        'pAlarmStatusList.Add(alarmStatus)
+                        'Timeout    XB 04/11/2014 - BA-1872
+                        myAlarms(Alarms.Timeout) = False
+                        alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                        pAlarmList.Add(alarmID)
+                        pAlarmStatusList.Add(alarmStatus)
 
                     Else
                         If myAlarms(Alarms.LongTermDeactivated) Then
@@ -7669,26 +7684,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             End If
 
-                            '' XB 31/10/2014 - BA-1872
-                            '' Ise Timeout   
-                            'If Not MyClass.IsElectrodesReady Then
+                            ' XB 04/11/2014 - BA-1872
+                            ' Ise Timeout   
+                            If MyClass.IsTimeOut Then
 
-                            '    alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
-                            '    alarmStatus = True
-                            '    pAlarmList.Add(alarmID)
-                            '    pAlarmStatusList.Add(alarmStatus)
+                                alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                alarmStatus = True
+                                pAlarmList.Add(alarmID)
+                                pAlarmStatusList.Add(alarmStatus)
 
-                            '    myAlarms(Alarms.Electrodes_Wrong) = True
-                            'Else
-                            '    If myAlarms(Alarms.Electrodes_Wrong) Then
-                            '        myAlarms(Alarms.Electrodes_Wrong) = False
-                            '        ' solved
-                            '        alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
-                            '        alarmStatus = False
-                            '        pAlarmList.Add(alarmID)
-                            '        pAlarmStatusList.Add(alarmStatus)
-                            '    End If
-                            'End If
+                                myAlarms(Alarms.Timeout) = True
+                            Else
+                                If myAlarms(Alarms.Timeout) Then
+                                    myAlarms(Alarms.Timeout) = False
+                                    ' solved
+                                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                    alarmStatus = False
+                                    pAlarmList.Add(alarmID)
+                                    pAlarmStatusList.Add(alarmStatus)
+                                End If
+                            End If
 
                         End If
 

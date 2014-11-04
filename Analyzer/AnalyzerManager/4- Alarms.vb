@@ -174,6 +174,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim alarmsDelg As New WSAnalyzerAlarmsDelegate 'AG 16/01/2014 - Move declaration here!
 
                 Dim myISEOffErrorFixed As Boolean = False  'JV 08/01/2014 BT #1118
+                Dim myISETimeoutErrorFixed As Boolean = False ' XB 04/11/2014 - BA-1872
                 For Each alarmItem As GlobalEnumerates.Alarms In pAlarmIDList
                     'General description
                     'Apply special Business depending the alarm code
@@ -820,10 +821,30 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     auxList = Nothing
                                 End If
                                 'AG 16/01/2014 - JV 08/01/2014 BT #1118
+
                             End If
 
                             'AG 23/03/2012
 
+                            ' XB 04/11/2014 - BA-1872
+                        Case GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+
+                            myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
+                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                                Dim temporalDS As New WSAnalyzerAlarmsDS
+                                temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
+
+                                'Search if exists alarm ISE_TIMEOUT_ERR with status TRUE, in this case set flag myISETimeoutErrorFixed = True (FIXED)
+                                'in order to mark it as fixed
+                                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
+                                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
+                                           Where a.AlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
+                                If auxList.Count > 0 Then
+                                    myISETimeoutErrorFixed = True
+                                End If
+                                auxList = Nothing
+                            End If
+                            ' XB 04/11/2014 - BA-1872
 
                             'SGM 19/06/2012
                         Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
@@ -908,6 +929,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ElseIf myISEOffErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_OFF_ERR Then
                             newRowFlag = True
                             'JV 08/01/2014 BT #1118
+                            ' XB 04/11/2014 - BA-1872
+                        ElseIf myISETimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                            newRowFlag = True
+                            ' XB 04/11/2014 - BA-1872
                         Else 'Fixed alarms
                             If myAlarmListAttribute.Contains(alarmIDItem) Then
                                 myAlarmListAttribute.Remove(alarmIDItem)
@@ -1777,6 +1802,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     solvedErrAlarmID.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
                     OtherAlarmsSolved = True
                     'JV 08/01/2014 BT #1118
+                ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                    OtherAlarmsSolved = True
                 End If
 
                 'AG 28/03/2012 - Special code Nr.9: for auto recover freeze alarms (when cover warn solved also mark the cover error as solved too!!)
@@ -1810,6 +1838,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             pAlarmList.Add(item)
                             pAlarmStatusList.Add(False)
                             'JV 08/01/2014 BT #1118
+                        ElseIf item = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                            pAlarmList.Add(item)
+                            pAlarmStatusList.Add(False)
                         End If
                     Next
                 End If

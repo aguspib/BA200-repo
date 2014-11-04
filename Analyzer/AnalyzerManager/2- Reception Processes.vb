@@ -313,6 +313,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                                 alarmStatus = True
+                                ISE_Manager.IsTimeOut = True
 
                                 PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                 If myAlarmList.Count > 0 Then
@@ -457,6 +458,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                                     alarmStatus = True
+                                    ISE_Manager.IsTimeOut = True
 
                                     PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                     If myAlarmList.Count > 0 Then
@@ -4607,6 +4609,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                     alarmStatus = False
+                    ISE_Manager.IsTimeOut = False
 
                     PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                     ' Deactivates Alarm end
