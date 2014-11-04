@@ -58,7 +58,7 @@
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
-		<revnumber>{3170A9D4-9345-4E34-8996-E2571C42B25F}</revnumber>
+		<revnumber>{A9CB08E8-1267-4B87-A86A-615AC7376334}</revnumber>
 		<lastprinted/>
 		<createdtm>06/21/1999 14:00</createdtm>
 		<lastsavedtm>07/14/2000 17:50</lastsavedtm>
@@ -358,6 +358,10 @@
 		<row><td>BSCSharpControl_Library.dll1</td><td>{EAE454A1-7A1C-48EC-ACC1-29D7B9AFEA34}</td><td>USER_SW</td><td>8</td><td/><td>bscsharpcontrol_library.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSControl_Library.dll</td><td>{68887255-58D0-410E-96D4-4B635D2CA049}</td><td>SERVICE_SW</td><td>8</td><td/><td>bscontrol_library.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>BSControl_Library.dll1</td><td>{F8298AA0-7BC4-4E7B-85E8-AB2B1D2BB817}</td><td>USER_SW</td><td>8</td><td/><td>bscontrol_library.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Biosystems.Ax00.App.dll</td><td>{8BA1EB3C-8B03-4E34-A3B2-C3685D09A8DB}</td><td>SERVICE_SW</td><td>8</td><td/><td>biosystems.ax00.app.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Biosystems.Ax00.App.dll1</td><td>{32A91D2F-BCF3-4047-B3B4-73961EBFAE5E}</td><td>USER_SW</td><td>8</td><td/><td>biosystems.ax00.app.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Biosystems.Ax00.Core.dll</td><td>{2A4E3467-2EB9-431D-B5FF-27B44986CB73}</td><td>SERVICE_SW</td><td>8</td><td/><td>biosystems.ax00.core.dll</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Biosystems.Ax00.Core.dll1</td><td>{46C33AC2-3D6A-40CB-9C09-B3F8DFF2F3BA}</td><td>USER_SW</td><td>8</td><td/><td>biosystems.ax00.core.dll1</td><td>17</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CDM_2.02.04.exe</td><td>{78EB0945-003A-4C24-A088-1A2B4F121BAD}</td><td>USB_DRIVERS</td><td>8</td><td/><td>cdm_2.02.04.exe</td><td>17</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CONSOLA.TTF1</td><td>{91B12069-DC0F-4AF8-8323-D8F5EA19F780}</td><td>FontsFolder</td><td>8</td><td/><td>consola.ttf</td><td>17</td><td>This component consists of font files to be registered on the target system.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>CONSOLAB.TTF1</td><td>{27B8B20D-6995-4D01-8888-18A0318F26AD}</td><td>FontsFolder</td><td>8</td><td/><td>consolab.ttf</td><td>17</td><td>This component consists of font files to be registered on the target system.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -2063,6 +2067,8 @@
 		<row><td>Service_Sw</td><td>AxInterop.WMPLib.dll</td></row>
 		<row><td>Service_Sw</td><td>BSCSharpControl_Library.dll</td></row>
 		<row><td>Service_Sw</td><td>BSControl_Library.dll</td></row>
+		<row><td>Service_Sw</td><td>Biosystems.Ax00.App.dll</td></row>
+		<row><td>Service_Sw</td><td>Biosystems.Ax00.Core.dll</td></row>
 		<row><td>Service_Sw</td><td>CONSOLA.TTF1</td></row>
 		<row><td>Service_Sw</td><td>CONSOLAB.TTF1</td></row>
 		<row><td>Service_Sw</td><td>Calculations.dll</td></row>
@@ -2134,6 +2140,8 @@
 		<row><td>User_Sw</td><td>BA400User.exe</td></row>
 		<row><td>User_Sw</td><td>BSCSharpControl_Library.dll1</td></row>
 		<row><td>User_Sw</td><td>BSControl_Library.dll1</td></row>
+		<row><td>User_Sw</td><td>Biosystems.Ax00.App.dll1</td></row>
+		<row><td>User_Sw</td><td>Biosystems.Ax00.Core.dll1</td></row>
 		<row><td>User_Sw</td><td>Calculations.dll1</td></row>
 		<row><td>User_Sw</td><td>CommAx00.exe1</td></row>
 		<row><td>User_Sw</td><td>ConfigurationSetup.dll1</td></row>
@@ -2300,6 +2308,10 @@
 		<row><td>barcodewarning256.png1</td><td>UserSw_Images</td><td>BARCOD~1.PNG|barcodewarning256.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\barcodewarning256.png</td><td>1</td><td/></row>
 		<row><td>baseline_eng.xps</td><td>ServiceSw_InfoDocs</td><td>BASELI~1.XPS|BaseLine_ENG.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\BaseLine_ENG.xps</td><td>1</td><td/></row>
 		<row><td>baseline_spa.xps</td><td>ServiceSw_InfoDocs</td><td>BASELI~1.XPS|BaseLine_SPA.xps</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;InfoDocs&gt;\BaseLine_SPA.xps</td><td>1</td><td/></row>
+		<row><td>biosystems.ax00.app.dll</td><td>Biosystems.Ax00.App.dll</td><td>BIOSYS~1.DLL|Biosystems.Ax00.App.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Biosystems.Ax00.App.dll</td><td>1</td><td/></row>
+		<row><td>biosystems.ax00.app.dll1</td><td>Biosystems.Ax00.App.dll1</td><td>BIOSYS~1.DLL|Biosystems.Ax00.App.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Biosystems.Ax00.App.dll</td><td>1</td><td/></row>
+		<row><td>biosystems.ax00.core.dll</td><td>Biosystems.Ax00.Core.dll</td><td>BIOSYS~1.DLL|Biosystems.Ax00.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES&gt;\Biosystems.Ax00.Core.dll</td><td>1</td><td/></row>
+		<row><td>biosystems.ax00.core.dll1</td><td>Biosystems.Ax00.Core.dll1</td><td>BIOSYS~1.DLL|Biosystems.Ax00.Core.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_RELEASE_FILES1&gt;\Biosystems.Ax00.Core.dll</td><td>1</td><td/></row>
 		<row><td>blank.png</td><td>ServiceSw_Images</td><td>Blank.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Blank.png</td><td>1</td><td/></row>
 		<row><td>blank.png1</td><td>UserSw_Images</td><td>Blank.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Blank.png</td><td>1</td><td/></row>
 		<row><td>bluecircle.png</td><td>ServiceSw_Images</td><td>BLUECI~1.PNG|BlueCircle.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\BlueCircle.png</td><td>1</td><td/></row>
@@ -3315,6 +3327,10 @@
 		<row><td>BSCSharpControl_Library.dll1</td><td/><td/><td>_AB54945A_BBB1_4A1B_BF1F_D15EE58F562C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSControl_Library.dll</td><td/><td/><td>_FCF0AA95_4E28_4D4C_B7D8_B2D3DB049B1B_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>BSControl_Library.dll1</td><td/><td/><td>_43D0D458_53DE_4FF0_9836_52EB661E4370_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Biosystems.Ax00.App.dll</td><td/><td/><td>_287E633B_F589_4C5A_9B4B_07376542D0FC_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Biosystems.Ax00.App.dll1</td><td/><td/><td>_72163C7E_95B6_490C_8D85_02FF8BB27964_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Biosystems.Ax00.Core.dll</td><td/><td/><td>_16059220_6A20_4BCB_B578_1697E16DDFEE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Biosystems.Ax00.Core.dll1</td><td/><td/><td>_B64F8F2A_01E0_490E_8FCE_C7E8A907FD56_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CDM_2.02.04.exe</td><td/><td/><td>_CEAA5512_A499_4FCB_9CD4_365BF46CACD1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CONSOLA.TTF1</td><td/><td/><td>_409C14F6_B96C_4AB7_AADD_9BA167E9AE3F_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>CONSOLAB.TTF1</td><td/><td/><td>_ACAF909D_4B28_482D_AD23_9D496844EF18_FILTER</td><td/><td/><td/><td/></row>
@@ -5960,7 +5976,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>ProductID</td><td>none</td><td/></row>
 		<row><td>ProductLanguage</td><td>1033</td><td/></row>
 		<row><td>ProductName</td><td>BA400</td><td/></row>
-		<row><td>ProductVersion</td><td>3.0.3</td><td/></row>
+		<row><td>ProductVersion</td><td>3.0.4</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
