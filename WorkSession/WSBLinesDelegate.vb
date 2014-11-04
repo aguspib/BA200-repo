@@ -170,8 +170,9 @@ Namespace Biosystems.Ax00.BL
         '''          of the informed Analyzer and WorkSession</returns>
         ''' <remarks>
         ''' Created by:  DL 19/02/2010
+        ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
-        Public Function GetByWorkSession(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetByWorkSession(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pBaseLineType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -183,9 +184,9 @@ Namespace Biosystems.Ax00.BL
                         Dim myWSBLines As New twksWSBLinesDAO
 
                         If (pWorkSessionID.Trim <> "") Then
-                            resultData = myWSBLines.GetByWorkSession(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myWSBLines.GetByWorkSession(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineType) 'BA-2067
                         Else
-                            resultData = myWSBLines.GetByAnalyzer(dbConnection, pAnalyzerID)
+                            resultData = myWSBLines.GetByAnalyzer(dbConnection, pAnalyzerID, pBaseLineType) 'BA-2067
                         End If
                     End If
                 End If
@@ -249,12 +250,14 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pType">STATIC or DYNAMIC or ALL (if "")</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all WaveLengths for the last executed adjustment BaseLine for 
         '''          the specified Analyzer</returns>
         ''' <remarks>
         ''' Created by:  AG 04/05/2011
+        '''              AG 04/11/2014 BA-2065 (adapt well rejection for STATIC or DYNAMIC base line)
         ''' </remarks>
-        Public Function GetCurrentBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function GetCurrentBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -264,7 +267,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.GetCurrentBaseLineValues(dbConnection, pAnalyzerID)
+                        resultData = myDAO.GetCurrentBaseLineValues(dbConnection, pAnalyzerID, pType)
                     End If
                 End If
             Catch ex As Exception

@@ -59,8 +59,9 @@ Namespace Biosystems.Ax00.BL
         ''' AG 04/01/2011 - copied and adapted from ExcelWaitForm
         ''' RH 12/07/2011 - Some code optimization and corrections
         ''' AG 28/07/2011 - add parameter pAnalyzerIDwhenWSNoExists for case generate excel with no worksession (only adjust base line)
+        ''' IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
-        Public Function ExportTestXLS(ByVal pWorkSessionID As String, ByVal pPathName As String, ByVal pFileName As String, ByVal pAnalyzerIDwhenWSNoExists As String) As GlobalDataTO
+        Public Function ExportTestXLS(ByVal pWorkSessionID As String, ByVal pPathName As String, ByVal pFileName As String, ByVal pAnalyzerIDwhenWSNoExists As String, ByVal pBaseLineType As String) As GlobalDataTO
             'Dim resultdata As New GlobalDataTO
             Dim resultdata As GlobalDataTO = Nothing
             Dim DateIniProcess As Date = Now
@@ -114,7 +115,7 @@ Namespace Biosystems.Ax00.BL
                                     Dim myAnalyzerDS As WSAnalyzersDS
                                     myAnalyzerDS = DirectCast(resultdata.SetDatos, WSAnalyzersDS)
 
-                                    resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists)
+                                    resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists, pBaseLineType) 'BA-2067
 
                                     If Not resultdata.HasError AndAlso myWorkSessionsDS.twksWorkSessions.Rows.Count > 0 Then
 
@@ -630,13 +631,15 @@ Namespace Biosystems.Ax00.BL
         '''' Created By: DL 08/06/2010
         '''' Modified AG 28/07/2011 - generate base lines sheet although no worksession exists (use pAnalyzerIDwhenWSNoExists)
         ''''                          parameter pAnalyzerDS ... byRef
-        ''''          RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        ''''          RH 02/01/2011 - Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        ''''          IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetBaseLine(ByVal pDBConnection As SqlConnection, _
                                       ByRef pAnalyzerDS As WSAnalyzersDS, _
                                       ByVal pWorkSessionDS As WorkSessionsDS, _
                                       ByVal pWorksheets As Object, _
-                                      ByVal pAnalyzerIDwhenWSNoExists As String) As GlobalDataTO
+                                      ByVal pAnalyzerIDwhenWSNoExists As String,
+                                      ByVal pBaseLineType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = ""
@@ -709,7 +712,7 @@ Namespace Biosystems.Ax00.BL
                     SetCellColor(myPage, myRango, 19)
 
                     myCellRow += 2
-                    resultdata = myWSBLinesDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID)
+                    resultdata = myWSBLinesDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID, pBaseLineType) 'BA-2067
 
                     If Not resultdata.HasError Then
                         Dim myBaseLinesDS As New BaseLinesDS
@@ -727,7 +730,6 @@ Namespace Biosystems.Ax00.BL
                             ' Well used
                             Dim qWellUsed As New List(Of Integer)
                             qWellUsed = (From a In myBaseLinesDS.twksWSBaseLines _
-                                         Where a.BaseLineID = myBaseLineID _
                                          Select a.WellUsed Distinct).ToList
 
                             Dim qDate As New List(Of twksWSBaseLinesRow)
