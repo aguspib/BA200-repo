@@ -334,10 +334,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
                         Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
                         'MyClass.ISE_Manager.StopInstructionStartedTimer()
-
-                        MyClass.sendingRepetitions = False
-                        MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                        MyClass.ClearStartTaskQueueToSend()
+                        ' Update the interval of the Timer with the expected time received from the Analyzer
+                        MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
                     End If
                 End If
                 ' XB 26/09/2014 - BA-1872
