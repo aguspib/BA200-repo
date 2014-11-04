@@ -1080,6 +1080,9 @@ Partial Public Class IAx00MainMDI
                     End If
 
                 End If
+
+                MyClass.ShowTimeoutMessage()
+
             End If
 
         Catch ex As Exception
@@ -1089,6 +1092,32 @@ Partial Public Class IAx00MainMDI
         Return True
     End Function
 
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by XB 04/11/2014 - BA-1872
+    ''' </remarks>
+    Private Sub ShowTimeoutMessage()
+        Dim myGlobal As New GlobalDataTO
+        Try
+            Dim myTitle As String = ""
+            myGlobal.ErrorCode = Messages.ERROR_COMM.ToString
+            myTitle = "Warning"
+
+            Dim myAdtionalText As String = ""
+            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+            myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
+
+            CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: Timeout", Me.Name & ".ShowTimeoutMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
+
+        Catch ex As Exception
+            CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ShowTimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+        End Try
+    End Sub
 
     ' XB 29/01/2014 - Task #1438
     Private Sub OnManageWatchDogEvent(ByVal pEnable As Boolean) Handles MDIAnalyzerManager.WatchDogEvent
