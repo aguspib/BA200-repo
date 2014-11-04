@@ -7,8 +7,22 @@ Imports Biosystems.Ax00.Calculations
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Public Class BaseLineEntity
+    Public MustInherit Class BaseLineEntity
         Implements IBaseLineEntity
+
+#Region "Abstract methods"
+        ''' <summary>
+        ''' Get the last ADJUST base lines
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AG 04/11/2014 BA-2065 (refactoring method GetLatestBaseLines in this class)
+        ''' </remarks>
+        Public MustOverride Function GetCurrentAdjustBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+
+#End Region
 
 #Region "Events definition"
         'Inform the well status changes due base line results
@@ -201,8 +215,12 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'Get latest base line with adjust 
                         Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                        Dim blinesDelg As New WSBLinesDelegate
-                        resultData = blinesDelg.GetCurrentBaseLineValues(dbConnection, pAnalyzerID)
+
+                        'AG 04/11/2014 BA-2065 refactoring
+                        'Dim blinesDelg As New WSBLinesDelegate
+                        'resultData = blinesDelg.GetCurrentBaseLineValues(dbConnection, pAnalyzerID)
+                        resultData = GetCurrentAdjustBaseLineValues(dbConnection, pAnalyzerID)
+
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             Dim ALineDS As New BaseLinesDS
                             ALineDS = CType(resultData.SetDatos, BaseLinesDS)
@@ -267,6 +285,46 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return resultData
         End Function
+
+
+        ''' <summary>
+        ''' Get the last ADJUST base lines
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pType">STATIC or DYNAMIC or ALL (if "")</param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AG 04/11/2014 BA-2065 (refactoring method GetLatestBaseLines in this class)
+        ''' </remarks>
+        Public Function GetCurrentAdjustBaseLineValuesByType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim blinesDelg As New WSBLinesDelegate
+                        resultData = blinesDelg.GetCurrentBaseLineValues(dbConnection, pAnalyzerID, pType)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.GetCurrentAdjustBaseLineValuesByType", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 
 #End Region
 

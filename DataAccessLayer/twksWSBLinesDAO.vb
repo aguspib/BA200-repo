@@ -521,14 +521,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pType">STATIC or DYNAMIC or ALL (if "")</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all WaveLengths for the last executed adjustment BaseLine for 
         '''          the specified Analyzer</returns>
         ''' <remarks>
         ''' Created by:  AG 04/05/2011
         ''' Modified by: AG 06/09/2012 - Changed the query to assure the results returned belongs to the informed AnalyzerID. Old query failed when 
         '''                              several there were Base Lines for several Analyzers in the table
+        '''              AG 04/11/2014 BA-2065 (adapt well rejection for STATIC or DYNAMIC base line)
         ''' </remarks>
-        Public Function GetCurrentBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function GetCurrentBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -537,13 +539,34 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AG 04/11/2014 BA-2065 also filter by pType
+                        'Dim cmdText As String = " SELECT * FROM twksWSBLines " & vbCrLf & _
+                        '                        " WHERE BaseLineID IN (SELECT MAX(BaseLineID) FROM twksWSBLines " & vbCrLf & _
+                        '                                            "  WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "') " & vbCrLf
+
+                        ''AG 06/09/2012 - Get the adjust light results for the specified Analyzer!!!!
+                        'cmdText &= " AND AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+                        'cmdText &= " ORDER BY Wavelength ASC "
+
                         Dim cmdText As String = " SELECT * FROM twksWSBLines " & vbCrLf & _
-                                                " WHERE BaseLineID IN (SELECT MAX(BaseLineID) FROM twksWSBLines " & vbCrLf & _
-                                                                    "  WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "') " & vbCrLf
+                        " WHERE BaseLineID IN (SELECT MAX(BaseLineID) FROM twksWSBLines " & vbCrLf & _
+                                            "  WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+
+                        If pType <> "" Then
+                            cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' "
+                        End If
+                        cmdText &= ") "
 
                         'AG 06/09/2012 - Get the adjust light results for the specified Analyzer!!!!
                         cmdText &= " AND AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+
+                        'AG 04/11/2014 BA-2065 also filter by pType
+                        If pType <> "" Then
+                            cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' "
+                        End If
+
                         cmdText &= " ORDER BY Wavelength ASC "
+                        'AG 04/11/2014 BA-2065
 
                         Dim myBaseLinesDS As New BaseLinesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

@@ -1821,7 +1821,7 @@ Namespace Biosystems.Ax00.Global
                     'AG 13/12/2011
                 Else
                     Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input parameter is not numeric", "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
+                    myLogAcciones2.CreateLogActivity("Protection! The input parameter is not numeric (" & pValue.ToString & ")", "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
                     returnValue = 0
                 End If
 
