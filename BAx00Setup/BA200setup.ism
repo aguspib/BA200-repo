@@ -5311,6 +5311,14 @@
 		<row><td>ID_STRING19</td><td>1034</td><td>NEWSHO~1|NewShortcut4</td><td>0</td><td/><td>765631787</td></row>
 		<row><td>ID_STRING2</td><td>1033</td><td>BioSystems SA</td><td>0</td><td/><td>-576692656</td></row>
 		<row><td>ID_STRING2</td><td>1034</td><td>BioSystems SA</td><td>0</td><td/><td>-576692656</td></row>
+		<row><td>ID_STRING20</td><td>1033</td><td>BA200S~1|BA200 Service</td><td>0</td><td/><td>765614829</td></row>
+		<row><td>ID_STRING20</td><td>1034</td><td>NEWSHO~1|NewShortcut3</td><td>0</td><td/><td>765606637</td></row>
+		<row><td>ID_STRING21</td><td>1033</td><td>BA200 Service</td><td>0</td><td/><td>765623117</td></row>
+		<row><td>ID_STRING21</td><td>1034</td><td>BA200 Service</td><td>0</td><td/><td>765623117</td></row>
+		<row><td>ID_STRING22</td><td>1033</td><td>BA200U~1|BA200 User</td><td>0</td><td/><td>765600621</td></row>
+		<row><td>ID_STRING22</td><td>1034</td><td>NEWSHO~1|NewShortcut4</td><td>0</td><td/><td>765594477</td></row>
+		<row><td>ID_STRING23</td><td>1033</td><td>BA200 User</td><td>0</td><td/><td>765631373</td></row>
+		<row><td>ID_STRING23</td><td>1034</td><td>BA200 User</td><td>0</td><td/><td>765631373</td></row>
 		<row><td>ID_STRING3</td><td>1033</td><td>Firmware</td><td>0</td><td/><td>-576700303</td></row>
 		<row><td>ID_STRING3</td><td>1034</td><td>NewFeature1</td><td>0</td><td/><td>-576698287</td></row>
 		<row><td>ID_STRING4</td><td>1033</td><td>USB Drivers</td><td>0</td><td/><td>-576712335</td></row>
@@ -5440,12 +5448,12 @@
 		<row><td>ARPPRODUCTICON.exe</td><td/><td>&lt;ISProductFolder&gt;\redist\Language Independent\OS Independent\setupicon.ico</td><td>0</td></row>
 		<row><td>Ax00Service.exe11_8E7F92D60AD045EB8AECBDEDA8E9EDCF.exe</td><td/><td>&lt;Release1&gt;\Ax00Service.exe</td><td>0</td></row>
 		<row><td>Ax00Service.exe1_67B97874F07844D5BCFB62D98E467A5E.exe</td><td/><td>&lt;Release1&gt;\Ax00Service.exe</td><td>0</td></row>
+		<row><td>BA200Service.exe11_CDC652CD02FF4F41A1E52CF0D3B73251.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES&gt;\BA200Service.exe</td><td>0</td></row>
+		<row><td>BA200User.exe11_0F5ACDA7E8A6425DB47176407B6D0AEF.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe</td><td>0</td></row>
 		<row><td>BA400User.exe11_AC5FC969D22F48E091C8A2D5BE3567C6.exe</td><td/><td>&lt;Release&gt;\BA400User.exe</td><td>0</td></row>
 		<row><td>BA400User.exe1_7359FDE3F39D44FEBC04E41B2D68A752.exe</td><td/><td>&lt;Release&gt;\BA400User.exe</td><td>0</td></row>
-		<row><td>NewShortcut1_77271FFE573E4930B20DE17B55D08E7F.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES&gt;\BA200Service.exe</td><td>0</td></row>
-		<row><td>NewShortcut2_F46350BF8E10401CAC38F33DB232E51F.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe</td><td>0</td></row>
-		<row><td>NewShortcut3_F9F8FE7FFC6845BDB4991B4443E72218.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES&gt;\BA200Service.exe</td><td>0</td></row>
-		<row><td>NewShortcut4_5F5E949E233A416F8E852507886E0818.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe</td><td>0</td></row>
+		<row><td>NewShortcut3_67EA0876F03B470CB37B734101EE52BD.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES&gt;\BA200Service.exe</td><td>0</td></row>
+		<row><td>NewShortcut4_76A604DFA18B44A8B05BF6F6746C2900.exe</td><td/><td>&lt;PATH_TO_RELEASE_FILES1&gt;\BA200User.exe</td><td>0</td></row>
 	</table>
 
 	<table name="IniFile">
@@ -6048,6 +6056,8 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
+		<row><td>BA200Service.exe11</td><td>BA200Service.exe</td><td/><td>ba200</td><td>2</td></row>
+		<row><td>BA200User.exe11</td><td>BA200User.exe</td><td/><td>ba200</td><td>2</td></row>
 		<row><td>NewShortcut1</td><td>BA200Service.exe</td><td/><td>ba200</td><td>2</td></row>
 		<row><td>NewShortcut2</td><td>BA200User.exe</td><td/><td>ba200</td><td>2</td></row>
 	</table>
@@ -6135,10 +6145,10 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>BA200Service.exe1</td><td>DesktopFolder</td><td>##IDS_SHORTCUT_DISPLAY_NAME1##</td><td>BA200Service.exe</td><td>[INSTALLDIR]Service Sw\BA200Service.exe</td><td/><td/><td/><td>NewShortcut3_F9F8FE7FFC6845BDB4991B4443E72218.exe</td><td>1</td><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>BA200Service.exe11</td><td>ba200</td><td>##IDS_SHORTCUT_DISPLAY_NAME1##</td><td>BA200Service.exe</td><td>[INSTALLDIR]Service Sw\BA200Service.exe</td><td/><td/><td/><td>NewShortcut1_77271FFE573E4930B20DE17B55D08E7F.exe</td><td>1</td><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>BA200User.exe1</td><td>DesktopFolder</td><td>##IDS_SHORTCUT_DISPLAY_NAME2##</td><td>BA200User.exe</td><td>[INSTALLDIR]User Sw\BA200User.exe</td><td/><td/><td/><td>NewShortcut4_5F5E949E233A416F8E852507886E0818.exe</td><td>1</td><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>BA200User.exe11</td><td>ba200</td><td>##IDS_SHORTCUT_DISPLAY_NAME2##</td><td>BA200User.exe</td><td>[INSTALLDIR]User Sw\BA200User.exe</td><td/><td/><td/><td>NewShortcut2_F46350BF8E10401CAC38F33DB232E51F.exe</td><td>1</td><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>BA200Service.exe1</td><td>DesktopFolder</td><td>##IDS_SHORTCUT_DISPLAY_NAME1##</td><td>BA200Service.exe</td><td>Service_Sw</td><td/><td/><td/><td>NewShortcut3_67EA0876F03B470CB37B734101EE52BD.exe</td><td>1</td><td>1</td><td>SERVICE_SW</td><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>BA200Service.exe11</td><td>ba200</td><td>##ID_STRING21##</td><td>BA200Service.exe</td><td>Service_Sw</td><td/><td/><td/><td>BA200Service.exe11_CDC652CD02FF4F41A1E52CF0D3B73251.exe</td><td>1</td><td>1</td><td>SERVICE_SW</td><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>BA200User.exe1</td><td>DesktopFolder</td><td>##IDS_SHORTCUT_DISPLAY_NAME2##</td><td>BA200User.exe</td><td>User_Sw</td><td/><td/><td/><td>NewShortcut4_76A604DFA18B44A8B05BF6F6746C2900.exe</td><td>1</td><td>1</td><td>USER_SW</td><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>BA200User.exe11</td><td>ba200</td><td>##ID_STRING23##</td><td>BA200User.exe</td><td>User_Sw</td><td/><td/><td/><td>BA200User.exe11_0F5ACDA7E8A6425DB47176407B6D0AEF.exe</td><td>1</td><td>1</td><td>USER_SW</td><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
