@@ -802,7 +802,7 @@ Namespace My
         
         <Global.System.Configuration.UserScopedSettingAttribute(),  _
          Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("BA400User.exe")>  _
+         Global.System.Configuration.DefaultSettingValueAttribute("BA200User.exe")>  _
         Public Property UserSwExeName() As String
             Get
                 Return CType(Me("UserSwExeName"),String)

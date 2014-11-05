@@ -189,7 +189,7 @@
       <Value Profile="(Default)">SynapseEventLog</Value>
     </Setting>
     <Setting Name="UserSwExeName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">BA400User.exe</Value>
+      <Value Profile="(Default)">BA200User.exe</Value>
     </Setting>
     <Setting Name="UserProjectName" Type="System.String" Scope="User">
       <Value Profile="(Default)">PresentationUSR</Value>
