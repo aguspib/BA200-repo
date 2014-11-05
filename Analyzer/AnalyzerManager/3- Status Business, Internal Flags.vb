@@ -2627,6 +2627,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return myGlobal
         End Function
 
+        ''' <summary>
+        ''' Programm the waiting timer for STATE instructions
+        ''' </summary>
+        ''' <param name="pInterval"></param>
+        ''' <remarks>
+        ''' Created by XB 05/11/2014 - timeout limit repetitions for STATE
+        ''' </remarks>
+        Private Sub InitializeTimerSTATEControl(ByVal pInterval As Integer)
+            Try
+                'Warning: pInterval most be greater than 0
+
+                If pInterval > 0 Then
+                    pInterval = pInterval
+                Else
+                    pInterval = WAITING_TIME_OFF
+                End If
+
+                If pInterval = WAITING_TIME_OFF Then
+                    waitingSTATETimer.Enabled = False
+                Else
+                    waitingSTATETimer.Enabled = False
+                    waitingSTATETimer.Interval = pInterval * 1000    'Convert time from seconds to miliseconds
+                    waitingSTATETimer.Enabled = True
+                End If
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerSTATEControl", EventLogEntryType.Error, False)
+            End Try
+        End Sub
+
 #End Region
 
     End Class

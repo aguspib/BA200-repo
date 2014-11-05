@@ -1110,7 +1110,6 @@ Partial Public Class IAx00MainMDI
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
 
-            CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: Timeout", Me.Name & ".ShowTimeoutMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
 
         Catch ex As Exception
