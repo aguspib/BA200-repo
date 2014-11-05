@@ -2161,7 +2161,7 @@
       GO
     </StructureScript>
     <UpdateScript>
-      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '2.12'
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.13'
       GO
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSBLines' AND sc.name = 'Type') = 0
       BEGIN
