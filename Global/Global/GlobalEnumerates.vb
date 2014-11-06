@@ -748,6 +748,10 @@ Namespace Biosystems.Ax00.Global
             MAX_RESULTSTOEXPORT_HIST 'AG 14/02/2014 - #1505 Max results to export from historical results
             MAX_APP_MEMORYUSAGE      'AG 24/02/2014 - #1520 Max BA400 application memory usage. When limit exceeded a message inform the user to close the app
             MAX_SQL_MEMORYUSAGE      'AG 24/02/2014 - #1520 Max SQL service memory usage. When limit exceeded a message inform the user to close the app
+
+            BL_TYPE_FOR_CALCULATIONS
+            BL_TYPE_FOR_WELLREJECT
+
         End Enum
 
 

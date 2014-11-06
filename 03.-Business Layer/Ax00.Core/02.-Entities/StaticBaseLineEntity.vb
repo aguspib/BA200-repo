@@ -1,5 +1,6 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -16,7 +17,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #Region "Overriden methods"
         Public Overrides Function GetCurrentAdjustBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
-            Return MyBase.GetCurrentAdjustBaseLineValuesByType(pDBConnection, pAnalyzerID, "STATIC")
+            Return MyBase.GetCurrentAdjustBaseLineValuesByType(pDBConnection, pAnalyzerID, BaseLineType.STATIC.ToString())
         End Function
 #End Region
 

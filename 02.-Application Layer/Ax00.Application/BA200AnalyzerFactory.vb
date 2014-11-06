@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Calculations
 Namespace Biosystems.Ax00.App
 
     Public Class BA200AnalyzerFactory
-        Implements IAnalyzerFactory
+        Inherits AnalyzerFactory
 
 #Region "Public Methods"
 
@@ -21,7 +21,7 @@ Namespace Biosystems.Ax00.App
         ''' <param name="fwVersionAttribute"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity Implements IAnalyzerFactory.CreateAnalyzer
+        Public Overrides Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity
 
             Dim analyzer As IAnalyzerEntity
             Dim baseLine As IBaseLineEntity
@@ -36,9 +36,7 @@ Namespace Biosystems.Ax00.App
             iseAnalyzer = New ISEAnalyzerEntity(analyzer, analyzerIDAttribute, analyzerModel, False)
             analyzer.ISEAnalyzer = iseAnalyzer
 
-            'Delegates
-            'AG 30/10/2014 BA-2064 comment new code temporally
-            'analyzer.Calculations = New CalculationsBA200Delegate()
+            LoadAnalyzerConfiguration(analyzer)
 
             Return analyzer
 

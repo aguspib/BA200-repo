@@ -75,6 +75,7 @@
     <Compile Include="AnalyzerController.vb" />
     <Compile Include="BA200AnalyzerFactory.vb" />
     <Compile Include="BA400AnalyzerFactory.vb" />
+    <Compile Include="AnalyzerFactory.vb" />
     <Compile Include="IAnalyzerController.vb" />
     <Compile Include="IAnalyzerFactory.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -120,6 +121,10 @@
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\BussinessLayer\Framework\Framework.vbproj">
+      <Project>{806a1f2f-07c1-43d2-af67-59accf4b5754}</Project>
+      <Name>Framework</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Calculations\Calculations.vbproj">
       <Project>{053cffd3-17b1-4a95-af8c-ff4b6de08809}</Project>

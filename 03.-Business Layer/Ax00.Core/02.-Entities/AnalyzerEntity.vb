@@ -3,6 +3,7 @@ Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Calculations
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -11,6 +12,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private WithEvents _baseLine As IBaseLineEntity
         Private WithEvents _iseAnalyzer As IISEAnalyzerEntity
+
+#Region "Properties"
 
         Property BaseLine As IBaseLineEntity Implements IAnalyzerEntity.BaseLine
             Get
@@ -30,6 +33,20 @@ Namespace Biosystems.Ax00.Core.Entities
             End Set
         End Property
 
+        Property BaseLineTypeForCalculations As BaseLineType Implements IAnalyzerEntity.BaseLineTypeForCalculations
+        Property BaseLineTypeForWellReject As BaseLineType Implements IAnalyzerEntity.BaseLineTypeForWellReject
+
+        Property Model As String Implements IAnalyzerEntity.Model
+            Get
+                Return myAnalyzerModel
+            End Get
+            Set(value As String)
+                myAnalyzerModel = value
+            End Set
+        End Property
+
+#End Region
+
         'AG 30/10/2014 BA-2064 comment new code temporally
         'Property Calculations As CalculationsDelegate Implements IAnalyzerEntity.calculations
 
@@ -37,7 +54,6 @@ Namespace Biosystems.Ax00.Core.Entities
             Me.New(assemblyName, analyzerModel)
             _baseLine = baseLine
         End Sub
-
 
 
 #Region "Abstract methods"

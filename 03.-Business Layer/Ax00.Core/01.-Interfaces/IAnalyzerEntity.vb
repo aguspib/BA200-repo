@@ -92,6 +92,9 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property BarcodeStartInstrExpected As Boolean
         Property FWUpdateResponseData As FWUpdateResponseTO '#REFACTORING
         Property AdjustmentsFilePath As String '#REFACTORING
+        Property BaseLineTypeForCalculations As BaseLineType
+        Property BaseLineTypeForWellReject As BaseLineType
+        Property Model As String
 
 #End Region
 
