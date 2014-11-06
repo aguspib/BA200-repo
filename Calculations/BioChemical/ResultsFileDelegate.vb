@@ -390,7 +390,7 @@ Namespace Biosystems.Ax00.BL
 
                 'IT 03/11/2014: INI BA-2067
                 'Visibilty of Pages
-                If pBaseLineType = "STATIC" Then
+                If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
                     myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
                     myPage.GetType.InvokeMember("Visible", BindingFlags.SetProperty, Nothing, myPage, New Object() {False})
                 End If

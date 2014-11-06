@@ -555,7 +555,7 @@ Public Class Ax00MainForm
                 If String.Compare(filename, "", False) <> 0 AndAlso String.Compare(pathname, "", False) <> 0 Then
                     Dim xlsResults As New ResultsExcelTest
                     'resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
-                    resultData = xlsResults.ExportTestXLS("2013101701", pathname, "Test.xls", "834000134", "STATIC")
+                    resultData = xlsResults.ExportTestXLS("2013101701", pathname, "Test.xls", "834000134", GlobalEnumerates.BaseLineType.STATIC.ToString)
                     If resultData.HasError Then
                         Dim myLogAcciones As New ApplicationLogManager()
                         myLogAcciones.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
