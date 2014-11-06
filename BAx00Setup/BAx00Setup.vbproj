@@ -104,6 +104,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="BA200setup.ism" />
+    <None Include="BA200setup.isproj" />
     <None Include="MsiBAx00setup.ism" />
     <None Include="MsiBAx00setup.isproj" />
     <None Include="My Project\Application.myapp">

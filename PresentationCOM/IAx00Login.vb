@@ -1116,8 +1116,8 @@ Public Class IAx00Login
         Try
             'RH 14/10/2010
             If (Not e.Error Is Nothing) Then
-                CreateLogActivity(e.Error.Message, Name & ".Ax00MDBackGround_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-                ShowMessage(Name & ".Ax00MDBackGround_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), e.Error.Message)
+                CreateLogActivity(e.Error.Message, Name & ".Ax00MDBackGround_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                ShowMessage(Name & ".Ax00MDBackGround_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), e.Error.Message)
             End If
 
             'RH 14/10/2010
