@@ -4128,7 +4128,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' USB connection cable has been disconnected and presentation inform this to AnalyzerManager class
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Modified by XBC 06/09/2012 - Add new parameter pConnectionCompleted</remarks>
+        ''' <remarks>
+        ''' Modified by XB 06/09/2012 - Add new parameter pConnectionCompleted
+        '''             XB 06/11/2014 - ISE Timeout management - BA-1872
+        ''' </remarks>
         Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -4140,6 +4143,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     MyClass.ISEAlreadyStarted = False
                 End If
                 ' XBC 16/01/2013
+
+                ' XB 06/11/2014 - BA-1872
+                ISECMDLost = False
+                MyClass.sendingRepetitions = False
+                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                MyClass.ClearStartTaskQueueToSend()
+                ' XB 06/11/2014 - BA-1872
 
                 ' XBC 26/10/2011
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
