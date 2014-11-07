@@ -34,17 +34,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns> GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
         ''' Creation: AG 16/04/2010
-        ''' Modified by: RH 30/06/2010
-        '''              AnalyzerIsReady depends on myRequestValue.
-        '''              Change "If myRequestValue = 1" by "If AnalyzerIsReady"
-        ''' AG 20/06/2012 - after connection establishment Sw has to wait until analyzer becomes ready to receive new instructions (Action = Ready)
-        ''' AG 19/11/2013 - call the method to process the last ANSPHR instruction received also in pause mode while barcode is scanning
-        ''' AG 28/11/2013 - #1397 changes into connection process in running (they are required for the recovery results in pause mode: after 1st STATUS after connection call STATE + POLLSN)
-        ''' AG 06/02/2014 - Fix issues numbers #1484
-        ''' XB 03/04/2014 - Fix a malfunction when INFO;Q:3 was sent meanwhile a ISE operation was working or Abort process was not finished - task #1557
-        ''' AG 15/04/2014 - #1594 paused in v300
-        ''' XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
-        ''' XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        ''' Modified by: RH 30/06/2010 - AnalyzerIsReady depends on myRequestValue.
+        '''                            - Change "If myRequestValue = 1" by "If AnalyzerIsReady"
+        '''              AG 20/06/2012 - after connection establishment Sw has to wait until analyzer becomes ready to receive new instructions (Action = Ready)
+        '''              AG 19/11/2013 - call the method to process the last ANSPHR instruction received also in pause mode while barcode is scanning
+        '''              AG 28/11/2013 - #1397 changes into connection process in running (they are required for the recovery results in pause mode: after 1st STATUS after connection call STATE + POLLSN)
+        '''              AG 06/02/2014 - Fix issues numbers #1484
+        '''              XB 03/04/2014 - Fix a malfunction when INFO;Q:3 was sent meanwhile a ISE operation was working or Abort process was not finished - task #1557
+        '''              AG 15/04/2014 - #1594 paused in v300
+        '''              XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
+        '''              XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        '''              XB 06/11/2014 - Implement Comms Timeout for RUNNING instruction - BA-1872
         ''' </remarks>
         Private Function ProcessStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
@@ -56,7 +56,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
                 ' XB 30/09/2014 - BA-1872
-                If MyClass.ISECMDLost Then
+                If MyClass.ISECMDLost Or MyClass.RUNNINGLost Then
                     'Deactivate waiting time control
                     numRepetitionsSTATE = 0
                     MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
@@ -314,10 +314,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 MyClass.sendingRepetitions = False
 
                                 ' Activates Alarm begin
-                                Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
-                                Dim myAlarmStatusList As New List(Of Boolean)
                                 Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                                 Dim alarmStatus As Boolean = False
+                                Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                Dim myAlarmStatusList As New List(Of Boolean)
 
                                 alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                                 alarmStatus = True
@@ -346,8 +346,100 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ' Update the interval of the Timer with the expected time received from the Analyzer
                         MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
                     End If
+
                 End If
                 ' XB 26/09/2014 - BA-1872
+
+                ' XB 06/11/2014 - BA-1872
+                If MyClass.RUNNINGLost Then
+                    MyClass.RUNNINGLost = False
+
+                    If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START And _
+                       AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_END Then
+                        MyClass.sendingRepetitions = True
+                        MyClass.numRepetitionsTimeout += 1
+                        Dim myLogAcciones As New ApplicationLogManager()
+                        If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                            myLogAcciones.CreateLogActivity("Num of Repetitions for RUNNING excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            waitingStartTaskTimer.Enabled = False
+                            MyClass.sendingRepetitions = False
+
+                            ' Activates Alarm begin
+                            Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                            Dim alarmStatus As Boolean = False
+                            Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                            alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                            alarmStatus = True
+                            ISE_Manager.IsTimeOut = True
+
+                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                            If myAlarmList.Count > 0 Then
+                                ' Note that this alarm is common on User and Service !
+                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            End If
+                            ' Activates Alarm end
+
+                            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                            'Update internal flags. Basically used by the running normal business
+                            If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                                'Update analyzer session flags into DataBase
+                                If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                    myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                                End If
+                            End If
+
+                            RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                        Else
+                            ' Instruction has not started by Fw, so is need to send it again
+                            myLogAcciones.CreateLogActivity("Repeat RUNNING Instruction [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                            myGlobal = MyClass.SendStartTaskinQueue()
+                        End If
+                    End If
+
+                End If
+
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_START Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                    ' Update the interval of the Timer with the expected time received from the Analyzer
+                    MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                End If
+
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
+                    RUNNINGLost = False
+                    MyClass.sendingRepetitions = False
+                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                    MyClass.ClearStartTaskQueueToSend()
+
+                    ' Deactivates Alarm begin - BA-1872
+                    Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                    Dim alarmStatus As Boolean = False
+                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                    Dim myAlarmStatusList As New List(Of Boolean)
+
+                    alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                    alarmStatus = False
+
+                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+
+                    'Finally call manage all alarms detected (new or solved)
+                    If myAlarmList.Count > 0 Then
+                        If GlobalBase.IsServiceAssembly Then
+                            ' Not Apply
+                        Else
+                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        End If
+
+                    End If
+                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
+                End If
+                ' XB 06/11/2014 - BA-1872
+
 
                 'AG 23/11/2011 - Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
                 Dim ISEAvailableValue As Integer = 0
@@ -458,10 +550,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     MyClass.sendingRepetitions = False
 
                                     ' Activates Alarm begin
-                                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
-                                    Dim myAlarmStatusList As New List(Of Boolean)
                                     Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                                     Dim alarmStatus As Boolean = False
+                                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                    Dim myAlarmStatusList As New List(Of Boolean)
 
                                     alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                                     alarmStatus = True
@@ -4640,6 +4732,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                     End If
+
+                    ' XB 06/11/2014 - BA-1872
+                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
                 End If
                 ' XBC 21/03/2012
 

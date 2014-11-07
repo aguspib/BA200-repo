@@ -2610,8 +2610,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If queuedAction = AnalyzerManagerSwActionList.ISE_CMD AndAlso Not queuedSwAdditionalParameters Is Nothing Then
                     myISECMD = CType(queuedSwAdditionalParameters, Biosystems.Ax00.Global.ISECommandTO)
                 End If
-                If Not myISECMD Is Nothing AndAlso _
-                   myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION Then
+                If (Not myISECMD Is Nothing AndAlso _
+                    (myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION)) Then
                     ' Special case for ISE save consumptions
                     myGlobal = MyClass.ISE_Manager.SaveConsumptions()
                     ' XB 29/09/2014 - BA-1872

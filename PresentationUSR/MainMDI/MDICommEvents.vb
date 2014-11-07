@@ -1108,7 +1108,23 @@ Partial Public Class IAx00MainMDI
 
             Dim myAdtionalText As String = ""
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
+
+            If Not MDIAnalyzerManager.Alarms Is Nothing Then
+                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
+                    myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
+                End If
+
+                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then
+                    myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "COMMS_TIMEOUT_ERR", CurrentLanguageAttribute)
+                    processingBeforeRunning = "2"
+                    ' In these case stop the mdi bar progress bar and enabled menus ... 
+                    ScreenWorkingProcess = False
+                    StopMarqueeProgressBar()
+                    EnableButtonAndMenus(True)
+                    ShowStatus(Messages.STANDBY)
+                    Cursor = Cursors.Default
+                End If
+            End If
 
             ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
 
