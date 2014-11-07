@@ -1967,6 +1967,9 @@ Namespace Biosystems.Ax00.Global
 
             BARCODE_ACTION_RECEIVED = 44 'Barcode request has been received and accepted by instrument
 
+            FLIGHT_ACTION_START = 46 'FLIGHT instruction has been received and accepted by instrument
+            FLIGHT_ACTION_DONE = 47
+
             'FW Scripts Low Level Instructions
             COMMAND_START = 50
             COMMAND_END = 51
