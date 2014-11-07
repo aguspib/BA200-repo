@@ -2222,13 +2222,13 @@ Namespace Biosystems.Ax00.Core.Entities
                             '- Read base line with ID = currBaseLineID
                             '    - If the type is STATIC then next ID = current+1
                             '    - Else: If already exists for well, led then nextId = current+1
-                            If currBaseLineID > 0 AndAlso pType = "DYNAMIC" Then
+                            If currBaseLineID > 0 AndAlso pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
                                 resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "")
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     Dim auxDS As New BaseLinesDS
                                     auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)
 
-                                    If auxDS.twksWSBaseLines.Rows.Count > 0 AndAlso auxDS.twksWSBaseLines(0).Type = "DYNAMIC" Then
+                                    If auxDS.twksWSBaseLines.Rows.Count > 0 AndAlso auxDS.twksWSBaseLines(0).Type = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
                                         Dim linqRes As List(Of BaseLinesDS.twksWSBaseLinesRow)
                                         linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDS.twksWSBaseLines _
                                                    Where a.WellUsed = pWellUsed AndAlso a.Wavelength = pLed Select a).ToList

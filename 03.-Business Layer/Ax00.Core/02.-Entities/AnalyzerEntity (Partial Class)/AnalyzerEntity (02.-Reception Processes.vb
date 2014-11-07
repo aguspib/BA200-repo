@@ -1045,7 +1045,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myBaseLineRow.WellUsed = myWell
                                 myBaseLineRow.WorkSessionID = Me.WorkSessionIDAttribute
                                 myBaseLineRow.AnalyzerID = Me.AnalyzerIDAttribute
-                                myBaseLineRow.Type = "STATIC" 'AG 28/10/2014 BA-2057
+                                myBaseLineRow.Type = GlobalEnumerates.BaseLineType.STATIC.ToString 'AG 28/10/2014 BA-2057
                                 myBaseLineRow.DateTime = DateTime.Now
 
                                 'Get the Wavelenght
@@ -1129,7 +1129,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If (Not myGlobalDataTO.HasError) Then
                             'Save baseline results into database
-                            myGlobalDataTO = Me.SaveBaseLineResults(dbConnection, myBaseLineDS, baseLineWithAdjust, "STATIC")
+                            myGlobalDataTO = Me.SaveBaseLineResults(dbConnection, myBaseLineDS, baseLineWithAdjust, GlobalEnumerates.BaseLineType.STATIC.ToString)
 
                             If Not myGlobalDataTO.HasError Then
                                 'Perform ANSBLD results business
@@ -3897,7 +3897,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not resultData.HasError Then
                             For index As Integer = 0 To myResults.WellUsed.Count - 1
                                 'Get the baseLineID
-                                resultData = GetNextBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myResults.WellUsed(index), True, "DYNAMIC", myResults.Wavelength)
+                                resultData = GetNextBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myResults.WellUsed(index), True, GlobalEnumerates.BaseLineType.DYNAMIC.ToString, myResults.Wavelength)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     nextBaseLineID = DirectCast(resultData.SetDatos, Integer)
                                 Else
@@ -3918,14 +3918,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                 baseLineRow.IT = myResults.IntegrationTime
                                 baseLineRow.DAC = myResults.DAC
                                 baseLineRow.DateTime = DateTime.Now
-                                baseLineRow.Type = "DYNAMIC" 'AG 28/10/2014 BA-2062
+                                baseLineRow.Type = GlobalEnumerates.BaseLineType.DYNAMIC.ToString 'AG 28/10/2014 BA-2062
                                 baseLineRow.EndEdit()
                                 myBaseLineDS.twksWSBaseLines.AddtwksWSBaseLinesRow(baseLineRow)
                             Next
                             myBaseLineDS.AcceptChanges()
 
                             'Save baseline results into database
-                            resultData = Me.SaveBaseLineResults(Nothing, myBaseLineDS, True, "DYNAMIC")
+                            resultData = Me.SaveBaseLineResults(Nothing, myBaseLineDS, True, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
                         End If
 
                     Else
