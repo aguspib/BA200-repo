@@ -641,7 +641,12 @@ Namespace Biosystems.Ax00.BL
                 myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {pSheetNumber})
 
                 ' Ini Header 
-                myHeader = "Base lines with adjustments of integration time and DAC"
+                'AG 07/11/2014 BA-2067 Different header depending the base line typ
+                If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                    myHeader = "Base lines with adjustments of integration time and DAC"
+                Else
+                    myHeader = "Dynamic Base lines (on the fly)"
+                End If
 
                 SetCellValue(myPage, "A1", myHeader, True)
                 MergeCells(myPage, "A1:H1")
