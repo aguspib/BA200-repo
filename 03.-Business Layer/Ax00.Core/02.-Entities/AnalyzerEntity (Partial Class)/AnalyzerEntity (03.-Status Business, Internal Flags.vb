@@ -327,6 +327,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Case GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_END
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StopRunning, "END")
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.SoftwareWSonRUNNING, "CLOSED") 'AG 07/11/2014 - This flag was set to TRUE but never to FALSE except after results recover!!
 
                             If (String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ENDprocess.ToString), "INPROCESS", False) = 0) Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ENDprocess, "CLOSED")
