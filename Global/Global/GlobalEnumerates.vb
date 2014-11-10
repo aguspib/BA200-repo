@@ -452,7 +452,6 @@ Namespace Biosystems.Ax00.Global
             FIRST_USER_TESTID
             CYCLE_MACHINE
             TOTAL_READINGS
-            SECOND_REAGENT
             PREDILUTION_CYCLES
             ISETEST_CYCLES_SERPLM
             ISETEST_CYCLES_URI

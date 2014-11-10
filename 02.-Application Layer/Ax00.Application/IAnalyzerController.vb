@@ -11,8 +11,8 @@ Namespace Biosystems.Ax00.App
 #End Region
 
 #Region "Public Methods"
-
-        Function CreateAnalyzer(model As AnalyzerModelEnum, assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity
+        ''' AG 10/11/2014 BA-2082 remove parameter model and use analyzerModel that are read from database
+        Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity
 
 #End Region
 

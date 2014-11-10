@@ -12,26 +12,26 @@
       </DataSource>
     </xs:appinfo>
   </xs:annotation>
-  <xs:element name="FieldLimitsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:Generator_UserDSName="FieldLimitsDS" msprop:Generator_DataSetName="FieldLimitsDS" msprop:EnableTableAdapterManager="true">
+  <xs:element name="FieldLimitsDS" msdata:IsDataSet="true" msdata:UseCurrentLocale="true" msprop:EnableTableAdapterManager="true" msprop:Generator_DataSetName="FieldLimitsDS" msprop:Generator_UserDSName="FieldLimitsDS">
     <xs:complexType>
       <xs:choice minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="tfmwFieldLimits" msprop:Generator_UserTableName="tfmwFieldLimits" msprop:Generator_RowDeletedName="tfmwFieldLimitsRowDeleted" msprop:Generator_RowChangedName="tfmwFieldLimitsRowChanged" msprop:Generator_RowClassName="tfmwFieldLimitsRow" msprop:Generator_RowChangingName="tfmwFieldLimitsRowChanging" msprop:Generator_RowEvArgName="tfmwFieldLimitsRowChangeEvent" msprop:Generator_RowEvHandlerName="tfmwFieldLimitsRowChangeEventHandler" msprop:Generator_TableClassName="tfmwFieldLimitsDataTable" msprop:Generator_TableVarName="tabletfmwFieldLimits" msprop:Generator_RowDeletingName="tfmwFieldLimitsRowDeleting" msprop:Generator_TablePropName="tfmwFieldLimits">
+        <xs:element name="tfmwFieldLimits" msprop:Generator_UserTableName="tfmwFieldLimits" msprop:Generator_RowEvArgName="tfmwFieldLimitsRowChangeEvent" msprop:Generator_TableVarName="tabletfmwFieldLimits" msprop:Generator_TablePropName="tfmwFieldLimits" msprop:Generator_RowDeletingName="tfmwFieldLimitsRowDeleting" msprop:Generator_RowChangingName="tfmwFieldLimitsRowChanging" msprop:Generator_RowDeletedName="tfmwFieldLimitsRowDeleted" msprop:Generator_RowEvHandlerName="tfmwFieldLimitsRowChangeEventHandler" msprop:Generator_TableClassName="tfmwFieldLimitsDataTable" msprop:Generator_RowChangedName="tfmwFieldLimitsRowChanged" msprop:Generator_RowClassName="tfmwFieldLimitsRow">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="LimitID" msprop:Generator_UserColumnName="LimitID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LimitID" msprop:Generator_ColumnPropNameInTable="LimitIDColumn" msprop:Generator_ColumnVarNameInTable="columnLimitID">
+              <xs:element name="LimitID" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LimitID" msprop:Generator_ColumnVarNameInTable="columnLimitID" msprop:Generator_ColumnPropNameInTable="LimitIDColumn" msprop:Generator_UserColumnName="LimitID">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="30" />
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
-              <xs:element name="LimitDescription" msprop:Generator_UserColumnName="LimitDescription" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LimitDescription" msprop:Generator_ColumnPropNameInTable="LimitDescriptionColumn" msprop:Generator_ColumnVarNameInTable="columnLimitDescription" type="xs:string" minOccurs="0" />
-              <xs:element name="MinValue" msprop:Generator_UserColumnName="MinValue" msprop:Generator_ColumnPropNameInRow="MinValue" msprop:Generator_ColumnVarNameInTable="columnMinValue" msprop:Generator_ColumnPropNameInTable="MinValueColumn" type="xs:float" minOccurs="0" />
-              <xs:element name="MaxValue" msprop:Generator_UserColumnName="MaxValue" msprop:Generator_ColumnPropNameInRow="MaxValue" msprop:Generator_ColumnVarNameInTable="columnMaxValue" msprop:Generator_ColumnPropNameInTable="MaxValueColumn" type="xs:float" />
-              <xs:element name="StepValue" msprop:Generator_UserColumnName="StepValue" msprop:Generator_ColumnPropNameInRow="StepValue" msprop:Generator_ColumnVarNameInTable="columnStepValue" msprop:Generator_ColumnPropNameInTable="StepValueColumn" type="xs:float" minOccurs="0" />
-              <xs:element name="DefaultValue" msprop:Generator_UserColumnName="DefaultValue" msprop:Generator_ColumnPropNameInRow="DefaultValue" msprop:Generator_ColumnVarNameInTable="columnDefaultValue" msprop:Generator_ColumnPropNameInTable="DefaultValueColumn" type="xs:float" minOccurs="0" />
-              <xs:element name="DecimalsAllowed" msprop:Generator_UserColumnName="DecimalsAllowed" msprop:Generator_ColumnPropNameInRow="DecimalsAllowed" msprop:Generator_ColumnVarNameInTable="columnDecimalsAllowed" msprop:Generator_ColumnPropNameInTable="DecimalsAllowedColumn" type="xs:int" minOccurs="0" />
-              <xs:element name="AnalyzerModel" msprop:Generator_UserColumnName="AnalyzerModel" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerModel" msprop:Generator_ColumnPropNameInTable="AnalyzerModelColumn" msprop:Generator_ColumnVarNameInTable="columnAnalyzerModel" minOccurs="0">
+              <xs:element name="LimitDescription" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="LimitDescription" msprop:Generator_ColumnVarNameInTable="columnLimitDescription" msprop:Generator_ColumnPropNameInTable="LimitDescriptionColumn" msprop:Generator_UserColumnName="LimitDescription" type="xs:string" minOccurs="0" />
+              <xs:element name="MinValue" msprop:Generator_ColumnVarNameInTable="columnMinValue" msprop:Generator_ColumnPropNameInRow="MinValue" msprop:Generator_ColumnPropNameInTable="MinValueColumn" msprop:Generator_UserColumnName="MinValue" type="xs:float" minOccurs="0" />
+              <xs:element name="MaxValue" msprop:Generator_ColumnVarNameInTable="columnMaxValue" msprop:Generator_ColumnPropNameInRow="MaxValue" msprop:Generator_ColumnPropNameInTable="MaxValueColumn" msprop:Generator_UserColumnName="MaxValue" type="xs:float" />
+              <xs:element name="StepValue" msprop:Generator_ColumnVarNameInTable="columnStepValue" msprop:Generator_ColumnPropNameInRow="StepValue" msprop:Generator_ColumnPropNameInTable="StepValueColumn" msprop:Generator_UserColumnName="StepValue" type="xs:float" minOccurs="0" />
+              <xs:element name="DefaultValue" msprop:Generator_ColumnVarNameInTable="columnDefaultValue" msprop:Generator_ColumnPropNameInRow="DefaultValue" msprop:Generator_ColumnPropNameInTable="DefaultValueColumn" msprop:Generator_UserColumnName="DefaultValue" type="xs:float" minOccurs="0" />
+              <xs:element name="DecimalsAllowed" msprop:Generator_ColumnVarNameInTable="columnDecimalsAllowed" msprop:Generator_ColumnPropNameInRow="DecimalsAllowed" msprop:Generator_ColumnPropNameInTable="DecimalsAllowedColumn" msprop:Generator_UserColumnName="DecimalsAllowed" type="xs:int" minOccurs="0" />
+              <xs:element name="AnalyzerModel" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AnalyzerModel" msprop:Generator_ColumnVarNameInTable="columnAnalyzerModel" msprop:Generator_ColumnPropNameInTable="AnalyzerModelColumn" msprop:Generator_UserColumnName="AnalyzerModel" minOccurs="0">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
                     <xs:maxLength value="10" />
@@ -43,9 +43,5 @@
         </xs:element>
       </xs:choice>
     </xs:complexType>
-    <xs:unique name="Constraint1" msdata:PrimaryKey="true">
-      <xs:selector xpath=".//mstns:tfmwFieldLimits" />
-      <xs:field xpath="mstns:LimitID" />
-    </xs:unique>
   </xs:element>
 </xs:schema>

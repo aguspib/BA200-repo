@@ -54,12 +54,14 @@ Namespace Biosystems.Ax00.App
         ''' <param name="analyzerIDAttribute"></param>
         ''' <param name="fwVersionAttribute"></param>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function CreateAnalyzer(model As AnalyzerModelEnum, assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity Implements IAnalyzerController.CreateAnalyzer
-            Select Case model
-                Case AnalyzerModelEnum.BA200
+        ''' <remarks>
+        ''' AG 10/11/2014 BA-2082 remove parameter model and use analyzerModel that are read from database
+        ''' </remarks>
+        Public Function CreateAnalyzer(assemblyName As String, analyzerModel As String, startingApplication As Boolean, workSessionIDAttribute As String, analyzerIDAttribute As String, fwVersionAttribute As String) As IAnalyzerEntity Implements IAnalyzerController.CreateAnalyzer
+            Select Case analyzerModel
+                Case AnalyzerModelEnum.A200.ToString 'BA200
                     _factory = New BA200AnalyzerFactory()
-                Case AnalyzerModelEnum.BA400
+                Case AnalyzerModelEnum.A400.ToString 'BA400
                     _factory = New BA400AnalyzerFactory()
             End Select
 

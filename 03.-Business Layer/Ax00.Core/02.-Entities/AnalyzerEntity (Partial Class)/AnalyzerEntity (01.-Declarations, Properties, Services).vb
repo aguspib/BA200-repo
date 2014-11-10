@@ -820,8 +820,10 @@ Namespace Biosystems.Ax00.Core.Entities
         '    End Get
         'End Property
 
+
         Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetModelValue
             Get
+                'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
                 Dim returnValue As String = ""
 
                 If pAnalyzerID.Length > 0 Then
@@ -830,10 +832,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     strTocompare = GetUpperPartSN(pAnalyzerID)
 
                     Select Case strTocompare
-                        Case "SN0"  ' TO DELETE
-                            returnValue = "A400"
+                        Case "SN0"  ' Generic
+                            returnValue = "A200"
+
                         Case GlobalBase.BA400ModelID
-                            returnValue = "A400"
+                            returnValue = "A200"
                     End Select
                 End If
 

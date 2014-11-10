@@ -6231,8 +6231,12 @@ Public Class Ax00ServiceMainMDI
 
             'AG 22/04/0210 - Moved from BSBaseServiceForm_Load
             If (Not AnalyzerController.IsAnalyzerInstantiated) Then
+
                 '#REFACTORING
-                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, My.Application.Info.AssemblyName, Me.AnalyzerModel, True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
+                'AG 10/11/2014 BA-2082 use the AnalyzerModel read from database instead of the enumerate AnalyzerModelEnum
+                'IMPORTANT NOTE: Unti the service Sw is adapted we must use 'A400' instead of Me.AnalyzerModel
+                'MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, Me.AnalyzerModel, True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, "A400", True, String.Empty, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Dim blnStartComm As Boolean = False
                 blnStartComm = AnalyzerController.Instance.Analyzer.Start(False)   'AG 21/04/2010 Start the CommAx00 process'blnStartComm = GlobalAnalyzerManager.Start(False)   'AG 21/04/2010 Start the CommAx00 process

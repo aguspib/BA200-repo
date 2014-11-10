@@ -8143,81 +8143,82 @@ Partial Public Class IAx00MainMDI
     ''' </remarks>
     Public Sub OpenRotorPositionsForm(ByRef FormToClose As Form, Optional ByVal pShowHQScreen As Boolean = False, Optional ByVal pAutomateProcessWithLIS As Boolean = False)
         Try
-            If (AnalyzerModelAttribute = "A400") Then
-                Cursor = Cursors.WaitCursor
+            'AG 10/11/2014 BA-2082 comment this IF (at least until complete adaptation)
+            'If (AnalyzerModelAttribute = "A400") Then
+            Cursor = Cursors.WaitCursor
 
-                SetWSActiveDataFromDB() 'AG 1/07/2011 - Get the current WSStatus value
+            SetWSActiveDataFromDB() 'AG 1/07/2011 - Get the current WSStatus value
 
-                If (WorkSessionIDAttribute = String.Empty) Then
-                    'Create and empty WS
-                    Dim myWSOrderTestsDS As New WSOrderTestsDS
-                    Dim myWSDelegate As New WorkSessionsDelegate
-                    Dim dataToReturn As New GlobalDataTO
+            If (WorkSessionIDAttribute = String.Empty) Then
+                'Create and empty WS
+                Dim myWSOrderTestsDS As New WSOrderTestsDS
+                Dim myWSDelegate As New WorkSessionsDelegate
+                Dim dataToReturn As New GlobalDataTO
 
-                    If (NEWAddWorkSession) Then
-                        'BT #1545
-                        dataToReturn = myWSDelegate.AddWorkSession_NEW(Nothing, myWSOrderTestsDS, True, AnalyzerIDAttribute)
-                    Else
-                        dataToReturn = myWSDelegate.AddWorkSession(Nothing, myWSOrderTestsDS, True, AnalyzerIDAttribute)
-                    End If
+                If (NEWAddWorkSession) Then
+                    'BT #1545
+                    dataToReturn = myWSDelegate.AddWorkSession_NEW(Nothing, myWSOrderTestsDS, True, AnalyzerIDAttribute)
+                Else
+                    dataToReturn = myWSDelegate.AddWorkSession(Nothing, myWSOrderTestsDS, True, AnalyzerIDAttribute)
+                End If
 
-                    If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
-                        'Get the ID of both: Work Session and Analyzer
-                        Dim myWorkSessionsDS As WorkSessionsDS = DirectCast(dataToReturn.SetDatos, WorkSessionsDS)
+                If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
+                    'Get the ID of both: Work Session and Analyzer
+                    Dim myWorkSessionsDS As WorkSessionsDS = DirectCast(dataToReturn.SetDatos, WorkSessionsDS)
 
-                        If (myWorkSessionsDS.twksWorkSessions.Rows.Count = 1) Then
-                            WorkSessionIDAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionID
-                            WSStatusAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionStatus
+                    If (myWorkSessionsDS.twksWorkSessions.Rows.Count = 1) Then
+                        WorkSessionIDAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionID
+                        WSStatusAttribute = myWorkSessionsDS.twksWorkSessions(0).WorkSessionStatus
 
-                            'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
-                            If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
-                            End If
+                        'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
+                        If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
                         End If
                     End If
-
-                    SetWSActiveDataFromDB()
                 End If
 
-                ' XB 22/11/2013 - Task #1394
-                DisplayISELockedPreparationsWarningAttribute = False
-
-                IWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
-                IWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
-                IWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
-                IWSRotorPositions.WorkSessionStatus(AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString) = WSStatusAttribute '#REFACTORING
-                IWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
-
-                ' XB 17/07/2013 - Auto WS process
-                'XB 23/07/2013 - auto HQ
-                'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
-                IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
-                'XB 23/07/2013
-
-                'AG 09/07/2013
-                IWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
-                'XB 23/07/2013 - auto HQ
-                ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
-                If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
-                    'XB 23/07/2013
-                    SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreateExecutions)
-                End If
-
-                'AG 09/07/2013
-
-                If FormToClose Is Nothing Then
-                    OpenMDIChildForm(IWSRotorPositions)
-                Else
-                    'RH 16/12/2010 Directly opens the Rotor Positioning form and closes the calling form
-                    IWSRotorPositions.MdiParent = Me
-                    IWSRotorPositions.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                    IWSRotorPositions.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                    IWSRotorPositions.Show()
-                    Application.DoEvents()
-                    FormToClose.Close()
-                End If
+                SetWSActiveDataFromDB()
             End If
+
+            ' XB 22/11/2013 - Task #1394
+            DisplayISELockedPreparationsWarningAttribute = False
+
+            IWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
+            IWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
+            IWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
+            IWSRotorPositions.WorkSessionStatus(AnalyzerController.Instance.Analyzer.AnalyzerStatus.ToString) = WSStatusAttribute '#REFACTORING
+            IWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
+
+            ' XB 17/07/2013 - Auto WS process
+            'XB 23/07/2013 - auto HQ
+            'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
+            IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+            'XB 23/07/2013
+
+            'AG 09/07/2013
+            IWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
+            'XB 23/07/2013 - auto HQ
+            ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
+            If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
+                'XB 23/07/2013
+                SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreateExecutions)
+            End If
+
+            'AG 09/07/2013
+
+            If FormToClose Is Nothing Then
+                OpenMDIChildForm(IWSRotorPositions)
+            Else
+                'RH 16/12/2010 Directly opens the Rotor Positioning form and closes the calling form
+                IWSRotorPositions.MdiParent = Me
+                IWSRotorPositions.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                IWSRotorPositions.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                IWSRotorPositions.Show()
+                Application.DoEvents()
+                FormToClose.Close()
+            End If
+            'End If
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenRotorPositionsForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -8566,8 +8567,10 @@ Partial Public Class IAx00MainMDI
             If (Not AnalyzerController.IsAnalyzerInstantiated) Then
                 'AG 06/09/2012 - Analyzer manager initialization requires WorkSessionID to be informed before AnalyzerID
 
+                'AG 10/11/2014 BA-2082 use the AnalyzerModel read from database instead of the enumerate AnalyzerModelEnum (inform the analyzer model before createAnalyzer)
+                MyClass.AnalyzerModel = AnalyzerModelAttribute
                 '#REFACTORING
-                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA200, My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
+                MDIAnalyzerManager = AnalyzerController.Instance.CreateAnalyzer(My.Application.Info.AssemblyName, MyClass.AnalyzerModel, pStartingApplication, WorkSessionIDAttribute, AnalyzerIDAttribute, FwVersionAttribute)
 
                 Application.DoEvents()
 

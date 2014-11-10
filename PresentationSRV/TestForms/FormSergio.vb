@@ -633,7 +633,7 @@ Public Class FormSergio
 
             Dim myUtil As New Utilities
             '#REFACTORING
-            Dim myAnalyzer As IAnalyzerEntity = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, String.Empty, String.Empty, False, String.Empty, String.Empty, String.Empty) '#REFACTORING
+            Dim myAnalyzer As IAnalyzerEntity = AnalyzerController.Instance.CreateAnalyzer(String.Empty, String.Empty, False, String.Empty, String.Empty, String.Empty) '#REFACTORING
 
             myGlobal = myAnalyzer.ProcessRecivedISEResult(myInstruction)
             Dim myISEResultData As New ISEResultsDataTO
@@ -1037,7 +1037,7 @@ Public Class FormSergio
 
             Dim myUtil As New Utilities
             '#REFACTORING
-            Dim myAnalyzer As IAnalyzerEntity = AnalyzerController.Instance.CreateAnalyzer(AnalyzerModelEnum.BA400, String.Empty, String.Empty, False, String.Empty, String.Empty, String.Empty)
+            Dim myAnalyzer As IAnalyzerEntity = AnalyzerController.Instance.CreateAnalyzer(String.Empty, String.Empty, False, String.Empty, String.Empty, String.Empty)
             myGlobal = myAnalyzer.ProcessANSUTILReceived(myInstruction)
 
 

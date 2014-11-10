@@ -605,7 +605,11 @@ Partial Public Class IMonitor
     End Function
 
     Private Sub InitializeRotors()
-        AnalyzerModel = "A400"
+        'AG 10/11/2014 BA-2082
+        'AnalyzerModel = "A400"
+        If AnalyzerModel = "" Then
+            AnalyzerModel = IAx00MainMDI.ActiveAnalyzerModel
+        End If
 
         PrepareButtons()
         PrepareIconNames()

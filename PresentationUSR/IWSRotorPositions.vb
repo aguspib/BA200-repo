@@ -7675,7 +7675,8 @@ Public Class IWSRotorPositions
 
                         If (myAnalyzersDS.tcfgAnalyzers.Rows.Count = 1) Then
                             AnalyzerModel = myAnalyzersDS.tcfgAnalyzers(0).AnalyzerModel
-                            validationOK = (AnalyzerModelAttribute = "A400")   'This screen is only for Analyzers with Model A400 
+                            'AG 10/11/2014 BA-2077 add BA200
+                            validationOK = (AnalyzerModelAttribute = "A400") OrElse (AnalyzerModelAttribute = "A200")  'This screen is only for Analyzers with Model A400 
                         Else
                             validationOK = False
                         End If
@@ -7685,7 +7686,8 @@ Public Class IWSRotorPositions
                         validationOK = False
                     End If
                 Else
-                    validationOK = (AnalyzerModelAttribute = "A400")   'This screen is only for Analyzers with Model A400 
+                    'AG 10/11/2014 BA-2077 add BA200
+                    validationOK = (AnalyzerModelAttribute = "A400") OrElse (AnalyzerModelAttribute = "A200")    'This screen is only for Analyzers with Model A400 
                 End If
             End If
 
