@@ -435,9 +435,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                 'Get the total number of Readings as: Value of limit READING1_CYCLES minus the internal Readings OffSet
+                'AG 10/11/2014 BA-2082 filter by Model
                 Dim totalReadingsNumber As Integer = 0
                 Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a As FieldLimitsDS.tfmwFieldLimitsRow In myClassFieldLimitsDS.tfmwFieldLimits _
-                                                                             Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING1_CYCLES.ToString _
+                                                                             Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING1_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                                                                             Select a).ToList
                 If (limitList.Count > 0) Then totalReadingsNumber = CInt(limitList.First.MaxValue) - internalReadingsOffset
                 'limitList = Nothing 'AG 24/10/2013
@@ -758,8 +759,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim maxReadingsWithR2 As Integer = 0
 
                             'Use linq for que the limits for R2
+                            'AG 10/11/2014 BA-2082 filter by model
                             limitList = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
-                                        Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString _
+                                        Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                                         Select a).ToList
                             If limitList.Count > 0 Then
                                 defaultR2IsAdded = CInt(limitList(0).MinValue) - internalReadingsOffset

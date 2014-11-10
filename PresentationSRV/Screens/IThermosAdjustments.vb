@@ -1038,7 +1038,8 @@ Public Class IThermosAdjustments
                     Case ADJUSTMENT_GROUPS.THERMOS_REAGENT1
                         myGlobal = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_THERMO_PROBE_R1_SETPOINT)
                     Case ADJUSTMENT_GROUPS.THERMOS_REAGENT2
-                        myGlobal = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_THERMO_PROBE_R2_SETPOINT)
+                        'AG 10/11/2014 BA-2082 filter by model those parameters with changes
+                        myGlobal = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_THERMO_PROBE_R2_SETPOINT, ActiveAnalyzerModel)
                     Case ADJUSTMENT_GROUPS.THERMOS_WS_HEATER
                         myGlobal = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.SRV_THERMO_HEATER_SETPOINT)
                 End Select

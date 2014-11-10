@@ -304,8 +304,9 @@ Public Class IProgTest
                                Where a.ParameterName = GlobalEnumerates.SwParameters.STEPS_UL.ToString _
                                Select a).ToList()
             Else 'samples
+                'AG 10/11/2014 BA-2082 filter also by analyzer model
                 qswParameter = (From a In SwParametersDS.tfmwSwParameters _
-                               Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString _
+                               Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
                                Select a).ToList()
             End If
 
@@ -354,9 +355,10 @@ Public Class IProgTest
             steps_uL = CType(qswParameter.First().ValueNumeric, Single)
 
             'AG 19/04/2011 - different conversion factor for reagents and samples
+            'AG 10/11/2014 BA-2082 filter also by analyzer model
             Dim sample_steps_uL As Single = 1 'AG 19/04/2011
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
-            Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString _
+            Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
             Select a).ToList()
             sample_steps_uL = CType(qswParameter.First().ValueNumeric, Single)
             'AG 19/04/2011
@@ -7486,9 +7488,10 @@ Public Class IProgTest
                 steps_uL = CType(qswParameter.First().ValueNumeric, Single)
 
                 'AG 19/04/2011 - different conversion factor for reagents and samples
+                'AG 10/11/2014 BA-2082 filter also by analyzer model
                 Dim sample_steps_uL As Single = 1 'AG 19/04/2011
                 qswParameter = (From a In SwParametersDS.tfmwSwParameters _
-                Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString _
+                Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
                 Select a).ToList()
 
                 sample_steps_uL = CType(qswParameter.First().ValueNumeric, Single)

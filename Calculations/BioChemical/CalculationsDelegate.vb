@@ -7849,8 +7849,9 @@ Namespace Biosystems.Ax00.Calculations
 
 
                 ' KineticsIncrease
+                'AG 10/11/2014 BA-2082 filter by current analyzer model
                 myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString _
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                           Select a).ToList
                 If myLinq.Count > 0 Then
                     common(pDimension).KineticsIncrease = myLinq(0).ValueNumeric
@@ -7860,8 +7861,9 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
                 ' AG 11/06/2010 - AnalyzerCycleMachine
+                'AG 10/11/2014 BA-2082 filter by current analyzer model
                 myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                           Select a).ToList
                 If myLinq.Count > 0 Then
                     common(pDimension).CycleMachine = myLinq(0).ValueNumeric
@@ -7918,9 +7920,10 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
                 'AG 23/10/2013 Task #1347
+                'AG 10/11/2014 BA-2082 filter by analyzer model
                 'KineticsIncreaseInPause
                 myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString _
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                           Select a).ToList
                 If myLinq.Count > 0 Then
                     common(pDimension).KineticsIncreaseInPause = myLinq(0).ValueNumeric
@@ -7941,8 +7944,9 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
                 'SwReadingsOffset 
+                'AG 10/11/2014 BA-2082 filter by model
                 myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString _
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                           Select a).ToList
                 If myLinq.Count > 0 Then
                     common(pDimension).SwReadingsOffset = CInt(myLinq(0).ValueNumeric)
@@ -7952,8 +7956,9 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
                 'DefaultReadNumberR2Added, NumberOfReadingsReadingsWithR2
+                'AG 10/11/2014 BA-2082 filter by model
                 myLimitsLinq = (From a As FieldLimitsDS.tfmwFieldLimitsRow In limitsDS.tfmwFieldLimits _
-                                Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString _
+                                Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                                 Select a).ToList
                 If myLimitsLinq.Count > 0 Then
                     common(pDimension).DefaultReadNumberR2Added = CInt(myLimitsLinq(0).MinValue) - common(pDimension).SwReadingsOffset
@@ -8695,13 +8700,15 @@ Namespace Biosystems.Ax00.Calculations
                         End If
 
                         'KINETICS INCREASE (Time interval between two readings)
-                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString).Count > 0) Then
-                            common(pDimension).KineticsIncrease = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString).First.ValueNumeric
+                        'AG 10/11/2014 BA-2082 filter by current analyzer model
+                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).Count > 0) Then
+                            common(pDimension).KineticsIncrease = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.ValueNumeric
                         End If
 
                         'ANALYZER CYCLE MACHINE (Time interval between two preparations)
-                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString).Count > 0) Then
-                            common(pDimension).CycleMachine = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString).First.ValueNumeric
+                        'AG 10/11/2014 BA-2082 filter by current analyzer model
+                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).Count > 0) Then
+                            common(pDimension).CycleMachine = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.ValueNumeric
                         End If
 
                         'LINEAR CORRELATION FACTOR
@@ -8725,9 +8732,10 @@ Namespace Biosystems.Ax00.Calculations
                         End If
 
                         'AG 23/10/2013 Task #1347
+                        'AG 10/11/2014 BA-2082 filter by analyzer model
                         'KINETICS INCREASE in pause (Time interval between two readings in pause mode)
-                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString).Count > 0) Then
-                            common(pDimension).KineticsIncreaseInPause = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString).First.ValueNumeric
+                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).Count > 0) Then
+                            common(pDimension).KineticsIncreaseInPause = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.ValueNumeric
                         End If
 
                         'R1SAMPLE1STREADINGSFORCALC (Determine the valid readings for section R1 + S affected for pause mode)
@@ -8738,8 +8746,9 @@ Namespace Biosystems.Ax00.Calculations
                         End If
 
                         'SwReadingsOffset
-                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString).Count > 0) Then
-                            common(pDimension).SwReadingsOffset = CInt(myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString).First.ValueNumeric)
+                        'AG 10/11/2014 BA-2082 filter by model
+                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).Count > 0) Then
+                            common(pDimension).SwReadingsOffset = CInt(myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.ValueNumeric)
                         End If
                         'AG 23/10/2013
 
@@ -8760,10 +8769,11 @@ Namespace Biosystems.Ax00.Calculations
                     Dim myLimitsDS As FieldLimitsDS = DirectCast(resultData.SetDatos, FieldLimitsDS)
                     If (myLimitsDS.tfmwFieldLimits.Rows.Count > 0) Then
                         'DefaultReadNumberR2Added, NumberOfReadingsReadingsWithR2
-                        If (myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString).Count > 0) Then
-                            common(pDimension).DefaultReadNumberR2Added = CInt(myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString).First.MinValue) - common(pDimension).SwReadingsOffset
-                            common(pDimension).NumberOfReadingsWithR2 = CInt(myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString).First.MaxValue) _
-                                                                        - CInt(myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString).First.MinValue) _
+                        'AG 10/11/2014 BA-2082 filter by model
+                        If (myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).Count > 0) Then
+                            common(pDimension).DefaultReadNumberR2Added = CInt(myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.MinValue) - common(pDimension).SwReadingsOffset
+                            common(pDimension).NumberOfReadingsWithR2 = CInt(myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.MaxValue) _
+                                                                        - CInt(myLimitsDS.tfmwFieldLimits.ToList.Where(Function(a) a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.MinValue) _
                                                                         + 1
                         End If
                     End If

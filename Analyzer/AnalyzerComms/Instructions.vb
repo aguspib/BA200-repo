@@ -2800,8 +2800,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Get the machine Cicle
                 Dim qswParameter As New List(Of ParametersDS.tfmwSwParametersRow)
                 'AG 19/04/2011 - Use the SAMPLE_STEPS_UL instead of STEPS_UL
+                'AG 10/11/2014 BA-2082 filter also by analyzer model
                 qswParameter = (From a In SwParametersDS.tfmwSwParameters _
-                               Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString _
+                               Where a.ParameterName = GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                                Select a).ToList()
 
                 If qswParameter.Count > 0 Then
