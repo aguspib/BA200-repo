@@ -175,6 +175,10 @@ Namespace Biosystems.Ax00.BL
 
         End Function
 
+#End Region
+
+#Region "Main privtes Excel methods"
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -185,7 +189,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pOnlyProgrammedTestCycle"></param>
         ''' <returns>gLOBALDatato (AbsorbancesDS)</returns>
         ''' <remarks></remarks>
-        Public Function GetReadingAbsorbancesByExecution(ByVal pDBConnection As SqlConnection, _
+        Private Function GetReadingAbsorbancesByExecution(ByVal pDBConnection As SqlConnection, _
                                                          ByVal pExecutionID As Integer, _
                                                          ByVal pAnalyzerID As String, _
                                                          ByVal pWorkSessionID As String, _
@@ -314,10 +318,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 
 
-#End Region
-
-
-#Region "Main privtes Excel methods"
 
         '''' <summary>
         '''' Create new excel file
@@ -922,7 +922,7 @@ Namespace Biosystems.Ax00.BL
                             ' Get test data
                             Dim myTestsData As New TestsDelegate
                             Dim myTestsDS As New TestsDS
-                            
+
 
                             resultdata = myTestsData.Read(pDBConnection, myTestID)
                             If Not resultdata.HasError And Not resultdata.SetDatos Is Nothing Then myTestsDS = CType(resultdata.SetDatos, TestsDS)
@@ -1107,7 +1107,7 @@ Namespace Biosystems.Ax00.BL
                                             Dim FirstCycle As Integer = -1
                                             Dim SecondCycle As Integer = -1
 
-                                            
+
 
                                             If Not myTestsDS.tparTests.Item(0).IsFirstReadingCycleNull Then FirstCycle = myTestsDS.tparTests.First.FirstReadingCycle
                                             If Not myTestsDS.tparTests.Item(0).IsSecondReadingCycleNull Then SecondCycle = myTestsDS.tparTests.First.SecondReadingCycle
@@ -1368,7 +1368,7 @@ Namespace Biosystems.Ax00.BL
                                         SetCellValue(myPage, "E" & myCellRow, myTestName)
                                         SetCellValue(myPage, "F" & myCellRow, "Rerun Number:", True)
                                         SetCellValue(myPage, "G" & myCellRow, myRerunNumber)
-                                        
+
                                         'myheadcell2 &= " ) Test " & myTestName & " Well / Rotor "
                                         'myheadcell2 &= " ) Test " & myTestName & " Rerun Number = "
 
@@ -2151,7 +2151,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 
 #End Region
-
 
 #Region "Private Methods"
 

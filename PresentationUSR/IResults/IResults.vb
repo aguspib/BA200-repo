@@ -5940,7 +5940,7 @@ Public Class IResults
 
             If String.Compare(pFileName, "", False) <> 0 AndAlso String.Compare(pPath, "", False) <> 0 Then
                 Dim xlsResults As New ResultsFileDelegate
-                resultData = xlsResults.ExportXLS(pWorkSessionID, pPath, pFileName, AnalyzerIDField, BaseLineType.STATIC.ToString()) 'BA-2067
+                resultData = xlsResults.ExportXLS(pWorkSessionID, pPath, pFileName, AnalyzerIDField, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString()) 'BA-2067
             End If
 
         Catch ex As Exception
