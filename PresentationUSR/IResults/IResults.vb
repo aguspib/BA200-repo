@@ -5906,7 +5906,7 @@ Public Class IResults
 
                 If String.Compare(filename, "", False) <> 0 AndAlso String.Compare(pathname, "", False) <> 0 Then
                     Dim xlsResults As New ResultsFileDelegate
-                    resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField, BaseLineType.DYNAMIC.ToString()) 'BA-2067
+                    resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString()) 'BA-2067
 
                     If resultData.HasError Then
                         Dim myLogAcciones As New ApplicationLogManager()
