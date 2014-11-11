@@ -7972,7 +7972,18 @@ Namespace Biosystems.Ax00.Calculations
                 ' Get baseline values
                 'Dark values are get from twksWSBLines
                 'Light values are get from twksWSBLinesByWell
-                resultData = GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+
+                'AG 11/11/2014 BA-2064 read the parameter that informs how works the model
+                'resultData = GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
+                          Where a.ParameterName = GlobalEnumerates.SwParameters.BL_TYPE_FOR_CALCULATIONS.ToString AndAlso a.AnalyzerModel = myAnalyzerModel Select a).ToList
+                If myLinq.Count > 0 Then
+                    resultData = GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID, myLinq(0).ValueText.ToString())
+                Else
+                    myClassGlobalResult = resultData
+                    Exit Try
+                End If
+                'AG 11/11/2014
 
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     Dim myBaseLineDS As New BaseLinesDS
@@ -8685,6 +8696,7 @@ Namespace Biosystems.Ax00.Calculations
                 Dim myParams As New SwParametersDelegate
                 resultData = myParams.ReadByAnalyzerModel(Nothing, myAnalyzerModel, myAnalyzerID)
 
+                Dim baseline_Type_Calc As String = GlobalEnumerates.BaseLineType.STATIC.ToString() 'AG 11/11/2014 BA-2064
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     Dim myParametersDS As ParametersDS = DirectCast(resultData.SetDatos, ParametersDS)
 
@@ -8752,6 +8764,11 @@ Namespace Biosystems.Ax00.Calculations
                         End If
                         'AG 23/10/2013
 
+                        'AG 11/11/2014 BA-2064 get the base line type for calculations
+                        If (myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.BL_TYPE_FOR_CALCULATIONS.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).Count > 0) Then
+                            baseline_Type_Calc = myParametersDS.tfmwSwParameters.ToList.Where(Function(a) a.ParameterName = GlobalEnumerates.SwParameters.BL_TYPE_FOR_CALCULATIONS.ToString AndAlso a.AnalyzerModel = myAnalyzerModel).First.ValueText.ToString
+                        End If
+
                     Else
                         myClassGlobalResult = resultData
                         Exit Try
@@ -8794,12 +8811,9 @@ Namespace Biosystems.Ax00.Calculations
 
                 If (Not pExecToCalculateRow.IsBaseLineIDNull AndAlso Not pExecToCalculateRow.IsAdjustBaseLineIDNull) Then
 
-                    'AG 29/10/2014 BA-2064
-                    'Dim myWSBLinesDelegate As New WSBLinesDelegate
-                    'resultData = myWSBLinesDelegate.ReadValuesForCalculations(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, _
-                    '                                                          myExecutionWell, common(pDimension).AdjustBaseLineID)
-                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
-                    'AG 29/10/2014 BA-2064
+                    'AG 11/11/2014 BA-2064 read the parameter that informs how works the model
+                    'resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                    resultData = GetBaseLineValues(Nothing, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, myExecutionWell, common(pDimension).AdjustBaseLineID, baseline_Type_Calc.ToString)
 
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                         Dim myBaseLineDS As BaseLinesDS = DirectCast(resultData.SetDatos, BaseLinesDS)
