@@ -38,9 +38,7 @@ Namespace Biosystems.Ax00.App
 
             LoadAnalyzerConfiguration(analyzer)
 
-            'Delegates
-            'AG 30/10/2014 BA-2064 comment new code temporally
-            'analyzer.Calculations = New CalculationsBA400Delegate()
+            baseLine.BaseLineTypeForWellReject = analyzer.BaseLineTypeForWellReject 'AG 11/11/2014 BA-2065 - Inform the base line type for well rejection for this analyzer
 
             Return analyzer
 

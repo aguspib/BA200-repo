@@ -4,6 +4,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Calculations
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -136,6 +137,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '                                                2 - Number of consecutive rejected wells > Limit while init FIFO phase (Sw will leave running sending STANDBY instruction)
         '                                                    RPM 06/09/2012 NO!!! use END instruction also in case 2
 
+        Private BaseLineTypeForWellRejectAttribute As String = GlobalEnumerates.BaseLineType.STATIC.ToString 'AG 11/11/2014 BA-2065
 #End Region
 
 #Region "Properties"
@@ -182,6 +184,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Property
 
+        'AG 11/11/2014 BA-2065
+        Public Property BaseLineTypeForWellReject() As BaseLineType Implements IBaseLineEntity.BaseLineTypeForWellReject
+            Set(ByVal value As BaseLineType)
+                BaseLineTypeForWellRejectAttribute = value
+            End Set
+            Get
+                Return BaseLineTypeForWellRejectAttribute
+            End Get
+        End Property
 #End Region
 
 #Region "Constructor and other initialization methods"

@@ -1,5 +1,6 @@
 ﻿Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.Core.Interfaces
 
@@ -13,6 +14,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property validALight() As Boolean
         ReadOnly Property exitRunningType() As Integer 'AG 04/06/2012
         ReadOnly Property existsAlightResults() As Boolean
+        Property BaseLineTypeForWellReject As BaseLineType 'AG 11/11/2014 BA-2065
 
 #End Region
 

@@ -311,41 +311,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     If Not resultData.HasError Then
                         'Peform well base line calculations
-                        resultData = BaseLine.ControlWellBaseLine(dbConnection, False, myWellBaseLineDS)
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN  ... now 
-                            'we have to calculate his status = TRUE or FALSE
-                            Dim alarmStatus As Boolean = False 'By default no alarm
-                            Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                            myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
-                            If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
-                            'If Not alarmStatus Then myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN 'AG 04/06/2012 - This method is called in Running, if the alarm METHACRYL_ROTOR_WARN already exists do not remove it
-
-                            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
-                            Dim AlarmStatusList As New List(Of Boolean)
-                            PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                            'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                            If AlarmList.Count > 0 Then
-                                'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    ' XBC 16/10/2012 - Alarms treatment for Service
-                                    ' Not Apply
-                                    'resultData = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                                Else
-                                    Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                                    resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
-                                End If
-                            Else
-                                ''If no alarm items in list ... inform presentation the reactions rotor is good!!
-                                'resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _
-                                '                                 GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN.ToString, False)
-                            End If
-                        End If
-
+                        'AG 11/11/2014 BA-2065 #REFACTORING (prepare for dynamic base line)
+                        resultData = ControlWellBaseLine(dbConnection, False, myWellBaseLineDS)
                     End If
 
                 End If
@@ -374,6 +341,67 @@ Namespace Biosystems.Ax00.Core.Entities
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Error, False)
                 'Finally
                 'If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 29/06/2012 - Running Cycles lost - Solution!
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' This business has been moved into a method from AnalyzerManager.ProcessWellBaseLineReadings
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pClassInitialization"></param>
+        ''' <param name="pWellBaseLine"></param>
+        ''' <returns></returns>
+        ''' <remarks>'AG 11/11/2014 BA-2065 #REFACTORING (prepare for dynamic base line)</remarks>
+        Private Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pClassInitialization As Boolean, ByVal pWellBaseLine As BaseLinesDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                resultData = BaseLine.ControlWellBaseLine(dbConnection, False, pWellBaseLine)
+                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                    'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN  ... now 
+                    'we have to calculate his status = TRUE or FALSE
+                    Dim alarmStatus As Boolean = False 'By default no alarm
+                    Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
+                    'If Not alarmStatus Then myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN 'AG 04/06/2012 - This method is called in Running, if the alarm METHACRYL_ROTOR_WARN already exists do not remove it
+
+                    Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+                    Dim AlarmStatusList As New List(Of Boolean)
+                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                    'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                    If AlarmList.Count > 0 Then
+                        'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                        If GlobalBase.IsServiceAssembly Then
+                            ' XBC 16/10/2012 - Alarms treatment for Service
+                            ' Not Apply
+                            'resultData = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
+                        Else
+                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                            resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            myLogAcciones.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
+                        End If
+                    Else
+                        ''If no alarm items in list ... inform presentation the reactions rotor is good!!
+                        'resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _
+                        '                                 GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN.ToString, False)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ControlWellBaseLine", EventLogEntryType.Error, False)
+
             End Try
             Return resultData
         End Function
