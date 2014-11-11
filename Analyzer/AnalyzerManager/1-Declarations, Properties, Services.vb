@@ -3149,6 +3149,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         End If
                                         ' Activates Alarm end
 
+                                        Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                                        'Update internal flags. Basically used by the running normal business
+                                        If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                                            'Update analyzer session flags into DataBase
+                                            If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                                            End If
+                                        End If
+
                                         RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                     Else
                                         myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
