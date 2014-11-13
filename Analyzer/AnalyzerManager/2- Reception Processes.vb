@@ -55,14 +55,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
-                ' XB 30/09/2014 - BA-1872
-                If MyClass.ISECMDLost Then
-                    'Deactivate waiting time control
-                    numRepetitionsSTATE = 0
-                    MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
-                End If
-                ' XB 30/09/2014 - BA-1872
-
                 ' Get Status field (parameter index 3)
 
                 ' AG+XBC 24/05/2012
@@ -325,7 +317,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                 If myAlarmList.Count > 0 Then
-                                    ' Note that this alarm is common on User and Service !
                                     myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                                 End If
                                 ' Activates Alarm end
@@ -453,7 +444,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 MyClass.numRepetitionsTimeout += 1
                                 Dim myLogAcciones As New ApplicationLogManager()
                                 If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                                    myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                    myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                     waitingStartTaskTimer.Enabled = False
                                     MyClass.sendingRepetitions = False
 
@@ -469,7 +460,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                                     If myAlarmList.Count > 0 Then
-                                        ' Note that this alarm is common on User and Service !
                                         myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                                     End If
                                     ' Activates Alarm end
@@ -4611,7 +4601,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobalDataTO.HasError Then
 
-                    ' Deactivates Alarm begin - BA-1872
+                    ' Deactivates Alarm begin
                     Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                     Dim alarmStatus As Boolean = False
 
@@ -4620,7 +4610,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ISE_Manager.IsTimeOut = False
 
                     PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
-                    ' Deactivates Alarm end - BA-1872
+                    ' Deactivates Alarm end
 
                     For i As Integer = 0 To myAlarmListTmp.Count - 1
                         PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)

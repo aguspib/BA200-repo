@@ -2318,73 +2318,68 @@ Public Class Ax00ServiceMainMDI
         End Try
     End Sub
 
-
     ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by XB 05/11/2014 - BA-1872
-    ''' </remarks>
-    Private Sub ShowISETimeoutMessage()
-        Dim myGlobal As New GlobalDataTO
-        Try
-            Dim myTitle As String = ""
-            myGlobal.ErrorCode = Messages.ERROR_COMM.ToString
-            myTitle = "Warning"
-
-            If Me.wfWaitScreen IsNot Nothing Then
-                Me.wfWaitScreen.Close()
-            End If
-
-            MyClass.IsAnalyzerInfoScreenRunning = False
-            MyClass.IsAutoConnecting = False
-
-            MyClass.isWaitingForRecover = False
-            MyClass.isWaitingForStandBy = False
-            MyClass.isWaitingForAdjust = False
-            MyClass.isWaitingForConnected = False
-            MyClass.isWaitingForCloseApp = False
-            MyClass.isWaitingForSleep = False
-
-            Me.ActivateMenus(True)
-            Me.ActivateActionButtonBar(True)
-
-            Dim myAdtionalText As String = ""
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
-
-            ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowISETimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".ShowISETimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
-        End Try
-    End Sub
-
-
-    ''' <summary>
-    ''' 
+    ''' Event to Show Sent Event information into presentation layer
+    ''' Remarks : If is necessary to implement business logic it must be to implement into ScriptsManagement layer
     ''' </summary>
     ''' <param name="pInstructionSent"></param>
-    ''' <remarks>
-    ''' Created by XB 05/11/2014 - BA-1872
-    ''' </remarks>
-    Private Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles MDIAnalyzerManager.SendEvent
-
-        Me.UIThread(Function() ManageSentEvent(pInstructionSent))
-
-    End Sub
-
-
-    ''' <summary>
-    ''' Special Event sent from Communications Layer
-    ''' </summary>
-    ''' <param name="pInstructionSent"></param>
-    ''' <remarks>
-    ''' Created by XB 05/11/2014 - code copied from the old OnManageSentEvent method and add new code for ISE timeouts - BA-1872
-    ''' </remarks>
-    Private Function ManageSentEvent(ByVal pInstructionSent As String) As Boolean
+    ''' <remarks>Created by XBC 10/11/2010</remarks>
+    Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles MDIAnalyzerManager.SendEvent
         Try
+            ' XBC 16/11/2011 - Topmost functionality 
+            '' XBC 05/05/2011 - timeout
+            'If pInstructionSent = AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString Then
+            '    Dim myGlobal As New GlobalDataTO
+            '    Dim myTitle As String = ""
+            '    myGlobal.ErrorCode = Messages.ERROR_COMM.ToString
+            '    myTitle = "Warning"
+            '    AutoConnectFailsErrorCode = myGlobal.ErrorCode
+            '    AutoConnectFailsTitle = myTitle
+            '    Me.AdjustmentsReaded = False
+
+            '    'Refresh CONNECTED Led in the Monitor Panel SGM 20/09/2011
+            '    Dim myConnected As Integer = 0
+            '    If Me.MDIAnalyzerManager.Connected Then
+            '        myConnected = 1
+            '    End If
+            '    Me.BsMonitor.RefreshSensorValue(AnalyzerSensors.CONNECTED.ToString, myConnected, False, Me.NotConnectedText)
+            '    'END SGM 20/09/2011
+
+            '    If AutoConnectFailsTitle <> "" Then
+
+            '        ' XBC 15/11/2011 - Add more info to solve communications problems with adjustments screens
+            '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+            '        Dim myAdtionalText As String = ""
+            '        For Each oForm As Form In Me.MdiChildren
+            '            If oForm Is AnalyzerInfo Or _
+            '               oForm Is IPositionsAdjustments Or _
+            '               oForm Is IPhotometryAdjustments Or _
+            '               oForm Is ITankLevelsAdjustments Or _
+            '               oForm Is IMotorsPumpsValvesTest Or _
+            '               oForm Is IThermosAdjustments Or _
+            '               oForm Is IStressModeTest Or _
+            '               oForm Is IDemoMode Or _
+            '               oForm Is IInstrumentUpdateUtil Or _
+            '               oForm Is FwScriptsEdition Then
+
+            '                myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_ERR_COMM2", CurrentLanguageAttribute)
+            '            End If
+            '        Next
+            '        ' XBC 15/11/2011 - Add more info to solve communications problems with adjustments screens
+
+            '        CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".MDIAnalyzerManager.SendEvent", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            '        ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode, myAdtionalText)
+            '    End If
+            'End If
+            '' XBC 05/05/2011 - timeout
+
+            ''#If DEBUG Then
+            ''            me.ErrorStatusLabel.Text = pInstructionSent
+            ''#Else
+            ''            ' Nothing
+            ''#End If
+            ' XBC 16/11/2011 - Topmost functionality 
+
             ' XBC 18/11/2011
             If String.Compare(pInstructionSent, AnalyzerManagerSwActionList.NO_THREADS.ToString, False) = 0 Then
 
@@ -2393,141 +2388,30 @@ Public Class Ax00ServiceMainMDI
 
                 MyClass.ShowTimeoutMessage()
 
-                Exit Function
+                Exit Sub
             End If
             ' XBC 18/11/2011
 
+            '            'SGM 25/11/2011
+            '#If DEBUG Then
+            '            If Not myConsole Is Nothing Then
+            '                Me.WriteDebugConsoleTraceLine(pInstructionSent)
+            '            End If
+            '#End If
+            '            'SGM 25/11/2011
 
-            ' XB 05/11/2014 - BA-1872
-            If String.Compare(pInstructionSent, AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString, False) = 0 Then
+            'If pInstructionSent = AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString Then
+            '    'SGM 25/10/2012 - stop current operation when Connection loss
+            '    MyClass.ManageConnectionLossAlarm()
 
-                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
-                    ' Just for ISE timeout
-                    If MDIAnalyzerManager.ISE_Manager IsNot Nothing AndAlso _
-                   MDIAnalyzerManager.ISE_Manager.IsISEModuleInstalled AndAlso _
-                   MDIAnalyzerManager.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None Then
-                        Dim myISEResultWithComErrors As ISEResultTO = New ISEResultTO
-                        myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
-                        MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
-                    End If
-
-                    If Not ActiveMdiChild Is Nothing Then
-
-                        If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                            Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
-                            CurrentMdiChild.PrepareErrorMode()
-                        End If
-
-                    End If
-
-                    MyClass.ShowISETimeoutMessage()
-
-                End If
-
-            End If
-            ' XB 05/11/2014 - BA-1872
+            '    MyClass.ShowTimeoutMessage()
+            'End If
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & "ManageSentEvent", EventLogEntryType.Error, False)
+            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & "OnManageSentEvent", EventLogEntryType.Error, False)
         End Try
-    End Function
-
-    ' XB 05/11/2014 - Replace old OnManageSentEvent method with the new OnManageSentEvent and ManageSentEvent to fix the problems with crossed threads
-    ' ''' <summary>
-    ' ''' Event to Show Sent Event information into presentation layer
-    ' ''' Remarks : If is necessary to implement business logic it must be to implement into ScriptsManagement layer
-    ' ''' </summary>
-    ' ''' <param name="pInstructionSent"></param>
-    ' ''' <remarks>Created by XBC 10/11/2010</remarks>
-    'Public Sub OnManageSentEvent(ByVal pInstructionSent As String) Handles MDIAnalyzerManager.SendEvent
-    '    Try
-    '        ' XBC 16/11/2011 - Topmost functionality 
-    '        '' XBC 05/05/2011 - timeout
-    '        'If pInstructionSent = AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString Then
-    '        '    Dim myGlobal As New GlobalDataTO
-    '        '    Dim myTitle As String = ""
-    '        '    myGlobal.ErrorCode = Messages.ERROR_COMM.ToString
-    '        '    myTitle = "Warning"
-    '        '    AutoConnectFailsErrorCode = myGlobal.ErrorCode
-    '        '    AutoConnectFailsTitle = myTitle
-    '        '    Me.AdjustmentsReaded = False
-
-    '        '    'Refresh CONNECTED Led in the Monitor Panel SGM 20/09/2011
-    '        '    Dim myConnected As Integer = 0
-    '        '    If Me.MDIAnalyzerManager.Connected Then
-    '        '        myConnected = 1
-    '        '    End If
-    '        '    Me.BsMonitor.RefreshSensorValue(AnalyzerSensors.CONNECTED.ToString, myConnected, False, Me.NotConnectedText)
-    '        '    'END SGM 20/09/2011
-
-    '        '    If AutoConnectFailsTitle <> "" Then
-
-    '        '        ' XBC 15/11/2011 - Add more info to solve communications problems with adjustments screens
-    '        '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-    '        '        Dim myAdtionalText As String = ""
-    '        '        For Each oForm As Form In Me.MdiChildren
-    '        '            If oForm Is AnalyzerInfo Or _
-    '        '               oForm Is IPositionsAdjustments Or _
-    '        '               oForm Is IPhotometryAdjustments Or _
-    '        '               oForm Is ITankLevelsAdjustments Or _
-    '        '               oForm Is IMotorsPumpsValvesTest Or _
-    '        '               oForm Is IThermosAdjustments Or _
-    '        '               oForm Is IStressModeTest Or _
-    '        '               oForm Is IDemoMode Or _
-    '        '               oForm Is IInstrumentUpdateUtil Or _
-    '        '               oForm Is FwScriptsEdition Then
-
-    '        '                myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_ERR_COMM2", CurrentLanguageAttribute)
-    '        '            End If
-    '        '        Next
-    '        '        ' XBC 15/11/2011 - Add more info to solve communications problems with adjustments screens
-
-    '        '        CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".MDIAnalyzerManager.SendEvent", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        '        ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode, myAdtionalText)
-    '        '    End If
-    '        'End If
-    '        '' XBC 05/05/2011 - timeout
-
-    '        ''#If DEBUG Then
-    '        ''            me.ErrorStatusLabel.Text = pInstructionSent
-    '        ''#Else
-    '        ''            ' Nothing
-    '        ''#End If
-    '        ' XBC 16/11/2011 - Topmost functionality 
-
-    '        ' XBC 18/11/2011
-    '        If String.Compare(pInstructionSent, AnalyzerManagerSwActionList.NO_THREADS.ToString, False) = 0 Then
-
-    '            'SGM 25/10/2012 - stop current operation when Connection loss
-    '            MyClass.ManageConnectionLossAlarm()
-
-    '            MyClass.ShowTimeoutMessage()
-
-    '            Exit Sub
-    '        End If
-    '        ' XBC 18/11/2011
-
-    '        '            'SGM 25/11/2011
-    '        '#If DEBUG Then
-    '        '            If Not myConsole Is Nothing Then
-    '        '                Me.WriteDebugConsoleTraceLine(pInstructionSent)
-    '        '            End If
-    '        '#End If
-    '        '            'SGM 25/11/2011
-
-    '        'If pInstructionSent = AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString Then
-    '        '    'SGM 25/10/2012 - stop current operation when Connection loss
-    '        '    MyClass.ManageConnectionLossAlarm()
-
-    '        '    MyClass.ShowTimeoutMessage()
-    '        'End If
-
-    '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, Me.Name & "OnManageSentEvent", EventLogEntryType.Error, False)
-    '    End Try
-    'End Sub
+    End Sub
 
     ''' <summary>
     ''' Event incharge to show information if Ax00 Is disconected.
