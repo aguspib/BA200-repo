@@ -36,15 +36,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by: SA 29/06/2012 - Removed the OpenDBTransaction; all functions called by this method should open their own DBTransaction
         '''                              or DBConnection, depending if they update or read data - This is to avoid locks between the different
         '''                              threads in execution
-        '''              AG 25/072012    pAdditionalInfoList
-        '''              AG 30/11/2012 - Do not inform the attribute endRunAlreadySentFlagAttribute as TRUE when call the ManageAnalyzer with ENDRUN or when you add it to the queue
-        '''                              This flag will be informed once the instruction has been really sent. Current code causes that sometimes the ENDRUN instruction is added to
-        '''                              queue but how the flag is informed before send the instruction it wont never be sent!!
-        '''              AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
-        '''              AG 05/06/2014 - #1657 Protection (provisional solution)! (do not clear instructions queue when there are only 1 alarm and it is ISE_OFF_ERR)
-        '''                            - PENDING FINAL SOLUTION: AlarmID ISE_OFF_ERR must be generated only 1 time when alarm appears, and only 1 time when alarm is fixed (now this alarm with status FALSE is generated with each ANSINF received)
-        '''              XB 04/11/2014 - Add ISE_TIMEOUT_ERR alarm - BA-1872
-        '''              XB 06/11/2014 - Add COMMS_TIMEOUT_ERR alarm - BA-1872
+        ''' AG 25/072012 pAdditionalInfoList
+        ''' AG 30/11/2012 - Do not inform the attribute endRunAlreadySentFlagAttribute as TRUE when call the ManageAnalyzer with ENDRUN or when you add it to the queue
+        '''                 This flag will be informed once the instruction has been really sent. Current code causes that sometimes the ENDRUN instruction is added to
+        '''                 queue but how the flag is informed before send the instruction it wont never be sent!!
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
+        ''' AG 05/06/2014 - #1657 Protection (provisional solution)! (do not clear instructions queue when there are only 1 alarm and it is ISE_OFF_ERR)
+        '''               - PENDING FINAL SOLUTION: AlarmID ISE_OFF_ERR must be generated only 1 time when alarm appears, and only 1 time when alarm is fixed (now this alarm with status FALSE is generated with each ANSINF received)
         ''' </remarks>
         Private Function ManageAlarms(ByVal pdbConnection As SqlClient.SqlConnection, _
                                       ByVal pAlarmIDList As List(Of GlobalEnumerates.Alarms), _
@@ -177,7 +175,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim myISEOffErrorFixed As Boolean = False  'JV 08/01/2014 BT #1118
                 Dim myISETimeoutErrorFixed As Boolean = False ' XB 04/11/2014 - BA-1872
-                Dim myCOMMSTimeoutErrorFixed As Boolean = False ' XB 06/11/2014 - BA-1872
                 For Each alarmItem As GlobalEnumerates.Alarms In pAlarmIDList
                     'General description
                     'Apply special Business depending the alarm code
@@ -849,26 +846,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
                             ' XB 04/11/2014 - BA-1872
 
-                            ' XB 06/11/2014 - BA-1872
-                        Case GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
-
-                            myGlobal = alarmsDelg.GetByAlarmID(dbConnection, GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString, Nothing, Nothing, AnalyzerIDAttribute, "")
-                            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                                Dim temporalDS As New WSAnalyzerAlarmsDS
-                                temporalDS = DirectCast(myGlobal.SetDatos, WSAnalyzerAlarmsDS)
-
-                                'Search if exists alarm COMMS_TIMEOUT_ERR with status TRUE, in this case set flag myCOMMSTimeoutErrorFixed = True (FIXED)
-                                'in order to mark it as fixed
-                                Dim auxList As List(Of WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow)
-                                auxList = (From a As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In temporalDS.twksWSAnalyzerAlarms _
-                                           Where a.AlarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR.ToString AndAlso a.AlarmStatus = True Select a).ToList
-                                If auxList.Count > 0 Then
-                                    myCOMMSTimeoutErrorFixed = True
-                                End If
-                                auxList = Nothing
-                            End If
-                            ' XB 06/11/2014 - BA-1872
-
                             'SGM 19/06/2012
                         Case GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR
                             If pAlarmStatusList(index) Then
@@ -956,10 +933,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ElseIf myISETimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
                             newRowFlag = True
                             ' XB 04/11/2014 - BA-1872
-                            ' XB 06/11/2014 - BA-1872
-                        ElseIf myCOMMSTimeoutErrorFixed AndAlso alarmIDItem = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                            newRowFlag = True
-                            ' XB 06/11/2014 - BA-1872
                         Else 'Fixed alarms
                             If myAlarmListAttribute.Contains(alarmIDItem) Then
                                 myAlarmListAttribute.Remove(alarmIDItem)
@@ -1538,7 +1511,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by: AG 13/04/2012 - Added optional parameter pAddAlwaysFlag
         '''              AG 25/07/2012 - Added optional parameters pAddInfo and pAdditionalInfoList to be used for the volume missing and clot alarms
         '''              XB 03/11/2014 - Add new ISE Timeout Alarm - BA-1872
-        '''              XB 06/11/2014 - Add new COMMS Timeour Alarm - BA-1872
         ''' </remarks>
         Private Sub PrepareLocalAlarmList(ByVal pAlarmCode As GlobalEnumerates.Alarms, ByVal pAlarmStatus As Boolean, _
                                           ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
@@ -1653,12 +1625,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
                         myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
                     End If
-                    'if exists ISE timeout or  ise status off do not add it again !!   ' XB 03/11/2014 - BA-1872
+                    'if exists ISE timeout or  ise status off do not add iit again !!   ' XB 03/11/2014 - BA-1872
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Or myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then addFlag = False
-                    'if exists COMMS timeout do not add it again !!   ' XB 06/11/2014 - BA-1872
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then addFlag = False
                 End If
 
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
@@ -1836,9 +1805,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
                     solvedErrAlarmID.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
                     OtherAlarmsSolved = True
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
-                    solvedErrAlarmID.Add(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
-                    OtherAlarmsSolved = True
                 End If
 
                 'AG 28/03/2012 - Special code Nr.9: for auto recover freeze alarms (when cover warn solved also mark the cover error as solved too!!)
@@ -1873,9 +1839,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             pAlarmStatusList.Add(False)
                             'JV 08/01/2014 BT #1118
                         ElseIf item = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                            pAlarmList.Add(item)
-                            pAlarmStatusList.Add(False)
-                        ElseIf item = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR Then
                             pAlarmList.Add(item)
                             pAlarmStatusList.Add(False)
                         End If

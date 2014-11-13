@@ -1008,9 +1008,6 @@ Namespace Biosystems.Ax00.Global
             INST_COMMAND_WARN           'Error with Command script                  | FW ERROR CODE:  43 | DL 27/07/2012 
             INST_LOADADJ_WARN           'Error Loading Adjustments                  | FW ERROR CODE:  45 | DL 27/07/2012 
 
-
-            COMMS_TIMEOUT_ERR   ' XB 06/11/2014 - BA-1872
-
             ''''''''''''''''
             'IMPORTANT NOTE: Every alarm added into this enumerate must be also added into method ConvertToAlarmIDEnumerate (in AnalyzerManager class) select case
             ''''''''''''''''
