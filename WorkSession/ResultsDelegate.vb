@@ -4449,6 +4449,8 @@ Namespace Biosystems.Ax00.BL
         '''              SA 26/08/2014 - BA-1861 ==> Added changes to export field SpecimenID (Barcode) to the Historic Module also when the corresponding result has 
         '''                                          been already exported and/or when the Order Test has been manually requested for a Patient Sample having Tests 
         '''                                          requested by LIS.
+        '''              SA 12/11/2014 - BA-2095 ==> For Order Tests of Patient Samples that do not have Tests requested by LIS, leave field SpecimenID empty instead
+        '''                                          of inform it with the same value than PatientID/SampleID.
         ''' </remarks>
         Private Function MoveWSOrderTestsToHISTModule(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
                                                       ByVal pHistSTDTestsDS As HisTestSamplesDS, ByVal pHistISETestsDS As HisISETestSamplesDS, _
@@ -4687,7 +4689,9 @@ Namespace Biosystems.Ax00.BL
                                         If (lstSpecimenID.Count > 0) Then
                                             myHistOrderTestsRow.SpecimenID = lstSpecimenID.First.SpecimenIDList.Trim.Split(CChar(vbCrLf))(0)
                                         Else
-                                            myHistOrderTestsRow.SpecimenID = mySampleID
+                                            'BA-2095 ==> For Order Tests of Patient Samples that do not have Tests requested by LIS, leave field 
+                                            '            SpecimenID empty instead of inform it with the same value than PatientID or SampleID
+                                            myHistOrderTestsRow.SetSpecimenIDNull()
                                         End If
                                     End If
 
