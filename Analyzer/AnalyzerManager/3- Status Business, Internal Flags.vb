@@ -47,6 +47,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''             AG 15/04/2014 - Fix issue number #1594 paused in v300 (if SOUND is in queue it will be sent on receives STATUS (it doesnt matter AnalyzerIsReadyAttribute))
         '''                             #1484 action SOUND_DONE in running also search next preparation
         '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        '''             XB 12/11/2014 - ISE CMD timeout management - BA-1872
         ''' </remarks>
         Private Function ManageRunningStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -509,6 +510,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myISECommand As ISECommandTO
                         myISECommand = CType(queuedParam, ISECommandTO)
                         If myISECommand.ISEMode <> GlobalEnumerates.ISEModes.None Then
+
+                            ' XB 12/11/2014 - BA-1872
+                            If Not MyClass.sendingRepetitions Then
+                                MyClass.numRepetitionsTimeout = 0
+                            End If
+                            MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                            MyClass.StoreStartTaskinQueue(AnalyzerManagerSwActionList.ISE_CMD, queuedParam, "", Nothing)
+                            ' XB 12/11/2014 - BA-1872
+
                             myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ISE_CMD, myISECommand)
                         End If
 
@@ -2610,8 +2620,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If queuedAction = AnalyzerManagerSwActionList.ISE_CMD AndAlso Not queuedSwAdditionalParameters Is Nothing Then
                     myISECMD = CType(queuedSwAdditionalParameters, Biosystems.Ax00.Global.ISECommandTO)
                 End If
-                If Not myISECMD Is Nothing AndAlso _
-                   myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION Then
+                If (Not myISECMD Is Nothing AndAlso _
+                    (myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION)) Then
                     ' Special case for ISE save consumptions
                     myGlobal = MyClass.ISE_Manager.SaveConsumptions()
                     ' XB 29/09/2014 - BA-1872

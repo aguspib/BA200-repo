@@ -105,11 +105,17 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pISETestSamplesRow">Typed DataSet ISETestSamplesDS containing the data of the ISETestSample to update</param>
         ''' <returns>GlobalDataTO containing the updated record and/or error information</returns>
-        ''' <remarks>Created by: XBC 15/10/2010
-        ''' AG 21/10/2010 - remove RangeLower and RangeUpper fields
-        ''' AG 27/10/2010 - parameter is row not DS</remarks>
-        ''' RH 12/06/2012 - Add QCActive, ControlReplicates, NumberOfControls, RejectionCriteria, CalculationMode, 
-        '''                 NumberOfSeries and TotalAllowedError fields. Code optimization.
+        ''' <remarks>
+        ''' Created by:  XB 15/10/2010
+        ''' Modified by: AG 21/10/2010 - Removed fields RangeLower and RangeUpper
+        '''              AG 27/10/2010 - Parameter is row not DS
+        '''              RH 12/06/2012 - Added fields QCActive, ControlReplicates, NumberOfControls, RejectionCriteria, CalculationMode, 
+        '''                              NumberOfSeries and TotalAllowedError fields. Code optimization.
+        '''              WE 30/07/2014 - BA-1865 ==> Added fields TestLongName, SlopeFactorA2 and SlopeFactorB2
+        '''              SA 05/11/2014 - BA-1944 (SubTask BA-2013) ==> Added field ISE_Volume. Replaced use of function ToStringSQL by use of 
+        '''                                                            function ReplaceNumericString for Real values and Format for DateTime values.
+        '''                                                            Removed final validation based on AffectedRecords = 1
+        ''' </remarks>
         Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pISETestSamplesRow As ISETestSamplesDS.tparISETestSamplesRow) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
@@ -118,115 +124,120 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim cmdText As String
-                    cmdText = " UPDATE tparISETestSamples " & _
-                              " SET    SampleType_ResultID = N'" & pISETestSamplesRow.SampleType_ResultID & "', " & _
-                              "        Decimals =  " & pISETestSamplesRow.Decimals & ", "
+                    Dim cmdText As String = " UPDATE tparISETestSamples " & vbCrLf & _
+                                            " SET    SampleType_ResultID = N'" & pISETestSamplesRow.SampleType_ResultID & "', " & vbCrLf & _
+                                                   " Decimals =  " & pISETestSamplesRow.Decimals & ", " & vbCrLf
 
-                    If pISETestSamplesRow.IsISE_DilutionFactorNull Then
-                        cmdText &= " ISE_DilutionFactor = NULL, "
+                    If (pISETestSamplesRow.IsISE_DilutionFactorNull) Then
+                        cmdText &= " ISE_DilutionFactor = NULL, " & vbCrLf
                     Else
-                        cmdText &= " ISE_DilutionFactor = " & pISETestSamplesRow.ISE_DilutionFactor.ToSQLString() & ", "
+                        cmdText &= " ISE_DilutionFactor = " & ReplaceNumericString(pISETestSamplesRow.ISE_DilutionFactor) & ", " & vbCrLf
                     End If
 
-                    If pISETestSamplesRow.IsActiveRangeTypeNull Then
-                        cmdText &= " ActiveRangeType = NULL, "
+                    If (pISETestSamplesRow.IsISE_VolumeNull) Then
+                        cmdText &= " ISE_Volume = NULL, " & vbCrLf
                     Else
-                        cmdText &= " ActiveRangeType = N'" & pISETestSamplesRow.ActiveRangeType & "', "
+                        cmdText &= " ISE_Volume = " & ReplaceNumericString(pISETestSamplesRow.ISE_Volume) & ", " & vbCrLf
+                    End If
+
+                    'WE 30/07/2014 - #1865
+                    If (pISETestSamplesRow.IsTestLongNameNull Or pISETestSamplesRow.TestLongName = String.Empty) Then
+                        cmdText &= " TestLongName = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " TestLongName = N'" & pISETestSamplesRow.TestLongName.ToString.Replace("'", "''") & "', " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsSlopeFactorA2Null) Then
+                        cmdText &= " SlopeFactorA2 = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorA2) & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsSlopeFactorB2Null) Then
+                        cmdText &= " SlopeFactorB2 = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorB2) & ", " & vbCrLf
+                    End If
+                    'WE 30/07/2014 - #1865 - End
+
+                    If (pISETestSamplesRow.IsActiveRangeTypeNull) Then
+                        cmdText &= " ActiveRangeType = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " ActiveRangeType = N'" & pISETestSamplesRow.ActiveRangeType & "', " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsQCActiveNull) Then
+                        cmdText &= " QCActive = 0, " & vbCrLf
+                    Else
+                        cmdText &= " QCActive = " & IIf(pISETestSamplesRow.QCActive, 1, 0).ToString() & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsControlReplicatesNull) Then
+                        cmdText &= " ControlReplicates = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " ControlReplicates = " & pISETestSamplesRow.ControlReplicates & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsNumberOfControlsNull) Then
+                        cmdText &= " NumberOfControls = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " NumberOfControls = " & pISETestSamplesRow.NumberOfControls & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsRejectionCriteriaNull) Then
+                        cmdText &= " RejectionCriteria = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " RejectionCriteria = " & pISETestSamplesRow.RejectionCriteria.ToSQLString() & ", " & vbCrLf
+                    End If
+
+                    If (String.IsNullOrEmpty(pISETestSamplesRow.CalculationMode)) Then
+                        cmdText &= " CalculationMode = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " CalculationMode = '" & pISETestSamplesRow.CalculationMode & "', " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsNumberOfSeriesNull) Then
+                        cmdText &= " NumberOfSeries = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " NumberOfSeries = " & pISETestSamplesRow.NumberOfSeries & ", " & vbCrLf
+                    End If
+
+                    If (pISETestSamplesRow.IsTotalAllowedErrorNull) Then
+                        cmdText &= " TotalAllowedError = NULL, " & vbCrLf
+                    Else
+                        cmdText &= " TotalAllowedError = " & pISETestSamplesRow.TotalAllowedError.ToSQLString() & ", " & vbCrLf
                     End If
 
                     If (pISETestSamplesRow.IsTS_UserNull) Then
                         'Get the logged User
                         Dim currentSession As New GlobalBase
-                        cmdText &= " TS_User = N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        cmdText &= " TS_User = N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', " & vbCrLf
                     Else
-                        cmdText &= " TS_User = N'" & pISETestSamplesRow.TS_User.Trim.Replace("'", "''") & "', "
+                        cmdText &= " TS_User = N'" & pISETestSamplesRow.TS_User.Trim.Replace("'", "''") & "', " & vbCrLf
                     End If
 
                     If (pISETestSamplesRow.IsTS_DateTimeNull) Then
-                        cmdText &= " TS_DateTime = '" & DateTime.Now.ToSQLString() & "', "
+                        cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                     Else
-                        cmdText &= " TS_DateTime = '" & pISETestSamplesRow.TS_DateTime.ToSQLString() & "', "
+                        cmdText &= " TS_DateTime = '" & pISETestSamplesRow.TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf
                     End If
 
-                    If (pISETestSamplesRow.IsQCActiveNull) Then
-                        cmdText &= " QCActive = 0, "
-                    Else
-                        cmdText &= " QCActive = " & IIf(pISETestSamplesRow.QCActive, 1, 0).ToString() & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsControlReplicatesNull) Then
-                        cmdText &= " ControlReplicates = NULL, "
-                    Else
-                        cmdText &= " ControlReplicates = " & pISETestSamplesRow.ControlReplicates & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsNumberOfControlsNull) Then
-                        cmdText &= " NumberOfControls = NULL, "
-                    Else
-                        cmdText &= " NumberOfControls = " & pISETestSamplesRow.NumberOfControls & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsRejectionCriteriaNull) Then
-                        cmdText &= " RejectionCriteria = NULL, "
-                    Else
-                        cmdText &= " RejectionCriteria = " & pISETestSamplesRow.RejectionCriteria.ToSQLString() & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsCalculationModeNull) Then
-                        cmdText &= " CalculationMode = '', "
-                    Else
-                        cmdText &= " CalculationMode = '" & pISETestSamplesRow.CalculationMode & "', "
-                    End If
-
-                    If (pISETestSamplesRow.IsNumberOfSeriesNull) Then
-                        cmdText &= " NumberOfSeries = NULL, "
-                    Else
-                        cmdText &= " NumberOfSeries = " & pISETestSamplesRow.NumberOfSeries & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsTotalAllowedErrorNull) Then
-                        cmdText &= " TotalAllowedError = NULL, "
-                    Else
-                        cmdText &= " TotalAllowedError = " & pISETestSamplesRow.TotalAllowedError.ToSQLString() & ", "
-                    End If
-
-                    ' WE 30/07/2014 - #1865
-                    If (pISETestSamplesRow.IsTestLongNameNull Or pISETestSamplesRow.TestLongName = String.Empty) Then
-                        cmdText &= " TestLongName = NULL, "
-                    Else
-                        cmdText &= " TestLongName = N'" & pISETestSamplesRow.TestLongName.ToString.Replace("'", "''") & "', "
-                    End If
-
-                    If (pISETestSamplesRow.IsSlopeFactorA2Null) Then
-                        cmdText &= " SlopeFactorA2 = NULL, "
-                    Else
-                        cmdText &= " SlopeFactorA2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorA2) & ", "
-                    End If
-
-                    If (pISETestSamplesRow.IsSlopeFactorB2Null) Then
-                        cmdText &= " SlopeFactorB2 = NULL "
-                    Else
-                        cmdText &= " SlopeFactorB2 = " & ReplaceNumericString(pISETestSamplesRow.SlopeFactorB2) & " "
-                    End If
-                    ' WE 30/07/2014 - #1865 - End
-
-                    cmdText &= " WHERE ISETestID = " & pISETestSamplesRow.ISETestID & " " & _
-                               " AND   SampleType = '" & pISETestSamplesRow.SampleType & "' "
+                    cmdText &= " WHERE ISETestID = " & pISETestSamplesRow.ISETestID & vbCrLf & _
+                               " AND   SampleType = '" & pISETestSamplesRow.SampleType & "' " & vbCrLf
 
                     'Execute the SQL Sentence
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
                     End Using
 
-                    If (resultData.AffectedRecords = 1) Then
-                        resultData.HasError = False
-                        resultData.SetDatos = pISETestSamplesRow
-                    Else
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                    End If
-
+                    'If (resultData.AffectedRecords = 1) Then
+                    '    resultData.HasError = False
+                    '    resultData.SetDatos = pISETestSamplesRow
+                    'Else
+                    '    resultData.HasError = True
+                    '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                    'End If
                 End If
 
             Catch ex As Exception
@@ -237,7 +248,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "tparISETestSamplesDAO.Update", EventLogEntryType.Error, False)
             End Try
-
             Return resultData
         End Function
 

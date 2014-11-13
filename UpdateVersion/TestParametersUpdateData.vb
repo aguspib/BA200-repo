@@ -2910,7 +2910,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <returns>GlobalDataTO containing a Boolean value that indicates (when TRUE) that previous Blank and Calibrator Results have to be deleted due to
         '''          field SampleVolume has changed</returns>
         ''' <remarks>
-        ''' Created by: SA 10/10/2014 - BA-1944 (SubTask BA-1985)
+        ''' Created by:  SA 10/10/2014 - BA-1944 (SubTask BA-1985)
+        ''' Modified by: SA 06/11/2014 - If field RedPostdilutionFactor has the same value in FACTORY DB and in CUSTOMER DB, it has to be checked if fields 
+        '''                              RedPostSampleVolume and RedPostSampleVolumeSteps have changed (it is possible if Reagents Volumes for the 
+        '''                              STD Test/Sample Type have changed). It has to be done in this function due to the changes in Reagents Volumes are
+        '''                              verified and applied later, and update only the table tparTestReagentsVolumes, assuming all fields in tparTestSamples
+        '''                              have been already updated 
         ''' </remarks>
         Private Function UpdateCustomerTestSamples(ByVal pFactoryTestSampleRow As TestSamplesDS.tparTestSamplesRow, _
                                                    ByVal pCustomerTestSampleRow As TestSamplesDS.tparTestSamplesRow, _
@@ -3034,10 +3039,19 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "STD", myTestName, mySampleType, "IncPostdilutionFactor", myIncPostDilutionFactor, _
                                                             pFactoryTestSampleRow.IncPostdilutionFactor.ToString)
 
-                        'Update fields in the Customer DataSet ==> Fields IncPostSampleVolume are IncPostSampleVolumeSteps are also affected
+                        'Update fields in the Customer DataSet ==> Fields IncPostSampleVolume and IncPostSampleVolumeSteps are also affected
                         pCustomerTestSampleRow.IncPostdilutionFactor = pFactoryTestSampleRow.IncPostdilutionFactor
                         pCustomerTestSampleRow.IncPostSampleVolume = pFactoryTestSampleRow.IncPostSampleVolume
                         pCustomerTestSampleRow.IncPostSampleVolumeSteps = pFactoryTestSampleRow.IncPostSampleVolumeSteps
+
+                    ElseIf (Not pCustomerTestSampleRow.IsIncPostdilutionFactorNull AndAlso pCustomerTestSampleRow.IncPostdilutionFactor = pFactoryTestSampleRow.IncPostdilutionFactor) Then
+                        'If field IncPostdilutionFactor is the same, check if fields IncPostSampleVolume and IncPostSampleVolumeSteps have changed (it is possible if 
+                        'Reagents Volumes for the STD Test/Sample Type have changed) 
+                        If (pCustomerTestSampleRow.IncPostSampleVolume <> pFactoryTestSampleRow.IncPostSampleVolume) Then
+                            'Update fields IncPostSampleVolume and IncPostSampleVolumeSteps in Customer DB
+                            pCustomerTestSampleRow.IncPostSampleVolume = pFactoryTestSampleRow.IncPostSampleVolume
+                            pCustomerTestSampleRow.IncPostSampleVolumeSteps = pFactoryTestSampleRow.IncPostSampleVolumeSteps
+                        End If
                     End If
                 Else
                     If (Not pCustomerTestSampleRow.IsIncPostdilutionFactorNull) Then
@@ -3066,6 +3080,15 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         pCustomerTestSampleRow.RedPostdilutionFactor = pFactoryTestSampleRow.RedPostdilutionFactor
                         pCustomerTestSampleRow.RedPostSampleVolume = pFactoryTestSampleRow.RedPostSampleVolume
                         pCustomerTestSampleRow.RedPostSampleVolumeSteps = pFactoryTestSampleRow.RedPostSampleVolumeSteps
+
+                    ElseIf (Not pCustomerTestSampleRow.IsRedPostdilutionFactorNull AndAlso pCustomerTestSampleRow.RedPostdilutionFactor = pFactoryTestSampleRow.RedPostdilutionFactor) Then
+                        'If field RedPostdilutionFactor is the same, check if fields RedPostSampleVolume and RedPostSampleVolumeSteps have changed (it is possible if 
+                        'Reagents Volumes for the STD Test/Sample Type have changed) 
+                        If (pCustomerTestSampleRow.RedPostSampleVolume <> pFactoryTestSampleRow.RedPostSampleVolume) Then
+                            'Update fields IncPostSampleVolume and IncPostSampleVolumeSteps in Customer DB
+                            pCustomerTestSampleRow.RedPostSampleVolume = pFactoryTestSampleRow.RedPostSampleVolume
+                            pCustomerTestSampleRow.RedPostSampleVolumeSteps = pFactoryTestSampleRow.RedPostSampleVolumeSteps
+                        End If
                     End If
                 Else
                     If (Not pCustomerTestSampleRow.IsRedPostdilutionFactorNull) Then
@@ -3791,7 +3814,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 '(2) Search in FACTORY DB all STD Test/SampleType/ReagentNumber for preloaded STD Tests that exists in CUSTOMER DB but for which only the
                 '    Reagents Volumes have been changed. Update all Reagents Volumes changed and delete previous Blank and Calibrator Results for the affected STD Tests/SampleTypes
                 If (Not myGlobalDataTO.HasError) Then
-                    myGlobalDataTO = UPDATEModifiedReagentVols(pDBConnection, False, pUpdateVersionChangesList)
+                    myGlobalDataTO = UpdateModifiedReagentVols(pDBConnection, False, pUpdateVersionChangesList)
                 End If
 
                 myDeletedTestProgramingTO = Nothing

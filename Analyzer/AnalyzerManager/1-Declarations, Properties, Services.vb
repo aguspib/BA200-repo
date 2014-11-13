@@ -134,6 +134,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         ' XB 26/09/2014 - BA-1872
         Private ISECMDLost As Boolean
+        Private RUNNINGLost As Boolean
         Private numRepetitionsSTATE As Integer
         Private waitingSTATETimer As New Timer()
 
@@ -2177,6 +2178,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''          XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
         '''          AG 15/04/2014 - #1591 do not send START while analyzer is starting pause
         '''          XB 26/09/2014 - Implement Start Task Timeout for ISE commands - BA-1872
+        '''          XB 06/11/2014 - Implement Start Task Timeout for RUNNING instruction - BA-1872
         ''' </remarks>
         Public Function ManageAnalyzer(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
                                        Optional ByVal pInstructionReceived As List(Of InstructionParameterTO) = Nothing, _
@@ -2326,7 +2328,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Exit Select
 
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING
+                                ' XB 06/11/2014 - BA-1872
+                                If Not MyClass.sendingRepetitions Then
+                                    MyClass.numRepetitionsTimeout = 0
+                                End If
+                                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                                MyClass.StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                ' XB 06/11/2014 - BA-1872
+
                                 myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.RUNNING)
+
                                 Exit Select
 
                                 ' XB 10/10/2013 - BT #1317
@@ -2764,6 +2775,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         Else
                                             ' XB 03/04/2014 
 
+                                            ' XB 26/09/2014 - BA-1872
+                                            If Not MyClass.sendingRepetitions Then
+                                                MyClass.numRepetitionsTimeout = 0
+                                            End If
+                                            MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                                            MyClass.StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
+                                            ' XB 26/09/2014 - BA-1872
+
                                             myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ISE_CMD, myISECommand)
 
                                             ' XB 26/09/2014 - BA-1872
@@ -2772,14 +2791,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             '    myGlobal = MyClass.ISE_Manager.StartInstructionStartedTimer
                                             'End If
                                             '' XBC 05/09/2012 
-
-                                            If Not myGlobal.HasError Then
-                                                If Not MyClass.sendingRepetitions Then
-                                                    MyClass.numRepetitionsTimeout = 0
-                                                End If
-                                                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
-                                                MyClass.StoreStartTaskinQueue(pAction, pSwAdditionalParameters, pFwScriptID, pParams)
-                                            End If
                                             ' XB 26/09/2014 - BA-1872
 
                                         End If ' XB 03/04/2014  
@@ -3088,10 +3099,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         myLogAcciones.CreateLogActivity("Num of Repetitions for STATE timeout excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
 
                                         ' Activates Alarm begin
-                                        Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
-                                        Dim myAlarmStatusList As New List(Of Boolean)
                                         Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                                         Dim alarmStatus As Boolean = False
+                                        Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                        Dim myAlarmStatusList As New List(Of Boolean)
 
                                         alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                                         alarmStatus = True
@@ -3111,6 +3122,50 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
 
                                     Exit Select
+
+                                    ' XB 06/11/2014 - BA-1872
+                                ElseIf MyClass.myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.RUNNING) Then
+                                    ' RUNNING Instruction
+                                    MyClass.RUNNINGLost = True
+                                    Dim myLogAcciones As New ApplicationLogManager()
+                                    myLogAcciones.CreateLogActivity("RUNNING lost !!! [START_TASK_TIMEOUT] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                                    If MyClass.numRepetitionsSTATE > GlobalBase.MaxRepetitionsTimeout Then
+                                        myLogAcciones.CreateLogActivity("Num of Repetitions for RUNNING timeout excedeed !!!", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+
+                                        ' Activates Alarm begin
+                                        Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                        Dim alarmStatus As Boolean = False
+                                        Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                        Dim myAlarmStatusList As New List(Of Boolean)
+
+                                        alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                                        alarmStatus = True
+                                        ISE_Manager.IsTimeOut = True
+
+                                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                        If myAlarmList.Count > 0 Then
+                                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                        End If
+                                        ' Activates Alarm end
+
+                                        Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+
+                                        'Update internal flags. Basically used by the running normal business
+                                        If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
+                                            'Update analyzer session flags into DataBase
+                                            If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
+                                                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                                                myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                                            End If
+                                        End If
+
+                                        RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                    Else
+                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
+                                        MyClass.InitializeTimerSTATEControl(WAITING_TIME_FAST)
+                                    End If
 
                                 Else
                                     ' Another Instructions
@@ -4128,7 +4183,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' USB connection cable has been disconnected and presentation inform this to AnalyzerManager class
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Modified by XBC 06/09/2012 - Add new parameter pConnectionCompleted</remarks>
+        ''' <remarks>
+        ''' Modified by XB 06/09/2012 - Add new parameter pConnectionCompleted
+        '''             XB 06/11/2014 - ISE Timeout management - BA-1872
+        ''' </remarks>
         Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -4140,6 +4198,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     MyClass.ISEAlreadyStarted = False
                 End If
                 ' XBC 16/01/2013
+
+                ' XB 06/11/2014 - BA-1872
+                ISECMDLost = False
+                RUNNINGLost = False
+                MyClass.sendingRepetitions = False
+                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                MyClass.ClearStartTaskQueueToSend()
+                ' XB 06/11/2014 - BA-1872
 
                 ' XBC 26/10/2011
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112

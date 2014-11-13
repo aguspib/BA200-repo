@@ -1108,7 +1108,40 @@ Partial Public Class IAx00MainMDI
 
             Dim myAdtionalText As String = ""
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
+
+            If Not MDIAnalyzerManager.Alarms Is Nothing Then
+                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
+                    myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
+
+                    If StartSessionisPending Then
+                        StartSessionisPending = False
+                        'Automatic process aborted
+                        SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
+                        InitializeAutoWSFlags()
+                        processingBeforeRunning = "2"
+                        ' In these case stop the mdi bar progress bar and enabled menus ... 
+                        ScreenWorkingProcess = False
+                        StopMarqueeProgressBar()
+                        EnableButtonAndMenus(True)
+                        ShowStatus(Messages.STANDBY)
+                        Cursor = Cursors.Default
+                    End If
+                End If
+
+                If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then
+                    myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "COMMS_TIMEOUT_ERR", CurrentLanguageAttribute)
+                    'Automatic process aborted
+                    SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
+                    InitializeAutoWSFlags()
+                    processingBeforeRunning = "2"
+                    ' In these case stop the mdi bar progress bar and enabled menus ... 
+                    ScreenWorkingProcess = False
+                    StopMarqueeProgressBar()
+                    EnableButtonAndMenus(True)
+                    ShowStatus(Messages.STANDBY)
+                    Cursor = Cursors.Default
+                End If
+            End If
 
             ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
 
@@ -1171,8 +1204,11 @@ Partial Public Class IAx00MainMDI
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
-    ''' <remarks>CREATE BY: 'TR 20/10/2011
-    ''' AG 28/11/2013 - BT #1397</remarks>
+    ''' <remarks>
+    ''' CREATE BY:  TR 20/10/2011
+    ''' Modified by AG 28/11/2013 - BT #1397
+    '''             XB 06/11/2014 - Ensure ProgressBar Marquee is Stopped
+    ''' </remarks>
     Private Sub OnDeviceRemoved(ByVal sender As Object, ByVal e As Biosystems.Ax00.PresentationCOM.DetectorForm.DriveDetectorEventArgs)
         Try
             ForceRefreshOnFirstStandBy = True               ' XB 06/11/2013
@@ -1282,6 +1318,15 @@ Partial Public Class IAx00MainMDI
                     'AG 24/10/2011
 
                 End If
+
+                ' XB 06/11/2014
+                If Not ProgressBar Is Nothing Then
+                    If ProgressBar.Visible And Not ProgressBar.Properties.Stopped Then
+                        StopMarqueeProgressBar()
+                    End If
+                End If
+                ' XB 06/11/2014
+
             End If
 
             ' XBC 04/09/2012 - Cut off communications channel
