@@ -4687,7 +4687,8 @@ Namespace Biosystems.Ax00.BL
                                         If (lstSpecimenID.Count > 0) Then
                                             myHistOrderTestsRow.SpecimenID = lstSpecimenID.First.SpecimenIDList.Trim.Split(CChar(vbCrLf))(0)
                                         Else
-                                            myHistOrderTestsRow.SpecimenID = mySampleID
+                                            'myHistOrderTestsRow.SpecimenID = mySampleID
+                                            myHistOrderTestsRow.SetSpecimenIDNull()
                                         End If
                                     End If
 
