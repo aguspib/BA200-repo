@@ -47,6 +47,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''             AG 15/04/2014 - Fix issue number #1594 paused in v300 (if SOUND is in queue it will be sent on receives STATUS (it doesnt matter AnalyzerIsReadyAttribute))
         '''                             #1484 action SOUND_DONE in running also search next preparation
         '''             XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        '''             XB 12/11/2014 - ISE CMD timeout management - BA-1872
         ''' </remarks>
         Private Function ManageRunningStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -509,6 +510,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myISECommand As ISECommandTO
                         myISECommand = CType(queuedParam, ISECommandTO)
                         If myISECommand.ISEMode <> GlobalEnumerates.ISEModes.None Then
+
+                            ' XB 12/11/2014 - BA-1872
+                            If Not MyClass.sendingRepetitions Then
+                                MyClass.numRepetitionsTimeout = 0
+                            End If
+                            MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                            MyClass.StoreStartTaskinQueue(AnalyzerManagerSwActionList.ISE_CMD, queuedParam, "", Nothing)
+                            ' XB 12/11/2014 - BA-1872
+
                             myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.ISE_CMD, myISECommand)
                         End If
 

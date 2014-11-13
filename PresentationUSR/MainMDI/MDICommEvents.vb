@@ -1115,6 +1115,10 @@ Partial Public Class IAx00MainMDI
 
                     If StartSessionisPending Then
                         StartSessionisPending = False
+                        'Automatic process aborted
+                        SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
+                        InitializeAutoWSFlags()
+                        processingBeforeRunning = "2"
                         ' In these case stop the mdi bar progress bar and enabled menus ... 
                         ScreenWorkingProcess = False
                         StopMarqueeProgressBar()
@@ -1126,6 +1130,9 @@ Partial Public Class IAx00MainMDI
 
                 If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then
                     myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "COMMS_TIMEOUT_ERR", CurrentLanguageAttribute)
+                    'Automatic process aborted
+                    SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
+                    InitializeAutoWSFlags()
                     processingBeforeRunning = "2"
                     ' In these case stop the mdi bar progress bar and enabled menus ... 
                     ScreenWorkingProcess = False
