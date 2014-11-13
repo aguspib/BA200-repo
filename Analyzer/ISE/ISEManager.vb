@@ -127,7 +127,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             LongTermDeactivated = 8
             ReagentsPack_DateInstall = 9
             Switch_Off = 10
-            'Timeout = 11        ' XB 31/10/2014 - BA-1872
         End Enum
 
 #End Region
@@ -3698,10 +3697,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Gets the current alarms for showing in ISE Utilities
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by SGM 26/10/2012
-        ''' Modified by XB 31/10/2014 - Add ISE timeout alarm - BA-1872
-        ''' </remarks>
+        ''' <remarks>SGM 26/10/2012</remarks>
         Public Function GetISEAlarmsForUtilities(ByRef pPendingCalibrations As List(Of MaintenanceOperations)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -3731,9 +3727,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If MyClass.myAlarms(Alarms.Electrodes_Wrong) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
                             If MyClass.myAlarms(Alarms.Electrodes_Cons_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
                             If MyClass.myAlarms(Alarms.Electrodes_Date_Expired) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
-
-                            ' XB 31/10/2014 - BA-1872
-                            'If MyClass.myAlarms(Alarms.Timeout) Then myISEUtilAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
 
                             pPendingCalibrations = New List(Of MaintenanceOperations)
                             If MyClass.IsCalibrationNeeded Then pPendingCalibrations.Add(MaintenanceOperations.ElectrodesCalibration)
@@ -7268,10 +7261,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Check ISE module Alarms
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by XBC 26/03/2012
-        ''' Modified by XB 31/10/2014 - Add ISE Timeout Alarm - BA-1872
-        ''' </remarks>
+        ''' <remarks>Created by XBC 26/03/2012</remarks>
         Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
@@ -7371,12 +7361,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         pAlarmList.Add(alarmID)
                         pAlarmStatusList.Add(alarmStatus)
                         'SGM 14/06/2012
-
-                        ''Timeout    XB 31/10/2014 - BA-1872
-                        'myAlarms(Alarms.Timeout) = False
-                        'alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-                        'pAlarmList.Add(alarmID)
-                        'pAlarmStatusList.Add(alarmStatus)
 
                     Else
                         If myAlarms(Alarms.LongTermDeactivated) Then
@@ -7668,28 +7652,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                             End If
-
-                            '' XB 31/10/2014 - BA-1872
-                            '' Ise Timeout   
-                            'If Not MyClass.IsElectrodesReady Then
-
-                            '    alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
-                            '    alarmStatus = True
-                            '    pAlarmList.Add(alarmID)
-                            '    pAlarmStatusList.Add(alarmStatus)
-
-                            '    myAlarms(Alarms.Electrodes_Wrong) = True
-                            'Else
-                            '    If myAlarms(Alarms.Electrodes_Wrong) Then
-                            '        myAlarms(Alarms.Electrodes_Wrong) = False
-                            '        ' solved
-                            '        alarmID = GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR
-                            '        alarmStatus = False
-                            '        pAlarmList.Add(alarmID)
-                            '        pAlarmStatusList.Add(alarmStatus)
-                            '    End If
-                            'End If
-
                         End If
 
                         ' Ise Electrodes Expired by consumption

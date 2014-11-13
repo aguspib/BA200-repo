@@ -5124,10 +5124,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pAlarmID"></param>
         ''' <returns>Boolean</returns>
-        ''' <remarks>
-        ''' Created by  AG 27/03/2012
-        ''' Modified by XB 31/10/2014 - add ISE_TIMEOUT_ERR alarm - BA-1872
-        ''' </remarks>
+        ''' <remarks>AG 27/03/2012</remarks>
         Private Function IgnoreAlarmWhileWarmUp(ByVal pAlarmID As GlobalEnumerates.Alarms) As Boolean
             Dim ignoreFlag As Boolean = True 'Default value TRUE
             Try
@@ -5149,8 +5146,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                   pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M OrElse _
                   pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P OrElse _
                   pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W OrElse _
-                  pAlarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
+                  pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T OrElse pAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W Then
                     ignoreFlag = False
                 End If
 
