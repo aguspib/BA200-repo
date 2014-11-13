@@ -475,6 +475,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Generate the Peration pameters with the corresponding values.
         ''' </summary>
         ''' <param name="pExecutionID"></param>
+        ''' <param name="pAnalyzerModel"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:  TR 13/04/2010
@@ -483,8 +484,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                          SampleClass =(PATIENT, CTRL) to get the instruction parammeter (TEST or PTEST)
         '''          TR 11/05/2012 - On the prepare Generation creating on the SampleClass validation removed the CTRL the 
         '''                          preparation generation is for patien only.
+        '''          AG 13/11/2014 BA-2118 add new parameter pAnalyzerModel
         ''' </remarks>
-        Public Function GeneratePreparation(ByVal pExecutionID As Integer) As GlobalDataTO
+        Public Function GeneratePreparation(ByVal pExecutionID As Integer, ByVal pAnalyzerModel As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 Dim myWSExecutionDS As New ExecutionsDS
@@ -522,6 +524,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Exit Try
                         End If
 
+                        'AG 13/11/2014 BA-2118 Get parameter SW_READINGSOFFSET
+                        Dim mySwParamsDelg As New SwParametersDelegate
+                        myGlobalDataTO = mySwParamsDelg.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString, pAnalyzerModel)
+
+                        'Cycles between sample dispensation and the 1st reading
+                        Dim readingsOffsetParam As Integer = 0
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing AndAlso DirectCast(myGlobalDataTO.SetDatos, ParametersDS).tfmwSwParameters.Rows.Count > 0 Then
+                            readingsOffsetParam = CInt(DirectCast(myGlobalDataTO.SetDatos, ParametersDS).tfmwSwParameters(0).ValueNumeric)
+                        End If
+                        'AG 13/11/2014
+
                         'TR -19/01/2011 -Validate the predilution mode to Get the instruction parameter.
                         If myPreparationTestDataDS.vwksPreparationsTestData.Count > 0 Then
                             'Valiadte if it's an automatic predilution, Patient and Control.
@@ -530,13 +543,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'Generate the parameterlist PTEST
                                 myPreparationParameterList = GetInstructionParameter("PTEST")
                                 myGlobalDataTO = FillPTestPreparation(myPreparationParameterList, myWSExecutionDS, _
-                                                                         myPreparationTestDataDS, myPreparationPositionDS)
+                                                                         myPreparationTestDataDS, myPreparationPositionDS, readingsOffsetParam)
 
                             Else
                                 myPreparationParameterList = GetInstructionParameter("TEST")
                                 'Create the test preparation for test
                                 myGlobalDataTO = FillTestPreparation(myPreparationParameterList, _
-                                                 myWSExecutionDS, myPreparationTestDataDS, myPreparationPositionDS)
+                                                 myWSExecutionDS, myPreparationTestDataDS, myPreparationPositionDS, readingsOffsetParam)
                             End If
                             'TR 21/05/2012 -In case of error the LOCK execution.
                             If myGlobalDataTO.HasError Then
@@ -2822,15 +2835,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Create the test preparation for instruction type TEST.
         ''' </summary>
         ''' <param name="pPreparationParameterList"></param>
+        ''' <param name="pWSExecutionDS"></param>
         ''' <param name="pPreparationTestDataDS"></param>
         ''' <param name="pPreparationPositionDS"></param>
+        ''' <param name="pSwReadingOffset">Cycles between sample dispensation and the 1st reading</param>
         ''' <returns></returns>
         ''' <remarks>CREATE BY: TR 19/01/2010
         ''' TR 21/05/2012 - Return Error when instruction incomplete
-        ''' AG 25/05/2012 - complete cases for return error when instruction incomplete: tm1, r2, vm1, vr1, vr2,  mw, rw, rn</remarks>
+        ''' AG 25/05/2012 - complete cases for return error when instruction incomplete: tm1, r2, vm1, vr1, vr2,  mw, rw, rn
+        ''' AG 13/11/2014 BA-2118 add parameter pSwReadingOffset</remarks>
         Private Function FillTestPreparation(ByVal pPreparationParameterList As List(Of InstructionParameterTO), ByVal pWSExecutionDS As ExecutionsDS, _
                                                                                 ByVal pPreparationTestDataDS As PreparationsTestDataDS, _
-                                                                                ByVal pPreparationPositionDS As PreparationsPositionDataDS) As GlobalDataTO
+                                                                                ByVal pPreparationPositionDS As PreparationsPositionDataDS, _
+                                                                                ByVal pSwReadingOffset As Integer) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
 
@@ -3341,9 +3358,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Next
                 'TR 21/05/2012 -Validate there're no error.
                 If Not myGlobalDataTO.HasError Then
-                    'AG 11/03/2011 - business if RN (19) is odd: instrucion is OK || if even: changes OW (17) and EW (18) in order to use the main filter
+                    'AG 11/03/2011 - business if RN (18) is odd: instrucion is OK || if even: changes OW (16) and EW (17) in order to use the main filter
                     'in the last reading before calculations
-                    Dim myCycle As Integer = CInt(pPreparationParameterList(18).ParameterValue)
+                    'AG 13/11/2014 BA-2118
+                    'Dim myCycle As Integer = CInt(pPreparationParameterList(18).ParameterValue)
+                    Dim myCycle As Integer = CInt(pPreparationParameterList(18).ParameterValue) - pSwReadingOffset
 
                     If myCycle Mod 2 = 0 Then
                         Dim auxValue As String = pPreparationParameterList(16).ParameterValue
@@ -3358,7 +3377,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 qTestData = Nothing 'AG 02/08/2012 - free memory
                 qPositionData = Nothing 'AG 02/08/2012 - free memory
-                
+
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3378,6 +3397,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pWSExecutionDS"></param>
         ''' <param name="pPreparationTestDataDS"></param>
         ''' <param name="pPreparationPositionDS"></param>
+        ''' <param name="pSwReadingOffset">Cycles between sample dispensation and the 1st reading</param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by:  TR 18/01/2011
@@ -3385,11 +3405,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              execute an automatic dilution (Instruction Index 21 and 20), filter for the DiluentSolution 
         '''                              defined for the Test/SampleType
         ''' TR 21/05/2012 - Return Error when instruction incomplete
-        ''' AG 25/05/2012 - complete cases for return error when instruction incomplete: r2, vm1, vr1, vr2, mw, rw, rn, pm1, ptm</remarks>
+        ''' AG 25/05/2012 - complete cases for return error when instruction incomplete: r2, vm1, vr1, vr2, mw, rw, rn, pm1, ptm
+        ''' AG 13/11/2014 BA-2118 add parameter pSwReadingOffset</remarks>
         Private Function FillPTestPreparation(ByVal pPreparationParameterList As List(Of InstructionParameterTO), _
                                               ByVal pWSExecutionDS As ExecutionsDS, _
                                               ByVal pPreparationTestDataDS As PreparationsTestDataDS, _
-                                              ByVal pPreparationPositionDS As PreparationsPositionDataDS) As GlobalDataTO
+                                              ByVal pPreparationPositionDS As PreparationsPositionDataDS, _
+                                              ByVal pSwReadingOffset As Integer) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
@@ -3800,7 +3822,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If Not myGlobalDataTO.HasError Then
                     'AG 11/03/2011 - business if RN (15) is odd instrucion is OK, if even changes OW (13) and EW (14) in order to used the main filter
                     'in the last reading before calculations
-                    Dim myCycle As Integer = CInt(pPreparationParameterList(15).ParameterValue)
+                    'AG 13/11/2014 BA-2118
+                    'Dim myCycle As Integer = CInt(pPreparationParameterList(15).ParameterValue)
+                    Dim myCycle As Integer = CInt(pPreparationParameterList(15).ParameterValue) - pSwReadingOffset
 
                     If myCycle Mod 2 = 0 Then
                         Dim auxValue As String = pPreparationParameterList(13).ParameterValue
@@ -3812,7 +3836,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
                 qTestData = Nothing 'AG 02/08/2012 - free memory
                 qPositionData = Nothing 'AG 02/08/2012 - free memory
-                
+
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

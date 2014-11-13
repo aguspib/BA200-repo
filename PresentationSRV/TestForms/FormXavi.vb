@@ -733,7 +733,7 @@ Public Class FormXavi
             Dim myInstruction As New Instructions
             Dim myInstrucList As New List(Of InstructionParameterTO)
             'obtener los valores para los parametros para las preparaciones
-            myglobalto = myInstruction.GeneratePreparation(CType(BsTextBoxToSend.Text.Trim(), Integer))
+            myglobalto = myInstruction.GeneratePreparation(CType(BsTextBoxToSend.Text.Trim(), Integer), Ax00ServiceMainMDI.AnalyzerModel)
             If Not myglobalto.HasError Then
                 Dim myLA00Inter As New LAX00Interpreter
                 'asignamos lo valores a nuestra listra de instrucciones

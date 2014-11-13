@@ -121,7 +121,7 @@ Public Class bsReception
             Dim myInstruction As New Instructions
             Dim myInstrucList As New List(Of InstructionParameterTO)
             'obtener los valores para los parametros para las preparaciones
-            myglobalto = myInstruction.GeneratePreparation(CType(BsTextBoxToSend.Text.Trim(), Integer)) 'Llamada standard.
+            myglobalto = myInstruction.GeneratePreparation(CType(BsTextBoxToSend.Text.Trim(), Integer), IAx00MainMDI.AnalyzerModel) 'Llamada standard.
             'myglobalto = myInstruction.GenerateISEPreparation(CType(BsTextBoxToSend.Text.Trim(), Integer)) 'Llamada ISE.
             If Not myglobalto.HasError Then
                 Dim myLA00Inter As New LAX00Interpreter

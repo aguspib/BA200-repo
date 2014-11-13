@@ -313,7 +313,7 @@ Public Class IProgTest
             If qswParameter.Count > 0 Then
                 myResult = pVolume * qswParameter.First().ValueNumeric
             End If
-
+            qswParameter = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " CalculateDilutionSteps ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -7829,10 +7829,22 @@ Public Class IProgTest
         Return myError
     End Function
 
+
     Private Function CheckProzoneMinCycle(ByVal ReadingCycle As Decimal) As Integer
         Dim result As Integer = 0
 
         Try
+            'AG 13/11/2014 BA-2118
+            Dim qswParameter As New List(Of ParametersDS.tfmwSwParametersRow)
+            Dim offset As Integer = 0
+            qswParameter = (From a In SwParametersDS.tfmwSwParameters _
+               Where a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString _
+               AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+               Select a).ToList()
+            If qswParameter.Count > 0 AndAlso Not qswParameter(0).IsValueNumericNull Then offset = CInt(qswParameter(0).ValueNumeric)
+            qswParameter = Nothing
+            'AG 13/11/2014
+
             'Validate if Mono reagent or Bi Reagent.
             Select Case AnalysisModeCombo.SelectedValue.ToString()
 
@@ -7843,7 +7855,8 @@ Public Class IProgTest
                         'Validate if Bichromatic.
                     ElseIf ReadingModeCombo.SelectedValue.ToString() = "BIC" Then
                         'Validate if it's even or odd.
-                        If FirstReadingCycleUpDown.Value Mod 2 = 0 Then
+                        'AG 13/11/2014 BA-2118 (modify condition '- offset')
+                        If (FirstReadingCycleUpDown.Value - offset) Mod 2 = 0 Then
                             'Even
                             result = ConvertCycletoTime(CType(ReadingCycle + 5, Integer))
                         Else
@@ -7859,7 +7872,8 @@ Public Class IProgTest
                         'Validate if Bichromatic.
                     ElseIf ReadingModeCombo.SelectedValue.ToString() = "BIC" Then
                         'Validate if it's even or odd.
-                        If SecondReadingCycleUpDown.Value Mod 2 = 0 Then
+                        'AG 13/11/2014 BA-2118 (modify condition '- offset')
+                        If (SecondReadingCycleUpDown.Value - offset) Mod 2 = 0 Then
                             'Even
                             result = ConvertCycletoTime(CType(ReadingCycle + 5, Integer))
                         Else

@@ -46,6 +46,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "Attributes"
         Private analyzerIDAttribute As String = "" 'AG 20/03/2012, required for read the reagents barcode length
         Private worksessionIDAttribute As String = ""
+        Private analyzerModelAttribute As String = "" 'AG 13/11/2014 BA-2118
 
         'AG 20/04/2010 - Last ExecutionID sent to prepare & the complete instruction data
         Private lastExecutionIDSentAttribute As Integer = GlobalConstants.NO_PENDING_PREPARATION_FOUND     '-1
@@ -222,6 +223,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Set(ByVal value As String)
                 worksessionIDAttribute = value
+            End Set
+        End Property
+
+        Public WriteOnly Property currentAnalyzerModel() As String '13/11/2014 AG BA-2118
+            'Get
+            '    Return analyzerModelAttribute 
+            'End Get
+
+            Set(ByVal value As String)
+                analyzerModelAttribute = value
             End Set
         End Property
 
@@ -2199,7 +2210,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'myGlobal = myInstruction.GeneratePreparation(pExecutionID)
                 If String.Equals(pExecutionType, "PREP_STD") Then
-                    myGlobal = myInstruction.GeneratePreparation(pExecutionID)
+                    myGlobal = myInstruction.GeneratePreparation(pExecutionID, analyzerModelAttribute)
                 ElseIf String.Equals(pExecutionType, "PREP_ISE") Then
                     'TR Genereate the ise type Peparation.
                     myGlobal = myInstruction.GenerateISEPreparation(pExecutionID)

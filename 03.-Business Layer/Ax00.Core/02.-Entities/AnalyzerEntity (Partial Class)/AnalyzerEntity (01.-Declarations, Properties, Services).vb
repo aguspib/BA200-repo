@@ -363,6 +363,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 20/03/2012 - inform about the current analyzer to the applayer
                     If Not AppLayer Is Nothing Then
                         AppLayer.currentAnalyzerID = AnalyzerIDAttribute
+                        AppLayer.currentAnalyzerModel = myAnalyzerModel '13/11/2014 AG BA-2118
                     End If
 
                     InitClassStructuresFromDataBase(Nothing) 'AG 31/05/2012
