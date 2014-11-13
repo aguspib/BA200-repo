@@ -1112,16 +1112,6 @@ Partial Public Class IAx00MainMDI
             If Not MDIAnalyzerManager.Alarms Is Nothing Then
                 If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
                     myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "ISE_TIMEOUT_ERR", CurrentLanguageAttribute)
-
-                    If StartSessionisPending Then
-                        StartSessionisPending = False
-                        ' In these case stop the mdi bar progress bar and enabled menus ... 
-                        ScreenWorkingProcess = False
-                        StopMarqueeProgressBar()
-                        EnableButtonAndMenus(True)
-                        ShowStatus(Messages.STANDBY)
-                        Cursor = Cursors.Default
-                    End If
                 End If
 
                 If MDIAnalyzerManager.Alarms.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then
