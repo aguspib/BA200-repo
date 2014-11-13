@@ -666,8 +666,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Update field FormulaText of a Calculated Test when the long name of an Standard or Calculated Test included in its formula is changed 
-        ''' in the corresponding Programming Screen
+        ''' Update field FormulaText of a Calculated Test when the long name of a Standard, ISE, Off-System or Calculated Test included in its formula is changed 
+        ''' in the corresponding Programming Screen.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTestID">Identifier of the Calculated Test</param>
@@ -675,6 +675,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 20/09/2012
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary description with ISE and Off-System as possible sources for changing its name.
         ''' </remarks>
         Public Function UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, ByVal pNewFormulaText As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -888,17 +889,23 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Get the list of Tests (of all available Test Types) that can be included in a formula of a Calculated Test
+        ''' Get the list of Tests of the specified Test Type that can be included in a formula of a Calculated Test.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pTypeTest">Determines the Test Types to be applied to the list.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS with the list of Tests allowed in 
         '''          formulas of Calculated Tests</returns>
         ''' <remarks>
         ''' Modified by: DL 13/05/2010
         '''              TR 09/03/2011 - Added the FactoryCalib on the Case STD.
         '''              AG 02/09/2014 - BA-1869 add the Available column
+        '''              WE 10/11/2014 - RQ00035C (BA-1867).
+        '''              WE 11/11/2014 - RQ00035C (BA-1867) Added fixed default value of 0 (False) to field FactoryCalib for ISE and Off-Systems
+        '''                              to solve issue with showing warning "It's recommended to change factory calibration values".
+        '''                              As a result, this message will never show up for ISE and Off-System Tests.
+        '''                              Note: FactoryCalib doesn’t intrinsically exist for these Test types (ISE/Off-System).
         ''' </remarks>
-        Public Function ReadAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pTypeTest As String = "") As GlobalDataTO
+        Public Function ReadAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTypeTest As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -907,17 +914,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String
+                        Dim cmdText As String = ""
+
                         Select Case (pTypeTest)
-                            Case ""
-                                cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, T.Available " & vbCrLf
-                                cmdText &= " FROM   tparTestSamples TS INNER JOIN tparTests T ON TS.TestID = T.TestID " & vbCrLf
-                                cmdText &= " UNION " & vbCrLf
-                                cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestName AS TestName, 1, Available " & vbCrLf
-                                cmdText &= " FROM   tparCalculatedTests" & vbCrLf
-                                cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
-                                cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf
-                                cmdText &= " ORDER BY TestTypeCode, SampleTypeCode, TestName"
+                            'Case ""
+                            '    cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, T.Available " & vbCrLf
+                            '    cmdText &= " FROM   tparTestSamples TS INNER JOIN tparTests T ON TS.TestID = T.TestID " & vbCrLf
+                            '    cmdText &= " UNION " & vbCrLf
+                            '    cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestName AS TestName, 1, Available " & vbCrLf
+                            '    cmdText &= " FROM   tparCalculatedTests" & vbCrLf
+                            '    cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
+                            '    cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf
+                            '    cmdText &= " ORDER BY TestTypeCode, SampleTypeCode, TestName"
 
                             Case "STD"
                                 cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, TS.FactoryCalib, T.Available " & vbCrLf
@@ -929,6 +937,32 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
                                 cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf
                                 cmdText &= " ORDER BY TestTypeCode, SampleTypeCode, TestName"
+
+                                ' ISE: field PreloadedTest doesn't exist in ISE table because all ISE Tests are intrinsically Factory Tests, so for ISE PreloadedTest is set to 1 as a fixed value.
+                                ' ISE: field FactoryCalib doesn´t intrinsically exist for ISE (and field doesn't exist in ISE table), so set this value to 0 (False) as a fixed value that must never change. 
+                            Case "ISE"
+                                cmdText &= " SELECT 'ISE' AS TestTypeCode, ITS.SampleType AS SampleTypeCode, ITS.ISETestID AS TestCode, IT.Name AS TestName, 1 AS PreloadedTest, 0 AS FactoryCalib, IT.Available " & vbCrLf
+                                cmdText &= " FROM   tparISETestSamples ITS INNER JOIN tparISETests IT ON ITS.ISETestID = IT.ISETestID " & vbCrLf
+
+                                ' OFFS: field FactoryCalib doesn´t intrinsically exist for Off-System (and field doesn't exist in OFFS table), so set this value to 0 (False) as a fixed value that must never change. 
+                            Case "OFFS"
+                                cmdText &= " SELECT 'OFFS' AS TestTypeCode, OTS.SampleType AS SampleTypeCode, OTS.OffSystemTestID AS TestCode, OT.Name AS TestName, OT.PreloadedOffSystemTest AS PreloadedTest, 0 AS FactoryCalib, OT.Available " & vbCrLf
+                                cmdText &= " FROM   tparOffSystemTestSamples OTS INNER JOIN tparOffSystemTests OT ON OTS.OffSystemTestID = OT.OffSystemTestID " & vbCrLf
+
+                                ' ISE: field PreloadedTest doesn't exist in ISE table because all ISE Tests are intrinsically Factory Tests, so for ISE PreloadedTest is set to 1 as a fixed value.
+                                ' ISE: field FactoryCalib doesn´t intrinsically exist for ISE (and field doesn't exist in ISE table), so set this value to 0 (False) as a fixed value that must never change.
+                                ' OFFS: field FactoryCalib doesn´t intrinsically exist for Off-System (and field doesn't exist in OFFS table), so set this value to 0 (False) as a fixed value that must never change. 
+                            Case "STD_ISE_OFFS"
+                                cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, TS.FactoryCalib, T.Available " & vbCrLf
+                                cmdText &= " FROM   tparTestSamples TS INNER JOIN tparTests T ON TS.TestID = T.TestID " & vbCrLf
+                                cmdText &= " UNION " & vbCrLf
+                                cmdText &= " SELECT 'ISE' AS TestTypeCode, ITS.SampleType AS SampleTypeCode, ITS.ISETestID AS TestCode, IT.Name AS TestName, 1, 0, IT.Available " & vbCrLf
+                                cmdText &= " FROM   tparISETestSamples ITS INNER JOIN tparISETests IT ON ITS.ISETestID = IT.ISETestID " & vbCrLf
+                                cmdText &= " UNION " & vbCrLf
+                                cmdText &= " SELECT 'OFFS' AS TestTypeCode, OTS.SampleType AS SampleTypeCode, OTS.OffSystemTestID AS TestCode, OT.Name AS TestName, OT.PreloadedOffSystemTest AS PreloadedTest, 0, OT.Available " & vbCrLf
+                                cmdText &= " FROM   tparOffSystemTestSamples OTS INNER JOIN tparOffSystemTests OT ON OTS.OffSystemTestID = OT.OffSystemTestID " & vbCrLf
+                                cmdText &= " ORDER BY TestTypeCode DESC, PreloadedTest DESC, SampleTypeCode ASC, TestName ASC"
+
                         End Select
 
                         Dim dsAllowedTests As New AllowedTestsDS

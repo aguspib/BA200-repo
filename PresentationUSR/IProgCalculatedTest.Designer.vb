@@ -241,7 +241,7 @@ Partial Class IProgCalculatedTest
         Me.bsCalTestFormula.SampleTypeTitle = "Sample Type:"
         Me.bsCalTestFormula.SelectedSampleType = ""
         Me.bsCalTestFormula.Size = New System.Drawing.Size(681, 364)
-        Me.bsCalTestFormula.StandardTestsTitle = "Standard Tests:"
+        Me.bsCalTestFormula.TestsTitle = "Standard Tests:"
         Me.bsCalTestFormula.TabIndex = 0
         Me.bsCalTestFormula.WarningImage = ""
         '

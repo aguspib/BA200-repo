@@ -307,6 +307,10 @@ Partial Public Class OffSystemTestsDS
 
         Private columnAvailable As Global.System.Data.DataColumn
 
+        Private columnPreloadedOffSystemTest As Global.System.Data.DataColumn
+
+        Private columnBiosystemsID As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -439,6 +443,22 @@ Partial Public Class OffSystemTestsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property PreloadedOffSystemTestColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnPreloadedOffSystemTest
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property BiosystemsIDColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnBiosystemsID
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -475,9 +495,9 @@ Partial Public Class OffSystemTestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparOffSystemTestsRow(ByVal OffSystemTestID As Integer, ByVal Name As String, ByVal ShortName As String, ByVal Decimals As Decimal, ByVal Units As String, ByVal ResultType As String, ByVal InUse As Boolean, ByVal ActiveRangeType As String, ByVal TS_User As String, ByVal TS_DateTime As Date, ByVal CustomPosition As Integer, ByVal Available As Boolean) As tparOffSystemTestsRow
+        Public Overloads Function AddtparOffSystemTestsRow(ByVal OffSystemTestID As Integer, ByVal Name As String, ByVal ShortName As String, ByVal Decimals As Decimal, ByVal Units As String, ByVal ResultType As String, ByVal InUse As Boolean, ByVal ActiveRangeType As String, ByVal TS_User As String, ByVal TS_DateTime As Date, ByVal CustomPosition As Integer, ByVal Available As Boolean, ByVal PreloadedOffSystemTest As Boolean, ByVal BiosystemsID As Integer) As tparOffSystemTestsRow
             Dim rowtparOffSystemTestsRow As tparOffSystemTestsRow = CType(Me.NewRow, tparOffSystemTestsRow)
-            Dim columnValuesArray() As Object = New Object() {OffSystemTestID, Name, ShortName, Decimals, Units, ResultType, InUse, ActiveRangeType, TS_User, TS_DateTime, CustomPosition, Available}
+            Dim columnValuesArray() As Object = New Object() {OffSystemTestID, Name, ShortName, Decimals, Units, ResultType, InUse, ActiveRangeType, TS_User, TS_DateTime, CustomPosition, Available, PreloadedOffSystemTest, BiosystemsID}
             rowtparOffSystemTestsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparOffSystemTestsRow)
             Return rowtparOffSystemTestsRow
@@ -512,6 +532,8 @@ Partial Public Class OffSystemTestsDS
             Me.columnTS_DateTime = MyBase.Columns("TS_DateTime")
             Me.columnCustomPosition = MyBase.Columns("CustomPosition")
             Me.columnAvailable = MyBase.Columns("Available")
+            Me.columnPreloadedOffSystemTest = MyBase.Columns("PreloadedOffSystemTest")
+            Me.columnBiosystemsID = MyBase.Columns("BiosystemsID")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -541,9 +563,14 @@ Partial Public Class OffSystemTestsDS
             MyBase.Columns.Add(Me.columnCustomPosition)
             Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnAvailable)
+            Me.columnPreloadedOffSystemTest = New Global.System.Data.DataColumn("PreloadedOffSystemTest", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnPreloadedOffSystemTest)
+            Me.columnBiosystemsID = New Global.System.Data.DataColumn("BiosystemsID", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnBiosystemsID)
             Me.columnName.MaxLength = 16
             Me.columnShortName.MaxLength = 8
             Me.columnUnits.MaxLength = 20
+            Me.columnPreloadedOffSystemTest.DefaultValue = CType(False, Boolean)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -870,6 +897,37 @@ Partial Public Class OffSystemTestsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property PreloadedOffSystemTest() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparOffSystemTests.PreloadedOffSystemTestColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'PreloadedOffSystemTest' in table 'tparOffSystemTests' is DB" & _
+                            "Null.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparOffSystemTests.PreloadedOffSystemTestColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property BiosystemsID() As Integer
+            Get
+                Try
+                    Return CType(Me(Me.tabletparOffSystemTests.BiosystemsIDColumn), Integer)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'BiosystemsID' in table 'tparOffSystemTests' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Integer)
+                Me(Me.tabletparOffSystemTests.BiosystemsIDColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsOffSystemTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparOffSystemTests.OffSystemTestIDColumn)
         End Function
@@ -1010,6 +1068,30 @@ Partial Public Class OffSystemTestsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetAvailableNull()
             Me(Me.tabletparOffSystemTests.AvailableColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsPreloadedOffSystemTestNull() As Boolean
+            Return Me.IsNull(Me.tabletparOffSystemTests.PreloadedOffSystemTestColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetPreloadedOffSystemTestNull()
+            Me(Me.tabletparOffSystemTests.PreloadedOffSystemTestColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsBiosystemsIDNull() As Boolean
+            Return Me.IsNull(Me.tabletparOffSystemTests.BiosystemsIDColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetBiosystemsIDNull()
+            Me(Me.tabletparOffSystemTests.BiosystemsIDColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

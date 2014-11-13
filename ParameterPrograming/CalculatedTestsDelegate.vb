@@ -424,18 +424,19 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Get list of standard/calculated Tests that can be included in the Formula defined for a Calculated Test
+        ''' Get list of Standard/ISE/Off-System Tests or Calculated Tests that can be included in the Formula defined for a Calculated Test.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestType">Optional parameter. When informed, it allows get only the Tests of the specified type</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS containing all Tests that can be used in the 
-        '''          Formula of a Calculated Test</returns>
+        ''' <param name="pTestType">Only selects Tests of type <pTestType></pTestType>. Allowed values are: (STD, ISE, OFFS, STD_ISE_OFFS, CALC)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS containing all Tests of the specified type that can be used in the 
+        '''          Formula of a Calculated Test.</returns>
         ''' <remarks>
         ''' Modified by: SA 22/06/2010 - Some errors fixed. Changed the way of getting the Test Icons. Unify functions 
         '''                              GetAllowedTestList, GetAllowedCalcList and GetAllowedStandardTestList: the three functions
         '''                              do the same and only GetAllowedCalcList was used
+        '''              WE 07/11/2014 - RQ00035C (BA-1867).
         ''' </remarks>
-        Public Function GetAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pTestType As String = "") As GlobalDataTO
+        Public Function GetAllowedTestList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -455,12 +456,15 @@ Namespace Biosystems.Ax00.BL
                             Dim systemTestsIconPath As String = String.Empty
                             Dim userTestsIconPath As String = String.Empty
                             Dim calcTestsIconPath As String = String.Empty
+                            Dim ISETestsIconPath As String = String.Empty
+                            Dim offSystemTestsIconPath As String = String.Empty
 
                             Dim resultDS As New PreloadedMasterDataDS
                             Dim myPreloadedMDDelegate As New PreloadedMasterDataDelegate
 
-                            If (pTestType = String.Empty OrElse pTestType = "STD") Then
-                                'Get the Icons needed for Standard Tests (Biosystems Tests)
+                            If (pTestType = "STD" OrElse pTestType = "STD_ISE_OFFS") Then
+                                ' (1) Get Icons for Standard Tests.
+                                ' 1.1 - Get the Icons needed for Standard Tests (Biosystems Tests)
                                 resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TESTICON")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
@@ -469,7 +473,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
                                 End If
 
-                                'Get the Icons needed for Standard Tests (User defined Tests)
+                                ' 1.2 - Get the Icons needed for Standard Tests (User defined Tests)
                                 resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "USERTEST")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
@@ -479,13 +483,39 @@ Namespace Biosystems.Ax00.BL
                                 End If
                             End If
 
-                            If (pTestType = "" Or pTestType = "CALC") Then
-                                'Get the Icons needed for Calculated Tests
+                            If (pTestType = "CALC") Then
+                                ' (2) Get the Icon needed for Calculated Tests.
                                 resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TCALC")
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
                                     If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
                                         calcTestsIconPath = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    End If
+                                End If
+                            End If
+
+                            ' Get the icon path for ISE {GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS = "TISE_SYS"}.
+                            If (pTestType = "ISE" Or pTestType = "STD_ISE_OFFS") Then
+                                ' (3) Get Icon for ISE Tests.
+                                ' There are only Factory-defined ISE Tests.
+                                resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TISE_SYS")
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+                                    If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+                                        ISETestsIconPath = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
+                                    End If
+                                End If
+                            End If
+
+                            ' Get the icon path for Off-System {GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS = "TOFF_SYS"}.
+                            If (pTestType = "OFFS" Or pTestType = "STD_ISE_OFFS") Then
+                                ' (4) Get Icon for Off-System Tests.
+                                ' Assumption: there is no separation between Factory and User-defined Off-System Tests icon.
+                                resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TOFF_SYS")
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+                                    If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+                                        offSystemTestsIconPath = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
                                     End If
                                 End If
                             End If
@@ -502,6 +532,14 @@ Namespace Biosystems.Ax00.BL
                                         End If
                                     ElseIf (allowedTestRow.TestTypeCode = "CALC") Then
                                         allowedTestRow.IconPath = calcTestsIconPath
+
+                                    ElseIf (allowedTestRow.TestTypeCode = "ISE") Then
+                                        allowedTestRow.IconPath = ISETestsIconPath
+
+                                    ElseIf (allowedTestRow.TestTypeCode = "OFFS") Then
+                                        ' Assumption: there is no separation between Factory and User-defined Off-System Tests icon.
+                                        allowedTestRow.IconPath = offSystemTestsIconPath
+
                                     End If
                                     allowedTestRow.EndEdit()
                                 Next
@@ -524,6 +562,62 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+
+        ' ''' <summary>
+        ' ''' Look up the Icon path for a specific Test from the Preloaded Masterdata table.
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection">Open DB Connection</param>
+        ' ''' <param name="pTestType">Only selects Tests of type <pTestType></pTestType>. Allowed values are: (STD, ISE, OFFS, STD_ISE_OFFS, CALC)</param>
+        ' ''' <returns>GlobalDataTO containing a typed DataSet AllowedTestsDS containing all Tests of the specified type that can be used in the 
+        ' '''          Formula of a Calculated Test.</returns>
+        ' ''' <remarks>
+        ' ''' Modified by: WE 10/11/2014 - RQ00035C (BA-1867).
+        ' ''' </remarks>
+        'Private Function GetIconPath(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String) As GlobalDataTO
+        '    Dim resultData As GlobalDataTO = Nothing
+        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '    Dim resultDS As New PreloadedMasterDataDS
+        '    Dim myPreloadedMDDelegate As New PreloadedMasterDataDelegate
+
+        '    Try
+        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+
+        '                ' Get the Icon path for the specific Tests.
+        '                resultData = myPreloadedMDDelegate.GetSubTableItem(dbConnection, GlobalEnumerates.PreloadedMasterDataEnum.ICON_PATHS, "TESTICON")
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    resultDS = DirectCast(resultData.SetDatos, PreloadedMasterDataDS)
+        '                    If (resultDS.tfmwPreloadedMasterData.Rows.Count > 0) Then
+        '                        resultData.SetDatos = resultDS.tfmwPreloadedMasterData(0).FixedItemDesc
+        '                    End If
+        '                End If
+
+        '            End If
+        '        End If
+
+        '    Catch ex As Exception
+        '        resultData = New GlobalDataTO()
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsDelegate.GetAllowedTestList", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+
+        '    Return resultData
+
+        'End Function
+
+
+
+
 
         ''' <summary>
         ''' Get the list of all defined Calculated Tests using the specified SampleType (or having at least
@@ -889,15 +983,16 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' When the long name of an Standard or Calculated Test is modified and it is included in the Formula of another Calculated Tests, value of
-        ''' field FormulaText for these Calculated Tests has to be rebuilt and update in both, Parameters Programming and Historic tables
+        ''' When the long name of a Standard, ISE, Off-System or Calculated Test is modified and it is included in the Formula of another Calculated Tests, value of
+        ''' field FormulaText for these Calculated Tests has to be rebuilt and updated in both, Parameters Programming and Historic tables.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pTestType">Test Type Code: STD or CALC</param>
-        ''' <param name="pTestID">Identifier of an STD or CALC Test</param>
+        ''' <param name="pTestType">Test Type Code: STD, ISE, OFFS or CALC</param>
+        ''' <param name="pTestID">Identifier of an STD, ISE, OFFS or CALC Test</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 20/09/2012
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary and Parameters description with ISE and Off-System as possible input value for parameter pTestType.
         ''' </remarks>
         Public Function UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestType As String, ByVal pTestID As Integer) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -1700,8 +1795,8 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' If the text of the formula of a Calculated Test has been changed due to the long name of an Standard or Calculated Test included in the formula
-        ''' has been changed, if the Calculated Test exists in Historic Module, the FormulaText field is updated also for it
+        ''' If the text of the formula of a Calculated Test has been changed due to the long name of a Standard, ISE, Off-System or Calculated Test included in the formula
+        ''' has been changed, if the Calculated Test exists in Historic Module, the FormulaText field is updated also for it.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTestID">Identifier of the Calculated Test</param>
@@ -1711,6 +1806,7 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA 20/09/2012 - Method has been placed here instead of in class HisCalculatedTestDelegate due to it is not possible to call functions in
         '''                              History project from Parameters Programming project (circular references are not allowed). Functions in DAO 
         '''                              Class for table thisCalculatedTests are called
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary description with ISE and Off-System as possible sources for changing its name.
         ''' </remarks>
         Private Function HIST_UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, ByVal pNewFormulaText As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing

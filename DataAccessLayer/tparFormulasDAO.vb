@@ -136,6 +136,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              the Test Name for Formula members with ValueType=TEST
         '''              SA  12/03/2012 - Changed the function template
         '''              JB  31/01/2013 - Add optional parameter DataBaseName and use it in query
+        '''              WE  11/11/2014 - RQ00035C (BA-1867).
         '''</remarks>
         Public Function GetFormulaValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer, Optional pDataBaseName As String = "") As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -160,6 +161,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
                                                 " AND    F.ValueType = 'TEST' " & vbCrLf & _
                                                 " AND    F.TestType = 'CALC' " & vbCrLf & _
+                                                " UNION " & vbCrLf & _
+                                                " SELECT F.*, IT.Name + ' ['+ F.SampleType + ']' AS TestName " & vbCrLf & _
+                                                " FROM   " & strFromLeft & "tparFormulas F INNER JOIN " & strFromLeft & "tparISETests IT ON CONVERT(int, F.[Value]) = IT.ISETestID " & vbCrLf & _
+                                                " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
+                                                " AND    F.ValueType = 'TEST' " & vbCrLf & _
+                                                " AND    F.TestType = 'ISE' " & vbCrLf & _
+                                                " UNION " & vbCrLf & _
+                                                " SELECT F.*, OT.Name + ' ['+ F.SampleType + ']' AS TestName " & vbCrLf & _
+                                                " FROM   " & strFromLeft & "tparFormulas F INNER JOIN " & strFromLeft & "tparOffSystemTests OT ON CONVERT(int, F.[Value]) = OT.OffSystemTestID " & vbCrLf & _
+                                                " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
+                                                " AND    F.ValueType = 'TEST' " & vbCrLf & _
+                                                " AND    F.TestType = 'OFFS' " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT F.*, NULL AS TestName " & vbCrLf & _
                                                 " FROM   " & strFromLeft & "tparFormulas F " & vbCrLf & _

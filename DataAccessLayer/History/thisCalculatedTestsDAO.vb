@@ -246,8 +246,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Update field FormulaText of a Calculated Test saved in Historic Module when the long name of an Standard or Calculated Test included in its
-        ''' formula is changed in the corresponding Programming Screen
+        ''' Update field FormulaText of a Calculated Test saved in Historic Module when the long name of a Standard, ISE, Off-System or Calculated Test included in its
+        ''' formula is changed in the corresponding Programming Screen.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pHistCalcTestID">Identifier of the Calculated Test in Historic Module</param>
@@ -255,6 +255,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 20/09/2012
+        ''' Modified by: WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary description with ISE and Off-System as possible sources for changing its name.
         ''' </remarks>
         Public Function UpdateFormulaText(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHistCalcTestID As Integer, ByVal pNewFormulaText As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO

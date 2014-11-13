@@ -40,19 +40,19 @@ Namespace Biosystems.Ax00.Controls.UserControls
         'Attribute variables for all the Labels
         Private FormulaTitleAttribute As String = ""
         Private SampleTypeTitleAttribute As String = ""
-        Private StandardTestsTitleAttribute As String = ""
+        Private TestsTitleAttribute As String = ""  ' WE 07/11/2014 - RQ00035C (BA-1867).
         Private CalculatedTestsTitleAttribute As String = ""
         Private DeleteBtnToolTipAttribute As String = ""
         Private ClearBtnTooltipAttribute As String = ""
 
         'Attribute variables needed to fill the Formula Controls
         Private SampleTypesListAttribute As DataSet
-        Private TestStandardListAttribute As DataSet
+        Private TestListAttribute As DataSet    ' WE 07/11/2014 - RQ00035C (BA-1867).
         Private TestCalculatedListAttribute As DataSet
 
         'Attribute variables needed when an unique SampleType is allowed
         Private SelectedSampleTypeAttribute As String = ""
-        Private TestSTDSampleTypeListAttribute As DataSet
+        Private TestSampleTypeListAttribute As DataSet  ' WE 07/11/2014 - RQ00035C (BA-1867).
         Private TestCALCSampleTypeListAttribute As DataSet
 
         'Attribute variables needed when the Formula is defined for an exiting Calculated Test
@@ -75,6 +75,9 @@ Namespace Biosystems.Ax00.Controls.UserControls
         'TR 09/03/2011 -Message used to indicate the factory values
         Private FactoryValuesMessageAttribute As String = ""
 
+        ' WE 07/11/2014 - RQ00035C (BA-1867) - To indicate the caption for the Factory values message.
+        Private FactoryValuesCaptionAttribute As String = ""
+
         Private myunique As Boolean '= False Redundant field initialization
 
         'TR 28/07/2011 -Set variable to indicate the Decimal separator.
@@ -95,7 +98,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Property
 
         ''' <summary>
-        ''' Property use to recive the factory value message.
+        ''' Property used to receive the factory value message.
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
@@ -106,6 +109,21 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Get
             Set(ByVal value As String)
                 FactoryValuesMessageAttribute = value
+            End Set
+        End Property
+
+        ''' <summary>
+        ''' Property used to get/set the Factory value message caption.
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>Created by: WE 11/11/2014 - RQ00035C (BA-1867).</remarks>
+        Public Property FactoryValueCaption() As String
+            Get
+                Return FactoryValuesCaptionAttribute
+            End Get
+            Set(ByVal value As String)
+                FactoryValuesCaptionAttribute = value
             End Set
         End Property
 
@@ -140,14 +158,15 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' </summary>
         ''' <remarks>
         ''' Created by: SA 06/07/2010
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
         ''' </remarks>
-        Public Property StandardTestsTitle() As String
+        Public Property TestsTitle() As String
             Get
-                Return StandardTestsTitleAttribute
+                Return TestsTitleAttribute
             End Get
             Set(ByVal value As String)
-                StandardTestsTitleAttribute = value ' & ":"
-                bsStandardLabel.Text = StandardTestsTitleAttribute
+                TestsTitleAttribute = value ' & ":"
+                bsTestLabel.Text = TestsTitleAttribute
             End Set
         End Property
 
@@ -215,17 +234,18 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Property
 
         ''' <summary>
-        ''' To fill the list containing Standard Tests
+        ''' To fill the list containing Tests (Standard, ISE and Off-Systems).
         ''' </summary>
         ''' <remarks>
         ''' Created by: DL 13/05/2010
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
         ''' </remarks>
-        Public WriteOnly Property TestStandardList() As DataSet
+        Public WriteOnly Property TestList() As DataSet
             Set(ByVal value As DataSet)
                 If value Is Nothing Then
-                    PrepareTestList(TestStandardListAttribute)
+                    PrepareTestList(TestListAttribute)
                 Else
-                    TestStandardListAttribute = value
+                    TestListAttribute = value
                 End If
             End Set
         End Property
@@ -248,10 +268,11 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         ''' <summary>
         ''' When this property is informed, it means the Formula will work only for 
-        ''' Tests (Standard and/or Calculated) defined for the specified SampleType.
+        ''' Tests (Standard, ISE, Off-System or Calculated) defined for the specified SampleType.
         ''' Besides, the ComboBox of available SampleTypes will be disabled and 
         ''' it will show the informed value as the selected option
-        ''' Modified by SG 30/07/2010 Add the Get
+        ''' Modified by: SG 30/07/2010 Add the Get
+        '''              WE 11/11/2014 - RQ00035C (BA-1867) - Updated Summary with ISE and Off-System.
         ''' </summary>
         Public Property SelectedSampleType() As String
             Get
@@ -268,18 +289,19 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Property
 
         ''' <summary>
-        ''' To fill the list containing Standard Tests when a SampleType has been informed
+        ''' To fill the list containing Tests (Standard, ISE and Off-System) when a SampleType has been informed.
         ''' </summary>
         ''' <remarks>
         ''' Created by: DL 13/05/2010
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
         ''' </remarks>
-        Public WriteOnly Property TestStandardSampleTypeList() As DataSet
+        Public WriteOnly Property TestSampleTypeList() As DataSet
             Set(ByVal value As DataSet)
                 If (value Is Nothing) Then
-                    PrepareTestList(TestSTDSampleTypeListAttribute)
+                    PrepareTestList(TestSampleTypeListAttribute)
                 Else
-                    TestSTDSampleTypeListAttribute = value
-                    FillStandardListView(TestSTDSampleTypeListAttribute)
+                    TestSampleTypeListAttribute = value
+                    FillTestListView(TestSampleTypeListAttribute)
                 End If
             End Set
         End Property
@@ -335,7 +357,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Property
 
         ''' <summary>
-        ''' To indicates if the control will recibe a Formula for Edition
+        ''' To indicates if the control will receive a Formula for Edition
         ''' </summary>
         Public WriteOnly Property EditionMode() As Boolean
             Set(ByVal value As Boolean)
@@ -390,7 +412,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     SampleTypeListComboBox.Enabled = False
                 End If
 
-                bsStandardTestListView.Enabled = value
+                bsTestListView.Enabled = value  ' WE 07/11/2014 - RQ00035C (BA-1867).
                 bsCalculatedTestListView.Enabled = value
                 AddSelectTestButton.Enabled = value
                 NumbersPanel.Enabled = value
@@ -577,14 +599,15 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Sub
 
         ''' <summary>
-        ''' Fill the ListView of Standard Tests
+        ''' Fill the Tests ListView with Tests (Standard, ISE and Off-System).
         ''' </summary>
         ''' <param name="pTestsListDataSet">DataSet containing the Standard Tests to load</param>
         ''' <remarks>
         ''' Created by:  DL 13/05/2010
         ''' AG 02/09/2014 - BA-1869 get information about components availability
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
         ''' </remarks>
-        Private Sub FillStandardListView(ByVal pTestsListDataSet As DataSet)
+        Private Sub FillTestListView(ByVal pTestsListDataSet As DataSet)
             'Try
             If (Not pTestsListDataSet Is Nothing) Then
                 If (pTestsListDataSet.Tables.Count > 0) Then
@@ -592,10 +615,10 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     FilterTestList(pTestsListDataSet)
 
                     'Configure the ListView
-                    InitializeStandardTestList()
+                    InitializeTestList()
 
                     'Assing the imageList
-                    bsStandardTestListView.SmallImageList = FillTestImageList(pTestsListDataSet.Tables(0))
+                    bsTestListView.SmallImageList = FillTestImageList(pTestsListDataSet.Tables(0))
 
                     Dim imageIndex As Integer = 0
                     For Each myTest As DataRow In pTestsListDataSet.Tables(0).Rows
@@ -608,7 +631,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                         End If
 
                         'Insert Standard Tests in the ListView
-                        With bsStandardTestListView.Items.Add(myTest("TestName").ToString().TrimEnd(), imageIndex)
+                        With bsTestListView.Items.Add(myTest("TestName").ToString().TrimEnd(), imageIndex)
                             .SubItems.Add(myTest("TestTypeCode").ToString().TrimEnd())
                             .SubItems.Add(myTest("TestCode").ToString().TrimEnd())
                             .SubItems.Add(myTest("SampleTypeCode").ToString().TrimEnd())
@@ -837,8 +860,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
             'Try
             If FormulaValuesListAttribute Is Nothing Then PrepareFormulaValuesList()
 
-            If (bsStandardTestListView.SelectedItems.Count > 0) Then
-                For Each selectItem As ListViewItem In bsStandardTestListView.SelectedItems
+            If (bsTestListView.SelectedItems.Count > 0) Then
+                For Each selectItem As ListViewItem In bsTestListView.SelectedItems  ' WE 07/11/2014 - RQ00035C (BA-1867).
                     Dim myRow As DataRow
                     myRow = FormulaValuesListAttribute.Tables(0).NewRow()
 
@@ -1143,29 +1166,32 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Function
 
         ''' <summary>
-        ''' Reload the list of Standard and Calculated Tests when a new SampleType is selected in the
-        ''' correspondent ComboBox
+        ''' Reload the list of Tests (Standard, ISE and Off-Systems) and Calculated Tests when a new SampleType is selected in the
+        ''' correspondent ComboBox.
         ''' </summary>
+        ''' <remarks>
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
+        ''' </remarks>
         Private Sub FilterTestListBySampleType()
             'Try
-            Dim tmpStdDataDS As New AllowedTestsDS
+            Dim tmpTestDataDS As New AllowedTestsDS
             Dim tmpCalDataDS As New AllowedTestsDS
 
-            'Filter the list of Standard Tests
-            If (TestStandardListAttribute IsNot Nothing AndAlso TestStandardListAttribute.Tables(0).Rows.Count > 0) Then
-                Dim standardTestDataDS As New AllowedTestsDS
-                standardTestDataDS = DirectCast(TestStandardListAttribute, AllowedTestsDS)
+            'Filter the list of Tests (Standard, ISE and Off-System).
+            If (TestListAttribute IsNot Nothing AndAlso TestListAttribute.Tables(0).Rows.Count > 0) Then
+                Dim testDataDS As New AllowedTestsDS
+                testDataDS = DirectCast(TestListAttribute, AllowedTestsDS)
 
                 Dim qSelectedTest As New List(Of tparAllowedTestsRow)
-                qSelectedTest = (From a In standardTestDataDS.tparAllowedTests _
+                qSelectedTest = (From a In testDataDS.tparAllowedTests _
                                 Where a.SampleTypeCode = SampleTypeListComboBox.SelectedValue.ToString _
                                Select a).ToList
 
-                For Each standardRow As AllowedTestsDS.tparAllowedTestsRow In qSelectedTest
-                    tmpStdDataDS.tparAllowedTests.ImportRow(standardRow)
-                Next standardRow
+                For Each testRow As AllowedTestsDS.tparAllowedTestsRow In qSelectedTest
+                    tmpTestDataDS.tparAllowedTests.ImportRow(testRow)
+                Next testRow
 
-                Me.TestStandardSampleTypeList = tmpStdDataDS
+                Me.TestSampleTypeList = tmpTestDataDS
             End If
 
             'Filter the list of Calculated Tests
@@ -1448,85 +1474,85 @@ Namespace Biosystems.Ax00.Controls.UserControls
                             End If
 
                         Case "NDEC", "NINT"
-                                    If (i > 0) Then
-                                        If FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER" OrElse _
-                                           (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "BRAC" AndAlso _
-                                            FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
-                                            'DL 08/02/2012. Not allow division by zero
-                                            If FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER" AndAlso _
-                                               FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "/" AndAlso _
-                                               FormulaValuesListAttribute.Tables(0).Rows(i).Item("Value").ToString = "0" Then
+                            If (i > 0) Then
+                                If FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER" OrElse _
+                                   (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "BRAC" AndAlso _
+                                    FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
+                                    'DL 08/02/2012. Not allow division by zero
+                                    If FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER" AndAlso _
+                                       FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "/" AndAlso _
+                                       FormulaValuesListAttribute.Tables(0).Rows(i).Item("Value").ToString = "0" Then
 
-                                                result = False
-                                            Else
-                                                result = True
-                                            End If
-                                        Else
-                                            result = False
-                                        End If
+                                        result = False
                                     Else
                                         result = True
                                     End If
+                                Else
+                                    result = False
+                                End If
+                            Else
+                                result = True
+                            End If
 
                         Case "TEST"
-                                    If (i > 0) Then
-                                        If (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER") OrElse _
-                                           (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "BRAC" AndAlso _
-                                            FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
-                                            result = True
-                                        Else
-                                            result = False
-                                        End If
-                                    Else
-                                        result = True
-                                    End If
+                            If (i > 0) Then
+                                If (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER") OrElse _
+                                   (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "BRAC" AndAlso _
+                                    FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
+                                    result = True
+                                Else
+                                    result = False
+                                End If
+                            Else
+                                result = True
+                            End If
 
                         Case "BRAC"
 
 
-                                    If (FormulaValuesListAttribute.Tables(0).Rows(i).Item("Value").ToString = "(") Then
-                                        If (i > 0) Then
-                                            If (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER") OrElse _
-                                               (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
+                            If (FormulaValuesListAttribute.Tables(0).Rows(i).Item("Value").ToString = "(") Then
+                                If (i > 0) Then
+                                    If (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString = "OPER") OrElse _
+                                       (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
+                                        result = True
+                                    Else
+                                        result = False
+                                        Exit For
+                                    End If
+                                Else
+                                    result = True
+                                End If
+                            ElseIf (FormulaValuesListAttribute.Tables(0).Rows(i).Item("Value").ToString = ")") Then
+                                If (i > 0) Then
+                                    Select Case (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString)
+                                        Case "OPER"
+                                            result = False
+                                        Case "BRAC"
+                                            If (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
+                                                result = False
+                                            End If
+                                        Case Else
+                                            'Check than exist any open brac
+                                            Dim myOpenBrac As Integer = 0
+                                            For j As Integer = 0 To i - 1
+                                                If (FormulaValuesListAttribute.Tables(0).Rows(j).Item("ValueType").ToString = "BRAC") Then
+                                                    If (FormulaValuesListAttribute.Tables(0).Rows(j).Item("Value").ToString = "(") Then
+                                                        myOpenBrac += 1
+                                                    Else
+                                                        myOpenBrac -= 1
+                                                    End If
+                                                End If
+                                            Next j
+                                            If (myOpenBrac > 0) Then
                                                 result = True
                                             Else
                                                 result = False
-                                                Exit For
                                             End If
-                                        Else
-                                            result = True
-                                        End If
-                                    ElseIf (FormulaValuesListAttribute.Tables(0).Rows(i).Item("Value").ToString = ")") Then
-                                        If (i > 0) Then
-                                            Select Case (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("ValueType").ToString)
-                                                Case "OPER"
-                                                    result = False
-                                                Case "BRAC"
-                                                    If (FormulaValuesListAttribute.Tables(0).Rows(i - 1).Item("Value").ToString = "(") Then
-                                                        result = False
-                                                    End If
-                                                Case Else
-                                                    'Check than exist any open brac
-                                                    Dim myOpenBrac As Integer = 0
-                                                    For j As Integer = 0 To i - 1
-                                                        If (FormulaValuesListAttribute.Tables(0).Rows(j).Item("ValueType").ToString = "BRAC") Then
-                                                            If (FormulaValuesListAttribute.Tables(0).Rows(j).Item("Value").ToString = "(") Then
-                                                                myOpenBrac += 1
-                                                            Else
-                                                                myOpenBrac -= 1
-                                                            End If
-                                                        End If
-                                                    Next j
-                                                    If (myOpenBrac > 0) Then
-                                                        result = True
-                                                    Else
-                                                        result = False
-                                                    End If
-                                            End Select
-                                        Else
-                                            result = False
-                                        End If
-                                    End If
+                                    End Select
+                                Else
+                                    result = False
+                                End If
+                            End If
                     End Select
                     'If Not result Then Exit For
                 Next i
@@ -1592,23 +1618,26 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <summary>
         ''' Initialization of the Standard Tests ListView
         ''' </summary>
-        Public Sub InitializeStandardTestList()
+        ''' <remarks>
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
+        ''' </remarks>
+        Public Sub InitializeTestList()
             'Try
-            bsStandardTestListView.Items.Clear()
-            bsStandardTestListView.Columns.Clear()
-            bsStandardTestListView.View = View.Details
-            'bsStandardTestListView.GridLines = True
-            bsStandardTestListView.FullRowSelect = True
-            bsStandardTestListView.Alignment = ListViewAlignment.Left
-            bsStandardTestListView.HideSelection = False
-            bsStandardTestListView.HeaderStyle = ColumnHeaderStyle.None
-            bsStandardTestListView.MultiSelect = False
-            bsStandardTestListView.Scrollable = True
+            bsTestListView.Items.Clear()
+            bsTestListView.Columns.Clear()
+            bsTestListView.View = View.Details
+            'bsTestListView.GridLines = True
+            bsTestListView.FullRowSelect = True
+            bsTestListView.Alignment = ListViewAlignment.Left
+            bsTestListView.HideSelection = False
+            bsTestListView.HeaderStyle = ColumnHeaderStyle.None
+            bsTestListView.MultiSelect = False
+            bsTestListView.Scrollable = True
 
-            bsStandardTestListView.Columns.Add("TestName", 160, HorizontalAlignment.Left)
-            bsStandardTestListView.Columns.Add("TestTypeCode", 0, HorizontalAlignment.Left)
-            bsStandardTestListView.Columns.Add("TestCode", 0, HorizontalAlignment.Left)
-            bsStandardTestListView.Columns.Add("SampleTypeCode", 0, HorizontalAlignment.Center)
+            bsTestListView.Columns.Add("TestName", 160, HorizontalAlignment.Left)
+            bsTestListView.Columns.Add("TestTypeCode", 0, HorizontalAlignment.Left)
+            bsTestListView.Columns.Add("TestCode", 0, HorizontalAlignment.Left)
+            bsTestListView.Columns.Add("SampleTypeCode", 0, HorizontalAlignment.Center)
             'Catch ex As Exception
             '    Throw ex
             'End Try
@@ -1773,10 +1802,13 @@ Namespace Biosystems.Ax00.Controls.UserControls
         End Sub
 
         ''' <summary>
-        ''' When double-clicking in a Standard Test, it is added as last Formula member
+        ''' When double-clicking on a Test (Standard, ISE or Off-System), it is added as last Formula member
         ''' </summary>
-        Private Sub bsStandardTestListView_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) _
-                                                       Handles bsStandardTestListView.DoubleClick
+        ''' <remarks>
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867).
+        ''' </remarks>
+        Private Sub bsTestListView_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) _
+                                                       Handles bsTestListView.DoubleClick
             'Try
             bsCalculatedTestListView.SelectedItems.Clear()
             EnterFomulaValue("AddSelectTestButton")
@@ -1804,7 +1836,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         Private Sub bsCalculatedTestListView_DoubleClick(ByVal sender As Object, ByVal e As System.EventArgs) _
                                                          Handles bsCalculatedTestListView.DoubleClick
             'Try
-            bsStandardTestListView.SelectedItems.Clear()
+            bsTestListView.SelectedItems.Clear()
             EnterFomulaValue("AddSelectTestButton")
 
             'Catch ex As Exception
@@ -1910,13 +1942,22 @@ Namespace Biosystems.Ax00.Controls.UserControls
             'http://stackoverflow.com/questions/380819/common-programming-mistakes-for-net-developers-to-avoid
         End Sub
 
-        Private Sub bsStandardTestListView_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsStandardTestListView.SelectedIndexChanged
+        ''' <summary>
+        ''' When a new Test from the Test ListView has been selected, and in case it is a Factory Test show a warning message.
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by: WE 07/11/2014 - RQ00035C (BA-1867) - Changed method name.
+        '''              WE 11/11/2014 - RQ00035C (BA-1867) - Call to other overload member of MessageBox.Show in order to harmonize this message
+        '''                                                   with same message as in screen IProgTest (Warning icon + Title).
+        ''' </remarks>
+        Private Sub bsTestListView_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTestListView.SelectedIndexChanged
             'Try
             'TR 09/03/2011 -Validate if there is a selected item
-            If bsStandardTestListView.SelectedItems.Count > 0 Then
-                'Validate if has factory values.
-                If CBool(bsStandardTestListView.SelectedItems(0).SubItems(4).Text) Then
-                    MessageBox.Show(FactoryValuesMessageAttribute, "Warning")
+            If bsTestListView.SelectedItems.Count > 0 Then
+                ' Validate if has factory values (check field 'FactoryCalib').
+                If CBool(bsTestListView.SelectedItems(0).SubItems(4).Text) Then
+                    ' MessageBox.Show(FactoryValuesMessageAttribute, "Warning")
+                    MessageBox.Show(FactoryValuesMessageAttribute, FactoryValueCaption, MessageBoxButtons.OK, MessageBoxIcon.Warning)
                 End If
             End If
             'Catch ex As Exception

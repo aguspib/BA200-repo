@@ -551,13 +551,16 @@ Public Class IProgCalculatedTest
 
             bsCalTestFormula.FormulaTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalcTests_Formula", pLanguageID) & ":"
             bsCalTestFormula.SampleTypeTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", pLanguageID) & ":"
-            bsCalTestFormula.StandardTestsTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_StandardTests", pLanguageID) & ":"
+            bsCalTestFormula.TestsTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", pLanguageID) & ":"
             bsCalTestFormula.CalculatedTestsTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalcTests_Long", pLanguageID) & ":"
 
             bsCalTestFormula.DelFormulaMemberToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CalcTests_DelLastMember", pLanguageID)
             bsCalTestFormula.ClearFormulaToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CalcTests_ClearFormula", pLanguageID)
 
             bsCalTestFormula.FactoryValueMessage = GetMessageText(GlobalEnumerates.Messages.FACTORY_VALUES.ToString(), pLanguageID) 'TR 09/03/2011
+
+            ' WE 07/11/2014 - RQ00035C (BA-1867) - Set the Product Name as Factory values message caption (Not to be translated!!!)
+            bsCalTestFormula.FactoryValueCaption = My.Application.Info.Title
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetFormulaLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -786,7 +789,7 @@ Public Class IProgCalculatedTest
         Try
             bsCalTestFormula.CalcTestID = 0
             bsCalTestFormula.SelectedSampleType = Nothing
-            bsCalTestFormula.TestStandardSampleTypeList = Nothing
+            bsCalTestFormula.TestSampleTypeList = Nothing
             bsCalTestFormula.TestCalculatedSampleTypeList = Nothing
             bsCalTestFormula.FormulaValuesList = Nothing
             bsCalTestFormula.GenerateFormula = String.Empty
@@ -1375,19 +1378,57 @@ Public Class IProgCalculatedTest
         End Try
     End Sub
 
+    ' ''' <summary>
+    ' ''' Load the list of Standard Tests in the Formula User Control   [NOT USED ANYMORE (OBSOLETE) REPLACED BY NEW METHOD LoadTests]
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by:  DL 13/05/2010 
+    ' ''' Modified by: SA 21/06/2010 - Added error control after calls to functions in Delegate Classes
+    ' ''' </remarks>
+    'Private Sub LoadStandardTests()
+    '    Try
+    '        Dim myGlobalDataTO As New GlobalDataTO
+    '        Dim myCalTestList As New CalculatedTestsDelegate
+
+    '        myGlobalDataTO = myCalTestList.GetAllowedTestList(Nothing, "STD")
+    '        If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
+    '            Dim allowedTestDataDS As New AllowedTestsDS
+    '            allowedTestDataDS = DirectCast(myGlobalDataTO.SetDatos, AllowedTestsDS)
+
+    '            For Each allowedTest As AllowedTestsDS.tparAllowedTestsRow In allowedTestDataDS.tparAllowedTests.Rows
+    '                allowedTest.BeginEdit()
+    '                allowedTest.IconPath = MyBase.IconsPath & allowedTest.IconPath
+    '                allowedTest.EndEdit()
+    '            Next
+
+    '            If (allowedTestDataDS.tparAllowedTests.Rows.Count > 0) Then
+    '                bsCalTestFormula.TestList = allowedTestDataDS
+    '            End If
+    '        Else
+    '            'Error getting the list of allowed Standard Tests, show the error message
+    '            ShowMessage(Me.Name & ".LoadStandardTests", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
+    '        End If
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadStandardTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage(Me.Name & ".LoadStandardTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+    'End Sub
+
+
     ''' <summary>
-    ''' Load the list of Standard Tests in the Formula User Control
+    ''' Load the list of Tests (Standard, ISE and Off-System) in the Formula User Control
     ''' </summary>
     ''' <remarks>
-    ''' Created by:  DL 13/05/2010 
+    ''' Created by:  WE 07/11/2014 - RQ00035C (BA-1867).
     ''' Modified by: SA 21/06/2010 - Added error control after calls to functions in Delegate Classes
     ''' </remarks>
-    Private Sub LoadStandardTests()
+    Private Sub LoadTests()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myCalTestList As New CalculatedTestsDelegate
 
-            myGlobalDataTO = myCalTestList.GetAllowedTestList(Nothing, "STD")
+            'myGlobalDataTO = myCalTestList.GetAllowedTestList(Nothing, "STD")
+            myGlobalDataTO = myCalTestList.GetAllowedTestList(Nothing, "STD_ISE_OFFS")
             If (Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Dim allowedTestDataDS As New AllowedTestsDS
                 allowedTestDataDS = DirectCast(myGlobalDataTO.SetDatos, AllowedTestsDS)
@@ -1399,17 +1440,20 @@ Public Class IProgCalculatedTest
                 Next
 
                 If (allowedTestDataDS.tparAllowedTests.Rows.Count > 0) Then
-                    bsCalTestFormula.TestStandardList = allowedTestDataDS
+                    bsCalTestFormula.TestList = allowedTestDataDS
                 End If
             Else
-                'Error getting the list of allowed Standard Tests, show the error message
-                ShowMessage(Me.Name & ".LoadStandardTests", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
+                'Error getting the list of allowed Tests, show the error message
+                ShowMessage(Me.Name & ".LoadTests", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadStandardTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".LoadStandardTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".LoadTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
+
+
+
 
     ''' <summary>
     ''' Verify if there is at least one User's change pending to save
@@ -1918,7 +1962,7 @@ Public Class IProgCalculatedTest
             InitialModeScreenStatus()
 
             'Load the list of Standard and Calculated Tests in the Formula Control
-            LoadStandardTests()
+            LoadTests()
             LoadCalculatedTests()
 
             If (bsCalTestListView.Items.Count > 0) Then
