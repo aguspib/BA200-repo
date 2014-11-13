@@ -2981,6 +2981,64 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+ <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>GeneralSetting MAX_QCRESULTS_TO_ACCUMULATE has been removed from tfmwGeneralSettings table</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwGeneralSettings WHERE SettingID = 'MAX_QCRESULTS_TO_ACCUMULATE') = 0) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>New SW Parameter MAX_QCRESULTS_TO_ACCUMULATE has been added to tfmwSwParameters table</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSWParameters WHERE ParameterName = 'MAX_QCRESULTS_TO_ACCUMULATE') = 1) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Data type of column CtrlsSendingGroup in table tqcResults has been changed from TINYINT (xtype=48) to INT (xtype=56)</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id 
+           WHERE  so.xtype = 'U' AND so.name = 'tqcResults' AND sc.name = 'CtrlsSendingGroup' AND sc.xtype = 56) = 1) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Data type of column CtrlsSendingGroup in table twksWSOrderTests has been changed from TINYINT (xtype=48) to INT (xtype=56)</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id 
+           WHERE  so.xtype = 'U' AND so.name = 'twksWSOrderTests' AND sc.name = 'CtrlsSendingGroup' AND sc.xtype = 56) = 1) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.10</Version>
+    <Label>Column SampleClass has been removed from table tqcResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id 
+           WHERE  so.xtype = 'U' AND so.name = 'tqcResults' AND sc.name = 'SampleClass') = 0) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
 
 
