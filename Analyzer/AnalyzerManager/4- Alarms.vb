@@ -758,6 +758,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myGlobal = Me.SearchNextPreparation(dbConnection, futureRequestNextWell) 'Search for next instruction to be sent ... and sent it!!
                                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then '(1)
                                     myNextPreparationToSendDS = CType(myGlobal.SetDatos, AnalyzerManagerDS)
+                                    '' PROVA XB !!!
+                                    'If Not myNextPreparationToSendDS.nextPreparation(0).IsCuvetteContaminationFlagNull AndAlso myNextPreparationToSendDS.nextPreparation(0).CuvetteContaminationFlag Then
+                                    '    Debug.Print("Quieto parao")
+                                    'End If
+                                    'If Not myNextPreparationToSendDS.nextPreparation(0).IsReagentContaminationFlagNull AndAlso myNextPreparationToSendDS.nextPreparation(0).ReagentContaminationFlag Then
+                                    '    Debug.Print("Quieto parao")
+                                    'End If
+                                    '' PROVA XB !!!
                                 End If
                             End If
 
@@ -831,7 +839,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 MyClass.RefreshISEAlarms()
                             End If
                             'SGM 19/06/2012
-
 
                             'DL 31/07/2012
                         Case GlobalEnumerates.Alarms.FW_CPU_ERR, GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR, _
@@ -1485,7 +1492,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by:  AG 18/03/2011
         ''' Modified by: AG 13/04/2012 - Added optional parameter pAddAlwaysFlag
         '''              AG 25/07/2012 - Added optional parameters pAddInfo and pAdditionalInfoList to be used for the volume missing and clot alarms
-        '''              XB 03/11/2014 - Add new ISE Timeout Alarm - BA-1872
         ''' </remarks>
         Private Sub PrepareLocalAlarmList(ByVal pAlarmCode As GlobalEnumerates.Alarms, ByVal pAlarmStatus As Boolean, _
                                           ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
@@ -1600,9 +1606,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
                         myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
                     End If
-                    'if exists ISE timeout or  ise status off do not add iit again !!   ' XB 03/11/2014 - BA-1872
-                ElseIf pAlarmCode = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR Then
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Or myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then addFlag = False
                 End If
 
                 'AG 10/02/2012 - While start instrument is inprocess only generate the alarms that affect the process
@@ -3828,6 +3831,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'AG 17/10/2011
                     'Special business for the CONNECTED false sensor ... insert into Alarms table (only for User Sw)
                     If pSensor = GlobalEnumerates.AnalyzerSensors.CONNECTED Then
+
+                        '' TO DELETE - XBC 06/07/2012
+                        'If pNewValue = 0 Then
+                        '    Debug.Print("CONNECTED = 0")
+                        'Else
+                        '    Debug.Print("CONNECTED = 1")
+                        'End If
+
 
                         'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                         'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then

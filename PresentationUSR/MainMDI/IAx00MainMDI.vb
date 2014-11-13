@@ -6554,7 +6554,6 @@ Partial Public Class IAx00MainMDI
             'myAlarms.Add(GlobalEnumerates.Alarms.ISE_ELEC_EXP_DATE)
             myAlarms.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
             myAlarms.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-            myAlarms.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) ' XB 03/11/2014 - BA-1872
 
             ISEModuleAlert = New bsAlert(Me, 220, 115 + ParentMDITopHeight, 170, 40, "ISE Module", True)
             ISEModuleAlert.Tag = myAlarms
