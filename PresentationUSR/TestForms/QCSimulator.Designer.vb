@@ -19,110 +19,174 @@ Partial Class QCSimulator
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle6 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle7 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle8 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle9 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle10 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsAddResultsButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsTestsListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsTestsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsTestsListDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.bsQCResultsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.bsCtrl3Panel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.bsCtrl3LotNumLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl3ValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl3Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl3TargetLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl3Run20TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run19TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run18TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run17TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run16TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3IDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl3Run15TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run14TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run13TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run12TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run11TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3InfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl3Run10TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run9TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run8TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run7TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run6TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run5TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run4TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run3TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run2TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl3Run1TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Panel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.bsCtrl2LotNumLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl2ValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl2TargetLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl2Run20TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run19TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run18TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run17TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run16TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2IDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl2Run15TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run14TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run13TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run12TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run11TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2InfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl2Run10TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run9TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run8TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run7TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run6TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run5TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run4TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run3TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run2TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl2Run1TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsNumResultsNumericUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown
-        Me.bsNumResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsQCResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDateToDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.bsDateFromLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsDateToLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1Panel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.bsCtrl1LotNumLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1Label = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1ValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1TargetLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1Run20TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run19TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run18TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run17TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run16TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1IDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1Run15TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run14TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run13TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run12TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run11TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1InfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsCtrl1Run10TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run9TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run8TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run7TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run6TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run5TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run4TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run3TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run2TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsCtrl1Run1TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.bsDateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker
-        Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsAddResultsButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsTestsListGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsTestsListLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsTestsListDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.bsQCResultsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsGenerationModeGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.bsRandomRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.bsManualRadioButton = New Biosystems.Ax00.Controls.UserControls.BSRadioButton()
+        Me.bsCtrl3Panel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsCtrl3LotNumLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl3ValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl3Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl3TargetLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl3Run20TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run19TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run18TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run17TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run16TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3IDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl3Run40TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run15TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run39TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run14TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run38TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run13TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run37TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run12TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run36TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run11TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run35TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3InfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl3Run34TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run33TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run10TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run32TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run9TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run31TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run8TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run30TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run7TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run29TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run6TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run28TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run5TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run27TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run4TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run26TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run3TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run25TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run2TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run24TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run1TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run23TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run22TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl3Run21TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Panel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsCtrl2LotNumLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl2ValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl2TargetLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl2Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl2Run20TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run19TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run18TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run17TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run16TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2IDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl2Run40TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run15TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run39TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run14TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run38TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run13TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run37TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run12TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run36TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run11TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run35TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2InfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl2Run34TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run33TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run10TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run32TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run9TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run31TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run8TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run30TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run7TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run29TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run6TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run28TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run5TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run27TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run4TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run26TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run3TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run25TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run2TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run24TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run1TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run23TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run21TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl2Run22TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsNumResultsNumericUpDown = New Biosystems.Ax00.Controls.UserControls.BSNumericUpDown()
+        Me.bsNumResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsQCResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDateToDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.bsDateFromLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsDateToLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1Panel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.bsCtrl1Run40TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run39TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run38TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run37TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run36TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run35TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run34TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run33TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run32TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run31TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run30TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run29TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run28TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run27TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run26TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run25TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run24TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run23TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run22TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run21TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1LotNumLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1Label = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1ValuesLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1TargetLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1Run20TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run19TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run18TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run17TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run16TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1IDLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1Run15TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run14TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run13TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run12TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run11TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1InfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsCtrl1Run10TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run9TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run8TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run7TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run6TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run5TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run4TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run3TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run2TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsCtrl1Run1TextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.bsDateFromDateTimePick = New Biosystems.Ax00.Controls.UserControls.BSDateTimePicker()
+        Me.bsAcceptButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsTestsListGroupBox.SuspendLayout()
         CType(Me.bsTestsListDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.bsQCResultsGroupBox.SuspendLayout()
+        Me.bsGenerationModeGroupBox.SuspendLayout()
         Me.bsCtrl3Panel.SuspendLayout()
         Me.bsCtrl2Panel.SuspendLayout()
         CType(Me.bsNumResultsNumericUpDown, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -132,7 +196,7 @@ Partial Class QCSimulator
         'bsExitButton
         '
         Me.bsExitButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsExitButton.Location = New System.Drawing.Point(915, 455)
+        Me.bsExitButton.Location = New System.Drawing.Point(915, 563)
         Me.bsExitButton.Name = "bsExitButton"
         Me.bsExitButton.Size = New System.Drawing.Size(31, 31)
         Me.bsExitButton.TabIndex = 12
@@ -141,7 +205,7 @@ Partial Class QCSimulator
         'bsAddResultsButton
         '
         Me.bsAddResultsButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsAddResultsButton.Location = New System.Drawing.Point(275, 457)
+        Me.bsAddResultsButton.Location = New System.Drawing.Point(275, 563)
         Me.bsAddResultsButton.Name = "bsAddResultsButton"
         Me.bsAddResultsButton.Size = New System.Drawing.Size(31, 31)
         Me.bsAddResultsButton.TabIndex = 2
@@ -152,9 +216,9 @@ Partial Class QCSimulator
         Me.bsTestsListGroupBox.Controls.Add(Me.bsTestsListLabel)
         Me.bsTestsListGroupBox.Controls.Add(Me.bsTestsListDataGridView)
         Me.bsTestsListGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.bsTestsListGroupBox.Location = New System.Drawing.Point(5, 10)
+        Me.bsTestsListGroupBox.Location = New System.Drawing.Point(4, -1)
         Me.bsTestsListGroupBox.Name = "bsTestsListGroupBox"
-        Me.bsTestsListGroupBox.Size = New System.Drawing.Size(310, 441)
+        Me.bsTestsListGroupBox.Size = New System.Drawing.Size(310, 559)
         Me.bsTestsListGroupBox.TabIndex = 0
         Me.bsTestsListGroupBox.TabStop = False
         '
@@ -175,33 +239,33 @@ Partial Class QCSimulator
         Me.bsTestsListDataGridView.AllowUserToAddRows = False
         Me.bsTestsListDataGridView.AllowUserToDeleteRows = False
         Me.bsTestsListDataGridView.AllowUserToResizeRows = False
-        DataGridViewCellStyle6.BackColor = System.Drawing.Color.White
-        DataGridViewCellStyle6.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle6.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle6.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle6.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.bsTestsListDataGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle6
+        DataGridViewCellStyle1.BackColor = System.Drawing.Color.White
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestsListDataGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
         Me.bsTestsListDataGridView.BackgroundColor = System.Drawing.Color.LightGray
         Me.bsTestsListDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.bsTestsListDataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
-        DataGridViewCellStyle7.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle7.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle7.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight
-        DataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-        DataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.bsTestsListDataGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle7
+        DataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle2.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight
+        DataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText
+        DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestsListDataGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle2
         Me.bsTestsListDataGridView.ColumnHeadersHeight = 20
         Me.bsTestsListDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing
-        DataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle8.BackColor = System.Drawing.Color.White
-        DataGridViewCellStyle8.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle8.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle8.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle8.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.bsTestsListDataGridView.DefaultCellStyle = DataGridViewCellStyle8
+        DataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle3.BackColor = System.Drawing.Color.White
+        DataGridViewCellStyle3.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestsListDataGridView.DefaultCellStyle = DataGridViewCellStyle3
         Me.bsTestsListDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter
         Me.bsTestsListDataGridView.EnterToTab = True
         Me.bsTestsListDataGridView.GridColor = System.Drawing.Color.Silver
@@ -209,30 +273,31 @@ Partial Class QCSimulator
         Me.bsTestsListDataGridView.MultiSelect = False
         Me.bsTestsListDataGridView.Name = "bsTestsListDataGridView"
         Me.bsTestsListDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.[Single]
-        DataGridViewCellStyle9.BackColor = System.Drawing.Color.DarkGray
-        DataGridViewCellStyle9.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle9.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle9.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle9.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.bsTestsListDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle9
+        DataGridViewCellStyle4.BackColor = System.Drawing.Color.DarkGray
+        DataGridViewCellStyle4.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle4.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestsListDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle4
         Me.bsTestsListDataGridView.RowHeadersVisible = False
         Me.bsTestsListDataGridView.RowHeadersWidth = 20
         Me.bsTestsListDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing
-        DataGridViewCellStyle10.BackColor = System.Drawing.Color.White
-        DataGridViewCellStyle10.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        DataGridViewCellStyle10.ForeColor = System.Drawing.Color.Black
-        DataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.LightSlateGray
-        DataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.White
-        DataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-        Me.bsTestsListDataGridView.RowsDefaultCellStyle = DataGridViewCellStyle10
+        DataGridViewCellStyle5.BackColor = System.Drawing.Color.White
+        DataGridViewCellStyle5.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        DataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black
+        DataGridViewCellStyle5.SelectionBackColor = System.Drawing.Color.LightSlateGray
+        DataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.White
+        DataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
+        Me.bsTestsListDataGridView.RowsDefaultCellStyle = DataGridViewCellStyle5
         Me.bsTestsListDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.bsTestsListDataGridView.Size = New System.Drawing.Size(290, 391)
+        Me.bsTestsListDataGridView.Size = New System.Drawing.Size(290, 512)
         Me.bsTestsListDataGridView.TabIndex = 1
         Me.bsTestsListDataGridView.TabToEnter = False
         '
         'bsQCResultsGroupBox
         '
+        Me.bsQCResultsGroupBox.Controls.Add(Me.bsGenerationModeGroupBox)
         Me.bsQCResultsGroupBox.Controls.Add(Me.bsCtrl3Panel)
         Me.bsQCResultsGroupBox.Controls.Add(Me.bsCtrl2Panel)
         Me.bsQCResultsGroupBox.Controls.Add(Me.bsNumResultsNumericUpDown)
@@ -246,11 +311,44 @@ Partial Class QCSimulator
         Me.bsQCResultsGroupBox.Controls.Add(Me.bsAcceptButton)
         Me.bsQCResultsGroupBox.Controls.Add(Me.bsCancelButton)
         Me.bsQCResultsGroupBox.ForeColor = System.Drawing.Color.Black
-        Me.bsQCResultsGroupBox.Location = New System.Drawing.Point(321, 10)
+        Me.bsQCResultsGroupBox.Location = New System.Drawing.Point(318, -2)
         Me.bsQCResultsGroupBox.Name = "bsQCResultsGroupBox"
-        Me.bsQCResultsGroupBox.Size = New System.Drawing.Size(636, 441)
+        Me.bsQCResultsGroupBox.Size = New System.Drawing.Size(636, 560)
         Me.bsQCResultsGroupBox.TabIndex = 3
         Me.bsQCResultsGroupBox.TabStop = False
+        '
+        'bsGenerationModeGroupBox
+        '
+        Me.bsGenerationModeGroupBox.Controls.Add(Me.bsRandomRadioButton)
+        Me.bsGenerationModeGroupBox.Controls.Add(Me.bsManualRadioButton)
+        Me.bsGenerationModeGroupBox.ForeColor = System.Drawing.Color.Black
+        Me.bsGenerationModeGroupBox.Location = New System.Drawing.Point(365, 37)
+        Me.bsGenerationModeGroupBox.Name = "bsGenerationModeGroupBox"
+        Me.bsGenerationModeGroupBox.Size = New System.Drawing.Size(260, 46)
+        Me.bsGenerationModeGroupBox.TabIndex = 25
+        Me.bsGenerationModeGroupBox.TabStop = False
+        '
+        'bsRandomRadioButton
+        '
+        Me.bsRandomRadioButton.AutoSize = True
+        Me.bsRandomRadioButton.Location = New System.Drawing.Point(132, 19)
+        Me.bsRandomRadioButton.Name = "bsRandomRadioButton"
+        Me.bsRandomRadioButton.Size = New System.Drawing.Size(114, 17)
+        Me.bsRandomRadioButton.TabIndex = 1
+        Me.bsRandomRadioButton.TabStop = True
+        Me.bsRandomRadioButton.Text = "Random Values"
+        Me.bsRandomRadioButton.UseVisualStyleBackColor = True
+        '
+        'bsManualRadioButton
+        '
+        Me.bsManualRadioButton.AutoSize = True
+        Me.bsManualRadioButton.Location = New System.Drawing.Point(15, 18)
+        Me.bsManualRadioButton.Name = "bsManualRadioButton"
+        Me.bsManualRadioButton.Size = New System.Drawing.Size(99, 17)
+        Me.bsManualRadioButton.TabIndex = 0
+        Me.bsManualRadioButton.TabStop = True
+        Me.bsManualRadioButton.Text = "Manual Entry"
+        Me.bsManualRadioButton.UseVisualStyleBackColor = True
         '
         'bsCtrl3Panel
         '
@@ -265,25 +363,45 @@ Partial Class QCSimulator
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run17TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run16TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3IDLabel)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run40TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run15TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run39TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run14TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run38TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run13TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run37TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run12TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run36TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run11TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run35TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3InfoLabel)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run34TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run33TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run10TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run32TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run9TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run31TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run8TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run30TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run7TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run29TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run6TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run28TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run5TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run27TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run4TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run26TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run3TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run25TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run2TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run24TextBox)
         Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run1TextBox)
-        Me.bsCtrl3Panel.Location = New System.Drawing.Point(10, 296)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run23TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run22TextBox)
+        Me.bsCtrl3Panel.Controls.Add(Me.bsCtrl3Run21TextBox)
+        Me.bsCtrl3Panel.Location = New System.Drawing.Point(10, 378)
         Me.bsCtrl3Panel.Name = "bsCtrl3Panel"
-        Me.bsCtrl3Panel.Size = New System.Drawing.Size(615, 92)
+        Me.bsCtrl3Panel.Size = New System.Drawing.Size(615, 138)
         Me.bsCtrl3Panel.TabIndex = 9
         '
         'bsCtrl3LotNumLabel
@@ -428,6 +546,21 @@ Partial Class QCSimulator
         Me.bsCtrl3IDLabel.Title = False
         Me.bsCtrl3IDLabel.Visible = False
         '
+        'bsCtrl3Run40TextBox
+        '
+        Me.bsCtrl3Run40TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run40TextBox.DecimalsValues = False
+        Me.bsCtrl3Run40TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run40TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run40TextBox.IsNumeric = False
+        Me.bsCtrl3Run40TextBox.Location = New System.Drawing.Point(550, 107)
+        Me.bsCtrl3Run40TextBox.Mandatory = False
+        Me.bsCtrl3Run40TextBox.Name = "bsCtrl3Run40TextBox"
+        Me.bsCtrl3Run40TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run40TextBox.TabIndex = 99
+        Me.bsCtrl3Run40TextBox.Tag = "40"
+        Me.bsCtrl3Run40TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run15TextBox
         '
         Me.bsCtrl3Run15TextBox.BackColor = System.Drawing.Color.White
@@ -442,6 +575,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run15TextBox.TabIndex = 14
         Me.bsCtrl3Run15TextBox.Tag = "15"
         Me.bsCtrl3Run15TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run39TextBox
+        '
+        Me.bsCtrl3Run39TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run39TextBox.DecimalsValues = False
+        Me.bsCtrl3Run39TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run39TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run39TextBox.IsNumeric = False
+        Me.bsCtrl3Run39TextBox.Location = New System.Drawing.Point(490, 107)
+        Me.bsCtrl3Run39TextBox.Mandatory = False
+        Me.bsCtrl3Run39TextBox.Name = "bsCtrl3Run39TextBox"
+        Me.bsCtrl3Run39TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run39TextBox.TabIndex = 98
+        Me.bsCtrl3Run39TextBox.Tag = "39"
+        Me.bsCtrl3Run39TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run14TextBox
         '
@@ -458,6 +606,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run14TextBox.Tag = "14"
         Me.bsCtrl3Run14TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run38TextBox
+        '
+        Me.bsCtrl3Run38TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run38TextBox.DecimalsValues = False
+        Me.bsCtrl3Run38TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run38TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run38TextBox.IsNumeric = False
+        Me.bsCtrl3Run38TextBox.Location = New System.Drawing.Point(430, 107)
+        Me.bsCtrl3Run38TextBox.Mandatory = False
+        Me.bsCtrl3Run38TextBox.Name = "bsCtrl3Run38TextBox"
+        Me.bsCtrl3Run38TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run38TextBox.TabIndex = 97
+        Me.bsCtrl3Run38TextBox.Tag = "38"
+        Me.bsCtrl3Run38TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run13TextBox
         '
         Me.bsCtrl3Run13TextBox.BackColor = System.Drawing.Color.White
@@ -472,6 +635,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run13TextBox.TabIndex = 12
         Me.bsCtrl3Run13TextBox.Tag = "13"
         Me.bsCtrl3Run13TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run37TextBox
+        '
+        Me.bsCtrl3Run37TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run37TextBox.DecimalsValues = False
+        Me.bsCtrl3Run37TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run37TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run37TextBox.IsNumeric = False
+        Me.bsCtrl3Run37TextBox.Location = New System.Drawing.Point(370, 107)
+        Me.bsCtrl3Run37TextBox.Mandatory = False
+        Me.bsCtrl3Run37TextBox.Name = "bsCtrl3Run37TextBox"
+        Me.bsCtrl3Run37TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run37TextBox.TabIndex = 96
+        Me.bsCtrl3Run37TextBox.Tag = "37"
+        Me.bsCtrl3Run37TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run12TextBox
         '
@@ -488,6 +666,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run12TextBox.Tag = "12"
         Me.bsCtrl3Run12TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run36TextBox
+        '
+        Me.bsCtrl3Run36TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run36TextBox.DecimalsValues = False
+        Me.bsCtrl3Run36TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run36TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run36TextBox.IsNumeric = False
+        Me.bsCtrl3Run36TextBox.Location = New System.Drawing.Point(310, 107)
+        Me.bsCtrl3Run36TextBox.Mandatory = False
+        Me.bsCtrl3Run36TextBox.Name = "bsCtrl3Run36TextBox"
+        Me.bsCtrl3Run36TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run36TextBox.TabIndex = 95
+        Me.bsCtrl3Run36TextBox.Tag = "36"
+        Me.bsCtrl3Run36TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run11TextBox
         '
         Me.bsCtrl3Run11TextBox.BackColor = System.Drawing.Color.White
@@ -503,6 +696,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run11TextBox.Tag = "11"
         Me.bsCtrl3Run11TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run35TextBox
+        '
+        Me.bsCtrl3Run35TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run35TextBox.DecimalsValues = False
+        Me.bsCtrl3Run35TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run35TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run35TextBox.IsNumeric = False
+        Me.bsCtrl3Run35TextBox.Location = New System.Drawing.Point(250, 107)
+        Me.bsCtrl3Run35TextBox.Mandatory = False
+        Me.bsCtrl3Run35TextBox.Name = "bsCtrl3Run35TextBox"
+        Me.bsCtrl3Run35TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run35TextBox.TabIndex = 94
+        Me.bsCtrl3Run35TextBox.Tag = "35"
+        Me.bsCtrl3Run35TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3InfoLabel
         '
         Me.bsCtrl3InfoLabel.AutoSize = True
@@ -515,6 +723,36 @@ Partial Class QCSimulator
         Me.bsCtrl3InfoLabel.TabIndex = 10
         Me.bsCtrl3InfoLabel.Text = "Control 3 Info"
         Me.bsCtrl3InfoLabel.Title = False
+        '
+        'bsCtrl3Run34TextBox
+        '
+        Me.bsCtrl3Run34TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run34TextBox.DecimalsValues = False
+        Me.bsCtrl3Run34TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run34TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run34TextBox.IsNumeric = False
+        Me.bsCtrl3Run34TextBox.Location = New System.Drawing.Point(190, 107)
+        Me.bsCtrl3Run34TextBox.Mandatory = False
+        Me.bsCtrl3Run34TextBox.Name = "bsCtrl3Run34TextBox"
+        Me.bsCtrl3Run34TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run34TextBox.TabIndex = 93
+        Me.bsCtrl3Run34TextBox.Tag = "34"
+        Me.bsCtrl3Run34TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run33TextBox
+        '
+        Me.bsCtrl3Run33TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run33TextBox.DecimalsValues = False
+        Me.bsCtrl3Run33TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run33TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run33TextBox.IsNumeric = False
+        Me.bsCtrl3Run33TextBox.Location = New System.Drawing.Point(130, 107)
+        Me.bsCtrl3Run33TextBox.Mandatory = False
+        Me.bsCtrl3Run33TextBox.Name = "bsCtrl3Run33TextBox"
+        Me.bsCtrl3Run33TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run33TextBox.TabIndex = 92
+        Me.bsCtrl3Run33TextBox.Tag = "33"
+        Me.bsCtrl3Run33TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run10TextBox
         '
@@ -531,6 +769,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run10TextBox.Tag = "10"
         Me.bsCtrl3Run10TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run32TextBox
+        '
+        Me.bsCtrl3Run32TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run32TextBox.DecimalsValues = False
+        Me.bsCtrl3Run32TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run32TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run32TextBox.IsNumeric = False
+        Me.bsCtrl3Run32TextBox.Location = New System.Drawing.Point(70, 107)
+        Me.bsCtrl3Run32TextBox.Mandatory = False
+        Me.bsCtrl3Run32TextBox.Name = "bsCtrl3Run32TextBox"
+        Me.bsCtrl3Run32TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run32TextBox.TabIndex = 91
+        Me.bsCtrl3Run32TextBox.Tag = "32"
+        Me.bsCtrl3Run32TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run9TextBox
         '
         Me.bsCtrl3Run9TextBox.BackColor = System.Drawing.Color.White
@@ -545,6 +798,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run9TextBox.TabIndex = 8
         Me.bsCtrl3Run9TextBox.Tag = "9"
         Me.bsCtrl3Run9TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run31TextBox
+        '
+        Me.bsCtrl3Run31TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run31TextBox.DecimalsValues = False
+        Me.bsCtrl3Run31TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run31TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run31TextBox.IsNumeric = False
+        Me.bsCtrl3Run31TextBox.Location = New System.Drawing.Point(10, 107)
+        Me.bsCtrl3Run31TextBox.Mandatory = False
+        Me.bsCtrl3Run31TextBox.Name = "bsCtrl3Run31TextBox"
+        Me.bsCtrl3Run31TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run31TextBox.TabIndex = 90
+        Me.bsCtrl3Run31TextBox.Tag = "31"
+        Me.bsCtrl3Run31TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run8TextBox
         '
@@ -561,6 +829,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run8TextBox.Tag = "8"
         Me.bsCtrl3Run8TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run30TextBox
+        '
+        Me.bsCtrl3Run30TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run30TextBox.DecimalsValues = False
+        Me.bsCtrl3Run30TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run30TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run30TextBox.IsNumeric = False
+        Me.bsCtrl3Run30TextBox.Location = New System.Drawing.Point(550, 81)
+        Me.bsCtrl3Run30TextBox.Mandatory = False
+        Me.bsCtrl3Run30TextBox.Name = "bsCtrl3Run30TextBox"
+        Me.bsCtrl3Run30TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run30TextBox.TabIndex = 89
+        Me.bsCtrl3Run30TextBox.Tag = "30"
+        Me.bsCtrl3Run30TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run7TextBox
         '
         Me.bsCtrl3Run7TextBox.BackColor = System.Drawing.Color.White
@@ -575,6 +858,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run7TextBox.TabIndex = 6
         Me.bsCtrl3Run7TextBox.Tag = "7"
         Me.bsCtrl3Run7TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run29TextBox
+        '
+        Me.bsCtrl3Run29TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run29TextBox.DecimalsValues = False
+        Me.bsCtrl3Run29TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run29TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run29TextBox.IsNumeric = False
+        Me.bsCtrl3Run29TextBox.Location = New System.Drawing.Point(490, 81)
+        Me.bsCtrl3Run29TextBox.Mandatory = False
+        Me.bsCtrl3Run29TextBox.Name = "bsCtrl3Run29TextBox"
+        Me.bsCtrl3Run29TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run29TextBox.TabIndex = 88
+        Me.bsCtrl3Run29TextBox.Tag = "29"
+        Me.bsCtrl3Run29TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run6TextBox
         '
@@ -591,6 +889,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run6TextBox.Tag = "6"
         Me.bsCtrl3Run6TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run28TextBox
+        '
+        Me.bsCtrl3Run28TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run28TextBox.DecimalsValues = False
+        Me.bsCtrl3Run28TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run28TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run28TextBox.IsNumeric = False
+        Me.bsCtrl3Run28TextBox.Location = New System.Drawing.Point(430, 81)
+        Me.bsCtrl3Run28TextBox.Mandatory = False
+        Me.bsCtrl3Run28TextBox.Name = "bsCtrl3Run28TextBox"
+        Me.bsCtrl3Run28TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run28TextBox.TabIndex = 87
+        Me.bsCtrl3Run28TextBox.Tag = "28"
+        Me.bsCtrl3Run28TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run5TextBox
         '
         Me.bsCtrl3Run5TextBox.BackColor = System.Drawing.Color.White
@@ -605,6 +918,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run5TextBox.TabIndex = 4
         Me.bsCtrl3Run5TextBox.Tag = "5"
         Me.bsCtrl3Run5TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run27TextBox
+        '
+        Me.bsCtrl3Run27TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run27TextBox.DecimalsValues = False
+        Me.bsCtrl3Run27TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run27TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run27TextBox.IsNumeric = False
+        Me.bsCtrl3Run27TextBox.Location = New System.Drawing.Point(370, 81)
+        Me.bsCtrl3Run27TextBox.Mandatory = False
+        Me.bsCtrl3Run27TextBox.Name = "bsCtrl3Run27TextBox"
+        Me.bsCtrl3Run27TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run27TextBox.TabIndex = 86
+        Me.bsCtrl3Run27TextBox.Tag = "27"
+        Me.bsCtrl3Run27TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run4TextBox
         '
@@ -621,6 +949,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run4TextBox.Tag = "4"
         Me.bsCtrl3Run4TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run26TextBox
+        '
+        Me.bsCtrl3Run26TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run26TextBox.DecimalsValues = False
+        Me.bsCtrl3Run26TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run26TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run26TextBox.IsNumeric = False
+        Me.bsCtrl3Run26TextBox.Location = New System.Drawing.Point(310, 81)
+        Me.bsCtrl3Run26TextBox.Mandatory = False
+        Me.bsCtrl3Run26TextBox.Name = "bsCtrl3Run26TextBox"
+        Me.bsCtrl3Run26TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run26TextBox.TabIndex = 85
+        Me.bsCtrl3Run26TextBox.Tag = "26"
+        Me.bsCtrl3Run26TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run3TextBox
         '
         Me.bsCtrl3Run3TextBox.BackColor = System.Drawing.Color.White
@@ -635,6 +978,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run3TextBox.TabIndex = 2
         Me.bsCtrl3Run3TextBox.Tag = "3"
         Me.bsCtrl3Run3TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run25TextBox
+        '
+        Me.bsCtrl3Run25TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run25TextBox.DecimalsValues = False
+        Me.bsCtrl3Run25TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run25TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run25TextBox.IsNumeric = False
+        Me.bsCtrl3Run25TextBox.Location = New System.Drawing.Point(250, 81)
+        Me.bsCtrl3Run25TextBox.Mandatory = False
+        Me.bsCtrl3Run25TextBox.Name = "bsCtrl3Run25TextBox"
+        Me.bsCtrl3Run25TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run25TextBox.TabIndex = 84
+        Me.bsCtrl3Run25TextBox.Tag = "25"
+        Me.bsCtrl3Run25TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl3Run2TextBox
         '
@@ -651,6 +1009,21 @@ Partial Class QCSimulator
         Me.bsCtrl3Run2TextBox.Tag = "2"
         Me.bsCtrl3Run2TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run24TextBox
+        '
+        Me.bsCtrl3Run24TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run24TextBox.DecimalsValues = False
+        Me.bsCtrl3Run24TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run24TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run24TextBox.IsNumeric = False
+        Me.bsCtrl3Run24TextBox.Location = New System.Drawing.Point(190, 81)
+        Me.bsCtrl3Run24TextBox.Mandatory = False
+        Me.bsCtrl3Run24TextBox.Name = "bsCtrl3Run24TextBox"
+        Me.bsCtrl3Run24TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run24TextBox.TabIndex = 83
+        Me.bsCtrl3Run24TextBox.Tag = "24"
+        Me.bsCtrl3Run24TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl3Run1TextBox
         '
         Me.bsCtrl3Run1TextBox.BackColor = System.Drawing.Color.White
@@ -666,6 +1039,51 @@ Partial Class QCSimulator
         Me.bsCtrl3Run1TextBox.Tag = "1"
         Me.bsCtrl3Run1TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl3Run23TextBox
+        '
+        Me.bsCtrl3Run23TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run23TextBox.DecimalsValues = False
+        Me.bsCtrl3Run23TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run23TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run23TextBox.IsNumeric = False
+        Me.bsCtrl3Run23TextBox.Location = New System.Drawing.Point(130, 81)
+        Me.bsCtrl3Run23TextBox.Mandatory = False
+        Me.bsCtrl3Run23TextBox.Name = "bsCtrl3Run23TextBox"
+        Me.bsCtrl3Run23TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run23TextBox.TabIndex = 82
+        Me.bsCtrl3Run23TextBox.Tag = "23"
+        Me.bsCtrl3Run23TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run22TextBox
+        '
+        Me.bsCtrl3Run22TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run22TextBox.DecimalsValues = False
+        Me.bsCtrl3Run22TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run22TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run22TextBox.IsNumeric = False
+        Me.bsCtrl3Run22TextBox.Location = New System.Drawing.Point(70, 81)
+        Me.bsCtrl3Run22TextBox.Mandatory = False
+        Me.bsCtrl3Run22TextBox.Name = "bsCtrl3Run22TextBox"
+        Me.bsCtrl3Run22TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run22TextBox.TabIndex = 81
+        Me.bsCtrl3Run22TextBox.Tag = "22"
+        Me.bsCtrl3Run22TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl3Run21TextBox
+        '
+        Me.bsCtrl3Run21TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl3Run21TextBox.DecimalsValues = False
+        Me.bsCtrl3Run21TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl3Run21TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl3Run21TextBox.IsNumeric = False
+        Me.bsCtrl3Run21TextBox.Location = New System.Drawing.Point(10, 81)
+        Me.bsCtrl3Run21TextBox.Mandatory = False
+        Me.bsCtrl3Run21TextBox.Name = "bsCtrl3Run21TextBox"
+        Me.bsCtrl3Run21TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl3Run21TextBox.TabIndex = 80
+        Me.bsCtrl3Run21TextBox.Tag = "21"
+        Me.bsCtrl3Run21TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Panel
         '
         Me.bsCtrl2Panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
@@ -679,25 +1097,45 @@ Partial Class QCSimulator
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run17TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run16TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2IDLabel)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run40TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run15TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run39TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run14TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run38TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run13TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run37TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run12TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run36TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run11TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run35TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2InfoLabel)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run34TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run33TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run10TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run32TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run9TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run31TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run8TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run30TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run7TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run29TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run6TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run28TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run5TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run27TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run4TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run26TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run3TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run25TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run2TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run24TextBox)
         Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run1TextBox)
-        Me.bsCtrl2Panel.Location = New System.Drawing.Point(10, 198)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run23TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run21TextBox)
+        Me.bsCtrl2Panel.Controls.Add(Me.bsCtrl2Run22TextBox)
+        Me.bsCtrl2Panel.Location = New System.Drawing.Point(10, 235)
         Me.bsCtrl2Panel.Name = "bsCtrl2Panel"
-        Me.bsCtrl2Panel.Size = New System.Drawing.Size(615, 92)
+        Me.bsCtrl2Panel.Size = New System.Drawing.Size(615, 138)
         Me.bsCtrl2Panel.TabIndex = 8
         '
         'bsCtrl2LotNumLabel
@@ -838,6 +1276,21 @@ Partial Class QCSimulator
         Me.bsCtrl2IDLabel.Title = False
         Me.bsCtrl2IDLabel.Visible = False
         '
+        'bsCtrl2Run40TextBox
+        '
+        Me.bsCtrl2Run40TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run40TextBox.DecimalsValues = False
+        Me.bsCtrl2Run40TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run40TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run40TextBox.IsNumeric = False
+        Me.bsCtrl2Run40TextBox.Location = New System.Drawing.Point(550, 107)
+        Me.bsCtrl2Run40TextBox.Mandatory = False
+        Me.bsCtrl2Run40TextBox.Name = "bsCtrl2Run40TextBox"
+        Me.bsCtrl2Run40TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run40TextBox.TabIndex = 69
+        Me.bsCtrl2Run40TextBox.Tag = "40"
+        Me.bsCtrl2Run40TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run15TextBox
         '
         Me.bsCtrl2Run15TextBox.BackColor = System.Drawing.Color.White
@@ -852,6 +1305,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run15TextBox.TabIndex = 15
         Me.bsCtrl2Run15TextBox.Tag = "15"
         Me.bsCtrl2Run15TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run39TextBox
+        '
+        Me.bsCtrl2Run39TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run39TextBox.DecimalsValues = False
+        Me.bsCtrl2Run39TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run39TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run39TextBox.IsNumeric = False
+        Me.bsCtrl2Run39TextBox.Location = New System.Drawing.Point(490, 107)
+        Me.bsCtrl2Run39TextBox.Mandatory = False
+        Me.bsCtrl2Run39TextBox.Name = "bsCtrl2Run39TextBox"
+        Me.bsCtrl2Run39TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run39TextBox.TabIndex = 68
+        Me.bsCtrl2Run39TextBox.Tag = "39"
+        Me.bsCtrl2Run39TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run14TextBox
         '
@@ -868,6 +1336,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run14TextBox.Tag = "14"
         Me.bsCtrl2Run14TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run38TextBox
+        '
+        Me.bsCtrl2Run38TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run38TextBox.DecimalsValues = False
+        Me.bsCtrl2Run38TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run38TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run38TextBox.IsNumeric = False
+        Me.bsCtrl2Run38TextBox.Location = New System.Drawing.Point(430, 107)
+        Me.bsCtrl2Run38TextBox.Mandatory = False
+        Me.bsCtrl2Run38TextBox.Name = "bsCtrl2Run38TextBox"
+        Me.bsCtrl2Run38TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run38TextBox.TabIndex = 67
+        Me.bsCtrl2Run38TextBox.Tag = "38"
+        Me.bsCtrl2Run38TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run13TextBox
         '
         Me.bsCtrl2Run13TextBox.BackColor = System.Drawing.Color.White
@@ -882,6 +1365,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run13TextBox.TabIndex = 13
         Me.bsCtrl2Run13TextBox.Tag = "13"
         Me.bsCtrl2Run13TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run37TextBox
+        '
+        Me.bsCtrl2Run37TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run37TextBox.DecimalsValues = False
+        Me.bsCtrl2Run37TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run37TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run37TextBox.IsNumeric = False
+        Me.bsCtrl2Run37TextBox.Location = New System.Drawing.Point(370, 107)
+        Me.bsCtrl2Run37TextBox.Mandatory = False
+        Me.bsCtrl2Run37TextBox.Name = "bsCtrl2Run37TextBox"
+        Me.bsCtrl2Run37TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run37TextBox.TabIndex = 66
+        Me.bsCtrl2Run37TextBox.Tag = "37"
+        Me.bsCtrl2Run37TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run12TextBox
         '
@@ -898,6 +1396,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run12TextBox.Tag = "12"
         Me.bsCtrl2Run12TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run36TextBox
+        '
+        Me.bsCtrl2Run36TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run36TextBox.DecimalsValues = False
+        Me.bsCtrl2Run36TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run36TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run36TextBox.IsNumeric = False
+        Me.bsCtrl2Run36TextBox.Location = New System.Drawing.Point(310, 107)
+        Me.bsCtrl2Run36TextBox.Mandatory = False
+        Me.bsCtrl2Run36TextBox.Name = "bsCtrl2Run36TextBox"
+        Me.bsCtrl2Run36TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run36TextBox.TabIndex = 65
+        Me.bsCtrl2Run36TextBox.Tag = "36"
+        Me.bsCtrl2Run36TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run11TextBox
         '
         Me.bsCtrl2Run11TextBox.BackColor = System.Drawing.Color.White
@@ -913,6 +1426,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run11TextBox.Tag = "11"
         Me.bsCtrl2Run11TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run35TextBox
+        '
+        Me.bsCtrl2Run35TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run35TextBox.DecimalsValues = False
+        Me.bsCtrl2Run35TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run35TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run35TextBox.IsNumeric = False
+        Me.bsCtrl2Run35TextBox.Location = New System.Drawing.Point(250, 107)
+        Me.bsCtrl2Run35TextBox.Mandatory = False
+        Me.bsCtrl2Run35TextBox.Name = "bsCtrl2Run35TextBox"
+        Me.bsCtrl2Run35TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run35TextBox.TabIndex = 64
+        Me.bsCtrl2Run35TextBox.Tag = "35"
+        Me.bsCtrl2Run35TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2InfoLabel
         '
         Me.bsCtrl2InfoLabel.AutoSize = True
@@ -925,6 +1453,36 @@ Partial Class QCSimulator
         Me.bsCtrl2InfoLabel.TabIndex = 10
         Me.bsCtrl2InfoLabel.Text = "Control 2 Info"
         Me.bsCtrl2InfoLabel.Title = False
+        '
+        'bsCtrl2Run34TextBox
+        '
+        Me.bsCtrl2Run34TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run34TextBox.DecimalsValues = False
+        Me.bsCtrl2Run34TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run34TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run34TextBox.IsNumeric = False
+        Me.bsCtrl2Run34TextBox.Location = New System.Drawing.Point(190, 107)
+        Me.bsCtrl2Run34TextBox.Mandatory = False
+        Me.bsCtrl2Run34TextBox.Name = "bsCtrl2Run34TextBox"
+        Me.bsCtrl2Run34TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run34TextBox.TabIndex = 63
+        Me.bsCtrl2Run34TextBox.Tag = "34"
+        Me.bsCtrl2Run34TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run33TextBox
+        '
+        Me.bsCtrl2Run33TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run33TextBox.DecimalsValues = False
+        Me.bsCtrl2Run33TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run33TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run33TextBox.IsNumeric = False
+        Me.bsCtrl2Run33TextBox.Location = New System.Drawing.Point(130, 107)
+        Me.bsCtrl2Run33TextBox.Mandatory = False
+        Me.bsCtrl2Run33TextBox.Name = "bsCtrl2Run33TextBox"
+        Me.bsCtrl2Run33TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run33TextBox.TabIndex = 62
+        Me.bsCtrl2Run33TextBox.Tag = "33"
+        Me.bsCtrl2Run33TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run10TextBox
         '
@@ -940,6 +1498,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run10TextBox.Tag = "10"
         Me.bsCtrl2Run10TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run32TextBox
+        '
+        Me.bsCtrl2Run32TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run32TextBox.DecimalsValues = False
+        Me.bsCtrl2Run32TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run32TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run32TextBox.IsNumeric = False
+        Me.bsCtrl2Run32TextBox.Location = New System.Drawing.Point(70, 107)
+        Me.bsCtrl2Run32TextBox.Mandatory = False
+        Me.bsCtrl2Run32TextBox.Name = "bsCtrl2Run32TextBox"
+        Me.bsCtrl2Run32TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run32TextBox.TabIndex = 61
+        Me.bsCtrl2Run32TextBox.Tag = "32"
+        Me.bsCtrl2Run32TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run9TextBox
         '
         Me.bsCtrl2Run9TextBox.BackColor = System.Drawing.Color.White
@@ -953,6 +1526,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run9TextBox.TabIndex = 8
         Me.bsCtrl2Run9TextBox.Tag = "9"
         Me.bsCtrl2Run9TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run31TextBox
+        '
+        Me.bsCtrl2Run31TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run31TextBox.DecimalsValues = False
+        Me.bsCtrl2Run31TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run31TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run31TextBox.IsNumeric = False
+        Me.bsCtrl2Run31TextBox.Location = New System.Drawing.Point(10, 107)
+        Me.bsCtrl2Run31TextBox.Mandatory = False
+        Me.bsCtrl2Run31TextBox.Name = "bsCtrl2Run31TextBox"
+        Me.bsCtrl2Run31TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run31TextBox.TabIndex = 60
+        Me.bsCtrl2Run31TextBox.Tag = "31"
+        Me.bsCtrl2Run31TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run8TextBox
         '
@@ -968,6 +1556,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run8TextBox.Tag = "8"
         Me.bsCtrl2Run8TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run30TextBox
+        '
+        Me.bsCtrl2Run30TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run30TextBox.DecimalsValues = False
+        Me.bsCtrl2Run30TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run30TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run30TextBox.IsNumeric = False
+        Me.bsCtrl2Run30TextBox.Location = New System.Drawing.Point(550, 81)
+        Me.bsCtrl2Run30TextBox.Mandatory = False
+        Me.bsCtrl2Run30TextBox.Name = "bsCtrl2Run30TextBox"
+        Me.bsCtrl2Run30TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run30TextBox.TabIndex = 59
+        Me.bsCtrl2Run30TextBox.Tag = "30"
+        Me.bsCtrl2Run30TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run7TextBox
         '
         Me.bsCtrl2Run7TextBox.BackColor = System.Drawing.Color.White
@@ -982,6 +1585,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run7TextBox.Tag = "7"
         Me.bsCtrl2Run7TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run29TextBox
+        '
+        Me.bsCtrl2Run29TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run29TextBox.DecimalsValues = False
+        Me.bsCtrl2Run29TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run29TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run29TextBox.IsNumeric = False
+        Me.bsCtrl2Run29TextBox.Location = New System.Drawing.Point(490, 81)
+        Me.bsCtrl2Run29TextBox.Mandatory = False
+        Me.bsCtrl2Run29TextBox.Name = "bsCtrl2Run29TextBox"
+        Me.bsCtrl2Run29TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run29TextBox.TabIndex = 58
+        Me.bsCtrl2Run29TextBox.Tag = "29"
+        Me.bsCtrl2Run29TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run6TextBox
         '
         Me.bsCtrl2Run6TextBox.BackColor = System.Drawing.Color.White
@@ -995,6 +1613,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run6TextBox.TabIndex = 5
         Me.bsCtrl2Run6TextBox.Tag = "6"
         Me.bsCtrl2Run6TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run28TextBox
+        '
+        Me.bsCtrl2Run28TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run28TextBox.DecimalsValues = False
+        Me.bsCtrl2Run28TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run28TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run28TextBox.IsNumeric = False
+        Me.bsCtrl2Run28TextBox.Location = New System.Drawing.Point(430, 81)
+        Me.bsCtrl2Run28TextBox.Mandatory = False
+        Me.bsCtrl2Run28TextBox.Name = "bsCtrl2Run28TextBox"
+        Me.bsCtrl2Run28TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run28TextBox.TabIndex = 57
+        Me.bsCtrl2Run28TextBox.Tag = "28"
+        Me.bsCtrl2Run28TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run5TextBox
         '
@@ -1011,6 +1644,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run5TextBox.Tag = "5"
         Me.bsCtrl2Run5TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run27TextBox
+        '
+        Me.bsCtrl2Run27TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run27TextBox.DecimalsValues = False
+        Me.bsCtrl2Run27TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run27TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run27TextBox.IsNumeric = False
+        Me.bsCtrl2Run27TextBox.Location = New System.Drawing.Point(370, 81)
+        Me.bsCtrl2Run27TextBox.Mandatory = False
+        Me.bsCtrl2Run27TextBox.Name = "bsCtrl2Run27TextBox"
+        Me.bsCtrl2Run27TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run27TextBox.TabIndex = 56
+        Me.bsCtrl2Run27TextBox.Tag = "27"
+        Me.bsCtrl2Run27TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run4TextBox
         '
         Me.bsCtrl2Run4TextBox.BackColor = System.Drawing.Color.White
@@ -1025,6 +1673,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run4TextBox.TabIndex = 3
         Me.bsCtrl2Run4TextBox.Tag = "4"
         Me.bsCtrl2Run4TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run26TextBox
+        '
+        Me.bsCtrl2Run26TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run26TextBox.DecimalsValues = False
+        Me.bsCtrl2Run26TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run26TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run26TextBox.IsNumeric = False
+        Me.bsCtrl2Run26TextBox.Location = New System.Drawing.Point(310, 81)
+        Me.bsCtrl2Run26TextBox.Mandatory = False
+        Me.bsCtrl2Run26TextBox.Name = "bsCtrl2Run26TextBox"
+        Me.bsCtrl2Run26TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run26TextBox.TabIndex = 55
+        Me.bsCtrl2Run26TextBox.Tag = "26"
+        Me.bsCtrl2Run26TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run3TextBox
         '
@@ -1041,6 +1704,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run3TextBox.Tag = "3"
         Me.bsCtrl2Run3TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run25TextBox
+        '
+        Me.bsCtrl2Run25TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run25TextBox.DecimalsValues = False
+        Me.bsCtrl2Run25TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run25TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run25TextBox.IsNumeric = False
+        Me.bsCtrl2Run25TextBox.Location = New System.Drawing.Point(250, 81)
+        Me.bsCtrl2Run25TextBox.Mandatory = False
+        Me.bsCtrl2Run25TextBox.Name = "bsCtrl2Run25TextBox"
+        Me.bsCtrl2Run25TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run25TextBox.TabIndex = 54
+        Me.bsCtrl2Run25TextBox.Tag = "25"
+        Me.bsCtrl2Run25TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsCtrl2Run2TextBox
         '
         Me.bsCtrl2Run2TextBox.BackColor = System.Drawing.Color.White
@@ -1055,6 +1733,21 @@ Partial Class QCSimulator
         Me.bsCtrl2Run2TextBox.TabIndex = 1
         Me.bsCtrl2Run2TextBox.Tag = "2"
         Me.bsCtrl2Run2TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run24TextBox
+        '
+        Me.bsCtrl2Run24TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run24TextBox.DecimalsValues = False
+        Me.bsCtrl2Run24TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run24TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run24TextBox.IsNumeric = False
+        Me.bsCtrl2Run24TextBox.Location = New System.Drawing.Point(190, 81)
+        Me.bsCtrl2Run24TextBox.Mandatory = False
+        Me.bsCtrl2Run24TextBox.Name = "bsCtrl2Run24TextBox"
+        Me.bsCtrl2Run24TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run24TextBox.TabIndex = 53
+        Me.bsCtrl2Run24TextBox.Tag = "24"
+        Me.bsCtrl2Run24TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl2Run1TextBox
         '
@@ -1071,13 +1764,58 @@ Partial Class QCSimulator
         Me.bsCtrl2Run1TextBox.Tag = "1"
         Me.bsCtrl2Run1TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
+        'bsCtrl2Run23TextBox
+        '
+        Me.bsCtrl2Run23TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run23TextBox.DecimalsValues = False
+        Me.bsCtrl2Run23TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run23TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run23TextBox.IsNumeric = False
+        Me.bsCtrl2Run23TextBox.Location = New System.Drawing.Point(130, 81)
+        Me.bsCtrl2Run23TextBox.Mandatory = False
+        Me.bsCtrl2Run23TextBox.Name = "bsCtrl2Run23TextBox"
+        Me.bsCtrl2Run23TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run23TextBox.TabIndex = 52
+        Me.bsCtrl2Run23TextBox.Tag = "23"
+        Me.bsCtrl2Run23TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run21TextBox
+        '
+        Me.bsCtrl2Run21TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run21TextBox.DecimalsValues = False
+        Me.bsCtrl2Run21TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run21TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run21TextBox.IsNumeric = False
+        Me.bsCtrl2Run21TextBox.Location = New System.Drawing.Point(10, 81)
+        Me.bsCtrl2Run21TextBox.Mandatory = False
+        Me.bsCtrl2Run21TextBox.Name = "bsCtrl2Run21TextBox"
+        Me.bsCtrl2Run21TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run21TextBox.TabIndex = 50
+        Me.bsCtrl2Run21TextBox.Tag = "21"
+        Me.bsCtrl2Run21TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl2Run22TextBox
+        '
+        Me.bsCtrl2Run22TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl2Run22TextBox.DecimalsValues = False
+        Me.bsCtrl2Run22TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl2Run22TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl2Run22TextBox.IsNumeric = False
+        Me.bsCtrl2Run22TextBox.Location = New System.Drawing.Point(70, 81)
+        Me.bsCtrl2Run22TextBox.Mandatory = False
+        Me.bsCtrl2Run22TextBox.Name = "bsCtrl2Run22TextBox"
+        Me.bsCtrl2Run22TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl2Run22TextBox.TabIndex = 51
+        Me.bsCtrl2Run22TextBox.Tag = "22"
+        Me.bsCtrl2Run22TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
         'bsNumResultsNumericUpDown
         '
         Me.bsNumResultsNumericUpDown.BackColor = System.Drawing.Color.White
         Me.bsNumResultsNumericUpDown.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsNumResultsNumericUpDown.ForeColor = System.Drawing.Color.Black
         Me.bsNumResultsNumericUpDown.Location = New System.Drawing.Point(18, 58)
-        Me.bsNumResultsNumericUpDown.Maximum = New Decimal(New Integer() {20, 0, 0, 0})
+        Me.bsNumResultsNumericUpDown.Maximum = New Decimal(New Integer() {40, 0, 0, 0})
         Me.bsNumResultsNumericUpDown.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
         Me.bsNumResultsNumericUpDown.Name = "bsNumResultsNumericUpDown"
         Me.bsNumResultsNumericUpDown.Size = New System.Drawing.Size(57, 21)
@@ -1119,7 +1857,7 @@ Partial Class QCSimulator
         Me.bsDateToDateTimePick.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.bsDateToDateTimePick.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsDateToDateTimePick.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.bsDateToDateTimePick.Location = New System.Drawing.Point(257, 58)
+        Me.bsDateToDateTimePick.Location = New System.Drawing.Point(229, 58)
         Me.bsDateToDateTimePick.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.bsDateToDateTimePick.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.bsDateToDateTimePick.Name = "bsDateToDateTimePick"
@@ -1132,7 +1870,7 @@ Partial Class QCSimulator
         Me.bsDateFromLabel.BackColor = System.Drawing.Color.Transparent
         Me.bsDateFromLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsDateFromLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsDateFromLabel.Location = New System.Drawing.Point(152, 40)
+        Me.bsDateFromLabel.Location = New System.Drawing.Point(124, 40)
         Me.bsDateFromLabel.Name = "bsDateFromLabel"
         Me.bsDateFromLabel.Size = New System.Drawing.Size(41, 13)
         Me.bsDateFromLabel.TabIndex = 35
@@ -1145,7 +1883,7 @@ Partial Class QCSimulator
         Me.bsDateToLabel.BackColor = System.Drawing.Color.Transparent
         Me.bsDateToLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsDateToLabel.ForeColor = System.Drawing.Color.Black
-        Me.bsDateToLabel.Location = New System.Drawing.Point(257, 40)
+        Me.bsDateToLabel.Location = New System.Drawing.Point(229, 40)
         Me.bsDateToLabel.Name = "bsDateToLabel"
         Me.bsDateToLabel.Size = New System.Drawing.Size(26, 13)
         Me.bsDateToLabel.TabIndex = 36
@@ -1155,6 +1893,26 @@ Partial Class QCSimulator
         'bsCtrl1Panel
         '
         Me.bsCtrl1Panel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run40TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run39TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run38TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run37TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run36TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run35TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run34TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run33TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run32TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run31TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run30TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run29TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run28TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run27TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run26TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run25TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run24TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run23TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run22TextBox)
+        Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run21TextBox)
         Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1LotNumLabel)
         Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Label)
         Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1ValuesLabel)
@@ -1181,10 +1939,310 @@ Partial Class QCSimulator
         Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run3TextBox)
         Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run2TextBox)
         Me.bsCtrl1Panel.Controls.Add(Me.bsCtrl1Run1TextBox)
-        Me.bsCtrl1Panel.Location = New System.Drawing.Point(10, 100)
+        Me.bsCtrl1Panel.Location = New System.Drawing.Point(10, 93)
         Me.bsCtrl1Panel.Name = "bsCtrl1Panel"
-        Me.bsCtrl1Panel.Size = New System.Drawing.Size(615, 92)
+        Me.bsCtrl1Panel.Size = New System.Drawing.Size(615, 138)
         Me.bsCtrl1Panel.TabIndex = 7
+        '
+        'bsCtrl1Run40TextBox
+        '
+        Me.bsCtrl1Run40TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run40TextBox.DecimalsValues = False
+        Me.bsCtrl1Run40TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run40TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run40TextBox.IsNumeric = False
+        Me.bsCtrl1Run40TextBox.Location = New System.Drawing.Point(550, 108)
+        Me.bsCtrl1Run40TextBox.Mandatory = False
+        Me.bsCtrl1Run40TextBox.Name = "bsCtrl1Run40TextBox"
+        Me.bsCtrl1Run40TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run40TextBox.TabIndex = 39
+        Me.bsCtrl1Run40TextBox.Tag = "40"
+        Me.bsCtrl1Run40TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run39TextBox
+        '
+        Me.bsCtrl1Run39TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run39TextBox.DecimalsValues = False
+        Me.bsCtrl1Run39TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run39TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run39TextBox.IsNumeric = False
+        Me.bsCtrl1Run39TextBox.Location = New System.Drawing.Point(490, 108)
+        Me.bsCtrl1Run39TextBox.Mandatory = False
+        Me.bsCtrl1Run39TextBox.Name = "bsCtrl1Run39TextBox"
+        Me.bsCtrl1Run39TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run39TextBox.TabIndex = 38
+        Me.bsCtrl1Run39TextBox.Tag = "39"
+        Me.bsCtrl1Run39TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run38TextBox
+        '
+        Me.bsCtrl1Run38TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run38TextBox.DecimalsValues = False
+        Me.bsCtrl1Run38TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run38TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run38TextBox.IsNumeric = False
+        Me.bsCtrl1Run38TextBox.Location = New System.Drawing.Point(430, 108)
+        Me.bsCtrl1Run38TextBox.Mandatory = False
+        Me.bsCtrl1Run38TextBox.Name = "bsCtrl1Run38TextBox"
+        Me.bsCtrl1Run38TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run38TextBox.TabIndex = 37
+        Me.bsCtrl1Run38TextBox.Tag = "38"
+        Me.bsCtrl1Run38TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run37TextBox
+        '
+        Me.bsCtrl1Run37TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run37TextBox.DecimalsValues = False
+        Me.bsCtrl1Run37TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run37TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run37TextBox.IsNumeric = False
+        Me.bsCtrl1Run37TextBox.Location = New System.Drawing.Point(370, 108)
+        Me.bsCtrl1Run37TextBox.Mandatory = False
+        Me.bsCtrl1Run37TextBox.Name = "bsCtrl1Run37TextBox"
+        Me.bsCtrl1Run37TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run37TextBox.TabIndex = 36
+        Me.bsCtrl1Run37TextBox.Tag = "37"
+        Me.bsCtrl1Run37TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run36TextBox
+        '
+        Me.bsCtrl1Run36TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run36TextBox.DecimalsValues = False
+        Me.bsCtrl1Run36TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run36TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run36TextBox.IsNumeric = False
+        Me.bsCtrl1Run36TextBox.Location = New System.Drawing.Point(310, 108)
+        Me.bsCtrl1Run36TextBox.Mandatory = False
+        Me.bsCtrl1Run36TextBox.Name = "bsCtrl1Run36TextBox"
+        Me.bsCtrl1Run36TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run36TextBox.TabIndex = 35
+        Me.bsCtrl1Run36TextBox.Tag = "36"
+        Me.bsCtrl1Run36TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run35TextBox
+        '
+        Me.bsCtrl1Run35TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run35TextBox.DecimalsValues = False
+        Me.bsCtrl1Run35TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run35TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run35TextBox.IsNumeric = False
+        Me.bsCtrl1Run35TextBox.Location = New System.Drawing.Point(250, 108)
+        Me.bsCtrl1Run35TextBox.Mandatory = False
+        Me.bsCtrl1Run35TextBox.Name = "bsCtrl1Run35TextBox"
+        Me.bsCtrl1Run35TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run35TextBox.TabIndex = 34
+        Me.bsCtrl1Run35TextBox.Tag = "35"
+        Me.bsCtrl1Run35TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run34TextBox
+        '
+        Me.bsCtrl1Run34TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run34TextBox.DecimalsValues = False
+        Me.bsCtrl1Run34TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run34TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run34TextBox.IsNumeric = False
+        Me.bsCtrl1Run34TextBox.Location = New System.Drawing.Point(190, 108)
+        Me.bsCtrl1Run34TextBox.Mandatory = False
+        Me.bsCtrl1Run34TextBox.Name = "bsCtrl1Run34TextBox"
+        Me.bsCtrl1Run34TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run34TextBox.TabIndex = 33
+        Me.bsCtrl1Run34TextBox.Tag = "34"
+        Me.bsCtrl1Run34TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run33TextBox
+        '
+        Me.bsCtrl1Run33TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run33TextBox.DecimalsValues = False
+        Me.bsCtrl1Run33TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run33TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run33TextBox.IsNumeric = False
+        Me.bsCtrl1Run33TextBox.Location = New System.Drawing.Point(130, 108)
+        Me.bsCtrl1Run33TextBox.Mandatory = False
+        Me.bsCtrl1Run33TextBox.Name = "bsCtrl1Run33TextBox"
+        Me.bsCtrl1Run33TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run33TextBox.TabIndex = 32
+        Me.bsCtrl1Run33TextBox.Tag = "33"
+        Me.bsCtrl1Run33TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run32TextBox
+        '
+        Me.bsCtrl1Run32TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run32TextBox.DecimalsValues = False
+        Me.bsCtrl1Run32TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run32TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run32TextBox.IsNumeric = False
+        Me.bsCtrl1Run32TextBox.Location = New System.Drawing.Point(70, 108)
+        Me.bsCtrl1Run32TextBox.Mandatory = False
+        Me.bsCtrl1Run32TextBox.Name = "bsCtrl1Run32TextBox"
+        Me.bsCtrl1Run32TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run32TextBox.TabIndex = 31
+        Me.bsCtrl1Run32TextBox.Tag = "32"
+        Me.bsCtrl1Run32TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run31TextBox
+        '
+        Me.bsCtrl1Run31TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run31TextBox.DecimalsValues = False
+        Me.bsCtrl1Run31TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run31TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run31TextBox.IsNumeric = False
+        Me.bsCtrl1Run31TextBox.Location = New System.Drawing.Point(10, 108)
+        Me.bsCtrl1Run31TextBox.Mandatory = False
+        Me.bsCtrl1Run31TextBox.Name = "bsCtrl1Run31TextBox"
+        Me.bsCtrl1Run31TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run31TextBox.TabIndex = 30
+        Me.bsCtrl1Run31TextBox.Tag = "31"
+        Me.bsCtrl1Run31TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run30TextBox
+        '
+        Me.bsCtrl1Run30TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run30TextBox.DecimalsValues = False
+        Me.bsCtrl1Run30TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run30TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run30TextBox.IsNumeric = False
+        Me.bsCtrl1Run30TextBox.Location = New System.Drawing.Point(550, 82)
+        Me.bsCtrl1Run30TextBox.Mandatory = False
+        Me.bsCtrl1Run30TextBox.Name = "bsCtrl1Run30TextBox"
+        Me.bsCtrl1Run30TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run30TextBox.TabIndex = 29
+        Me.bsCtrl1Run30TextBox.Tag = "30"
+        Me.bsCtrl1Run30TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run29TextBox
+        '
+        Me.bsCtrl1Run29TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run29TextBox.DecimalsValues = False
+        Me.bsCtrl1Run29TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run29TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run29TextBox.IsNumeric = False
+        Me.bsCtrl1Run29TextBox.Location = New System.Drawing.Point(490, 82)
+        Me.bsCtrl1Run29TextBox.Mandatory = False
+        Me.bsCtrl1Run29TextBox.Name = "bsCtrl1Run29TextBox"
+        Me.bsCtrl1Run29TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run29TextBox.TabIndex = 28
+        Me.bsCtrl1Run29TextBox.Tag = "29"
+        Me.bsCtrl1Run29TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run28TextBox
+        '
+        Me.bsCtrl1Run28TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run28TextBox.DecimalsValues = False
+        Me.bsCtrl1Run28TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run28TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run28TextBox.IsNumeric = False
+        Me.bsCtrl1Run28TextBox.Location = New System.Drawing.Point(430, 82)
+        Me.bsCtrl1Run28TextBox.Mandatory = False
+        Me.bsCtrl1Run28TextBox.Name = "bsCtrl1Run28TextBox"
+        Me.bsCtrl1Run28TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run28TextBox.TabIndex = 27
+        Me.bsCtrl1Run28TextBox.Tag = "28"
+        Me.bsCtrl1Run28TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run27TextBox
+        '
+        Me.bsCtrl1Run27TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run27TextBox.DecimalsValues = False
+        Me.bsCtrl1Run27TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run27TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run27TextBox.IsNumeric = False
+        Me.bsCtrl1Run27TextBox.Location = New System.Drawing.Point(370, 82)
+        Me.bsCtrl1Run27TextBox.Mandatory = False
+        Me.bsCtrl1Run27TextBox.Name = "bsCtrl1Run27TextBox"
+        Me.bsCtrl1Run27TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run27TextBox.TabIndex = 26
+        Me.bsCtrl1Run27TextBox.Tag = "27"
+        Me.bsCtrl1Run27TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run26TextBox
+        '
+        Me.bsCtrl1Run26TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run26TextBox.DecimalsValues = False
+        Me.bsCtrl1Run26TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run26TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run26TextBox.IsNumeric = False
+        Me.bsCtrl1Run26TextBox.Location = New System.Drawing.Point(310, 82)
+        Me.bsCtrl1Run26TextBox.Mandatory = False
+        Me.bsCtrl1Run26TextBox.Name = "bsCtrl1Run26TextBox"
+        Me.bsCtrl1Run26TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run26TextBox.TabIndex = 25
+        Me.bsCtrl1Run26TextBox.Tag = "26"
+        Me.bsCtrl1Run26TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run25TextBox
+        '
+        Me.bsCtrl1Run25TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run25TextBox.DecimalsValues = False
+        Me.bsCtrl1Run25TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run25TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run25TextBox.IsNumeric = False
+        Me.bsCtrl1Run25TextBox.Location = New System.Drawing.Point(250, 82)
+        Me.bsCtrl1Run25TextBox.Mandatory = False
+        Me.bsCtrl1Run25TextBox.Name = "bsCtrl1Run25TextBox"
+        Me.bsCtrl1Run25TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run25TextBox.TabIndex = 24
+        Me.bsCtrl1Run25TextBox.Tag = "25"
+        Me.bsCtrl1Run25TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run24TextBox
+        '
+        Me.bsCtrl1Run24TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run24TextBox.DecimalsValues = False
+        Me.bsCtrl1Run24TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run24TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run24TextBox.IsNumeric = False
+        Me.bsCtrl1Run24TextBox.Location = New System.Drawing.Point(190, 82)
+        Me.bsCtrl1Run24TextBox.Mandatory = False
+        Me.bsCtrl1Run24TextBox.Name = "bsCtrl1Run24TextBox"
+        Me.bsCtrl1Run24TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run24TextBox.TabIndex = 23
+        Me.bsCtrl1Run24TextBox.Tag = "24"
+        Me.bsCtrl1Run24TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run23TextBox
+        '
+        Me.bsCtrl1Run23TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run23TextBox.DecimalsValues = False
+        Me.bsCtrl1Run23TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run23TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run23TextBox.IsNumeric = False
+        Me.bsCtrl1Run23TextBox.Location = New System.Drawing.Point(130, 82)
+        Me.bsCtrl1Run23TextBox.Mandatory = False
+        Me.bsCtrl1Run23TextBox.Name = "bsCtrl1Run23TextBox"
+        Me.bsCtrl1Run23TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run23TextBox.TabIndex = 22
+        Me.bsCtrl1Run23TextBox.Tag = "23"
+        Me.bsCtrl1Run23TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run22TextBox
+        '
+        Me.bsCtrl1Run22TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run22TextBox.DecimalsValues = False
+        Me.bsCtrl1Run22TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run22TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run22TextBox.IsNumeric = False
+        Me.bsCtrl1Run22TextBox.Location = New System.Drawing.Point(70, 82)
+        Me.bsCtrl1Run22TextBox.Mandatory = False
+        Me.bsCtrl1Run22TextBox.Name = "bsCtrl1Run22TextBox"
+        Me.bsCtrl1Run22TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run22TextBox.TabIndex = 21
+        Me.bsCtrl1Run22TextBox.Tag = "22"
+        Me.bsCtrl1Run22TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'bsCtrl1Run21TextBox
+        '
+        Me.bsCtrl1Run21TextBox.BackColor = System.Drawing.Color.White
+        Me.bsCtrl1Run21TextBox.DecimalsValues = False
+        Me.bsCtrl1Run21TextBox.Font = New System.Drawing.Font("Verdana", 8.25!)
+        Me.bsCtrl1Run21TextBox.ForeColor = System.Drawing.Color.Black
+        Me.bsCtrl1Run21TextBox.IsNumeric = False
+        Me.bsCtrl1Run21TextBox.Location = New System.Drawing.Point(10, 82)
+        Me.bsCtrl1Run21TextBox.Mandatory = False
+        Me.bsCtrl1Run21TextBox.Name = "bsCtrl1Run21TextBox"
+        Me.bsCtrl1Run21TextBox.Size = New System.Drawing.Size(55, 21)
+        Me.bsCtrl1Run21TextBox.TabIndex = 20
+        Me.bsCtrl1Run21TextBox.Tag = "21"
+        Me.bsCtrl1Run21TextBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
         'bsCtrl1LotNumLabel
         '
@@ -1576,7 +2634,7 @@ Partial Class QCSimulator
         Me.bsDateFromDateTimePick.CalendarTrailingForeColor = System.Drawing.Color.Silver
         Me.bsDateFromDateTimePick.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.bsDateFromDateTimePick.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.bsDateFromDateTimePick.Location = New System.Drawing.Point(152, 58)
+        Me.bsDateFromDateTimePick.Location = New System.Drawing.Point(124, 58)
         Me.bsDateFromDateTimePick.MaxDate = New Date(3000, 12, 31, 0, 0, 0, 0)
         Me.bsDateFromDateTimePick.MinDate = New Date(1900, 1, 1, 0, 0, 0, 0)
         Me.bsDateFromDateTimePick.Name = "bsDateFromDateTimePick"
@@ -1586,7 +2644,7 @@ Partial Class QCSimulator
         'bsAcceptButton
         '
         Me.bsAcceptButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsAcceptButton.Location = New System.Drawing.Point(560, 400)
+        Me.bsAcceptButton.Location = New System.Drawing.Point(560, 522)
         Me.bsAcceptButton.Name = "bsAcceptButton"
         Me.bsAcceptButton.Size = New System.Drawing.Size(31, 31)
         Me.bsAcceptButton.TabIndex = 10
@@ -1595,7 +2653,7 @@ Partial Class QCSimulator
         'bsCancelButton
         '
         Me.bsCancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.bsCancelButton.Location = New System.Drawing.Point(594, 400)
+        Me.bsCancelButton.Location = New System.Drawing.Point(594, 522)
         Me.bsCancelButton.Name = "bsCancelButton"
         Me.bsCancelButton.Size = New System.Drawing.Size(31, 31)
         Me.bsCancelButton.TabIndex = 11
@@ -1608,7 +2666,7 @@ Partial Class QCSimulator
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
-        Me.ClientSize = New System.Drawing.Size(962, 498)
+        Me.ClientSize = New System.Drawing.Size(958, 600)
         Me.ControlBox = False
         Me.Controls.Add(Me.bsQCResultsGroupBox)
         Me.Controls.Add(Me.bsTestsListGroupBox)
@@ -1625,6 +2683,8 @@ Partial Class QCSimulator
         CType(Me.bsTestsListDataGridView, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsQCResultsGroupBox.ResumeLayout(False)
         Me.bsQCResultsGroupBox.PerformLayout()
+        Me.bsGenerationModeGroupBox.ResumeLayout(False)
+        Me.bsGenerationModeGroupBox.PerformLayout()
         Me.bsCtrl3Panel.ResumeLayout(False)
         Me.bsCtrl3Panel.PerformLayout()
         Me.bsCtrl2Panel.ResumeLayout(False)
@@ -1731,5 +2791,68 @@ Partial Class QCSimulator
     Friend WithEvents bsCtrl3LotNumLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsCtrl2LotNumLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents bsCtrl1LotNumLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
+    Friend WithEvents bsGenerationModeGroupBox As Biosystems.Ax00.Controls.UserControls.BSGroupBox
+    Friend WithEvents bsRandomRadioButton As Biosystems.Ax00.Controls.UserControls.BSRadioButton
+    Friend WithEvents bsManualRadioButton As Biosystems.Ax00.Controls.UserControls.BSRadioButton
+    Friend WithEvents bsCtrl1Run40TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run39TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run38TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run37TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run36TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run35TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run34TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run33TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run32TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run31TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run30TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run29TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run28TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run27TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run26TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run25TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run24TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run23TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run22TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl1Run21TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run40TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run39TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run38TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run37TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run36TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run35TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run34TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run33TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run32TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run31TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run30TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run29TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run28TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run27TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run26TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run25TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run24TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run23TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run21TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl2Run22TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run40TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run39TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run38TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run37TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run36TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run35TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run34TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run33TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run32TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run31TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run30TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run29TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run28TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run27TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run26TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run25TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run24TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run23TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run22TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
+    Friend WithEvents bsCtrl3Run21TextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
 
 End Class

@@ -11,9 +11,17 @@ Public Class QCSimulator
 #Region "Declarations"
     Private ChangesMade As Boolean = False
     Private TestsListDS As New TestControlsDS
-    Private TextBoxesCtrl1Array As New ArrayList(15)
-    Private TextBoxesCtrl2Array As New ArrayList(15)
-    Private TextBoxesCtrl3Array As New ArrayList(15)
+    Private TextBoxesCtrl1Array As New ArrayList()
+    Private TextBoxesCtrl2Array As New ArrayList()
+    Private TextBoxesCtrl3Array As New ArrayList()
+
+    Private lowerLimitCtrl1 As Single
+    Private lowerLimitCtrl2 As Single
+    Private lowerLimitCtrl3 As Single
+    Private upperLimitCtrl1 As Single
+    Private upperLimitCtrl2 As Single
+    Private upperLimitCtrl3 As Single
+
 #End Region
 
 #Region "Attributes"
@@ -52,7 +60,27 @@ Public Class QCSimulator
             TextBoxesCtrl1Array.Add(bsCtrl1Run18TextBox)
             TextBoxesCtrl1Array.Add(bsCtrl1Run19TextBox)
             TextBoxesCtrl1Array.Add(bsCtrl1Run20TextBox)
-
+            TextBoxesCtrl1Array.Add(bsCtrl1Run21TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run22TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run23TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run24TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run25TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run26TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run27TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run28TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run29TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run30TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run31TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run32TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run33TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run34TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run35TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run36TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run37TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run38TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run39TextBox)
+            TextBoxesCtrl1Array.Add(bsCtrl1Run40TextBox)
+           
             TextBoxesCtrl2Array.Add(bsCtrl2Run1TextBox)
             TextBoxesCtrl2Array.Add(bsCtrl2Run2TextBox)
             TextBoxesCtrl2Array.Add(bsCtrl2Run3TextBox)
@@ -73,6 +101,26 @@ Public Class QCSimulator
             TextBoxesCtrl2Array.Add(bsCtrl2Run18TextBox)
             TextBoxesCtrl2Array.Add(bsCtrl2Run19TextBox)
             TextBoxesCtrl2Array.Add(bsCtrl2Run20TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run21TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run22TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run23TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run24TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run25TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run26TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run27TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run28TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run29TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run30TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run31TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run32TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run33TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run34TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run35TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run36TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run37TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run38TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run39TextBox)
+            TextBoxesCtrl2Array.Add(bsCtrl2Run40TextBox)
 
             TextBoxesCtrl3Array.Add(bsCtrl3Run1TextBox)
             TextBoxesCtrl3Array.Add(bsCtrl3Run2TextBox)
@@ -94,6 +142,26 @@ Public Class QCSimulator
             TextBoxesCtrl3Array.Add(bsCtrl3Run18TextBox)
             TextBoxesCtrl3Array.Add(bsCtrl3Run19TextBox)
             TextBoxesCtrl3Array.Add(bsCtrl3Run20TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run21TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run22TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run23TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run24TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run25TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run26TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run27TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run28TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run29TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run30TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run31TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run32TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run33TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run34TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run35TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run36TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run37TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run38TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run39TextBox)
+            TextBoxesCtrl3Array.Add(bsCtrl3Run40TextBox)
         Catch ex As Exception
             MessageBox.Show(ex.Message, Me.Name & ".CreateResultsArrays", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
@@ -122,6 +190,9 @@ Public Class QCSimulator
                             bsCtrl1InfoLabel.Text = myTestControlRow.ControlName & "/" & myTestControlRow.LotNumber
                             bsCtrl1ValuesLabel.Text = "(" & myTestControlRow.MinConcentration.ToString & _
                                                       "-" & myTestControlRow.MaxConcentration.ToString & ")"
+
+                            lowerLimitCtrl1 = myTestControlRow.MinConcentration
+                            upperLimitCtrl1 = myTestControlRow.MaxConcentration
                         Case 1
                             bsCtrl2Panel.Visible = True
                             bsCtrl2IDLabel.Text = myTestControlRow.ControlID.ToString
@@ -129,6 +200,9 @@ Public Class QCSimulator
                             bsCtrl2InfoLabel.Text = myTestControlRow.ControlName & "/" & myTestControlRow.LotNumber
                             bsCtrl2ValuesLabel.Text = "(" & myTestControlRow.MinConcentration.ToString & _
                                                       "-" & myTestControlRow.MaxConcentration.ToString & ")"
+
+                            lowerLimitCtrl2 = myTestControlRow.MinConcentration
+                            upperLimitCtrl2 = myTestControlRow.MaxConcentration
                         Case 2
                             bsCtrl3Panel.Visible = True
                             bsCtrl3IDLabel.Text = myTestControlRow.ControlID.ToString
@@ -136,6 +210,9 @@ Public Class QCSimulator
                             bsCtrl3InfoLabel.Text = myTestControlRow.ControlName & "/" & myTestControlRow.LotNumber
                             bsCtrl3ValuesLabel.Text = "(" & myTestControlRow.MinConcentration.ToString & _
                                                       "-" & myTestControlRow.MaxConcentration.ToString & ")"
+
+                            lowerLimitCtrl3 = myTestControlRow.MinConcentration
+                            upperLimitCtrl3 = myTestControlRow.MaxConcentration
                     End Select
                     myControlNum += 1
                 Next
@@ -303,21 +380,17 @@ Public Class QCSimulator
             Dim myTextBox1 As New TextBox
             Dim myTextBox2 As New TextBox
             Dim myTextBox3 As New TextBox
-            'TR 20/07/2012 -Get the Ctrl sending Group.
+
             Dim myCtrlSendingGroup As Integer = 0
             For i As Integer = 1 To Convert.ToInt32(bsNumResultsNumericUpDown.Value)
-
-                'TR 20/07/2012 -Get the Ctrl sending Group.
-                If myCtrlSendingGroup = 0 Then
+                If (myCtrlSendingGroup = 0) Then
                     myGlobalDataTO = myQCResultsDelegate.GetMaxCtrlsSendingGroup(Nothing, AnalyzerIDAttribute)
-                    If Not myGlobalDataTO.HasError Then
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         myCtrlSendingGroup = CInt(myGlobalDataTO.SetDatos) + 1
                     End If
                 Else
                     myCtrlSendingGroup += 1
                 End If
-                
-                'TR 20/07/2012 -END.
 
                 myDateTime = DateAdd(DateInterval.Day, i, firstDateTime)
 
@@ -336,7 +409,6 @@ Public Class QCSimulator
                     qcResultsRow.SetResultCommentNull()
                     qcResultsRow.ManualResultFlag = False
                     qcResultsRow.SetManualResultValueNull()
-                    'TR 20/07/2012  -add the sending group
                     qcResultsRow.CtrlsSendingGroup = myCtrlSendingGroup
                     myQCResultsDS.tqcResults.AddtqcResultsRow(qcResultsRow)
                 Else
@@ -359,7 +431,6 @@ Public Class QCSimulator
                         qcResultsRow.SetResultCommentNull()
                         qcResultsRow.ManualResultFlag = False
                         qcResultsRow.SetManualResultValueNull()
-                        'TR 20/07/2012  -add the sending group
                         qcResultsRow.CtrlsSendingGroup = myCtrlSendingGroup
                         myQCResultsDS.tqcResults.AddtqcResultsRow(qcResultsRow)
                     Else
@@ -383,11 +454,10 @@ Public Class QCSimulator
                         qcResultsRow.SetResultCommentNull()
                         qcResultsRow.ManualResultFlag = False
                         qcResultsRow.SetManualResultValueNull()
-                        'TR 20/07/2012  -add the sending group
                         qcResultsRow.CtrlsSendingGroup = myCtrlSendingGroup
                         myQCResultsDS.tqcResults.AddtqcResultsRow(qcResultsRow)
                     Else
-                        If (numControls = 2 AndAlso myTextBox1.Text = String.Empty AndAlso _
+                        If (numControls = 3 AndAlso myTextBox1.Text = String.Empty AndAlso _
                             myTextBox2.Text = String.Empty AndAlso myTextBox3.Text = String.Empty) Then allResultsOK = False
                     End If
                 End If
@@ -459,6 +529,8 @@ Public Class QCSimulator
 
                 bsDateToDateTimePick.Enabled = False
                 bsDateToDateTimePick.BackColor = SystemColors.MenuBar
+
+                bsGenerationModeGroupBox.Enabled = False
             Else
                 bsNumResultsNumericUpDown.Enabled = True
                 bsNumResultsNumericUpDown.BackColor = Color.White
@@ -469,8 +541,12 @@ Public Class QCSimulator
                 'Date To is always disabled
                 bsDateToDateTimePick.Enabled = False
                 bsDateToDateTimePick.BackColor = SystemColors.MenuBar
+
+                bsGenerationModeGroupBox.Enabled = True
+                bsManualRadioButton.Checked = True
             End If
 
+            'FIRST CONTROL
             Dim myTextBox As New TextBox
             For Each obj As Object In TextBoxesCtrl1Array
                 myTextBox = CType(obj, TextBox)
@@ -506,6 +582,26 @@ Public Class QCSimulator
             bsCtrl1Run18TextBox.DecimalsValues = decimalsAllowed
             bsCtrl1Run19TextBox.DecimalsValues = decimalsAllowed
             bsCtrl1Run20TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run21TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run22TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run23TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run24TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run25TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run26TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run27TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run28TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run29TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run30TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run31TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run32TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run33TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run34TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run35TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run36TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run37TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run38TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run39TextBox.DecimalsValues = decimalsAllowed
+            bsCtrl1Run40TextBox.DecimalsValues = decimalsAllowed
 
             If (pDisableArea) Then
                 bsCtrl1IDLabel.Text = String.Empty
@@ -513,6 +609,7 @@ Public Class QCSimulator
                 bsCtrl1ValuesLabel.Text = String.Empty
             End If
 
+            'SECOND CONTROL
             If (bsCtrl2Panel.Visible) Then
                 For Each obj As Object In TextBoxesCtrl2Array
                     myTextBox = CType(obj, TextBox)
@@ -548,6 +645,26 @@ Public Class QCSimulator
                 bsCtrl2Run18TextBox.DecimalsValues = decimalsAllowed
                 bsCtrl2Run19TextBox.DecimalsValues = decimalsAllowed
                 bsCtrl2Run20TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run21TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run22TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run23TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run24TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run25TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run26TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run27TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run28TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run29TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run30TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run31TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run32TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run33TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run34TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run35TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run36TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run37TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run38TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run39TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl2Run40TextBox.DecimalsValues = decimalsAllowed
 
                 If (pDisableArea) Then
                     bsCtrl2IDLabel.Text = String.Empty
@@ -556,6 +673,7 @@ Public Class QCSimulator
                 End If
             End If
 
+            'THIRD CONTROL
             If (bsCtrl3Panel.Visible) Then
                 For Each obj As Object In TextBoxesCtrl3Array
                     myTextBox = CType(obj, TextBox)
@@ -591,6 +709,26 @@ Public Class QCSimulator
                 bsCtrl3Run18TextBox.DecimalsValues = decimalsAllowed
                 bsCtrl3Run19TextBox.DecimalsValues = decimalsAllowed
                 bsCtrl3Run20TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run21TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run22TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run23TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run24TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run25TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run26TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run27TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run28TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run29TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run30TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run31TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run32TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run33TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run34TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run35TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run36TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run37TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run38TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run39TextBox.DecimalsValues = decimalsAllowed
+                bsCtrl3Run40TextBox.DecimalsValues = decimalsAllowed
 
                 If (pDisableArea) Then
                     bsCtrl3IDLabel.Text = String.Empty
@@ -664,6 +802,7 @@ Public Class QCSimulator
                 GetControlsInfo(bsTestsListDataGridView.SelectedRows(0).Cells("TestType").Value.ToString(), _
                                 CInt(bsTestsListDataGridView.SelectedRows(0).Cells("TestID").Value), _
                                 bsTestsListDataGridView.SelectedRows(0).Cells("SampleType").Value.ToString())
+                bsManualRadioButton.Checked = True
             End If
         Catch ex As Exception
             MessageBox.Show(ex.Message, Me.Name & ".bsAddResultsButton_Click", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -674,14 +813,27 @@ Public Class QCSimulator
                                                                                                                             bsCtrl1Run6TextBox.KeyPress, bsCtrl1Run7TextBox.KeyPress, bsCtrl1Run8TextBox.KeyPress, bsCtrl1Run9TextBox.KeyPress, bsCtrl1Run10TextBox.KeyPress, _
                                                                                                                             bsCtrl1Run11TextBox.KeyPress, bsCtrl1Run12TextBox.KeyPress, bsCtrl1Run13TextBox.KeyPress, bsCtrl1Run14TextBox.KeyPress, bsCtrl1Run15TextBox.KeyPress, _
                                                                                                                             bsCtrl1Run16TextBox.KeyPress, bsCtrl1Run17TextBox.KeyPress, bsCtrl1Run18TextBox.KeyPress, bsCtrl1Run19TextBox.KeyPress, bsCtrl1Run20TextBox.KeyPress, _
+                                                                                                                            bsCtrl1Run21TextBox.KeyPress, bsCtrl1Run22TextBox.KeyPress, bsCtrl1Run23TextBox.KeyPress, bsCtrl1Run24TextBox.KeyPress, bsCtrl1Run25TextBox.KeyPress, _
+                                                                                                                            bsCtrl1Run26TextBox.KeyPress, bsCtrl1Run27TextBox.KeyPress, bsCtrl1Run28TextBox.KeyPress, bsCtrl1Run29TextBox.KeyPress, bsCtrl1Run30TextBox.KeyPress, _
+                                                                                                                            bsCtrl1Run31TextBox.KeyPress, bsCtrl1Run32TextBox.KeyPress, bsCtrl1Run33TextBox.KeyPress, bsCtrl1Run34TextBox.KeyPress, bsCtrl1Run35TextBox.KeyPress, _
+                                                                                                                            bsCtrl1Run36TextBox.KeyPress, bsCtrl1Run37TextBox.KeyPress, bsCtrl1Run38TextBox.KeyPress, bsCtrl1Run39TextBox.KeyPress, bsCtrl1Run40TextBox.KeyPress, _
                                                                                                                             bsCtrl2Run1TextBox.KeyPress, bsCtrl2Run2TextBox.KeyPress, bsCtrl2Run3TextBox.KeyPress, bsCtrl2Run4TextBox.KeyPress, bsCtrl2Run5TextBox.KeyPress, _
                                                                                                                             bsCtrl2Run6TextBox.KeyPress, bsCtrl2Run7TextBox.KeyPress, bsCtrl2Run8TextBox.KeyPress, bsCtrl2Run9TextBox.KeyPress, bsCtrl2Run10TextBox.KeyPress, _
                                                                                                                             bsCtrl2Run11TextBox.KeyPress, bsCtrl2Run12TextBox.KeyPress, bsCtrl2Run13TextBox.KeyPress, bsCtrl2Run14TextBox.KeyPress, bsCtrl2Run15TextBox.KeyPress, _
                                                                                                                             bsCtrl2Run16TextBox.KeyPress, bsCtrl2Run17TextBox.KeyPress, bsCtrl2Run18TextBox.KeyPress, bsCtrl2Run19TextBox.KeyPress, bsCtrl2Run20TextBox.KeyPress, _
+                                                                                                                            bsCtrl2Run21TextBox.KeyPress, bsCtrl2Run22TextBox.KeyPress, bsCtrl2Run23TextBox.KeyPress, bsCtrl2Run24TextBox.KeyPress, bsCtrl2Run25TextBox.KeyPress, _
+                                                                                                                            bsCtrl2Run26TextBox.KeyPress, bsCtrl2Run27TextBox.KeyPress, bsCtrl2Run28TextBox.KeyPress, bsCtrl2Run29TextBox.KeyPress, bsCtrl2Run30TextBox.KeyPress, _
+                                                                                                                            bsCtrl2Run31TextBox.KeyPress, bsCtrl2Run32TextBox.KeyPress, bsCtrl2Run33TextBox.KeyPress, bsCtrl2Run34TextBox.KeyPress, bsCtrl2Run35TextBox.KeyPress, _
+                                                                                                                            bsCtrl2Run36TextBox.KeyPress, bsCtrl2Run37TextBox.KeyPress, bsCtrl2Run38TextBox.KeyPress, bsCtrl2Run39TextBox.KeyPress, bsCtrl2Run40TextBox.KeyPress, _
                                                                                                                             bsCtrl3Run1TextBox.KeyPress, bsCtrl3Run2TextBox.KeyPress, bsCtrl3Run3TextBox.KeyPress, bsCtrl3Run4TextBox.KeyPress, bsCtrl3Run5TextBox.KeyPress, _
                                                                                                                             bsCtrl3Run6TextBox.KeyPress, bsCtrl3Run7TextBox.KeyPress, bsCtrl3Run8TextBox.KeyPress, bsCtrl3Run9TextBox.KeyPress, bsCtrl3Run10TextBox.KeyPress, _
                                                                                                                             bsCtrl3Run11TextBox.KeyPress, bsCtrl3Run12TextBox.KeyPress, bsCtrl3Run13TextBox.KeyPress, bsCtrl3Run14TextBox.KeyPress, bsCtrl3Run15TextBox.KeyPress, _
-                                                                                                                            bsCtrl3Run16TextBox.KeyPress, bsCtrl3Run17TextBox.KeyPress, bsCtrl3Run18TextBox.KeyPress, bsCtrl3Run19TextBox.KeyPress, bsCtrl3Run20TextBox.KeyPress
+                                                                                                                            bsCtrl3Run16TextBox.KeyPress, bsCtrl3Run17TextBox.KeyPress, bsCtrl3Run18TextBox.KeyPress, bsCtrl3Run19TextBox.KeyPress, bsCtrl3Run20TextBox.KeyPress, _
+                                                                                                                            bsCtrl3Run21TextBox.KeyPress, bsCtrl3Run22TextBox.KeyPress, bsCtrl3Run23TextBox.KeyPress, bsCtrl3Run24TextBox.KeyPress, bsCtrl3Run25TextBox.KeyPress, _
+                                                                                                                            bsCtrl3Run26TextBox.KeyPress, bsCtrl3Run27TextBox.KeyPress, bsCtrl3Run28TextBox.KeyPress, bsCtrl3Run29TextBox.KeyPress, bsCtrl3Run30TextBox.KeyPress, _
+                                                                                                                            bsCtrl3Run31TextBox.KeyPress, bsCtrl3Run32TextBox.KeyPress, bsCtrl3Run33TextBox.KeyPress, bsCtrl3Run34TextBox.KeyPress, bsCtrl3Run35TextBox.KeyPress, _
+                                                                                                                            bsCtrl3Run36TextBox.KeyPress, bsCtrl3Run37TextBox.KeyPress, bsCtrl3Run38TextBox.KeyPress, bsCtrl3Run39TextBox.KeyPress, bsCtrl3Run40TextBox.KeyPress
+
         Try
             Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
             If (e.KeyChar = CChar(".") OrElse e.KeyChar = CChar(",") OrElse e.KeyChar = CChar("") OrElse e.KeyChar = ChrW(Keys.Back)) Then
@@ -744,12 +896,111 @@ Public Class QCSimulator
     End Sub
 
     Private Sub bsExitButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsExitButton.Click
-        If (Not ChangesMade OrElse _
-               ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString, , Me) = Windows.Forms.DialogResult.Yes) Then
-            Me.Close()
-        End If
+        Try
+            If (Not ChangesMade OrElse ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString, , Me) = Windows.Forms.DialogResult.Yes) Then
+                Me.Close()
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message, Me.Name & ".bsExitButton_Click", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub bsManualRadioButton_CheckedChanged(sender As Object, e As EventArgs) Handles bsManualRadioButton.CheckedChanged
+        Try
+            If (bsManualRadioButton.Checked) Then
+                Dim myTextBox As New TextBox
+                For Each obj As Object In TextBoxesCtrl1Array
+                    myTextBox = CType(obj, TextBox)
+
+                    If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
+                        myTextBox.Enabled = True
+                        myTextBox.BackColor = Color.White
+                    End If
+                Next
+
+                If (bsCtrl2Panel.Visible) Then
+                    For Each obj As Object In TextBoxesCtrl2Array
+                        myTextBox = CType(obj, TextBox)
+
+                        If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
+                            myTextBox.Enabled = True
+                            myTextBox.BackColor = Color.White
+                        End If
+                    Next
+                End If
+
+                If (bsCtrl3Panel.Visible) Then
+                    For Each obj As Object In TextBoxesCtrl3Array
+                        myTextBox = CType(obj, TextBox)
+
+                        If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
+                            myTextBox.Enabled = True
+                            myTextBox.BackColor = Color.White
+                        End If
+                    Next
+                End If
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message, Me.Name & ".bsManualRadioButton_CheckedChanged", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
+
+    Private Sub bsRandomRadioButton_CheckedChanged(sender As Object, e As EventArgs) Handles bsRandomRadioButton.CheckedChanged
+        Try
+            If (bsRandomRadioButton.Checked) Then
+                'Get the number of decimals allowed for the selected Test
+                Dim numOfTestdecimals As Integer = Convert.ToInt32(bsTestsListDataGridView.SelectedRows(0).Cells("DecimalsAllowed").Value)
+
+                'Get random values for the first Control
+                Dim myTextBox As New TextBox
+                For Each obj As Object In TextBoxesCtrl1Array
+                    myTextBox = CType(obj, TextBox)
+
+                    myTextBox.MaxLength = 11
+                    myTextBox.TextAlign = HorizontalAlignment.Right
+                    If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
+                        myTextBox.Text = (Math.Floor(((upperLimitCtrl1 + 1) - (lowerLimitCtrl1 - 1) + 1) * Rnd()) + lowerLimitCtrl1).ToString("F" & numOfTestdecimals.ToString())
+
+                        myTextBox.Enabled = False
+                        myTextBox.BackColor = SystemColors.MenuBar
+                    End If
+                Next
+
+                'Get random values for the second Control
+                If (bsCtrl2Panel.Visible) Then
+                    For Each obj As Object In TextBoxesCtrl2Array
+                        myTextBox = CType(obj, TextBox)
+
+                        myTextBox.MaxLength = 11
+                        myTextBox.TextAlign = HorizontalAlignment.Right
+                        If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
+                            myTextBox.Text = (Math.Floor(((upperLimitCtrl2 + 1) - (lowerLimitCtrl2 - 1) + 1) * Rnd()) + lowerLimitCtrl2).ToString("F" & numOfTestdecimals.ToString())
+
+                            myTextBox.Enabled = False
+                            myTextBox.BackColor = SystemColors.MenuBar
+                        End If
+                    Next
+                End If
+
+                'Get random values for the third Control
+                If (bsCtrl3Panel.Visible) Then
+                    For Each obj As Object In TextBoxesCtrl3Array
+                        myTextBox = CType(obj, TextBox)
+
+                        myTextBox.MaxLength = 11
+                        myTextBox.TextAlign = HorizontalAlignment.Right
+                        If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
+                            myTextBox.Text = (Math.Floor(((upperLimitCtrl3 + 1) - (lowerLimitCtrl3 - 1) + 1) * Rnd()) + lowerLimitCtrl3 + 1.25).ToString("F" & numOfTestdecimals.ToString())
+
+                            myTextBox.Enabled = False
+                            myTextBox.BackColor = SystemColors.MenuBar
+                        End If
+                    Next
+                End If
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message, Me.Name & ".bsRandomRadioButton_CheckedChanged", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
     End Sub
 #End Region
-
-    
 End Class

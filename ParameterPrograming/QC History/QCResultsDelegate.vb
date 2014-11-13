@@ -101,17 +101,21 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Return the number of results for and specific runsgroup where the included mean is true.
+        ''' Get the number of QC Results in the informed Cumulated Serie that are used to calculate the statistic mean for the 
+        ''' QCTestSampleID and QCControlLotID
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pQCTestSampleID"></param>
-        ''' <param name="pQCControlLotID"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pCumSerieNum"></param>
-        ''' <returns></returns>
-        ''' <remarks>CREATED BY: TR/SA</remarks>
-        Public Function CountStatisticsSResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pQCTestSampleID As Integer, _
-                                                   ByVal pQCControlLotID As Integer, ByVal pAnalyzerID As String, ByVal pCumSerieNum As Integer) As GlobalDataTO
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pQCTestSampleID">Identifier of the Test/SampleType in QC Module</param>
+        ''' <param name="pQCControlLotID">Identifier of the Control/Lot in QC Module</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pCumSerieNum">Number of the Cumulated Serie for the QCTestSampleID and QCControlLotID</param>
+        ''' <returns>GlobalDataTO containing an integer with the number of QC Results in the informed Cumulated Serie that are used to 
+        '''          calculate the statistic mean for the QCTestSampleID and QCControlLotID</returns>
+        ''' <remarks>
+        ''' Created by: TR/SA
+        ''' </remarks>
+        Public Function CountStatisticsResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pQCTestSampleID As Integer, _
+                                               ByVal pQCControlLotID As Integer, ByVal pAnalyzerID As String, ByVal pCumSerieNum As Integer) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -121,7 +125,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myQCResultsDAO As New tqcResultsDAO
-                        myGlobalDataTO = myQCResultsDAO.CountStatisticsSResults(dbConnection, pQCTestSampleID, pQCControlLotID, pAnalyzerID, pCumSerieNum)
+                        myGlobalDataTO = myQCResultsDAO.CountStatisticsResults(dbConnection, pQCTestSampleID, pQCControlLotID, pAnalyzerID, pCumSerieNum)
                     End If
                 End If
             Catch ex As Exception
@@ -131,7 +135,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CountStatisticsSResults", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CountStatisticsResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
