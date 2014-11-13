@@ -721,6 +721,9 @@ Public Class IQCGraphs
     '''              SA 25/09/2014 - BA-1608  ==> In the Linq used to get the list of selected Controls, condition a.n=0 is wrong; it should be
     '''                                           a.n > 0 (it is an old error, but its unique efect was that values in Y-Axis were normalized, 
     '''                                           although only one Control was plotted)
+    '''              SA 11/11/2014 - BA-1885  ==> When there are more than 50 QC Results to plot, the X-Axis should not show each RerunNumber (because 
+    '''                                           so many numbers cannot be readable); property ArgumentScaleType has to be set to Numeric to avoid
+    '''                                           overlapping of values in X-Axis
     ''' </remarks>
     Private Sub LoadLeveyJenningsGraph()
         Try
@@ -755,6 +758,9 @@ Public Class IQCGraphs
 
             Dim myXRange As List(Of Integer)
             Dim myDataSourceTable As DataTable
+
+            Dim k As Integer = 0
+            Dim minQCSeries As Single = 50
 
             Dim mySeriesCount As Integer = 1
             For Each openQCResultRow As OpenQCResultsDS.tOpenResultsRow In mySelectedCtrlLots
@@ -856,6 +862,8 @@ Public Class IQCGraphs
                         End If
                     End If
 
+
+                    k = 0
                     For Each runNumber As DataRow In myDataSourceTable.Rows
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
@@ -866,15 +874,17 @@ Public Class IQCGraphs
 
                         If (validResultValues.Count = 1) Then
                             runNumber("Values") = validResultValues.First.VisibleResultValue
+                            k += 1    'Count the number of values to plot...
                         End If
                     Next
                     myDataSourceTable.AcceptChanges()
 
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).DataSource = myDataSourceTable
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
-                    'When only ONE Control is selected, this property is not used to allow that values of X-Axis shown exactly the 
-                    'RunNumbers for which the Control has a not excluded value
-                    'bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical  
+
+                    'BA-1885 - When the number of results to plot is greater than 50, this property has to be used to avoid overlapping of values in X-Axis
+                    If (k > minQCSeries) Then bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 
@@ -954,6 +964,7 @@ Public Class IQCGraphs
                         End If
                     End If
 
+                    k = 0
                     For Each runNumber As DataRow In myDataSourceTable.Rows
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
@@ -964,14 +975,23 @@ Public Class IQCGraphs
 
                         If (validResultValues.Count = 1) Then
                             runNumber("Values") = validResultValues.First.RELError
+                            k += 1     'Count the number of values to plot...   
                         End If
                     Next
                     myDataSourceTable.AcceptChanges()
 
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).DataSource = myDataSourceTable
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
-                    'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE 
-                    bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative 'ScaleType.Numerical
+
+                    If (k <= 50) Then
+                        'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE 
+                        bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
+                    Else
+                        'BA-1885 - If the number of results to plot is greater than 50, property ArgumentScaleType is set to NUMERICAL to avoid 
+                        'overlapping of values in X-Axis
+                        bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+                    End If
+                    
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 

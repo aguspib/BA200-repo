@@ -428,7 +428,7 @@ Namespace Biosystems.Ax00.BL
                         Dim myRunsGroupsDAO As New tqcRunsGroupsDAO
                         'Coun the statistic resul bu the runs gropu 
                         Dim myQCResultsDelegate As New QCResultsDelegate
-                        myGlobalDataTO = myQCResultsDelegate.CountStatisticsSResults(dbConnection, pQCTestSampleID, pQCControlLotID, pAnalyzerID, pCumResultsNum)
+                        myGlobalDataTO = myQCResultsDelegate.CountStatisticsResults(dbConnection, pQCTestSampleID, pQCControlLotID, pAnalyzerID, pCumResultsNum)
 
                         If Not myGlobalDataTO.HasError Then
                             Dim myRunsGroupNumber As Integer = CInt(myGlobalDataTO.SetDatos)

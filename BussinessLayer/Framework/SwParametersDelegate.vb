@@ -219,44 +219,51 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Get value of specific parameter
+        ''' Read the numeric value of the specified Software Parameter for the specified Analyzer Model
         ''' </summary>
-        ''' <param name="pDBConnection">Open Database Connection</param>
-        ''' <param name="pParameterName">Execution identifier></param>
-        ''' <param name="pAnalyzerModel">Execution identifier></param>
-        ''' <returns></returns>
-        ''' <remarks>SGM 08/03/11</remarks>
-        Public Function ReadNumValueByParameterName(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                            ByVal pParameterName As String, _
-                                            ByVal pAnalyzerModel As String) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pParameterName">Name of the Software Parameter to read</param>
+        ''' <param name="pAnalyzerModel">Analyzer Model. If the Software Parameter is not dependent of the Analyzer Model, this function parameter has to be informed as Nothing</param>
+        ''' <returns>GlobalDataTO containg an integer with the current value of the specified SW Parameter for the informed Analyzer Model</returns>
+        ''' <remarks>
+        ''' Created by:  SG 08/03/2011
+        ''' Modified by: SA 11/11/2014 - BA-1885 ==> Some code improvements
+        ''' </remarks>
+        Public Function ReadNumValueByParameterName(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pParameterName As String, ByVal pAnalyzerModel As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim mytfmwSwParametersDAO As New tfmwSwParametersDAO
-                        resultData = mytfmwSwParametersDAO.ReadByParameterName(dbConnection, pParameterName, pAnalyzerModel)
-                        If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
-                            Dim myParamsDS As ParametersDS
-                            myParamsDS = CType(resultData.SetDatos, ParametersDS)
-                            resultData.SetDatos = myParamsDS.tfmwSwParameters(0).ValueNumeric
+                        Dim mySwParametersDAO As New tfmwSwParametersDAO
+
+                        resultData = mySwParametersDAO.ReadByParameterName(dbConnection, pParameterName, pAnalyzerModel)
+                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                            Dim myParamsDS As ParametersDS = DirectCast(resultData.SetDatos, ParametersDS)
+                            If (myParamsDS.tfmwSwParameters.Rows.Count > 0) Then
+                                resultData.SetDatos = myParamsDS.tfmwSwParameters.First.ValueNumeric
+                            Else
+                                'If the SW Parameter does not exist in the table, it is an error
+                                resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                resultData.HasError = True
+                            End If
                         End If
                     End If
                 End If
 
             Catch ex As Exception
+                resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = "SYSTEM_ERROR"
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "SwParametersDelegate.ReadNumValueByParameterName", EventLogEntryType.Error, False)
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function

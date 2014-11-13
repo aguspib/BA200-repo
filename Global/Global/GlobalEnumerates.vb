@@ -124,7 +124,8 @@ Namespace Biosystems.Ax00.Global
         ''' Define the Enumeration for General Settings
         ''' </summary>
         ''' <remarks>
-        ''' Created by: VR 29/12/2009 
+        ''' Created by:  VR 29/12/2009 
+        ''' Modified by: SA 11/11/2014 - BA-1885 ==> Item MAX_QCRESULTS_TO_ACCUMULATE removed from the enumerated 
         ''' </remarks>
         Public Enum GeneralSettingsEnum
             ACCESS_CONTROL_ACTIVATION
@@ -139,7 +140,6 @@ Namespace Biosystems.Ax00.Global
             MAX_DAYS_PREVIOUS_BLK_CALIB
             MAX_NEW_TESTS_ALLOWED
             MAX_PATIENT_ORDER_TESTS
-            MAX_QCRESULTS_TO_ACCUMULATE
             SUPERVISOR_CREATED_TEST_COUNT 'AG 03/09/2014 - complete enum
         End Enum
 
@@ -444,7 +444,14 @@ Namespace Biosystems.Ax00.Global
             CRITICAL_PAUSEMODE 'AG 22/11/2013 - Task #1391
         End Enum
 
+        ''' <summary>
+        ''' Enumeration for DB SOFTWARE Parameters
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by: SA 11/11/2014 - BA-1885 ==> Added new item MAX_QCRESULTS_TO_ACCUMULATE to the enumerated 
+        ''' </remarks>
         Public Enum SwParameters
+
             MAX_FILE_LOG_SIZE
             LIMIT_ABS
             PATH_LENGHT
@@ -765,6 +772,8 @@ Namespace Biosystems.Ax00.Global
             MAX_RESULTSTOEXPORT_HIST 'AG 14/02/2014 - #1505 Max results to export from historical results
             MAX_APP_MEMORYUSAGE      'AG 24/02/2014 - #1520 Max BA400 application memory usage. When limit exceeded a message inform the user to close the app
             MAX_SQL_MEMORYUSAGE      'AG 24/02/2014 - #1520 Max SQL service memory usage. When limit exceeded a message inform the user to close the app
+
+            MAX_QCRESULTS_TO_ACCUMULATE 'BA-1885
         End Enum
 
 
@@ -1008,9 +1017,7 @@ Namespace Biosystems.Ax00.Global
             INST_COMMAND_WARN           'Error with Command script                  | FW ERROR CODE:  43 | DL 27/07/2012 
             INST_LOADADJ_WARN           'Error Loading Adjustments                  | FW ERROR CODE:  45 | DL 27/07/2012 
 
-
-            COMMS_TIMEOUT_ERR   ' XB 06/11/2014 - BA-1872
-
+            COMMS_TIMEOUT_ERR           'XB 06/11/2014 - BA-1872
             ''''''''''''''''
             'IMPORTANT NOTE: Every alarm added into this enumerate must be also added into method ConvertToAlarmIDEnumerate (in AnalyzerManager class) select case
             ''''''''''''''''

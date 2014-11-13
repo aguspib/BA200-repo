@@ -3193,6 +3193,9 @@ Namespace Biosystems.Ax00.BL
         '''                              this function is called from the Update Version process.
         '''              SA 18/11/2013 - Passed the open DB Connection to all called functions to avoid locked errors when this function is 
         '''                              called from the Update Version process.
+        '''              SA 11/11/2014 - BA-1885 ==> Replaced call to function GetGeneralSettingValue in GeneralSettingsDelegate by call to function 
+        '''                                          ReadNumValueByParameterName in SwParametersDelegate due to MAX_QCRESULTS_TO_ACCUMULATE has been
+        '''                                          moved from General Settings table to Sw Parameters table
         ''' </remarks>
         Public Function ValidateDependenciesOnResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
                                                       ByVal pAnalyzerID As String, ByVal pToShowWarningScreen As Boolean) As GlobalDataTO
@@ -3236,14 +3239,13 @@ Namespace Biosystems.Ax00.BL
                             Dim myResultsLabel As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Results", _
                                                                                                         currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString)
 
-                            'Get value of the General Setting for the allowed maximum number of non cumulated QC Results for the 
-                            'Control/Lot and the Test/SampleType
+                            'Get value of the SW Parameter for the allowed maximum number of non cumulated QC Results for the Control/Lot and the Test/SampleType
                             Dim myMaxQCResults As Integer = 0
-                            Dim myGeneralSettingsDelegate As New GeneralSettingsDelegate
+                            Dim mySWParametersDelegate As New SwParametersDelegate
 
-                            resultData = myGeneralSettingsDelegate.GetGeneralSettingValue(dbConnection, GlobalEnumerates.GeneralSettingsEnum.MAX_QCRESULTS_TO_ACCUMULATE.ToString)
+                            resultData = mySWParametersDelegate.ReadNumValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.MAX_QCRESULTS_TO_ACCUMULATE.ToString, Nothing)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                myMaxQCResults = Convert.ToInt32(DirectCast(resultData.SetDatos, String))
+                                myMaxQCResults = Convert.ToInt32(DirectCast(resultData.SetDatos, Single))
 
                                 'Get all different Controls requested in the WS
                                 Dim lstDiffControls As List(Of Integer) = (From a As WorkSessionResultDS.ControlsRow In myWSResultsDS.Controls _

@@ -45,33 +45,12 @@ Public Class IQCResultsReview
     ''' Reload the screen when auxiliary screen IQCCumulateControlsResults is closed
     ''' </summary>
     ''' <remarks>
-    ''' Created by: TR 02/07/2012
+    ''' Created by:  TR 02/07/2012
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Replaced current code by a call to function LoadScreen
     ''' </remarks>
     Public Sub ReloadScreen()
         Try
-            InitializeScreen()
-            FillTestSampleListView()
-
-            If (bsTestSampleListView.Items.Count = 0) Then
-                'Disable screen controls
-                EnableDisableControls(False)
-
-                bsAddButtom.Enabled = False
-                bsEditButtom.Enabled = False
-                bsDeleteButtom.Enabled = False
-                bsGraphsButton.Enabled = False
-            Else
-                'Enable screen controls
-                EnableDisableControls(True)
-
-                bsAddButtom.Enabled = True
-                bsEditButtom.Enabled = True
-                bsDeleteButtom.Enabled = True
-                bsGraphsButton.Enabled = True
-
-                'Select the first element on the listview.
-                bsTestSampleListView.Items(0).Selected = True
-            End If
+            LoadScreen(False)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ReloadScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ReloadScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -201,6 +180,44 @@ Public Class IQCResultsReview
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddResultValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AddResultValues ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' For the selected Test/SampleType, load QC data applying the specified criteria
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 13/11/2014 - BA-1885 ==> Code moved from Click event of SearchButton
+    ''' </remarks>
+    Private Sub ApplySearchCriteria()
+        Try
+            Me.Enabled = False
+            Cursor = Cursors.WaitCursor
+
+            If (bsTestSampleListView.SelectedItems.Count > 0) Then
+                If (Not ValidateErrorRequiredValues()) Then
+                    If (ChangeMade) Then
+                        SaveUpdatedValues(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), _
+                                          bsTestSampleListView.SelectedItems(0).SubItems(5).Text, _
+                                          CInt(bsTestSampleListView.SelectedItems(0).SubItems(3).Text), _
+                                          bsTestSampleListView.SelectedItems(0).SubItems(1).Text)
+                        ChangeMade = False
+                    End If
+
+                    'Clear previous filters
+                    PrevSelectedControlName.Clear()
+                    BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), False)
+                End If
+            End If
+
+            Cursor = Cursors.Default
+            Me.Enabled = True
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            Me.Enabled = True
+
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplySearchCriteria ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".ApplySearchCriteria ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -1080,6 +1097,109 @@ Public Class IQCResultsReview
     End Sub
 
     ''' <summary>
+    ''' When a new Test/SampleType is selected, get and load all non-cumulated QC Results for all linked Control/Lots
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  SA 13/11/2014 - BA-1885 ==> Code moved from SelectedIndexChanged event of the ListView containing the Tests/SampleTypes.
+    '''                                          Disable the screen and show the hourglass cursor while details areas are beign loaded 
+    ''' </remarks>
+    Private Sub LoadDataOfSelectedTestSample()
+        Try
+            If (bsTestSampleListView.SelectedItems.Count = 1) Then
+                Me.Enabled = False
+                Cursor = Cursors.WaitCursor
+
+                LoadingData = True
+
+                'Clean previous filter control; clean the Error Provider control
+                PrevSelectedControlName.Clear()
+                bsResultErrorProv.Clear()
+
+                'Set the decimals allowed to my local variable to format numeric values
+                LocalDecimalAllow = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
+                BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), True)
+                LoadingData = False
+
+                Me.Enabled = True
+                Cursor = Cursors.Default
+            Else
+                'TR 23/07/2012 - If there is not a Test/SampleType selected in the list, then all Controls are cleared
+                ClearControls()
+            End If
+        Catch ex As Exception
+            Me.Enabled = True
+            Cursor = Cursors.Default
+
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadDataOfSelectedTestSample ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".LoadDataOfSelectedTestSample ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
+    ''' Initialize and configure all Screen controls and load data for the first Test/Sample Type in the list when the 
+    ''' screen is opened
+    ''' </summary>
+    ''' <param name="pInitialScreenLoad">True if the method is called for initial screen loading; False if the method is 
+    '''                                  called to refresh the screen after closing the auxiliary screen of Cumulate Control Results</param>
+    ''' <remarks>
+    ''' Created by:  SA 13/11/2014 - BA-1885 ==> Code moved from the Screen Load Event
+    ''' </remarks>
+    Private Sub LoadScreen(ByVal pInitialScreenLoad As Boolean)
+        Try
+            InitializeScreen()
+            FillTestSampleListView()
+
+            If (pInitialScreenLoad) Then
+                'TR 20/04/2012 - Get level of the connected User
+                Dim myGlobalBase As New GlobalBase
+                CurrentUserLevel = myGlobalBase.GetSessionInfo().UserLevel
+            End If
+
+            If (bsTestSampleListView.Items.Count = 0) Then
+                'Disable screen controls
+                EnableDisableControls(False)
+
+                bsAddButtom.Enabled = False
+                bsEditButtom.Enabled = False
+                bsDeleteButtom.Enabled = False
+                bsGraphsButton.Enabled = False
+            Else
+                If (pInitialScreenLoad) Then
+                    If (QCTestSampleIDAttribute > 0) Then
+                        'Select the Test/SampleType on the ListView
+                        SelectQCTestSampleID(QCTestSampleIDAttribute)
+                    Else
+                        'Select the first Test/SampleType on the ListView
+                        bsTestSampleListView.Items(0).Selected = True
+                    End If
+                Else
+                    'Select the first Test/SampleType on the ListView
+                    bsTestSampleListView.Items(0).Selected = True
+                End If
+
+                'Enable screen controls
+                EnableDisableControls(True)
+
+                bsAddButtom.Enabled = True
+                bsEditButtom.Enabled = True
+                bsDeleteButtom.Enabled = True
+                bsGraphsButton.Enabled = True
+
+                'TR 20/04/2012 - Validate the user level to activate/desactivate functionalities
+                If (pInitialScreenLoad) Then ScreenStatusByUserLevel()
+            End If
+
+            If (pInitialScreenLoad) Then
+                ResetBorder()
+                Application.DoEvents()
+            End If
+        Catch ex As Exception
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".LoadScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    ''' <summary>
     ''' Get icons and tooltip texts of all screen buttons
     ''' </summary>
     ''' <param name="pLanguageID">Current application Language</param>
@@ -1165,6 +1285,8 @@ Public Class IQCResultsReview
     '''              SA 25/01/2012 - Column LotNumber is deleted due to column ControlName will shown ControlName (LotNumber)     
     '''                              Changed labels used for columns containing calculated Mean, SD and CV         
     '''              JC 12/11/2012 - Added columns Mean, CV and CalcCV     
+    '''              SA 12/11/2014 - BA-1885 ==> Extend the width of column "n" to allow show numbers of three digits. Reduce width
+    '''                                          of columns CalcMean and CalcSD proportionally
     ''' </remarks>
     Private Sub PrepareResultControlLotGrid(ByVal pLanguageID As String)
         Try
@@ -1251,7 +1373,7 @@ Public Class IQCResultsReview
 
             'Number of open QC Results (not included in the statistical calculation of the Mean) for the Test/SampleType and Control/Lot
             bsResultControlLotGridView.Columns.Add("n", "n")
-            bsResultControlLotGridView.Columns("n").Width = 25
+            bsResultControlLotGridView.Columns("n").Width = 35
             bsResultControlLotGridView.Columns("n").DataPropertyName = "n"
             bsResultControlLotGridView.Columns("n").HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
             bsResultControlLotGridView.Columns("n").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
@@ -1261,7 +1383,7 @@ Public Class IQCResultsReview
             'Additional columns to show Mean, SD and CV calculated from all obtained open QC Results
             'Calculated Mean of open QC Results for the Test/SampleType and Control/Lot
             bsResultControlLotGridView.Columns.Add("CalcMean", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pLanguageID))
-            bsResultControlLotGridView.Columns("CalcMean").Width = 50
+            bsResultControlLotGridView.Columns("CalcMean").Width = 45
             bsResultControlLotGridView.Columns("CalcMean").DataPropertyName = "CalcMean"
             bsResultControlLotGridView.Columns("CalcMean").DefaultCellStyle.NullValue = Nothing
             bsResultControlLotGridView.Columns("CalcMean").SortMode = DataGridViewColumnSortMode.NotSortable
@@ -1272,7 +1394,7 @@ Public Class IQCResultsReview
 
             'Assigned Standard Deviation for the Test/SampleType and Control/Lot
             bsResultControlLotGridView.Columns.Add("CalcSD", myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", pLanguageID))
-            bsResultControlLotGridView.Columns("CalcSD").Width = 55
+            bsResultControlLotGridView.Columns("CalcSD").Width = 50
             bsResultControlLotGridView.Columns("CalcSD").DataPropertyName = "CalcSD"
             bsResultControlLotGridView.Columns("CalcSD").DefaultCellStyle.NullValue = Nothing
             bsResultControlLotGridView.Columns("CalcSD").SortMode = DataGridViewColumnSortMode.NotSortable
@@ -1886,58 +2008,22 @@ Public Class IQCResultsReview
         End Try
     End Sub
 
+    ''' <summary>
+    ''' Load screen event
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:  TR
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Code for the event Shown has been moved to this event to avoid show the screen while it is 
+    '''                                          still loading (the time needed for loading can be larger now due to until 300 results by Control/Lot
+    '''                                          are allowed). Additionally, new function LoadScreen has been created and the final code has been
+    '''                                          moved to it. 
+    ''' </remarks>
     Private Sub QCResultsReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            InitializeScreen()
-            FillTestSampleListView()
-
-            'TR 20/04/2012 - Get level of the connected User
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
-
-            If (bsTestSampleListView.Items.Count = 0) Then
-                'Disable screen controls
-                EnableDisableControls(False)
-
-                bsAddButtom.Enabled = False
-                bsEditButtom.Enabled = False
-                bsDeleteButtom.Enabled = False
-                bsGraphsButton.Enabled = False
-            Else
-                'Enable screen controls
-                EnableDisableControls(True)
-
-                bsAddButtom.Enabled = True
-                bsEditButtom.Enabled = True
-                bsDeleteButtom.Enabled = True
-                bsGraphsButton.Enabled = True
-            End If
-
-            ResetBorder()
-            Application.DoEvents()
+            LoadScreen(True)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultsReview_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QCResultsReview_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
-
-    Private Sub QCResultsReview_Shown(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Shown
-        Try
-            If (bsTestSampleListView.Items.Count > 0) Then
-                If (QCTestSampleIDAttribute > 0) Then
-                    'Select the Test/SampleType on the ListView
-                    SelectQCTestSampleID(QCTestSampleIDAttribute)
-                Else
-                    'Select the first Test/SampleType on the ListView
-                    bsTestSampleListView.Items(0).Selected = True
-                End If
-
-                'TR 20/04/2012 - Validate the user level to activate/desactivate functionalities
-                ScreenStatusByUserLevel()
-            End If
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultsReview_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".QCResultsReview_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
 
@@ -2005,23 +2091,17 @@ Public Class IQCResultsReview
         End Try
     End Sub
 
+    ''' <summary>
+    ''' For the selected Test/SampleType, load QC data applying the specified criteria
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Disable the screen and show the hourglass cursor while details areas are beign loaded
+    '''                                          Code moved to a new method ApplySearchCriteria
+    ''' </remarks>
     Private Sub SearchButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSearchButton.Click
         Try
-            If (bsTestSampleListView.SelectedItems.Count > 0) Then
-                If (Not ValidateErrorRequiredValues()) Then
-                    If (ChangeMade) Then
-                        SaveUpdatedValues(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), _
-                                          bsTestSampleListView.SelectedItems(0).SubItems(5).Text, _
-                                          CInt(bsTestSampleListView.SelectedItems(0).SubItems(3).Text), _
-                                          bsTestSampleListView.SelectedItems(0).SubItems(1).Text)
-                        ChangeMade = False
-                    End If
-
-                    'Clear prev. filter Control.
-                    PrevSelectedControlName.Clear()
-                    BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), False)
-                End If
-            End If
+            ApplySearchCriteria()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SearchButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SearchButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -2088,23 +2168,17 @@ Public Class IQCResultsReview
         End Try
     End Sub
 
+    ''' <summary>
+    ''' When a new Test/SampleType is selected in the ListView, load its QC data
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by:
+    ''' Modified by: SA 13/11/2014 - BA-1885 ==> Disable the screen and show the hourglass cursor while details areas are beign loaded
+    '''                                          Code moved to a new method LoadDataOfSelectedTestSample
+    ''' </remarks>
     Private Sub TestSampleListView_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTestSampleListView.SelectedIndexChanged
         Try
-            If (bsTestSampleListView.SelectedItems.Count = 1) Then
-                LoadingData = True
-
-                'Clean previous filter control; clean the Error Provider control
-                PrevSelectedControlName.Clear()
-                bsResultErrorProv.Clear()
-
-                'Set the decimals allowed to my local variable to format numeric values
-                LocalDecimalAllow = CInt(bsTestSampleListView.SelectedItems(0).SubItems(4).Text)
-                BindCalculationCriteria(CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text), True)
-                LoadingData = False
-            Else
-                'TR 23/07/2012 -If not selected element on the list the clear controls
-                ClearControls()
-            End If
+            LoadDataOfSelectedTestSample()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestSampleListView_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestSampleListView_SelectedIndexChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
