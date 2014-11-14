@@ -137,7 +137,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '                                                2 - Number of consecutive rejected wells > Limit while init FIFO phase (Sw will leave running sending STANDBY instruction)
         '                                                    RPM 06/09/2012 NO!!! use END instruction also in case 2
 
-        Private BaseLineTypeForWellRejectAttribute As String = GlobalEnumerates.BaseLineType.STATIC.ToString 'AG 11/11/2014 BA-2065
+        Private BaseLineTypeForWellRejectAttribute As BaseLineType = GlobalEnumerates.BaseLineType.STATIC 'AG 11/11/2014 BA-2065
 #End Region
 
 #Region "Properties"
@@ -299,7 +299,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         ''' <summary>
-        ''' Get the last ADJUST base lines
+        ''' Get the last base lines (from the twksWSBLines table) by type
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
@@ -320,6 +320,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (Not dbConnection Is Nothing) Then
                         Dim blinesDelg As New WSBLinesDelegate
                         resultData = blinesDelg.GetCurrentBaseLineValues(dbConnection, pAnalyzerID, pType)
+
                     End If
                 End If
             Catch ex As Exception
@@ -806,11 +807,12 @@ Namespace Biosystems.Ax00.Core.Entities
                         '1) Declarations
                         ''''''''''''''''
                         Dim myReactionsDlg As New ReactionsRotorDelegate
-                        Dim myBLineDlg As New WSBLinesDelegate
                         Dim myBLineByWellDlg As New WSBLinesByWellDelegate
 
-                        Dim wellBaseLineDS As New BaseLinesDS
+                        Dim dynamicBaseLineDS As New BaseLinesDS
+                        Dim convertIntoWellBaseLineDS As New BaseLinesDS
                         Dim newReactionsWellsDS As New ReactionsRotorDS
+                        Dim linqRes As New List(Of BaseLinesDS.twksWSBaseLinesRow)
 
                         '120 wells in rotor + 10 items required to initiate the FIFO + 7 not used after ALIGHT (ControlWellBaseLine used it after ALIGHT, no applies for dynamic but we reuse the method, so we need to add it)
                         Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER + BL_WELLREJECT_ITEMS_NOTUSED)
@@ -818,7 +820,15 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim newBaseLineID As Integer = 0
 
 
-                        '2) Loop for all wells in reactions rotor
+                        '2) Get last dynamic base line results for all wells
+                        ''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        resultData = GetCurrentAdjustBaseLineValuesByType(dbConnection, myAnalyzerID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            dynamicBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
+                        End If
+
+
+                        '3) Loop for all wells in reactions rotor
                         '''''''''''''''''''''''''''''''''''''''''
                         For myIndex As Integer = 1 To endLoopIndex
                             'Get the well number in the interval [1, 120]
@@ -833,31 +843,35 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             'Read the last dynamic values for wellID (all leds)
-                            resultData = myBLineDlg.GetCurrentBaseLineValues(dbConnection, myAnalyzerID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                wellBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
-                                For Each blRow As BaseLinesDS.twksWSBaseLinesRow In wellBaseLineDS.twksWSBaseLines.Rows
-                                    blRow.BeginEdit()
-                                    blRow.BaseLineID = newBaseLineID
-                                    blRow.WorkSessionID = pWorkSessionID
-                                    blRow.WellUsed = wellID
-                                    blRow.DateTime = Now
+                            linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In dynamicBaseLineDS.twksWSBaseLines _
+                                       Where a.WellUsed = wellID Select a).ToList
 
-                                    blRow.SetMainDarkNull() 'This field is only used in base line with adjust
-                                    blRow.SetRefDarkNull() 'This field is only used in base line with adjust
-                                    blRow.SetDACNull() 'This field is only used in base line with adjust
-                                    blRow.SetITNull() 'This field is only used in base line with adjust
-                                    blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
-                                    blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
-                                    blRow.EndEdit()
-                                Next
-                                wellBaseLineDS.twksWSBaseLines.AcceptChanges()
-                                resultData = ControlWellBaseLine(dbConnection, False, wellBaseLineDS, False)
-                            Else
-                                Exit For
-                            End If
+                            convertIntoWellBaseLineDS.twksWSBaseLines.Clear()
+                            For Each row As BaseLinesDS.twksWSBaseLinesRow In linqRes
+                                convertIntoWellBaseLineDS.twksWSBaseLines.ImportRow(row)
+                            Next
+                            convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
 
+                            'Transform into data required for ControlWellBaseLine
+                            For Each blRow As BaseLinesDS.twksWSBaseLinesRow In convertIntoWellBaseLineDS.twksWSBaseLines.Rows
+                                blRow.BeginEdit()
+                                blRow.BaseLineID = newBaseLineID
+                                blRow.WorkSessionID = pWorkSessionID
+                                blRow.WellUsed = wellID
+                                blRow.DateTime = Now
+
+                                blRow.SetMainDarkNull() 'This field is only used in base line with adjust
+                                blRow.SetRefDarkNull() 'This field is only used in base line with adjust
+                                blRow.SetDACNull() 'This field is only used in base line with adjust
+                                blRow.SetITNull() 'This field is only used in base line with adjust
+                                blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
+                                blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
+                                blRow.EndEdit()
+                            Next
+                            convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
+                            resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, False)
                         Next
+                        linqRes = Nothing
 
                         '3) Finally prepare a refreshDS for the whole reactions rotor
                         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
