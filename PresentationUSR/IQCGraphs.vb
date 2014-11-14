@@ -751,6 +751,21 @@ Public Class IQCGraphs
             Dim numSelectedWithMean As Integer = mySelectedCtrlLots.Count
             bsPrintButton.Enabled = (numSelectedWithMean > 0)
 
+            'If more than one Control is selected, verify the total number of Results to plot (the maximum between all selected Controls)
+            Dim myMaxNumOfResults = 0
+            If (mySelectedCtrlLots.Count > 1) Then
+                Dim k As Integer = 0
+                For Each openQCResultRow As OpenQCResultsDS.tOpenResultsRow In mySelectedCtrlLots
+                    'Count the number of results to plot for this Control and check if it is bigger than the previous value of myMaxNumOfResults
+                    k = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
+                        Where a.QCControlLotID = openQCResultRow.QCControlLotID _
+                      AndAlso Not a.Excluded _
+                       Select a.CalcRunNumber Distinct).ToList.Count
+
+                    If (k > myMaxNumOfResults) Then myMaxNumOfResults = k
+                Next
+            End If
+
             Dim myDiagram As New XYDiagram
             Dim maxRelError As Double = 0
             Dim validResultValues As List(Of QCResultsDS.tqcResultsRow)
@@ -759,9 +774,7 @@ Public Class IQCGraphs
             Dim myXRange As List(Of Integer)
             Dim myDataSourceTable As DataTable
 
-            Dim k As Integer = 0
             Dim minQCSeries As Single = 50
-
             Dim mySeriesCount As Integer = 1
             For Each openQCResultRow As OpenQCResultsDS.tOpenResultsRow In mySelectedCtrlLots
                 'Get RunNumbers to be used as Axis-X values for this Control
@@ -862,8 +875,6 @@ Public Class IQCGraphs
                         End If
                     End If
 
-
-                    k = 0
                     For Each runNumber As DataRow In myDataSourceTable.Rows
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
@@ -874,7 +885,6 @@ Public Class IQCGraphs
 
                         If (validResultValues.Count = 1) Then
                             runNumber("Values") = validResultValues.First.VisibleResultValue
-                            k += 1    'Count the number of values to plot...
                         End If
                     Next
                     myDataSourceTable.AcceptChanges()
@@ -883,7 +893,7 @@ Public Class IQCGraphs
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
 
                     'BA-1885 - When the number of results to plot is greater than 50, this property has to be used to avoid overlapping of values in X-Axis
-                    If (k > minQCSeries) Then bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+                    If (myDataSourceTable.Rows.Count > minQCSeries) Then bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
 
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
@@ -964,7 +974,6 @@ Public Class IQCGraphs
                         End If
                     End If
 
-                    k = 0
                     For Each runNumber As DataRow In myDataSourceTable.Rows
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
@@ -975,7 +984,6 @@ Public Class IQCGraphs
 
                         If (validResultValues.Count = 1) Then
                             runNumber("Values") = validResultValues.First.RELError
-                            k += 1     'Count the number of values to plot...   
                         End If
                     Next
                     myDataSourceTable.AcceptChanges()
@@ -983,15 +991,15 @@ Public Class IQCGraphs
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).DataSource = myDataSourceTable
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
 
-                    If (k <= 50) Then
-                        'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE 
+                    If (myMaxNumOfResults <= minQCSeries) Then
+                        'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE if there are less than 51 Results to plot 
                         bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
                     Else
                         'BA-1885 - If the number of results to plot is greater than 50, property ArgumentScaleType is set to NUMERICAL to avoid 
                         'overlapping of values in X-Axis
                         bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
                     End If
-                    
+
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 
