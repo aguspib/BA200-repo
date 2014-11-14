@@ -6602,13 +6602,13 @@ Public Class IProgTest
                     Dim testMode As String = AnalysisModeCombo.SelectedValue.ToString().TrimEnd()
                     If testMode <> "MREP" And testMode <> "BREP" Then
                         If SecondReadingCycleUpDown.Value Mod 2 = 0 Then
-                            'T2 is Even
+                            'T2 is Odd
                             If FirstReadingCycleUpDown.Value Mod 2 <> 0 Then
                                 ValidationError = True
                                 BsErrorProvider1.SetError(FirstReadingCycleUpDown, GetMessageText(GlobalEnumerates.Messages.SAME_PARITY.ToString))
                             End If
                         Else
-                            'T2 is Odd
+                            'T2 is Even
                             If FirstReadingCycleUpDown.Value Mod 2 = 0 Then
                                 ValidationError = True
                                 BsErrorProvider1.SetError(FirstReadingCycleUpDown, GetMessageText(GlobalEnumerates.Messages.SAME_PARITY.ToString))
@@ -7853,10 +7853,10 @@ Public Class IProgTest
                     ElseIf ReadingModeCombo.SelectedValue.ToString() = "BIC" Then
                         'Validate if it's even or odd.
                         If FirstReadingCycleUpDown.Value Mod 2 = 0 Then
-                            'Even
+                            'Odd
                             result = ConvertCycletoTime(CType(ReadingCycle + 5, Integer))
                         Else
-                            'ODD
+                            'Even
                             result = ConvertCycletoTime(CType(ReadingCycle + 4, Integer))
                         End If
                     End If
@@ -7869,10 +7869,10 @@ Public Class IProgTest
                     ElseIf ReadingModeCombo.SelectedValue.ToString() = "BIC" Then
                         'Validate if it's even or odd.
                         If SecondReadingCycleUpDown.Value Mod 2 = 0 Then
-                            'Even
+                            'Odd
                             result = ConvertCycletoTime(CType(ReadingCycle + 5, Integer))
                         Else
-                            'ODD
+                            'Even
                             result = ConvertCycletoTime(CType(ReadingCycle + 4, Integer))
                         End If
                     End If
