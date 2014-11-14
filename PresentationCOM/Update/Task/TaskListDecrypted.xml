@@ -2158,11 +2158,6 @@
   <AppVersion>
     <Version>3.04</Version>
     <StructureScript>
-      GO
-    </StructureScript>
-    <UpdateScript>
-      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.13'
-      GO
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSBLines' AND sc.name = 'Type') = 0
       BEGIN
       ALTER TABLE [Ax00].[dbo].twksWSBLines ADD Type [nvarchar](15) NOT NULL DEFAULT 'STATIC'
@@ -2184,8 +2179,232 @@
       [WellUsed] ASC
       )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
       END
+      SET ANSI_PADDING OFF
+      GO
+
+
+      SET ANSI_PADDING ON
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwSwParameters_1') = 1)
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters DROP CONSTRAINT PK_tfmwSwParameters_1
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwSwParameters' AND sc.name = 'ParameterID') = 1
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters DROP COLUMN [ParameterID]
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwSwParameters' AND sc.name = 'ParameterID') = 0
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters ADD [ParameterID] [int] IDENTITY(1,1) NOT NULL
+      END
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwSwParameters_1') = 0)
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters ADD  CONSTRAINT [PK_tfmwSwParameters_1] PRIMARY KEY CLUSTERED 
+      (
+	      [ParameterID] ASC
+      )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+      END
 
       SET ANSI_PADDING OFF
+      GO  
+      
+    
+      SET ANSI_PADDING ON
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwPreloadedRanges') = 1)
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits DROP CONSTRAINT PK_tfmwPreloadedRanges
+      END
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwFieldLimits' AND sc.name = 'IndexID') = 0
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits ADD [IndexID] [int] IDENTITY(1,1) NOT NULL
+      END
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwFieldLimits_1') = 0)
+      BEGIN
+	      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits ADD  CONSTRAINT PK_tfmwFieldLimits_1 PRIMARY KEY CLUSTERED 
+      (
+	      [IndexID] ASC
+      )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+      END
+
+      SET ANSI_PADDING OFF
+      GO
+    </StructureScript>
+    <UpdateScript>
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.13'
+      GO
+      
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwSwParameters') = 1)
+      BEGIN
+      DELETE tfmwSwParameters WHERE AnalyzerModel = 'A200'
+      INSERT INTO [tfmwSwParameters]
+                 ([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
+           SELECT [ParameterName],1,'A200',[ValueNumeric],[ValueText],[Description] FROM [tfmwSwParameters] WHERE AnalyzerModel = 'A400'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'KINETICS_INCREASE' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 18.0421 WHERE [ParameterName] = 'KINETICS_INCREASE' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'CYCLE_MACHINE' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 18 WHERE [ParameterName] = 'CYCLE_MACHINE' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'TOTAL_READINGS' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 34 WHERE [ParameterName] = 'TOTAL_READINGS' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'SECOND_REAGENT' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 18 WHERE [ParameterName] = 'SECOND_REAGENT' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'SAMPLE_STEPS_UL' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 7.95775 WHERE [ParameterName] = 'SAMPLE_STEPS_UL' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'WAITING_CYCLES_AFTER_R1' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 0 WHERE [ParameterName] = 'WAITING_CYCLES_AFTER_R1' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'SW_READINGSOFFSET' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 1 WHERE [ParameterName] = 'SW_READINGSOFFSET' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'SS_KINETICS_INCREASE' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 18 WHERE [ParameterName] = 'SS_KINETICS_INCREASE' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'EMAIL_SUBJECT' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueText] = 'A200 Data' WHERE [ParameterName] = 'EMAIL_SUBJECT' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'SRV_CYCLETIME_MACHINE' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 18 WHERE [ParameterName] = 'SRV_CYCLETIME_MACHINE' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'WAITING_CYCLES_BEFORE_RUNNING' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwSwParameters] SET [ValueNumeric] = 0 WHERE [ParameterName] = 'WAITING_CYCLES_BEFORE_RUNNING' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      DELETE tfmwSwParameters WHERE ParameterName = 'SECOND_REAGENT'
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'BL_TYPE_FOR_CALCULATIONS') = 0)
+      BEGIN
+	      INSERT INTO [tfmwSwParameters]([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
+	      VALUES ('BL_TYPE_FOR_CALCULATIONS', 1, 'A400', NULL, 'STATIC', 'BaseLine type used to calculations')
+
+	      INSERT INTO [tfmwSwParameters]([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
+	      VALUES ('BL_TYPE_FOR_CALCULATIONS', 1, 'A200', NULL, 'DYNAMIC', 'BaseLine type used to calculations')
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwSwParameters] WHERE [ParameterName] = 'BL_TYPE_FOR_WELLREJECT') = 0)
+      BEGIN
+	      INSERT INTO [Ax00].[dbo].[tfmwSwParameters]([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
+	      VALUES ('BL_TYPE_FOR_WELLREJECT', 1, 'A400', NULL, 'STATIC', 'BaseLine type used to wells rejection')
+
+	      INSERT INTO [Ax00].[dbo].[tfmwSwParameters]([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
+	      VALUES ('BL_TYPE_FOR_WELLREJECT', 1, 'A200', NULL, 'STATIC', 'BaseLine type used to wells rejection')
+      END
+      GO
+
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwFieldLimits') = 1)
+      BEGIN
+      DELETE tfmwFieldLimits WHERE AnalyzerModel = 'A200'
+
+      INSERT INTO [tfmwFieldLimits]
+                 ([LimitID],[LimitDescription],[MinValue],[MaxValue],[StepValue],[DefaultValue],[DecimalsAllowed],[AnalyzerModel])
+                 SELECT [LimitID],[LimitDescription],[MinValue],[MaxValue],[StepValue],[DefaultValue],[DecimalsAllowed],'A200' FROM [tfmwFieldLimits] WHERE AnalyzerModel = 'A400'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'READING1_CYCLES' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwFieldLimits] SET [MinValue] = 2, [MaxValue] = 35 WHERE [LimitID] = 'READING1_CYCLES' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'READING2_CYCLES' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwFieldLimits] SET [MinValue] = 19, [MaxValue] = 35 WHERE [LimitID] = 'READING2_CYCLES' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'REAGENT1_VOLUME' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwFieldLimits] SET [MinValue] = 100, [MaxValue] = 500 WHERE [LimitID] = 'REAGENT1_VOLUME' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tfmwFieldLimits] WHERE [LimitID] = 'SRV_THERMO_PROBE_R2_SETPOINT' AND [AnalyzerModel] = 'A200') = 1)
+      BEGIN
+      UPDATE [tfmwFieldLimits] SET [MinValue] = 0, [MaxValue] = 60, [DefaultValue] = 45 WHERE [LimitID] = 'SRV_THERMO_PROBE_R2_SETPOINT' AND [AnalyzerModel] = 'A200'
+      END
+      GO
+
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tcfgAnalyzers') = 1)
+      BEGIN
+	      UPDATE [dbo].[tcfgAnalyzers]  SET Active = 0
+      END
+      GO
+
+      IF ((SELECT COUNT(*) FROM [dbo].[tcfgAnalyzers] WHERE [AnalyzerID] = 'SN0000099999_Ax200' ) = 0)
+      BEGIN
+	      INSERT INTO [dbo].[tcfgAnalyzers] ([AnalyzerID],[AnalyzerModel],[FirmwareVersion],[Generic],[Active]) VALUES('SN0000099999_Ax200', 'A200', '0.0', 1, 1)
+
+      END
+      GO
+
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwAnalyzerModelTubesByRing') = 1)
+      BEGIN
+	      INSERT INTO [dbo].[tfmwAnalyzerModelTubesByRing] ([AnalyzerModel],[RotorType],[RingNumber],[TubeType],[ApplyToAllFlag]) VALUES ('A200', 'SAMPLES',1,'T13',1)
+	      INSERT INTO [dbo].[tfmwAnalyzerModelTubesByRing] ([AnalyzerModel],[RotorType],[RingNumber],[TubeType],[ApplyToAllFlag]) VALUES ('A200', 'SAMPLES',1,'T15',1)
+	      INSERT INTO [dbo].[tfmwAnalyzerModelTubesByRing] ([AnalyzerModel],[RotorType],[RingNumber],[TubeType],[ApplyToAllFlag]) VALUES ('A200', 'SAMPLES',1,'PED',0)
+	      INSERT INTO [dbo].[tfmwAnalyzerModelTubesByRing] ([AnalyzerModel],[RotorType],[RingNumber],[TubeType],[ApplyToAllFlag]) VALUES ('A200', 'REAGENTS',2,'BOTTLE3',1)
+	      INSERT INTO [dbo].[tfmwAnalyzerModelTubesByRing] ([AnalyzerModel],[RotorType],[RingNumber],[TubeType],[ApplyToAllFlag]) VALUES ('A200', 'REAGENTS',2,'BOTTLE2',1)
+	      INSERT INTO [dbo].[tfmwAnalyzerModelTubesByRing] ([AnalyzerModel],[RotorType],[RingNumber],[TubeType],[ApplyToAllFlag]) VALUES ('A200', 'REAGENTS',2,'BOTTLE1',1)
+      END
+      GO
+      
+  
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwAnalyzerModelRotorsConfig') = 1)
+      BEGIN
+	      UPDATE tfmwAnalyzerModelRotorsConfig SET RotorType = 'SAMPLES', RingPositions = 44, FirstCellNumber = 1, LastCellNumber = 44 
+	      WHERE AnalyzerModel = 'A200' AND RotorType = 'SAMP_REAG' AND RingNumber = 1
+	
+	      UPDATE tfmwAnalyzerModelRotorsConfig SET RotorType = 'REAGENTS', RingPositions = 44, FirstCellNumber = 45, LastCellNumber = 88 
+	      WHERE AnalyzerModel = 'A200' AND RotorType = 'SAMP_REAG' AND RingNumber = 2
+
+      END
       GO
     </UpdateScript>
   </AppVersion >  
