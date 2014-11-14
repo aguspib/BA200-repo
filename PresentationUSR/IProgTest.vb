@@ -7857,10 +7857,10 @@ Public Class IProgTest
                         'Validate if it's even or odd.
                         'AG 13/11/2014 BA-2118 (modify condition '- offset')
                         If (FirstReadingCycleUpDown.Value - offset) Mod 2 = 0 Then
-                            'Odd
+                            'Even
                             result = ConvertCycletoTime(CType(ReadingCycle + 5, Integer))
                         Else
-                            'Even
+                            'ODD
                             result = ConvertCycletoTime(CType(ReadingCycle + 4, Integer))
                         End If
                     End If
@@ -7874,10 +7874,10 @@ Public Class IProgTest
                         'Validate if it's even or odd.
                         'AG 13/11/2014 BA-2118 (modify condition '- offset')
                         If (SecondReadingCycleUpDown.Value - offset) Mod 2 = 0 Then
-                            'Odd
+                            'Even
                             result = ConvertCycletoTime(CType(ReadingCycle + 5, Integer))
                         Else
-                            'Even
+                            'ODD
                             result = ConvertCycletoTime(CType(ReadingCycle + 4, Integer))
                         End If
                     End If
