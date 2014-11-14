@@ -2542,10 +2542,21 @@
     <Result>True</Result>
   </IntegrityValidation>
   <IntegrityValidation>
-    <Version>3.0</Version>
+    <Version>3.04</Version>
     <Label>PRIMARY KEY OF twksWSBLines IS CREATED</Label>
     <Script>
       IF (SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_twksWSBLines') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>Internal flags for subprocesses management exists in tfmwSwFlags </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwSwFlags WHERE FlagID LIKE '%DynamicBL%') = 3)
       SELECT 'True'
       ELSE
       SELECT 'False'

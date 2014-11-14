@@ -568,6 +568,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by  AG 03/11/2010
         ''' Modified by AG 02/03/2011 - add parameter pNextWell
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
+        '''             AG 14/11/2014 BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
         ''' </remarks>
         Private Function ManageStandByStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -966,6 +967,61 @@ Namespace Biosystems.Ax00.Core.Entities
                         myGlobal = myFlagsDelg.ResetFlags(Nothing, AnalyzerIDAttribute)
                         InitializeAnalyzerFlags(Nothing)
                         'AG 23/03/2012
+
+                        'AG 14/11/2014 BA-2065
+                    Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_START
+                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "INI")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
+
+                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
+
+                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "INI")
+
+                        End If
+
+
+                    Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE
+                        'Fill rotor finishes
+                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
+
+                            'TODO
+                            'Send FLIGHT in read mode and inform flag
+                            'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
+
+                            'Read rotor finishes
+                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                            Dim validResults As Boolean = True
+
+                            '1. Validate results
+                            'TODO
+
+                            '2. If not valid try 1 FLIGHT rerun
+                            If Not validResults Then
+                                'TODO
+
+                            Else
+                                '3.1 Prepare data for the 1st reactions rotor turn in worksession
+
+                                '3.2 Inform flag finished
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
+
+                                'TODO
+                                'Send FLIGHT in empty mode and inform flag
+                                'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty , "INI")
+
+                            End If
+
+                            'Empty rotor finishes
+                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
+
+                        End If
+                        'AG 14/11/2014 BA-2065
 
                     Case Else
 

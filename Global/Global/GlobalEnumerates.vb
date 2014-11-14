@@ -1133,6 +1133,11 @@ Namespace Biosystems.Ax00.Global
             ' XBC 01/08/2012 - When a ReportSAT is generated when RUNNING WS ' PENDING TO TEST !!!
             ReportSATonRUNNING
             SoftwareWSonRUNNING
+
+            'AG 14/11/2014 BA-2065 new flags for perform Dynamic base line (flow, validation, results, ...)
+            DynamicBL_Fill
+            DynamicBL_Read
+            DynamicBL_Empty
         End Enum
 
 #End Region
