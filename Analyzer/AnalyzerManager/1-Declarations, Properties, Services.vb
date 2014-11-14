@@ -3117,6 +3117,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                         RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                     Else
+                                        ' Instruction has not started by Fw, so is need to send it again
+                                        myLogAcciones.CreateLogActivity("Repeat STATE Instruction [" & MyClass.numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                         myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
                                         MyClass.InitializeTimerSTATEControl(WAITING_TIME_FAST)
                                     End If
@@ -3163,6 +3165,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                         RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                     Else
+                                        ' Instruction has not started by Fw, so is need to send it again
+                                        myLogAcciones.CreateLogActivity("Repeat STATE Instruction [" & MyClass.numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                         myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
                                         MyClass.InitializeTimerSTATEControl(WAITING_TIME_FAST)
                                     End If
