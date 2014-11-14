@@ -250,7 +250,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Dim wellLineDS As New BaseLinesDS
                                             wellLineDS = CType(resultData.SetDatos, BaseLinesDS)
                                             If wellLineDS.twksWSBaseLines.Rows.Count > 0 Then
-                                                resultData = ControlWellBaseLine(dbConnection, True, wellLineDS)
+                                                resultData = ControlWellBaseLine(dbConnection, True, wellLineDS, False)
                                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                                     myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
                                                 End If
@@ -289,7 +289,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.GetLatestBaseLines", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.GetLatestBaseLines", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -328,7 +328,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.GetCurrentAdjustBaseLineValuesByType", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.GetCurrentAdjustBaseLineValuesByType", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -482,7 +482,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.ControlAdjustBaseLine", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.ControlAdjustBaseLine", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -504,10 +504,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns>GlobalDataTO (GlobalEnumeates.Alarms)</returns>
         ''' <remarks>
         ''' AG 02/05/2011 Creation
+        ''' AG 14/11/2014 BA-2065 add parameter pFromInstructionANSPHR
         ''' </remarks>
         Public Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pClassInitialization As Boolean, _
-                                            ByVal pWellBaseLine As BaseLinesDS) As GlobalDataTO Implements IBaseLineEntity.ControlWellBaseLine
+                                            ByVal pWellBaseLine As BaseLinesDS, ByVal pFromInstructionANSPHR As Boolean) As GlobalDataTO Implements IBaseLineEntity.ControlWellBaseLine
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -754,9 +755,9 @@ Namespace Biosystems.Ax00.Core.Entities
                     'rejectionParameters.alarm = GlobalEnumerates.Alarms.NONE 'AG 18/05/2011 - comment after testing
                     resultData.SetDatos = rejectionParameters.alarm
 
-                    'AG 12/06/2012
-                    'Finally raise event with the reactions rotor well new information
-                    If Not pClassInitialization AndAlso Not resultData.HasError AndAlso newReactionsWellsDS.twksWSReactionsRotor.Rows.Count > 0 Then
+                    'AG 12/06/2012 - Finally raise event with the reactions rotor well new information
+                    'AG 14/11/2014 BA-2065 raiseEvent during ANSPHR but not during ANSFBLD
+                    If Not pClassInitialization AndAlso pFromInstructionANSPHR AndAlso Not resultData.HasError AndAlso newReactionsWellsDS.twksWSReactionsRotor.Rows.Count > 0 Then
                         RaiseEvent WellReactionsChanges(newReactionsWellsDS)
                     End If
 
@@ -777,13 +778,131 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.ControlWellBaseLine", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.ControlWellBaseLine", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 29/06/2012 - Running Cycles lost - Solution!
             End Try
             Return resultData
         End Function
 
+
+        ''' <summary>
+        ''' PRE: Method is called when FLIGHT instruction has returned results for all leds and these results are OK
+        ''' 
+        ''' Using the results of the FLIGHT instruction (for all leds) prepares the database for a quick running (updates table twksWSBLinesByWell)
+        ''' </summary>
+        ''' <returns>GlobalDataTo with error o not</returns>
+        ''' <remarks>AG 14/11/2014 BA-2065 Creation</remarks>
+        Public Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO Implements IBaseLineEntity.ControlDynamicBaseLine
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        '1) Declarations
+                        ''''''''''''''''
+                        Dim myReactionsDlg As New ReactionsRotorDelegate
+                        Dim myBLineDlg As New WSBLinesDelegate
+                        Dim myBLineByWellDlg As New WSBLinesByWellDelegate
+
+                        Dim wellBaseLineDS As New BaseLinesDS
+                        Dim newReactionsWellsDS As New ReactionsRotorDS
+
+                        '120 wells in rotor + 10 items required to initiate the FIFO + 7 not used after ALIGHT (ControlWellBaseLine used it after ALIGHT, no applies for dynamic but we reuse the method, so we need to add it)
+                        Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER + BL_WELLREJECT_ITEMS_NOTUSED)
+                        Dim wellID As Integer = 0
+                        Dim newBaseLineID As Integer = 0
+
+
+                        '2) Loop for all wells in reactions rotor
+                        '''''''''''''''''''''''''''''''''''''''''
+                        For myIndex As Integer = 1 To endLoopIndex
+                            'Get the well number in the interval [1, 120]
+                            wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
+
+                            'Get next baselineID in table twksWSBLinesByWell for wellID
+                            resultData = myBLineByWellDlg.GetCurrentBaseLineID(dbConnection, myAnalyzerID, pWorkSessionID, wellID)
+                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                newBaseLineID = DirectCast(resultData.SetDatos, Integer) + 1
+                            Else
+                                Exit For
+                            End If
+
+                            'Read the last dynamic values for wellID (all leds)
+                            resultData = myBLineDlg.GetCurrentBaseLineValues(dbConnection, myAnalyzerID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                wellBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
+                                For Each blRow As BaseLinesDS.twksWSBaseLinesRow In wellBaseLineDS.twksWSBaseLines.Rows
+                                    blRow.BeginEdit()
+                                    blRow.BaseLineID = newBaseLineID
+                                    blRow.WorkSessionID = pWorkSessionID
+                                    blRow.WellUsed = wellID
+                                    blRow.DateTime = Now
+
+                                    blRow.SetMainDarkNull() 'This field is only used in base line with adjust
+                                    blRow.SetRefDarkNull() 'This field is only used in base line with adjust
+                                    blRow.SetDACNull() 'This field is only used in base line with adjust
+                                    blRow.SetITNull() 'This field is only used in base line with adjust
+                                    blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
+                                    blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
+                                    blRow.EndEdit()
+                                Next
+                                wellBaseLineDS.twksWSBaseLines.AcceptChanges()
+                                resultData = ControlWellBaseLine(dbConnection, False, wellBaseLineDS, False)
+                            Else
+                                Exit For
+                            End If
+
+                        Next
+
+                        '3) Finally prepare a refreshDS for the whole reactions rotor
+                        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        If Not resultData.HasError Then
+                            resultData = myReactionsDlg.RepaintAllReactionsRotor(dbConnection, myAnalyzerID)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim newWellsDS As New ReactionsRotorDS
+                                newWellsDS = DirectCast(resultData.SetDatos, ReactionsRotorDS)
+                                RaiseEvent WellReactionsChanges(newWellsDS)
+                            End If
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            'resultData.SetDatos = <value to return; if any>
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BaseLineEntity.ControlDynamicBaseLine", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Changes during Reset WS
+        ''' </summary>
+        ''' <remarks></remarks>
         Public Sub ResetWS() Implements IBaseLineEntity.ResetWS
             InitStructures(True, False) 'Clear well base line parameters on RESET worksession
         End Sub
@@ -893,37 +1012,37 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End With
 
-                Else
-                    'The well is discarted due some diode position has absorbance error
-                    'Remove it from rejectionparameters structure
-                    If pDiodePosition > 0 Then
-                        With rejectionParameters
-                            If .wellUsed.Contains(pWell) Then
-                                .wellUsed.RemoveRange(.wellUsed.Count - 1, 1)
-                                .rejected.RemoveRange(.rejected.Count - 1, 1)
-                                If .initializationParameterItem > 0 Then .initializationParameterItem -= 1
-                            End If
+                    Else
+                        'The well is discarted due some diode position has absorbance error
+                        'Remove it from rejectionparameters structure
+                        If pDiodePosition > 0 Then
+                            With rejectionParameters
+                                If .wellUsed.Contains(pWell) Then
+                                    .wellUsed.RemoveRange(.wellUsed.Count - 1, 1)
+                                    .rejected.RemoveRange(.rejected.Count - 1, 1)
+                                    If .initializationParameterItem > 0 Then .initializationParameterItem -= 1
+                                End If
 
-                            If .absByWELL Is Nothing Then
-                                'No items ... do nothing
-                            ElseIf .absByWELL(0).Abs.Count = 1 Then
-                                'Only one item ... remove it
-                                Erase .absByWELL
-                            Else
-                                'Several items (wells) in struture ... Remove only current wellBL
-                                For wl As Integer = 0 To pDiodePosition - 1
-                                    .absByWELL(wl).Abs.RemoveRange(0, 1)
-                                Next
+                                If .absByWELL Is Nothing Then
+                                    'No items ... do nothing
+                                ElseIf .absByWELL(0).Abs.Count = 1 Then
+                                    'Only one item ... remove it
+                                    Erase .absByWELL
+                                Else
+                                    'Several items (wells) in struture ... Remove only current wellBL
+                                    For wl As Integer = 0 To pDiodePosition - 1
+                                        .absByWELL(wl).Abs.RemoveRange(0, 1)
+                                    Next
 
-                            End If
-                        End With
+                                End If
+                            End With
+                        End If
+
                     End If
-
-                End If
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.InitializationWellRejectionControl", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitializationWellRejectionControl", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1053,7 +1172,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If .initRejected Then
                             Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Well rejection initialization parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                            myLogAcciones.CreateLogActivity("Well rejection initialization parameters (FIFO) rejected. " & infoRejection, "BaseLineEntity.TreatInitializationResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
                             'If initialization rejected then ... update variable wellsExcludedFromFIFO Then
                             For i As Integer = 0 To .wellUsed.Count - 1
@@ -1084,7 +1203,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             .alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
                             exitRunningTypeAttribute = 2
                             Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Max consecutive initializations rejected limit!!", "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False)
+                            myLogAcciones.CreateLogActivity("Max consecutive initializations rejected limit!!", "BaseLineEntity.TreatInitializationResults", EventLogEntryType.Information, False)
                         End If
                     End If
 
@@ -1093,7 +1212,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.TreatInitializationResults", EventLogEntryType.Error, False)
             End Try
             Return wellsExcludedFromFIFO
         End Function
@@ -1179,7 +1298,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If warnMethacrylate Then
                             Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Update wells rejection parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                            myLogAcciones.CreateLogActivity("Update wells rejection parameters (FIFO) rejected. " & infoRejection, "BaseLineEntity.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
                             .alarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
                             '.initRejected = True '????
@@ -1187,7 +1306,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Else
                         'Well rejected
                         Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Well rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                        myLogAcciones.CreateLogActivity("Well rejected. " & infoRejection, "BaseLineEntity.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
                         'AG 04/06/2012
                         consecutiveRejectedWells += 1 'Increment counter
@@ -1195,7 +1314,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If exitRunningTypeAttribute = 0 Then
                                 .alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
                                 exitRunningTypeAttribute = 1
-                                myLogAcciones.CreateLogActivity("Max consecutive rejected wells limit!!", "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False)
+                                myLogAcciones.CreateLogActivity("Max consecutive rejected wells limit!!", "BaseLineEntity.TreatWellRejectionResults", EventLogEntryType.Information, False)
                             End If
                         End If
                         'AG 04/06/2012
@@ -1205,7 +1324,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.TreatWellRejectionResults", EventLogEntryType.Error, False)
             End Try
             Return myExcludedWell
         End Function
@@ -1312,7 +1431,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.UpdateAnalyzerReactionsRotor", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.UpdateAnalyzerReactionsRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1362,7 +1481,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.InitStructures", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitStructures", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1523,7 +1642,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.GetClassParameterValues", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.GetClassParameterValues", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1574,7 +1693,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         '    Catch ex As Exception
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.CalculateStandardDeviation", EventLogEntryType.Error, False)
+        '        myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.CalculateStandardDeviation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResult
 

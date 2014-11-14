@@ -1394,6 +1394,90 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+
+        ''' <summary>
+        ''' When analyzer enters in StandBy repaint the whole reactions rotor, not only the WashStation wells
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <returns>GlobalDataTo with ReactionsRotorDS</returns>
+        ''' <remarks>AG 14/11/2014 BA-2065 REFACTORING</remarks>
+        Public Function RepaintAllReactionsRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim newWellsDS As New ReactionsRotorDS
+
+                        'Update the reactions rotor table (WellContent = 'E' or 'C' for all wells, we are in standby)
+                        resultData = GetAllWellsLastTurn(dbConnection, pAnalyzerID)
+                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                            Dim currentWellsDS As ReactionsRotorDS
+
+                            currentWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
+                            'All wells with WellContent = 'W' changes to WellContent = 'E' or to 'C'
+                            'resultData = reactionsDelegate.SetToEmptyTheWellsInWashStation(dbConnection, AnalyzerIDAttribute)
+                            Dim contaminatedWellsDS As New ReactionsRotorDS
+                            resultData = AsignFinalValuesAfterLeavingRunning(dbConnection, pAnalyzerID, currentWellsDS)
+                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                contaminatedWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
+                            End If
+
+                            'Read again the complete current reactions rotor (last turn)
+                            resultData = GetAllWellsLastTurn(dbConnection, pAnalyzerID)
+                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                currentWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
+
+                                'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
+                                For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In currentWellsDS.twksWSReactionsRotor.Rows
+                                    item.BeginEdit()
+                                    'WellContent must be 'E' (empty) or 'C' (contaminated)
+                                    If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
+
+                                    'WellStatus must be 'R' (ready) or 'X' (rejected)
+                                    If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
+                                    item.EndEdit()
+
+                                    newWellsDS.twksWSReactionsRotor.ImportRow(item)
+                                Next
+                                newWellsDS.AcceptChanges()
+                            End If
+
+                        End If
+
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            resultData.SetDatos = newWellsDS
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.RepaintAllReactionsRotor", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
 #Region "Private Methods"
@@ -1412,11 +1496,11 @@ Namespace Biosystems.Ax00.BL
             Try
                 If pWellNumber <= 0 Then
                     myValue = pMaxRotorWells + pWellNumber
-                    If myValue = 0 Then myValue = pMaxRotorWells
+                            If myValue = 0 Then myValue = pMaxRotorWells
 
-                ElseIf pWellNumber > pMaxRotorWells Then
-                    myValue = pWellNumber - pMaxRotorWells
-                End If
+                        ElseIf pWellNumber > pMaxRotorWells Then
+                            myValue = pWellNumber - pMaxRotorWells
+                        End If
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()

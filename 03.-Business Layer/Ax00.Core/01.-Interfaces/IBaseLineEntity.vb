@@ -20,12 +20,18 @@ Namespace Biosystems.Ax00.Core.Interfaces
 
 #Region "Public Methods"
 
+        'Treat ALIGHT results
         Function ControlAdjustBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
                                               ByVal pALineDS As BaseLinesDS) As GlobalDataTO
 
+        'Treat FLIGHT results (if valid)
+        Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
+
+        'Implements the well rejections algorithm
+        'AG 14/11/2014 BA-2065 add parameter pFromInstructionANSPHR
         Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pClassInitialization As Boolean, _
-                                            ByVal pWellBaseLine As BaseLinesDS) As GlobalDataTO
+                                            ByVal pWellBaseLine As BaseLinesDS, ByVal pFromInstructionANSPHR As Boolean) As GlobalDataTO
 
         Function GetLatestBaseLines(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO

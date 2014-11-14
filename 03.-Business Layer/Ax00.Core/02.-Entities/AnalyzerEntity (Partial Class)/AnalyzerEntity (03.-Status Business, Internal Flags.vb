@@ -1006,6 +1006,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             Else
                                 '3.1 Prepare data for the 1st reactions rotor turn in worksession
+                                myGlobal = BaseLine.ControlDynamicBaseLine(Nothing, WorkSessionIDAttribute)
 
                                 '3.2 Inform flag finished
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
@@ -1190,15 +1191,16 @@ Namespace Biosystems.Ax00.Core.Entities
                                 resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, GlobalEnumerates.Alarms.BASELINE_WELL_WARN.ToString, True)
                             End If
 
-                            'AG 26/09/2012 - COMMENTED
-                            ''2) Update the reactions rotor table (remove WellContent = 'W' washstation to 'E' empty due the wash station does not work in standby)
-                            'Dim reactionsDelegate As New ReactionsRotorDelegate
+                            'AG 26/09/2012 -NEW -Simplification: When analyzer enters in StandBy repaint the whole reactions rotor, not only the WashStation wells
+                            '2) Update the reactions rotor table (WellContent = 'E' or 'C' for all wells, we are in standby)
+                            Dim reactionsDelegate As New ReactionsRotorDelegate
+
+                            'AG 14/11/2014 BA-2065 REFACTORING
                             'resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
                             'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             '    Dim wellsDS As ReactionsRotorDS
                             '    wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                            '    'AG 13/12/2011
                             '    'All wells with WellContent = 'W' changes to WellContent = 'E' or to 'C'
                             '    'resultData = reactionsDelegate.SetToEmptyTheWellsInWashStation(dbConnection, AnalyzerIDAttribute)
                             '    Dim contaminatedWellsDS As New ReactionsRotorDS
@@ -1206,87 +1208,37 @@ Namespace Biosystems.Ax00.Core.Entities
                             '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             '        contaminatedWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
                             '    End If
-                            '    'AG 13/12/2011
 
-                            '    'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
-                            '    'AG 26/09/2012 - in standby all wellContent must be E or C so change the linq
-                            '    Dim myList As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
-                            '    Dim myContaminatedList As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
-                            '    'myList = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor _
-                            '    '          Where a.WellContent = "W" Select a).ToList
-                            '    myList = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor _
-                            '              Where a.WellContent <> "E" AndAlso a.WellContent <> "C" Select a).ToList
+                            '    'Read again the complete current reactions rotor (last turn)
+                            '    resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
+                            '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                            '        wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                            '    If myList.Count > 0 Then
+                            '        'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
                             '        Dim newWellsDS As New ReactionsRotorDS
-
-                            '        For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In myList
+                            '        For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor.Rows
                             '            item.BeginEdit()
                             '            'WellContent must be 'E' (empty) or 'C' (contaminated)
-                            '            item.WellContent = "E"
-                            '            If contaminatedWellsDS.twksWSReactionsRotor.Rows.Count > 0 AndAlso Not item.IsWellNumberNull Then
-                            '                myContaminatedList = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In contaminatedWellsDS.twksWSReactionsRotor _
-                            '                                        Where a.WellNumber = item.WellNumber Select a).ToList
-
-                            '                If myContaminatedList.Count > 0 Then
-                            '                    item.WellContent = "C"
-                            '                End If
-                            '            End If
+                            '            If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
 
                             '            'WellStatus must be 'R' (ready) or 'X' (rejected)
                             '            If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
                             '            item.EndEdit()
+
                             '            newWellsDS.twksWSReactionsRotor.ImportRow(item)
                             '        Next
                             '        newWellsDS.AcceptChanges()
                             '        resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
                             '    End If
-                            '    myList = Nothing 'AG 02/08/2012 - free memory
-                            '    myContaminatedList = Nothing 'AG 02/08/2012 - free memory
                             'End If
-
-                            'AG 26/09/2012 - COMMENTED
-
-                            'AG 26/09/2012 -NEW -Simplification: When analyzer enters in StandBy repaint the whole reactions rotor, not only the WashStation wells
-                            '2) Update the reactions rotor table (WellContent = 'E' or 'C' for all wells, we are in standby)
-                            Dim reactionsDelegate As New ReactionsRotorDelegate
-                            resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim wellsDS As ReactionsRotorDS
-                                wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-
-                                'All wells with WellContent = 'W' changes to WellContent = 'E' or to 'C'
-                                'resultData = reactionsDelegate.SetToEmptyTheWellsInWashStation(dbConnection, AnalyzerIDAttribute)
-                                Dim contaminatedWellsDS As New ReactionsRotorDS
-                                resultData = reactionsDelegate.AsignFinalValuesAfterLeavingRunning(dbConnection, AnalyzerIDAttribute, wellsDS)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    contaminatedWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-                                End If
-
-                                'Read again the complete current reactions rotor (last turn)
-                                resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-
-                                    'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
-                                    Dim newWellsDS As New ReactionsRotorDS
-                                    For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor.Rows
-                                        item.BeginEdit()
-                                        'WellContent must be 'E' (empty) or 'C' (contaminated)
-                                        If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
-
-                                        'WellStatus must be 'R' (ready) or 'X' (rejected)
-                                        If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
-                                        item.EndEdit()
-
-                                        newWellsDS.twksWSReactionsRotor.ImportRow(item)
-                                    Next
-                                    newWellsDS.AcceptChanges()
-                                    resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
-                                End If
-
+                            ''AG 26/09/2012 -NEW
+                            resultData = reactionsDelegate.RepaintAllReactionsRotor(dbConnection, AnalyzerIDAttribute)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim newWellsDS As New ReactionsRotorDS
+                                newWellsDS = DirectCast(resultData.SetDatos, ReactionsRotorDS)
+                                resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
                             End If
-                            'AG 26/09/2012 -NEW
+                            'AG 14/11/2014 REFACTORING
 
                             If (Not resultData.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed

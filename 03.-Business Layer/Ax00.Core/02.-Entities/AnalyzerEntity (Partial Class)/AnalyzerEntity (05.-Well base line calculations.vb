@@ -358,7 +358,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
-                resultData = BaseLine.ControlWellBaseLine(dbConnection, False, pWellBaseLine)
+                resultData = BaseLine.ControlWellBaseLine(dbConnection, False, pWellBaseLine, True)
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN  ... now 
                     'we have to calculate his status = TRUE or FALSE
