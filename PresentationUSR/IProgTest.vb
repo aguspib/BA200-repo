@@ -9427,7 +9427,7 @@ Public Class IProgTest
 
             'TR 11/04/2011 -END 
             GetScreenMoreLabels()
-            GetScreenTooltip()
+            GetScreenTooltips()
             GetScreenTestRefRanges()
 
         Catch ex As Exception
@@ -9479,47 +9479,43 @@ Public Class IProgTest
 
     End Sub
 
-    ''' <summary>
-    ''' Get texts in the current application language for all screen controls
+   ''' <summary>
+    ''' Get texts in the current application language for all Tooltips of all graphical buttons in the screen
     ''' </summary>
     ''' <remarks>
-    ''' Created by: PG 08/10/10
-    ''' Modified by: RH 17/11/2011 Remove pLanguageID, because it is a class property/field. There is no need to pass it as a parameter.
+    ''' Created by:  PG 08/10/2010
+    ''' Modified by: RH 17/11/2011 - Removed pLanguageID, because it is a class property/field. There is no need to pass it as a parameter
+    '''              AG 05/09/2014 - BA-1869 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of STD Tests (Custom Order Button)
+    '''              SA 17/11/2014 - BA-2125 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of STD Tests (Custom Order Button) - previous change was not really done; code 
+    '''                                          was commented and the label was not the correct one. Commented code to get ToolTips for Print 
+    '''                                          and CLIA Values Buttons due to they are not visible.
     ''' </remarks>
-    Private Sub GetScreenTooltip()
+    Private Sub GetScreenTooltips()
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            ' For Tooltips...
-            'bsScreenToolTips.SetToolTip(ExitButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
-            bsScreenToolTips.SetToolTip(AddCalibratorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Tests_AddCalibValues", currentLanguage))
             bsScreenToolTips.SetToolTip(AddButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", currentLanguage))
-            'bsScreenToolTips.SetToolTip(AddSampleTypeButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Tests_AddSampleType", currentLanguage))
-            bsScreenToolTips.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
-            'bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", pLanguageID))
-            bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-
             bsScreenToolTips.SetToolTip(EditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
-            bsScreenToolTips.SetToolTip(PrintTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
-            bsScreenToolTips.SetToolTip(DeleteSampleTypeButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_DelSampleType", currentLanguage))
-            bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            'TR 11/04/2011
-            bsScreenToolTips.SetToolTip(BsButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CLIABV_Values", currentLanguage))
-            'TR 11/04/2011 -END
-
+            bsScreenToolTips.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
+            bsScreenToolTips.SetToolTip(BsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TEST_SORTING_SELECTION", currentLanguage))
             bsScreenToolTips.SetToolTip(CopyTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_COPY_TEST", currentLanguage))
-            'TR 06/03/2012
+            'bsScreenToolTips.SetToolTip(PrintTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+
+            bsScreenToolTips.SetToolTip(DeleteSampleTypeButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_DelSampleType", currentLanguage))
+            bsScreenToolTips.SetToolTip(AddCalibratorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Tests_AddCalibValues", currentLanguage))
             bsScreenToolTips.SetToolTip(AddControls, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ADD_CONTROLS", currentLanguage))
-
             bsScreenToolTips.SetToolTip(DeleteControlButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DELETE_CONTROLS", currentLanguage))
-            'bsScreenToolTips.SetToolTip(BsCustomOrderButton , myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_COPY_TEST", currentLanguage)) 'AG 05/09/2014 - BA-1869
+            'bsScreenToolTips.SetToolTip(BsButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CLIABV_Values", currentLanguage))
 
+            bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".GetScreenTooltip ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltips ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".GetScreenTooltips ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
-
     End Sub
 
     ''' <summary>

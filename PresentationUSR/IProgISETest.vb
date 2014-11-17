@@ -718,7 +718,16 @@ Public Class IProgISETest
     ''' Get texts in the current application language for all screen controls
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SG 20/10/2010
+    ''' Created by:  SG 20/10/2010
+    ''' Modified by: RH 05/06/2012 - Get labels for Quality Control Tab
+    '''              WE 30/07/2014 - BA-1865 ==> Get labels for new controls ReportName and Decimals 
+    '''              WE 01/08/2014 - BA-1865 ==> Get labels for Slope Function control in Options Tab
+    '''              AG 05/09/2014 - BA-1869 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of ISE Tests (Custom Order Button)
+    '''              SA 17/11/2014 - BA-2125 ==> Added ToolTip for new button used to open the auxiliary screen that allow sort and set the  
+    '''                                          availability of ISE Tests (Custom Order Button) - previous change was not really done; code 
+    '''                                          was commented and the label was not the correct one. Commented code to get ToolTip for Print 
+    '''                                          Button due to it is not visible.
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -727,45 +736,30 @@ Public Class IProgISETest
             'For Labels, CheckBox, RadioButtons.....
             bsISETestLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_ISETests_Definition", currentLanguage)
             bsISETestListLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_ISETests_List", currentLanguage)
-
             bsFullNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Name", currentLanguage) + ":"
             bsNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ShortName", currentLanguage) + ":"
             bsUnitLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Unit", currentLanguage) + ":"
-            bsSampleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", currentLanguage) + ":" 'AG 21/10/2010
-            bsAvailableISETestCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AvailableISETest", currentLanguage)  'AG 21/10/2010
-            bsReportNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_ReportName", currentLanguage) + ":"   ' WE 30/07/2014 - #1865
-            bsDecimalsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decimals", currentLanguage) + ":"     ' WE 30/07/2014 - #1865
+            bsSampleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SampleType", currentLanguage) + ":"
+            bsAvailableISETestCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_AvailableISETest", currentLanguage)
+            bsReportNameLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_ReportName", currentLanguage) + ":"
+            bsDecimalsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Decimals", currentLanguage) + ":"
 
-            'For Tooltips
-            bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            'bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage)) 'AG 05/09/2014 - BA-1869
-
-            ' WE 01/08/2014 - #1865
-            ' Details tab
+            'Details tab
             DetailsTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_Options", currentLanguage)
             bsSlopeFunctionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_SlopeFunction", currentLanguage) + ":"
             bsReferenceRangesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ReferenceRanges_Long", currentLanguage) + ":"
-            ' WE 01/08/2014 - #1865 - End
-
-            'For BSTestRefRanges
             bsTestRefRanges.TextForGenericRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Generic", currentLanguage)
             bsTestRefRanges.TextForNormalityLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Normality", currentLanguage) & ":"
             bsTestRefRanges.TextForMinValueLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MinValue", currentLanguage)
             bsTestRefRanges.TextForMaxValueLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_MaxValue", currentLanguage)
-
             bsTestRefRanges.TextForDetailedRadioButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DetailedReferenceRange", currentLanguage)
             bsTestRefRanges.TextForGenderColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Gender", currentLanguage)
             bsTestRefRanges.TextForAgeColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Age", currentLanguage)
             bsTestRefRanges.TextForFromColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_From", currentLanguage)
             bsTestRefRanges.TextForToColumn = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_To", currentLanguage)
-
             bsTestRefRanges.ToolTipForDetailDeleteButton = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DelReferenceRange", currentLanguage)
 
-            'RH 05/06/2012
+            'Quality Control Tab
             QCTabPage.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_QualityControl", currentLanguage)
             QCValuesLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Quality_Control_Values", currentLanguage)
             QCActiveCheckBox.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_QCActive", currentLanguage)
@@ -782,8 +776,14 @@ Public Class IProgISETest
             ControlsSelectionLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_ControlSelection", currentLanguage)
             AddControlLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CREATE_NEW_CONTROLS", currentLanguage)
             CUMULATE_QCRESULTS_Label = GetMessageText(GlobalEnumerates.Messages.CUMULATE_QCRESULTS.ToString(), currentLanguage)
-            'RH 05/06/2012 END
 
+            'For Tooltips
+            bsScreenToolTips.SetToolTip(bsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsCustomOrderButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_TEST_SORTING_SELECTION", currentLanguage))
+            'bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
