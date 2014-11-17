@@ -5453,9 +5453,9 @@ Partial Public Class IAx00MainMDI
                 Dim myWS As New WorkSessionsDelegate
 
                 If (Not HISTWorkingMode) Then
-                    myGlobal = myWS.ResetWS(Nothing, ActiveAnalyzer, ActiveWorkSession)
+                    myGlobal = myWS.ResetWS(Nothing, ActiveAnalyzer, ActiveWorkSession, AnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                 Else
-                    myGlobal = myWS.ResetWSNEW(Nothing, ActiveAnalyzer, ActiveWorkSession)
+                    myGlobal = myWS.ResetWSNEW(Nothing, ActiveAnalyzer, ActiveWorkSession, AnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                 End If
 
                 If (Not myGlobal.HasError) Then

@@ -383,6 +383,8 @@ Namespace Biosystems.Ax00.BL
 
         ''' <summary>
         ''' Delete all BaseLines by Well for the specified Analyzer Work Session
+        ''' STATIC well rejections -> delete all records in table
+        ''' DYNAMIC well rejections -> delete all records in table except the MAX(baseLineID) of each well
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -390,8 +392,9 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 14/05/2010 
+        ''' AG 17/11/2014 BA-2065 (add pAnalyzerModel parameter + new business)
         ''' </remarks>
-        Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -400,8 +403,42 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'Dim myDAO As New twksWSBLinesByWellDAO
+                        'resultData = myDAO.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
+
+                        'Read how is configurated the well rejection type depending the analyzer model
+                        Dim myParams As New SwParametersDelegate
+                        Dim BaseLineTypeForWellReject As GlobalEnumerates.BaseLineType
+                        resultData = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.BL_TYPE_FOR_WELLREJECT.ToString(), pAnalyzerModel)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            Dim textValue As String = ""
+                            textValue = CStr(resultData.SetDatos)
+                            BaseLineTypeForWellReject = DirectCast([Enum].Parse(GetType(GlobalEnumerates.BaseLineType), textValue), GlobalEnumerates.BaseLineType)
+                        End If
+
                         Dim myDAO As New twksWSBLinesByWellDAO
-                        resultData = myDAO.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
+                        If BaseLineTypeForWellReject = GlobalEnumerates.BaseLineType.STATIC Then
+                            'Delete all table
+                            resultData = myDAO.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
+
+                        ElseIf BaseLineTypeForWellReject = GlobalEnumerates.BaseLineType.DYNAMIC Then
+                            'Get the max baseLineID of each well
+                            resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID)
+
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                'Delete all except the max baseLineID of each well
+                                Dim auxDataSet As New BaseLinesDS
+                                auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
+                                resultData = myDAO.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, auxDataSet)
+
+                                'Update the BaseLineID as 0
+                                If Not resultData.HasError Then
+                                    resultData = myDAO.UpdateBaseLineIDAfterReset(dbConnection, pAnalyzerID, 0)
+                                End If
+
+                            End If
+
+                        End If
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -411,7 +448,7 @@ Namespace Biosystems.Ax00.BL
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
                     End If
-                End If
+                    End If
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
@@ -525,6 +562,44 @@ Namespace Biosystems.Ax00.BL
                 myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesByWellDelegate.UpdateIsMean", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Returns the last information (max baselineID) for each well
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 17/11/2014 BA-2065</remarks>
+        Public Function GetAllWellsLastTurn(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesByWellDAO
+                        resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSBLinesByWellDelegate.GetAllWellsLastTurn", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function

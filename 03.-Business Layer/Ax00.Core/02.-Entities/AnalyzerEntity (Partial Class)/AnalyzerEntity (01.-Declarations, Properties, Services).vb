@@ -4790,9 +4790,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     'Reset the current WS
                     If (Not HISTWorkingMode) Then
-                        myGlobal = myWSDelegate.ResetWS(pDBConnection, pWSAnalyzerID, ActiveWorkSession, False)
+                        myGlobal = myWSDelegate.ResetWS(pDBConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     Else
-                        myGlobal = myWSDelegate.ResetWSNEW(pDBConnection, pWSAnalyzerID, ActiveWorkSession, False, False)
+                        myGlobal = myWSDelegate.ResetWSNEW(pDBConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     End If
                     If (Not myGlobal.HasError) Then MyClass.ResetWorkSession()
                 End If

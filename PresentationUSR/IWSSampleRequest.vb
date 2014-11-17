@@ -4992,7 +4992,7 @@ Public Class IWSSampleRequest
                         End If
                     Else
                         'The WS is reset: THIS CASE NEVER HAPPENS!!
-                        myGlobalDataTO = myWSDelegate.ResetWSNEW(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
+                        myGlobalDataTO = myWSDelegate.ResetWSNEW(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, AnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
 
                         If (Not myGlobalDataTO.HasError) Then
                             'Update screen attributes and  global variables in the main MDI Form

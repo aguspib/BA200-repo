@@ -101,7 +101,7 @@ Public Class Ax00MainMenuForm
                 Dim myWS As New WorkSessionsDelegate
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myWS.ResetWS(Nothing, "SN0000099999_Ax400", Me.TextBox1.Text)
+                myGlobal = myWS.ResetWS(Nothing, "SN0000099999_Ax400", Me.TextBox1.Text, "A400")
                 If (Not myGlobal.HasError) Then
                     MsgBox("OK ")
                 Else

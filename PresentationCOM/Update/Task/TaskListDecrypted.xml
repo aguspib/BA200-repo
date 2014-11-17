@@ -2330,7 +2330,7 @@
       VALUES ('BL_TYPE_FOR_WELLREJECT', 1, 'A400', NULL, 'STATIC', 'BaseLine type used to wells rejection')
 
       INSERT INTO [Ax00].[dbo].[tfmwSwParameters]([ParameterName],[DependByModel],[AnalyzerModel],[ValueNumeric],[ValueText],[Description])
-      VALUES ('BL_TYPE_FOR_WELLREJECT', 1, 'A200', NULL, 'STATIC', 'BaseLine type used to wells rejection')
+      VALUES ('BL_TYPE_FOR_WELLREJECT', 1, 'A200', NULL, 'DYNAMIC', 'BaseLine type used to wells rejection')
       END
       GO
 

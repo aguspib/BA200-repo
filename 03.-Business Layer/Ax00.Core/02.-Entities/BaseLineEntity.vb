@@ -12,16 +12,16 @@ Namespace Biosystems.Ax00.Core.Entities
         Implements IBaseLineEntity
 
 #Region "Abstract methods"
-        ''' <summary>
-        ''' Get the last ADJUST base lines
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' AG 04/11/2014 BA-2065 (refactoring method GetLatestBaseLines in this class)
-        ''' </remarks>
-        Public MustOverride Function GetCurrentAdjustBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+
+        'AG 17/11/2014 BA-2065 - Make abstract
+        ' ''' <summary>
+        ' ''' Changes during Reset WS
+        ' ''' </summary>
+        ' ''' <remarks></remarks>
+        'Public Sub ResetWS() Implements IBaseLineEntity.ResetWS
+        '    InitStructures(True, False) 'Clear well base line parameters on RESET worksession
+        'End Sub
+        Public MustOverride Sub ResetWS() Implements IBaseLineEntity.ResetWS
 
 #End Region
 
@@ -230,7 +230,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'AG 04/11/2014 BA-2065 refactoring
                         'Dim blinesDelg As New WSBLinesDelegate
                         'resultData = blinesDelg.GetCurrentBaseLineValues(dbConnection, pAnalyzerID)
-                        resultData = GetCurrentAdjustBaseLineValues(dbConnection, pAnalyzerID)
+                        resultData = GetCurrentAdjustBaseLineValuesByType(dbConnection, pAnalyzerID, GlobalEnumerates.BaseLineType.STATIC.ToString)
 
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             Dim ALineDS As New BaseLinesDS
@@ -933,14 +933,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         ''' <summary>
-        ''' Changes during Reset WS
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Sub ResetWS() Implements IBaseLineEntity.ResetWS
-            InitStructures(True, False) 'Clear well base line parameters on RESET worksession
-        End Sub
-
-        ''' <summary>
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
@@ -1007,6 +999,50 @@ Namespace Biosystems.Ax00.Core.Entities
                 Throw ex
             End Try
         End Sub
+
+        ''' <summary>
+        ''' Initialize the well rejection control structure
+        ''' </summary>
+        ''' <param name="pResetWellRejectionParameters" ></param>
+        ''' <remarks>
+        ''' AG 03/05/2011 Creation
+        ''' AG 17/11/2014 BA-2065 define as public because is used by methods that overrides ResetWS
+        ''' </remarks>
+        Public Sub InitStructures(ByVal pResetWellRejectionParameters As Boolean, ByVal pNewAdjustBaseLine As Boolean)
+            Try
+                With wellBL
+                    If Not .mainLight Is Nothing Then .mainLight.Clear() Else .mainLight = New List(Of Integer)
+                    If Not .refLight Is Nothing Then .refLight.Clear() Else .refLight = New List(Of Integer)
+                    If Not .Abs Is Nothing Then .Abs.Clear() Else .Abs = New List(Of Single)
+                    .well = 0
+                    .rejected = False
+                End With
+
+                If pResetWellRejectionParameters Then
+                    With rejectionParameters
+                        If Not .absAVG Is Nothing Then .absAVG.Clear() Else .absAVG = New List(Of Single)
+                        If Not .absSD Is Nothing Then .absSD.Clear() Else .absSD = New List(Of Single)
+                        Erase .absByWELL
+                        If Not .wellUsed Is Nothing Then .wellUsed.Clear() Else .wellUsed = New List(Of Integer)
+                        If Not .rejected Is Nothing Then .rejected.Clear() Else .rejected = New List(Of Boolean)
+
+                        .alarm = GlobalEnumerates.Alarms.NONE
+                        .initializationParameterItem = 0
+                        .initRejected = False
+
+                        If pNewAdjustBaseLine Then .wellsNotUsedAfterALight = 0 'After an ALIGHT results the firsts BL wells must be not used
+                    End With
+
+                    InitializationComplete = False
+
+                End If
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitStructures", EventLogEntryType.Error, False)
+            End Try
+        End Sub
+
 
 #End Region
 
@@ -1475,49 +1511,6 @@ Namespace Biosystems.Ax00.Core.Entities
 #End Region
 
 #Region "Other private methods"
-
-        ''' <summary>
-        ''' Initialize the well rejection control structure
-        ''' </summary>
-        ''' <param name="pResetWellRejectionParameters" ></param>
-        ''' <remarks>
-        ''' AG 03/05/2011 Creation
-        ''' </remarks>
-        Private Sub InitStructures(ByVal pResetWellRejectionParameters As Boolean, ByVal pNewAdjustBaseLine As Boolean)
-            Try
-                With wellBL
-                    If Not .mainLight Is Nothing Then .mainLight.Clear() Else .mainLight = New List(Of Integer)
-                    If Not .refLight Is Nothing Then .refLight.Clear() Else .refLight = New List(Of Integer)
-                    If Not .Abs Is Nothing Then .Abs.Clear() Else .Abs = New List(Of Single)
-                    .well = 0
-                    .rejected = False
-                End With
-
-                If pResetWellRejectionParameters Then
-                    With rejectionParameters
-                        If Not .absAVG Is Nothing Then .absAVG.Clear() Else .absAVG = New List(Of Single)
-                        If Not .absSD Is Nothing Then .absSD.Clear() Else .absSD = New List(Of Single)
-                        Erase .absByWELL
-                        If Not .wellUsed Is Nothing Then .wellUsed.Clear() Else .wellUsed = New List(Of Integer)
-                        If Not .rejected Is Nothing Then .rejected.Clear() Else .rejected = New List(Of Boolean)
-
-                        .alarm = GlobalEnumerates.Alarms.NONE
-                        .initializationParameterItem = 0
-                        .initRejected = False
-
-                        If pNewAdjustBaseLine Then .wellsNotUsedAfterALight = 0 'After an ALIGHT results the firsts BL wells must be not used
-                    End With
-
-                    InitializationComplete = False
-
-                End If
-
-            Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitStructures", EventLogEntryType.Error, False)
-            End Try
-        End Sub
-
 
         ''' <summary>
         ''' Initialize the internal variables using preloaded limits using FieldLimits or SwParameters tables

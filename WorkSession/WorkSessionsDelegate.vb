@@ -2357,8 +2357,9 @@ Namespace Biosystems.Ax00.BL
         '''                              in an internal Virtual Rotor before reset all positions
         '''              SA 04/10/2011 - Activated again the code for deleting WSAnalyzerAlarms
         '''             XBC 14/06/2012 - Add pPreserveRotorPositions parameter with the aim to delete Rotor Positions when change of Analyzer
+        '''              AG 17/11/2014 BA-2065 new parameter pAnalyzerModel
         ''' </remarks>
-        Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String, _
                                 Optional ByVal pPreserveRotorPositions As Boolean = True) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -2455,7 +2456,7 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError) Then
                             'Delete all base lines by well for the specified AnalyzerID/WorkSessionID
                             Dim myWSBaseLinesByWell As New WSBLinesByWellDelegate
-                            resultData = myWSBaseLinesByWell.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myWSBaseLinesByWell.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                         End If
 
                         If (Not resultData.HasError) Then
@@ -5669,10 +5670,13 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pAnalyzerModel"></param>
         ''' <param name="pPreserveRotorPositions">Flag indicating if the content of Reagents and Samples Rotors have to be saved 
         '''                                       to be used in following WorkSessions: default value is TRUE. It is set to FALSE
         '''                                       when the function is called due to the connected Analyzer is different of the one
         '''                                       in which the specified WorkSession was executed</param>
+        ''' <param name="pSaveLISPendingOrders"></param>
+        ''' <param name="pIsUpdateProcess"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  GDS
@@ -5706,8 +5710,9 @@ Namespace Biosystems.Ax00.BL
         '''              XB 25/04/2013 - Add new optional pSaveLISPendingOrders parameter to indicate if the process to Save the LIS orders not processed Is required or not 
         '''              AG + TR 02/05/2013 - open the transaction only when pIsUpdateProcess is TRUE (also for close it)
         '''              TR 07/01/2013 -Clear commented code to make the function readable.
+        '''              AG 17/11/2014 BA-2065 new parameter pAnalyzerModel
         ''' </remarks>
-        Public Function ResetWSNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function ResetWSNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String, _
                                    Optional ByVal pPreserveRotorPositions As Boolean = True, Optional ByVal pSaveLISPendingOrders As Boolean = True, _
                                    Optional pIsUpdateProcess As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -5723,7 +5728,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 ' XB 23/04/2013 - ResetWSNEW is replaced by ResetWS_5DB_TRANS
-                resultData = ResetWS_5DB_TRANS(pDBConnection, pAnalyzerID, pWorkSessionID, pPreserveRotorPositions, pSaveLISPendingOrders, pIsUpdateProcess)
+                resultData = ResetWS_5DB_TRANS(pDBConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel, pPreserveRotorPositions, pSaveLISPendingOrders, pIsUpdateProcess) 'AG 17/11/2014 BA-2065 inform analyzerModel
 
                 'AG + TR 02/05/2013
                 If pIsUpdateProcess Then
@@ -5814,8 +5819,9 @@ Namespace Biosystems.Ax00.BL
         '''                                 open DB Connection received as parameter
         '''              AG 18/11/2013 - (#1385) Delete all positions in process for analyzer
         '''              XB 05/02/2014 - Do not save previous Orders from LIS (Patch 2.1.1c) - Task #1491
+        '''              AG 17/11/2014 BA-2065 inform analyzerModel
         ''' </remarks>
-        Public Function ResetWS_5DB_TRANS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function ResetWS_5DB_TRANS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String, _
                                    Optional ByVal pPreserveRotorPositions As Boolean = True, Optional ByVal pSaveLISPendingOrders As Boolean = True, _
                                    Optional pIsUpdateProcess As Boolean = False) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -5991,7 +5997,7 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError) Then
                             'Delete all base lines by well for the specified AnalyzerID/WorkSessionID
                             Dim myWSBaseLinesByWell As New WSBLinesByWellDelegate
-                            resultData = myWSBaseLinesByWell.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myWSBaseLinesByWell.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                         End If
 
                         If (Not resultData.HasError) Then

@@ -553,6 +553,145 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Returns the last information (max baselineID) for each well
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 17/11/2014 BA-2065</remarks>
+        Public Function GetAllWellsLastTurn(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+                        cmdText &= "SELECT W1.wellused, MAX(W1.baselineID) AS BaselineID FROM twksWSBLinesByWell W1 " & vbCrLf
+                        cmdText &= " INNER JOIN twksWSBLinesByWell W2 ON W1.WellUsed = W2.WellUsed " & vbCrLf
+                        cmdText &= " WHERE W1.AnalyzerID = N'" & pAnalyzerID.Replace("'", "''").ToString & "'" & vbCrLf
+                        cmdText &= " AND W1.WorksessionID = N'" & pWorkSessionID.Replace("'", "''").ToString & "'" & vbCrLf
+                        cmdText &= " GROUP BY W1.WellUsed ORDER BY WellUsed ASC "
+
+                        Dim myDataSet As New BaseLinesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myDataSet.twksWSBaseLines)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myDataSet
+                        resultData.HasError = False
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSBLinesByWellDAO.FunctionName", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Delete all BaseLines by Well for the specified Analyzer Work Session except the informed in parameter DataSet
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pLastValuesDS"></param>
+        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        ''' <remarks>
+        ''' AG 17/11/2014 BA-2065
+        ''' </remarks>
+        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                            ByVal pLastValuesDS As BaseLinesDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = String.Empty
+                    For Each row As BaseLinesDS.twksWSBaseLinesRow In pLastValuesDS.twksWSBaseLines
+                        cmdText &= " DELETE twksWSBLinesByWell " & vbCrLf & _
+                                   " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                   " AND WellUsed =" & row.WellUsed & vbCrLf & _
+                                   " AND BaseLineID <>" & row.BaseLineID & vbCrLf
+                        cmdText &= vbNewLine
+                    Next
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.ResetWSForDynamicBL", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' When well rejection algorithm works with dynamic base line after reset rename the BaseLineID of the existings records to NewBaseLineID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="NewBaseLineID"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AG 17/11/2014 BA-2065
+        ''' </remarks>
+        Public Function UpdateBaseLineIDAfterReset(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal NewBaseLineID As Integer) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = String.Empty
+                    cmdText &= " UPDATE twksWSBLinesByWell SET BaseLineID = " & NewBaseLineID & vbCrLf & _
+                               " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.UpdateBaseLineIDAfterReset", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
 #End Region
     End Class
 End Namespace

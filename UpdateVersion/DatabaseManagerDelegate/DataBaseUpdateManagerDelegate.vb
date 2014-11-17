@@ -580,10 +580,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             'Reset any work session before starting update. Need to get the Worksession ID and the AnalyzerIDAttribute to reset the current WorkSession
                             If (Not GlobalConstants.HISTWorkingMode) Then
                                 'myGlobal = myWS.ResetWS(Nothing, analyzerID, worksessionID)
-                                myGlobal = myWS.ResetWS(pServer.ConnectionContext.SqlConnectionObject(), analyzerID, worksessionID)
+                                myGlobal = myWS.ResetWS(pServer.ConnectionContext.SqlConnectionObject(), analyzerID, worksessionID, analyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                             Else
                                 'myGlobal = myWS.ResetWSNEW(Nothing, analyzerID, worksessionID)
-                                myGlobal = myWS.ResetWSNEW(pServer.ConnectionContext.SqlConnectionObject(), analyzerID, worksessionID, False, True, True)
+                                myGlobal = myWS.ResetWSNEW(pServer.ConnectionContext.SqlConnectionObject(), analyzerID, worksessionID, analyzerModel, False, True, True) 'AG 17/11/2014 BA-2065 inform analyzerModel
                             End If
 
                             If Not myGlobal.HasError Then
