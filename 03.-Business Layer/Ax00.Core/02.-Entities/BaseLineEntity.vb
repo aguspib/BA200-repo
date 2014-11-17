@@ -505,11 +505,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns>GlobalDataTO (GlobalEnumeates.Alarms)</returns>
         ''' <remarks>
         ''' AG 02/05/2011 Creation
-        ''' AG 14/11/2014 BA-2065 add parameter pFromInstructionANSPHR
+        ''' AG 14/11/2014 BA-2065 add parameter pType
         ''' </remarks>
         Public Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pClassInitialization As Boolean, _
-                                            ByVal pWellBaseLine As BaseLinesDS, ByVal pFromInstructionANSPHR As Boolean) As GlobalDataTO Implements IBaseLineEntity.ControlWellBaseLine
+                                            ByVal pWellBaseLine As BaseLinesDS, ByVal pType As GlobalEnumerates.BaseLineType) As GlobalDataTO Implements IBaseLineEntity.ControlWellBaseLine
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
@@ -757,8 +757,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     resultData.SetDatos = rejectionParameters.alarm
 
                     'AG 12/06/2012 - Finally raise event with the reactions rotor well new information
-                    'AG 14/11/2014 BA-2065 raiseEvent during ANSPHR but not during ANSFBLD
-                    If Not pClassInitialization AndAlso pFromInstructionANSPHR AndAlso Not resultData.HasError AndAlso newReactionsWellsDS.twksWSReactionsRotor.Rows.Count > 0 Then
+                    'AG 14/11/2014 BA-2065 raiseEvent during ANSPHR (STATIC) but not during ANSFBLD (DYNAMIC)
+                    If Not pClassInitialization AndAlso pType = BaseLineType.STATIC AndAlso Not resultData.HasError AndAlso newReactionsWellsDS.twksWSReactionsRotor.Rows.Count > 0 Then
                         RaiseEvent WellReactionsChanges(newReactionsWellsDS)
                     End If
 
@@ -792,7 +792,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' Using the results of the FLIGHT instruction (for all leds) prepares the database for a quick running (updates table twksWSBLinesByWell)
         ''' </summary>
-        ''' <returns>GlobalDataTo with error o not</returns>
+        ''' <returns>GlobalDataTo with error o not (data as Alarms enumerate)</returns>
         ''' <remarks>AG 14/11/2014 BA-2065 Creation</remarks>
         Public Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO Implements IBaseLineEntity.ControlDynamicBaseLine
             Dim resultData As GlobalDataTO = Nothing
@@ -818,6 +818,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER + BL_WELLREJECT_ITEMS_NOTUSED)
                         Dim wellID As Integer = 0
                         Dim newBaseLineID As Integer = 0
+                        Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
 
 
                         '2) Get last dynamic base line results for all wells and leds
@@ -869,8 +870,22 @@ Namespace Biosystems.Ax00.Core.Entities
                                 blRow.EndEdit()
                             Next
                             convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
-                            resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, False)
-                            If resultData.HasError Then
+                            resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, BaseLineType.DYNAMIC)
+
+                            'Evaluate the result: no alarm, base line WARN or base line ERR
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                If DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms) <> GlobalEnumerates.Alarms.NONE Then
+                                    'If there is still not alarm informed --> Get it
+                                    If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                        'Alarm can change from WARM to ERROR but not from ERROR to WARN
+                                    ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                    End If
+                                End If
+                            ElseIf resultData.HasError Then
                                 Exit For
                             End If
                         Next
@@ -887,6 +902,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                         End If
 
+                        resultData.SetDatos = myAlarm
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)

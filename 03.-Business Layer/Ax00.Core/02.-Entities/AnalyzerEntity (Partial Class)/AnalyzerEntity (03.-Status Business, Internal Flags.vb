@@ -575,6 +575,12 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
             Try
+                Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim AlarmStatusList As New List(Of Boolean)
+                Dim alarmStatus As Boolean = False 'By default no alarm
+                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+
+
                 Select Case pAx00ActionCode
                     'The STANDBY instruction starts (prepare event for inform UI layer)
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_START
@@ -582,8 +588,6 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'AG 12/03/2012 - If exists remove the alarm REACTIONS ROTOR MISSING (only if current status is SLEEPING)
                         If AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
-                            Dim AlarmStatusList As New List(Of Boolean)
                             PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then
@@ -874,8 +878,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 0, False)
 
                             'AG 12/03/2012 - If exists remove the alarm REACTIONS ROTOR MISSING
-                            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
-                            Dim AlarmStatusList As New List(Of Boolean)
                             PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then
@@ -1011,7 +1013,23 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 '3.1 Prepare data for the 1st reactions rotor turn in worksession
                                 myGlobal = BaseLine.ControlDynamicBaseLine(Nothing, WorkSessionIDAttribute)
-                                If myGlobal.HasError Then
+
+                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)
+                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
+
+                                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                                    If AlarmList.Count > 0 Then
+                                        If GlobalBase.IsServiceAssembly Then
+                                            'Alarms treatment for Service
+                                        Else
+                                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                                            Dim myLogAcciones As New ApplicationLogManager()
+                                            myLogAcciones.CreateLogActivity("Treat alarms (dynamic base line converted to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ManageStandByStatus", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                        End If
+                                    End If
+                                ElseIf myGlobal.HasError Then
                                     'If not active generate base line alarm (error)
                                     'TODO
                                 End If
@@ -1045,6 +1063,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
 
+                AlarmStatusList = Nothing
+                AlarmList = Nothing
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()

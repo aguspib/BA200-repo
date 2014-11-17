@@ -28,10 +28,10 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
 
         'Implements the well rejections algorithm
-        'AG 14/11/2014 BA-2065 add parameter pFromInstructionANSPHR
+        'AG 14/11/2014 BA-2065 add parameter pType (STATIC or DYNAMIC)
         Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
                                             ByVal pClassInitialization As Boolean, _
-                                            ByVal pWellBaseLine As BaseLinesDS, ByVal pFromInstructionANSPHR As Boolean) As GlobalDataTO
+                                            ByVal pWellBaseLine As BaseLinesDS, ByVal pType As GlobalEnumerates.BaseLineType) As GlobalDataTO
 
         Function GetLatestBaseLines(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
