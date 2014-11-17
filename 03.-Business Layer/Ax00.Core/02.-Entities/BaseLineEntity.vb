@@ -809,27 +809,27 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim myReactionsDlg As New ReactionsRotorDelegate
                         Dim myBLineByWellDlg As New WSBLinesByWellDelegate
 
-                        Dim dynamicBaseLineDS As New BaseLinesDS
+                        Dim LastDynamicBaseLineDS As New BaseLinesDS
                         Dim convertIntoWellBaseLineDS As New BaseLinesDS
                         Dim newReactionsWellsDS As New ReactionsRotorDS
                         Dim linqRes As New List(Of BaseLinesDS.twksWSBaseLinesRow)
 
-                        '120 wells in rotor + 10 items required to initiate the FIFO + 7 not used after ALIGHT (ControlWellBaseLine used it after ALIGHT, no applies for dynamic but we reuse the method, so we need to add it)
+                        '120 wells in rotor + 10 items required to initiate the FIFO + 7 wells not used after ALIGHT (ControlWellBaseLine used it after ALIGHT. It doesn't apply for dynamic but we reuse the method, so we need to add them)
                         Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER + BL_WELLREJECT_ITEMS_NOTUSED)
                         Dim wellID As Integer = 0
                         Dim newBaseLineID As Integer = 0
 
 
-                        '2) Get last dynamic base line results for all wells
-                        ''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        '2) Get last dynamic base line results for all wells and leds
+                        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                         resultData = GetCurrentAdjustBaseLineValuesByType(dbConnection, myAnalyzerID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            dynamicBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
+                            LastDynamicBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
                         End If
 
 
-                        '3) Loop for all wells in reactions rotor
-                        '''''''''''''''''''''''''''''''''''''''''
+                        '3) Loop calling well rejections algorithm for all wells in reactions rotor
+                        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                         For myIndex As Integer = 1 To endLoopIndex
                             'Get the well number in the interval [1, 120]
                             wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
@@ -843,7 +843,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                             'Read the last dynamic values for wellID (all leds)
-                            linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In dynamicBaseLineDS.twksWSBaseLines _
+                            linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
                                        Where a.WellUsed = wellID Select a).ToList
 
                             convertIntoWellBaseLineDS.twksWSBaseLines.Clear()
@@ -870,6 +870,9 @@ Namespace Biosystems.Ax00.Core.Entities
                             Next
                             convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
                             resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, False)
+                            If resultData.HasError Then
+                                Exit For
+                            End If
                         Next
                         linqRes = Nothing
 

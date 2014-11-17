@@ -811,10 +811,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
                             myGlobal = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, AnalyzerIDAttribute)
 
-                            'Before send ALIGHT process ... delete the all ALIGHT results
+                            'Before send ALIGHT process ... delete the all ALIGHT/FLIGHT results
                             If Not myGlobal.HasError Then
                                 Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
+                                myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                 If Not myGlobal.HasError Then
                                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                     baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
@@ -915,10 +915,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                 Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
                                 myGlobal = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, AnalyzerIDAttribute)
 
-                                'Before send ALIGHT process ... delete the all ALIGHT results
+                                'Before send ALIGHT process ... delete the all ALIGHT/FLIGHT results
                                 If Not myGlobal.HasError Then
                                     Dim ALightDelg As New WSBLinesDelegate
-                                    myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
+                                    myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                     If Not myGlobal.HasError Then
                                         'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                         baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
@@ -978,6 +978,10 @@ Namespace Biosystems.Ax00.Core.Entities
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
 
+                            'When FLIGHT read is accepted ... delete the all previous FLIGHT results
+                            Dim myBLinesDlg As New WSBLinesDelegate
+                            myGlobal = myBLinesDlg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "INI")
 
@@ -1007,6 +1011,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             Else
                                 '3.1 Prepare data for the 1st reactions rotor turn in worksession
                                 myGlobal = BaseLine.ControlDynamicBaseLine(Nothing, WorkSessionIDAttribute)
+                                If myGlobal.HasError Then
+                                    'If not active generate base line alarm (error)
+                                    'TODO
+                                End If
 
                                 '3.2 Inform flag finished
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")

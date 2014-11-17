@@ -4400,9 +4400,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "END")
                                 ' XBC 01/10/2012
 
-                                'Before send ALIGHT in wup process ... delete the all ALIGHT results
+                                'Before send ALIGHT in wup process ... delete the all ALIGHT/FLIGHT results
                                 Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
+                                myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                 If Not myGlobal.HasError Then
                                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                     baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter

@@ -685,8 +685,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 29/04/2011 - Due to field WorkSessionID was removed from table twksWSBLines, method is renamed from ResetWS to 
         '''                              ResetAdjustsBLines, parameter pWorkSessionID is also removed, and the query is changed to remove the filter
         ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
+        ''' AG 16/11/2014 BA-2065 rename method from ResetAdjustsBLines to ResetBLinesValues
         ''' </remarks>
-        Public Function ResetAdjustsBLines(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
+        Public Function ResetBLinesValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -713,7 +714,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.ResetAdjustsBLines", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.ResetBLinesValues", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

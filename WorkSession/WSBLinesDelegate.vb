@@ -384,8 +384,9 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: AG 29/04/2011 - Due to field WorkSessionID was removed from table twksWSBLines, method is renamed from ResetWS to 
         '''                              ResetAdjustsBLines, parameter pWorkSessionID is also removed, and the query is changed to remove the filter
         ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
+        ''' AG 16/11/2014 BA-2065 rename method from ResetAdjustsBLines to ResetBLinesValues
         ''' </remarks>
-        Public Function ResetAdjustsBLines(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function ResetBLinesValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -401,9 +402,9 @@ Namespace Biosystems.Ax00.BL
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim counter As Integer = CType(resultData.SetDatos, Integer)
                             If (counter = 0) Then
-                                'Remove ALIGHT results only when no executions are using these adjust base line identifiers
+                                'Remove ALIGHT/FLIGHT results (or both) only when no executions are using these adjust base line identifiers
                                 Dim myDAO As New twksWSBLinesDAO
-                                resultData = myDAO.ResetAdjustsBLines(dbConnection, pAnalyzerID, pType)
+                                resultData = myDAO.ResetBLinesValues(dbConnection, pAnalyzerID, pType)
                             End If
                         End If
 
@@ -426,7 +427,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ResetAdjustsBLines", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ResetBLinesValues", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
