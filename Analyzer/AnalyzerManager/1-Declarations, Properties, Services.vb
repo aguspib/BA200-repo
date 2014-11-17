@@ -137,6 +137,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private RUNNINGLost As Boolean
         Private numRepetitionsSTATE As Integer
         Private waitingSTATETimer As New Timer()
+        Private StartingRunningFirstTime As Boolean
 
         'Public IsDisplayingServiceData As Boolean = True 'SGM 15/09/2011 exclusion flag for avoiding to update data while displaying data
         'SGM 29/09/2011

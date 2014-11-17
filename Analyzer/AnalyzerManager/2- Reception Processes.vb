@@ -355,7 +355,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If MyClass.RUNNINGLost Then
                     MyClass.RUNNINGLost = False
 
-                    If AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START And _
+                    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY AndAlso _
+                       AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
                        AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_END Then
                         MyClass.sendingRepetitions = True
                         MyClass.numRepetitionsTimeout += 1
@@ -409,36 +410,41 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ' Update the interval of the Timer with the expected time received from the Analyzer
                     Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
                     MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                    StartingRunningFirstTime = True
                 End If
 
-                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Then
-                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
-                    RUNNINGLost = False
-                    MyClass.sendingRepetitions = False
-                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                    MyClass.ClearStartTaskQueueToSend()
+                If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Or _
+                   AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                    If StartingRunningFirstTime Then
+                        StartingRunningFirstTime = False
+                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
+                        RUNNINGLost = False
+                        MyClass.sendingRepetitions = False
+                        MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                        MyClass.ClearStartTaskQueueToSend()
 
-                    ' Deactivates Alarm begin - BA-1872
-                    Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                    Dim alarmStatus As Boolean = False
-                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
-                    Dim myAlarmStatusList As New List(Of Boolean)
+                        ' Deactivates Alarm begin - BA-1872
+                        Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                        Dim alarmStatus As Boolean = False
+                        Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                        Dim myAlarmStatusList As New List(Of Boolean)
 
-                    alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
-                    alarmStatus = False
+                        alarmID = GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR
+                        alarmStatus = False
 
-                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                        PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
 
-                    'Finally call manage all alarms detected (new or solved)
-                    If myAlarmList.Count > 0 Then
-                        If GlobalBase.IsServiceAssembly Then
-                            ' Not Apply
-                        Else
-                            myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                        'Finally call manage all alarms detected (new or solved)
+                        If myAlarmList.Count > 0 Then
+                            If GlobalBase.IsServiceAssembly Then
+                                ' Not Apply
+                            Else
+                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                            End If
+
                         End If
-
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
                     End If
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.COMMS_TIMEOUT_ERR)
                 End If
                 ' XB 06/11/2014 - BA-1872
 
