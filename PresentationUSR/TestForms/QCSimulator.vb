@@ -959,7 +959,8 @@ Public Class QCSimulator
                     myTextBox.MaxLength = 11
                     myTextBox.TextAlign = HorizontalAlignment.Right
                     If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
-                        myTextBox.Text = (Math.Floor(((upperLimitCtrl1 + 1) - (lowerLimitCtrl1 - 1) + 1) * Rnd()) + lowerLimitCtrl1).ToString("F" & numOfTestdecimals.ToString())
+                        Randomize()
+                        myTextBox.Text = ((upperLimitCtrl1 - lowerLimitCtrl1 + 1) * Rnd() + lowerLimitCtrl1).ToString("F" & numOfTestdecimals.ToString())
 
                         myTextBox.Enabled = False
                         myTextBox.BackColor = SystemColors.MenuBar
@@ -974,7 +975,8 @@ Public Class QCSimulator
                         myTextBox.MaxLength = 11
                         myTextBox.TextAlign = HorizontalAlignment.Right
                         If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
-                            myTextBox.Text = (Math.Floor(((upperLimitCtrl2 + 1) - (lowerLimitCtrl2 - 1) + 1) * Rnd()) + lowerLimitCtrl2).ToString("F" & numOfTestdecimals.ToString())
+                            Randomize()
+                            myTextBox.Text = ((upperLimitCtrl2 - lowerLimitCtrl2 + 1) * Rnd() + lowerLimitCtrl2).ToString("F" & numOfTestdecimals.ToString())
 
                             myTextBox.Enabled = False
                             myTextBox.BackColor = SystemColors.MenuBar
@@ -990,7 +992,8 @@ Public Class QCSimulator
                         myTextBox.MaxLength = 11
                         myTextBox.TextAlign = HorizontalAlignment.Right
                         If (Convert.ToInt32(myTextBox.Tag) <= bsNumResultsNumericUpDown.Value) Then
-                            myTextBox.Text = (Math.Floor(((upperLimitCtrl3 + 1) - (lowerLimitCtrl3 - 1) + 1) * Rnd()) + lowerLimitCtrl3 + 1.25).ToString("F" & numOfTestdecimals.ToString())
+                            Randomize()
+                            myTextBox.Text = ((upperLimitCtrl3 - lowerLimitCtrl3 + 1) * Rnd() + lowerLimitCtrl3).ToString("F" & numOfTestdecimals.ToString())
 
                             myTextBox.Enabled = False
                             myTextBox.BackColor = SystemColors.MenuBar

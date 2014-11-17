@@ -168,6 +168,9 @@ Public Class QCIndividualResultsByTestControlReport
     ''' Created by:  SA 20/06/2014 - BT #1668 (rewritten based in the function used in screen IQCGraphs) 
     ''' Modified by: SA 25/09/2014 - BA-1608 ==> Added some changes required after activation of Option Strict On (convert to Integer runNumber("Argument")
     '''                                          when use it in a Linq 
+    '''              SA 14/11/2014 - BA-1885 ==> When there are more than 50 QC Results to plot, the X-Axis should not show each RerunNumber (because 
+    '''                                          so many numbers cannot be readable); property ArgumentScaleType has to be set to Numeric to avoid
+    '''                                          overlapping of values in X-Axis
     ''' </remarks>
     Private Sub PrepareLJGraph()
 
@@ -269,6 +272,7 @@ Public Class QCIndividualResultsByTestControlReport
             End If
         End If
 
+        Dim minQCSeries = 50
         Dim validResultValues As List(Of QCResultsDS.tqcResultsRow)
         For Each runNumber As DataRow In myDataSourceTable.Rows
             'Search value of the Control/Lot for the Run Number 
@@ -286,6 +290,10 @@ Public Class QCIndividualResultsByTestControlReport
 
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).DataSource = myDataSourceTable
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentDataMember = "Argument"
+
+        'BA-1885 - When the number of results to plot is greater than 50, this property has to be used to avoid overlapping of values in X-Axis
+        If (myDataSourceTable.Rows.Count > minQCSeries) Then XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ValueScaleType = ScaleType.Numerical
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ValueDataMembers.AddRange(New String() {"Values"})
 
