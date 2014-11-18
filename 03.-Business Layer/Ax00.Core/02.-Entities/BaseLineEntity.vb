@@ -252,7 +252,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             If wellLineDS.twksWSBaseLines.Rows.Count > 0 Then
 
                                                 'AG 18/11/2014 BA-2065 REFACTORING. Call this method well by well not only 1 time with the complete dataset
-                                                resultData = InitiateRejectionParameters(dbConnection, wellLineDS)
+                                                resultData = InitiateRejectionParametersOnStartUp(dbConnection, wellLineDS)
                                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                                     myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
                                                 End If
@@ -348,7 +348,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pWellBaseLineDS"></param>
         ''' <returns>GlobalDataTo (setDatos as ALARM)</returns>
         ''' <remarks>AG 18/11/2014 BA-2065 REFACTORING + fix issue</remarks>
-        Private Function InitiateRejectionParameters(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWellBaseLineDS As BaseLinesDS) As GlobalDataTO
+        Private Function InitiateRejectionParametersOnStartUp(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWellBaseLineDS As BaseLinesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -417,7 +417,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitiateRejectionParameters", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitiateRejectionParametersOnStartUp", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -901,8 +901,9 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim newReactionsWellsDS As New ReactionsRotorDS
                         Dim linqRes As New List(Of BaseLinesDS.twksWSBaseLinesRow)
 
-                        '120 wells in rotor + 10 items required to initiate the FIFO + 7 wells not used after ALIGHT (ControlWellBaseLine used it after ALIGHT. It doesn't apply for dynamic but we reuse the method, so we need to add them)
-                        Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER + BL_WELLREJECT_ITEMS_NOTUSED)
+                        '120 wells in rotor + 10 items required to initiate the FIFO  (the 7 wells not used after ALIGHT are not taken into account)
+                        rejectionParameters.wellsNotUsedAfterALight = BL_WELLREJECT_ITEMS_NOTUSED + 1 'FLIGHT is read withl all well filled, so wellsNotUsedAfterALight can not be taken into account
+                        Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER)
                         Dim wellID As Integer = 0
                         Dim newBaseLineID As Integer = 0
                         Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
