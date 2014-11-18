@@ -232,6 +232,7 @@ Partial Class IProgCalculatedTest
         Me.bsCalTestFormula.ClearFormulaToolTip = ""
         Me.bsCalTestFormula.DecimalSeparator = Nothing
         Me.bsCalTestFormula.DelFormulaMemberToolTip = ""
+        Me.bsCalTestFormula.FactoryValueCaption = ""
         Me.bsCalTestFormula.FactoryValueMessage = ""
         Me.bsCalTestFormula.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.bsCalTestFormula.ForeColor = System.Drawing.Color.Black
@@ -241,8 +242,8 @@ Partial Class IProgCalculatedTest
         Me.bsCalTestFormula.SampleTypeTitle = "Sample Type:"
         Me.bsCalTestFormula.SelectedSampleType = ""
         Me.bsCalTestFormula.Size = New System.Drawing.Size(681, 364)
-        Me.bsCalTestFormula.TestsTitle = "Standard Tests:"
         Me.bsCalTestFormula.TabIndex = 0
+        Me.bsCalTestFormula.TestsTitle = "Tests:"
         Me.bsCalTestFormula.WarningImage = ""
         '
         'RefRangesTabPage

@@ -931,6 +931,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 cmdText &= " SELECT 'STD' AS TestTypeCode, TS.SampleType AS SampleTypeCode, TS.TestID AS TestCode, T.TestName AS TestName, T.PreloadedTest, TS.FactoryCalib, T.Available " & vbCrLf
                                 cmdText &= " FROM   tparTestSamples TS INNER JOIN tparTests T ON TS.TestID = T.TestID " & vbCrLf
 
+                                ' Exclude those Calculated Tests that are already part of the formula of (an)other Calculated Test(s).
                             Case "CALC"
                                 cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestLongName AS TestName, Available " & vbCrLf
                                 cmdText &= " FROM   tparCalculatedTests" & vbCrLf

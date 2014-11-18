@@ -507,6 +507,8 @@ Namespace Biosystems.Ax00.BL
         '''              SA 04/09/2014 - BA-1865 ==> After update the ISETest/SampleType, call new function HIST_Update in ISETestSamplesDelegate to 
         '''                                          verify if the data has to be updated also in Historics Module (when the ISETest/SampleType has
         '''                                          been already exported)
+        '''              WE 17/11/2014 - RQ00035C (BA-1867) - When the name of an ISE Test is modified and it has been included in the Formula of (an)other Calculated Test(s),
+        '''                              the value of field FormulaText for these Calculated Tests has to be rebuilt and updated in both, Parameters Programming and Historic tables.
         ''' </remarks>
         Public Function SaveISETestNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUpdatedISETests As ISETestsDS, _
                                        ByVal pUpdatedISETestSamples As ISETestSamplesDS, ByVal pNewISERefRanges As TestRefRangesDS, _
@@ -536,6 +538,15 @@ Namespace Biosystems.Ax00.BL
                                     resultData = myISESampleType.HIST_Update(dbConnection, pUpdatedISETestSamples.tparISETestSamples.First.ISETestID, _
                                                                              pUpdatedISETestSamples.tparISETestSamples.First.SampleType)
                                 End If
+                            End If
+                        End If
+
+                        ' WE 17/11/2014 - RQ00035C (BA-1867): Verify if it's needed to update field FormulaText of those Calculated Tests in which formula
+                        ' the modified ISE Test has been included (when the name of the ISE Test is changed).
+                        If (Not resultData.HasError) Then
+                            Dim myCalcTestDlg As New CalculatedTestsDelegate
+                            If pUpdatedISETests.tparISETests.Rows.Count > 0 Then
+                                resultData = myCalcTestDlg.UpdateFormulaText(dbConnection, "ISE", pUpdatedISETests.tparISETests(0).ISETestID)
                             End If
                         End If
 
