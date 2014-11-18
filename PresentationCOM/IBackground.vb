@@ -60,6 +60,7 @@ Public Class IBackground
     ''' </remarks>
     Public Sub ShowMDI(ByVal ShowBackground As Boolean)
         Try
+            Me.Cursor = System.Windows.Forms.Cursors.WaitCursor 'IT 18/11/2014: BA-2025
             If ShowBackground Then
                 myMDI.FormBack = Me
                 AddHandler myMDI.Resize, AddressOf myMDI_Resize
@@ -68,6 +69,7 @@ Public Class IBackground
             Me.Visible = ShowBackground 'Just in case the handler to myMDI.Resize has not been called yet
             myMDI.Show()
             myMDI.Focus()
+            Me.Cursor = System.Windows.Forms.Cursors.Default 'IT 18/11/2014: BA-2025
 
         Catch ex As Exception
             RaiseEvent ExceptionHappened(ex)
