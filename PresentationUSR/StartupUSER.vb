@@ -2,6 +2,7 @@
 'Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global
+Imports System.Threading
 
 Public NotInheritable Class StartupUSER
 
@@ -81,14 +82,16 @@ Public NotInheritable Class StartupUSER
                 ShowBackground = True
 #End If
 
-                'AG 03/06/2014 - #1644 First time we call the WaitOne of createWSExecutions semaphore spends time, so call it when USR app is started, just before the Login
-                If GlobalConstants.CreateWSExecutionsWithSemaphore Then
-                    'Do not add log traces here. The SQL services could not still be started
-                    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
-                    GlobalSemaphores.createWSExecutionsSemaphore.Release()
-                    GlobalSemaphores.createWSExecutionsQueue = 0
-                End If
-                'AG 03/06/2014 - #1644
+                ''AG 03/06/2014 - #1644 First time we call the WaitOne of createWSExecutions semaphore spends time, so call it when USR app is started, just before the Login
+                'If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+                '    'Do not add log traces here. The SQL services could not still be started
+                '    GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+                '    GlobalSemaphores.createWSExecutionsSemaphore.Release()
+                '    GlobalSemaphores.createWSExecutionsQueue = 0
+                'End If
+                ''AG 03/06/2014 - #1644
+                Dim process As New Thread(AddressOf LoadSemaphores)
+                process.Start()
 
                 Ax00StartUp = New IAx00StartUp(Nothing) With { _
                             .Title = "Loading...", _
@@ -98,7 +101,9 @@ Public NotInheritable Class StartupUSER
                 Dim myBackForm As New IBackground(IAx00MainMDI, Ax00StartUp)
                 Application.DoEvents()
 
+                myBackForm.TopMost = True 'IT 18/11/2014: BA-2025
                 myBackForm.ShowMDI(ShowBackground)
+                myBackForm.TopMost = False 'IT 18/11/2014: BA-2025
 
                 'Ax00StartUp.Close()
             End If
@@ -114,6 +119,25 @@ Public NotInheritable Class StartupUSER
         End If
 
         Me.Close()
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    '''  Created by IT 18/11/2014: BA-2025
+    ''' </remarks>
+    Public Shared Sub LoadSemaphores()
+
+        'AG 03/06/2014 - #1644 First time we call the WaitOne of createWSExecutions semaphore spends time, so call it when USR app is started, just before the Login
+        If GlobalConstants.CreateWSExecutionsWithSemaphore Then
+            'Do not add log traces here. The SQL services could not still be started
+            GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
+            GlobalSemaphores.createWSExecutionsSemaphore.Release()
+            GlobalSemaphores.createWSExecutionsQueue = 0
+        End If
+        'AG 03/06/2014 - #1644
+
     End Sub
 
     '    Private Sub Startup_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
