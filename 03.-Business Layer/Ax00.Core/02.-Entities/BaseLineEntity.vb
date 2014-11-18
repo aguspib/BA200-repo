@@ -250,10 +250,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Dim wellLineDS As New BaseLinesDS
                                             wellLineDS = CType(resultData.SetDatos, BaseLinesDS)
                                             If wellLineDS.twksWSBaseLines.Rows.Count > 0 Then
-                                                resultData = ControlWellBaseLine(dbConnection, True, wellLineDS, False)
-                                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+
+                                                'AG 18/11/2014 BA-2065 REFACTORING. Call this method well by well not only 1 time with the complete dataset
+                                                resultData = InitiateRejectionParameters(dbConnection, wellLineDS)
+                                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                                     myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
                                                 End If
+                                                'AG 18/11/2014 BA-2065
+
                                             End If
                                         End If
                                     End If
@@ -337,6 +341,89 @@ Namespace Biosystems.Ax00.Core.Entities
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' Initiate the well rejections parameters using the last wells in FIFO after start application
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pWellBaseLineDS"></param>
+        ''' <returns>GlobalDataTo (setDatos as ALARM)</returns>
+        ''' <remarks>AG 18/11/2014 BA-2065 REFACTORING + fix issue</remarks>
+        Private Function InitiateRejectionParameters(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWellBaseLineDS As BaseLinesDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Comment old code
+                        'We must call this method well by well not only 1 time with the complete dataset
+                        'resultData = ControlWellBaseLine(Nothing, True, wellLineDS, BaseLineTypeForWellReject)
+                        'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                        '    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                        'End If
+
+                        Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                        Dim singleWellDS As New BaseLinesDS
+                        Dim linqRes As List(Of BaseLinesDS.twksWSBaseLinesRow)
+                        Dim linqResWells As List(Of Integer)
+
+                        'Order by DateTime ASC
+                        linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In pWellBaseLineDS.twksWSBaseLines Select a Order By a.DateTime Ascending).ToList
+                        If linqRes.Count > 0 Then
+                            'Get all distinct wells (in the previous order)
+                            linqResWells = (From a As BaseLinesDS.twksWSBaseLinesRow In linqRes Select a.WellUsed Distinct).ToList
+                            For Each item As Integer In linqResWells
+                                singleWellDS.Clear()
+                                linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In pWellBaseLineDS.twksWSBaseLines Where a.WellUsed = item Select a Order By a.Wavelength).ToList
+
+                                For Each wellBSrow As BaseLinesDS.twksWSBaseLinesRow In linqRes
+                                    singleWellDS.twksWSBaseLines.ImportRow(wellBSrow)
+                                Next
+                                singleWellDS.twksWSBaseLines.AcceptChanges()
+
+                                'Call the control well rejection well by well
+                                resultData = ControlWellBaseLine(Nothing, True, singleWellDS, BaseLineTypeForWellReject)
+                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                    'If there is still not alarm informed --> Get it
+                                    If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                        'Alarm can change from WARM to ERROR but not from ERROR to WARN
+                                    ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                    End If
+                                Else
+                                    Exit For
+                                End If
+                            Next
+                        End If
+
+                        linqRes = Nothing
+                        linqResWells = Nothing
+
+                        If Not resultData.HasError Then
+                            resultData.SetDatos = myAlarm
+                        End If
+
+                    End If
+                End If
+
+
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineEntity.InitiateRejectionParameters", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 
 #End Region
 

@@ -420,6 +420,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with the group of BaseLines by Well</returns>
         ''' <remarks>
         ''' Created by:  AG 04/05/2011
+        ''' Modify by: AG 18/11/2014 BA-2065 exclude worksession from the query
         ''' </remarks>
         Public Function GetMeanWellBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                   ByVal pWorkSessionID As String) As GlobalDataTO
@@ -435,8 +436,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText = "SELECT AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime " & vbCrLf & _
                                   " FROM twksWSBLinesByWell  WHERE IsMean = 1 " & vbCrLf & _
                                   " AND AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "'" & vbCrLf & _
-                                  " AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "'" & vbCrLf & _
                                   " ORDER BY BaseLineID, WellUsed , Wavelenght "
+
+                        'AG 18/11/2014 BA-2065 removed after AND AnalyzerID ...
+                        '" AND WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "'" & vbCrLf & _
 
                         Dim myBaseLinesDS As New BaseLinesDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
