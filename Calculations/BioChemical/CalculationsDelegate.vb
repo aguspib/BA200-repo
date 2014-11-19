@@ -1050,6 +1050,7 @@ Namespace Biosystems.Ax00.Calculations
         '''                              is not NULL, then call the function for searching the Reference Ranges that will be used to validate the result
         '''                            - Data obtained for the Test/SampleType also includes field CalibratorType, CalibrationFactor and 
         '''                              SampleTypeAlternative: the corresponding fields are informed in the Calibrator Structure
+        ''' AG 19/11/2014 BA-2096 adapt calculations for BA200 use parameter common(pDimension).SwReadingsOffset instead of - 2 fixed!!!!
         ''' </remarks>
         Private Sub InitTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal myExecutionsDS As ExecutionsDS)
             Dim resultData As New GlobalDataTO
@@ -1076,12 +1077,17 @@ Namespace Biosystems.Ax00.Calculations
 
                     'AG 09/05/2011 - Test programming starts at time 18 (cycle 3): 0s - 1, 9s - 2, 18s - 3, ...
                     'For apply calculations InitialReadingCycle must be 1 so apply -2 offset
-                    test.InitialReadingCycle = myTestsDS.testCalculations(0).FirstReadingCycle - 2
+                    'AG 19/11/2014 the SwReading offset depends by model, do not fix it in code to 2
+                    'test.InitialReadingCycle = myTestsDS.testCalculations(0).FirstReadingCycle - 2
+                    test.InitialReadingCycle = myTestsDS.testCalculations(0).FirstReadingCycle - common(0).SwReadingsOffset
 
                     'AG 09/05/2011 - Test programming starts at time 18 (cycle 3): 0s - 1, 9s - 2, 18s - 3, ...
                     'For apply calculations FinalReadingCycle must be 1 so apply -2 offset
                     test.FinalReadingCycle = test.InitialReadingCycle
-                    If Not myTestsDS.testCalculations(0).IsSecondReadingCycleNull Then test.FinalReadingCycle = myTestsDS.testCalculations(0).SecondReadingCycle - 2
+
+                    'AG 19/11/2014 the SwReading offset depends by model, do not fix it in code to 2
+                    'If Not myTestsDS.testCalculations(0).IsSecondReadingCycleNull Then test.FinalReadingCycle = myTestsDS.testCalculations(0).SecondReadingCycle - 2
+                    If Not myTestsDS.testCalculations(0).IsSecondReadingCycleNull Then test.FinalReadingCycle = myTestsDS.testCalculations(0).SecondReadingCycle - common(0).SwReadingsOffset
 
                     'Find position for Main and Reference WaveLenght
                     Dim myAnalyzerLedPositionsDS As New AnalyzerLedPositionsDS
