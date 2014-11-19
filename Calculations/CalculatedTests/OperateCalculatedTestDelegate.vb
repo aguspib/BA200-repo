@@ -300,8 +300,11 @@ Namespace Biosystems.Ax00.Calculations
                                                     'Error getting the Formula defined for the Calculated Test
                                                     Exit For
                                                 End If
-                                            Else
-                                                'Error in the internal For loop
+
+                                            ElseIf (resultData.HasError) Then
+                                                'BA-979: Exit For only when there was an error. When allComponentTestsHaveResults = False, evaluate 
+                                                '        if the rest of Calculated Tests in which the Test is included can be calculated (otherwise some Calculated 
+                                                '        Tests can be never calculated!!)
                                                 Exit For
                                             End If
                                         Else
