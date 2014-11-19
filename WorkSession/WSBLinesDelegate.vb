@@ -330,7 +330,9 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Return all Base Lines data needed for calculations (light counts are get from twksWSBLinesByWell and dark counts are get from twksWSBLines)
+        ''' Return all Base Lines data needed for calculations
+        ''' STATIC base line: Read ligth values from twksWSBLinesByWell, read dark and adjust (TI, DAC) values from twksWSBLines
+        ''' DYNAMIC base line: Read ligth values from twksWSBLines (DYNAMIC), read dark and adjust (TI, DAC) values from twksWSBLines (STATIC with adjust)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -343,6 +345,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  AG 04/01/2011
         ''' AG 29/10/2014 BA-2064 adapt for static or dynamic base lines (new parameter pType) (renamed, old name GetBaseLineValues)
+        ''' AG 19/11/2014 BA-2064 reinterprete the formula and get the correct information for calculations using dynamic base line
         ''' </remarks>
         Public Function ReadValuesForCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                   ByVal pBaseLineWellID As Integer, ByVal pWell As Integer, ByVal pBaselineAdjustID As Integer, ByVal pType As String) As GlobalDataTO
@@ -355,9 +358,15 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.ReadValuesForCalculations(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineWellID, pWell, pBaselineAdjustID, pType)
+                        If pType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                            resultData = myDAO.ReadValuesForCalculations(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineWellID, pWell, pBaselineAdjustID, pType)
+                        ElseIf pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                            resultData = myDAO.ReadValuesForCalculationsDynamic(dbConnection, pAnalyzerID, pWell, pBaselineAdjustID)
+                        End If
+
                     End If
                 End If
+
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True

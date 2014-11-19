@@ -4515,7 +4515,9 @@ Namespace Biosystems.Ax00.Calculations
                 'Dim mydelegate2 As New WSBLinesByWellDelegate
                 'myGlobal = mydelegate2.Read(pdbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed)
 
-                'AG 04/01/2011 - Read ligth values from twksWSBLinesByWell, read dark & adjust (TI, DAC) values from twksWSBLines
+                'AG 04/01/2011 - BA-2064
+                'STATIC base line: Read ligth values from twksWSBLinesByWell, read dark & adjust (TI, DAC) values from twksWSBLines
+                'DYNAMIC base line: Read ligth values from twksWSBLines (DYNAMIC), read dark & adjust (TI, DAC) values from twksWSBLines (STATIC with adjust)
                 Dim mydelegate As New WSBLinesDelegate
                 myGlobal = mydelegate.ReadValuesForCalculations(pdbConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pAdjustBaseLineID, pType)
 

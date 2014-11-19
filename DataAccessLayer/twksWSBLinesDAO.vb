@@ -594,7 +594,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Return all Base Lines data needed for calculations (light counts are get from twksWSBLinesByWell and dark counts are get from twksWSBLines)
+        ''' Return all Base Lines data needed for calculations 
+        ''' STATIC: (light counts are get from twksWSBLinesByWell and dark counts are get from twksWSBLines (STATIC))
+        ''' DYNAMIC: (light counts are get from twksWSBLinesByWell and dark counts are get from twksWSBLines (DYNAMIC)) - 1st try WRONG!!
+        '''         Do not delete code, because it not affects the STATIC calculations and maybe the business dynamic develop here must be reactivated again
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -672,6 +675,68 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Return all Base Lines data needed for calculations for DYNAMIC
+        ''' DYNAMIC base line: Read ligth values from twksWSBLines (DYNAMIC), read dark and adjust (TI, DAC) values from twksWSBLines (STATIC with adjust)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWell">Rotor Well Number</param>
+        ''' <param name="pBaseLineDynamicID">Identifier of an dynamic Base Line</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet BaseLineDS</returns>
+        ''' <remarks>
+        ''' AG 19/11/2014 BA-2064 method copied and adapted from ReadValuesForCalculations
+        ''' </remarks>
+        Public Function ReadValuesForCalculationsDynamic(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                          ByVal pWell As Integer, ByVal pBaseLineDynamicID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = ""
+
+                        'AG 29/10/2014 BA-2064 select also BL.Type
+                        cmdText = " SELECT BL.Wavelength , BL.MainLight , BL.RefLight, BL.MainDark , BL.RefDark, BL.IT, BL.DAC, " & vbCrLf & _
+                                  " BL.DateTime, BL.WellUsed, BL.Type " & vbCrLf & _
+                                  " FROM   twksWSBLines BL  " & vbCrLf & _
+                                  " WHERE BL.AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                  " AND  BL.BaseLineID = " & pBaseLineDynamicID.ToString & vbCrLf & _
+                                  " AND  BL.WellUsed = " & pWell.ToString & vbCrLf
+
+                        cmdText &= " AND   BL.Type = '" & GlobalEnumerates.BaseLineType.DYNAMIC.ToString.Trim.Replace("'", "''") & "' " & vbCrLf
+                        cmdText &= " ORDER BY BL.Wavelength "
+
+                        Dim myBaseLinesDS As New BaseLinesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myBaseLinesDS.twksWSBaseLines)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myBaseLinesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.ReadValuesForCalculationsDynamic", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 
         ''' <summary>
         ''' Delete of adjustment BaseLines for the specified Analyzer
