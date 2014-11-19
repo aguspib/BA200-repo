@@ -127,13 +127,15 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pWaveLength">Wave length</param>
         ''' <param name="pWellBaseLineID">Identifier of a BaseLine by Well</param>
         ''' <param name="pWellUsed">Rotor Well Number</param>
+        ''' <param name="pBLType">Base line type</param>
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all data of the specified BaseLine/WaveLength</returns>
         ''' <remarks>
         ''' Created by:  DL 02/06/2010
+        ''' AG 19/11/2014 BA-2067 add parameter for base line type
         ''' </remarks>
         Public Function GetByWaveLength(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                         ByVal pAdjustBaseLineID As Integer, ByVal pWaveLength As Integer, ByVal pWellBaseLineID As Integer, _
-                                        ByVal pWellUsed As Integer) As GlobalDataTO
+                                        ByVal pWellUsed As Integer, ByVal pBLType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -143,9 +145,14 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myWSBLines As New twksWSBLinesDAO
-                        resultData = myWSBLines.GetByWaveLength(dbConnection, pAnalyzerID, pWorkSessionID, pAdjustBaseLineID, pWaveLength, pWellBaseLineID, pWellUsed)
+                        If pBLType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                            resultData = myWSBLines.GetByWaveLength(dbConnection, pAnalyzerID, pWorkSessionID, pAdjustBaseLineID, pWaveLength, pWellBaseLineID, pWellUsed)
+                        ElseIf pBLType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                            resultData = myWSBLines.GetByWaveLengthDYNAMIC(dbConnection, pAnalyzerID, pAdjustBaseLineID, pWaveLength, pWellUsed, pBLType)
+                        End If
+
                     End If
-                End If
+                    End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -188,8 +195,9 @@ Namespace Biosystems.Ax00.BL
                         Else
                             resultData = myWSBLines.GetByAnalyzer(dbConnection, pAnalyzerID, pBaseLineType) 'BA-2067
                         End If
+
                     End If
-                End If
+                    End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -361,7 +369,7 @@ Namespace Biosystems.Ax00.BL
                         If pType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
                             resultData = myDAO.ReadValuesForCalculations(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineWellID, pWell, pBaselineAdjustID, pType)
                         ElseIf pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
-                            resultData = myDAO.ReadValuesForCalculationsDynamic(dbConnection, pAnalyzerID, pWell, pBaselineAdjustID)
+                            resultData = myDAO.ReadValuesForCalculationsDYNAMIC(dbConnection, pAnalyzerID, pWell, pBaselineAdjustID)
                         End If
 
                     End If

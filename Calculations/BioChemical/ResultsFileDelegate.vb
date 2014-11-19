@@ -130,14 +130,14 @@ Namespace Biosystems.Ax00.BL
                                         End If
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetAbsorbance(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets)
+                                            resultdata = SheetAbsorbance(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType)
                                         Else
                                             'Exit Function
                                             Return resultdata
                                         End If
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetComplete(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets)
+                                            resultdata = SheetComplete(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType)
                                         Else
                                             'Exit Function
                                             Return resultdata
@@ -180,12 +180,14 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pWorkSessionID"></param>
         ''' <param name="pOnlyProgrammedTestCycle"></param>
         ''' <returns>gLOBALDatato (AbsorbancesDS)</returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' AG 19/11/2014 BA-2067 add parameter for base line type
+        ''' </remarks>
         Public Function GetReadingAbsorbancesByExecution(ByVal pDBConnection As SqlConnection, _
                                                          ByVal pExecutionID As Integer, _
                                                          ByVal pAnalyzerID As String, _
                                                          ByVal pWorkSessionID As String, _
-                                                         ByVal pOnlyProgrammedTestCycle As Boolean) As GlobalDataTO
+                                                         ByVal pOnlyProgrammedTestCycle As Boolean, ByVal pBLType As String) As GlobalDataTO
 
             Dim resultData As GlobalDataTO = Nothing
             Dim allOK As Boolean = False
@@ -274,7 +276,7 @@ Namespace Biosystems.Ax00.BL
                                                                                myRefWaveLength, _
                                                                                myNumCycles, _
                                                                                myWellBaseLineID, _
-                                                                               myWellUsed)
+                                                                               myWellUsed, pBLType)
 
                                             'ag 15/10/2012 - WHEN SYStem error keep the error flag
                                             If resultData.HasError And resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString Then
@@ -1108,11 +1110,12 @@ Namespace Biosystems.Ax00.BL
         '''' <remarks>
         '''' Created By: DL 08/06/2010
         '''' Modified By: RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        '''' AG 19/11/2014 BA-2067 add parameter for base line type
         '''' </remarks>
         Private Function SheetAbsorbance(ByVal pDBConnection As SqlConnection, _
                                          ByVal pAnalyzerDS As WSAnalyzersDS, _
                                          ByVal pWorkSessionDS As WorkSessionsDS, _
-                                         ByVal pWorkSheets As Object) As GlobalDataTO
+                                         ByVal pWorkSheets As Object, ByVal pBLType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = pWorkSessionDS.twksWorkSessions(0).WorkSessionID
@@ -1361,7 +1364,7 @@ Namespace Biosystems.Ax00.BL
                                                                                    myRefWaveLength, _
                                                                                    myNumCycles, _
                                                                                    qExecutionList(indexList).BaseLineID, _
-                                                                                   qExecutionList(indexList).WellUsed)
+                                                                                   qExecutionList(indexList).WellUsed, pBLType)
 
                                                 Dim myabs As New AbsorbanceDS
                                                 myabs = CType(resultdata.SetDatos, AbsorbanceDS)
@@ -1435,11 +1438,12 @@ Namespace Biosystems.Ax00.BL
         '''' <remarks>
         '''' Created By: DL 08/06/2010
         '''' Modified By: RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        '''' AG 19/11/2014 BA-2067 add parameter for base line type
         '''' </remarks>
         Private Function SheetComplete(ByVal pDBConnection As SqlConnection, _
                                        ByVal pAnalyzerDS As WSAnalyzersDS, _
                                        ByVal pWorkSessionDS As WorkSessionsDS, _
-                                       ByVal pWorkSheets As Object) As GlobalDataTO
+                                       ByVal pWorkSheets As Object, ByVal pBLType As String) As GlobalDataTO
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = pWorkSessionDS.twksWorkSessions(0).WorkSessionID
 
@@ -1753,7 +1757,7 @@ Namespace Biosystems.Ax00.BL
                                                                                    myMainWaveLength, _
                                                                                    myRefWaveLength, _
                                                                                    myNumCycles, _
-                                                                                   qExecutionList(indexList).BaseLineID, qExecutionList(indexList).WellUsed)
+                                                                                   qExecutionList(indexList).BaseLineID, qExecutionList(indexList).WellUsed, pBLType)
 
 
                                                 Dim myabs As New AbsorbanceDS
@@ -2510,13 +2514,14 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a GraphDS Dataset if success, error message otherwise</returns>
         ''' <remarks>
         ''' Created by: RH 27/02/2012 Based on previous code by DL
+        ''' AG 19/11/2014 BA-2067 add parameter for base line type
         ''' </remarks>
         Public Function GetDataForAbsCurve(ByVal pDBConnection As SqlClient.SqlConnection, _
                                            ByVal pOrderTestID As Integer, _
                                            ByVal pRerunNumber As Integer, _
                                            ByVal pMultiItemNumber As Integer, _
                                            ByVal pExecutions As List(Of vwksWSAbsorbanceDS.vwksWSAbsorbanceRow), _
-                                           ByVal pAllowDecimals As Integer) As GlobalDataTO
+                                           ByVal pAllowDecimals As Integer, ByVal pBLType As String) As GlobalDataTO
 
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -2563,7 +2568,7 @@ Namespace Biosystems.Ax00.BL
                             For i As Integer = 0 To pExecutions.Count - 1
                                 resultData = GetReadingAbsorbancesByExecution( _
                                                 dbConnection, pExecutions(i).ExecutionID, pExecutions(i).AnalyzerID, _
-                                                pExecutions(i).WorkSessionID, False) 'AG 09/03/2011 - change True for False
+                                                pExecutions(i).WorkSessionID, False, pBLType) 'AG 09/03/2011 - change True for False
 
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     myAbsorbancesDS = CType(resultData.SetDatos, AbsorbanceDS)
@@ -2698,10 +2703,15 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pWorkSessionID"></param>
         ''' <param name="pAdjustBaseLineID"></param>
         ''' <param name="pMainWaveLength"></param>
+        ''' <param name="pRefWaveLength"></param>
         ''' <param name="pNumCycles"></param>
+        ''' <param name="pBaseLineWellID"></param>
+        ''' <param name="pWellUsed"></param>
+        ''' <param name="pBLType"></param>
         ''' <returns>GlobalDataTO</returns>
         ''' <remarks>Created DL
-        ''' AG 04/01/2011 - add pBaseLineWellID and pWellUsed parameters and used into GetByWaveLength</remarks>
+        ''' AG 04/01/2011 - add pBaseLineWellID and pWellUsed parameters and used into GetByWaveLength
+        ''' AG 19/11/2014 BA-2067 add parameter for base line type</remarks>
         Private Function GetReadingAbsorbances(ByVal pdbconnection As SqlConnection, _
                                                ByVal pAnalyzerID As String, _
                                                ByVal pExecutionID As Integer, _
@@ -2711,7 +2721,7 @@ Namespace Biosystems.Ax00.BL
                                                ByVal pRefWaveLength As Integer, _
                                                ByVal pNumCycles As Integer, _
                                                ByVal pBaseLineWellID As Integer, _
-                                               ByVal pWellUsed As Integer) As GlobalDataTO
+                                               ByVal pWellUsed As Integer, ByVal pBLType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
 
@@ -2807,7 +2817,7 @@ Namespace Biosystems.Ax00.BL
                                         Dim myMainLight As Integer
                                         Dim myRefLight As Integer
 
-                                        resultdata = myBaseLineDelegate.GetByWaveLength(pdbconnection, pAnalyzerID, pWorkSessionID, pAdjustBaseLineID, myWaveLengthPos, pBaseLineWellID, pWellUsed)
+                                        resultdata = myBaseLineDelegate.GetByWaveLength(pdbconnection, pAnalyzerID, pWorkSessionID, pAdjustBaseLineID, myWaveLengthPos, pBaseLineWellID, pWellUsed, pBLType)
                                         If Not resultdata.HasError Then
                                             Dim myBaseLineDS As New BaseLinesDS
 

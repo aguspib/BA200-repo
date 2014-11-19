@@ -597,7 +597,8 @@ Public Class bsResultsChart
                     If Not dr.IsReplicateNumberNull Then .ReplicateNumber = dr.ReplicateNumber.ToString
                 End With
 
-                resultdata = myExportCalculations.GetReadingAbsorbancesByExecution(Nothing, dr.ExecutionID, dr.AnalyzerID, dr.WorkSessionID, False) 'AG 09/03/2011 - change True for False
+                'resultdata = myExportCalculations.GetReadingAbsorbancesByExecution(Nothing, dr.ExecutionID, dr.AnalyzerID, dr.WorkSessionID, False) 'AG 09/03/2011 - change True for False
+                resultdata = myExportCalculations.GetReadingAbsorbancesByExecution(Nothing, dr.ExecutionID, dr.AnalyzerID, dr.WorkSessionID, False, GlobalEnumerates.BaseLineType.DYNAMIC.ToString) 'AG 19/11/2014 BA-2067 this control is not used!! Add the new required parameter 'fixed' in code
                 If (Not resultdata.HasError) Then
                     myAbsorbancesDS = CType(resultdata.SetDatos, AbsorbanceDS)
                     Exit For

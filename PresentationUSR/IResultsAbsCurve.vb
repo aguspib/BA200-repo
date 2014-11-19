@@ -1393,7 +1393,7 @@ Public Class IResultsAbsCurve
                                                                         RerunAttribute, _
                                                                         MultiItemNumberAttribute,
                                                                         Executions,
-                                                                        AllowDecimals)
+                                                                        AllowDecimals, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString())
 
         GettingDataForAbsCurve = False
     End Sub
@@ -2299,7 +2299,7 @@ Public Class IResultsAbsCurve
             'DL 15/05/2012
 
             myGlobalDataTO = myResultsFileDelegate.GetDataForAbsCurve(Nothing, pOrderTestID, pRerunNumber, _
-                                                                      pMultiItemNumber, qExecutions, AllowDecimals)
+                                                                      pMultiItemNumber, qExecutions, AllowDecimals, AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations.ToString())
 
             If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                 ReplicateDS = CType(myGlobalDataTO.SetDatos, GraphDS)
