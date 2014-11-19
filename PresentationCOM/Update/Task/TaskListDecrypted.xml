@@ -2974,10 +2974,16 @@
   </AppVersion >
   <AppVersion>
     <Version>3.11</Version>
-  <StructureScript></StructureScript>
-  <UpdateScript>
-    UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.1', ServiceSoftware = '1.3.1', FirmwareScripts = '1.3.0', Firmware = '2.14', DBSoftware = '3.11'
-    GO
-  </UpdateScript>
+    <StructureScript></StructureScript>
+    <UpdateScript>
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.1', ServiceSoftware = '1.3.1', FirmwareScripts = '1.3.0', Firmware = '2.14', DBSoftware = '3.11'
+      GO
+      IF ((SELECT COUNT(*) FROM dbo.tfmwFieldLimits WHERE LimitID = 'REAGENT2_VOLUME' AND AnalyzerModel = 'A400' AND MinValue = 10) = 0)
+      UPDATE dbo.tfmwFieldLimits SET MinValue = 10 WHERE LimitID = 'REAGENT2_VOLUME' AND AnalyzerModel = 'A400'
+      GO
+      IF ((SELECT COUNT(*) FROM dbo.tfmwFieldLimits WHERE LimitID = 'PREPARATION_VOLUME' AND AnalyzerModel = 'A400' AND MinValue = 180) = 0)
+      UPDATE dbo.tfmwFieldLimits SET MinValue = 180 WHERE LimitID = 'PREPARATION_VOLUME' AND AnalyzerModel = 'A400'
+      GO
+    </UpdateScript>
   </AppVersion>
 </TaskListDS>

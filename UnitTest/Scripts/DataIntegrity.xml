@@ -3050,6 +3050,28 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+<IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>Min Value of Field Limit REAGENT2_VOLUME has been changed from 40 to 10</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM dbo.tfmwFieldLimits WHERE LimitID = 'REAGENT2_VOLUME' AND AnalyzerModel = 'A400'  AND MinValue = 10) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+<IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>Min Value of Field Limit PREPARATION_VOLUME has been changed from 200 to 180</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM dbo.tfmwFieldLimits WHERE LimitID = 'PREPARATION_VOLUME' AND AnalyzerModel = 'A400' AND MinValue = 180) = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
 
 
