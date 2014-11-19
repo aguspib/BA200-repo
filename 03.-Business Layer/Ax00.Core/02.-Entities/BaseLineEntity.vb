@@ -879,9 +879,12 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' Using the results of the FLIGHT instruction (for all leds) prepares the database for a quick running (updates table twksWSBLinesByWell)
         ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pInitialWell">The starting well used when simulate a complete rotor turn calling ControlWellBaseLine</param>
         ''' <returns>GlobalDataTo with error o not (data as Alarms enumerate)</returns>
         ''' <remarks>AG 14/11/2014 BA-2065 Creation</remarks>
-        Public Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO Implements IBaseLineEntity.ControlDynamicBaseLine
+        Public Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IBaseLineEntity.ControlDynamicBaseLine
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -919,7 +922,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         '3) Loop calling well rejections algorithm for all wells in reactions rotor
                         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                        For myIndex As Integer = 1 To endLoopIndex
+                        For myIndex As Integer = pInitialWell To endLoopIndex + (pInitialWell - 1)
                             'Get the well number in the interval [1, 120]
                             wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
 

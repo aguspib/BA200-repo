@@ -24,8 +24,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function ControlAdjustBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
                                               ByVal pALineDS As BaseLinesDS) As GlobalDataTO
 
-        'Treat FLIGHT results (if valid)
-        Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String) As GlobalDataTO
+        'BA-2065 Treat FLIGHT results (if valid)
+        Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO
 
         'Implements the well rejections algorithm
         'AG 14/11/2014 BA-2065 add parameter pType (STATIC or DYNAMIC)
