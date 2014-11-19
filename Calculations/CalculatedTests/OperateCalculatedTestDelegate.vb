@@ -76,7 +76,10 @@ Namespace Biosystems.Ax00.Calculations
         '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
         '''              SA 19/09/2014 - BA-1927 ==> When calling function UpdateOrderToExport in OrdersDelegate, pass the local DB Connection instead 
         '''                                          of the received as parameter (to avoid timeouts)
-        '''              AG 16/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
+        '''              AG 16/10/2014 - BA-2011 ==> Updated properly the OrderToExport field when the recalculated result is an accepted one
+        '''              SA 19/11/2014 - BA-979  ==> Changed the key part of the values added to dictionary:  it will include also the SampleType (besides 
+        '''                                          TestType and TestID) to allow evaluation of Calculated Tests having the same Test (with different 
+        '''                                          SampleType) in the Formula of a Calculated Test
         ''' </remarks> 
         Public Function ExecuteCalculatedTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
                                               ByVal pManualRecalculation As Boolean) As GlobalDataTO
@@ -154,9 +157,10 @@ Namespace Biosystems.Ax00.Calculations
                                                     operateCalculatedTestDS = DirectCast(resultData.SetDatos, OperateCalculatedTestDS)
 
                                                     If (operateCalculatedTestDS.vwksOperateCalculatedTest.Count > 0) Then
-                                                        'Insert into the diccionary the pairs <TestType|TestID, Result> for evaluating the formula ahead
+                                                        'Insert into the diccionary the pairs <TestType|TestID|SampleType, Result> for evaluating the formula ahead
+                                                        'BA-979: SampleType has been added as part of the key along with TestType and TestID
                                                         With (operateCalculatedTestDS.vwksOperateCalculatedTest(0))
-                                                            TestsResults.Add(.TestType & "|" & .TestID.ToString(), .Result)
+                                                            TestsResults.Add(.TestType & "|" & .TestID.ToString() & "|" & .SampleType, .Result)
                                                         End With
 
                                                         If (Not relatedStandardTestHasRemark) Then
@@ -503,7 +507,11 @@ Namespace Biosystems.Ax00.Calculations
         ''' </returns>
         ''' <remarks>
         ''' Created by:  RH 18/05/2010
-        ''' Modified by: SA 20/04/2012 - 
+        ''' Modified by: SA 20/04/2012
+        '''              SA 19/11/2014 - BA-979 ==> Changes due to field TestTypeAndID has been replaced by field TestTypeTestIDSampleType 
+        '''                                         in typed DataSet FormulasDS. Besides, use field ValueType (instead of TestType) to verify 
+        '''                                         the type of value to append to the Expression to evaluate (this change allows evaluation 
+        '''                                         of Calculated Tests with ISE and OFFS Tests in their Formula)
         ''' </remarks>
         Private Function Evaluate(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFormulaDS As FormulasDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -516,9 +524,9 @@ Namespace Biosystems.Ax00.Calculations
                     If (Not dbConnection Is Nothing) Then
                         Dim Expression As New System.Text.StringBuilder
                         For Each row As FormulasDS.tparFormulasRow In pFormulaDS.tparFormulas
-                            Select Case row.TestType
-                                Case "STD", "CALC"
-                                    Expression.Append("(" & TestsResults(row.TestTypeAndID).ToSQLString() & ")")
+                            Select Case row.ValueType
+                                Case "TEST"
+                                    Expression.Append("(" & TestsResults(row.TestTypeTestIDSampleType).ToSQLString() & ")")
                                 Case Else
                                     Expression.Append(row.Value)
                             End Select
@@ -541,7 +549,6 @@ Namespace Biosystems.Ax00.Calculations
             End Try
             Return resultData
         End Function
-
 #End Region
     End Class
 End Namespace

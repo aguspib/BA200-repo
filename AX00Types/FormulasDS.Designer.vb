@@ -281,7 +281,7 @@ Partial Public Class FormulasDS
     <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
      Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
     Private Sub InitExpressions()
-        Me.tparFormulas.TestTypeAndIDColumn.Expression = "TestType+'|' + Value"
+        Me.tparFormulas.TestTypeTestIDSampleTypeColumn.Expression = "TestType+'|'+ Value+'|'+SampleType "
     End Sub
 
     <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
@@ -311,7 +311,7 @@ Partial Public Class FormulasDS
 
         Private columnFormulaText As Global.System.Data.DataColumn
 
-        Private columnTestTypeAndID As Global.System.Data.DataColumn
+        Private columnTestTypeTestIDSampleType As Global.System.Data.DataColumn
 
         Private columnAvailable As Global.System.Data.DataColumn
 
@@ -425,9 +425,9 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public ReadOnly Property TestTypeAndIDColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property TestTypeTestIDSampleTypeColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnTestTypeAndID
+                Return Me.columnTestTypeTestIDSampleType
             End Get
         End Property
 
@@ -476,9 +476,9 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparFormulasRow(ByVal CalcTestID As Integer, ByVal Position As Integer, ByVal ValueType As String, ByVal TestType As String, ByVal Value As String, ByVal TestName As String, ByVal SampleType As String, ByVal FormulaText As String, ByVal TestTypeAndID As String, ByVal Available As Boolean) As tparFormulasRow
+        Public Overloads Function AddtparFormulasRow(ByVal CalcTestID As Integer, ByVal Position As Integer, ByVal ValueType As String, ByVal TestType As String, ByVal Value As String, ByVal TestName As String, ByVal SampleType As String, ByVal FormulaText As String, ByVal TestTypeTestIDSampleType As String, ByVal Available As Boolean) As tparFormulasRow
             Dim rowtparFormulasRow As tparFormulasRow = CType(Me.NewRow, tparFormulasRow)
-            Dim columnValuesArray() As Object = New Object() {CalcTestID, Position, ValueType, TestType, Value, TestName, SampleType, FormulaText, TestTypeAndID, Available}
+            Dim columnValuesArray() As Object = New Object() {CalcTestID, Position, ValueType, TestType, Value, TestName, SampleType, FormulaText, TestTypeTestIDSampleType, Available}
             rowtparFormulasRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparFormulasRow)
             Return rowtparFormulasRow
@@ -519,7 +519,7 @@ Partial Public Class FormulasDS
             Me.columnTestName = MyBase.Columns("TestName")
             Me.columnSampleType = MyBase.Columns("SampleType")
             Me.columnFormulaText = MyBase.Columns("FormulaText")
-            Me.columnTestTypeAndID = MyBase.Columns("TestTypeAndID")
+            Me.columnTestTypeTestIDSampleType = MyBase.Columns("TestTypeTestIDSampleType")
             Me.columnAvailable = MyBase.Columns("Available")
         End Sub
 
@@ -542,11 +542,11 @@ Partial Public Class FormulasDS
             MyBase.Columns.Add(Me.columnSampleType)
             Me.columnFormulaText = New Global.System.Data.DataColumn("FormulaText", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnFormulaText)
-            Me.columnTestTypeAndID = New Global.System.Data.DataColumn("TestTypeAndID", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnTestTypeAndID)
+            Me.columnTestTypeTestIDSampleType = New Global.System.Data.DataColumn("TestTypeTestIDSampleType", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnTestTypeTestIDSampleType)
             Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnAvailable)
-            Me.columnTestTypeAndID.ReadOnly = True
+            Me.columnTestTypeTestIDSampleType.ReadOnly = True
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -570,7 +570,7 @@ Partial Public Class FormulasDS
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Private Sub InitExpressions()
-            Me.TestTypeAndIDColumn.Expression = "TestType+'|' + Value"
+            Me.TestTypeTestIDSampleTypeColumn.Expression = "TestType+'|'+ Value+'|'+SampleType "
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -819,16 +819,16 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property TestTypeAndID() As String
+        Public Property TestTypeTestIDSampleType() As String
             Get
-                If Me.IsTestTypeAndIDNull Then
+                If Me.IsTestTypeTestIDSampleTypeNull Then
                     Return String.Empty
                 Else
-                    Return CType(Me(Me.tabletparFormulas.TestTypeAndIDColumn), String)
+                    Return CType(Me(Me.tabletparFormulas.TestTypeTestIDSampleTypeColumn), String)
                 End If
             End Get
             Set(value As String)
-                Me(Me.tabletparFormulas.TestTypeAndIDColumn) = value
+                Me(Me.tabletparFormulas.TestTypeTestIDSampleTypeColumn) = value
             End Set
         End Property
 
@@ -945,14 +945,14 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Function IsTestTypeAndIDNull() As Boolean
-            Return Me.IsNull(Me.tabletparFormulas.TestTypeAndIDColumn)
+        Public Function IsTestTypeTestIDSampleTypeNull() As Boolean
+            Return Me.IsNull(Me.tabletparFormulas.TestTypeTestIDSampleTypeColumn)
         End Function
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Sub SetTestTypeAndIDNull()
-            Me(Me.tabletparFormulas.TestTypeAndIDColumn) = Global.System.Convert.DBNull
+        Public Sub SetTestTypeTestIDSampleTypeNull()
+            Me(Me.tabletparFormulas.TestTypeTestIDSampleTypeColumn) = Global.System.Convert.DBNull
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
