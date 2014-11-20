@@ -4994,7 +4994,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Using the results of the FLIGHT instruction (for all leds) prepares the database for a quick running (updates table twksWSBLinesByWell)
         ''' Used:
         ''' - After FLIGHT results reception
-        ''' - After RESET WS the last FLIGHT results must be treated again in order to prepare next worksession
+        ''' - After RESET WS the last FLIGHT results must be treated again in order to prepare next worksession - CANCELLED!!!
+        '''              (after reset the well rejections will be obtained from the last rotor turn in previous worksession)
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pWorkSessionID"></param>

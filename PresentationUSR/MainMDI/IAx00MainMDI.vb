@@ -8295,7 +8295,8 @@ Partial Public Class IAx00MainMDI
                         If (AnalyzerController.IsAnalyzerInstantiated) Then
                             AnalyzerController.Instance.Analyzer.ActiveWorkSession = WorkSessionIDAttribute
                             AnalyzerController.Instance.Analyzer.ActiveAnalyzer = AnalyzerIDAttribute
-                            AnalyzerController.Instance.Analyzer.ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
+                            'AnalyzerController.Instance.Analyzer.ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1) 'AG 20/11/2014 BA-2065 CANCELLED!! (Use this method is after RESET we evaluate the wells rejection for next rotor turn using information of last FLIGHT)
+                            '                                                                                                                                    Instead of it we use the last rotor turn calculated during running using the well (static) base line
                         End If
 
                         'Finally enable WS Buttons and Menu Options
