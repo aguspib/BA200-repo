@@ -179,6 +179,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function ReadAdjustments(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
         Sub ClearLastExportedResults()
         Function ExistSomeAlarmThatRequiresStopWS() As Boolean
+        Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO 'AG 20/11/2014 BA-2065
 
 #End Region
 

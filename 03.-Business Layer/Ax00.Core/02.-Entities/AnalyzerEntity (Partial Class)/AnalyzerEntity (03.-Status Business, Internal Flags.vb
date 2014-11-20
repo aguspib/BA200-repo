@@ -1012,7 +1012,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             Else
                                 '3.1 Prepare data for the 1st reactions rotor turn in worksession
-                                myGlobal = BaseLine.ControlDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
+                                myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
 
                                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                     myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)

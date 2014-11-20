@@ -889,6 +889,8 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
+                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
@@ -909,7 +911,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER)
                         Dim wellID As Integer = 0
                         Dim newBaseLineID As Integer = 0
-                        Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
 
 
                         '2) Get last dynamic base line results for all wells and leds
@@ -919,81 +920,83 @@ Namespace Biosystems.Ax00.Core.Entities
                             LastDynamicBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
                         End If
 
+                        If Not resultData.HasError AndAlso LastDynamicBaseLineDS.twksWSBaseLines.Rows.Count > 0 Then
 
-                        '3) Loop calling well rejections algorithm for all wells in reactions rotor
-                        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                        For myIndex As Integer = pInitialWell To endLoopIndex + (pInitialWell - 1)
-                            'Get the well number in the interval [1, 120]
-                            wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
+                            '3) Loop calling well rejections algorithm for all wells in reactions rotor
+                            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            For myIndex As Integer = pInitialWell To endLoopIndex + (pInitialWell - 1)
+                                'Get the well number in the interval [1, 120]
+                                wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
 
-                            'Get next baselineID in table twksWSBLinesByWell for wellID
-                            resultData = myBLineByWellDlg.GetCurrentBaseLineID(dbConnection, myAnalyzerID, pWorkSessionID, wellID)
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                newBaseLineID = DirectCast(resultData.SetDatos, Integer) + 1
-                            Else
-                                Exit For
-                            End If
-
-                            'Read the last dynamic values for wellID (all leds)
-                            linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
-                                       Where a.WellUsed = wellID Select a).ToList
-
-                            convertIntoWellBaseLineDS.twksWSBaseLines.Clear()
-                            For Each row As BaseLinesDS.twksWSBaseLinesRow In linqRes
-                                convertIntoWellBaseLineDS.twksWSBaseLines.ImportRow(row)
-                            Next
-                            convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
-
-                            'Transform into data required for ControlWellBaseLine
-                            For Each blRow As BaseLinesDS.twksWSBaseLinesRow In convertIntoWellBaseLineDS.twksWSBaseLines.Rows
-                                blRow.BeginEdit()
-                                blRow.BaseLineID = newBaseLineID
-                                blRow.WorkSessionID = pWorkSessionID
-                                blRow.WellUsed = wellID
-                                blRow.DateTime = Now
-
-                                blRow.SetMainDarkNull() 'This field is only used in base line with adjust
-                                blRow.SetRefDarkNull() 'This field is only used in base line with adjust
-                                blRow.SetDACNull() 'This field is only used in base line with adjust
-                                blRow.SetITNull() 'This field is only used in base line with adjust
-                                blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
-                                blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
-                                blRow.EndEdit()
-                            Next
-                            convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
-                            resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, BaseLineType.DYNAMIC)
-
-                            'Evaluate the result: no alarm, base line WARN or base line ERR
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                If DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms) <> GlobalEnumerates.Alarms.NONE Then
-                                    'If there is still not alarm informed --> Get it
-                                    If myAlarm = GlobalEnumerates.Alarms.NONE Then
-                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
-
-                                        'Alarm can change from WARM to ERROR but not from ERROR to WARN
-                                    ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                                        myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
-
-                                    End If
+                                'Get next baselineID in table twksWSBLinesByWell for wellID
+                                resultData = myBLineByWellDlg.GetCurrentBaseLineID(dbConnection, myAnalyzerID, pWorkSessionID, wellID)
+                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                                    newBaseLineID = DirectCast(resultData.SetDatos, Integer) + 1
+                                Else
+                                    Exit For
                                 End If
-                            ElseIf resultData.HasError Then
-                                Exit For
-                            End If
-                        Next
-                        linqRes = Nothing
 
-                        '3) Finally prepare a refreshDS for the whole reactions rotor
-                        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                        If Not resultData.HasError Then
-                            resultData = myReactionsDlg.RepaintAllReactionsRotor(dbConnection, myAnalyzerID)
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                Dim newWellsDS As New ReactionsRotorDS
-                                newWellsDS = DirectCast(resultData.SetDatos, ReactionsRotorDS)
-                                RaiseEvent WellReactionsChanges(newWellsDS)
+                                'Read the last dynamic values for wellID (all leds)
+                                linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
+                                           Where a.WellUsed = wellID Select a).ToList
+
+                                convertIntoWellBaseLineDS.twksWSBaseLines.Clear()
+                                For Each row As BaseLinesDS.twksWSBaseLinesRow In linqRes
+                                    convertIntoWellBaseLineDS.twksWSBaseLines.ImportRow(row)
+                                Next
+                                convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
+
+                                'Transform into data required for ControlWellBaseLine
+                                For Each blRow As BaseLinesDS.twksWSBaseLinesRow In convertIntoWellBaseLineDS.twksWSBaseLines.Rows
+                                    blRow.BeginEdit()
+                                    blRow.BaseLineID = newBaseLineID
+                                    blRow.WorkSessionID = pWorkSessionID
+                                    blRow.WellUsed = wellID
+                                    blRow.DateTime = Now
+
+                                    blRow.SetMainDarkNull() 'This field is only used in base line with adjust
+                                    blRow.SetRefDarkNull() 'This field is only used in base line with adjust
+                                    blRow.SetDACNull() 'This field is only used in base line with adjust
+                                    blRow.SetITNull() 'This field is only used in base line with adjust
+                                    blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
+                                    blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
+                                    blRow.EndEdit()
+                                Next
+                                convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
+                                resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, BaseLineType.DYNAMIC)
+
+                                'Evaluate the result: no alarm, base line WARN or base line ERR
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    If DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms) <> GlobalEnumerates.Alarms.NONE Then
+                                        'If there is still not alarm informed --> Get it
+                                        If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                            myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                            'Alarm can change from WARM to ERROR but not from ERROR to WARN
+                                        ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                            myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                        End If
+                                    End If
+                                ElseIf resultData.HasError Then
+                                    Exit For
+                                End If
+                            Next
+                            linqRes = Nothing
+
+                            '4) Finally prepare a refreshDS for the whole reactions rotor
+                            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            If Not resultData.HasError Then
+                                resultData = myReactionsDlg.RepaintAllReactionsRotor(dbConnection, myAnalyzerID)
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    Dim newWellsDS As New ReactionsRotorDS
+                                    newWellsDS = DirectCast(resultData.SetDatos, ReactionsRotorDS)
+                                    RaiseEvent WellReactionsChanges(newWellsDS)
+                                End If
                             End If
+
                         End If
 
-                        resultData.SetDatos = myAlarm
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
@@ -1004,6 +1007,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
                     End If
                 End If
+                resultData.SetDatos = myAlarm
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed

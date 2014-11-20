@@ -8295,6 +8295,7 @@ Partial Public Class IAx00MainMDI
                         If (AnalyzerController.IsAnalyzerInstantiated) Then
                             AnalyzerController.Instance.Analyzer.ActiveWorkSession = WorkSessionIDAttribute
                             AnalyzerController.Instance.Analyzer.ActiveAnalyzer = AnalyzerIDAttribute
+                            AnalyzerController.Instance.Analyzer.ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
                         End If
 
                         'Finally enable WS Buttons and Menu Options

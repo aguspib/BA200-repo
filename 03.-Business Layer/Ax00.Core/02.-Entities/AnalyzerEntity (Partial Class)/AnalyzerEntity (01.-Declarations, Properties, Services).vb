@@ -4990,6 +4990,27 @@ Namespace Biosystems.Ax00.Core.Entities
             Return returnValue
         End Function
 
+        ''' <summary>
+        ''' Using the results of the FLIGHT instruction (for all leds) prepares the database for a quick running (updates table twksWSBLinesByWell)
+        ''' Used:
+        ''' - After FLIGHT results reception
+        ''' - After RESET WS the last FLIGHT results must be treated again in order to prepare next worksession
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pInitialWell"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 20/11/2014 BA-2065</remarks>
+        Public Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IAnalyzerEntity.ProcessDynamicBaseLine
+            Dim myGlobal As New GlobalDataTO
+            Try
+                myGlobal = BaseLine.ControlDynamicBaseLine(pDBConnection, pWorkSessionID, pInitialWell)
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessDynamicBaseLine", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobal
+        End Function
 #End Region
 
     End Class

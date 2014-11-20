@@ -405,6 +405,7 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return resultData
         End Function
+
 #End Region
 
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
