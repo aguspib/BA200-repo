@@ -4399,6 +4399,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by: SA 12/06/2014 - BT #1660 ==> Replaced call to function ProcessISETESTResults in ISEReception class, for its new 
         '''                                           version (ProcessISETESTResultsNEW) 
         '''               XB 30/09/2014 - Implement Start Task Timeout for ISE commands - Remove too restrictive limitations because timeouts - BA-1872
+        '''               XB 19/11/2014 - Emplace the kind of errors derived of BA-1614 inside the management of timeouts and automatic instructions repetitions - BA-1872
         ''' </remarks>
         Public Function ProcessRecivedISEResult(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -4409,13 +4410,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'myGlobalDataTO = DAOBase.GetOpenDBTransaction(Nothing)
                 'If (Not myGlobalDataTO.HasError) And (Not myGlobalDataTO.SetDatos Is Nothing) Then
                 '    dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-
-                ' XB 30/09/2014 - BA-1872
-                ISECMDLost = False
-                MyClass.sendingRepetitions = False
-                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                MyClass.ClearStartTaskQueueToSend()
-                ' XB 30/09/2014 - BA-1872
 
                 Dim myPreparationID As Integer = -1
                 Dim myISEResultStr As String = ""
@@ -4747,6 +4741,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XBC 21/03/2012
 
                 'End If'AG 03/07/2012 - Running Cycles lost - Solution!
+
+
+                ' XB 19/11/2014 - BA-1872
+                If ISE_Manager.FirmwareErrDetected Then
+                    Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_FAST.ToString & "] seconds")
+                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                Else
+                    ISECMDLost = False
+                    MyClass.sendingRepetitions = False
+                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                    MyClass.ClearStartTaskQueueToSend()
+                End If
+                ' XB 19/11/2014 - BA-1872
 
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
