@@ -358,60 +358,64 @@ Namespace Biosystems.Ax00.Core.Entities
                 If AnalyzerIDAttribute <> value Then
                     Dim previousValue As String = AnalyzerIDAttribute 'AG 21/06/2012 - Previous analyzer id
                     AnalyzerIDAttribute = value
-                    myAnalyzerModel = GetModelValue(AnalyzerIDAttribute)
 
-                    'AG 20/03/2012 - inform about the current analyzer to the applayer
-                    If Not AppLayer Is Nothing Then
-                        AppLayer.currentAnalyzerID = AnalyzerIDAttribute
-                        AppLayer.currentAnalyzerModel = myAnalyzerModel '13/11/2014 AG BA-2118
-                    End If
+                    If value <> "" Then 'AG 20/11/2014 BA-2133
+                        myAnalyzerModel = GetModelValue(AnalyzerIDAttribute)
 
-                    InitClassStructuresFromDataBase(Nothing) 'AG 31/05/2012
+                        'AG 20/03/2012 - inform about the current analyzer to the applayer
+                        If Not AppLayer Is Nothing Then
+                            AppLayer.currentAnalyzerID = AnalyzerIDAttribute
+                            AppLayer.currentAnalyzerModel = myAnalyzerModel '13/11/2014 AG BA-2118
+                        End If
 
-                    'AG 20/03/2012
-                    'Initialize internal flags structure
-                    InitializeAnalyzerFlags(Nothing, previousValue)
+                        InitClassStructuresFromDataBase(Nothing) 'AG 31/05/2012
 
-                    'Initialize the analyzer settings
-                    InitializeAnalyzerSettings(Nothing)
+                        'AG 20/03/2012
+                        'Initialize internal flags structure
+                        InitializeAnalyzerFlags(Nothing, previousValue)
 
-                    'Initialize the analyzer led positions
-                    InitializeAnalyzerLedPositions(Nothing)
+                        'Initialize the analyzer settings
+                        InitializeAnalyzerSettings(Nothing)
 
-                    'Initialize the ISE information master data
-                    InitializeISEInformation(Nothing)
+                        'Initialize the analyzer led positions
+                        InitializeAnalyzerLedPositions(Nothing)
 
-                    'SGM 22/03/2012 Init ISEManager instance as disconnected mode
-                    'it will be replaced by a new instance when Adjustments received
-                    If ISEAnalyzer Is Nothing Then
-                        '#TODO REFACTORING ISEAnalyzer = New ISEManager(Me, MyClass.ActiveAnalyzer, myAnalyzerModel, True)
-                    End If
+                        'Initialize the ISE information master data
+                        InitializeISEInformation(Nothing)
 
-                    ''Initialize the FwAdjustments master data
-                    'If FwVersionAttribute.Length > 0 Then
-                    '    InitializeFWAdjustments(Nothing)
-                    'End If
+                        'SGM 22/03/2012 Init ISEManager instance as disconnected mode
+                        'it will be replaced by a new instance when Adjustments received
+                        If ISEAnalyzer Is Nothing Then
+                            '#TODO REFACTORING ISEAnalyzer = New ISEManager(Me, MyClass.ActiveAnalyzer, myAnalyzerModel, True)
+                        End If
 
-                    'AG 30/08/2013 - Bug # 1271 - when new analyzer is connected Sw has to clear all alarms related to the last analyzer connected
-                    'The complete solution is next code but requires a futher validation because it could exists some exceptions (alarm not depending on the connected analyzer) - so remove
-                    'only the alarms recalculated with data in DataBase (the base line alarms)
-                    'myAlarmListAttribute.Clear()
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                    'AG 30/08/2013
+                        ''Initialize the FwAdjustments master data
+                        'If FwVersionAttribute.Length > 0 Then
+                        '    InitializeFWAdjustments(Nothing)
+                        'End If
 
-                    ' XBC 14/06/2012
-                    TemporalAnalyzerConnectedAttr = value
-                    'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
-                    'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If Not GlobalBase.IsServiceAssembly Then
-                        ' User Sw
-                        MyClass.InitBaseLineCalculations(Nothing, StartingApplicationAttr)
-                    End If
-                    ' XBC 14/06/2012
+                        'AG 30/08/2013 - Bug # 1271 - when new analyzer is connected Sw has to clear all alarms related to the last analyzer connected
+                        'The complete solution is next code but requires a futher validation because it could exists some exceptions (alarm not depending on the connected analyzer) - so remove
+                        'only the alarms recalculated with data in DataBase (the base line alarms)
+                        'myAlarmListAttribute.Clear()
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                        'AG 30/08/2013
+
+                        ' XBC 14/06/2012
+                        TemporalAnalyzerConnectedAttr = value
+                        'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
+                        'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                        If Not GlobalBase.IsServiceAssembly Then
+                            ' User Sw
+                            MyClass.InitBaseLineCalculations(Nothing, StartingApplicationAttr)
+                        End If
+                        ' XBC 14/06/2012
+                    End If 'AG 20/11/2014 BA-2133
 
                 End If
             End Set
+
         End Property
 
         Public Property ActiveFwVersion() As String Implements IAnalyzerEntity.ActiveFwVersion  'SGM 28/11/2011

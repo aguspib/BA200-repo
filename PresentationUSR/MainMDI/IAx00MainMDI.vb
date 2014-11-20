@@ -8593,6 +8593,10 @@ Partial Public Class IAx00MainMDI
                 ' XBC 14/06/2012
                 AnalyzerController.Instance.Analyzer.StartingApplication = pStartingApplication '#REFACTORING
 
+                'AG 20/11/2014 BA-2133 after load a SATreport clear the active analyzer property before inform the analyzerID of the SATreport
+                'Do this because if current analyzerID is the same as the SATreport not all properties are initiated
+                If Not pStartingApplication Then AnalyzerController.Instance.Analyzer.ActiveAnalyzer = ""
+
                 'AG 22/09/2011
                 AnalyzerController.Instance.Analyzer.ActiveAnalyzer = AnalyzerIDAttribute '#REFACTORING
                 AnalyzerController.Instance.Analyzer.ActiveWorkSession = WorkSessionIDAttribute '#REFACTORING
