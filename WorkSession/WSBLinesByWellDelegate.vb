@@ -384,18 +384,21 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' Delete all BaseLines by Well for the specified Analyzer Work Session
         ''' STATIC well rejections -> delete all records in table
-        ''' DYNAMIC well rejections -> delete all records in table except the MAX(baseLineID) of each well
+        ''' DYNAMIC well rejections -> delete all STATIC records in table except the MAX(baseLineID) of each well
+        '''                            the dynamic are not removed for store historical information that is required for Excel results generation
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pAnalyzerModel"></param>
+        ''' <param name="pForceResetFlag">Default value FALSE. When TRUE the table will be cleared always</param>
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 14/05/2010 
         ''' AG 17/11/2014 BA-2065 (add pAnalyzerModel parameter + new business)
         ''' AG 20/11/2014 BA-2065 (use the last static base line by well)
         ''' </remarks>
-        Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
+        Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String, Optional ByVal pForceResetFlag As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -413,11 +416,18 @@ Namespace Biosystems.Ax00.BL
                         'Read how is configurated the well rejection type depending the analyzer model
                         Dim myParams As New SwParametersDelegate
                         Dim BaseLineTypeForWellReject As GlobalEnumerates.BaseLineType
-                        resultData = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.BL_TYPE_FOR_WELLREJECT.ToString(), pAnalyzerModel)
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            Dim textValue As String = ""
-                            textValue = CStr(resultData.SetDatos)
-                            BaseLineTypeForWellReject = DirectCast([Enum].Parse(GetType(GlobalEnumerates.BaseLineType), textValue), GlobalEnumerates.BaseLineType)
+
+                        'If not force reset then decide depending the parameter that depends by model
+                        If Not pForceResetFlag Then
+                            resultData = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.BL_TYPE_FOR_WELLREJECT.ToString(), pAnalyzerModel)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim textValue As String = ""
+                                textValue = CStr(resultData.SetDatos)
+                                BaseLineTypeForWellReject = DirectCast([Enum].Parse(GetType(GlobalEnumerates.BaseLineType), textValue), GlobalEnumerates.BaseLineType)
+                            End If
+                        Else
+                            'Force delete!!
+                            BaseLineTypeForWellReject = GlobalEnumerates.BaseLineType.STATIC
                         End If
 
                         If BaseLineTypeForWellReject = GlobalEnumerates.BaseLineType.STATIC Then
@@ -425,33 +435,44 @@ Namespace Biosystems.Ax00.BL
                             resultData = myDAO.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
 
                         ElseIf BaseLineTypeForWellReject = GlobalEnumerates.BaseLineType.DYNAMIC Then
-                            'Get the max baseLineID of each well
-                            resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID)
+                            'Get the max baseLineID of each well (all STATIC and DYNAMIC)
+                            resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, "")
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                'Delete all except the max baseLineID of each well
+                                'Delete all the STATIC records, except the max baseLineID of each well
                                 Dim auxDataSet As New BaseLinesDS
                                 auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
                                 resultData = myDAO.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, auxDataSet)
 
-                                'Update the BaseLineID that exists yet as 0
-                                If Not resultData.HasError Then
-                                    resultData = myDAO.UpdateBaseLineIDAfterReset(dbConnection, pAnalyzerID, 0)
+                                'Renumerate the existing STATIC BaseLineID as the maximum DYNAMIC value + 1
+                                resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
+                                    Dim newBaseLineID As Integer = 0
+                                    If auxDataSet.twksWSBaseLines.Rows.Count > 0 Then
+                                        newBaseLineID = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDataSet.twksWSBaseLines Select a.BaseLineID).Max
+                                    End If
+                                    newBaseLineID += 1
+
+                                    'Update the existing records of STATIC base line to newBaseLineID value
+                                    If Not resultData.HasError Then
+                                        resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, newBaseLineID, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                                    End If
                                 End If
 
                             End If
                         End If
                         'AG 20/11/2014
 
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
+                            If (Not resultData.HasError) Then
+                                'When the Database Connection was opened locally, then the Commit is executed
+                                If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            Else
+                                'When the Database Connection was opened locally, then the Rollback is executed
+                                If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                            End If
                     End If
-                    End If
+                End If
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
@@ -576,9 +597,10 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pType">DYNAMIC - STATIC - "" ALL</param>
         ''' <returns></returns>
         ''' <remarks>AG 17/11/2014 BA-2065</remarks>
-        Public Function GetAllWellsLastTurn(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetAllWellsLastTurn(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -589,7 +611,7 @@ Namespace Biosystems.Ax00.BL
 
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSBLinesByWellDAO
-                        resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID)
+                        resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, pType)
                     End If
                 End If
 
