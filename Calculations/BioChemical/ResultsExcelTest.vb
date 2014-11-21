@@ -727,7 +727,7 @@ Namespace Biosystems.Ax00.BL
                     SetCellColor(myPage, myRango, 19)
 
                     myCellRow += 2
-                    resultdata = myWSBLinesDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID, pBaseLineType) 'BA-2067
+                    resultdata = myWSBLinesDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID, GlobalEnumerates.BaseLineType.STATIC.ToString()) 'BA-2067
 
                     If Not resultdata.HasError Then
                         Dim myBaseLinesDS As New BaseLinesDS
