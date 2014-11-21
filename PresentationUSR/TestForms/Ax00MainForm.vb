@@ -25,61 +25,29 @@ Public Class Ax00MainForm
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     Private WithEvents MDIAnalyzerManager As AnalyzerManager
-
     Dim LocalAnalizerDS As New AnalyzersDS
 
-    Private Sub BsButton1_Click(ByVal sender As System.Object, _
-                                ByVal e As System.EventArgs)
-
-        InitializeApplicationInfoSession("BIOSYSTEMS", "BIOSYSTEMS", "ENG")
-
-        Dim myTestProfilesManagement As New IProgTestProfiles
-
-        If Not GetFormFromList(myTestProfilesManagement.Name) Then
-            myTestProfilesManagement.MdiParent = Me
-            myTestProfilesManagement.Show()
-        End If
-
+#Region "PERMANENT BUTTONS - DO NOT DELETE THEM!!!"
+    Private Sub bsTestUpdateVersionProcessButton_Click(sender As Object, e As EventArgs) Handles bsTestUpdateVersionProcessButton.Click
+        UpdateProcessValidation.ShowDialog()
+        Me.Close()
     End Sub
 
-    Private Sub BsButton2_Click(ByVal sender As System.Object, _
-                                ByVal e As System.EventArgs) _
-            Handles BsButton2.Click
-
-        'Dim ActiveForm As Form = Me.ActiveMdiChild
-        'ActiveForm.Close()
-
+    Private Sub bsXmlEncryptButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsXmlEncryptButton.Click
+        XmlEncrypt.ShowDialog()
+        Me.Close()
     End Sub
 
-    Private Sub BsButton3_Click(ByVal sender As System.Object, _
-                                ByVal e As System.EventArgs) _
-            Handles BsButton3.Click
+    Private Sub bsLogFileViewButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLogFileViewButton.Click
+        Dim myApplicationLogView As New ApplicationLogView
 
-        Dim myNewContaminacion As New IProgTestContaminations
-        myNewContaminacion.ShowDialog()
-        'MessageBox.Show(GetApplicationInfoSession().UserName)
-
-        'Dim myOrderTestForm As New OrderTest
-        'myOrderTestForm.ShowDialog()
-
-        'Dim resultdata As New GlobalDataTO
-        'Dim myDelegate As New WSRequiredElementsDelegate
-        'resultdata = myDelegate.GetNotPositionedElements(Nothing, Ax00MainMDI.ActiveWorkSession)
-
+        myApplicationLogView.WorkSessionID = IAx00MainMDI.ActiveWorkSession
+        myApplicationLogView.ShowDialog()
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, _
-                              ByVal e As System.EventArgs) _
-            Handles xmlEncrypt.Click
-
-        Dim f2 As New XmlEncrypt
-        f2.ShowDialog()
-
-    End Sub
-
-    Private Sub BsButton5_Click(ByVal sender As System.Object, _
-                                ByVal e As System.EventArgs) _
-            Handles BsButton5.Click
+    Private Sub bsAGTestingButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsAGTestingButton.Click
+        Dim myForm As New bsReception
+        myForm.ShowDialog()
 
         '// AG tests button - calculations
         'Dim Calc As New AG_Tests
@@ -94,41 +62,53 @@ Public Class Ax00MainForm
         '    myTestProgrammingForm.WorkSessionID = ""
         'End If
 
-        'myTestProgrammingForm.Show()
+        'myTestProgrammingForm.Show()   
+    End Sub
+#End Region
 
-        Dim myForm As New bsReception
+#Region "OTHER BUTTONS"
+    Private Sub BsButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+        InitializeApplicationInfoSession("BIOSYSTEMS", "BIOSYSTEMS", "ENG")
 
-        myForm.ShowDialog()
-
+        Dim myTestProfilesManagement As New IProgTestProfiles
+        If Not GetFormFromList(myTestProfilesManagement.Name) Then
+            myTestProfilesManagement.MdiParent = Me
+            myTestProfilesManagement.Show()
+        End If
     End Sub
 
-    Private Sub BsButton6_Click(ByVal sender As System.Object, _
-                                ByVal e As System.EventArgs) _
-            Handles BsButton6.Click
+    Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton2.Click
+        'Dim ActiveForm As Form = Me.ActiveMdiChild
+        'ActiveForm.Close()
+    End Sub
 
+    Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
+        Dim myNewContaminacion As New IProgTestContaminations
+        myNewContaminacion.ShowDialog()
+        'MessageBox.Show(GetApplicationInfoSession().UserName)
+
+        'Dim myOrderTestForm As New OrderTest
+        'myOrderTestForm.ShowDialog()
+
+        'Dim resultdata As New GlobalDataTO
+        'Dim myDelegate As New WSRequiredElementsDelegate
+        'resultdata = myDelegate.GetNotPositionedElements(Nothing, Ax00MainMDI.ActiveWorkSession)
+    End Sub
+
+    Private Sub BsButton6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton6.Click
         Dim David As New IProgTest
-        'Dim David As New Contaminations
-
         David.Show()
-
     End Sub
 
-    Private Sub bsOrderRequestButton_Click(ByVal sender As System.Object, _
-                                           ByVal e As System.EventArgs) _
-            Handles bsOrderRequestButton.Click
-
+    Private Sub bsOrderRequestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsOrderRequestButton.Click
         Dim myf As New Ax00MainMenuForm
         myf.ShowDialog()
-
     End Sub
 
     Private Sub GetAnalyzerInfo()
-
         Try
-
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myAnalyzerDelegate As New AnalyzersDelegate
-
 
             ' XBC 07/06/2012
             'myGlobalDataTO = myAnalyzerDelegate.GetAnalyzer(Nothing)
@@ -138,35 +118,20 @@ Public Class Ax00MainForm
             If Not myGlobalDataTO.HasError Then
                 LocalAnalizerDS = CType(myGlobalDataTO.SetDatos, AnalyzersDS)
             End If
-
         Catch ex As Exception
-            'Write error SYSTEM_ERROR in the Application Log
             CreateLogActivity(ex.Message, Me.Name & " GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-
-            'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010 "SYSTEM_ERROR", ex.Message)
         End Try
-
     End Sub
 
-    Private Sub Panel2_Paint(ByVal sender As System.Object, _
-                             ByVal e As System.Windows.Forms.PaintEventArgs) _
-            Handles Panel2.Paint
-
+    Private Sub Panel2_Paint(ByVal sender As System.Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Panel2.Paint
         GetAnalyzerInfo()
-
     End Sub
 
-
-    Private Sub BsButton1_Click_1(ByVal sender As System.Object, _
-                                  ByVal e As System.EventArgs) _
-            Handles BsButton1.Click
-
+    Private Sub BsButton1_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
         Dim obj As New IAx00MainMDI
         obj.ShowDialog()
-
     End Sub
-
 
     'Private Sub Button3_Click(ByVal sender As System.Object, _
     '                          ByVal e As System.EventArgs) _
@@ -224,93 +189,6 @@ Public Class Ax00MainForm
         f.ShowDialog()
     End Sub
 
-    Private Sub bsSusanaButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSusanaButton.Click
-        Dim myGlobal As New GlobalDataTO
-        Dim dbConnection As SqlClient.SqlConnection
-
-        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
-        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
-            If (Not dbConnection Is Nothing) Then
-                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
-
-                myGlobal = myUpdateProcessDelegate.SetFactorySTDTestsProgramming(dbConnection, myUpdateVersionChangesList)
-                If (Not myGlobal.HasError) Then
-                    'When the Database Connection was opened locally, then the Commit is executed
-                    DAOBase.CommitTransaction(dbConnection)
-
-                    'Write the XML File containing all changes made in CUSTOMER DB
-                    Dim myDirName As String = "C:\Temp\"  'Application.StartupPath
-                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & "STD UPDATE VERSION.xml"
-
-                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
-                Else
-                    'When the Database Connection was opened locally, then the Rollback is executed
-                    DAOBase.RollbackTransaction(dbConnection)
-                End If
-            End If
-        End If
-    End Sub
-
-    Private Sub Button5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSusanaTest2.Click
-        Dim myGlobal As New GlobalDataTO
-        Dim dbConnection As SqlClient.SqlConnection
-
-        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
-        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
-            If (Not dbConnection Is Nothing) Then
-                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
-
-                myGlobal = myUpdateProcessDelegate.SetFactoryISETestsProgramming(dbConnection, myUpdateVersionChangesList)
-                If (Not myGlobal.HasError) Then
-                    'When the Database Connection was opened locally, then the Commit is executed
-                    DAOBase.CommitTransaction(dbConnection)
-
-                    'Write the XML File containing all changes made in CUSTOMER DB
-                    Dim myDirName As String = "C:\Temp\"  'Application.StartupPath
-                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & " ISE UPDATE VERSION.xml"
-
-                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
-                Else
-                    'When the Database Connection was opened locally, then the Rollback is executed
-                    DAOBase.RollbackTransaction(dbConnection)
-                End If
-            End If
-        End If
-    End Sub
-
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Dim myGlobal As New GlobalDataTO
-        Dim dbConnection As SqlClient.SqlConnection
-
-        myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
-        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-            dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
-            If (Not dbConnection Is Nothing) Then
-                Dim myUpdateVersionChangesList As New UpdateVersionChangesDS
-                Dim myUpdateProcessDelegate As New UpdateVersion.UpdatePreloadedFactoryTestDelegate
-
-                myGlobal = myUpdateProcessDelegate.SetFactoryCALCTestsProgramming(dbConnection, myUpdateVersionChangesList)
-                If (Not myGlobal.HasError) Then
-                    'When the Database Connection was opened locally, then the Commit is executed
-                    DAOBase.CommitTransaction(dbConnection)
-
-                    'Write the XML File containing all changes made in CUSTOMER DB
-                    Dim myDirName As String = "C:\Temp\"  'Application.StartupPath
-                    Dim myFileName As String = Now.ToString("yyyyMMdd HHmm") & "CALC UPDATE VERSION.xml"
-
-                    myUpdateVersionChangesList.WriteXml(myDirName & myFileName)
-                Else
-                    'When the Database Connection was opened locally, then the Rollback is executed
-                    DAOBase.RollbackTransaction(dbConnection)
-                End If
-            End If
-        End If
-    End Sub
-
     ' deleted 'RH Tests 2' GUI button
     'Private Sub Button5_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button5.Click
     '    If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -334,13 +212,6 @@ Public Class Ax00MainForm
     '    End If
     'End Sub
 
-    Private Sub LogFileView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LogFileView.Click
-        Dim myApplicationLogView As New ApplicationLogView
-
-        myApplicationLogView.WorkSessionID = IAx00MainMDI.ActiveWorkSession
-        myApplicationLogView.ShowDialog()
-    End Sub
-
     Private Sub Button6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button6.Click
         ISE_Test.Show()
         Me.Close()
@@ -351,15 +222,8 @@ Public Class Ax00MainForm
     '    Me.Close()
     'End Sub
 
-
-
     Private Sub BsGenerateISECodesButton_Click(sender As Object, e As EventArgs) Handles BsGenerateISECodesButton.Click
         ISECodeGenerator.Show()
-        Me.Close()
-    End Sub
-
-    Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        UpdateProcessValidation.ShowDialog()
         Me.Close()
     End Sub
 
@@ -381,7 +245,6 @@ Public Class Ax00MainForm
         Dim dialogres As DialogResult = BSCustomMessageBox.Show(Me, message2, title, MessageBoxButtons.RetryCancel, MessageBoxIcon.Question, "Continue", "Stop", "")
 
         Select Case dialogres
-
             Case DialogResult.Retry
                 MessageBox.Show("you clicked Continue")
             Case System.Windows.Forms.DialogResult.Retry
@@ -389,8 +252,6 @@ Public Class Ax00MainForm
             Case System.Windows.Forms.DialogResult.Cancel, DialogResult.Ignore
                 MessageBox.Show("you clicked Stop")
         End Select
-
-
     End Sub
 
     Private Sub BsButton4_Click(sender As Object, e As EventArgs) Handles BsButton4.Click
@@ -457,7 +318,6 @@ Public Class Ax00MainForm
 
     'JV 29/10/2013
     Private Sub SimpleButton1_Click(sender As Object, e As EventArgs) Handles SimpleButton1.Click
-
         Dim messageBoxType As MessageBoxButtons = MessageBoxButtons.AbortRetryIgnore
         Dim userAnswer As DialogResult = DialogResult.No
 
@@ -466,12 +326,10 @@ Public Class Ax00MainForm
         userAnswer = BSCustomMessageBox.Show(Me, "Default button Middle", My.Application.Info.Title, messageBoxType, MessageBoxIcon.Warning, BSCustomMessageBox.BSMessageBoxDefaultButton.MiddleButton, "Stop", "Abort", "Cancel")
 
         userAnswer = BSCustomMessageBox.Show(Me, "Default button Right", My.Application.Info.Title, messageBoxType, MessageBoxIcon.Warning, BSCustomMessageBox.BSMessageBoxDefaultButton.RightButton, "Stop", "Abort", "Cancel")
-
     End Sub
     'JV 29/10/2013
 
     Private Sub SimpleButton2_Click(sender As Object, e As EventArgs) Handles SimpleButton2.Click
-
         Dim resultData As New GlobalDataTO
         Dim myExDlg As New ExecutionsDelegate
         'resultData = myExDlg.ExistCriticalPauseTests(Nothing, "SN0000099999_Ax400", "A400", "2013112501")
@@ -485,8 +343,6 @@ Public Class Ax00MainForm
         userAnswer = BSCustomMessageBox.Show(Me, "En este momento el analizador está realizando preparaciones que se pueden ver afectadas por la pausa, se recomienda esperar a que termine la dispensación", _
                                              My.Application.Info.Title, messageBoxType, MessageBoxIcon.Warning, BSCustomMessageBox.BSMessageBoxDefaultButton.LeftButton, "", "Wait", "Pause")
         MessageBox.Show("Resp.: " & userAnswer.ToString())
-
     End Sub
-
-   
+#End Region
 End Class
