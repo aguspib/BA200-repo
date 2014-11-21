@@ -223,7 +223,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' AG 12/06/2012 - created (copied from wellBaseLineWorker_DoWork (v0.4.3)
+        ''' Created by:  AG 12/06/2012 - created (copied from wellBaseLineWorker_DoWork (v0.4.3)
+        ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
         Private Function ProcessWellBaseLineReadings(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -271,6 +272,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         newRow.BaseLineID = newID
                         newRow.WellUsed = myBaseLineWell
                         newRow.DateTime = Now
+                        newRow.Type = GlobalEnumerates.BaseLineType.STATIC.ToString() 'BA-2067
                         newRow.SetMainDarkNull() 'This field is only used in base line with adjust
                         newRow.SetRefDarkNull() 'This field is only used in base line with adjust
                         newRow.SetDACNull() 'This field is only used in base line with adjust

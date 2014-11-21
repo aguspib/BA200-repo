@@ -119,8 +119,9 @@ Namespace Biosystems.Ax00.BL
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with the group of BaseLines by Well</returns>
         ''' <remarks>
         ''' Created by:  DL 31/05/2010 
+        ''' Modified by: IT 03/11/2014 - BA-2067: Added Baseline Type parameter
         ''' </remarks>
-        Public Function GetByWorkSession(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetByWorkSession(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pBaseLineType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -130,7 +131,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myWSBLinesbyWell As New twksWSBLinesByWellDAO
-                        resultData = myWSBLinesbyWell.GetByWorkSession(dbConnection, pAnalyzerID, pWorkSessionID)
+                        resultData = myWSBLinesbyWell.GetByWorkSession(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineType)
                     End If
                 End If
             Catch ex As Exception

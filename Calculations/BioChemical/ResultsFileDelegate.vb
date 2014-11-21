@@ -60,7 +60,7 @@ Namespace Biosystems.Ax00.BL
         ''' AG 04/01/2011 - copied and adapted from ExcelWaitForm
         ''' RH 12/07/2011 - Some code optimization and corrections
         ''' AG 28/07/2011 - add parameter pAnalyzerIDwhenWSNoExists for case generate excel with no worksession (only adjust base line)
-        ''' IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        ''' IT 21/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
         Public Function ExportXLS(ByVal pWorkSessionID As String, ByVal pPathName As String, ByVal pFileName As String, ByVal pAnalyzerIDwhenWSNoExists As String, ByVal pBaseLineType As String) As GlobalDataTO
             'Dim resultdata As New GlobalDataTO
@@ -107,16 +107,17 @@ Namespace Biosystems.Ax00.BL
                                     Dim myAnalyzerDS As WSAnalyzersDS
                                     myAnalyzerDS = DirectCast(resultdata.SetDatos, WSAnalyzersDS)
 
-                                    resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists, 1, BaseLineType.STATIC.ToString()) 'BA-2067
+                                    resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists)
+
                                     'BA-2067
                                     If pBaseLineType = BaseLineType.DYNAMIC.ToString() Then
-                                        resultdata = SheetBaseLine(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pAnalyzerIDwhenWSNoExists, 2, BaseLineType.DYNAMIC.ToString())
+                                        resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, 2, BaseLineType.DYNAMIC.ToString())
                                     End If
 
                                     If Not resultdata.HasError AndAlso myWorkSessionsDS.twksWorkSessions.Rows.Count > 0 Then
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets)
+                                            resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, 3, BaseLineType.STATIC.ToString()) 'BA-2067
                                         Else
                                             'Exit Function
                                             Return resultdata
@@ -421,14 +422,17 @@ Namespace Biosystems.Ax00.BL
         '''' <returns>GlobalDataTO containing sucess/error information</returns>
         '''' <remarks>
         '''' Created By: DLM 08/06/2010
-        '''' Modified AG: 04/01/2011
-        ''''          AG: 05/09/2011 - also copy AbsValue
-        ''''          RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        '''' Modified: AG 04/01/2011
+        ''''           AG 05/09/2011 - also copy AbsValue
+        ''''           RH 02/01/2011 - Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        ''''           IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetBaseLinebyWell(ByVal pDBConnection As SqlConnection, _
                                             ByVal pAnalyzerDS As WSAnalyzersDS, _
                                             ByVal pWorkSessionDS As WorkSessionsDS, _
-                                            ByVal pWorkSheets As Object) As GlobalDataTO
+                                            ByVal pWorkSheets As Object,
+                                            ByVal pSheetNumber As Integer,
+                                            ByVal pBaseLineType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = pWorkSessionDS.twksWorkSessions(0).WorkSessionID
@@ -439,10 +443,15 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet base line by well sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {pSheetNumber})
 
-                ' Ini Header 
-                myHeader = "Base lines by well (without adjustments)"
+                'Ini Header 
+                'IT 21/11/2014 BA-2067 Different header depending the base line type
+                If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                    myHeader = "Base lines by well (without adjustments)"
+                Else
+                    myHeader = "Dynamic Base lines (on the fly)"
+                End If
 
                 SetCellValue(myPage, "A1", myHeader, True)
                 MergeCells(myPage, "A1:H1")
@@ -468,7 +477,7 @@ Namespace Biosystems.Ax00.BL
                     myCellRow += 2
 
                     Dim myWSBLinesbyWellDelegate As New WSBLinesByWellDelegate
-                    resultdata = myWSBLinesbyWellDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID)
+                    resultdata = myWSBLinesbyWellDelegate.GetByWorkSession(pDBConnection, myRowAnalyzer.AnalyzerID, myWSID, pBaseLineType)
                     If Not resultdata.HasError Then
                         Dim myBaseLinesDS As New BaseLinesDS
                         myBaseLinesDS = DirectCast(resultdata.SetDatos, BaseLinesDS)
@@ -620,15 +629,12 @@ Namespace Biosystems.Ax00.BL
         '''' Modified AG 28/07/2011 - generate base lines sheet although no worksession exists (use pAnalyzerIDwhenWSNoExists)
         ''''                          parameter pAnalyzerDS ... byRef
         ''''          RH 02/01/2011 - Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
-        ''''          IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetBaseLine(ByVal pDBConnection As SqlConnection, _
                                       ByRef pAnalyzerDS As WSAnalyzersDS, _
                                       ByVal pWorkSessionDS As WorkSessionsDS, _
                                       ByVal pWorksheets As Object, _
-                                      ByVal pAnalyzerIDwhenWSNoExists As String,
-                                      ByVal pSheetNumber As Integer,
-                                      ByVal pBaseLineType As String) As GlobalDataTO
+                                      ByVal pAnalyzerIDwhenWSNoExists As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = ""
