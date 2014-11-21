@@ -22,6 +22,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' Created by: GDS 21/05/2010
         ''' Modified by: AG 02/05/2011 - Replaced fields MainDark and RefDark for ABSValue and IsMean
+        '''              IT 03/11/2014 - BA-2067: Dynamic BaseLine Type   
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -41,7 +42,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   "  , WorkSessionID" & vbCrLf & _
                                   "  , BaseLineID" & vbCrLf & _
                                   "  , Wavelenght" & vbCrLf & _
-                                  "  , WellUsed" & vbCrLf
+                                  "  , WellUsed" & vbCrLf & _
+                                  "  , Type" & vbCrLf
 
 
 
@@ -71,7 +73,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "  , '" & myRow.WorkSessionID.Replace("'", "''").ToString & "'" & vbCrLf & _
                                    "  ,  " & myRow.BaseLineID.ToString & vbCrLf & _
                                    "  ,  " & myRow.Wavelength.ToString & vbCrLf & _
-                                   "  ,  " & myRow.WellUsed.ToString & vbCrLf
+                                   "  ,  " & myRow.WellUsed.ToString & vbCrLf & _
+                                   "  ,  '" & myRow.Type & "'" & vbCrLf
 
                         If Not myRow.IsMainLightNull Then
                             cmdText &= "  ,  " & myRow.MainLight.ToString & vbCrLf
@@ -252,8 +255,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  DL 19/02/2010
         ''' Modified by: AG 04/01/2011 - Order by WellUsed and BaseLineID instead of by BaseLineID
         '''              AG 02/05/2011 - Replaced fields MainDark and RefDark for ABSValue and IsMean
+        '''              IT 03/11/2014 - BA-2067: Added the Column Type
         ''' </remarks>
-        Public Function GetByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        Public Function GetByWorkSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pBaseLineType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -263,10 +267,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        cmdText &= " SELECT   AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime" & vbCrLf
+                        cmdText &= " SELECT   AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime, Type " & vbCrLf
                         cmdText &= " FROM     twksWSBLinesByWell" & vbCrLf
                         cmdText &= " WHERE    AnalyzerID    = '" & pAnalyzerID.Trim & "'" & vbCrLf
                         cmdText &= "   AND    WorkSessionID = '" & pWorkSessionID.Trim & "'" & vbCrLf
+                        cmdText &= "   AND    Type = '" & pBaseLineType.Trim & "' " & vbCrLf
                         cmdText &= " ORDER BY WellUsed, BaselineID, WaveLength"
 
                         Dim myBaseLinesDS As New BaseLinesDS
@@ -420,7 +425,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with the group of BaseLines by Well</returns>
         ''' <remarks>
         ''' Created by:  AG 04/05/2011
-        ''' Modify by: AG 18/11/2014 BA-2065 exclude worksession from the query
+        ''' Modify by: AG 18/11/2014 - BA-2065: exclude worksession from the query
+        '''            IT 03/11/2014 - BA-2067: Added the Column Type
         ''' </remarks>
         Public Function GetMeanWellBaseLineValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                   ByVal pWorkSessionID As String) As GlobalDataTO
@@ -433,7 +439,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        cmdText = "SELECT AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime " & vbCrLf & _
+                        cmdText = "SELECT AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime, Type " & vbCrLf & _
                                   " FROM twksWSBLinesByWell  WHERE IsMean = 1 " & vbCrLf & _
                                   " AND AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "'" & vbCrLf & _
                                   " ORDER BY BaseLineID, WellUsed , Wavelenght "

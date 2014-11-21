@@ -883,7 +883,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pWorkSessionID"></param>
         ''' <param name="pInitialWell">The starting well used when simulate a complete rotor turn calling ControlWellBaseLine</param>
         ''' <returns>GlobalDataTo with error o not (data as Alarms enumerate)</returns>
-        ''' <remarks>AG 14/11/2014 BA-2065 Creation</remarks>
+        ''' <remarks>
+        ''' Created by:  AG 14/11/2014 - BA-2065 Creation
+        ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        ''' </remarks>
         Public Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IBaseLineEntity.ControlDynamicBaseLine
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -953,6 +956,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     blRow.WorkSessionID = pWorkSessionID
                                     blRow.WellUsed = wellID
                                     blRow.DateTime = Now
+                                    blRow.Type = BaseLineType.DYNAMIC.ToString() 'BA-2067
 
                                     blRow.SetMainDarkNull() 'This field is only used in base line with adjust
                                     blRow.SetRefDarkNull() 'This field is only used in base line with adjust
