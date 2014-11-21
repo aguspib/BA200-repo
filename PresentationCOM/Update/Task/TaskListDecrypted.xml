@@ -2974,7 +2974,20 @@
   </AppVersion >
   <AppVersion>
     <Version>3.11</Version>
-    <StructureScript></StructureScript>
+    <StructureScript>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'PreloadedOffSystemTest') = 0
+      BEGIN
+      ALTER TABLE [dbo].tparOffSystemTests ADD PreloadedOffSystemTest bit NOT NULL
+      CONSTRAINT PreloadedOffSystemTest_Default DEFAULT 0;
+      END
+      GO
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'BiosystemsID') = 0
+      BEGIN
+      ALTER TABLE [dbo].tparOffSystemTests ADD BiosystemsID int NULL
+      END
+      GO
+    </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.1', ServiceSoftware = '1.3.1', FirmwareScripts = '1.3.0', Firmware = '2.14', DBSoftware = '3.11'
       GO

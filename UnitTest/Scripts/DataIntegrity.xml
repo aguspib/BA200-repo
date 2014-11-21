@@ -3072,6 +3072,30 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>Column BiosystemsID has been added to table tparOffSystemTests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id 
+           WHERE  so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'BiosystemsID') = 1) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>Column PreloadedOffSystemTest has been added to table tparOffSystemTests</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id 
+           WHERE  so.xtype = 'U' AND so.name = 'tparOffSystemTests' AND sc.name = 'PreloadedOffSystemTest') = 1) 
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+    </IntegrityValidation>
 </DBIntegrityDS>
 
 

@@ -214,6 +214,7 @@
     <Compile Include="UpdateVersion\CalibratorUpdateDAO.vb" />
     <Compile Include="UpdateVersion\ContaminationsUpdateDAO.vb" />
     <Compile Include="UpdateVersion\ISETestUpdateDAO.vb" />
+    <Compile Include="UpdateVersion\OffSystemTestUpdateDAO.vb" />
     <Compile Include="UpdateVersion\TestParametersUpdateDAO.vb" />
     <Compile Include="vcfgLISMappingsDAO.vb" />
     <Compile Include="vparAllTestByTypeDAO.vb" />
