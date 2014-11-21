@@ -2705,7 +2705,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
 
-                                    ' XB 19/11/2014 - BA-1872!!!
+                                    ' XB 19/11/2014 - BA-1872
                                     FirmwareErrDetectedAttr = True
 
                                     'LastISEResult.IsCancelError = True
@@ -2746,14 +2746,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
 
-                                    ' XB 19/11/2014 - BA-1872!!!
+                                    ' XB 19/11/2014 - BA-1872
                                     FirmwareErrDetectedAttr = True
 
                                     'LastISEResult.IsCancelError = True
                                     'pForcedResult = ISEProcedureResult.Exception
-                                    MyClass.IsPumpCalibrationNeeded = True
+                                    'MyClass.IsPumpCalibrationNeeded = True
                                     '' XB 20/05/2014 - Task #1614
-                                    ' XB 19/11/2014 - BA-1872!!!
+                                    ' XB 19/11/2014 - BA-1872
                                 End If
                             Case ISECommands.SHOW_PUMP_CAL
                                 isFinished = (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.PMC)
@@ -2786,13 +2786,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                     ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
 
-                                    ' XB 19/11/2014 - BA-1872!!!
+                                    ' XB 19/11/2014 - BA-1872
                                     FirmwareErrDetectedAttr = True
 
                                     'LastISEResult.IsCancelError = True
                                     'pForcedResult = ISEProcedureResult.Exception
                                     ' XB 20/05/2014 - Task #1614
-                                    ' XB 19/11/2014 - BA-1872!!!
+                                    ' XB 19/11/2014 - BA-1872
                                 End If
 
                             Case ISECommands.READ_mV
@@ -2803,12 +2803,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                         ' This is an error. ISE must answer AMV or BMV or an ERC, but no this instruction: <ISE!>
 
-                                        ' XB 19/11/2014 - BA-1872!!!
+                                        ' XB 19/11/2014 - BA-1872
                                         FirmwareErrDetectedAttr = True
 
                                         'LastISEResult.IsCancelError = True
                                         'pForcedResult = ISEProcedureResult.Exception
-                                        ' XB 19/11/2014 - BA-1872!!!
+                                        ' XB 19/11/2014 - BA-1872
 
                                     End If
                                 End If
@@ -2821,12 +2821,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If Not isFinished Then
                                     If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                         ' This is an error. ISE must answer DDT00 but no this instruction: <ISE!>
-                                        ' XB 19/11/2014 - BA-1872!!!
+                                        ' XB 19/11/2014 - BA-1872
                                         FirmwareErrDetectedAttr = True
 
                                         'LastISEResult.IsCancelError = True
                                         'pForcedResult = ISEProcedureResult.Exception
-                                        ' XB 19/11/2014 - BA-1872!!!
+                                        ' XB 19/11/2014 - BA-1872
 
                                     End If
                                 End If
@@ -2839,12 +2839,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If Not isFinished Then
                                     If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                         ' This is an error. ISE must answer DDT01 but no this instruction: <ISE!>
-                                        ' XB 19/11/2014 - BA-1872!!!
+                                        ' XB 19/11/2014 - BA-1872
                                         FirmwareErrDetectedAttr = True
 
                                         'LastISEResult.IsCancelError = True
                                         'pForcedResult = ISEProcedureResult.Exception
-                                        ' XB 19/11/2014 - BA-1872!!!
+                                        ' XB 19/11/2014 - BA-1872
                                     End If
                                 End If
                                 ' XB 20/05/2014 - Task #1614
@@ -2913,7 +2913,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             ' XB 20/05/2014 - Task #1614
                         ElseIf MyClass.CurrentCommandTO.ISECommandID = ISECommands.READ_mV AndAlso LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                             FirmwareErrDetectedAttr = True
 
                             'LastISEResult.IsCancelError = True
@@ -2922,7 +2922,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'MyClass.IsISEInitiatedOKAttr = False
                             'RaiseEvent ISEConnectionFinished(False)
                             ' XB 20/05/2014 - Task #1614
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                         End If
 
                     Case ISEProcedures.ActivateModule
@@ -2985,12 +2985,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If Not isFinished Then
                             If LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                                 ' This is an error. ISE must answer a AMV or BMV or an ERC, but no this instruction: <ISE!>
-                                ' XB 19/11/2014 - BA-1872!!!
+                                ' XB 19/11/2014 - BA-1872
                                 FirmwareErrDetectedAttr = True
 
                                 'LastISEResult.IsCancelError = True
                                 'pForcedResult = ISEProcedureResult.Exception
-                                ' XB 19/11/2014 - BA-1872!!!
+                                ' XB 19/11/2014 - BA-1872
                             End If
                         End If
                         ' XB 20/05/2014 - Task #1614
@@ -3024,14 +3024,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             ' XB 30/04/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer a CAL results or an ERC, but no this instruction: <ISE!>
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                             FirmwareErrDetectedAttr = True
 
                             'LastISEResult.IsCancelError = True
                             'pForcedResult = ISEProcedureResult.Exception
                             'MyClass.IsCalibrationNeeded = True
                             ' XB 30/04/2014 - Task #1614
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                         End If
 
                     Case ISEProcedures.CalibratePumps
@@ -3057,14 +3057,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                             FirmwareErrDetectedAttr = True
 
                             'LastISEResult.IsCancelError = True
                             'pForcedResult = ISEProcedureResult.Exception
                             'MyClass.IsPumpCalibrationNeeded = True
                             ' XB 20/05/2014 - Task #1614
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                         End If
 
                         ' XBC 27/09/2012
@@ -3090,12 +3090,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             ' XB 20/05/2014 - Task #1614
                         ElseIf LastISEResult.ReceivedResults.Contains("<ISE!>") Then
                             ' This is an error. ISE must answer results or an ERC, but no this instruction: <ISE!>
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                             FirmwareErrDetectedAttr = True
 
                             'LastISEResult.IsCancelError = True
                             'pForcedResult = ISEProcedureResult.Exception
-                            ' XB 19/11/2014 - BA-1872!!!
+                            ' XB 19/11/2014 - BA-1872
                             ' XB 20/05/2014 - Task #1614
                         End If
 
