@@ -549,38 +549,53 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If myAlarms.Contains(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR) Then
 
                                 ' XB 26/09/2014 - BA-1872
-                                MyClass.sendingRepetitions = True
-                                MyClass.numRepetitionsTimeout += 1
-                                Dim myLogAcciones As New ApplicationLogManager()
-                                If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
-                                    myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                    waitingStartTaskTimer.Enabled = False
-                                    MyClass.sendingRepetitions = False
+                                If MyClass.ISE_Manager IsNot Nothing Then
+                                    If Not MyClass.ISE_Manager.IsISEModuleInstalled Then
 
-                                    ' Activates Alarm begin
-                                    Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                                    Dim alarmStatus As Boolean = False
-                                    Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
-                                    Dim myAlarmStatusList As New List(Of Boolean)
+                                        ' XB 21/11/2014 - If ISE module isn't Installed remove the ISE Timeout Alarm - BA-1872
+                                        If MyClass.ISE_Manager IsNot Nothing Then
+                                            If Not MyClass.ISE_Manager.IsISEModuleInstalled Then
+                                                Debug.Print("ISE Module NOT installed !")
+                                                myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                                            End If
+                                        End If
+                                        ' XB 21/11/2014 - BA-1872
+                                    Else
 
-                                    alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
-                                    alarmStatus = True
-                                    ISE_Manager.IsTimeOut = True
+                                        MyClass.sendingRepetitions = True
+                                        MyClass.numRepetitionsTimeout += 1
+                                        Dim myLogAcciones As New ApplicationLogManager()
+                                        If MyClass.numRepetitionsTimeout > GlobalBase.MaxRepetitionsTimeout Then
+                                            myLogAcciones.CreateLogActivity("Num of Repetitions for Start Tasks timeout excedeed because error 61 !!!", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                            waitingStartTaskTimer.Enabled = False
+                                            MyClass.sendingRepetitions = False
 
-                                    PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
-                                    If myAlarmList.Count > 0 Then
-                                        ' Note that this alarm is common on User and Service !
-                                        myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            ' Activates Alarm begin
+                                            Dim alarmID As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                            Dim alarmStatus As Boolean = False
+                                            Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
+                                            Dim myAlarmStatusList As New List(Of Boolean)
+
+                                            alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
+                                            alarmStatus = True
+                                            ISE_Manager.IsTimeOut = True
+
+                                            PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
+                                            If myAlarmList.Count > 0 Then
+                                                ' Note that this alarm is common on User and Service !
+                                                myGlobal = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
+                                            End If
+                                            ' Activates Alarm end
+
+                                            RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
+                                        Else
+                                            ' Instruction has not started by Fw, so is need to send it again
+                                            myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                            myGlobal = MyClass.SendStartTaskinQueue()
+                                        End If
+
                                     End If
-                                    ' Activates Alarm end
-
-                                    RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
-                                Else
-                                    ' Instruction has not started by Fw, so is need to send it again
-                                    myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                    myGlobal = MyClass.SendStartTaskinQueue()
                                 End If
-
 
                                 'If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
                                 '    myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
