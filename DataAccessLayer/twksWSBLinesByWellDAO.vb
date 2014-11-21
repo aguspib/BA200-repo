@@ -74,7 +74,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "  ,  " & myRow.BaseLineID.ToString & vbCrLf & _
                                    "  ,  " & myRow.Wavelength.ToString & vbCrLf & _
                                    "  ,  " & myRow.WellUsed.ToString & vbCrLf & _
-                                   "  ,  " & myRow.Type & vbCrLf
+                                   "  ,  '" & myRow.Type & "'" & vbCrLf
 
                         If Not myRow.IsMainLightNull Then
                             cmdText &= "  ,  " & myRow.MainLight.ToString & vbCrLf
