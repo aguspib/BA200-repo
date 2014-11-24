@@ -141,7 +141,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Verify if the informed OFFSTestID already exists in Historics Module and in this case, get its data
+        ''' Verify if the informed OFFSTestID already exists in Historics Module and it's not a closed Test, and in this case get its data.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pOFFSTestID">Identifier of the OFF-SYSTEM Test in Parameters Programming Module</param>

@@ -112,7 +112,17 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete all the specified Calculated Tests (Test Definition, Formula and Reference Ranges) 
+        ''' Delete all the specified Calculated Tests (Test Definition, Formula and Reference Ranges).
+        ''' Additionally, it deletes all related Calculated Tests that contain these specified Calculated Tests in their formulas.
+        ''' Detailled functionality:
+        ''' *Step 1: For all Calculated Tests that have the Calculated Tests from step 2 included in their formula: perform the 6 actions stated below:
+        '''    1. Mark as DeletedFlag if exists into a saved Worksession from LIS.
+        '''    2. Remove the Calculated Test from all Test Profiles in which it is included.
+        '''    3. Delete Reference Ranges for the affected Calculated Test.
+        '''    4. Delete the elements of the Formula of the affected Calculated Test.
+        '''    5. Delete the affected Calculated Test.
+        '''    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
+        ''' *Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pCalcTests">Typed DataSet CalculatedTestsDS with the list of Calculated Tests to delete</param>        
@@ -134,6 +144,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 10/05/2013 - Mark as deleted test if this test form part of a LIS saved worksession
         '''              SA 16/10/2014 - BA-1944 (SubTask BA-2017) ==> Return the CalculatedTestsDS containing all Calculated Tests also deleted
         '''                                                            due to the removed one was part of their Formulas
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary description.
         ''' </remarks>
         Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTests As CalculatedTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -249,14 +260,15 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete all Calculated Tests in which the informed Test Identifier (it can be the ID of an Standard or a Calculated Test) is 
-        ''' included in their Formula
+        ''' Delete all Calculated Tests in which the informed Test Identifier (it can be the ID of a Standard, ISE, Off-System or Calculated Test) is 
+        ''' included in their Formula. Additionally, it deletes all related Calculated Tests that contain these affected Calculated Tests in their formulas.
+        ''' Also it performs some related actions regarding Test Profiles, Reference Ranges, Calc.Test Formulas, Historic Module and LIS Saved WS.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Optional parameter. When informed, it indicates the Test will be searched in the defined Formulas 
         '''                           linked to the specified SampleType</param>
-        ''' <param name="pTestType">Optional parameter. It indicates if the informed ID corresponds to an Standard Test or to a Calculated Test</param>
+        ''' <param name="pTestType">Optional parameter. The informed ID corresponds to a Standard, ISE, Off-system or Calculated Test (STD,ISE,OFFS,CALC).</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  DL 17/05/2010
@@ -264,6 +276,7 @@ Namespace Biosystems.Ax00.BL
         '''                              instead of disabling
         '''              SA 13/09/2012 - Instead of calling functions GetCalcTest and Delete for each Calculated Test in which the informed 
         '''                              TestType/TestID/SampleType is included, load all the IDs in a CalculatedTestsDS and finally call Delete function
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameters description.
         ''' </remarks>
         Public Function DeleteCalculatedTestbyTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                      Optional ByVal pSampleType As String = "", Optional ByVal pTestType As String = "STD") _
@@ -276,8 +289,8 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'Search on the Formula table if there are any record with the informed TestType/TestID/SampleType and return 
-                        'the ID of all Calculated Tests in which the informed TestType/TestID/SampleType is included
+                        ' Search in the Formula table if there is/are any record(s) with the informed TestType/TestID/SampleType and return 
+                        ' the ID of all Calculated Tests in which the informed TestType/TestID/SampleType is included.
                         Dim myFormulaDelegate As New FormulasDelegate
                         myGlobalDataTO = myFormulaDelegate.ReadFormulaByTestID(dbConnection, pTestID, pSampleType, pTestType)
 
@@ -306,7 +319,7 @@ Namespace Biosystems.Ax00.BL
                             Next
 
                             If (tempCalcTestDS.tparCalculatedTests.Rows.Count > 0) Then
-                                'Delete all affected Calculated Tests
+                                ' If there is at least 1 affected Calculated Test => Delete all affected Calculated Tests and perform related actions.
                                 myGlobalDataTO = Delete(dbConnection, tempCalcTestDS)
                             End If
                         End If
@@ -1019,7 +1032,7 @@ Namespace Biosystems.Ax00.BL
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                     myComponentsDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
 
-                                    'Buid the FormulaText 
+                                    'Build the FormulaText 
                                     newFormulaText = String.Empty
                                     For Each formulaItem As FormulasDS.tparFormulasRow In myComponentsDS.tparFormulas.Rows
                                         If (formulaItem.ValueType = "TEST") Then

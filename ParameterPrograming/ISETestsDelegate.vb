@@ -541,8 +541,8 @@ Namespace Biosystems.Ax00.BL
                             End If
                         End If
 
-                        ' WE 17/11/2014 - RQ00035C (BA-1867): Verify if it's needed to update field FormulaText of those Calculated Tests in which formula
-                        ' the modified ISE Test has been included (when the name of the ISE Test is changed).
+                        ' WE 17/11/2014 - RQ00035C (BA-1867): Update field FormulaText for those Calculated Tests in which formula
+                        ' the modified ISE Test Name has been included (when the Name of the ISE Test is changed).
                         If (Not resultData.HasError) Then
                             Dim myCalcTestDlg As New CalculatedTestsDelegate
                             If pUpdatedISETests.tparISETests.Rows.Count > 0 Then

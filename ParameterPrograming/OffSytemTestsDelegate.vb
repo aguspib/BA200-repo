@@ -352,7 +352,11 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Update data of the specified OFF-SYSTEM Test (basic data, sample type data and reference ranges)
+        ''' - Update data of the specified OFF-SYSTEM Test (Basic data, Sample Type data and Reference Ranges).
+        ''' - Update data of the OFF-SYSTEM Test/SampleType in Historic Module.
+        ''' - When the Name of the Off-System Test is changed: Update field FormulaText for those Calculated Tests in which formula
+        '''   the modified Off-System Test Name has been included.
+        ''' - When the Sample Type has been changed,  it also manages the deletion of all affected Test Profiles and Calculated Tests.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pOffSystemTestDS">Typed DataSet OffSystemTestsDS with basic data of the OFF-SYSTEM Test to add</param>
@@ -374,7 +378,8 @@ Namespace Biosystems.Ax00.BL
         '''                            - Added optional parameter pCloseHistory to indicate if the OffSystem Test has to be marked as closed in Historic Module
         '''                            - Depending on value of the added parameters call function to update data or mark the Test as closed in Historic Module
         '''              SA 17/09/2012 - Removed parameter pCloseHistory and its related functionality; it is not needed due to function HIST_UpdateByOFFSTestIDAndSampleType 
-        '''                              verifies if fields ResultType and/or SampleType have been changed and in this case close the OFFSystemTest 
+        '''                              verifies if fields ResultType and/or SampleType have been changed and in this case close the OFFSystemTest
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Extend with deletion of all affected Calculated Tests.
         ''' </remarks>
         Public Function Modify(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS, ByVal pTestSampleTypesDS As OffSystemTestSamplesDS, _
                                ByVal pRefRangesDS As TestRefRangesDS, ByVal pAffectedElementsDS As DependenciesElementsDS, Optional ByVal pUpdateHistory As Boolean = False) _
@@ -386,10 +391,33 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'If there are affected Elements, remove the OFF-SYSTEM Test from all Profiles in which it is included 
+
                         If (pAffectedElementsDS.DependenciesElements.Count > 0) Then
+                            ' Only execute when the SampleType of the modified Off-System Test is changed on screen and there are elements affected.
+
+                            ' Remove the specified OFF-SYSTEM Test from all Test Profiles in which it has been included.
                             Dim myTestProfileDelegate As New TestProfilesDelegate
                             resultData = myTestProfileDelegate.DeleteByTestIDSampleType(dbConnection, pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+
+                            ' WE 24/11/2014 - RQ00035C (BA-1867).
+                            If (Not resultData.HasError) Then
+                                ' Remove all affected Calculated Tests that have the currently modified Off-System Test in their formula.
+                                ' Due to the change of Sample Type on screen by the user, and the Off-System Test may occur in other Calculated Tests and/or Test Profiles, 
+                                ' the following 2 steps must be performed:
+                                '
+                                ' Step 1: For all Calculated Tests that have the Calculated Tests from step 2 included in their formula: perform the 6 actions stated below:
+                                '    1. Mark as DeletedFlag if exists into a saved Worksession from LIS.
+                                '    2. Remove the Calculated Test from all Test Profiles in which it is included.
+                                '    3. Delete Reference Ranges for the affected Calculated Test.
+                                '    4. Delete the elements of the Formula of the affected Calculated Test.
+                                '    5. Delete the affected Calculated Test.
+                                '    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
+                                ' Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
+                                Dim myCalcTestsDelegate As New CalculatedTestsDelegate
+                                resultData = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(dbConnection, pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+                            End If
+                            ' WE 24/11/2014 - RQ00035C (BA-1867) - END.
+
                         End If
 
                         'Update basic data of the OFF-SYSTEM Test
@@ -403,6 +431,16 @@ Namespace Biosystems.Ax00.BL
                             Dim myOffSystemTestSamplesDelegate As New OffSystemTestSamplesDelegate
                             resultData = myOffSystemTestSamplesDelegate.Modify(dbConnection, pTestSampleTypesDS)
                         End If
+
+                        ' WE 19/11/2014 - RQ00035C (BA-1867): Update field FormulaText for those Calculated Tests in which formula
+                        ' the modified Off-System Test Name has been included (when the Name of the Off-System Test is changed).
+                        If (Not resultData.HasError) Then
+                            Dim myCalcTestDelegate As New CalculatedTestsDelegate
+                            If pOffSystemTestDS.tparOffSystemTests.Rows.Count > 0 Then
+                                resultData = myCalcTestDelegate.UpdateFormulaText(dbConnection, "OFFS", pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID)
+                            End If
+                        End If
+                        ' WE 19/11/2014 - RQ00035C (BA-1867) - END.
 
                         'Update the Reference Ranges
                         If (Not resultData.HasError) Then
@@ -642,16 +680,24 @@ Namespace Biosystems.Ax00.BL
 
 
         ''' <summary>
-        ''' Validate if the deletion of the specified OFF-SYSTEM Tests affects Test Profiles in which they are included
+        ''' Validate if the deletion of the specified OFF-SYSTEM Tests (due to deletion of the Off-System Test or having updated its Sample Type)
+        ''' affects Test Profiles and/or Calculated Tests in which they are included.
+        ''' For each Off-System Test to be deleted, search the list of affected elements:
+        '''   1-Test Profiles containing the Off-System Test.
+        '''   2-Calculated Tests containing the Off-System Test in their Formula
+        '''     2.1-Test Profiles containing each affected Calculated Test.
+        '''     2.2-Calculated Tests containing each affected Calculated Test (from step 2) in their Formula.
         ''' </summary>
         ''' <returns>GlobalDataTO containing a typed DataSet DependenciesElementsDS with the list of affected elements</returns>
         ''' <remarks>
-        ''' Created by: SA 03/11/2011
+        ''' Created by:  SA 03/11/2011
+        ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): Extend with Calculated Tests as possible affected elements.
         ''' </remarks>
         Public Function ValidatedDependencies(ByVal pOffSystemTestsDS As OffSystemTestsDS) As GlobalDataTO
             Dim myResult As New GlobalDataTO
             Try
-                Dim imageBytes As Byte()
+                Dim imageBytesTPROF As Byte()
+                Dim imageBytesTCALC As Byte()
                 Dim preloadedDataConfig As New PreloadedMasterDataDelegate()
 
                 Dim myDependeciesElementsDS As New DependenciesElementsDS
@@ -660,23 +706,31 @@ Namespace Biosystems.Ax00.BL
                 Dim myGlobalDataTO As New GlobalDataTO
                 Dim myTestProfileTestDS As New TestProfileTestsDS
 
+                Dim myFormulasDS As New FormulasDS
+                Dim myRelatedElements As New FormulasDS
+                Dim myFormulasDelegate As New FormulasDelegate
+
+                ' Get icon for TestProfiles and Calculated Tests.
+                imageBytesTPROF = preloadedDataConfig.GetIconImage("PROFILES")
+                imageBytesTCALC = preloadedDataConfig.GetIconImage("TCALC")
+
                 For Each offSystemTestRow As OffSystemTestsDS.tparOffSystemTestsRow In pOffSystemTestsDS.tparOffSystemTests.Rows
-                    'Clean the Test Profiles DS for each new OFF-SYSTEM Test to process
+                    ' 1. Get the Test Profiles in which the OFF-SYSTEM Test is included.
+
+                    ' Clean the Test Profiles DS for each new OFF-SYSTEM Test to process.
                     myTestProfileTestDS.tparTestProfileTests.Clear()
 
-                    'Get the Test Profiles in which the OFF-SYSTEM Test is included
                     Dim myTestProfilesTestDelegate As New TestProfileTestsDelegate
                     myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, offSystemTestRow.OffSystemTestID, "", "OFFS")
 
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
 
-                        'Get icon for TestProfiles; load the returned Test Profiles in the list of affected Elements to return
-                        imageBytes = preloadedDataConfig.GetIconImage("PROFILES")
+                        ' Load the returned Test Profiles in the list of affected Elements to return.
                         For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
                             myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
 
-                            myDependenciesElementsRow.Type = imageBytes
+                            myDependenciesElementsRow.Type = imageBytesTPROF
                             myDependenciesElementsRow.Name = testProfTest.TestProfileName
                             myDependenciesElementsRow.FormProfileMember = offSystemTestRow.Name
 
@@ -684,11 +738,89 @@ Namespace Biosystems.Ax00.BL
                             myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
                         Next
                     Else
+                        'Error verifying affected Test Profiles
                         myResult = myGlobalDataTO
                         Exit For
                     End If
+
+                    ' TODO:    myResult.SetDatos = myDependeciesElementsDS
+
+                    ' 2. Verify affected Calculated Tests (Calculated Tests having the deleted Off-System Test included in their Formula).
+                    myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, offSystemTestRow.OffSystemTestID, "", "OFFS")
+                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                        myFormulasDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+
+                        For Each formRow As FormulasDS.tparFormulasRow In myFormulasDS.tparFormulas.Rows
+                            myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                            myDependenciesElementsRow.Type = imageBytesTCALC
+                            myDependenciesElementsRow.Name = formRow.TestName
+                            myDependenciesElementsRow.FormProfileMember = "=" & formRow.FormulaText
+                            myDependenciesElementsRow.Related = False
+
+                            myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+
+                            ' For the affected Calculated Test: 
+                            ' 2.1 - Search if it is included in the Formula of other Calculated Tests.
+                            myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, formRow.CalcTestID, formRow.SampleType, "CALC")
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myRelatedElements = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
+
+                                For Each relatedElementRow As FormulasDS.tparFormulasRow In myRelatedElements.tparFormulas.Rows
+                                    myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                                    myDependenciesElementsRow.Type = imageBytesTCALC
+                                    myDependenciesElementsRow.Name = relatedElementRow.TestName
+                                    myDependenciesElementsRow.FormProfileMember = "=" & relatedElementRow.FormulaText
+                                    myDependenciesElementsRow.Related = True
+
+                                    myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+
+                                    ' 2.2 - Search if it is included in Test Profiles.
+                                    myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, relatedElementRow.CalcTestID, relatedElementRow.SampleType, "CALC")
+                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                        myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
+
+                                        For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
+                                            myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                                            myDependenciesElementsRow.Type = imageBytesTPROF
+                                            myDependenciesElementsRow.Name = testProfTest.TestProfileName
+                                            myDependenciesElementsRow.FormProfileMember = offSystemTestRow.Name
+
+                                            myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+                                        Next
+                                    Else
+                                        'Error verifying affected Test Profiles - 2nd level
+                                        Exit For
+                                    End If
+                                Next
+                            Else
+                                'Error verifying affected Calculated Tests - 2nd level
+                                Exit For
+                            End If
+                        Next
+                    Else
+                        'Error verifying affected Calculated Tests
+                        Exit For
+                    End If
+
                 Next
-                myResult.SetDatos = myDependeciesElementsDS
+
+                imageBytesTPROF = Nothing
+                imageBytesTCALC = Nothing
+
+                If (Not myGlobalDataTO.HasError) Then
+                    'Return the list of affected Elements
+                    myGlobalDataTO.SetDatos = myDependeciesElementsDS
+                End If
+
+                myResult = myGlobalDataTO
+
+                ' TODO:    Test case myResult.SetDatos = Nothing
+                ' TODO:    Test case myResult.SetDatos = myDependeciesElementsDS
+                ' TODO:    Test case myResult.HasError = True
+
             Catch ex As Exception
                 myResult.HasError = True
                 myResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -920,8 +1052,8 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' When basic data of an OFFSTest/SampleType (OffSystemTestName, MeasureUnit and/or DecimalsAllowed) is changed in OFF-SYSTEM Tests 
         ''' Programming Screen,  values are updated for the corresponding record in the Historics Module table (the one having the same 
-        ''' OffSystemTestID and SampleType,  and having ClosedOffSystemTest = False)But when besides basic data, the ResultType is changed,
-        ''' But when besides basic data, the ResultType is changed, then the OffSystem Test is marked as closed and the data is not updated 
+        ''' OffSystemTestID and SampleType,  and having ClosedOffSystemTest = False).
+        ''' But when besides basic data, the ResultType and/or Sample Type is changed, then the OffSystem Test is marked as closed and the data is not updated.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pHisOFFSTestsDS">Typed DataSet HisOFFSTestSamplesDS containing the OFFTest/SampleType to update</param>

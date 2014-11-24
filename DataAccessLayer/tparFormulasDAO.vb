@@ -261,22 +261,23 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Verify if the specified Test is included in the formula of a Calculated Test, filtering data by
-        ''' Sample Type if this value has been informed
+        ''' Verify if the specified Test (Standard, ISE, Off-System or Calculated Test) is included in the formula of a Calculated Test,
+        ''' filtering data by Sample Type if this value has been informed.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code</param>
-        ''' <param name="pTestType">Type of Test</param>
+        ''' <param name="pTestType">Type of Test (STD,ISE,OFFS,CALC).</param>
         ''' <param name="pExcludeSampleTypes">When True, it indicates the Test will be searched in Formulas but using a
-        '''                                   SampleType different of the specified ones. Optional parameter</param>
+        '''                                   SampleType different of the specified ones. Optional parameter.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet FormulasDS with the Identifier and Name of the Calculated
-        '''          Test in which formula the specified Test is included</returns>
+        '''          Test(s) in which formula the specified Test is included.</returns>
         ''' <remarks>
         ''' Created by:  TR 17/05/2010
         ''' Modified by: SA 14/01/2010 - Added new optional parameter to allow search a Test in a Formula but using a SampleType 
         '''                              different of the specified ones
         '''              SA 12/03/2012 - Changed the function template
+        '''              WE 21/11/2014 - RQ00035C (BA-1867): change Summary and Parameter description.
         ''' </remarks>
         Public Function ReadFormulaByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, _
                                             ByVal pTestType As String, Optional ByVal pExcludeSampleTypes As Boolean = False) As GlobalDataTO

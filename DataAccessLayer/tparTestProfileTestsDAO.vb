@@ -77,17 +77,20 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Read the TestProfiles in which the specified Test is included
+        ''' Read the TestProfiles in which the specified Test (STD,ISE,OFFS,CALC)) is included.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleTpe">Sample Type code. Optional parameter.</param>
+        ''' <param name="pTestType">Type of Test (STD,ISE,OFFS,CALC). Optional parameter.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestProfileTestsDS with the list
-        '''          of Test Profiles in which the Test is included</returns>
+        '''          of Test Profiles in which the Test is included.</returns>
         ''' <remarks>
         ''' Created by:  TR 18/05/2010
         ''' Modified by: SA 18/10/2010 - Changed the SQL to use this function only for STANDARD TESTS
         '''              TR 25/11/2010 - Added optional parameters pSampleType and pTestType (with default value STD)
         '''              SA 04/01/2011 - For OFF-SYSTEM Tests, verify the TestProfile has the same SampleType defined for the the Test
+        '''              WE 21/11/2014 - RQ00035C (BA-1867): change Summary and Parameter description.
         ''' </remarks>
         Public Function ReadByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                      Optional ByVal pSampleTpe As String = "", Optional ByVal pTestType As String = "STD") As GlobalDataTO
@@ -233,12 +236,13 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' Delete the specified Standard Test from all Test Profiles in which it is included. When a SampleType is informed, 
-        ''' it means that the Standard Test have to be deleted only of all the Test Profiles defined for this SampleType.
+        ''' Delete the specified Test (Standard, ISE, Off-System or Calculated Test) from all Test Profiles in which it is included.
+        ''' When a SampleType is informed, it means that the Test only has to be deleted from all the Test Profiles defined for this SampleType.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Standard Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code. Optional parameter</param>
+        ''' <param name="pTestType">Test Type Code (STD,ISE,OFFS,CALC). Optional parameter</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  TR
@@ -246,6 +250,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              not needed; call to DeleteEmptyProfiles moved to the Delegate.
         '''                              Function moved here from tparTestProfiles
         '''              SA 18/10/2010 - Changed the SQL to use this function only for STANDARD TESTS
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameters description.
         ''' </remarks>
         Public Function DeleteByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                  ByVal pTestID As Integer, _
