@@ -74,7 +74,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    "  ,  " & myRow.BaseLineID.ToString & vbCrLf & _
                                    "  ,  " & myRow.Wavelength.ToString & vbCrLf & _
                                    "  ,  " & myRow.WellUsed.ToString & vbCrLf & _
-                                   "  ,  " & myRow.Type & vbCrLf
+                                   "  ,  '" & myRow.Type & "'" & vbCrLf
 
                         If Not myRow.IsMainLightNull Then
                             cmdText &= "  ,  " & myRow.MainLight.ToString & vbCrLf
@@ -569,9 +569,11 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pType">DYNAMIC - STATIC - "" ALL</param>
         ''' <returns></returns>
-        ''' <remarks>AG 17/11/2014 BA-2065</remarks>
-        Public Function GetAllWellsLastTurn(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+        ''' <remarks>AG 17/11/2014 BA-2065
+        ''' AG 21/11/2014 BA-2065 add paramter pType</remarks>
+        Public Function GetAllWellsLastTurn(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -587,6 +589,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " INNER JOIN twksWSBLinesByWell W2 ON W1.WellUsed = W2.WellUsed " & vbCrLf
                         cmdText &= " WHERE W1.AnalyzerID = N'" & pAnalyzerID.Replace("'", "''").ToString & "'" & vbCrLf
                         cmdText &= " AND W1.WorksessionID = N'" & pWorkSessionID.Replace("'", "''").ToString & "'" & vbCrLf
+
+                        If pType <> "" Then
+                            cmdText &= " AND W1.Type = N'" & pType.Replace("'", "''").ToString & "'" & vbCrLf
+                        End If
+
                         cmdText &= " GROUP BY W1.WellUsed ORDER BY WellUsed ASC "
 
                         Dim myDataSet As New BaseLinesDS
@@ -621,6 +628,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
         ''' <summary>
         ''' Delete all BaseLines by Well for the specified Analyzer Work Session except the informed in parameter DataSet
+        ''' Remove only the records with Type = STATIC
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -629,6 +637,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' AG 17/11/2014 BA-2065
+        ''' AG 21/11/2014 BA-2065 remove only records with type STATIC
         ''' </remarks>
         Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                             ByVal pLastValuesDS As BaseLinesDS) As GlobalDataTO
@@ -644,7 +653,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= " DELETE twksWSBLinesByWell " & vbCrLf & _
                                    " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                   " AND WellUsed =" & row.WellUsed & vbCrLf & _
+                                   " AND WellUsed = " & row.WellUsed & vbCrLf & _
+                                   " AND Type = '" & GlobalEnumerates.BaseLineType.STATIC.ToString.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND BaseLineID <>" & row.BaseLineID & vbCrLf
                         cmdText &= vbNewLine
                     Next
@@ -665,16 +675,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' When well rejection algorithm works with dynamic base line after reset rename the BaseLineID of the existings records to NewBaseLineID
+        ''' Update the base line ID (filtering by Type) to a new value
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <param name="NewBaseLineID"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' AG 17/11/2014 BA-2065
+        ''' AG 21/11/2014 BA-2065
         ''' </remarks>
-        Public Function UpdateBaseLineIDAfterReset(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal NewBaseLineID As Integer) As GlobalDataTO
+        Public Function UpdateBaseLineIDByType(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal NewBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -684,7 +694,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = String.Empty
                     cmdText &= " UPDATE twksWSBLinesByWell SET BaseLineID = " & NewBaseLineID & vbCrLf & _
-                               " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+                               " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " AND  Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -696,7 +707,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.UpdateBaseLineIDAfterReset", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.UpdateBaseLineIDByType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

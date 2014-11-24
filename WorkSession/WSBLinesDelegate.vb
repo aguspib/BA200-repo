@@ -402,6 +402,7 @@ Namespace Biosystems.Ax00.BL
         '''                              ResetAdjustsBLines, parameter pWorkSessionID is also removed, and the query is changed to remove the filter
         ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
         ''' AG 16/11/2014 BA-2065 rename method from ResetAdjustsBLines to ResetBLinesValues
+        ''' AG 21/11/2014 BA-2062 when Reset the ALIGHT results reset also the table twksWSBLinesByWell
         ''' </remarks>
         Public Function ResetBLinesValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
@@ -422,6 +423,13 @@ Namespace Biosystems.Ax00.BL
                                 'Remove ALIGHT/FLIGHT results (or both) only when no executions are using these adjust base line identifiers
                                 Dim myDAO As New twksWSBLinesDAO
                                 resultData = myDAO.ResetBLinesValues(dbConnection, pAnalyzerID, pType)
+
+                                'AG 21/11/2014 BA-2062 if pType = "" (ALL) also delete the twksWSBLinesByWell table (inform the model is not required then)
+                                If Not resultData.HasError AndAlso pType = "" Then
+                                    Dim myBLByWellDlgte As New WSBLinesByWellDelegate
+                                    resultData = myBLByWellDlgte.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, "", True)
+                                End If
+
                             End If
                         End If
 
