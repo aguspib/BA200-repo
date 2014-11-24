@@ -654,7 +654,7 @@ Namespace Biosystems.Ax00.BL
                         '1st read distinct worksessionID by Analyzer
                         resultData = myDAO.ReadWorkSessions(dbConnection, pAnalyzerID)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            If DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
+                            If DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 1 Then
                                 '2on remove all worksession but the most recent one
                                 resultData = myDAO.DeleteAll(dbConnection, pAnalyzerID, DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).WorkSessionID)
                             End If
