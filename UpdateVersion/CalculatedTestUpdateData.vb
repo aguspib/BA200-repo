@@ -122,7 +122,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myFormulaText As String = String.Empty
                 Dim myCalcTestUpdateDAO As New CalculatedTestUpdateDAO
 
-                'Get all members of the Formula of the NEW CALC Test in FACTORY DB
+                'Get all members of the Formula of the CALC Test in FACTORY DB
                 myGlobalDataTO = myCalcTestUpdateDAO.GetFormulaInFactoryDB(pDBConnection, pNewCalcTestRow.CalcTestID)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     pNewFormulaDS = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
@@ -598,7 +598,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                             pUpdateVersionChangesList.DeletedElements.AddDeletedElementsRow(myUpdateVersionDeletedElementsRow)
                             pUpdateVersionChangesList.DeletedElements.AcceptChanges()
 
-                            'For each Calculated Test also remove (due to the deleted one was part of its formula), add a row in the global DS containing all changes in 
+                            'For each Calculated Test also removed (due to the deleted one was part of its formula), add a row in the global DS containing all changes in 
                             'Customer DB due to the Update Version Process (sub-table DeletedElements) 
                             For Each affectedCalcTest As CalculatedTestsDS.tparCalculatedTestsRow In myAffectedCalcTestsDS.tparCalculatedTests
                                 myUpdateVersionDeletedElementsRow = pUpdateVersionChangesList.DeletedElements.NewDeletedElementsRow
