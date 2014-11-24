@@ -452,15 +452,18 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete the specified STANDARD Test from all Test Profiles in which it is included. When a SampleType is informed, 
-        ''' it means that the STANDARD Test have to be deleted only of all the Test Profiles defined for this SampleType.
-        ''' Besides, delete all empty Test Profiles (all Test Profiles without Tests) 
+        ''' Delete the specified Test (Standard, ISE, Off-System or Calculated Test) from all Test Profiles in which it is included.
+        ''' When a SampleType is informed, it means that the Test only has to be deleted from all the Test Profiles defined for this SampleType.
+        ''' Besides, delete all empty Test Profiles (all Test Profiles without any Tests).
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code. Optional parameter</param>
+        ''' <param name="pTestType">Test Type Code (STD,ISE,OFFS,CALC). Optional parameter</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified by: WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameters description.
+        ''' </remarks>
         Public Function DeleteByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                  Optional ByVal pSampleType As String = "", Optional ByVal pTestType As String = "STD") As GlobalDataTO
             Dim resultData As New GlobalDataTO

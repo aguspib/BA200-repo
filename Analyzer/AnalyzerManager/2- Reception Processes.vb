@@ -551,15 +551,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 ' XB 26/09/2014 - BA-1872
                                 If MyClass.ISE_Manager IsNot Nothing Then
                                     If Not MyClass.ISE_Manager.IsISEModuleInstalled Then
+                                        ' If ISE module isn't Installed remove the ISE Timeout Alarm
+                                        Debug.Print("ISE Module NOT installed !")
+                                        myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
 
-                                        ' XB 21/11/2014 - If ISE module isn't Installed remove the ISE Timeout Alarm - BA-1872
-                                        If MyClass.ISE_Manager IsNot Nothing Then
-                                            If Not MyClass.ISE_Manager.IsISEModuleInstalled Then
-                                                Debug.Print("ISE Module NOT installed !")
-                                                myAlarms.Remove(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                                        If GlobalBase.IsServiceAssembly Then
+                                            ' Only Sw Service
+                                            If Not myAlarms.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR) Then
+                                                myAlarms.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                                                MyClass.ISE_Manager.IsISESwitchON = False
                                             End If
+
                                         End If
-                                        ' XB 21/11/2014 - BA-1872
                                     Else
 
                                         MyClass.sendingRepetitions = True

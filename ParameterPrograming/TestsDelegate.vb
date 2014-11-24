@@ -1697,7 +1697,7 @@ Namespace Biosystems.Ax00.BL
                                                 myGlobalDataTO = myTestSampleMultirulesDelegate.DeleMultiRulesByTestIDNEW(dbConnection, "STD", DelTestSampRow.TestID)
                                             End If
 
-                                            'TR 11/05/2011 -Mark Test as delete on the history tables.
+                                            'TR 11/05/2011 -Mark Test as deleted on the QC history tables.
                                             If Not myGlobalDataTO.HasError Then
                                                 myGlobalDataTO = myHistoryTestSamplesDelegate.MarkTestValuesAsDeleteNEW(dbConnection, "STD", DelTestSampRow.TestID)
                                             End If
@@ -1729,7 +1729,7 @@ Namespace Biosystems.Ax00.BL
                                             End If
                                             'TR 25/01/2012 -END
 
-                                            'TR 11/05/2011 -Mark Test Sample as delete on the history tables.
+                                            'TR 11/05/2011 -Mark Test Sample as delete on the QC history tables.
                                             If Not myGlobalDataTO.HasError Then
                                                 myGlobalDataTO = myHistoryTestSamplesDelegate.MarkSampleTypeValuesAsDeleteNEW(dbConnection, "STD", DelTestSampRow.TestID, _
                                                                                                                               DelTestSampRow.SampleType)
