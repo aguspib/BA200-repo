@@ -976,6 +976,14 @@ Namespace Biosystems.Ax00.BL
                                                     workSessionDataDS.twksWorkSessions(0).EndEdit()
                                                 End If
                                             End If
+
+                                            'AG 24/11/2014 BA-2065
+                                            If Not dataToReturn.HasError Then
+                                                Dim blWellDlg As New WSBLinesByWellDelegate
+                                                dataToReturn = blWellDlg.UpdateWorkSessionID(dbConnection, pAnalyzerID, workSessionID)
+                                            End If
+                                            'AG 24/11/2014
+
                                         End If
                                     Else
                                         'When the WorkSession is updated, the InUse flag of all elements removed (if any) have to be set to False
@@ -6866,6 +6874,14 @@ Namespace Biosystems.Ax00.BL
                             If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                                 'Get data of the created WorkSession 
                                 workSessionDataDS = DirectCast(dataToReturn.SetDatos, WorkSessionsDS)
+
+                                'AG 24/11/2014 BA-2065
+                                If Not workSessionDataDS.twksWorkSessions(0).IsWorkSessionIDNull Then
+                                    Dim blWellDlg As New WSBLinesByWellDelegate
+                                    dataToReturn = blWellDlg.UpdateWorkSessionID(dbConnection, pAnalyzerID, workSessionDataDS.twksWorkSessions(0).WorkSessionID)
+                                End If
+                                'AG 24/11/2014
+
                             Else
                                 stopProcess = True
                             End If

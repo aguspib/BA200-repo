@@ -629,6 +629,70 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Update the WorkSessionID
+        ''' Required because using dynamic base line after reset this table can contain several records. We must update the WorkSessionID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pNewWorkSessionID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 24/11/2014 BA-2065</remarks>
+        Public Function UpdateWorkSessionID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pNewWorkSessionID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesByWellDAO
+
+                        'Protection against primary key violation
+                        '1st read distinct worksessionID by Analyzer
+                        resultData = myDAO.ReadWorkSessions(dbConnection, pAnalyzerID)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            If DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
+                                '2on remove all worksession but the most recent one
+                                resultData = myDAO.DeleteAll(dbConnection, pAnalyzerID, DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).WorkSessionID)
+                            End If
+                        End If
+
+                        '3rd finally update worksessionID
+                        If Not resultData.HasError Then
+                            resultData = myDAO.UpdateWorkSessionID(dbConnection, pAnalyzerID, pNewWorkSessionID)
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            'resultData.SetDatos = <value to return; if any>
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSBLinesByWellDelegate.UpdateWorkSessionID", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
     End Class
