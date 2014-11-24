@@ -2575,4 +2575,15 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>New column Type in table twksWSBLinesByWell</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'twksWSBLinesByWell' AND sc.name = 'Type') = 1
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
 </DBIntegrityDS>
