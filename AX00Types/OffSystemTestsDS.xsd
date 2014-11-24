@@ -49,6 +49,8 @@
               <xs:element name="Available" msprop:Generator_ColumnVarNameInTable="columnAvailable" msprop:Generator_ColumnPropNameInRow="Available" msprop:Generator_ColumnPropNameInTable="AvailableColumn" msprop:Generator_UserColumnName="Available" type="xs:boolean" minOccurs="0" />
               <xs:element name="PreloadedOffSystemTest" msprop:Generator_ColumnVarNameInTable="columnPreloadedOffSystemTest" msprop:Generator_ColumnPropNameInRow="PreloadedOffSystemTest" msprop:Generator_ColumnPropNameInTable="PreloadedOffSystemTestColumn" msprop:Generator_UserColumnName="PreloadedOffSystemTest" type="xs:boolean" default="false" minOccurs="0" />
               <xs:element name="BiosystemsID" msprop:Generator_ColumnVarNameInTable="columnBiosystemsID" msprop:Generator_ColumnPropNameInRow="BiosystemsID" msprop:Generator_ColumnPropNameInTable="BiosystemsIDColumn" msprop:Generator_UserColumnName="BiosystemsID" type="xs:int" minOccurs="0" />
+              <xs:element name="SampleType" msprop:Generator_ColumnVarNameInTable="columnSampleType" msprop:Generator_ColumnPropNameInRow="SampleType" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="SampleTypeColumn" msprop:Generator_UserColumnName="SampleType" type="xs:string" minOccurs="0" />
+              <xs:element name="DefaultValue" msprop:Generator_ColumnVarNameInTable="columnDefaultValue" msprop:Generator_ColumnPropNameInRow="DefaultValue" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInTable="DefaultValueColumn" msprop:Generator_UserColumnName="DefaultValue" type="xs:string" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
