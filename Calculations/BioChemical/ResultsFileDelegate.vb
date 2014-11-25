@@ -124,21 +124,21 @@ Namespace Biosystems.Ax00.BL
                                         End If
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetCount(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets)
+                                            resultdata = SheetCount(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType) 'BA-2067
                                         Else
                                             'Exit Function
                                             Return resultdata
                                         End If
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetAbsorbance(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType)
+                                            resultdata = SheetAbsorbance(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType) 'BA-2067
                                         Else
                                             'Exit Function
                                             Return resultdata
                                         End If
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetComplete(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType)
+                                            resultdata = SheetComplete(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType) 'BA-2067
                                         Else
                                             'Exit Function
                                             Return resultdata
@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.BL
 
                                         'RH 13/07/2011
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetResultsByReplicates(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets)
+                                            resultdata = SheetResultsByReplicates(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, pBaseLineType) 'BA-2067
                                         Else
                                             Return resultdata
                                         End If
@@ -374,7 +374,7 @@ Namespace Biosystems.Ax00.BL
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"BaseLine"})
                 ' Rename page 2
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
-                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Dynamic BaseLine"})
+                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Dynamic Base Line by Well"}) 'BA-2067
                 ' Rename page 3
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Base Line by Well"})
@@ -485,6 +485,7 @@ Namespace Biosystems.Ax00.BL
                         Dim qBaseLineID As New List(Of Integer)
                         ' Filter by baseline id
                         qBaseLineID = (From a In myBaseLinesDS.twksWSBaseLines _
+                                       Order By a.BaseLineID _
                                        Select a.BaseLineID Distinct).ToList
 
                         For indexGroupBaseLine As Integer = 0 To qBaseLineID.Count - 1
@@ -848,11 +849,13 @@ Namespace Biosystems.Ax00.BL
         '''' Created By: DLM 08/06/2010
         '''' AG 04/01/2011
         ''''          RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
+        '''' Modified By: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetCount(ByVal pDBConnection As SqlConnection, _
                                     ByVal pAnalyzerDS As WSAnalyzersDS, _
                                     ByVal pWorkSessionDS As WorkSessionsDS, _
-                                    ByVal pWorkSheets As Object) As GlobalDataTO
+                                    ByVal pWorkSheets As Object,
+                                    ByVal pBaseLineType As String) As GlobalDataTO
 
             Dim resultdata As New GlobalDataTO
             Dim myWSID As String = pWorkSessionDS.twksWorkSessions(0).WorkSessionID
@@ -1011,7 +1014,7 @@ Namespace Biosystems.Ax00.BL
                                         MergeCells(myPage, myRango)
 
                                         'AG 26/04/2011 - Well and Base lines headers depends on replicate number
-                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "L")
+                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "L", pBaseLineType) 'BA-2067
 
                                         SetCellValue(myPage, "A" & myCellRow, "COUNTS")
                                         myRango = "A" & myCellRow & ":L" & myCellRow  ' myRango = "A" & myCellRow & ":K" & myCellRow 'DL 12/01/2012
@@ -1290,7 +1293,7 @@ Namespace Biosystems.Ax00.BL
                                         MergeCells(myPage, myRango)
 
                                         'AG 26/04/2011 - Well and Base lines headers depends on replicate number
-                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "M")
+                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "M", pBLType) 'BA-2067
 
                                         SetCellValue(myPage, "A" & myCellRow, "ABS")
                                         'DL 12/01/2012. Begin
@@ -1440,7 +1443,8 @@ Namespace Biosystems.Ax00.BL
         '''' <remarks>
         '''' Created By: DL 08/06/2010
         '''' Modified By: RH 02/01/2011 Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
-        '''' AG 19/11/2014 BA-2067 add parameter for base line type
+        ''''              AG 19/11/2014 BA-2067 add parameter for base line type
+        ''''              IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetComplete(ByVal pDBConnection As SqlConnection, _
                                        ByVal pAnalyzerDS As WSAnalyzersDS, _
@@ -1596,7 +1600,7 @@ Namespace Biosystems.Ax00.BL
                                         MergeCells(myPage, myRango)
 
                                         'AG 26/04/2011 - Well and Base lines headers depends on replicate number
-                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "M")
+                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "M", pBLType) 'BA-2067
 
 
                                         SetCellValue(myPage, "A" & myCellRow, "COUNTS")
@@ -1873,12 +1877,14 @@ Namespace Biosystems.Ax00.BL
         '''' <param name="pWorkSessionID">Work Session Identifier</param>
         '''' <returns>GlobalDataTO containing sucess/error information</returns>
         '''' <remarks>
-        '''' Created By: RH 13/07/2011
+        '''' Created By:  RH 13/07/2011
+        '''' Modified By: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' </remarks>
         Private Function SheetResultsByReplicates(ByVal pDBConnection As SqlConnection, _
                                          ByVal pAnalyzerDS As WSAnalyzersDS, _
                                          ByVal pWorkSessionDS As WorkSessionsDS, _
-                                         ByVal pWorkSheets As Object) As GlobalDataTO
+                                         ByVal pWorkSheets As Object, _
+                                         ByVal pBaseLineType As String) As GlobalDataTO
 
             Dim resultdata As GlobalDataTO = Nothing
 
@@ -1887,6 +1893,7 @@ Namespace Biosystems.Ax00.BL
                 Dim XlsPageHeader As String
                 Dim XlsPageRange As String
                 Const StrNull As String = "?"
+                Dim titleAdjustBaseLineId = IIf(pBaseLineType = "DYNAMIC", "Dynamic Adjust BaseLineID", "Adjust BaseLineID") 'BA-2067
 
                 Dim WSData As WorkSessionsDS.twksWorkSessionsRow = pWorkSessionDS.twksWorkSessions(0)
                 Dim ExecutionsResultsDS As ExecutionsDS
@@ -1987,8 +1994,8 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 SetCellValue(XlsPage, "B" & CurrentXlsPageRow, _
-                                                 String.Format("Replicate number = {0} Well / Rotor = {1} / ? - Adjust BaseLineID = {2} - Well BaseLineID = {3}", _
-                                                               ReplicateNumber, WellUsed, AdjustBaseLineID, BaseLineID))
+                                                 String.Format("Replicate number = {0} Well / Rotor = {1} / ? - {4} = {2} - Well BaseLineID = {3}", _
+                                                               ReplicateNumber, WellUsed, AdjustBaseLineID, BaseLineID, titleAdjustBaseLineId)) 'BA-2067
 
                                 XlsPageRange = String.Format("A{0}:K{0}", CurrentXlsPageRow)
                                 SetCellColor(XlsPage, XlsPageRange, 6)
@@ -3004,15 +3011,28 @@ Namespace Biosystems.Ax00.BL
             myColumns.GetType().InvokeMember("Autofit", BindingFlags.InvokeMethod, Nothing, myColumns, Nothing)
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="pCellRow"></param>
+        ''' <param name="pExecutionList"></param>
+        ''' <param name="pPage"></param>
+        ''' <param name="pcolLetter"></param>
+        ''' <param name="pBaseLineType"></param>
+        ''' <remarks>
+        ''' Modified by: IT 25/11/2014 - BA-2067: Dynamic BaseLine
+        ''' </remarks>
         Private Sub setReplicatesHeader(ByRef pCellRow As Integer, _
                                         ByVal pExecutionList As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                         ByVal pPage As Object, _
-                                        ByVal pcolLetter As String)
+                                        ByVal pcolLetter As String,
+                                        ByVal pBaseLineType As String)
 
             'AG 26/04/2011
             pCellRow += 1
             Dim myreplhead As String = ""
             Dim myrango As String = ""
+            Dim titleAdjustBaseLineId = IIf(pBaseLineType = "DYNAMIC", "Dynamic Adjust BaseLineID", "Adjust BaseLineID") 'BA-2067
 
             For replicateNumber As Integer = 0 To pExecutionList.Count - 1
                 'DL 12/01/2012. Begin
@@ -3038,7 +3058,7 @@ Namespace Biosystems.Ax00.BL
                     myreplhead &= "? / ?"
                 End If
 
-                myreplhead &= " - Adjust BaseLineID = "
+                myreplhead &= String.Format(" - {0} = ", titleAdjustBaseLineId) 'BA-2067
                 If Not pExecutionList(replicateNumber).IsAdjustBaseLineIDNull Then
                     myreplhead &= pExecutionList(replicateNumber).AdjustBaseLineID
                 Else
