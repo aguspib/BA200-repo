@@ -269,8 +269,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
                         cmdText &= " SELECT   AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime, Type " & vbCrLf
                         cmdText &= " FROM     twksWSBLinesByWell" & vbCrLf
-                        cmdText &= " WHERE    AnalyzerID    = '" & pAnalyzerID.Trim & "'" & vbCrLf
-                        cmdText &= "   AND    WorkSessionID = '" & pWorkSessionID.Trim & "'" & vbCrLf
+                        cmdText &= " WHERE    AnalyzerID    = N'" & pAnalyzerID.Trim & "'" & vbCrLf
+                        cmdText &= "   AND    WorkSessionID = N'" & pWorkSessionID.Trim & "'" & vbCrLf
                         cmdText &= "   AND    Type = '" & pBaseLineType.Trim & "' " & vbCrLf
                         cmdText &= " ORDER BY WellUsed, BaselineID, WaveLength"
 
@@ -327,8 +327,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
                         cmdText = " SELECT MAX(BaseLineID) AS CurrentBaseLineID "
                         cmdText += " FROM   twksWSBLinesByWell "
-                        cmdText += " WHERE  AnalyzerID = '" & pAnalyzerID & "' "
-                        cmdText += " AND WorkSessionID = '" & pWorkSessionID & "' "
+                        cmdText += " WHERE  AnalyzerID = N'" & pAnalyzerID & "' "
+                        cmdText += " AND WorkSessionID = N'" & pWorkSessionID & "' "
                         cmdText += " AND WellUsed = " & pWell
 
                         'Dont repeat the BaseLineId in different wells
@@ -387,8 +387,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
                         cmdText &= " SELECT TOP 1 WellUsed FROM twksWSBLinesByWell "
-                        cmdText &= " WHERE AnalyzerID = '" & pAnalyzerID.Replace("'", "''").ToString & "'"
-                        cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Replace("'", "''").ToString & "'"
+                        cmdText &= " WHERE AnalyzerID = N'" & pAnalyzerID.Replace("'", "''").ToString & "'"
+                        cmdText &= " AND WorkSessionID = N'" & pWorkSessionID.Replace("'", "''").ToString & "'"
                         cmdText &= " ORDER BY DateTime DESC"
 
                         Dim myDataSet As New BaseLinesDS()
@@ -441,7 +441,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
                         cmdText = "SELECT AnalyzerID, WorkSessionID, BaseLineID, WaveLenght as [WaveLength], WellUsed, MainLight, RefLight, ABSvalue, IsMean, DateTime, Type " & vbCrLf & _
                                   " FROM twksWSBLinesByWell  WHERE IsMean = 1 " & vbCrLf & _
-                                  " AND AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "'" & vbCrLf & _
+                                  " AND AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "'" & vbCrLf & _
                                   " ORDER BY BaseLineID, WellUsed , Wavelenght "
 
                         'AG 18/11/2014 BA-2065 removed after AND AnalyzerID ...
@@ -491,8 +491,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = " DELETE twksWSBLinesByWell " & vbCrLf & _
-                                            " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                            " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' "
+                                            " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                            " AND    WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -536,8 +536,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = ""
                     cmdText &= "UPDATE twksWSBLinesByWell SET IsMean = " & CInt(IIf(pIsMeanValue, 1, 0)).ToString
                     cmdText &= " WHERE WellUsed IN (" & pWellsString & " )"
-                    cmdText &= " AND AnalyzerID = '" & pAnalyzerID.Replace("'", "''").ToString & "'"
-                    cmdText &= " AND WorkSessionID = '" & pWorkSessionID.Replace("'", "''").ToString & "'"
+                    cmdText &= " AND AnalyzerID = N'" & pAnalyzerID.Replace("'", "''").ToString & "'"
+                    cmdText &= " AND WorkSessionID = N'" & pWorkSessionID.Replace("'", "''").ToString & "'"
 
                     'AG 15/02/2012
                     'cmdText &= " AND BaseLineID = " & pBaseLineID
@@ -651,8 +651,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = String.Empty
                     For Each row As BaseLinesDS.twksWSBaseLinesRow In pLastValuesDS.twksWSBaseLines
                         cmdText &= " DELETE twksWSBLinesByWell " & vbCrLf & _
-                                   " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                   " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                   " AND    WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND WellUsed = " & row.WellUsed & vbCrLf & _
                                    " AND Type = '" & GlobalEnumerates.BaseLineType.STATIC.ToString.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND BaseLineID <>" & row.BaseLineID & vbCrLf
@@ -694,7 +694,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = String.Empty
                     cmdText &= " UPDATE twksWSBLinesByWell SET BaseLineID = " & NewBaseLineID & vbCrLf & _
-                               " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                " AND  Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -708,6 +708,129 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.UpdateBaseLineIDByType", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update the WorkSessionID
+        ''' Required because using dynamic base line after reset this table can contain several records. We must update the WorkSessionID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pNewWorkSessionID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 24/11/2014 BA-2065</remarks>
+        Public Function UpdateWorkSessionID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pNewWorkSessionID As String) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = String.Empty
+                    cmdText &= " UPDATE twksWSBLinesByWell SET WorkSessionID = N'" & pNewWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.UpdateWorkSessionID", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Read distinct worksessions by AnalyzerID
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Public Function ReadWorkSessions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT DISTINCT WorkSessionID " & vbCrLf & _
+                                                " FROM   twksWSBLinesByWell" & vbCrLf & _
+                                                " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " ORDER BY WorkSessionID DESC " & vbCrLf
+
+                        Dim myBaseLinesDS As New BaseLinesDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(myBaseLinesDS.twksWSBaseLines)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = myBaseLinesDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.ReadWorkSessions", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Delete all records. Similar than ResetWS but here when informed the worksession in parameter is not deleted
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pExceptWorkSessionID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 24/11/2014 BA-2065</remarks>
+        Public Function DeleteAll(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, Optional ByVal pExceptWorkSessionID As String = "") As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = " DELETE twksWSBLinesByWell " & vbCrLf & _
+                                            " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                    If pExceptWorkSessionID <> "" Then
+                        cmdText &= " AND    WorkSessionID <> N'" & pExceptWorkSessionID.Trim.Replace("'", "''") & "' "
+                    End If
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.DeleteAll", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
