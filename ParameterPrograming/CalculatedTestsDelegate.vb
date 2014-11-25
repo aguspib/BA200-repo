@@ -262,7 +262,7 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' Delete all Calculated Tests in which the informed Test Identifier (it can be the ID of a Standard, ISE, Off-System or Calculated Test) is 
         ''' included in their Formula. Additionally, it deletes all related Calculated Tests that contain these affected Calculated Tests in their formulas.
-        ''' Also it performs some related actions regarding Test Profiles, Reference Ranges, Calc.Test Formulas, Historic Module and LIS Saved WS.
+        ''' Also it performs some Calculated Test related actions regarding Test Profiles, Reference Ranges, Calc.Test Formulas, Historic Module and LIS Saved WS.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>

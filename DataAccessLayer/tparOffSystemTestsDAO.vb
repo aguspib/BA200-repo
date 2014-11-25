@@ -643,6 +643,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet ReportsTestsSortingDS</returns>
         ''' <remarks>
         ''' Created by:  AG 02/09/2014 - BA-1869
+        ''' Modified by: WE 25/11/2014 - RQ00035C (BA-1867): Change in query string due to new field 'PreloadedOffSystemTest'.
         ''' </remarks>
         Public Function GetCustomizedSortedTestSelectionList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -655,7 +656,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         'Use ShortName as TestName in the same way as method tcfgReportsTestsSortingDAO.GetSortedTestList
                         Dim cmdText As String = " SELECT  'OFFS' AS TestType, OffSystemTestID AS TestID, CustomPosition AS TestPosition, " & vbCrLf & _
-                                                         " ShortName AS TestName, 0 AS PreloadedTest, Available FROM tparOffSystemTests " & vbCrLf & _
+                                                         " ShortName AS TestName, PreloadedOffSystemTest AS PreloadedTest, Available FROM tparOffSystemTests " & vbCrLf & _
                                                 " ORDER BY CustomPosition ASC "
 
                         Dim myDataSet As New ReportsTestsSortingDS
