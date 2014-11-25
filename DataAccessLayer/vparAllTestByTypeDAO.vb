@@ -19,6 +19,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing an string value with the LIS Mapping for the specified TestType/TestID</returns>
         ''' <remarks>
         ''' Created by:  TR 23/04/2013
+        ''' Modified by: SA 25/11/2014 - BA-2105 ==> Changed the SQL Query to avoid an error when field LISValue is NULL (an error is raised
+        '''                                          when try to convert it to string)
         ''' </remarks>
         Public Function GetLISValue(ByVal pDBConnection As SqlClient.SqlConnection, pTestType As String, pTestID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -29,10 +31,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT LISValue " & vbCrLf & _
-                                                " FROM   vparAllTestsByType " & vbCrLf & _
-                                                " WHERE  TestType = '" & pTestType.Trim & "' " & vbCrLf & _
-                                                " AND    TestID = " & pTestID.ToString
+                        Dim cmdText As String = " SELECT (CASE WHEN LISValue IS NULL THEN '' ELSE LISValue END) AS LISValue " & vbCrLf & _
+                                                " FROM    vparAllTestsByType " & vbCrLf & _
+                                                " WHERE   TestType = '" & pTestType.Trim & "' " & vbCrLf & _
+                                                " AND     TestID   = " & pTestID.ToString
 
                         Dim myResult As String = String.Empty
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
