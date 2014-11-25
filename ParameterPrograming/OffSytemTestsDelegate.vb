@@ -112,10 +112,13 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete all the specified OFF-SYSTEM Tests (Test Definition, Sample Type data and Reference Ranges) 
+        ''' - Delete the specified set of OFF-SYSTEM Tests (Test Definition, Sample Type data and Reference Ranges).
+        ''' - Delete all affected Calculated Tests that contain these Off-System Tests in their formulas.
+        ''' - Delete all related Calculated Tests that contain these affected Calculated Tests in their formulas.
+        ''' - Perform some Calculated Test related actions regarding Test Profiles, Reference Ranges, Calc.Test Formulas, Historic Module and LIS Saved WS. 
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pOffSystemTests">Typed DataSet OffSystemTestsDS with the list of Off System Tests to delete</param>        
+        ''' <param name="pOffSystemTests">Typed DataSet OffSystemTestsDS with the list of Off-System Tests to delete</param>        
         ''' <returns>GlobalDataTO containing sucess/error information</returns>
         ''' <remarks>
         ''' Created by:  DL 01/12/2010
@@ -126,6 +129,7 @@ Namespace Biosystems.Ax00.BL
         '''                              has to be marked as closed in Historic Module
         '''              XB 18/02/2013 - Fix the use of parameter pTestType which is not used in this function nowadays (BugsTracking #1136)
         '''              AG 10/05/2013 - Mark as deleted test if this test form part of a LIS saved worksession
+        '''              WE 25/11/2014 - RQ00035C (BA-1867): Extend with deletion of all affected Calculated Tests and updating all affected Test Profiles.
         ''' </remarks>
         Public Function Delete(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTests As OffSystemTestsDS) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -142,8 +146,29 @@ Namespace Biosystems.Ax00.BL
                         Dim myOffSystemTestsDelete As New tparOffSystemTestsDAO
                         Dim myOffSystemTestSamples As New OffSystemTestSamplesDelegate
                         Dim mySavedWS As New SavedWSOrderTestsDelegate
+                        Dim myCalcTestsDelegate As New CalculatedTestsDelegate
 
                         For Each offSystemTest As OffSystemTestsDS.tparOffSystemTestsRow In pOffSystemTests.tparOffSystemTests.Rows
+
+                            ' WE 25/11/2014 - RQ00035C (BA-1867).
+                            ' Remove all affected Calculated Tests that have the currently deleted Off-System Test in their formula.
+                            ' Due to the deletion of the Off-System Test on screen by the user, and the Off-System Test may occur in other Calculated Tests and/or Test Profiles, 
+                            ' the following 2 steps must be performed:
+                            '
+                            ' Step 1: For all Calculated Tests that have the Calculated Tests from step 2 included in their formula: perform the 6 actions stated below:
+                            '    1. Mark as DeletedFlag if exists into a saved Worksession from LIS.
+                            '    2. Remove the Calculated Test from all Test Profiles in which it is included.
+                            '    3. Delete Reference Ranges for the affected Calculated Test.
+                            '    4. Delete the elements of the Formula of the affected Calculated Test.
+                            '    5. Delete the affected Calculated Test.
+                            '    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
+                            ' Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
+
+                            '*** Perform step 1 + 2 (affected Calculated Test and Test Profile actions) ***
+                            resultData = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(dbConnection, offSystemTest.OffSystemTestID, "", "OFFS")
+                            ' WE 25/11/2014 - RQ00035C (BA-1867) - END.
+
+                            '*** Perform Off-System Test related actions ***
                             'Mark as DeletedFlag if exists into a saved Worksession from LIS
                             resultData = mySavedWS.UpdateDeletedTestFlag(dbConnection, "OFFS", offSystemTest.OffSystemTestID)
                             If resultData.HasError Then Exit For
@@ -359,9 +384,10 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' - Update data of the specified OFF-SYSTEM Test (Basic data, Sample Type data and Reference Ranges).
         ''' - Update data of the OFF-SYSTEM Test/SampleType in Historic Module.
-        ''' - When the Name of the Off-System Test is changed: Update field FormulaText for those Calculated Tests in which formula
-        '''   the modified Off-System Test Name has been included.
-        ''' - When the Sample Type has been changed,  it also manages the deletion of all affected Test Profiles and Calculated Tests.
+        ''' - When the Name of the Off-System Test is changed: Update field FormulaText for those Calculated Tests
+        '''   in which formula the modified Off-System Test Name has been included.
+        ''' - When the Sample Type has been changed,  it also manages the change of all affected Test Profiles and
+        '''   deletion of all affected Calculated Tests.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pOffSystemTestDS">Typed DataSet OffSystemTestsDS with basic data of the OFF-SYSTEM Test to add</param>
@@ -384,7 +410,7 @@ Namespace Biosystems.Ax00.BL
         '''                            - Depending on value of the added parameters call function to update data or mark the Test as closed in Historic Module
         '''              SA 17/09/2012 - Removed parameter pCloseHistory and its related functionality; it is not needed due to function HIST_UpdateByOFFSTestIDAndSampleType 
         '''                              verifies if fields ResultType and/or SampleType have been changed and in this case close the OFFSystemTest
-        '''              WE 24/11/2014 - RQ00035C (BA-1867): Extend with deletion of all affected Calculated Tests.
+        '''              WE 24/11/2014 - RQ00035C (BA-1867): Extend with deletion of all affected Calculated Tests and updating all affected Test Profiles.
         ''' </remarks>
         Public Function Modify(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestDS As OffSystemTestsDS, ByVal pTestSampleTypesDS As OffSystemTestSamplesDS, _
                                ByVal pRefRangesDS As TestRefRangesDS, ByVal pAffectedElementsDS As DependenciesElementsDS, Optional ByVal pUpdateHistory As Boolean = False) _
@@ -398,7 +424,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
 
                         If (pAffectedElementsDS.DependenciesElements.Count > 0) Then
-                            ' Only execute when the SampleType of the modified Off-System Test is changed on screen and there are elements affected.
+                            ' The SampleType of the modified Off-System Test is changed on screen and there are elements affected.
 
                             ' Remove the specified OFF-SYSTEM Test from all Test Profiles in which it has been included.
                             Dim myTestProfileDelegate As New TestProfilesDelegate
@@ -418,12 +444,16 @@ Namespace Biosystems.Ax00.BL
                                 '    5. Delete the affected Calculated Test.
                                 '    6. If the affected CalculatedTest exists in Historic Module, mark it as closed.
                                 ' Step 2: For all affected Calculated Tests: also perform the 6 actions stated above.
+
+                                '*** Perform step 1 + 2 (affected Calculated Test and Test Profile actions) ***
                                 Dim myCalcTestsDelegate As New CalculatedTestsDelegate
                                 resultData = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(dbConnection, pOffSystemTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
                             End If
                             ' WE 24/11/2014 - RQ00035C (BA-1867) - END.
 
                         End If
+
+                        '*** Perform Off-System Test related actions ***
 
                         'Update basic data of the OFF-SYSTEM Test
                         If (Not resultData.HasError) Then
@@ -485,6 +515,8 @@ Namespace Biosystems.Ax00.BL
                                 End If
                             End If
                         End If
+
+                        '*** END of Perform Off-System Test related actions ***
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -767,12 +799,14 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' Validate if the deletion of the specified OFF-SYSTEM Tests (due to deletion of the Off-System Test or having updated its Sample Type)
         ''' affects Test Profiles and/or Calculated Tests in which they are included.
-        ''' For each Off-System Test to be deleted, search the list of affected elements:
+        ''' For each Off-System Test to be deleted or having its Sample Type updated, search the list of affected elements:
         '''   1-Test Profiles containing the Off-System Test.
         '''   2-Calculated Tests containing the Off-System Test in their Formula
         '''     2.1-Test Profiles containing each affected Calculated Test.
         '''     2.2-Calculated Tests containing each affected Calculated Test (from step 2) in their Formula.
         ''' </summary>
+        ''' <param name="pOffSystemTestsDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM Test(s)
+        '''                                 selected to be deleted, or containing the OFF-SYSTEM Test to be updated.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet DependenciesElementsDS with the list of affected elements</returns>
         ''' <remarks>
         ''' Created by:  SA 03/11/2011
@@ -824,11 +858,9 @@ Namespace Biosystems.Ax00.BL
                         Next
                     Else
                         'Error verifying affected Test Profiles
-                        myResult = myGlobalDataTO
+                        'myResult = myGlobalDataTO
                         Exit For
                     End If
-
-                    ' TODO:    myResult.SetDatos = myDependeciesElementsDS
 
                     ' 2. Verify affected Calculated Tests (Calculated Tests having the deleted Off-System Test included in their Formula).
                     myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, offSystemTestRow.OffSystemTestID, "", "OFFS")
@@ -901,10 +933,6 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 myResult = myGlobalDataTO
-
-                ' TODO:    Test case myResult.SetDatos = Nothing
-                ' TODO:    Test case myResult.SetDatos = myDependeciesElementsDS
-                ' TODO:    Test case myResult.HasError = True
 
             Catch ex As Exception
                 myResult.HasError = True

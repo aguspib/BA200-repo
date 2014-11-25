@@ -15,16 +15,20 @@ Public Class tcfgReportsTestsSortingDAO
     ''' Default sorting is the following one:
     ''' 1- Standard Tests:
     '''    a) Preloaded Test
-    '''    b) UserTest
+    '''    b) User Test
     ''' 2- Calculated Tests
     ''' 3- ISE Test
-    ''' 4- OFF Systems Test
+    ''' 4- OFF-Systems Test
+    '''    a) Preloaded Test
+    '''    b) User Test
+    ''' Note: this method does not return the list of Tests in the sorting order as specified above!
     ''' </summary>
     ''' <param name="pDBConnection">Open DB Connection</param>
     ''' <returns>GlobalDataTO containing a typed DataSet ReportsTestsSortingDS with all Tests sorted according
     '''          the default criteria</returns>
     ''' <remarks>
     ''' Created by: TR 25/11/2011
+    ''' Modified by: WE 25/11/2014 - RQ00035C (BA-1867): Change in query string due to new field 'PreloadedOffSystemTest' and note added to Summary.
     ''' </remarks>
     Public Function GetDefaultSortedTestList(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
         Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -47,7 +51,7 @@ Public Class tcfgReportsTestsSortingDAO
                                             " FROM   tparISETests " & vbCrLf & _
                                             " UNION " & vbCrLf & _
                                             " SELECT 'OFFS' AS TestType, OffSystemTestID AS TestID, ShortName AS TestName, " & vbCrLf & _
-                                            "        OffSystemTestID AS TestPosition, 0 AS PreloadedTest " & vbCrLf & _
+                                            "        OffSystemTestID AS TestPosition, PreloadedOffSystemTest AS PreloadedTest " & vbCrLf & _
                                             " FROM   tparOffSystemTests " & vbCrLf
 
                     Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
