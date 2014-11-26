@@ -2565,10 +2565,9 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.04</Version>
-    <Label>Data validation in tfmwVersions Table for package 3.0.4</Label>
+    <Label>New column Type in table twksWSBLinesByWell</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.4'
-      AND ServiceSoftware = '1.2.4' AND FirmwareScripts = '1.1.0' AND Firmware = '0.13')= 1
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'twksWSBLinesByWell' AND sc.name = 'Type') = 1
       SELECT 'True'
       ELSE
       SELECT 'False'
@@ -2577,9 +2576,54 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.04</Version>
-    <Label>New column Type in table twksWSBLinesByWell</Label>
+    <Label>All parameters that depends by model are defined for BA400 and for BA200</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE  so.name = 'twksWSBLinesByWell' AND sc.name = 'Type') = 1
+      IF (SELECT COUNT(*) FROM tfmwSwParameters WHERE AnalyzerModel IS NOT NULL AND AnalyzerModel = 'A400') = (SELECT COUNT(*) FROM tfmwSwParameters WHERE AnalyzerModel IS NOT NULL AND AnalyzerModel = 'A200')
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>Count parameters that not depends by model</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwSwParameters WHERE AnalyzerModel IS NOT NULL AND AnalyzerModel = 'A400') = 164
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>All limits that depends by model are defined for BA400 and for BA200</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwFieldLimits WHERE AnalyzerModel IS NOT NULL AND AnalyzerModel = 'A400') = (SELECT COUNT(*) FROM tfmwFieldLimits WHERE AnalyzerModel IS NOT NULL AND AnalyzerModel = 'A200')
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>Count limits that not depends by model</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM tfmwFieldLimits WHERE AnalyzerModel IS NULL) = 62
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.04</Version>
+    <Label>Data validation in tfmwVersions Table for package 3.0.4</Label>
+    <Script>
+      IF (SELECT COUNT(*) FROM [Ax00].[dbo].[tfmwVersions] WHERE UserSoftware = '3.0.4'
+      AND ServiceSoftware = '1.2.4' AND FirmwareScripts = '1.1.0' AND Firmware = '0.13')= 1
       SELECT 'True'
       ELSE
       SELECT 'False'

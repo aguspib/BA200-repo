@@ -86,13 +86,13 @@
       SET ANSI_PADDING ON
       GO
       CREATE TABLE [dbo].[tfmwSwParameters](
-      [ParameterID] [int] NOT NULL,
       [ParameterName] [varchar](50) NOT NULL,
       [DependByModel] [bit] NOT NULL,
       [AnalyzerModel] [varchar](10) NULL,
       [ValueNumeric] [real] NULL,
       [ValueText] [nvarchar](50) NULL,
       [Description] [varchar](255) NULL,
+      [ParameterID] [int] IDENTITY(1,1) NOT NULL,
       CONSTRAINT [PK_tfmwSwParameters_1] PRIMARY KEY CLUSTERED
       (
       [ParameterID] ASC
@@ -119,9 +119,10 @@
       [DefaultValue] [real] NULL,
       [DecimalsAllowed] [tinyint] NOT NULL,
       [AnalyzerModel] [varchar](10) NULL,
-      CONSTRAINT [PK_tfmwPreloadedRanges] PRIMARY KEY CLUSTERED
+      [IndexID] [int] IDENTITY(1,1) NOT NULL,
+      CONSTRAINT [PK_tfmwFieldLimits_1] PRIMARY KEY CLUSTERED
       (
-      [LimitID] ASC
+      [IndexID] ASC
       )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
       ) ON [PRIMARY]
       GO

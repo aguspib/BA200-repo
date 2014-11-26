@@ -1001,17 +1001,23 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             'Read rotor finishes
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                            Dim validResults As Boolean = True
+                            Dim DynamicBLvalidResults As Boolean = True
 
-                            '1. Validate results
-                            'TODO
+                            '1. Validate results (BA-2081) - UNCOMMENT WHEN VALIDATED!!!
+                            'myGlobal = BaseLine.ValidateDynamicBaseLinesResults(Nothing, AnalyzerIDAttribute)
+                            'If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            '    DynamicBLvalidResults = DirectCast(myGlobal.SetDatos, Boolean)
+                            'ElseIf myGlobal.HasError Then
+                            '    DynamicBLvalidResults = False
+                            'End If
 
                             '2. If not valid try 1 FLIGHT rerun
-                            If Not validResults Then
-                                'TODO
+                            If Not DynamicBLvalidResults Then
+                                'If 1st time try again
+                                'Else generate alarm BASELINE_INIT_ERR (change reactions rotor required)
 
                             Else
-                                '3.1 Prepare data for the 1st reactions rotor turn in worksession
+                                '3.1 Prepare data for the 1st reactions rotor turn in worksession (BA-2065)
                                 myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
 
                                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
