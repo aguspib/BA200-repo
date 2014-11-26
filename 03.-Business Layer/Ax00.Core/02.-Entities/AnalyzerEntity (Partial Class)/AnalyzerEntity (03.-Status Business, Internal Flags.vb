@@ -568,7 +568,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by  AG 03/11/2010
         ''' Modified by AG 02/03/2011 - add parameter pNextWell
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
-        '''             AG 14/11/2014 BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
+        '''             AG 14/11/2014 - BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
+        '''             IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' </remarks>
         Private Function ManageStandByStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -972,84 +973,40 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         'AG 14/11/2014 BA-2065
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_START
+
+                        'IT 26/11/2014 - BA-2075 INI
                         If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "INI")
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
-
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
-
-                            'When FLIGHT read is accepted ... delete the all previous FLIGHT results
-                            Dim myBLinesDlg As New WSBLinesDelegate
-                            myGlobal = myBLinesDlg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
-
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "INI")
-
                         End If
-
+                        'IT 26/11/2014 - BA-2075 END
 
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE
+
+                        'IT 26/11/2014 - BA-2075 INI
                         'Fill rotor finishes
                         If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
 
-                            'TODO
-                            'Send FLIGHT in read mode and inform flag
-                            'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
-
                             'Read rotor finishes
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                            Dim validResults As Boolean = True
-
-                            '1. Validate results
-                            'TODO
-
-                            '2. If not valid try 1 FLIGHT rerun
-                            If Not validResults Then
-                                'TODO
-
-                            Else
-                                '3.1 Prepare data for the 1st reactions rotor turn in worksession
-                                myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
-
-                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                                    myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)
-                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
-
-                                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                                    If AlarmList.Count > 0 Then
-                                        If GlobalBase.IsServiceAssembly Then
-                                            'Alarms treatment for Service
-                                        Else
-                                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                                            Dim myLogAcciones As New ApplicationLogManager()
-                                            myLogAcciones.CreateLogActivity("Treat alarms (dynamic base line converted to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ManageStandByStatus", EventLogEntryType.Information, False) 'AG 28/06/2012
-                                        End If
-                                    End If
-                                ElseIf myGlobal.HasError Then
-                                    'If not active generate base line alarm (error)
-                                    'TODO
-                                End If
-
-                                '3.2 Inform flag finished
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
-
-                                'TODO
-                                'Send FLIGHT in empty mode and inform flag
-                                'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty , "INI")
-
-                            End If
-
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
+                            
                             'Empty rotor finishes
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
 
                         End If
-                        'AG 14/11/2014 BA-2065
 
+                        If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS)
+                        End If
+                        'IT 26/11/2014 - BA-2075 END
                     Case Else
 
                 End Select
@@ -1061,7 +1018,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         myGlobal = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                     End If
                 End If
-
 
                 AlarmStatusList = Nothing
                 AlarmList = Nothing

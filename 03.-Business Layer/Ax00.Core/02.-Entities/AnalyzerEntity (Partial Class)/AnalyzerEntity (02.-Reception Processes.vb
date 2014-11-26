@@ -1182,6 +1182,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         End If
                                     End If
 
+                                    'IT 26/11/2014 - BA-2075 INI
                                     'If no alarm or all ALIGHT has been rejected ... inform presentation depending the current Sw process
                                     If Not myGlobalDataTO.HasError Then
                                         'AG 28/02/2012
@@ -1190,52 +1191,18 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                             'Inform flag for alight is finished
                                             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-                                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "END")
 
-                                            Dim wupManeuversFinishFlag As Boolean = False 'AG 23/05/2012
-                                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
+                                            If (validALIGHTAttribute) Then
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "END")
+                                            Else
+                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
+                                            End If
 
-                                                ' XBC 13/02/2012 - CODEBR Configuration instruction
-                                                'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
-                                                ' XBC 13/02/2012 - CODEBR Configuration instruction
-
-                                                'Inform the start instrument (wup process has finished)
-                                                Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
-                                                Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
-
-                                                'WUPCOMPLETEFLAG
-                                                myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
-                                                With myAnalyzerSettingsRow
-                                                    .AnalyzerID = AnalyzerIDAttribute
-                                                    .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
-                                                    .CurrentValue = "1"
-                                                End With
-                                                myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
-
-                                                Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                                                myGlobalDataTO = myAnalyzerSettings.Save(dbConnection, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
-
-                                                wupManeuversFinishFlag = True
-
-                                                ' XBC 13/02/2012 - CODEBR Configuration instruction
-                                                'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process FINISH sent again the config instruction (maybe user has changed something)
-
-                                                Dim BarCodeDS As New AnalyzerManagerDS
-                                                Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
-                                                rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
-                                                With rowBarCode
-                                                    .RotorType = "SAMPLES"
-                                                    .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
-                                                    .Position = 0
-                                                End With
-                                                BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
-                                                BarCodeDS.AcceptChanges()
-                                                myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
-                                                ' XBC 13/02/2012 - CODEBR Configuration instruction
+                                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+                                                ValidateWarmUpProcess(myAnalyzerFlagsDS)
 
                                             ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
                                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess, "CLOSED")
-
 
                                             ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
                                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "CLOSED")
@@ -1252,91 +1219,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 'Sw must inform the start instrument process is OK
                                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
                                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-
-                                                    'Inform the start instrument (wup process has finished)
-                                                    Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
-                                                    Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
-
-                                                    'WUPCOMPLETEFLAG
-                                                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
-                                                    With myAnalyzerSettingsRow
-                                                        .AnalyzerID = AnalyzerIDAttribute
-                                                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
-                                                        .CurrentValue = "1"
-                                                    End With
-                                                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
-
-                                                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
-                                                    myGlobalDataTO = myAnalyzerSettings.Save(dbConnection, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
-
-                                                    wupManeuversFinishFlag = True
-
-                                                    ' XBC 13/02/2012 - CODEBR Configuration instruction
-                                                    Dim BarCodeDS As New AnalyzerManagerDS
-                                                    Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
-                                                    rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
-                                                    With rowBarCode
-                                                        .RotorType = "SAMPLES"
-                                                        .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
-                                                        .Position = 0
-                                                    End With
-                                                    BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
-                                                    BarCodeDS.AcceptChanges()
-                                                    myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
-                                                    ' XBC 13/02/2012 - CODEBR Configuration instruction
+                                                    ValidateWarmUpProcess(myAnalyzerFlagsDS)
                                                 End If
 
                                             End If
-
-                                            'AG 23/05/2012
-                                            If wupManeuversFinishFlag Then
-                                                'Inform the presentation layer to activate the STOP wup button
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED, 1, True)
-                                                ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - ISE alarms ready to be shown
-
-                                                'AG 23/05/2012 - Evaluate if Sw has to recommend to change reactions rotor (remember all alarms are remove when Start Instruments starts)
-                                                Dim analyzerReactRotor As New AnalyzerReactionsRotorDelegate
-                                                myGlobalDataTO = analyzerReactRotor.ChangeReactionsRotorRecommended(dbConnection, AnalyzerIDAttribute, myAnalyzerModel)
-                                                If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                                                    If CType(myGlobalDataTO.SetDatos, String) <> "" Then
-                                                        myAlarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
-                                                        'Update internal alarm list if exists alarm but not saved it into database!!!
-                                                        'But generate refresh
-                                                        If Not myAlarmListAttribute.Contains(myAlarm) Then
-                                                            myAlarmListAttribute.Add(myAlarm)
-                                                            myGlobalDataTO = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
-                                                        End If
-                                                    End If
-                                                End If
-                                            End If
-                                            'AG 23/05/2012
-
-                                            'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
-                                            If SensorValuesAttribute.ContainsKey(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) AndAlso SensorValuesAttribute(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 Then
-
-                                                Dim tempISEAlarmList As New List(Of GlobalEnumerates.Alarms)
-                                                Dim tempISEAlarmStatusList As New List(Of Boolean)
-                                                myGlobalDataTO = ISEAnalyzer.CheckAlarms(MyClass.Connected, tempISEAlarmList, tempISEAlarmStatusList)
-
-                                                AlarmList.Clear()
-                                                AlarmStatusList.Clear()
-                                                For i As Integer = 0 To tempISEAlarmList.Count - 1
-                                                    PrepareLocalAlarmList(tempISEAlarmList(i), tempISEAlarmStatusList(i), AlarmList, AlarmStatusList)
-                                                Next
-
-                                                If AlarmList.Count > 0 Then
-                                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                                    If GlobalBase.IsServiceAssembly Then
-                                                        ' XBC 16/10/2012 - Alarms treatment for Service
-                                                        ' Not Apply
-                                                        'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                                                    Else
-                                                        myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                                    End If
-                                                End If
-                                            End If
-                                            'AG 16/05/2012
 
                                             'Update analyzer session flags into DataBase
                                             If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
@@ -1346,10 +1232,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                         End If
                                     End If
-
+                                    'IT 26/11/2014 - BA-2075 END
                                 End If
                             End If
-
                         End If
                         query = Nothing 'AG 02/08/2012 - free memory
 
@@ -3941,6 +3826,210 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Method to validate and manage the Warm up process.
+        ''' </summary>
+        ''' <param name="myAnalyzerFlagsDS"></param>
+        ''' <remarks>
+        ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        ''' </remarks>
+        Private Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS)
+
+            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
+
+                If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
+
+                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") And
+                       (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "") Then
+
+                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI"
+                        Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
+                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                        Return
+
+                    End If
+
+                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") Then
+                        FinalizeWarmUpProcess()
+                        Return
+                    End If
+
+                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "END") And
+                        (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "") Then
+
+                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
+                        Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                        Return
+
+                    End If
+
+                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END") And
+                        (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") Then
+
+                        If (ProcessFlightReadAction(myAnalyzerFlagsDS)) Then
+                            mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
+                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                            Return
+                        Else
+                            mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
+                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                            Return
+
+                        End If
+
+                    End If
+
+                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "END") Then
+                        FinalizeWarmUpProcess()
+                        Return
+                    End If
+
+                Else
+
+                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
+                        FinalizeWarmUpProcess()
+                        Return
+                    End If
+
+                End If
+
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Method used to process the data that are read from the FLIGHT instruction.
+        ''' </summary>
+        ''' <param name="myAnalyzerFlagsDS"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        ''' </remarks>
+        Private Function ProcessFlightReadAction(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As Boolean
+            Dim validResults As Boolean = True
+            Dim myGlobal As New GlobalDataTO
+            Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+
+            '1. Validate results
+            'TODO
+
+            '2. If not valid try 1 FLIGHT rerun
+            If Not validResults Then
+                'TODO
+                Return False
+            Else
+                '3.1 Prepare data for the 1st reactions rotor turn in worksession
+                myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
+
+            End If
+
+            Return False
+
+        End Function
+
+        ''' <summary>
+        ''' Method used to finalize the Warm up process.
+        ''' </summary>
+        ''' <remarks>
+        ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        ''' </remarks>
+        Private Sub FinalizeWarmUpProcess()
+
+            Dim myGlobalDataTO As New GlobalDataTO
+            Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
+            Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
+
+            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+            Dim AlarmStatusList As New List(Of Boolean)
+            Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+
+            Dim wupManeuversFinishFlag As Boolean = False 'AG 23/05/2012
+
+            'WUPCOMPLETEFLAG
+            myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+            With myAnalyzerSettingsRow
+                .AnalyzerID = AnalyzerIDAttribute
+                .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
+                .CurrentValue = "1"
+            End With
+            myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+
+            Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
+            myGlobalDataTO = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, myAnalyzerSettingsDS, Nothing)
+
+            wupManeuversFinishFlag = True
+
+            ' XBC 13/02/2012 - CODEBR Configuration instruction
+            'myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process FINISH sent again the config instruction (maybe user has changed something)
+
+            Dim BarCodeDS As New AnalyzerManagerDS
+            Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
+            rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
+            With rowBarCode
+                .RotorType = "SAMPLES"
+                .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
+                .Position = 0
+            End With
+            BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
+            BarCodeDS.AcceptChanges()
+            myGlobalDataTO = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+            ' XBC 13/02/2012 - CODEBR Configuration instruction
+
+            'AG 23/05/2012
+            If wupManeuversFinishFlag Then
+                'Inform the presentation layer to activate the STOP wup button
+                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED, 1, True)
+                ISEAnalyzer.IsAnalyzerWarmUp = False 'AG 22/05/2012 - ISE alarms ready to be shown
+
+                'AG 23/05/2012 - Evaluate if Sw has to recommend to change reactions rotor (remember all alarms are remove when Start Instruments starts)
+                Dim analyzerReactRotor As New AnalyzerReactionsRotorDelegate
+                myGlobalDataTO = analyzerReactRotor.ChangeReactionsRotorRecommended(Nothing, AnalyzerIDAttribute, myAnalyzerModel)
+                If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                    If CType(myGlobalDataTO.SetDatos, String) <> "" Then
+                        myAlarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
+                        'Update internal alarm list if exists alarm but not saved it into database!!!
+                        'But generate refresh
+                        If Not myAlarmListAttribute.Contains(myAlarm) Then
+                            myAlarmListAttribute.Add(myAlarm)
+                            myGlobalDataTO = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
+                        End If
+                    End If
+                End If
+            End If
+            'AG 23/05/2012
+
+            'AG 16/05/2012 - If warm up maneuvers are finished check for the ise alarms 
+            If SensorValuesAttribute.ContainsKey(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) AndAlso SensorValuesAttribute(AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 1 Then
+
+                Dim tempISEAlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim tempISEAlarmStatusList As New List(Of Boolean)
+                myGlobalDataTO = ISEAnalyzer.CheckAlarms(MyClass.Connected, tempISEAlarmList, tempISEAlarmStatusList)
+
+                AlarmList.Clear()
+                AlarmStatusList.Clear()
+                For i As Integer = 0 To tempISEAlarmList.Count - 1
+                    PrepareLocalAlarmList(tempISEAlarmList(i), tempISEAlarmStatusList(i), AlarmList, AlarmStatusList)
+                Next
+
+                If AlarmList.Count > 0 Then
+                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                    If GlobalBase.IsServiceAssembly Then
+                        ' XBC 16/10/2012 - Alarms treatment for Service
+                        ' Not Apply
+                        'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
+                    Else
+                        myGlobalDataTO = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                    End If
+                End If
+            End If
+            'AG 16/05/2012
+        End Sub
+
+
 #End Region
 
 #Region "UIRefresh DataSet Methods"
