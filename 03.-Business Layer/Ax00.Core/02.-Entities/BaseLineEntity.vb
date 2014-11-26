@@ -108,6 +108,13 @@ Namespace Biosystems.Ax00.Core.Entities
         Private BL_WELLREJECT_ABS_LIMIT_MAX As Single = 0.08
         Private BL_WELLREJECT_SD As Single = 0.027
 
+        'AG 26/11/2014 BA-2081
+        'Dynamic base line validations
+        Private BL_DYNAMIC_ABS_LIMIN_MIN As Single = -0.1
+        Private BL_DYNAMIC_ABS_LIMIN_MAX As Single = 0.1
+        Private BL_DYNAMIC_SD As Single = 0.02
+
+
         Private PATH_LENGHT As Single = 6.11
         Private LIMIT_ABS As Single = 3.3
         Private MAX_REJECTED_WELLS As Integer = 20 'Max rejected wells allowed in one reactions rotor
@@ -1143,6 +1150,129 @@ Namespace Biosystems.Ax00.Core.Entities
         End Sub
 
 
+        ''' <summary>
+        ''' Validate that the results obtained from a FLIGHT are good enough
+        ''' 1) For each well and leds limitMIN major ABS minor limitMAX
+        ''' 2) For each leds SD using all wells minor valueMAX
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <returns>GlobalDataTO (setDatos as boolean: TRUE results valid, FALSE results not valid)</returns>
+        ''' <remarks>AG 25/11/2014 BA-2081</remarks>
+        Public Function ValidateDynamicBaseLinesResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IBaseLineEntity.ValidateDynamicBaseLinesResults
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        '1) Declare variables
+                        Dim validValuesFlag As Boolean = True
+                        Dim LastDynamicBaseLineDS As New BaseLinesDS
+                        Dim listOfLeds As New List(Of Integer)
+                        Dim listOfWells As New List(Of Integer)
+                        Dim linqRes As List(Of BaseLinesDS.twksWSBaseLinesRow)
+                        Dim absorbancesList As New List(Of Single)
+                        Dim calculatedValue As Single 'Calculated value for absorbance and for standard deviation
+
+                        'Declare delegates
+                        Dim calcDel As New CalculationsDelegate
+                        Dim myUtil As New Utilities
+
+
+                        '2) Get last dynamic base line results for all wells and leds
+                        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        resultData = GetCurrentAdjustBaseLineValuesByType(dbConnection, myAnalyzerID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            LastDynamicBaseLineDS = DirectCast(resultData.SetDatos, BaseLinesDS)
+
+                            '3) Get different leds and wells
+                            listOfLeds = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines Select a.Wavelength Distinct).ToList
+                            listOfWells = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines Select a.WellUsed Distinct).ToList
+
+                            '4) Validation for each led
+                            For Each ledPosition In listOfLeds
+                                'Only validate the active leds
+                                If adjustBL.enabled(ledPosition) Then
+
+                                    'Validation for each well
+                                    For Each wellPosition In listOfWells
+                                        'Get data by well and led
+                                        linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
+                                                                   Where a.Wavelength = ledPosition AndAlso a.WellUsed = wellPosition Select a Order By a.BaseLineID Descending).ToList
+
+                                        If linqRes.Count > 0 Then
+                                            'Calculate well absorbance by led
+                                            If linqRes(0).MainLight <> 0 AndAlso linqRes(0).RefLight <> 0 Then
+                                                resultData = calcDel.CalculateAbsorbance(linqRes(0).MainLight, linqRes(0).RefLight, adjustBL.mainLight(ledPosition), _
+                                                                                          adjustBL.refLight(ledPosition), adjustBL.mainDark(ledPosition), adjustBL.refDark(ledPosition), _
+                                                                                           0, PATH_LENGHT, LIMIT_ABS, False)
+                                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                    'Validate if the absorbance calculated is inside limits
+                                                    calculatedValue = DirectCast(resultData.SetDatos, Single)
+                                                    If calculatedValue < BL_DYNAMIC_ABS_LIMIN_MIN OrElse calculatedValue > BL_DYNAMIC_ABS_LIMIN_MAX Then
+                                                        validValuesFlag = False
+                                                    Else
+                                                        'If valid ... add to absorbances list that will be use later to calculate the standard deviation
+                                                        absorbancesList.Add(calculatedValue)
+                                                    End If
+                                                Else
+                                                    validValuesFlag = False
+                                                End If
+
+                                            Else
+                                                validValuesFlag = False
+                                            End If
+                                        End If
+
+                                        If Not validValuesFlag Then Exit For
+                                    Next
+
+                                    'Calculate standard deviation for all wells in rotor (using the same led)
+                                    calculatedValue = myUtil.CalculateStandardDeviation(absorbancesList)
+                                    If calculatedValue > BL_DYNAMIC_SD Then
+                                        validValuesFlag = False
+                                    End If
+
+                                End If
+
+                                absorbancesList.Clear() 'Clear the list of the absorbances (wells by led). It will be used for next led
+                                If Not validValuesFlag Then Exit For
+                            Next
+
+                        End If
+
+                        'Inform dat to return
+                        resultData.SetDatos = validValuesFlag
+
+                        'Release memory
+                        listOfLeds = Nothing
+                        listOfWells = Nothing
+                        linqRes = Nothing
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "BaseLineEntity.ValidateDynamicBaseLinesResults", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
 #End Region
 
 #Region "Private Base Line Calculations Methods"
@@ -1180,33 +1310,33 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End With
 
-                    Else
-                        'The well is discarted due some diode position has absorbance error
-                        'Remove it from rejectionparameters structure
-                        If pDiodePosition > 0 Then
-                            With rejectionParameters
-                                If .wellUsed.Contains(pWell) Then
-                                    .wellUsed.RemoveRange(.wellUsed.Count - 1, 1)
-                                    .rejected.RemoveRange(.rejected.Count - 1, 1)
-                                    If .initializationParameterItem > 0 Then .initializationParameterItem -= 1
-                                End If
+                Else
+                    'The well is discarted due some diode position has absorbance error
+                    'Remove it from rejectionparameters structure
+                    If pDiodePosition > 0 Then
+                        With rejectionParameters
+                            If .wellUsed.Contains(pWell) Then
+                                .wellUsed.RemoveRange(.wellUsed.Count - 1, 1)
+                                .rejected.RemoveRange(.rejected.Count - 1, 1)
+                                If .initializationParameterItem > 0 Then .initializationParameterItem -= 1
+                            End If
 
-                                If .absByWELL Is Nothing Then
-                                    'No items ... do nothing
-                                ElseIf .absByWELL(0).Abs.Count = 1 Then
-                                    'Only one item ... remove it
-                                    Erase .absByWELL
-                                Else
-                                    'Several items (wells) in struture ... Remove only current wellBL
-                                    For wl As Integer = 0 To pDiodePosition - 1
-                                        .absByWELL(wl).Abs.RemoveRange(0, 1)
-                                    Next
+                            If .absByWELL Is Nothing Then
+                                'No items ... do nothing
+                            ElseIf .absByWELL(0).Abs.Count = 1 Then
+                                'Only one item ... remove it
+                                Erase .absByWELL
+                            Else
+                                'Several items (wells) in struture ... Remove only current wellBL
+                                For wl As Integer = 0 To pDiodePosition - 1
+                                    .absByWELL(wl).Abs.RemoveRange(0, 1)
+                                Next
 
-                                End If
-                            End With
-                        End If
-
+                            End If
+                        End With
                     End If
+
+                End If
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -1703,8 +1833,15 @@ Namespace Biosystems.Ax00.Core.Entities
                         WASHSTATION_BLW_LIMIT_MAX = CInt(qLingLimits(0).MaxValue)
                     End If
 
+                    'AG 26/11/2014 BA-2081
+                    qLingLimits = (From a As FieldLimitsDS.tfmwFieldLimitsRow In fieldLimitsAttribute.tfmwFieldLimits _
+                                   Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.BL_DYNAMIC_ABS_LIMIT.ToString Select a).ToList
+                    If qLingLimits.Count > 0 Then
+                        BL_DYNAMIC_ABS_LIMIN_MIN = CInt(qLingLimits(0).MinValue)
+                        BL_DYNAMIC_ABS_LIMIN_MIN = CInt(qLingLimits(0).MaxValue)
+                    End If
 
-
+                    qLingLimits = Nothing
                 Else
                     'Well base line initialization process limits
                     Dim qLingParameter As New List(Of ParametersDS.tfmwSwParametersRow)
@@ -1762,6 +1899,15 @@ Namespace Biosystems.Ax00.Core.Entities
                     If qLingParameter.Count > 0 Then
                         BL_CONSECUTIVEREJECTED_WELL = CInt(qLingParameter(0).ValueNumeric)
                     End If
+
+                    'AG 26/11/2014 BA-2081
+                    qLingParameter = (From a As ParametersDS.tfmwSwParametersRow In swParametersAttribute.tfmwSwParameters _
+                                      Where a.ParameterName = GlobalEnumerates.SwParameters.BL_DYNAMIC_SD.ToString Select a).ToList
+                    If qLingParameter.Count > 0 Then
+                        BL_DYNAMIC_SD = CInt(qLingParameter(0).ValueNumeric)
+                    End If
+
+                    qLingParameter = Nothing
                 End If
 
 

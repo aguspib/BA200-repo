@@ -418,8 +418,9 @@ Namespace Biosystems.Ax00.Global
             LIS_TIMER_LIMIT
             LIS_TIMER_LIMIT_ASTM
             LIS_HOSTQUERY_PACK_LIMIT
-
             LIS_MAX_WAIT_ORDERS_LIMIT 'SGM 11/07/2013
+
+            BL_DYNAMIC_ABS_LIMIT 'AG 26/11/2014 BA-2081
 
         End Enum
 
@@ -750,6 +751,8 @@ Namespace Biosystems.Ax00.Global
 
             BL_TYPE_FOR_CALCULATIONS
             BL_TYPE_FOR_WELLREJECT
+
+            BL_DYNAMIC_SD 'AG 26/11/2014 BA-2081
 
         End Enum
 
