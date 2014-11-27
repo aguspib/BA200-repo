@@ -3943,17 +3943,20 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
                 'If still not active, generate base line alarm (error)
-                PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                If AlarmList.Count > 0 Then
-                    If GlobalBase.IsServiceAssembly Then
-                        'Alarms treatment for Service
-                    Else
-                        Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                        myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                    If AlarmList.Count > 0 Then
+                        If GlobalBase.IsServiceAssembly Then
+                            'Alarms treatment for Service
+                        Else
+                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                        End If
                     End If
                 End If
+
             End If
 
             Return validResults

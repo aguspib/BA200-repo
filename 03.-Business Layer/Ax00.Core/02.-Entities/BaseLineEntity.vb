@@ -1194,7 +1194,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             listOfWells = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines Select a.WellUsed Distinct).ToList
 
                             '4) Validation for each led
-                            For Each ledPosition In listOfLeds
+                            For ledPosition As Integer = 0 To listOfLeds.Count - 1
                                 'Only validate the active leds
                                 If adjustBL.enabled(ledPosition) Then
 
@@ -1202,7 +1202,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     For Each wellPosition In listOfWells
                                         'Get data by well and led
                                         linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
-                                                                   Where a.Wavelength = ledPosition AndAlso a.WellUsed = wellPosition Select a Order By a.BaseLineID Descending).ToList
+                                                                   Where a.Wavelength = listOfLeds(ledPosition) AndAlso a.WellUsed = wellPosition Select a Order By a.BaseLineID Descending).ToList
 
                                         If linqRes.Count > 0 Then
                                             'Calculate well absorbance by led
@@ -1232,9 +1232,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Next
 
                                     'Calculate standard deviation for all wells in rotor (using the same led)
-                                    calculatedValue = myUtil.CalculateStandardDeviation(absorbancesList)
-                                    If calculatedValue > BL_DYNAMIC_SD Then
-                                        validValuesFlag = False
+                                    If validValuesFlag AndAlso absorbancesList.Count > 0 Then
+                                        calculatedValue = myUtil.CalculateStandardDeviation(absorbancesList)
+                                        If calculatedValue > BL_DYNAMIC_SD Then
+                                            validValuesFlag = False
+                                        End If
                                     End If
 
                                 End If
@@ -1837,8 +1839,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     qLingLimits = (From a As FieldLimitsDS.tfmwFieldLimitsRow In fieldLimitsAttribute.tfmwFieldLimits _
                                    Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.BL_DYNAMIC_ABS_LIMIT.ToString Select a).ToList
                     If qLingLimits.Count > 0 Then
-                        BL_DYNAMIC_ABS_LIMIN_MIN = CInt(qLingLimits(0).MinValue)
-                        BL_DYNAMIC_ABS_LIMIN_MIN = CInt(qLingLimits(0).MaxValue)
+                        BL_DYNAMIC_ABS_LIMIN_MIN = CSng(qLingLimits(0).MinValue)
+                        BL_DYNAMIC_ABS_LIMIN_MAX = CSng(qLingLimits(0).MaxValue)
                     End If
 
                     qLingLimits = Nothing
@@ -1904,7 +1906,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     qLingParameter = (From a As ParametersDS.tfmwSwParametersRow In swParametersAttribute.tfmwSwParameters _
                                       Where a.ParameterName = GlobalEnumerates.SwParameters.BL_DYNAMIC_SD.ToString Select a).ToList
                     If qLingParameter.Count > 0 Then
-                        BL_DYNAMIC_SD = CInt(qLingParameter(0).ValueNumeric)
+                        BL_DYNAMIC_SD = CSng(qLingParameter(0).ValueNumeric)
                     End If
 
                     qLingParameter = Nothing
