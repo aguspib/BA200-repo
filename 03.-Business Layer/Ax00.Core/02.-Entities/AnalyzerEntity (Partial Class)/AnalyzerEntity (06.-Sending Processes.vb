@@ -13,6 +13,7 @@ Imports System.Timers
 Imports System.Data
 Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.Core.Entities
 
@@ -2280,6 +2281,54 @@ Namespace Biosystems.Ax00.Core.Entities
 
         End Function
 
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>AG 27/11/2014 BA-2144</remarks>
+        Private Function SendAutomaticALIGHTRerun(ByVal pdbConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobal As GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobal = DAOBase.GetOpenDBConnection(pdbConnection)
+                If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        baselineInitializationFailuresAttribute += 1
+                        If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
+                            'When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
+                            Dim SwParams As New SwParametersDelegate
+                            myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
+                            If Not myGlobal.HasError Then
+                                Dim SwParamsDS As New ParametersDS
+                                SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
+                                If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
+                                    Dim reactionsDelegate As New ReactionsRotorDelegate
+                                    CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
+                                End If
+                            End If
+                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                            'When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
+                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                        End If
+
+                    End If
+                End If
+
+
+            Catch ex As Exception
+                myGlobal.HasError = True
+                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendAutomaticALIGHTRerun", EventLogEntryType.Error, False)
+            Finally
+                If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobal
+        End Function
 #End Region
 
     End Class

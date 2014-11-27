@@ -1145,13 +1145,25 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                                     myAlarm = CType(myGlobalDataTO.SetDatos, GlobalEnumerates.Alarms)
                                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                                        alarmStatus = True
+                                        'AG 27/11/2014 BA-2144
+                                        'alarmStatus = True
 
-                                        'AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
-                                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                                            myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                        ''AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
+                                        'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                                        '    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                        'End If
+                                        If baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
+                                            alarmStatus = True
+                                            If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                                                myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                            End If
+                                        Else
+                                            'No alarm!! Alarm will be generated when the ALIGHT fails the maximum times
+                                            myAlarm = GlobalEnumerates.Alarms.NONE
+                                            alarmStatus = True
+                                            myGlobalDataTO = SendAutomaticALIGHTRerun(dbConnection)
                                         End If
-
+                                        'AG 27/11/2014 BA-2144
 
                                     Else ' Valid alight
                                         myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
@@ -1161,24 +1173,21 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
                                     Dim AlarmStatusList As New List(Of Boolean)
-                                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList) 'Baseline_init_err (true or false)
 
-                                    'AG 23/05/2012 - Baseline err excludes methacrylate rotor warn
-                                    If alarmStatus AndAlso myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                                        myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                                    End If
-                                    'AG 23/05/2012
+                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                        PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList) 'Baseline_init_err (true or false)
+                                        'AG 23/05/2012 - Baseline err excludes methacrylate rotor warn
+                                        If alarmStatus AndAlso myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                                            myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                                        End If
+                                        'AG 23/05/2012
 
-                                    If AlarmList.Count > 0 Then
-                                        'myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                        If GlobalBase.IsServiceAssembly Then
-                                            ' XBC 17/10/2012 - Alarms treatment for Service
-                                            ' Not Apply
-                                            'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                                        Else
-                                            myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                                        If AlarmList.Count > 0 Then
+                                            If GlobalBase.IsServiceAssembly Then
+                                                'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
+                                            Else
+                                                myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                                            End If
                                         End If
                                     End If
 
