@@ -180,7 +180,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                                              " ON OT.OffSystemTestID = OTS.OffSystemTestID " & vbCrLf & _
                                                 " EXCEPT " & vbCrLf & _
                                                 " SELECT OT.BiosystemsID, OT.ResultType, OT.Units, OT.Decimals, OTS.SampleType, OTS.DefaultValue, OTS.ActiveRangeType " & vbCrLf & _
-                                                " FROM   [Ax00].[dbo].[tparOffSystemTests] OT INNER JOIN [Ax00].[dbo].[tparOffSystemTestSamples] OTS ON OT.OffSystemTestID = OTS.OffSystemTestID " & vbCrLf
+                                                " FROM   [Ax00].[dbo].[tparOffSystemTests] OT INNER JOIN [Ax00].[dbo].[tparOffSystemTestSamples] OTS ON OT.OffSystemTestID = OTS.OffSystemTestID " & vbCrLf & _
+                                                " WHERE  OT.PreloadedOffSystemTest = 1 " & vbCrLf
 
                         Dim factoryOFFSTestsDS As New OffSystemTestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

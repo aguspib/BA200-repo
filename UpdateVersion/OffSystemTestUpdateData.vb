@@ -175,7 +175,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
-                Dim sampleTypeChanged As Boolean = False
+                Dim sampleOrResultTypeChanged As Boolean = False
                 Dim testRefRangesDS As New TestRefRangesDS
                 Dim myTestRefRangesDelegate As New TestRefRangesDelegate
                 Dim myTestProfileDelegate As New TestProfilesDelegate
@@ -215,7 +215,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         If (Not myGlobalDataTO.HasError) Then
                             myGlobalDataTO = UpdateCustomerTest(updatedOFFSTest, myCustomerOFFSTestDS.tparOffSystemTests.First, testRefRangesDS, pUpdateVersionChangesList)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                sampleTypeChanged = Convert.ToBoolean(myGlobalDataTO.SetDatos)
+                                sampleOrResultTypeChanged = Convert.ToBoolean(myGlobalDataTO.SetDatos)
                                 myCustomerOFFSTestDS.AcceptChanges()
 
                                 '(4.1) Fill the OffSystemTestSamplesDS needed for the Update
@@ -225,10 +225,14 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 myOFFSTestSampleRow.SampleType = myCustomerOFFSTestDS.tparOffSystemTests.First.SampleType
                                 myOFFSTestSampleRow.SetDefaultValueNull()
                                 If (Not myCustomerOFFSTestDS.tparOffSystemTests.First.IsDefaultValueNull) Then myOFFSTestSampleRow.DefaultValue = myCustomerOFFSTestDS.tparOffSystemTests.First.DefaultValue
-                                myOFFSTestSampleRow.SetActiveRangeTypeNull()
+                                If (Not myCustomerOFFSTestDS.tparOffSystemTests.First.IsActiveRangeTypeNull) Then
+                                    myOFFSTestSampleRow.ActiveRangeType = myCustomerOFFSTestDS.tparOffSystemTests.First.ActiveRangeType
+                                Else
+                                    myOFFSTestSampleRow.SetActiveRangeTypeNull()
+                                End If
                                 myOFFSTestSampleDS.tparOffSystemTestSamples.AddtparOffSystemTestSamplesRow(myOFFSTestSampleRow)
 
-                                If (sampleTypeChanged) Then
+                                If (sampleOrResultTypeChanged) Then
                                     '(4.2) If the SampleType has changed, delete the OFFS Test/SampleType from all Test Profiles in which it is included 
                                     myGlobalDataTO = myTestProfileDelegate.DeleteByTestIDSampleType(pDBConnection, myCustomerOFFSTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
 
@@ -267,14 +271,15 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' <param name="pFactoryOFFSTestRow">Row of OffSystemTestsDS containing data of the OFFS Test in FACTORY DB</param>
         ''' <param name="pCustomerOFFSTestRow">Row of OffSystemTestsDS containing data of the OFFS Test in CUSTOMER DB</param>
         ''' <param name="pUpdateVersionChangesList">Global structure to save all changes executed by the Update Version process in Customer DB</param>
-        ''' <returns>GlobalDataTO containing a Boolean value: when TRUE, it means the SampleType of the OFFS Test has changed</returns>
+        ''' <returns>GlobalDataTO containing a Boolean value: when TRUE, it means the SampleType and or the ResultType of the OFFS Test has changed
+        '''          (in the case of the ResultType, the function returns TRUE only when the ResultType has changed from QUANTITATIVE to QUALITATIVE)</returns>
         ''' <remarks>
         ''' Created by:  SA 20/11/2014 - BA-2105
         ''' </remarks>
         Private Function UpdateCustomerTest(ByVal pFactoryOFFSTestRow As OffSystemTestsDS.tparOffSystemTestsRow, ByVal pCustomerOFFSTestRow As OffSystemTestsDS.tparOffSystemTestsRow, _
                                             ByRef pTestRefRangesDS As TestRefRangesDS, ByRef pUpdateVersionChangesList As UpdateVersionChangesDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim sampleTypeChanged As Boolean = False
+            Dim sampleOrResultTypeChanged As Boolean = False
 
             Try
                 'Build the TestName to report changes...
@@ -282,7 +287,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 'Verify if field SampleType has changed
                 If (pFactoryOFFSTestRow.SampleType <> pCustomerOFFSTestRow.SampleType) Then
-                    sampleTypeChanged = True
+                    sampleOrResultTypeChanged = True
 
                     'Add a row for field SampleType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
                     AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "OFFS", myOFFSTestName, pFactoryOFFSTestRow.SampleType, "SampleType", pCustomerOFFSTestRow.SampleType, _
@@ -326,7 +331,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 'Verify if field ResultType has changed
                 If (pFactoryOFFSTestRow.ResultType <> pCustomerOFFSTestRow.ResultType) Then
-                    'Add a row for field ResultType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    'Update the field in the DS and add a row for field ResultType in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
+                    pCustomerOFFSTestRow.ResultType = pFactoryOFFSTestRow.ResultType
                     AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "OFFS", myOFFSTestName, pFactoryOFFSTestRow.SampleType, "ResultType", pCustomerOFFSTestRow.ResultType, _
                                                         pFactoryOFFSTestRow.ResultType)
 
@@ -349,11 +355,12 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     ElseIf (pFactoryOFFSTestRow.ResultType = "QUALTIVE") Then
                         'ResultType has changed from QUANTITATIVE to QUALITATIVE - Decimals and Units fields are NULL for QUALITATIVE OFFS Tests 
+                        sampleOrResultTypeChanged = True
 
                         'Add a row for field Decimals in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
                         'and update field in the Customer DataSet
                         AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "OFFS", myOFFSTestName, pFactoryOFFSTestRow.SampleType, "Decimals", pCustomerOFFSTestRow.Decimals.ToString, "--")
-                        pCustomerOFFSTestRow.SetDecimalsNull()
+                        pCustomerOFFSTestRow.Decimals = 0
 
                         If (Not pCustomerOFFSTestRow.IsUnitsNull) Then
                             'Add a row for field Units in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
@@ -375,7 +382,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     End If
                 End If
 
-                myGlobalDataTO.SetDatos = sampleTypeChanged
+                myGlobalDataTO.SetDatos = sampleOrResultTypeChanged
                 myGlobalDataTO.HasError = False
             Catch ex As Exception
                 myGlobalDataTO.HasError = True

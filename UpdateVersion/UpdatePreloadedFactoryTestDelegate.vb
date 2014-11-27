@@ -222,19 +222,24 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'Get the SW Version in CUSTOMER DB to determine which update processes have to be executed: DELETE and UPDATE 
+                        'can be executed only for SW Versions greater or equal to 3.1.1, due to fields that allow to identify Preloaded 
+                        'OffSystem Tests do not exists in previous application versions
                         Dim myOFFSTestsUpdate As New OffSystemTestUpdateData
                         Dim myNumVersion As Integer = Convert.ToInt32(pCustomerSwVersion.Replace(".", ""))
 
                         If (myNumVersion >= 311) Then
                             '(1) Execute the Update Version Process for DELETED OFFS TESTS
                             resultData = myOFFSTestsUpdate.DELETERemovedOFFSTests(dbConnection, pUpdateVersionChangesList)
-
-                            '(2) Execute the Update Version Process for UPDATED OFFS TESTS
-                            If (Not resultData.HasError) Then resultData = myOFFSTestsUpdate.UPDATEModifiedOFFSTests(dbConnection, pUpdateVersionChangesList)
                         End If
 
-                        '(3) Execute the Update Version Process for NEW OFFS TESTS
+                        '(2) Execute the Update Version Process for NEW OFFS TESTS
                         If (Not resultData.HasError) Then resultData = myOFFSTestsUpdate.CREATENewOFFSTests(dbConnection, pUpdateVersionChangesList)
+
+                        If (myNumVersion >= 311) Then
+                            '(3) Execute the Update Version Process for UPDATED OFFS TESTS
+                            If (Not resultData.HasError) Then resultData = myOFFSTestsUpdate.UPDATEModifiedOFFSTests(dbConnection, pUpdateVersionChangesList)
+                        End If
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
