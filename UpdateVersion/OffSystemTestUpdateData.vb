@@ -218,28 +218,33 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 sampleTypeChanged = Convert.ToBoolean(myGlobalDataTO.SetDatos)
                                 myCustomerOFFSTestDS.AcceptChanges()
 
-                                '(4.1) Fill the OffSystemTestSamplesDS needed for the Add
+                                '(4.1) Fill the OffSystemTestSamplesDS needed for the Update
                                 Dim myOFFSTestSampleRow As OffSystemTestSamplesDS.tparOffSystemTestSamplesRow
                                 myOFFSTestSampleRow = myOFFSTestSampleDS.tparOffSystemTestSamples.NewtparOffSystemTestSamplesRow()
+                                myOFFSTestSampleRow.OffSystemTestID = myCustomerOFFSTestDS.tparOffSystemTests.First.OffSystemTestID
                                 myOFFSTestSampleRow.SampleType = myCustomerOFFSTestDS.tparOffSystemTests.First.SampleType
                                 myOFFSTestSampleRow.SetDefaultValueNull()
                                 If (Not myCustomerOFFSTestDS.tparOffSystemTests.First.IsDefaultValueNull) Then myOFFSTestSampleRow.DefaultValue = myCustomerOFFSTestDS.tparOffSystemTests.First.DefaultValue
                                 myOFFSTestSampleRow.SetActiveRangeTypeNull()
-                                myOFFSTestSampleDS.tparOffSystemTestSamples.ImportRow(myOFFSTestSampleRow)
+                                myOFFSTestSampleDS.tparOffSystemTestSamples.AddtparOffSystemTestSamplesRow(myOFFSTestSampleRow)
 
-                                '(4.2) If the SampleType has changed, delete the OFFS Test/SampleType from all Test Profiles in which it is included 
-                                myGlobalDataTO = myTestProfileDelegate.DeleteByTestIDSampleType(pDBConnection, myCustomerOFFSTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+                                If (sampleTypeChanged) Then
+                                    '(4.2) If the SampleType has changed, delete the OFFS Test/SampleType from all Test Profiles in which it is included 
+                                    myGlobalDataTO = myTestProfileDelegate.DeleteByTestIDSampleType(pDBConnection, myCustomerOFFSTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
 
-                                '(4.3) If the SampleType has changed, delete all Calculated Tests in which the OFFS Test/SampleType is included
-                                If (Not myGlobalDataTO.HasError) Then
-                                    myGlobalDataTO = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(pDBConnection, myCustomerOFFSTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+                                    '(4.3) If the SampleType has changed, delete all Calculated Tests in which the OFFS Test/SampleType is included
+                                    If (Not myGlobalDataTO.HasError) Then
+                                        myGlobalDataTO = myCalcTestsDelegate.DeleteCalculatedTestbyTestID(pDBConnection, myCustomerOFFSTestDS.tparOffSystemTests(0).OffSystemTestID, "", "OFFS")
+                                    End If
                                 End If
 
                                 '(4.4.) Finally, update the OFFS Test/SampleType in Customer DB
-                                myGlobalDataTO = myOFFSTestsDelegate.Modify(pDBConnection, myCustomerOFFSTestDS, myOFFSTestSampleDS, testRefRangesDS, New DependenciesElementsDS, True)
+                                If (Not myGlobalDataTO.HasError) Then
+                                    myGlobalDataTO = myOFFSTestsDelegate.Modify(pDBConnection, myCustomerOFFSTestDS, myOFFSTestSampleDS, testRefRangesDS, New DependenciesElementsDS, True)
+                                End If
                             End If
                         End If
-                       
+
                         If (myGlobalDataTO.HasError) Then Exit For
                     Next
                 End If
@@ -309,13 +314,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         pCustomerOFFSTestRow.DefaultValue = pFactoryOFFSTestRow.DefaultValue
                     End If
                 Else
-                    If (Not pCustomerOFFSTestRow.IsSampleTypeNull) Then
+                    If (Not pCustomerOFFSTestRow.IsDefaultValueNull) Then
                         'Add a row for field DefaultValue in the DS containing all changes in Customer DB due to the Update Version Process (sub-table UpdatedElements) 
                         AddUpdatedElementToChangesStructure(pUpdateVersionChangesList, "OFFS", myOFFSTestName, pFactoryOFFSTestRow.SampleType, "DefaultValue", pCustomerOFFSTestRow.DefaultValue, _
                                                             myDefaultValue)
 
                         'Update field in the Customer DataSet 
-                        pCustomerOFFSTestRow.SetSampleTypeNull()
+                        pCustomerOFFSTestRow.SetDefaultValueNull()
                     End If
                 End If
 

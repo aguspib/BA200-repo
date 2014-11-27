@@ -240,7 +240,7 @@ Public Class IProgOffSystemTest
     End Sub
 
     ''' <summary>
-    ''' Delete the selected OffSystem Tests
+    ''' Delete the selected OffSystem Test(s).
     ''' </summary>
     ''' <remarks>
     ''' Created by: DL 01/12/2010
@@ -1586,6 +1586,7 @@ Public Class IProgOffSystemTest
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 17/10/2012
+    ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): beside Profiles extend with Calculated Tests as possible affected elements.
     ''' </remarks>
     Private Sub SaveChanges_NEW()
         Try
@@ -1595,7 +1596,7 @@ Public Class IProgOffSystemTest
 
             'Verify if the OFF-SYSTEM Test can be saved
             If (ValidateSavingConditions()) Then
-                'If the SampleType has been changed, verify if there are affected Profiles
+                ' If the SampleType has been changed, verify if there are affected Profiles and Calculated Tests to delete.
                 If (SelectedOffSystemTestID > 0 AndAlso bsSampleTypeComboBox.SelectedValue.ToString <> SelectedTestSampleTypesDS.tparOffSystemTestSamples(0).SampleType) Then
                     'Load the selected OFF-SYSTEM Test in a typed DataSet OffSystemTestsDS
                     Dim offSytemTestDataDS As New OffSystemTestsDS
@@ -1878,14 +1879,16 @@ Public Class IProgOffSystemTest
     End Sub
 
     ''' <summary>
-    ''' Validate if there are affected elements (Profiles) that have to be changed/deleted due to deletion of 
-    ''' the selected OFF-SYSTEM Tests or due to the change of the SampleType of an updated OFF-SYSTEM Test 
+    ''' Validate if there are affected elements - Profiles that have to be changed and/or Calculated Tests that
+    ''' have to be deleted due to the deletion of the selected OFF-SYSTEM Test(s) or change of the SampleType
+    ''' of an updated OFF-SYSTEM Test.
     ''' </summary>
-    ''' <param name="pOffSystemTestDataDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM 
-    '''                                    Tests selected to be deleted</param>
+    ''' <param name="pOffSystemTestDataDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM Test(s)
+    '''                                    selected to be deleted, or containing the OFF-SYSTEM Test to be updated.</param>
     ''' <returns>GlobalDataTO containing a typed DataSet DependenciesElementsDS with the list of affected elements</returns>
     ''' <remarks>
     ''' Created by:  SA 04/01/2011
+    ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameter description (added Calculated Tests as possible cause).
     ''' </remarks>
     Private Function ValidateDependencies(ByVal pOffSystemTestDataDS As OffSystemTestsDS) As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO

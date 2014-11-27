@@ -67,15 +67,17 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Delete the specified Test from all Test Profiles in which it is included. When a SampleType is informed, 
-        ''' it means that the Test have to be deleted only of all the Test Profiles defined for this SampleType.
+        ''' Delete the specified Test (Standard, ISE, Off-System or Calculated Test) from all Test Profiles in which it is included.
+        ''' When a SampleType is informed, it means that the Test only has to be deleted from all the Test Profiles defined for this SampleType.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code. Optional parameter</param>
+        ''' <param name="pTestType">Test Type Code (STD,ISE,OFFS,CALC). Optional parameter</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  SA 08/07/2010 - The function in this Delegate was missing (DAO was directly called)
+        ''' Modified by: WE 24/11/2014 - RQ00035C (BA-1867): Updated Summary and Parameters description.
         ''' </remarks>
         Public Shared Function DeleteByTestIDSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                                  Optional ByVal pSampleType As String = "", Optional ByVal pTestType As String = "STD") As GlobalDataTO
@@ -239,14 +241,17 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Read the TestProfiles in which the specified Test (with optionally, the SampleType) is included
+        ''' Read the TestProfiles in which the specified Test (Standard, ISE, Off-System or Calculated Test) - with optionally the SampleType - is included.
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
+        ''' <param name="pSampleType">Sample Type Code. Optional parameter.</param>
+        ''' <param name="pTestType">Type of Test (STD,ISE,OFFS,CALC). Optional parameter.</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestProfileTestsDS with the list
         '''          of Test Profiles in which the Test is included</returns>
         ''' <remarks>
         ''' Created by:  TR 24/11/2010
+        '''              WE 21/11/2014 - RQ00035C (BA-1867): change Summary and Parameter description.
         ''' </remarks>
         Public Function ReadByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
                                      Optional ByVal pSampleType As String = "", Optional ByVal pTestType As String = "STD") As GlobalDataTO
