@@ -800,10 +800,12 @@ Namespace Biosystems.Ax00.BL
         ''' Validate if the deletion of the specified OFF-SYSTEM Tests (due to deletion of the Off-System Test or having updated its Sample Type)
         ''' affects Test Profiles and/or Calculated Tests in which they are included.
         ''' For each Off-System Test to be deleted or having its Sample Type updated, search the list of affected elements:
-        '''   1-Test Profiles containing the Off-System Test.
-        '''   2-Calculated Tests containing the Off-System Test in their Formula
-        '''     2.1-Test Profiles containing each affected Calculated Test.
-        '''     2.2-Calculated Tests containing each affected Calculated Test (from step 2) in their Formula.
+        '''   1 - Test Profiles containing the Off-System Test.
+        '''   2 - Calculated Tests containing the Off-System Test in their Formula
+        '''     2.1 - Calculated Tests containing each affected Calculated Test (from step 2) in their Formula.
+        '''       2.1.1 - Test Profiles containing each affected Calculated Test (from step 2.1) in their Formula.
+        '''     2.2 - Test Profiles containing each affected Calculated Test (from step 2).
+        '''     
         ''' </summary>
         ''' <param name="pOffSystemTestsDS">Typed DataSet OffSystemTestsDS containing the list of OFF-SYSTEM Test(s)
         '''                                 selected to be deleted, or containing the OFF-SYSTEM Test to be updated.</param>
@@ -811,6 +813,9 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  SA 03/11/2011
         ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): Extend with Calculated Tests as possible affected elements.
+        '''              WE 26/11/2015 - RQ00035C (BA-1867): - Solved issue regarding not selecting Test Profiles that contain affected Calculated Tests (2.2).
+        '''                                                  - Column 'Additional Information' in the Affected Elements Warning is now showing the correct data.
+        '''                                                  - Disabled myDependenciesElementsRow.Related because it is not being used anywhere.
         ''' </remarks>
         Public Function ValidatedDependencies(ByVal pOffSystemTestsDS As OffSystemTestsDS) As GlobalDataTO
             Dim myResult As New GlobalDataTO
@@ -833,6 +838,7 @@ Namespace Biosystems.Ax00.BL
                 imageBytesTPROF = preloadedDataConfig.GetIconImage("PROFILES")
                 imageBytesTCALC = preloadedDataConfig.GetIconImage("TCALC")
 
+                ' Search for each Off-System Test all its affected elements (Calculated Tests (2 levels) and Profiles (3 levels).
                 For Each offSystemTestRow As OffSystemTestsDS.tparOffSystemTestsRow In pOffSystemTestsDS.tparOffSystemTests.Rows
                     ' 1. Get the Test Profiles in which the OFF-SYSTEM Test is included.
 
@@ -853,14 +859,15 @@ Namespace Biosystems.Ax00.BL
                             myDependenciesElementsRow.Name = testProfTest.TestProfileName
                             myDependenciesElementsRow.FormProfileMember = offSystemTestRow.Name
 
-                            'Insert on dependencies table
+                            'Insert in dependencies table
                             myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
                         Next
                     Else
-                        'Error verifying affected Test Profiles
+                        'Error verifying affected Test Profiles - 1st level
                         'myResult = myGlobalDataTO
                         Exit For
                     End If
+                    ' END OF 1. Get the Test Profiles in which the OFF-SYSTEM Test is included.
 
                     ' 2. Verify affected Calculated Tests (Calculated Tests having the deleted Off-System Test included in their Formula).
                     myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, offSystemTestRow.OffSystemTestID, "", "OFFS")
@@ -873,56 +880,83 @@ Namespace Biosystems.Ax00.BL
                             myDependenciesElementsRow.Type = imageBytesTCALC
                             myDependenciesElementsRow.Name = formRow.TestName
                             myDependenciesElementsRow.FormProfileMember = "=" & formRow.FormulaText
-                            myDependenciesElementsRow.Related = False
+                            'myDependenciesElementsRow.Related = False
 
                             myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
 
                             ' For the affected Calculated Test: 
-                            ' 2.1 - Search if it is included in the Formula of other Calculated Tests.
+                            ' 2.1 - Search if it is included in the Formula of other Calculated Tests (nested Calculated Test).
                             myGlobalDataTO = myFormulasDelegate.ReadFormulaByTestID(Nothing, formRow.CalcTestID, formRow.SampleType, "CALC")
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 myRelatedElements = DirectCast(myGlobalDataTO.SetDatos, FormulasDS)
 
                                 For Each relatedElementRow As FormulasDS.tparFormulasRow In myRelatedElements.tparFormulas.Rows
-                                    myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+ 
+                                    ' Check if current Calc.Test has not already been added to the Dependencies List in the Outer For Each loop.
+                                    If (myFormulasDS.tparFormulas.ToList.Where(Function(a) a.CalcTestID = CInt(relatedElementRow.CalcTestID)).Count = 0) Then
+                                        myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
 
-                                    myDependenciesElementsRow.Type = imageBytesTCALC
-                                    myDependenciesElementsRow.Name = relatedElementRow.TestName
-                                    myDependenciesElementsRow.FormProfileMember = "=" & relatedElementRow.FormulaText
-                                    myDependenciesElementsRow.Related = True
+                                        myDependenciesElementsRow.Type = imageBytesTCALC
+                                        myDependenciesElementsRow.Name = relatedElementRow.TestName
+                                        myDependenciesElementsRow.FormProfileMember = formRow.TestName    ' "=" & relatedElementRow.FormulaText
+                                        'myDependenciesElementsRow.Related = True
 
-                                    myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+                                        myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
 
-                                    ' 2.2 - Search if it is included in Test Profiles.
-                                    myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, relatedElementRow.CalcTestID, relatedElementRow.SampleType, "CALC")
-                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                        myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
+                                        ' 2.1.1 - Search if current Calculated Test (nested) is included in any Test Profile.
+                                        myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, relatedElementRow.CalcTestID, relatedElementRow.SampleType, "CALC")
+                                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                            myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
 
-                                        For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
-                                            myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+                                            For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
+                                                myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
 
-                                            myDependenciesElementsRow.Type = imageBytesTPROF
-                                            myDependenciesElementsRow.Name = testProfTest.TestProfileName
-                                            myDependenciesElementsRow.FormProfileMember = offSystemTestRow.Name
+                                                myDependenciesElementsRow.Type = imageBytesTPROF
+                                                myDependenciesElementsRow.Name = testProfTest.TestProfileName
+                                                myDependenciesElementsRow.FormProfileMember = relatedElementRow.TestName    ' offSystemTestRow.Name
 
-                                            myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
-                                        Next
-                                    Else
-                                        'Error verifying affected Test Profiles - 2nd level
-                                        Exit For
+                                                myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+                                            Next
+                                        Else
+                                            'Error verifying affected Test Profiles - 3rd level
+                                            Exit For
+                                        End If
                                     End If
                                 Next
                             Else
                                 'Error verifying affected Calculated Tests - 2nd level
                                 Exit For
                             End If
+                            ' END OF 2.1 - Search if it is included in the Formula of other Calculated Tests (nested Calculated Test).
+
+                            ' 2.2 - Search if the current Calculated Test is included in any Test Profile.
+                            myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, formRow.CalcTestID, formRow.SampleType, "CALC")
+                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
+
+                                For Each testProfTest As TestProfileTestsDS.tparTestProfileTestsRow In myTestProfileTestDS.tparTestProfileTests.Rows
+                                    myDependenciesElementsRow = myDependeciesElementsDS.DependenciesElements.NewDependenciesElementsRow()
+
+                                    myDependenciesElementsRow.Type = imageBytesTPROF
+                                    myDependenciesElementsRow.Name = testProfTest.TestProfileName
+                                    myDependenciesElementsRow.FormProfileMember = formRow.TestName   ' offSystemTestRow.Name
+
+                                    myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
+                                Next
+                            Else
+                                'Error verifying affected Test Profiles - 2nd level
+                                Exit For
+                            End If
+
                         Next
                     Else
-                        'Error verifying affected Calculated Tests
+                        'Error verifying affected Calculated Tests - 2nd level
                         Exit For
                     End If
+                    ' END OF 2. Verify affected Calculated Tests (Calculated Tests having the deleted Off-System Test included in their Formula).
 
                 Next
+                ' END OF Search for each Off-System Test all its affected elements (Calculated Tests (2 levels) and Profiles (3 levels).
 
                 imageBytesTPROF = Nothing
                 imageBytesTCALC = Nothing
