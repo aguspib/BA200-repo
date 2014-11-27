@@ -5198,7 +5198,9 @@ Public Class IProgTest
     ''' <summary>
     ''' Create new test localy
     ''' </summary>
-    ''' <remarks></remarks>
+    ''' <remarks>
+    ''' Modified by XB 26/11/2014 - Correction - BA-2141
+    ''' </remarks>
     Private Sub CreateNewTest()
         Try
             Dim NewTestRow As TestsDS.tparTestsRow
@@ -5264,7 +5266,11 @@ Public Class IProgTest
                 NewTestRow.KineticBlankLimit = CType(KineticBlankUpDown.Value, Integer)
             End If
 
-            NewTestRow.TestVersionNumber = 1
+            ' XB 26/11/2014 - BA-2141
+            'NewTestRow.TestVersionNumber = 1
+            NewTestRow.TestVersionNumber = 0
+            ' XB 26/11/2014 - BA-2141
+
             NewTestRow.TestVersionDateTime = DateTime.Now
             NewTestRow.InUse = False
             NewTestRow.TS_User = GetApplicationInfoSession.UserName

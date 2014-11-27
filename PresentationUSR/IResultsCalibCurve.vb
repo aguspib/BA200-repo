@@ -1611,6 +1611,7 @@ Public Class IResultsCalibCurve
     '''             AG 18/07/2012 - filter also by sample type
     '''             XB 30/07/2014 - BA-1863
     '''             XB 23/09/2014 - Add TestVersion field to can filter by it when select the calibrator chart result from Historics - BA-1863
+    '''             XB 26/11/2014 - correction of last point, because from current results this field maybe 0 or 1 - BA-2141
     ''' </remarks>
     Private Sub UpdateCalibratorsMuliItemDataGrid(ByVal pTestName As String, ByVal pSampleType As String)
         Try
@@ -1630,6 +1631,10 @@ Public Class IResultsCalibCurve
 
             'dgv.Rows.Clear()
             'Set the rows count for the Collapse Column
+
+            ' XB 26/11/2014 - BA-2141
+            Dim TheoreticalConcList As List(Of Single)
+
             If Not HistoricalModeField Then 'AG 17/10/2012 - collapse only when current WS results
                 CType(dgv.Columns(CollapseColName), bsDataGridViewCollapseColumn).RowsCount = 0
 
@@ -1651,28 +1656,43 @@ Public Class IResultsCalibCurve
 
                 myOrderTestID = TestList(0).OrderTestID
 
-                ' From Current Results, TestVersion is always = 0
-                myTestVersion = 0
-                ' XB 30/07/2014 - BA-1863
+                ' XB 26/11/2014 - here TestVersion field is not required - BA-2141
+                '' From Current Results, TestVersion is always = 0
+                'myTestVersion = 0
+                '' XB 30/07/2014 - BA-1863
+                TheoreticalConcList = (From row In AverageResults.vwksResults _
+                                       Where row.OrderTestID = myOrderTestID _
+                                       AndAlso (Not row.IsTestVersionNull) _
+                                       Select row.TheoricalConcentration Distinct).ToList()
+                ' XB 26/11/2014 - BA-2141
             Else
                 myOrderTestID = SelectedOrderTestIDField
 
                 myTestVersion = SelectedTestVersionNumberField
                 ' XB 30/07/2014 - BA-1863
 
+                ' XB 26/11/2014 - BA-2141
+                TheoreticalConcList = (From row In AverageResults.vwksResults _
+                                        Where row.OrderTestID = myOrderTestID _
+                                        AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
+                                        Select row.TheoricalConcentration Distinct).ToList()
+                ' XB 26/11/2014 - BA-2141
+
             End If
 
-            ' XB 30/07/2014 - BA-1863
+            ' XB 26/11/2014 - correction: this query is moved above inside every case, current results or historic results - BA-2141
+            '' XB 30/07/2014 - BA-1863
+            ''Dim TheoreticalConcList As List(Of Single) = _
+            ''                (From row In AverageResults.vwksResults _
+            ''                 Where row.OrderTestID = TestList(0).OrderTestID _
+            ''                 Select row.TheoricalConcentration Distinct).ToList()
             'Dim TheoreticalConcList As List(Of Single) = _
-            '                (From row In AverageResults.vwksResults _
-            '                 Where row.OrderTestID = TestList(0).OrderTestID _
-            '                 Select row.TheoricalConcentration Distinct).ToList()
-            Dim TheoreticalConcList As List(Of Single) = _
-                  (From row In AverageResults.vwksResults _
-                   Where row.OrderTestID = myOrderTestID _
-                 AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
-                   Select row.TheoricalConcentration Distinct).ToList()
-            ' XB 30/07/2014 - BA-1863
+            '      (From row In AverageResults.vwksResults _
+            '       Where row.OrderTestID = myOrderTestID _
+            '     AndAlso (Not row.IsTestVersionNull AndAlso row.TestVersion = myTestVersion) _
+            '       Select row.TheoricalConcentration Distinct).ToList()
+            '' XB 30/07/2014 - BA-1863
+            ' XB 26/11/2014 - BA-2141
 
             If TheoreticalConcList.Count = 0 Then
                 For j As Integer = 0 To dgv.Rows.Count - 1

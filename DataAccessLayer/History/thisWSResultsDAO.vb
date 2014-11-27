@@ -478,6 +478,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTo with dataset as ResultsDS.ReportCalibCurve</returns>
         ''' <remarks>
         ''' Created by XB 30/07/2014 - BT #1863
+        ''' Modified by XB 26/11/2014 - Correction: add HR.CurveSlope , HR.CurveOffset, HR.CurveCorrelation fields - BA-2141
         ''' </remarks>
         Public Function GetResultsCalibCurveForReport(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                       ByVal pAnalyzerID As String, _
@@ -500,7 +501,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   "       CAST(HR.RelativeErrorCurve AS DECIMAL(20,4)) AS RelativeErrorCurve, " & _
                                   "       HR.CalibratorBlankAbsUsed, HTS.CurveGrowthType, HTS.CurveType, HTS.CurveAxisXType, " & _
                                   "       HTS.CurveAxisYType, HTS.TestLongName, HTCV.TheoreticalConcentration As TheoricalConcentration, " & _
-                                  "       MD.FixedItemDesc As MeasureUnit " & _
+                                  "       MD.FixedItemDesc As MeasureUnit, HR.CurveSlope , HR.CurveOffset, HR.CurveCorrelation " & _
                                   " FROM thisWSResults HR INNER JOIN thisWSOrderTests HOT ON HR.HistOrderTestID = HOT.HistOrderTestID " & _
                                   "                       INNER JOIN thisTestSamples HTS ON HOT.HistTestID = HTS.HistTestID AND HOT.SampleType = HTS.SampleType " & _
                                   "                                                     AND HOT.TestVersionNumber = HTS.TestVersionNumber " & _
