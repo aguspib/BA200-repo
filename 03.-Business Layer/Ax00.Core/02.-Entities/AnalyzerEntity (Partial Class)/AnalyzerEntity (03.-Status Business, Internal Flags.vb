@@ -1169,7 +1169,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'From RUNNING to STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And pNewStatusValue = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             '1) Maybe there are some messages that can be shown
-                            If baselineParametersFailuresAttribute Then
+                            If WELLbaselineParametersFailuresAttribute Then
                                 'Prepare DS for inform presentation
                                 'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
                                 resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, GlobalEnumerates.Alarms.BASELINE_WELL_WARN.ToString, True)

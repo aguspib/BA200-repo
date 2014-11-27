@@ -50,7 +50,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         WriteOnly Property SetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single
         ReadOnly Property MaxWaitTime() As Integer
         ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean
-        ReadOnly Property ShowBaseLineParameterFailedMessage() As Boolean
+        ReadOnly Property ShowBaseLineWellRejectionParameterFailedMessage() As Boolean
         ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable
         ReadOnly Property ValidALIGHT() As Boolean
         ReadOnly Property ExistsALIGHT() As Boolean

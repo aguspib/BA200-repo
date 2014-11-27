@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
         Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
-        Private BASELINE_INIT_FAILURES As Integer = 2 'Default initial value for MAX baseline failures without warning (real value will be read in the Init method)
+        Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX baseline failures without warning (real value will be read in the Init method)
         Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm
         Private WELL_OFFSET_FOR_PREDILUTION As Integer = 4 'Default well offset until next request when a PTEST instruction is sent
         Private WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
@@ -190,8 +190,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private validALIGHTAttribute As Boolean = False 'AG - inform if exist an valid ALIGHT results (twksWSBLines table)
         Private existsALIGHTAttribute As Boolean = False 'AG 20/06/2012
-        Private baselineInitializationFailuresAttribute As Integer = 0 'Alight and well base line initialization failures (used for repeat instructions or show messages)
-        Private baselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
+        Private baselineInitializationFailuresAttribute As Integer = 0 'Alight, Flight and well base line initialization failures (used for repeat instructions or show messages)
+        Private WELLbaselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
 
 
         'AG 01/04/2011 - Analyzer numerical values attributes (for inform the presentation is needed)
@@ -755,18 +755,25 @@ Namespace Biosystems.Ax00.Core.Entities
             End Get
         End Property
 
+
+        ''' <summary>
+        ''' ALIGHT fails or FLIGHT fails (all tentatives)
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineInitializationFailedMessage
             Get
-                Return CBool(IIf(baselineInitializationFailuresAttribute >= BASELINE_INIT_FAILURES, True, False))
+                Return CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False))
             End Get
 
         End Property
 
 
-        Public ReadOnly Property ShowBaseLineParameterFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineParameterFailedMessage
+        Public ReadOnly Property ShowBaseLineWellRejectionParameterFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineWellRejectionParameterFailedMessage
             Get
-                Dim result As Boolean = CBool(IIf(AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING And baselineParametersFailuresAttribute, True, False))
-                If result Then baselineParametersFailuresAttribute = False 'Once the alarm is shown clear this flag
+                Dim result As Boolean = CBool(IIf(AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING And WELLbaselineParametersFailuresAttribute, True, False))
+                If result Then WELLbaselineParametersFailuresAttribute = False 'Once the alarm is shown clear this flag
 
                 Return result
             End Get
@@ -1697,7 +1704,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
                             If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
                                 myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                                baselineParametersFailuresAttribute = False
+                                WELLbaselineParametersFailuresAttribute = False
                             End If
 
                             resultData = InitClassStructuresFromDataBase(dbConnection)
@@ -1747,7 +1754,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                             If showGlobeFlag Then
                                                 'Set this attribute to limit in order the alarm will be shown as monitor globe
-                                                baselineInitializationFailuresAttribute = BASELINE_INIT_FAILURES
+                                                baselineInitializationFailuresAttribute = ALIGHT_INIT_FAILURES
                                             End If
 
                                         End If
@@ -1826,7 +1833,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                       Where a.ParameterName = GlobalEnumerates.SwParameters.BLINE_INIT_FAILURES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
-                                BASELINE_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
+                                ALIGHT_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _

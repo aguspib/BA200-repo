@@ -576,7 +576,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If already exists (2on tentative also fails): If running -> Go to StandBy
                             If pAlarmStatusList(index) Then 'Alarm Exists
                                 baselineInitializationFailuresAttribute += 1
-                                If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < BASELINE_INIT_FAILURES Then
+                                If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
                                     'When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
                                     Dim SwParams As New SwParametersDelegate
                                     myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
@@ -683,13 +683,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                 '(NO, IMPLEMENT THIS BUSINESS, REJECTED!!!!) If no executions IN process -> Send ENDRUN, else do nothing (wait)
 
                                 'BUSINESS: Activate flag
-                                baselineParametersFailuresAttribute = True
+                                WELLbaselineParametersFailuresAttribute = True
 
                                 'PRESENTATION: Show message "Change methacrylate rotor is high recommend" when user performs Wup, Start or finish work session 
                                 '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
 
                             Else
-                                baselineParametersFailuresAttribute = False
+                                WELLbaselineParametersFailuresAttribute = False
                             End If
 
                             'Recover instruction error

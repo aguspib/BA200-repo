@@ -1187,7 +1187,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     If Not myGlobalDataTO.HasError Then
                                         'AG 28/02/2012
                                         'If AlarmList.Count = 0 Or baselineInitializationFailuresAttribute >= BASELINE_INIT_FAILURES Then
-                                        If validALIGHTAttribute Or baselineInitializationFailuresAttribute >= BASELINE_INIT_FAILURES Then
+                                        If validALIGHTAttribute Or baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
 
                                             'Inform flag for alight is finished
                                             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
@@ -3942,21 +3942,23 @@ Namespace Biosystems.Ax00.Core.Entities
                     alarmStatus = True
                 End If
 
-                'If still not active, generate base line alarm (error)
-                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                    If AlarmList.Count > 0 Then
-                        If GlobalBase.IsServiceAssembly Then
-                            'Alarms treatment for Service
-                        Else
-                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
-                        End If
+            Else
+                'Not valid results!! 1st time a new FLIGHT is send, if max tentatives wrong ... generate BASELINE_INIT_ERR error
+            End If
+
+            'If still not active, generate base line alarm (error)
+            If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                If AlarmList.Count > 0 Then
+                    If GlobalBase.IsServiceAssembly Then
+                        'Alarms treatment for Service
+                    Else
+                        Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                        myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                        Dim myLogAcciones As New ApplicationLogManager()
+                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
                     End If
                 End If
-
             End If
 
             Return validResults
