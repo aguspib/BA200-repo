@@ -822,7 +822,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                 If Not myGlobal.HasError Then
                                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                    baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
+                                    ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
                                     'AG 12/09/2011 - when change rotor is performed the ALIGHt well starts in 1, ignore the well field in status instruction (RPalazon, JGelabert, STortosa)
                                     'myGlobal = Me.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
                                     myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
@@ -924,7 +924,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
                                     If Not myGlobal.HasError Then
                                         'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                        baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
+                                        ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
                                         'AG 12/09/2011 - when change rotor is performed the ALIGHt well starts in 1, ignore the well field in status instruction (RPalazon, JGelabert, STortosa)
                                         'myGlobal = Me.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
                                         myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)

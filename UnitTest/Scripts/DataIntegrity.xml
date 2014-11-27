@@ -2589,7 +2589,7 @@
     <Version>3.04</Version>
     <Label>Count parameters that not depends by model</Label>
     <Script>
-      IF (SELECT COUNT(*) FROM tfmwSwParameters WHERE AnalyzerModel IS NOT NULL AND AnalyzerModel = 'A400') = 164
+      IF (SELECT COUNT(*) FROM tfmwSwParameters WHERE AnalyzerModel IS NULL) = 165
       SELECT 'True'
       ELSE
       SELECT 'False'

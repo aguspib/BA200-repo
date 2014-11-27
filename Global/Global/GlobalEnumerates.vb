@@ -506,7 +506,7 @@ Namespace Biosystems.Ax00.Global
             BL_WELLREJECT_INI_SD 'Max SD allowed during well rejection initialization
             BL_WELLREJECT_SD 'Max SD allowed during well rejection (running)
             BL_WELLREJECT_INI_WELLNUMBER 'Well number used in well rejection initialization
-            BLINE_INIT_FAILURES 'Number of failures of baseline initializations
+            BLINE_INIT_FAILURES 'Number of failures of baseline initializations (ALIGHT)
             MAX_REJECTED_WELLS 'Max number of rejected wells in reactions rotor
             MAX_REACTROTOR_DAYS 'Max days using the same reactions rotor
             MAX_REACTROTOR_WELLS 'Max wells in reactions rotor
@@ -753,7 +753,7 @@ Namespace Biosystems.Ax00.Global
             BL_TYPE_FOR_WELLREJECT
 
             BL_DYNAMIC_SD 'AG 26/11/2014 BA-2081
-
+            FLIGHT_INIT_FAILURES 'Number of failures of baseline initializations (FLIGHT)
         End Enum
 
 

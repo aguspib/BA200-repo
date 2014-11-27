@@ -1156,7 +1156,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Else ' Valid alight
                                         myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
                                         alarmStatus = False
-                                        baselineInitializationFailuresAttribute = 0
+                                        ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
                                     End If
 
                                     Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
@@ -3872,7 +3872,9 @@ Namespace Biosystems.Ax00.Core.Entities
                     If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END") And
                         (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") Then
 
-                        If (ProcessFlightReadAction(myAnalyzerFlagsDS)) Then
+                        'AG 27/11/2014 BA-2066
+                        'If (ProcessFlightReadAction(myAnalyzerFlagsDS)) Then
+                        If (ProcessFlightReadAction(myAnalyzerFlagsDS)) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
                             mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
                             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
@@ -3911,6 +3913,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        ''' AG 27/11/2014 BA-2066
         ''' </remarks>
         Private Function ProcessFlightReadAction(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As Boolean
 
@@ -3932,6 +3935,8 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
             If validResults Then
+                ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
+
                 '3.1 Prepare data for the 1st reactions rotor turn in worksession (BA-2065)
                 myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
@@ -3943,7 +3948,13 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Else
+                'AG 27/11/2014 BA-2066
                 'Not valid results!! 1st time a new FLIGHT is send, if max tentatives wrong ... generate BASELINE_INIT_ERR error
+                dynamicbaselineInitializationFailuresAttribute += 1
+                If dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
+                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                    alarmStatus = True
+                End If
             End If
 
             'If still not active, generate base line alarm (error)
@@ -4062,6 +4073,17 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
             End If
             'AG 16/05/2012
+        End Sub
+
+
+        ''' <summary>
+        ''' Reset the baseline failed tentatives (ALIGHT and FLIGHT) when valid results are received
+        ''' 
+        ''' </summary>
+        ''' <remarks>AG 27/11/2014 BA-2066</remarks>
+        Private Sub ResetBaseLineFailuresCounters()
+            baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
+            dynamicbaselineInitializationFailuresAttribute = 0 'Reset FLIGHT failures counter
         End Sub
 
 

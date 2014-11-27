@@ -64,7 +64,9 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
         Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
-        Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX baseline failures without warning (real value will be read in the Init method)
+        Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX ALIGHT failures without warning (real value will be read in the Init method)
+        Private FLIGHT_INIT_FAILURES As Integer = 2 'AG 27/11/2014 BA-2066 - Default initial value for MAX FLIGHT failures without warning (real value will be read in the Init method)
+
         Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm
         Private WELL_OFFSET_FOR_PREDILUTION As Integer = 4 'Default well offset until next request when a PTEST instruction is sent
         Private WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
@@ -190,8 +192,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
         Private validALIGHTAttribute As Boolean = False 'AG - inform if exist an valid ALIGHT results (twksWSBLines table)
         Private existsALIGHTAttribute As Boolean = False 'AG 20/06/2012
-        Private baselineInitializationFailuresAttribute As Integer = 0 'Alight, Flight and well base line initialization failures (used for repeat instructions or show messages)
+        Private baselineInitializationFailuresAttribute As Integer = 0 'Alight base line initialization failures (used for repeat instructions or show messages)
+        Private dynamicbaselineInitializationFailuresAttribute As Integer = 0 'AG 27/11/2014 BA-2066 Flight base line initialization failures (used for repeat instructions or show messages)
         Private WELLbaselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
+
 
 
         'AG 01/04/2011 - Analyzer numerical values attributes (for inform the presentation is needed)
@@ -761,10 +765,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <value></value>
         ''' <returns></returns>
-        ''' <remarks></remarks>
+        ''' <remarks>Modify AG 27/11/2014 BA-2066</remarks>
         Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineInitializationFailedMessage
             Get
-                Return CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False))
+                'Return CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False))
+                Return (CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False)) OrElse CBool(IIf(dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES, True, False)))
             End Get
 
         End Property
@@ -1874,6 +1879,14 @@ Namespace Biosystems.Ax00.Core.Entities
                                 WELL_OFFSET_FOR_ISETEST_URI = CInt(myQRes(0).ValueNumeric)  'Well offset for ise test (uri) (cycles until Fw activates the biochemical request after receive an URI isetest)
                             End If
                             'AG 12/07/2012
+
+                            'AG 27/11/2014 BA-2066
+                            myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
+                                      Where a.ParameterName = GlobalEnumerates.SwParameters.FLIGHT_INIT_FAILURES.ToString Select a).ToList
+                            If myQRes.Count > 0 Then
+                                FLIGHT_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
+                            End If
+
                             myQRes = Nothing 'AG 02/08/2012 - free memory
                         End If
                         'AG 02/05/2011
