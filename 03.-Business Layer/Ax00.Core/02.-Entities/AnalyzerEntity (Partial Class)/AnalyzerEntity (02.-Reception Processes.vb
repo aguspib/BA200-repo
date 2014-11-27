@@ -3821,6 +3821,10 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
 
             Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSFBLDReceived", EventLogEntryType.Error, False)
             End Try
@@ -3918,54 +3922,41 @@ Namespace Biosystems.Ax00.Core.Entities
             Dim alarmStatus As Boolean = False 'By default no alarm
             Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
 
-            '1. Validate results (BA-2081) - UNCOMMENT WHEN VALIDATED!!!
-            'myGlobal = BaseLine.ValidateDynamicBaseLinesResults(Nothing, AnalyzerIDAttribute)
-            'If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-            '    DynamicBLvalidResults = DirectCast(myGlobal.SetDatos, Boolean)
-            'ElseIf myGlobal.HasError Then
-            '    DynamicBLvalidResults = False
-            'End If
+            '1. Validate results (BA-2081)
+            myGlobal = BaseLine.ValidateDynamicBaseLinesResults(Nothing, AnalyzerIDAttribute)
+            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                validResults = DirectCast(myGlobal.SetDatos, Boolean)
+            ElseIf myGlobal.HasError Then
+                validResults = False
+            End If
 
-            '2. If not valid try 1 FLIGHT rerun
-            If Not validResults Then
-                'If 1st time try again
-                'Else generate alarm BASELINE_INIT_ERR (change reactions rotor required)
 
-            Else
+            If validResults Then
                 '3.1 Prepare data for the 1st reactions rotor turn in worksession (BA-2065)
                 myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
-
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)
                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
-
-                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                    If AlarmList.Count > 0 Then
-                        If GlobalBase.IsServiceAssembly Then
-                            'Alarms treatment for Service
-                        Else
-                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Treat alarms (dynamic base line converted to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ManageStandByStatus", EventLogEntryType.Information, False) 'AG 28/06/2012
-                        End If
-                    End If
                 ElseIf myGlobal.HasError Then
-                    'If not active generate base line alarm (error)
-                    'TODO
+                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                    alarmStatus = True
                 End If
 
-                '''' NO ES NECESARIO YA SE VALIDA FUERA
-                '3.2 Inform flag finished
-                'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
-
-                'TODO
-                'Send FLIGHT in empty mode and inform flag
-                'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty , "INI")
-
+                'If still not active, generate base line alarm (error)
+                PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                If AlarmList.Count > 0 Then
+                    If GlobalBase.IsServiceAssembly Then
+                        'Alarms treatment for Service
+                    Else
+                        Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                        myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                        Dim myLogAcciones As New ApplicationLogManager()
+                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                    End If
+                End If
             End If
 
-            Return False
+            Return validResults
 
         End Function
 
