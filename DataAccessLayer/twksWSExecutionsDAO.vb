@@ -5051,6 +5051,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet with the list of affected Executions</returns>
         ''' <remarks>
         ''' Created by:  SA 13/07/2012 
+        ''' Modified by: SA 28/11/2014 - BA-1616 ==> Changed the SQL Query to get also field KineticsLinear from table twksWSExecutions, needed to 
+        '''                                          initialize the Preparation structure (in CalculationsDelegate) in case of re-calculations
         ''' </remarks>
         Public Function GetExecutionsAffectedByNewBlankOrCalib(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                                ByVal pWorkSessionID As String, ByVal pTestID As Integer, Optional ByVal pSampleType As String = "") _
@@ -5066,7 +5068,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT  WSE.ExecutionID, WSE.ExecutionStatus,  WSE.WorkSessionID, WSE.AnalyzerID, WSE.BaseLineID, WSE.WellUsed, " & vbCrLf & _
                                                        "  WSE.OrderTestID, WSE.PostDilutionType, WSE.ReplicateNumber, WSE.RerunNumber, WSE.MultiItemNumber, " & vbCrLf & _
                                                        "  WSE.SampleClass, WSE.AdjustBaseLineID, WSE.ThermoWarningFlag, WSE.ClotValue, WSE.ExecutionType,  " & vbCrLf & _
-                                                       "  T.TestID, T.TestName, WSE.ValidReadings, WSE.CompleteReadings, OT.TestType, OT.SampleType, " & vbCrLf & _
+                                                       "  WSE.KineticsLinear, WSE.ValidReadings, WSE.CompleteReadings, T.TestID, T.TestName, OT.TestType, OT.SampleType, " & vbCrLf & _
                                                        "  OT.ReplicatesNumber AS ReplicatesTotalNum, OT.ControlID, OT.OrderID, O.SampleID " & vbCrLf & _
                                                 " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & vbCrLf & _
                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
@@ -5090,22 +5092,6 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
                             End Using
                         End Using
-
-                        'Dim cmdText As String = " SELECT * FROM vwksWSExecutionsResults " & vbCrLf & _
-                        '                        " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                        '                        " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                        '                        " AND    TestID = " & pTestID.ToString & vbCrLf & _
-                        '                        " AND    ExecutionStatus = 'CLOSED' " & vbCrLf & _
-                        '                        " AND    ExecutionType = 'PREP_STD' " & vbCrLf & _
-                        '                        " AND   (SampleClass = 'CTRL' OR SampleClass = 'PATIENT') " & vbCrLf & _
-                        '                        " ORDER BY SampleClass, ExecutionID " & vbCrLf
-
-                        'Dim executionDataDS As New ExecutionsDS
-                        'Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                        '    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        '        dbDataAdapter.Fill(executionDataDS.vwksWSExecutionsResults)
-                        '    End Using
-                        'End Using
 
                         resultData.SetDatos = executionDataDS
                         resultData.HasError = False
@@ -5324,7 +5310,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS with the list of Calibrator Executions for the specified 
         '''          Analyzer/WorkSession/OrderTestID/MultiItemNumber and ReplicateNumber (for all existing RerunNumbers)</returns>
         ''' <remarks>
-        ''' Created by: SA 09/07/2012
+        ''' Created by:  SA 09/07/2012
+        ''' Modified by: SA 28/11/2014 - BA-1616 ==> Changed the SQL Query to get also field KineticsLinear from table twksWSExecutions, needed to 
+        '''                                          initialize the Preparation structure (in CalculationsDelegate) in case of re-calculations
         ''' </remarks>
         Public Function ReadAffectedCalibExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                     ByVal pOrderTestID As Integer, ByVal pMultiItemNumber As Integer, ByVal pReplicateNumber As Integer) As GlobalDataTO
@@ -5339,7 +5327,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT  WSE.ExecutionID, WSE.ExecutionStatus,  WSE.WorkSessionID, WSE.AnalyzerID, WSE.BaseLineID, WSE.WellUsed, " & vbCrLf & _
                                                        "  WSE.OrderTestID, WSE.PostDilutionType, WSE.ReplicateNumber, WSE.RerunNumber, WSE.MultiItemNumber, " & vbCrLf & _
                                                        "  WSE.SampleClass, WSE.AdjustBaseLineID, WSE.ThermoWarningFlag, WSE.ClotValue, WSE.ExecutionType,  " & vbCrLf & _
-                                                       "  T.TestID, T.TestName, WSE.ValidReadings, WSE.CompleteReadings, OT.TestType, OT.SampleType, " & vbCrLf & _
+                                                       "  WSE.KineticsLinear, WSE.ValidReadings, WSE.CompleteReadings, T.TestID, T.TestName,  OT.TestType, OT.SampleType, " & vbCrLf & _
                                                        "  OT.ReplicatesNumber AS ReplicatesTotalNum, OT.ControlID, OT.OrderID, O.SampleID " & vbCrLf & _
                                                 " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & vbCrLf & _
                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
