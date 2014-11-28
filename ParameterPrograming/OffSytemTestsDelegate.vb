@@ -813,9 +813,12 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' Created by:  SA 03/11/2011
         ''' Modified by: WE 21/11/2014 - RQ00035C (BA-1867): Extend with Calculated Tests as possible affected elements.
-        '''              WE 26/11/2015 - RQ00035C (BA-1867): - Solved issue regarding not selecting Test Profiles that contain affected Calculated Tests (2.2).
-        '''                                                  - Column 'Additional Information' in the Affected Elements Warning is now showing the correct data.
-        '''                                                  - Disabled myDependenciesElementsRow.Related because it is not being used anywhere.
+        '''              WE 26/11/2015 - RQ00035C (BA-1867)/BA-2142: - Solved issue regarding not selecting Test Profiles that contain affected Calculated Tests (case 2.2).
+        '''                                                          - Column 'Additional Information' in the Affected Elements Warning is now showing the correct data.
+        '''                                                          - Disabled myDependenciesElementsRow.Related because it is not being used anywhere.
+        '''              WE 28/11/2015 - RQ00035C (BA-1867/BA-2142): Don´t pass Sample Type of the current Calculated Test because all Test Profiles must be returned
+        '''                                                          independent of the Test Profile's Sample Type. This is to assure that also Calculated Tests (nested)
+        '''                                                          of type Multiple will be returned (case 2.1.1 and 2.2).
         ''' </remarks>
         Public Function ValidatedDependencies(ByVal pOffSystemTestsDS As OffSystemTestsDS) As GlobalDataTO
             Dim myResult As New GlobalDataTO
@@ -904,7 +907,9 @@ Namespace Biosystems.Ax00.BL
                                         myDependeciesElementsDS.DependenciesElements.AddDependenciesElementsRow(myDependenciesElementsRow)
 
                                         ' 2.1.1 - Search if current Calculated Test (nested) is included in any Test Profile.
-                                        myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, relatedElementRow.CalcTestID, relatedElementRow.SampleType, "CALC")
+                                        ' Don´t pass Sample Type of the current Calculated Test (nested) because all Test Profiles must be returned independent of the Test Profile's Sample Type.
+                                        ' This is to assure that also Calculated Tests (nested) of type Multiple will be returned.
+                                        myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, relatedElementRow.CalcTestID, "", "CALC")
                                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                             myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
 
@@ -930,7 +935,9 @@ Namespace Biosystems.Ax00.BL
                             ' END OF 2.1 - Search if it is included in the Formula of other Calculated Tests (nested Calculated Test).
 
                             ' 2.2 - Search if the current Calculated Test is included in any Test Profile.
-                            myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, formRow.CalcTestID, formRow.SampleType, "CALC")
+                            ' Don´t pass Sample Type of the current Calculated Test because all Test Profiles must be returned independent of the Test Profile's Sample Type.
+                            ' This is to assure that also Calculated Tests of type Multiple will be returned.
+                            myGlobalDataTO = myTestProfilesTestDelegate.ReadByTestID(Nothing, formRow.CalcTestID, "", "CALC")
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 myTestProfileTestDS = DirectCast(myGlobalDataTO.SetDatos, TestProfileTestsDS)
 
