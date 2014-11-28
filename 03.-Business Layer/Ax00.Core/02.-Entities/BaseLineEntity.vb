@@ -206,13 +206,19 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
         ''' <summary>
-        ''' During class initialization gets the latest adjust base line values and latest well base line used in initialization parameter
+        ''' During class initialization gets the latest adjust base line values and latest well base line used in initialization parameter.
+        ''' Check:
+        ''' 1. Last STATIC base lines calculated with ALIGHT
+        ''' 2. Last DYNAMIC base lines calculated with FLIGHT
+        ''' 3. Last STATIC well base line calculates during RUNNING
+        ''' 4. Evaluate the rejected wells number, number of days from the last rotor change,... and other conditions
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <param name="pWorkSessionID"></param>
         ''' <returns>GlobalDataTo with setDatos as GlobalEnumerates.Alarms</returns>
-        ''' <remarks>AG 04/05/2011</remarks>
+        ''' <remarks>AG 04/05/2011
+        ''' AG 28/11/2014 BA-2081 during start app evaluate the last dynamic base line results too</remarks>
         Public Function GetLatestBaseLines(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                             ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO Implements IBaseLineEntity.GetLatestBaseLines
             Dim resultData As New GlobalDataTO
@@ -242,6 +248,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             Dim ALineDS As New BaseLinesDS
                             ALineDS = CType(resultData.SetDatos, BaseLinesDS)
+
+                            ' 1. Last STATIC base lines calculated with ALIGHT
                             If ALineDS.twksWSBaseLines.Rows.Count > 0 Then
                                 validAlightAttribute = False
                                 resultData = ControlAdjustBaseLine(dbConnection, ALineDS)
@@ -249,8 +257,22 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
 
-                                    'If adjust base line is OK then get current wells in rejection parameters
+                                    'AG 28/11/2014 BA-2081
                                     If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                        ' 2. Last DYNAMIC base lines calculated with FLIGHT
+                                        resultData = ValidateDynamicBaseLinesResults(dbConnection, pAnalyzerID)
+                                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+
+                                            'If not valid ---> Generate alarm
+                                            If Not DirectCast(resultData.SetDatos, Boolean) Then
+                                                myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                                            End If
+                                        End If
+                                    End If
+
+                                    If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                        'If adjust base line is OK then get current wells in rejection parameters
+                                        ' 3. Last STATIC well base line calculates during RUNNING
                                         Dim blinesWellDelegate As New WSBLinesByWellDelegate
                                         resultData = blinesWellDelegate.GetMeanWellBaseLineValues(dbConnection, pAnalyzerID, pWorkSessionID)
                                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
@@ -269,8 +291,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                         End If
                                     End If
 
-                                    'AG 07/03/2012 - ControlWellBaseLine only evaluates the results. If no error we must also
-                                    'evaluate the rejected wells number, the days from the last rotor change,... and other conditions
+                                    'AG 07/03/2012 - ControlWellBaseLine only evaluates the results. If no error we must also ...
+                                    '4. Evaluate the rejected wells number, number of days from the last rotor change,... and other conditions
                                     If myAlarm = GlobalEnumerates.Alarms.NONE Then
                                         Dim analyzerReactRotor As New AnalyzerReactionsRotorDelegate
                                         resultData = analyzerReactRotor.ChangeReactionsRotorRecommended(dbConnection, pAnalyzerID, pAnalyzerModel)
