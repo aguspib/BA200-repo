@@ -3054,7 +3054,8 @@ Public Class IResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 20/01/2011
-    ''' AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
+    ''' Modified by: AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
+    '''              XB 28/11/2014 - recalculates calculated tests also for OFFS tests - BA-1867
     ''' </remarks>
     Private Sub OpenOffSystemResultsScreen()
         Try
@@ -3077,6 +3078,17 @@ Public Class IResults
                         'Add/update/delete the results of OffSystem OrderTests
                         Dim myResultsDelegate As New ResultsDelegate(MyBase.AnalyzerModel)
                         resultData = myResultsDelegate.SaveOffSystemResults(Nothing, myOffSystemTestsResultsDS, AnalyzerIDField, WorkSessionIDField)
+
+                        ' XB 28/11/2014 - BA-1867
+                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        ' recalculate calculated tests
+                        For Each offSystemTestResult As OffSystemTestsResultsDS.OffSystemTestsResultsRow In myOffSystemTestsResultsDS.OffSystemTestsResults
+                            myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
+                            myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
+                            resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, offSystemTestResult.OrderTestID, True)
+                        Next
+                        ' XB 28/11/2014 - BA-1867
+
 
                         'TR 28/06/2013 -Prepare and send results to LIS.
                         If (Not resultData.HasError) Then

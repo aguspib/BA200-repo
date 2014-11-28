@@ -241,6 +241,7 @@ Partial Class IResults
     '''                              in the grid column for the result (CONC Value)
     '''              AG 22/09/2014 - BA-1940 show specimen in the grid (test name column ... specimen (TEST NAME) )
     '''                              Same format as in the results by test (patients)
+    '''              XB 28/11/2014 - Sort the CALC tests behind ISE anf OFFS too - BA-1867
     ''' </remarks>
     Private Sub UpdateExperimentalsDataGrid()
         Dim dgv As BSDataGridView = bsExperimentalsDataGridView
@@ -279,7 +280,12 @@ Partial Class IResults
             Dim sentRepetitionCriteria As String = String.Empty
 
             'AG 25/06/2012 - implement a loop for test type
-            Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+
+            ' XB 28/11/2014 - BA-1867
+            ' Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+            Dim TestType() As String = {"STD", "ISE", "OFFS", "CALC"}
+            ' XB 28/11/2014 - BA-1867
+
             For Each itemType As String In TestType
                 'AG 21/06/2012 - improve speed, search current patient results using LINQ and then apply loop only the linq results
                 Dim currentPatientAvgResultsList As List(Of ResultsDS.vwksResultsRow)

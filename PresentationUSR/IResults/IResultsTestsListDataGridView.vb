@@ -73,6 +73,7 @@ Partial Class IResults
     ''' Modified by: AG 01/12/2010 - Adapted for ISE and OFFS tests
     '''              SA 26/01/2011 - Besides the TestType Icon, inform also the Code in the correspondent hidden column
     '''              RH 02/02/2011 - Removed the hidden column for storing the code of the TestType
+    '''              XB 28/11/2014 - Sort the CALC tests behind ISE anf OFFS too - BA-1867
     ''' </remarks>
     Private Sub UpdateTestsListDataGrid()
         Try
@@ -82,7 +83,11 @@ Partial Class IResults
             Dim dgv As BSDataGridView = bsTestsListDataGridView
             Dim TestsList As List(Of ResultsDS.vwksResultsRow)
             Dim RowIndex As Integer = -1
-            Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+
+            ' XB 28/11/2014 - BA-1867
+            'Dim TestType() As String = {"STD", "CALC", "ISE", "OFFS"}
+            Dim TestType() As String = {"STD", "ISE", "OFFS", "CALC"}
+            ' XB 28/11/2014 - BA-1867
 
             ProcessEvent = False
             'TR 11/07/2012 -Declare Outside the for 

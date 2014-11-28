@@ -1203,7 +1203,7 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by: SA 16/07/2012 - Based in ChangeAcceptedResult
         ''' AG 16/10/2014 BA-2011
         '''     Inform new required parameters + add pExportStatus parameter
-        '''     #1 Change Accepted result for a PATIENT or CONTROL do not launch recalculations (but in case of PATIENTs recalculate affected calculated tests)
+        '''     #1 Change Accepted result for a PATIENT or CONTROL do not launch RecalculateResultsNEW (but in case of PATIENTs recalculate affected calculated tests ExecuteCalculatedTest)
         '''     #2 Set OrderToExport = TRUE when the new accepted result belongs a patient or a control and his export status is different than SENT
         ''' </remarks>
         Public Function ChangeAcceptedResultNEW(ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pExportStatus As String) As GlobalDataTO
@@ -1365,7 +1365,8 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by:  SA 09/07/2012 - Based in RecalculateResults
         ''' Modified by: SA 12/06/2014 - BT# 1660 ==> When the Result to recalculate is for an  ISETest/SampleType, new function RecalculateISEAverageValue is
         '''                                           called instead of the previous version function (RecalculateAverageValue)
-        ''' AG 15/10/2014 BA-2011 do not use optional parameters
+        '''              AG 15/10/2014 BA-2011 do not use optional parameters
+        '''              XB 28/11/2014 - recalculates calculated tests also for ISE tests - BA-1867
         ''' </remarks>
         Public Function RecalculateResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pSelectedExecRow As ExecutionsDS.vwksWSExecutionsResultsRow, _
                                               ByVal pExecToRecalculateRow As ExecutionsDS.vwksWSExecutionsResultsRow, ByVal pManualRecalculationFlag As Boolean, _
@@ -1468,6 +1469,16 @@ Namespace Biosystems.Ax00.Calculations
 
                 ElseIf (myRecalData.ExecutionType = "PREP_ISE" AndAlso myRecalData.ExecutionStatus = "CLOSED") Then
                     resultData = RecalculateISEAverageValue(Nothing, myRecalData.AnalyzerID, myRecalData.WorkSessionID, myRecalData.Execution)
+
+                    ' XB 28/11/2014 - BA-1867
+                    ' recalculate calculated tests
+                    If (pSelectedExecRow.SampleClass = "PATIENT") Then
+                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        myCalcTestsDelegate.AnalyzerID = pSelectedExecRow.AnalyzerID
+                        myCalcTestsDelegate.WorkSessionID = pSelectedExecRow.WorkSessionID
+                        resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, pSelectedExecRow.OrderTestID, True)
+                    End If
+                    ' XB 28/11/2014 - BA-1867
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     myLogAcciones.CreateLogActivity("Recalculate selected ISE result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
