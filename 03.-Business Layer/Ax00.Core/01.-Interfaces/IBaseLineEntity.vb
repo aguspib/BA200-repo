@@ -43,7 +43,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
 
 #Region "Events definition"
 
-        Event WellReactionsChanges(ByVal pReactionsRotorDS As ReactionsRotorDS)
+        Event WellReactionsChanges(ByVal pReactionsRotorDS As ReactionsRotorDS, ByVal pFromDynamicBaseLineProcessingFlag As Boolean)
 
 #End Region
 

@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
 #Region "Events definition"
         'Inform the well status changes due base line results
-        Public Event WellReactionsChanges(ByVal pReactionsRotorDS As ReactionsRotorDS) Implements IBaseLineEntity.WellReactionsChanges
+        Public Event WellReactionsChanges(ByVal pReactionsRotorDS As ReactionsRotorDS, ByVal pFromDynamicBaseLineProcessingFlag As Boolean) Implements IBaseLineEntity.WellReactionsChanges
 
 #End Region
 
@@ -853,7 +853,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     'AG 12/06/2012 - Finally raise event with the reactions rotor well new information
                     'AG 14/11/2014 BA-2065 raiseEvent during ANSPHR (STATIC) but not during ANSFBLD (DYNAMIC)
                     If Not pClassInitialization AndAlso pType = BaseLineType.STATIC AndAlso Not resultData.HasError AndAlso newReactionsWellsDS.twksWSReactionsRotor.Rows.Count > 0 Then
-                        RaiseEvent WellReactionsChanges(newReactionsWellsDS)
+                        RaiseEvent WellReactionsChanges(newReactionsWellsDS, False)
                     End If
 
                 Else
@@ -1002,7 +1002,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     Dim newWellsDS As New ReactionsRotorDS
                                     newWellsDS = DirectCast(resultData.SetDatos, ReactionsRotorDS)
-                                    RaiseEvent WellReactionsChanges(newWellsDS)
+                                    RaiseEvent WellReactionsChanges(newWellsDS, True)
                                 End If
                             End If
 
