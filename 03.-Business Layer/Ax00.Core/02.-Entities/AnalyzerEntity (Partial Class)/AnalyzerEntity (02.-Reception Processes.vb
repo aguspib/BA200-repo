@@ -3924,6 +3924,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' AG 27/11/2014 BA-2066
+        ''' AG 28/11/2014 BA-2066 reorganize code in order to refresh monitor when valid results and when much times invalid!!!
         ''' </remarks>
         Private Function ProcessFlightReadAction(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As Boolean
 
@@ -3946,43 +3947,40 @@ Namespace Biosystems.Ax00.Core.Entities
 
             If validResults Then
                 ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
+            Else
+                dynamicbaselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2066 - Increment tentatives number
+            End If
 
-                '3.1 Prepare data for the 1st reactions rotor turn in worksession (BA-2065)
+            '3.1 Prepare data for the 1st reactions rotor turn in worksession when valid results OR when max tentatives KO (BA-2066)
+            If validResults OrElse dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
                 myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                'Error or  max tentatives -- generate alarm
+                If myGlobal.HasError OrElse dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
+                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                    alarmStatus = True
+                ElseIf Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)
                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
-                ElseIf myGlobal.HasError Then
-                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
-                    alarmStatus = True
                 End If
 
-            Else
-                'AG 27/11/2014 BA-2066
-                'Not valid results!! 1st time a new FLIGHT is send, if max tentatives wrong ... generate BASELINE_INIT_ERR error
-                dynamicbaselineInitializationFailuresAttribute += 1
-                If dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
-                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
-                    alarmStatus = True
-                End If
             End If
 
-            'If still not active, generate base line alarm (error)
-            If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                If AlarmList.Count > 0 Then
-                    If GlobalBase.IsServiceAssembly Then
-                        'Alarms treatment for Service
-                    Else
-                        Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                        myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                'If still not active, generate base line alarm (error)
+                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                    If AlarmList.Count > 0 Then
+                        If GlobalBase.IsServiceAssembly Then
+                            'Alarms treatment for Service
+                        Else
+                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                        End If
                     End If
                 End If
-            End If
 
-            Return validResults
+                Return validResults
 
         End Function
 
