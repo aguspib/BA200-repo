@@ -2295,7 +2295,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
                     dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        baselineInitializationFailuresAttribute += 1
                         If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
                             'When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
                             Dim SwParams As New SwParametersDelegate

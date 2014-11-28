@@ -1152,6 +1152,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
                                         '    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
                                         'End If
+                                        baselineInitializationFailuresAttribute += 1
                                         If baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
                                             alarmStatus = True
                                             If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then

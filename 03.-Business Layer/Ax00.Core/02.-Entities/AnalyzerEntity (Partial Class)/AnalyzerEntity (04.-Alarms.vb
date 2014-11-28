@@ -575,7 +575,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If alarm is new: Automatically perform new Alight
                             'If already exists (2on tentative also fails): If running -> Go to StandBy
                             If pAlarmStatusList(index) Then 'Alarm Exists
-                                baselineInitializationFailuresAttribute += 1
+                                'baselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2144
                                 If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
                                     'AG 27/11/2014 BA-2144 comment code, business will be implemented in method SendAutomaticALIGHTRerun 
                                     ''When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
