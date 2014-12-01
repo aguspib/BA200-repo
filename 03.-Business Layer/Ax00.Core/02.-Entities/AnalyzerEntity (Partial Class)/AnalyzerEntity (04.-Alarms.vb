@@ -575,45 +575,45 @@ Namespace Biosystems.Ax00.Core.Entities
                             'If alarm is new: Automatically perform new Alight
                             'If already exists (2on tentative also fails): If running -> Go to StandBy
                             If pAlarmStatusList(index) Then 'Alarm Exists
-                                baselineInitializationFailuresAttribute += 1
+                                'baselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2144
                                 If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
-                                    'When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
-                                    Dim SwParams As New SwParametersDelegate
-                                    myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
-                                    If Not myGlobal.HasError Then
-                                        Dim SwParamsDS As New ParametersDS
-                                        SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
-                                        If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
-                                            Dim reactionsDelegate As New ReactionsRotorDelegate
-                                            CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
-                                        End If
-                                    End If
+                                    'AG 27/11/2014 BA-2144 comment code, business will be implemented in method SendAutomaticALIGHTRerun 
+                                    ''When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
+                                    'Dim SwParams As New SwParametersDelegate
+                                    'myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
+                                    'If Not myGlobal.HasError Then
+                                    '    Dim SwParamsDS As New ParametersDS
+                                    '    SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
+                                    '    If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
+                                    '        Dim reactionsDelegate As New ReactionsRotorDelegate
+                                    '        CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
+                                    '    End If
+                                    'End If
 
-                                    'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
-                                            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
-                                            myParamsQueue.Add(CurrentWellAttribute.ToString)
-                                        End If
-                                    End If
-                                    'AG 14/05/2012
+                                    ''AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+                                    ''myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                                    'If methodHasToAddInstructionToQueueFlag = 0 Then
+                                    '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                                    '    methodHasToAddInstructionToQueueFlag = 1
+                                    'ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+                                    '    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+                                    '    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
+                                    '        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
+                                    '        myParamsQueue.Add(CurrentWellAttribute.ToString)
+                                    '    End If
+                                    'End If
+                                    ''AG 14/05/2012
 
-                                    'When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                                    ''When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
+                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
 
-                                    'RUNNING
-                                    'AG 05/06/2012
-                                    'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
-                                    'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
-                                    '
-                                    'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
+
 
                                 ElseIf AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
+                                    'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
+                                    'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
+                                    'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
+
                                     Select Case wellBaseLineAutoPausesSession
                                         Case 0 'Nothing
 

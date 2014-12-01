@@ -1146,13 +1146,26 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                                     myAlarm = CType(myGlobalDataTO.SetDatos, GlobalEnumerates.Alarms)
                                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                                        alarmStatus = True
+                                        'AG 27/11/2014 BA-2144
+                                        'alarmStatus = True
 
-                                        'AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
-                                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
-                                            myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                        ''AG 28/02/2012 - If exits base line alarm delete it before send a new ALIGHT instruction
+                                        'If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                                        '    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                        'End If
+                                        baselineInitializationFailuresAttribute += 1
+                                        If baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES Then
+                                            alarmStatus = True
+                                            If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                                                myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                                            End If
+                                        Else
+                                            'No alarm!! Alarm will be generated when the ALIGHT fails the maximum times
+                                            myAlarm = GlobalEnumerates.Alarms.NONE
+                                            alarmStatus = True
+                                            myGlobalDataTO = SendAutomaticALIGHTRerun(dbConnection)
                                         End If
-
+                                        'AG 27/11/2014 BA-2144
 
                                     Else ' Valid alight
                                         myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
@@ -1162,24 +1175,21 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
                                     Dim AlarmStatusList As New List(Of Boolean)
-                                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList) 'Baseline_init_err (true or false)
 
-                                    'AG 23/05/2012 - Baseline err excludes methacrylate rotor warn
-                                    If alarmStatus AndAlso myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                                        myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                                    End If
-                                    'AG 23/05/2012
+                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                        PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList) 'Baseline_init_err (true or false)
+                                        'AG 23/05/2012 - Baseline err excludes methacrylate rotor warn
+                                        If alarmStatus AndAlso myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
+                                            myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                                        End If
+                                        'AG 23/05/2012
 
-                                    If AlarmList.Count > 0 Then
-                                        'myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                        If GlobalBase.IsServiceAssembly Then
-                                            ' XBC 17/10/2012 - Alarms treatment for Service
-                                            ' Not Apply
-                                            'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                                        Else
-                                            myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                                        If AlarmList.Count > 0 Then
+                                            If GlobalBase.IsServiceAssembly Then
+                                                'myGlobalDataTO = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
+                                            Else
+                                                myGlobalDataTO = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                                            End If
                                         End If
                                     End If
 
@@ -3841,6 +3851,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' AG 27/11/2014 BA-2066
+        ''' AG 28/11/2014 BA-2066 reorganize code in order to refresh monitor when valid results and when much times invalid!!!
         ''' </remarks>
         Private Function ProcessFlightReadAction(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As Boolean
 
@@ -3863,43 +3874,40 @@ Namespace Biosystems.Ax00.Core.Entities
 
             If validResults Then
                 ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
+            Else
+                dynamicbaselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2066 - Increment tentatives number
+            End If
 
-                '3.1 Prepare data for the 1st reactions rotor turn in worksession (BA-2065)
+            '3.1 Prepare data for the 1st reactions rotor turn in worksession when valid results OR when max tentatives KO (BA-2066)
+            If validResults OrElse dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
                 myGlobal = ProcessDynamicBaseLine(Nothing, WorkSessionIDAttribute, 1)
-                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                'Error or  max tentatives -- generate alarm
+                If myGlobal.HasError OrElse dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
+                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
+                    alarmStatus = True
+                ElseIf Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myAlarm = CType(myGlobal.SetDatos, GlobalEnumerates.Alarms)
                     If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
-                ElseIf myGlobal.HasError Then
-                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
-                    alarmStatus = True
                 End If
 
-            Else
-                'AG 27/11/2014 BA-2066
-                'Not valid results!! 1st time a new FLIGHT is send, if max tentatives wrong ... generate BASELINE_INIT_ERR error
-                dynamicbaselineInitializationFailuresAttribute += 1
-                If dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES Then
-                    myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
-                    alarmStatus = True
-                End If
             End If
 
-            'If still not active, generate base line alarm (error)
-            If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                If AlarmList.Count > 0 Then
-                    If GlobalBase.IsServiceAssembly Then
-                        'Alarms treatment for Service
-                    Else
-                        Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                        myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                'If still not active, generate base line alarm (error)
+                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                    If AlarmList.Count > 0 Then
+                        If GlobalBase.IsServiceAssembly Then
+                            'Alarms treatment for Service
+                        Else
+                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                        End If
                     End If
                 End If
-            End If
 
-            Return validResults
+                Return validResults
 
         End Function
 
