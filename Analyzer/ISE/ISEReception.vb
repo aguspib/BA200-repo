@@ -348,6 +348,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                                               one than exists and applies)
         '''                                          ** Changed the way of getting Alarms for the Average Result, due to the previous process has several errors
         '''                                          ** For CONTROLS it is not needed to update field AcceptedResultFlag = FALSE for the previous Rerun results
+        ''' Modified by XB 28/11/2014 - recalculates calculated tests for ISE tests - BA-1867
         ''' </remarks>
         Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
                                                  ByVal pISEMode As String, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
@@ -430,6 +431,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim myCalc As New RecalculateResultsDelegate
                             Dim myExecutionDelegate As New ExecutionsDelegate
                             Dim myCalculationISEDelegate As New CalculationISEDelegate
+
+                            ' XB 28/11/2014 - BA-1867
+                            Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
 
                             myGlobalDataTO = myExecutionDelegate.GetExecutionByPreparationID(dbConnection, pPreparationID, pWorkSessionID, pAnalyzerID, True)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
@@ -665,6 +669,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         'Delete all Alarms saved previously for the Average Result
                                         myGlobalDataTO = myResultAlarmsDelegate.DeleteAll(dbConnection, resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
                                         If (myGlobalDataTO.HasError) Then Exit For
+
                                     Next
                                 End If
 
@@ -686,6 +691,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         If (execRow.ReplicatesTotalNum = execRow.ReplicateNumber) Then
                                             myGlobalDataTO = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, execRow.OrderTestID, "CLOSED")
                                             If (myGlobalDataTO.HasError) Then Exit For
+
+
+                                            ' XB 28/11/2014 - BA-1867
+                                            ' recalculate calculated tests
+                                            myCalcTestsDelegate.AnalyzerID = pAnalyzerID
+                                            myCalcTestsDelegate.WorkSessionID = pWorkSessionID
+                                            myGlobalDataTO = myCalcTestsDelegate.ExecuteCalculatedTest(dbConnection, execRow.OrderTestID, True)
+                                            If (myGlobalDataTO.HasError) Then Exit For
+                                            ' XB 28/11/2014 - BA-1867
                                         End If
                                     Next
                                 End If
@@ -741,6 +755,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'The ExecutionsDS will be the function return value
                                 myReturnValue = myExecutionDS
                             End If
+
+                            ' XB 28/11/2014 - BA-1867
+                            myCalcTestsDelegate = Nothing
 
                         ElseIf (myGlobalDataTO.HasError) Then
                             'Get all ISE Executions for the informed PreparationID
@@ -2910,6 +2927,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         Dim myCalc As New RecalculateResultsDelegate
                                         myGlobalDataTO = myCalc.IsValidISERefRanges(dbConnection, execRow.OrderTestID, execRow.TestID, execRow.SampleType, execRow.CONC_Value)
                                         'XBC 16/02/2012
+
 
                                         If (Not myGlobalDataTO.HasError AndAlso Not CBool(myGlobalDataTO.SetDatos)) Then
                                             'Fill the result alarm DataRow
