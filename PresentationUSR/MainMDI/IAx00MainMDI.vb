@@ -3215,10 +3215,12 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>
     ''' Created by:  AG 01/06/2010 - Tested: ok
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 01/12/2014 - BA-2075
     ''' </remarks>
     Private Sub bsTSStartInstrumentButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSStartInstrumentButton.Click
         Try
             Dim myGlobal As New GlobalDataTO
+            Dim activateButtonsFlag As Boolean = False
 
             CreateLogActivity("Btn Instrument", Me.Name & ".bsTSStartInstrumentButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
@@ -3246,93 +3248,54 @@ Partial Public Class IAx00MainMDI
             'AG 23/05/2012
 
             If ChangeReactionsRotorRecommendedWarning = 0 Then 'If no message shown then send instruction
-                If (AnalyzerController.IsAnalyzerInstantiated) Then
-                    AnalyzerController.Instance.Analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
 
-                    Dim activateButtonsFlag As Boolean = False
-                    Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
-                    myCurrentAlarms = AnalyzerController.Instance.Analyzer.Alarms
+                'Disable all buttons until Ax00 accept the new instruction
+                SetActionButtonsEnableProperty(False)
 
-                    'Disable all buttons until Ax00 accept the new instruction
-                    SetActionButtonsEnableProperty(False)
+                'DL 17/05/2012
+                SetEnableMainTab(False, True) 'DL 26/03/2012 test
+                ChangeErrorStatusLabel(True) 'AG 18/05/2012 - Clear error provider 
 
-                    'DL 17/05/2012
-                    SetEnableMainTab(False, True) 'DL 26/03/2012 test
-                    ChangeErrorStatusLabel(True) 'AG 18/05/2012 - Clear error provider 
-                    AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
-                    'DL 17/05/2012
+                If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
+                    'Show message
+                    ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
+                    activateButtonsFlag = True
 
-                    'AG 20/02/2012 - The following condition is added into a public method
-                    ''AG 30/09/2011 - before continue warm up check for current alarms
-                    'If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso (myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                    '   OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
-                    '   OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) _
-                    '   OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)) Then
-                    If AnalyzerController.Instance.Analyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
-                        'AG 20/02/2012
+                    'AG 12/03/2012
+                    'NOTE: This button is disable while the REACT_ROTOR_MISSING alarm exist. In other way we have to implement a new elseIf case
+                    'Continue the process on the aborted task (Washing)
+                Else
+                    myGlobal = AnalyzerController.Instance.StartWarmUpProcess() 'BA-2075
 
-                        'Show message
-                        ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-                        activateButtonsFlag = True
+                    If Not myGlobal.HasError Then
+                        If AnalyzerController.Instance.Analyzer.Connected Then
+                            ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
 
-                        'AG 12/03/2012
-                        'NOTE: This button is disable while the REACT_ROTOR_MISSING alarm exist. In other way we have to implement a new elseIf case
-                        'Continue the process on the aborted task (Washing)
-
-                    ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED", False) = 0 Then
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "" 'Reset flag
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
-
-                        'Do nothing
-                        'When Sw receives the ANSINFO if no bottle alarm the proper instruction will be sent
-                        'Continue the process on the aborted task (Adjust base light)
-
-                    ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED", False) = 0 Then
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
-
-                        'Do nothing
-                        'When Sw receives the ANSINFO if no bottle alarm the proper instruction will be sent
-                        'If no previous start instrument canceled ... start the whole process: sent the standby
-
-                    Else
-                        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 'clear sensor
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "" 'Reset flag
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "" 'Reset flag
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
-                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
-                        myGlobal = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
-
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                            If Not AnalyzerController.Instance.Analyzer.Connected Then
-                                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = ""
-                                'AG 14/10/2011 - Error Comms message is shown in ManageReceptionEvent
-                                'Dim myAuxGlobal As New GlobalDataTO() With {.ErrorCode = "ERROR_COMM"}
-                                'ShowMessage("Warning", myAuxGlobal.ErrorCode)
-                                activateButtonsFlag = True
-
-                            Else
-                                ShowStatus(Messages.STARTING_INSTRUMENT) 'RH 21/03/2012
-
-                                'Start instrument instruction send OK (initialize wup UI flags)
-                                myGlobal = InitializeStartInstrument()
+                            'Activate only if current screen is monitor
+                            WarmUpFinishedAttribute = False
+                            BsTimerWUp.Enabled = True
+                            If Not ActiveMdiChild Is Nothing Then
+                                If (TypeOf ActiveMdiChild Is IMonitor) Then
+                                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                                    'CurrentMdiChild.bsWamUpGroupBox.Enabled = True
+                                    CurrentMdiChild.bsWamUpGroupBox.Visible = True
+                                End If
                             End If
-
-                        ElseIf myGlobal.HasError Then
-                            ShowMessage("Error", myGlobal.ErrorMessage)
+                            'END DL 09/09/2011
+                        Else
                             activateButtonsFlag = True
                         End If
+                    Else
+                        ShowMessage("Error", myGlobal.ErrorMessage)
+                        activateButtonsFlag = True
+                    End If
 
-                        If activateButtonsFlag Then
-                            SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
-                            SetEnableMainTab(True) 'DL 26/03/2012 test
-                        End If
-
+                    If activateButtonsFlag Then
+                        SetActionButtonsEnableProperty(True) 'AG 14/10/2011 - update vertical button bar
+                        SetEnableMainTab(True) 'DL 26/03/2012 test
                     End If
                 End If
+
             End If
 
         Catch ex As Exception

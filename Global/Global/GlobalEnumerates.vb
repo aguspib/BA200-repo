@@ -2366,6 +2366,24 @@ Namespace Biosystems.Ax00.Global
         End Enum
 #End Region
 
+#Region "Processes"
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Created by: IT 01/12/2014 - BA-2075
+        ''' </remarks>
+        Public Enum WarmUpProcessFlag
+            StartInstrument
+            Wash
+            ProcessStaticBaseLine
+            ProcessDynamicBaseLine
+            ConfigureBarCode
+        End Enum
+
+#End Region
+
 #End Region
 
 #Region "SAT Reports"

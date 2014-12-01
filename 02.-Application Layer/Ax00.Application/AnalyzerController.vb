@@ -1,4 +1,8 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.BL
+Imports Biosystems.Ax00.Types
+Imports System.Globalization
 
 Namespace Biosystems.Ax00.App
 
@@ -71,6 +75,150 @@ Namespace Biosystems.Ax00.App
 
             Return Analyzer
 
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Created by: IT 01/12/2014 - BA-2075
+        ''' </remarks>
+        Public Function StartWarmUpProcess() As GlobalDataTO
+
+            Dim myGlobal As New GlobalDataTO
+            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
+            If (IsAnalyzerInstantiated) Then
+                Analyzer.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
+
+                Dim activateButtonsFlag As Boolean = False
+                Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
+                myCurrentAlarms = Analyzer.Alarms
+
+                Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True
+                'DL 17/05/2012
+
+                If String.Compare(Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED", False) = 0 Then
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "" 'Reset flag
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
+
+                    'Do nothing
+                    'When Sw receives the ANSINFO if no bottle alarm the proper instruction will be sent
+                    'Continue the process on the aborted task (Adjust base light)
+
+                ElseIf String.Compare(Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED", False) = 0 Then
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = ""
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
+
+                    'Do nothing
+                    'When Sw receives the ANSINFO if no bottle alarm the proper instruction will be sent
+                    'If no previous start instrument canceled ... start the whole process: sent the standby
+
+                Else
+                    Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED) = 0 'clear sensor
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SDOWNprocess) = "" 'Reset flag
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "" 'Reset flag
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Reset flag
+                    Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "INPROCESS"
+
+                    'myGlobal = Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
+                    Analyzer.ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.StartInstrument)
+
+                    'If (Not myGlobal.HasError) Then
+                    If Analyzer.Connected Then
+                        'Start instrument instruction send OK (initialize wup UI flags)
+                        myGlobal = InitializeStartInstrument()
+                    Else
+                        Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = ""
+                    End If
+                    'End If
+                End If
+            End If
+
+            Return myGlobal
+
+        End Function
+
+#End Region
+
+#Region "Private Methods"
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Modified by XB 30/01/2013 - DateTime to Invariant Format (Bugs tracking #1121)
+        '''             IT 01/12/2014 - BA-2075
+        ''' </remarks>
+        Private Function InitializeStartInstrument() As GlobalDataTO
+            Dim myGlobal As GlobalDataTO = Nothing
+            'Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                'DL 09/09/2011
+                'Set Enable (or set visible meeting 12/09/2011 ??) frame time W-Up in common Monitor
+                'IMonitor.bsWamUpGroupBox.Enabled = True
+                Dim swParams As New SwParametersDelegate
+
+                ' Read W-Up full time configuration
+                myGlobal = swParams.ReadByAnalyzerModel(Nothing, Analyzer.Model)
+
+                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                    Dim myParametersDS As New ParametersDS
+
+                    myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
+                    Dim myList As New List(Of ParametersDS.tfmwSwParametersRow)
+
+                    myList = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
+                              Where String.Equals(a.ParameterName, GlobalEnumerates.SwParameters.WUPFULLTIME.ToString) _
+                              Select a).ToList
+
+                    Dim WUPFullTime As Single
+                    If myList.Count > 0 Then WUPFullTime = myList(0).ValueNumeric '= DateTime.Now.ToString("yyyyMMdd hh-mm") & "_" & myList(0).ValueText
+                End If
+
+                ' Save initial states when press over w-up
+                If Not myGlobal.HasError Then
+                    Dim myAnalyzerSettingsDS As New AnalyzerSettingsDS
+                    Dim myAnalyzerSettingsRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow
+
+                    'WUPCOMPLETEFLAG
+                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+                    With myAnalyzerSettingsRow
+                        .AnalyzerID = Analyzer.ActiveAnalyzer
+                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPCOMPLETEFLAG.ToString()
+                        .CurrentValue = "0"
+                    End With
+                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+
+                    'WUPCOMPLETEFLAG
+                    myAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.NewtcfgAnalyzerSettingsRow
+                    With myAnalyzerSettingsRow
+                        .AnalyzerID = Analyzer.ActiveAnalyzer
+                        .SettingID = GlobalEnumerates.AnalyzerSettingsEnum.WUPSTARTDATETIME.ToString()
+                        ''.CurrentValue = Now.ToString 'AG + SA 05/10/2012
+                        '.CurrentValue = Now.ToString("yyyy/MM/dd HH:mm:ss")
+                        .CurrentValue = Now.ToString(CultureInfo.InvariantCulture)
+                    End With
+                    myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Add(myAnalyzerSettingsRow)
+
+                    Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
+                    myGlobal = myAnalyzerSettings.Save(Nothing, Analyzer.ActiveAnalyzer, myAnalyzerSettingsDS, Nothing)
+
+                End If
+
+                AnalyzerController.Instance.Analyzer.ISEAnalyzer.IsAnalyzerWarmUp = True 'SGM 13/04/2012 
+
+            Catch ex As Exception
+                Throw ex
+            End Try
+
+            Return myGlobal
         End Function
 
 #End Region

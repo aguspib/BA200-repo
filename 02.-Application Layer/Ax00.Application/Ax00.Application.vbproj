@@ -122,6 +122,10 @@
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\BussinessLayer\ConfigurationSetup\ConfigurationSetup.vbproj">
+      <Project>{bc01c1bd-2a93-4002-b74f-7bcf9793309d}</Project>
+      <Name>ConfigurationSetup</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\BussinessLayer\Framework\Framework.vbproj">
       <Project>{806a1f2f-07c1-43d2-af67-59accf4b5754}</Project>
       <Name>Framework</Name>

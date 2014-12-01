@@ -754,26 +754,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.WASHING_STDBY_END
                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "END")
 
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
-                            'ag 30/09/2011
-                            ' We has to wait until receive a ANSINFO instruction ... if no bottle / deposit alarms then send the ALIGHT, else show message and abort warmup process
-                            'Before send ALIGHT in wup process ... delete the all ALIGHT results
-                            'Dim ALightDelg As New WSBLinesDelegate
-                            'myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                            'If Not myGlobal.HasError Then
-                            '    'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                            '    baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
-                            '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
-
-                            '    'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                            '    If Not myGlobal.HasError Then
-                            '        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                            '        SetAnalyzerNotReady()
-                            '    End If
-                            'End If
-                            'AG 30/09/2011
-
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WASHprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WASHprocess.ToString) = "INPROCESS" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WASHprocess, "CLOSED")
 
 
@@ -903,13 +884,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "END")
 
                             'AG 24/05/2012 - If start instrument wash paused and wash not finished sent the wash
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" AndAlso _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then 'Send Wash
-                                'Case Start instrument failed before wash was performed (for example no reactions missing)
-                                'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True) 'Send a WASH instruction (Conditioning complete)
-
+                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
+                                ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'BA-2075
                             Else
                                 'Else Alight
                                 'User execute the change reaction rotor when start instrument OK: Sw instructions NRotor + Alight
@@ -1004,7 +980,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
 
                         If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS)
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
                         End If
                         'IT 26/11/2014 - BA-2075 END
                     Case Else

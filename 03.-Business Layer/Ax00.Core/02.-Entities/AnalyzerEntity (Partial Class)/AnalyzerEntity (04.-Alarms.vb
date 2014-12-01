@@ -4258,7 +4258,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' - During Abort do not sent WASH if bottle/deposit alarms exists
         ''' 
         ''' </summary>
-        ''' <remarks>AG 29/09/2011</remarks>
+        ''' <remarks>AG 29/09/2011
+        ''' Modified by: IT 01/12/2014 - BA-2075
+        ''' </remarks>
         Private Function CheckIfProcessCanContinue() As Boolean
             Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
             Try
@@ -4312,33 +4314,19 @@ Namespace Biosystems.Ax00.Core.Entities
                 'AG 22/02/2012
 
                 If readyToSentInstruction Then
+
+                    If bottleErrAlarm OrElse reactRotorMissingAlarm Then
+                        readyToSentInstruction = False
+                    End If
+
                     'Some action button process required Wash instruction is bottle level OK before Sw sends it
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
-                            'Note the SDOWNprocess & WASHprocess are not controlled here due the alarm err check is done on the click event (Presentation Layer)
 
-                            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                readyToSentInstruction = False
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
 
-                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-
-                            Else
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
-
-                                ' XBC 01/10/2012 - correction : When Washing process into WUPprocess is starting, previous StartInstrument process must set as END
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
-                                ' XBC 01/10/2012
-
-                                'Send a WASH instruction (Conditioning complete)
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
-                            End If
-
-                            'AG 20/02/2012 - abort process
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
-
+                        'AG 20/02/2012 - abort process
+                        'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
                             If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                                 If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                                     readyToSentInstruction = False
@@ -4374,51 +4362,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         End If
-
-                        'Some action button process required Alight instruction is bottle level OK before Sw sends it
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "END" AndAlso _
-                           mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "" Then 'If alight instruction has been not already sent
-
-                        'Some action button process required Alight instruction is bottle level OK
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
-                            'Note the NEWROTORprocess & BASELINEprocess are not controlled here due the alarm err check is done on the click event (Presentation Layer)
-
-                            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                readyToSentInstruction = False
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
-
-                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-
-                            Else
-                                'Send the ALIGHT instruction
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-
-                                ' XBC 01/10/2012 - correction : When BaseLine process into WUPprocess is starting, previous StartInstrument and Washing processes must set as END
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "END")
-                                ' XBC 01/10/2012
-
-                                'Before send ALIGHT in wup process ... delete the all ALIGHT/FLIGHT results
-                                Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
-                                If Not myGlobal.HasError Then
-                                    'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                    ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-
-                                    'When a process involves an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                        SetAnalyzerNotReady()
-                                    End If
-                                End If
-
-                            End If
-
-                        End If
-
+                    Else
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
                     End If
                 End If
 
@@ -4436,6 +4381,32 @@ Namespace Biosystems.Ax00.Core.Entities
             End Try
             Return readyToSentInstruction
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
+        Private Function CheckIfWashingIsPossible() As Boolean
+
+            Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
+            Dim bottleErrAlarm As Boolean = False
+            Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
+            Dim myGlobal As New GlobalDataTO
+            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
+            If ExistBottleAlarms() Then
+                bottleErrAlarm = True
+            End If
+
+            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
+                readyToSentInstruction = False
+            End If
+
+            Return readyToSentInstruction
+
+        End Function
+
 #End Region
 
 #Region "Freeze alarms methods"

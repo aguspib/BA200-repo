@@ -180,6 +180,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Sub ClearLastExportedResults()
         Function ExistSomeAlarmThatRequiresStopWS() As Boolean
         Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO 'AG 20/11/2014 BA-2065
+        Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As GlobalEnumerates.WarmUpProcessFlag) 'IT 01/12/2014 - BA-2075
 
 #End Region
 
