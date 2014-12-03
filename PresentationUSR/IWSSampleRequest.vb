@@ -6750,6 +6750,7 @@ Public Class IWSSampleRequest
     '''                                           incomplete) and in this case shows a warning message
     '''              SA 20/05/2014 - BT #1633 ==> Added validation of Screen Property IncompleteTest for patientCase = 3 (n rows selected in Patient Samples grid having 
     '''                                           different Tests and belonging to different Patients). This change should have been included in BT #1494
+    '''              XB 02/12/2014 - Add functionality to includes ISE and OFFS into CALC tests - BA-1867
     ''' </remarks>
     Private Sub SearchTestsForPatientSamples()
         Try
@@ -7013,8 +7014,10 @@ Public Class IWSSampleRequest
                     lstWSPatients = (From a In myWorkSessionResultDS.Patients _
                                      Where a.Selected = False _
                                      AndAlso (Not a.IsCalcTestIDNull) _
+                                     AndAlso (Not a.TestType = "OFFS") _
                                      Order By a.SampleID, a.StatFlag _
                                      Select a).ToList
+                    ' XB 02/12/2014 - This query must not contains OFFS tests because these tests are unselected by default and since v3.1.1 could include inside a CALC TEST - BA-1867
 
                     For Each testInFormula As WorkSessionResultDS.PatientsRow In lstWSPatients
                         UnSelectRelatedCalcTest(testInFormula.SampleID, testInFormula.StatFlag, testInFormula.CalcTestID)

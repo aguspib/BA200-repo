@@ -2749,6 +2749,7 @@ Namespace Biosystems.Ax00.BL
         '''                              should be done for all Test Types, not only for Standard ones
         '''              SA 28/10/2010 - Delete also ISE and OFF-SYSTEM Tests. Check if Calibrators can be deleted only for Standard Tests
         '''              TR 11/03/2013 - When (pDeletionType=IN_LIST): add filter AndAlso LISRequest = FALSE in the first LINQ.
+        '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
         ''' </remarks>
         Public Function DeletePatientOrderTests(ByVal pDeletionType As String, ByVal pSelectedTestsDS As SelectedTestsDS, _
                                                 ByVal pWSResultDS As WorkSessionResultDS, Optional ByVal pSampleType As String = "", _
@@ -2906,7 +2907,10 @@ Namespace Biosystems.Ax00.BL
                                     Next
                                 End If
 
-                                If (testType = "STD") Then
+                                ' XB 02/12/2014 - BA-1867
+                                'If (testType = "STD") Then
+                                If (testType = "STD") OrElse (testType = "ISE") OrElse (testType = "OFFS") Then
+                                    ' XB 02/12/2014 - BA-1867
                                     'Verify if the Patient Order Test to delete is linked to a Calculated Test
                                     If (Not lstWSPatientsDS(0).IsCalcTestIDNull AndAlso lstWSPatientsDS(0).CalcTestID <> "") Then
                                         'Get the list of Calculated Tests in which the Test is included
@@ -2924,13 +2928,15 @@ Namespace Biosystems.Ax00.BL
                                     'Remove all links
                                     DeleteCalculatedTest(sampleID, statFlag, testID, pWSResultDS)
 
-                                ElseIf (testType = "ISE") Then
-                                    'Non positioned Patient Order Tests can always be deleted
-                                    lstWSPatientsDS(0).Delete()
+                                    ' XB 02/12/2014 - BA-1867
+                                    'ElseIf (testType = "ISE") Then
+                                    '    'Non positioned Patient Order Tests can always be deleted
+                                    '    lstWSPatientsDS(0).Delete()
 
-                                ElseIf (testType = "OFFS") Then
-                                    'Non positioned Patient Order Tests can always be deleted
-                                    lstWSPatientsDS(0).Delete()
+                                    'ElseIf (testType = "OFFS") Then
+                                    '    'Non positioned Patient Order Tests can always be deleted
+                                    '    lstWSPatientsDS(0).Delete()
+                                    ' XB 02/12/2014 - BA-1867
                                 End If
 
                                 'Confirm changes done in the entry DataSet 
@@ -7050,6 +7056,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: SA 22/10/2010 - Added sorting of ISE Tests (following Standard Tests)
         '''              SA 02/12/2010 - Added sorting of OFF SYSTEM Tests (following Calculated Tests)
         '''              SA 31/01/2012 - Set to Nothing all declared Lists
+        '''              XB 02/12/2014 - Adapt the sorting to ISE and OFFS included also inside CALC tests - BA-1867
         ''' </remarks>
         Public Sub SortPatients(ByVal pWSResultDS As WorkSessionResultDS, Optional ByVal pSortingType As Integer = 1)
             Try
@@ -7123,7 +7130,7 @@ Namespace Biosystems.Ax00.BL
                                         nextCreationOrder += 1
                                     Next
 
-                                    'Get all Open Patient Order Tests with the current priority, corresponding to Standard Tests that are
+                                    'Get all Open Patient Order Tests with the current priority, corresponding to Partial Tests that are
                                     'linked to Calculated Tests and having the SampleID/SampleType currently in process
                                     lstWSPatientsDS = (From b In pWSResultDS.Patients _
                                                       Where b.SampleClass = "PATIENT" _
@@ -7131,10 +7138,13 @@ Namespace Biosystems.Ax00.BL
                                                     AndAlso b.StatFlag = statValue _
                                                     AndAlso b.SampleID = mySampleID _
                                                     AndAlso b.SampleType = mySampleType _
-                                                    AndAlso b.TestType = "STD" _
+                                                    AndAlso (b.TestType = "STD" OrElse b.TestType = "ISE" OrElse b.TestType = "OFFS") _
                                                     AndAlso Not b.IsCalcTestIDNull _
                                                    Order By b.CalcTestID, b.CreationOrder _
                                                      Select b).ToList
+
+                                    ' XB 02/12/2014 - BA-1867
+                                    'replace: AndAlso b.TestType = "STD"  by: AndAlso (b.TestType = "STD" OrElse b.TestType = "ISE" OrElse b.TestType = "OFFS")
 
                                     For Each patientOrderTest As WorkSessionResultDS.PatientsRow In lstWSPatientsDS
                                         'Update the CreationOrder
@@ -7161,7 +7171,7 @@ Namespace Biosystems.Ax00.BL
                                         nextCreationOrder += 1
                                     Next
 
-                                    '...get also all Open Patient Order Tests with the current priority, corresponding to Off-System Tests
+                                    '...get also all Open Patient Order Tests with the current priority, corresponding to Off-System Tests not included inside any CALC test
                                     'and having the SampleID/SampleType currently in process
                                     lstWSPatientsDS = (From b In pWSResultDS.Patients _
                                                       Where b.SampleClass = "PATIENT" _
@@ -7169,6 +7179,7 @@ Namespace Biosystems.Ax00.BL
                                                     AndAlso b.StatFlag = statValue _
                                                     AndAlso b.SampleID = mySampleID _
                                                     AndAlso b.SampleType = mySampleType _
+                                                    AndAlso b.IsCalcTestIDNull _
                                                     AndAlso b.TestType = "OFFS" _
                                                    Order By b.CreationOrder _
                                                      Select b).ToList
@@ -7178,6 +7189,7 @@ Namespace Biosystems.Ax00.BL
                                         patientOrderTest.CreationOrder = nextCreationOrder
                                         nextCreationOrder += 1
                                     Next
+                                    ' XB 02/12/2014 - add condition "IsCalcTestIDNull" for the OFFS tests that are not included inside CALC test - BA-1867
                                 Next
                             Next
 
