@@ -689,29 +689,25 @@ Namespace Biosystems.Ax00.Calculations
 
         'End Function
 
-
         ''' <summary>
-        ''' Save the results for an executionID (preparationID in Ax5)
-        ''' into database depending the sample class
+        ''' Save the results for an ExecutionID (PreparationID in Ax5) into database depending on the Sample Class
         ''' </summary>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pRecalculusFlag">When TRUE, it indicates the CalculateExecution function was called for recalculate results</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by:   AG 02/03/2010 (Tested Pending)
+        ''' Created by:  AG  02/03/2010 (Tested Pending)
         ''' Modified by: GDS 29/04/2010 (Added pDBConnection parameter)
         ''' </remarks>
-        Private Function SaveExecutionResults(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-
+        Private Function SaveExecutionResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pRecalculusFlag As Boolean) As GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 myClassGlobalResult = DAOBase.GetOpenDBTransaction(pDBConnection)
-
                 If (Not myClassGlobalResult.HasError) And (Not myClassGlobalResult.SetDatos Is Nothing) Then
-                    dbConnection = CType(myClassGlobalResult.SetDatos, SqlClient.SqlConnection)
-
+                    dbConnection = DirectCast(myClassGlobalResult.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'ExecutionID, AnalyzerID and WorkSesionID are used for read and update from database
-
                         Dim myCurveID As Integer = -1   'AG 12/03/2010
 
                         For item As Integer = 0 To UBound(preparation)
@@ -735,7 +731,6 @@ Namespace Biosystems.Ax00.Calculations
                         If (Not myClassGlobalResult.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
@@ -745,21 +740,19 @@ Namespace Biosystems.Ax00.Calculations
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) And Not (dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
                 myClassGlobalResult.HasError = True
-                myClassGlobalResult.ErrorCode = "SYSTEM_ERROR"
+                myClassGlobalResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myClassGlobalResult.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.SaveExecutionResults", EventLogEntryType.Error, False)
 
             Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
-
             Return myClassGlobalResult
-
         End Function
 
 
@@ -4010,35 +4003,30 @@ Namespace Biosystems.Ax00.Calculations
 #End Region
 
 #Region "Private saving results methods"
-
-
         ''' <summary>
-        ''' SAVE VALUES IN TABLE twksWSExecutions the replicate results final abs, date, error, alarms
+        ''' Save in Executions table (twksWSExecutions) result values for each Replicate: final abs, date, error, alarms
         ''' </summary>
-        ''' <param name="pItem"></param>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pItem">Index of the Execution in preparation structure</param>
         ''' <remarks>
-        ''' Created by AG 02/03/2010 (Tested OK)
-        ''' Modified by AG 11/08/2010 if calib multiitem save replicateid and also previous replicates!!
-        ''' PRE: Connection is open
+        ''' Created by:  AG 02/03/2010 
+        ''' Modified by: AG 11/08/2010 - For multipoint Calibrators, the current Replicate is saved and also the previous one
+        '''              SA 03/12/2014 - BA-1616 ==> In the call to function SaveExecutionsResults, inform parameter that indicates if 
+        '''                                          the Execution has been re-calculated (field RecalculationFlag in structure common)
         ''' </remarks>
-        Private Sub SaveReplicateResults(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                         ByVal pItem As Integer)
-
+        Private Sub SaveReplicateResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pItem As Integer)
             Try
-                If Not pDBConnection Is Nothing Then
-                    'SAVE VALUES IN TABLE twksWSExecutions the replicate results final abs, date, error, alarms
-                    '''''''''''''''
-                    '1) Prepare DS                    
+                If (Not pDBConnection Is Nothing) Then
+                    'SAVE VALUES IN TABLE twksWSExecutions for Replicate results: final ABS, date, error, alarms
+                    '(1) Prepare DS                    
                     With preparation(pItem)
-
-                        Dim ex_delegate As New ExecutionsDelegate
                         Dim ex_results As New ExecutionsDS
+                        Dim ex_delegate As New ExecutionsDelegate
                         Dim ex_Row As ExecutionsDS.twksWSExecutionsRow
 
-                        'AG 11/08/2010 - when calib multi item we have to save
-                        'the current replicate and also the previous
+                        'AG 11/08/2010 - For multipoint Calibrators we have to save the current Replicate and also the previous
                         Dim startReplicateLoopValue As Integer = .ReplicateID - 1
-                        If preparation(pItem).SampleClass = "CALIB" And calibrator.NumberOfCalibrators > 1 Then
+                        If (preparation(pItem).SampleClass = "CALIB" And calibrator.NumberOfCalibrators > 1) Then
                             startReplicateLoopValue = 0
                         End If
 
@@ -4048,20 +4036,19 @@ Namespace Biosystems.Ax00.Calculations
                             ex_Row.ExecutionID = myExecutionID(pItem)
 
                             'AG 11/08/2010
-                            If myReplNum <> .ReplicateID - 1 Then
-                                'ex_Row.ExecutionID -= calibrator.NumberOfCalibrators * (.ReplicateID - 1 - myReplNum)
-                                ex_Row.ExecutionID = .ReplicateExecutionID(myReplNum) 'AG 14/08/2010
+                            If (myReplNum <> .ReplicateID - 1) Then
+                                ex_Row.ExecutionID = .ReplicateExecutionID(myReplNum)
                             End If
                             'END AG 11/08/2010
 
                             ex_Row.ABS_Value = .ReplicateAbs(myReplNum) + BUGDECIMALS
-                            If Trim$(.ErrorReplicateAbs(myReplNum)) <> "" Then ex_Row.ABS_Error = .ErrorReplicateAbs(myReplNum)
+                            If (Trim$(.ErrorReplicateAbs(myReplNum)) <> String.Empty) Then ex_Row.ABS_Error = .ErrorReplicateAbs(myReplNum)
                             ex_Row.InUse = .RepInUse(myReplNum)
                             ex_Row.ResultDate = .ReplicateDate(myReplNum)
-                            ex_Row.ExecutionStatus = "CLOSED" '"FINISHED"
+                            ex_Row.ExecutionStatus = "CLOSED"
 
                             'Additional information for kinetics
-                            If String.Equals(test.AnalysisMode, "MRK") Or String.Equals(test.AnalysisMode, "BRK") Then
+                            If (test.AnalysisMode = "MRK") OrElse (test.AnalysisMode = "BRK") Then
                                 ex_Row.rkinetics = .rKineticsReplicate(myReplNum) + BUGDECIMALS
                                 ex_Row.KineticsInitialValue = .KineticsCurve(myReplNum, 0) + BUGDECIMALS
                                 ex_Row.KineticsSlope = .KineticsCurve(myReplNum, 1) + BUGDECIMALS
@@ -4079,70 +4066,55 @@ Namespace Biosystems.Ax00.Calculations
                                 Case "BLANK"
                                     ex_Row.SetABS_InitialNull()
                                     ex_Row.SetABS_MainFilterNull()
-                                    ex_Row.SetAbs_WorkReagentNull() 'AG 12/07/2010
+                                    ex_Row.SetAbs_WorkReagentNull()
 
                                     Select Case test.AnalysisMode
                                         Case "MRFT", "BRFT", "MRK", "BRK" 'Fixed time and kinetics (InitialReplicateAbs)
                                             ex_Row.ABS_Initial = .InitialReplicateAbs(myReplNum) + BUGDECIMALS
 
                                         Case "MREP", "BREP" 'End Point bicrhomatic (MainFilterReplicateAbs)
-                                            If String.Equals(test.ReadingType, "BIC") Then    'Only bicromatic
+                                            If (test.ReadingType = "BIC") Then    'Only bicromatic
                                                 ex_Row.ABS_MainFilter = .MainFilterReplicateAbs(myReplNum) + BUGDECIMALS
                                             End If
-
-                                            'AG 12/0/2010
                                         Case "BRDIF"
                                             ex_Row.Abs_WorkReagent = .WorkingReagentReplicateAbs(myReplNum)
-                                            'END AG 12/0/2010
-
                                     End Select
 
                                 Case "CALIB"
-                                    If calibrator.NumberOfCalibrators = 1 Then
-                                        'Nothing for replicate level
-                                    Else    'NumberOfCalibrators > 1                                    
-                                        'AG 11/08/2010 - use the proper data!!
-                                        'ex_Row.CONC_CurveError = calibrator.Curve.ErrorCurve(pItem) + BUGDECIMALS
+                                    If (calibrator.NumberOfCalibrators = 1) Then
+                                        'Nothing to do for Replicate level
+
+                                    Else
+                                        'NumberOfCalibrators > 1                                    
                                         ex_Row.CONC_CurveError = .ErrorCurveReplicate(myReplNum) + BUGDECIMALS
-
                                         ex_Row.CONC_Value = .ReplicateConc(myReplNum)
-                                        If Trim$(.ErrorReplicateConc(myReplNum)) <> "" Then ex_Row.CONC_Error = .ErrorReplicateConc(myReplNum)
+                                        If (Trim$(.ErrorReplicateConc(myReplNum)) <> String.Empty) Then ex_Row.CONC_Error = .ErrorReplicateConc(myReplNum)
                                     End If
-
 
                                 Case "CTRL", "PATIENT"
                                     ex_Row.CONC_Value = .ReplicateConc(myReplNum) + BUGDECIMALS
-                                    If Trim$(.ErrorReplicateConc(myReplNum)) <> "" Then ex_Row.CONC_Error = .ErrorReplicateConc(myReplNum)
-
+                                    If (Trim$(.ErrorReplicateConc(myReplNum)) <> String.Empty) Then ex_Row.CONC_Error = .ErrorReplicateConc(myReplNum)
                             End Select
-
-                            '2) Save into Database                    
                             ex_results.twksWSExecutions.AddtwksWSExecutionsRow(ex_Row)
-                            'ex_results.twksWSExecutions.ImportRow(ex_Row)
-
-                            'AG 11/08/2010
-                            'myClassGlobalResult = ex_delegate.SaveExecutionsResults(pDBConnection, ex_results)
                         Next
-                        myClassGlobalResult = ex_delegate.SaveExecutionsResults(pDBConnection, ex_results)
-                        'END AG 11/08/2010
 
+                        '(2) Save into Database                    
+                        myClassGlobalResult = ex_delegate.SaveExecutionsResults(pDBConnection, ex_results, common(pItem).RecalculationFlag)
                     End With
                 End If
-
             Catch ex As Exception
                 Me.CatchLaunched("SaveReplicateResults", ex)
             End Try
-
         End Sub
 
-
-
         ''' <summary>
-        ''' Save in Results table (twksResults) the average values (final ABS, final CONC, datetime, errors and alarms) for 
-        ''' and OrderTest (whatever SampleClass) requested in the active WS
+        ''' Save in Results table (twksResults) the average values (final ABS, final CONC, datetime, errors and alarms) for an OrderTest 
+        ''' (whatever SampleClass) requested in the active WS
         ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pItem">For SampleClass BLANK, CTRL and PATIENT: always zero
         '''                     For SampleClass CALIB: zero for Single Point Calibrator (and Calibrator Number -1) for Multiple Point Calibrators</param>
+        ''' <param name="curveResultID"></param>
         ''' <remarks>
         ''' Created by:  AG 02/03/2010 - Prerequisite: Connection is opened - (Tested OK)
         ''' Modified by: AG 12/03/2010 - Added new ByRef parameter curveResultID
@@ -4154,80 +4126,80 @@ Namespace Biosystems.Ax00.Calculations
         '''                              accepted and validated in order to sent them to QC Module when the active WS is reset 
         '''              AG 25/06/2012 - ResultsDS also informs AnalyzerID and WorkSessionID
         '''              TR 19/07/2012 - Inform field SampleClass for the result
-        '''              AG 30/07/2014 - #1887 On CTRL or PATIENT recalculations set OrderToExport = TRUE
-        '''              AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
+        '''              AG 30/07/2014 - BA-1887 ==> On CTRL or PATIENT recalculations set OrderToExport = TRUE
+        '''              AG 15/10/2014 - BA-2011 ==> Update properly the OrderToExport field when the recalculated result is an accepted one
+        '''              SA 03/12/2014 - BA-1616 ==> In the call to function SaveResults, inform parameter that indicates if the Execution has been 
+        '''                                          re-calculated (field RecalculationFlag in structure common)
         ''' </remarks>
         Private Sub SaveAverageResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pItem As Integer, ByRef curveResultID As Integer)
             Try
                 If (Not pDBConnection Is Nothing) Then
-                    'SAVE VALUES IN TABLE twksResults the orderTestID average results: final abs, date, error, alarms
-                    '''''''''''''''
-                    '1) Prepare DS
+                    'SAVE VALUES IN TABLE twksResults the average result for the orderTestID: final ABS, final CONC, datetime, error, alarms
+
+                    '(1) Prepare DS
                     With preparation(pItem)
-                        Dim myGlobal As New GlobalDataTO    'AG 10/09/2010
-                        Dim res_delegate As New ResultsDelegate
                         Dim res_DS As New ResultsDS
+                        Dim myGlobal As New GlobalDataTO
                         Dim res_row As ResultsDS.twksResultsRow
+                        Dim res_delegate As New ResultsDelegate
+
                         res_row = res_DS.twksResults.NewtwksResultsRow
 
-                        'Add the PK
+                        'Inform fields of the PK
                         res_row.OrderTestID = myOrderTestID
                         res_row.RerunNumber = myRerunNumber
                         res_row.MultiPointNumber = pItem + 1
 
-                        'TR 19/07/2012 -Inform the sampleClass
+                        'Inform the SampleClass
                         res_row.SampleClass = .SampleClass
 
-                        'Add the other fields
+                        'Add the rest of fields
                         res_row.TestVersion = test.TestVersion
                         res_row.ABSValue = .Abs
                         res_row.ResultDateTime = .AverageDate
-                        If Trim$(.ErrorAbs) <> "" Then res_row.ABS_Error = .ErrorAbs
+                        If (Trim$(.ErrorAbs) <> String.Empty) Then res_row.ABS_Error = .ErrorAbs
                         res_row.SubstrateDepletion = .SubstrateDepletion
 
-                        'AG 21/07/2010 - In recalculation mode do not change the accepted results
-                        'res_row.AcceptedResultFlag = True
-                        If Not common(pItem).RecalculationFlag Then
+                        'AG 21/07/2010 - In recalculation mode, do not change the accepted results
+                        If (Not common(pItem).RecalculationFlag) Then
                             res_row.AcceptedResultFlag = True
                         Else
                             res_row.IsAcceptedResultFlagNull()
                         End If
                         'END AG 21/07/2010
 
-                        If .ErrorAbs = "" AndAlso .ErrorConc = "" AndAlso (calibrator.ErrorCalibration = "" OrElse calibrator.ManualFactorFlag) Then
+                        If (.ErrorAbs = String.Empty AndAlso .ErrorConc = String.Empty AndAlso (calibrator.ErrorCalibration = "" OrElse calibrator.ManualFactorFlag)) Then
                             res_row.ValidationStatus = "OK"
                         Else
                             res_row.ValidationStatus = "NOTCALC"
 
-                            'AG 06/11/2012 - When CALIB multipoint set the validationStatus NOTCALC only if ErrorCalibrations <> ""
+                            'AG 06/11/2012 - For Multipoint CALIB, set ValidationStatus = NOTCALC only if ErrorCalibrations <> ""
                             'A possible situation could be: Curva calculated but one point with ErrorConc (out or out_high) but we have to mark ValidationStatus = OK
                             'because the curve exists
-                            If .SampleClass = "CALIB" AndAlso calibrator.NumberOfCalibrators > 1 AndAlso calibrator.ErrorCalibration = "" Then
+                            If (.SampleClass = "CALIB" AndAlso calibrator.NumberOfCalibrators > 1 AndAlso calibrator.ErrorCalibration = String.Empty) Then
                                 res_row.ValidationStatus = "OK"
                             End If
                             'AG 06/11/2012
                         End If
 
-                        'AG 10/09/2010 - new rules
-                        'AG 19/05/2010 - export and printed fields
+                        'AG 10/09/2010 - New rules
+                        'ExportStatus and Printed fields
                         res_row.ExportStatus = "NOTSENT"
                         res_row.Printed = False
-                        'END AG 19/05/2010
 
-                        'AG 10/11/2010 - Init new values
+                        'Init new values
                         res_row.ManualResultFlag = False
                         res_row.SetManualResultNull()
                         res_row.SetManualResultTextNull()
-                        'END AG 10/11/2010
-
-                        'AG 30/07/2014 add also sampleclass CTRL 'AG 10/09/2010 - new rules for ExportStatus
-                        If common(0).RecalculationFlag AndAlso myManualRecalculationsFlag AndAlso (preparation(0).SampleClass = "PATIENT" OrElse preparation(0).SampleClass = "CTRL") Then
+                        
+                        'AG 30/07/2014 - Added also SampleClass CTRL 'AG 10/09/2010 - new rules for ExportStatus
+                        If (common(0).RecalculationFlag AndAlso myManualRecalculationsFlag AndAlso (preparation(0).SampleClass = "PATIENT" OrElse preparation(0).SampleClass = "CTRL")) Then
                             myGlobal = res_delegate.RecalculateExportStatusValue(pDBConnection, myOrderTestID, myRerunNumber)
-                            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                 res_row.ExportStatus = CType(myGlobal.SetDatos, String)
                             End If
                         End If
-                        'END AG 10/09/2010 - new rules
+                        'END AG 10/09/2010 - New rules
 
                         res_row.SetCurveSlopeNull()
                         res_row.SetCurveOffsetNull()
@@ -4237,76 +4209,71 @@ Namespace Biosystems.Ax00.Calculations
                             Case "BLANK"
                                 res_row.SetABS_InitialNull()
                                 res_row.SetABS_MainFilterNull()
-                                res_row.SetAbs_WorkReagentNull()    'AG 12/07/2010
+                                res_row.SetAbs_WorkReagentNull()
 
                                 Select Case test.AnalysisMode
                                     Case "MRFT", "BRFT", "MRK", "BRK" 'Fixed time and kinetics (InitialReplicateAbs)
                                         res_row.ABS_Initial = .InitialAbs
 
                                     Case "MREP", "BREP" 'End Point bicrhomatic (MainFilterReplicateAbs)
-                                        If test.ReadingType = "BIC" Then    'Only bicromatic
+                                        If (test.ReadingType = "BIC") Then    'Only bicromatic
                                             res_row.ABS_MainFilter = .MainFilterAbs
                                         End If
 
-                                        'AG 12/0/2010
                                     Case "BRDIF"
                                         res_row.Abs_WorkReagent = .WorkingReagentAbs
-                                        'END AG 12/0/2010
                                 End Select
 
                             Case "CALIB"
                                 res_row.CalibratorBlankAbsUsed = calibrator.BlankAbsUsed
                                 res_row.CalibrationError = calibrator.ErrorCalibration
 
-                                If calibrator.NumberOfCalibrators > 1 Then
+                                If (calibrator.NumberOfCalibrators > 1) Then
                                     res_row.CurveGrowthType = calibrator.Curve.CurveGrowthType
                                     res_row.CurveType = calibrator.Curve.CurveType
 
-                                    'AG 01/07/2011 - For LINEAR regression curves save: formula coefficients and correlation factor
-                                    If String.Equals(calibrator.Curve.CurveType, "LINEAR") AndAlso String.Equals(calibrator.ErrorCalibration, String.Empty) Then
+                                    'AG 01/07/2011 - For LINEAR Regression Curves save: formula coefficients and correlation factor
+                                    If (calibrator.Curve.CurveType = "LINEAR") AndAlso (calibrator.ErrorCalibration = String.Empty) Then
                                         res_row.CurveCorrelation = calibrator.Curve.CorrelationFactor
                                         res_row.CurveSlope = CSng(calibrator.Curve.Coefficient(1, 0))
                                         res_row.CurveOffset = calibrator.Curve.Points(ABS_ID, 0) 'AG 13/07/2011 - CSng(calibrator.Curve.Coefficient(0, 0)) -NO, the Offset is got from the curve (first point so Concentration = 0)
                                     End If
-                                    'EG 01/07/2011
+                                    'AG 01/07/2011
 
                                     res_row.CurveAxisXType = calibrator.Curve.CurveAxisXType
                                     res_row.CurveAxisYType = calibrator.Curve.CurveAxisYType
 
                                     'Concentration information about current calibrator point (item variable)
                                     res_row.CONC_Value = calibrator.Curve.ConcCurve(pItem)
-                                    If Trim$(.ErrorConc) <> "" Then res_row.CONC_Error = .ErrorConc 'Preparation(Item)
+                                    If (Trim$(.ErrorConc) <> String.Empty) Then res_row.CONC_Error = .ErrorConc
                                     res_row.RelativeErrorCurve = calibrator.Curve.ErrorCurve(pItem)
 
-                                    Dim curve_res As New CurveResultsDelegate
                                     Dim myGlobal2 As New GlobalDataTO
+                                    Dim curve_res As New CurveResultsDelegate
 
                                     'AG 12/03/2010
-                                    'Dim curveResultID As Integer = -1  
-                                    If pItem = 0 And curveResultID = -1 Then
-                                        'AG 12/03/2010
-
-                                        'Check if exists results for the ordertestid belongs to the calibration curve -NOTE: IGNORE THE VALIDATION STATUS
-                                        'Find the curveresultID
+                                    If (pItem = 0 AndAlso curveResultID = -1) Then
+                                        'Check if existing results for the OrderTestID belongs to the Calibration Curve -NOTE: IGNORE THE VALIDATION STATUS
+                                        'Find the CurveResultID
                                         Dim ignoreValidationStatus As Boolean = True
                                         myGlobal2 = res_delegate.GetAcceptedResults(pDBConnection, myOrderTestID, ignoreValidationStatus, False)
-                                        If Not myGlobal2.HasError And Not myGlobal2.SetDatos Is Nothing Then
-                                            Dim curve2_DS As New ResultsDS
-                                            curve2_DS = CType(myGlobal2.SetDatos, ResultsDS)
-                                            If curve2_DS.twksResults.Rows.Count > 0 Then
-                                                If Not curve2_DS.twksResults(0).IsCurveResultsIDNull Then curveResultID = curve2_DS.twksResults(0).CurveResultsID
+                                        If (Not myGlobal2.HasError AndAlso Not myGlobal2.SetDatos Is Nothing) Then
+                                            Dim curve2_DS As ResultsDS = DirectCast(myGlobal2.SetDatos, ResultsDS)
+                                            If (curve2_DS.twksResults.Rows.Count > 0) Then
+                                                If (Not curve2_DS.twksResults(0).IsCurveResultsIDNull) Then curveResultID = curve2_DS.twksResults(0).CurveResultsID
                                             End If
                                         End If
-                                    End If  'AG 12/03/2010
+                                    End If
+                                    'AG 12/03/2010
 
                                     'AG 09/06/2010 - If ABS_ERROR or SYSTEM_ERROR then delete curve
-                                    If calibrator.ErrorCalibration = GlobalEnumerates.CalibrationFactorErrors.ABS_ERROR.ToString Or calibrator.ErrorCalibration = GlobalEnumerates.CalibrationFactorErrors.SYSTEM_ERROR.ToString Then
-                                        If curveResultID <> -1 Then
+                                    If (calibrator.ErrorCalibration = GlobalEnumerates.CalibrationFactorErrors.ABS_ERROR.ToString) OrElse _
+                                       (calibrator.ErrorCalibration = GlobalEnumerates.CalibrationFactorErrors.SYSTEM_ERROR.ToString) Then
+                                        If (curveResultID <> -1) Then
                                             'Mark CurveResultID as NULL for OrderTestId, RerunNumber
                                             myGlobal2 = res_delegate.ClearCurveResultsID(pDBConnection, myOrderTestID, myRerunNumber)
-
-                                            'Delete Curve
-                                            If Not myGlobal2.HasError Then
+                                            If (Not myGlobal2.HasError) Then
+                                                'Delete Curve
                                                 myGlobal2 = curve_res.DeleteCurve(pDBConnection, curveResultID)
                                             End If
                                         End If
@@ -4315,19 +4282,19 @@ Namespace Biosystems.Ax00.Calculations
                                         'END AG 09/06/2010
 
                                         'If no curve found ... then find next curveID
-                                        If pItem = 0 And curveResultID = -1 Then
+                                        If (pItem = 0 AndAlso curveResultID = -1) Then
                                             myGlobal2 = curve_res.FindNextID(pDBConnection)
-                                            If Not myGlobal2.HasError And Not myGlobal2.SetDatos Is Nothing Then
+                                            If (Not myGlobal2.HasError AndAlso Not myGlobal2.SetDatos Is Nothing) Then
                                                 curveResultID = CType(myGlobal2.SetDatos, Integer)
                                             Else
                                                 myClassGlobalResult = myGlobal2
                                                 Exit Try
                                             End If
-                                            If curveResultID = -1 Then Exit Try 'Protection case
+                                            If (curveResultID = -1) Then Exit Try 'Protection case
                                         End If
 
                                         'Save the curve in twksCurveResults before saving the average results in twksResults only one time
-                                        If pItem = 0 Then
+                                        If (pItem = 0) Then
                                             'Save the Calibrator curve (points)
                                             Dim curveDS As New CurveResultsDS
                                             For i As Integer = 0 To UBound(calibrator.Curve.Points, 2)
@@ -4339,80 +4306,74 @@ Namespace Biosystems.Ax00.Calculations
                                                 curvepointrow.CONCValue = calibrator.Curve.Points(CONC_ID, i)
                                                 curveDS.twksCurveResults.AddtwksCurveResultsRow(curvepointrow)
                                             Next i
+
                                             myGlobal2 = curve_res.SaveResults(pDBConnection, curveDS)
-                                            If myGlobal2.HasError Then
+                                            If (myGlobal2.HasError) Then
                                                 myClassGlobalResult = myGlobal2
                                                 Exit Try
                                             End If
                                         End If 'If pItem = 0 Then
-
                                     End If 'AG 09/06/2010
 
                                     res_row.CurveResultsID = curveResultID
                                     'END save the curve
 
-                                ElseIf calibrator.NumberOfCalibrators = 1 Then
+                                ElseIf (calibrator.NumberOfCalibrators = 1) Then
                                     'Calibrator average results information 
                                     res_row.CalibratorFactor = calibrator.Factor
-                                    If Trim$(calibrator.ErrorCalibration) <> "" Then res_row.CalibrationError = calibrator.ErrorCalibration
+                                    If (Trim$(calibrator.ErrorCalibration) <> String.Empty) Then res_row.CalibrationError = calibrator.ErrorCalibration
                                 End If
 
                                 'AG 10/09/2010 - update ManualFactorFlag & ManualFactor only when calibrator
-                                If calibrator.ManualFactorFlag Then
+                                If (calibrator.ManualFactorFlag) Then
                                     res_row.ManualResultFlag = True
                                     res_row.ManualResult = calibrator.ManualFactor
                                 End If
                                 'END AG 10/09/2010
 
-
                             Case "CTRL", "PATIENT"
                                 res_row.CONC_Value = .Conc
-                                If Trim$(.ErrorConc) <> "" Then res_row.CONC_Error = .ErrorConc
+                                If (Trim$(.ErrorConc) <> String.Empty) Then res_row.CONC_Error = .ErrorConc
                         End Select
 
-                        '2) Save into Database
+                        '(2) Save into Database
                         res_row.TS_DateTime = Now
                         res_row.AnalyzerID = myAnalyzerID
                         res_row.WorkSessionID = myWorkSessionID
                         res_DS.twksResults.AddtwksResultsRow(res_row)
 
-                        'Dim myGlobal As New GlobalDataTO    'AG 10/09/2010
-                        myGlobal = res_delegate.SaveResults(pDBConnection, res_DS)
-                        If myGlobal.HasError Then
+                        myGlobal = res_delegate.SaveResults(pDBConnection, res_DS, common(pItem).RecalculationFlag)
+                        If (myGlobal.HasError) Then
                             myClassGlobalResult = myGlobal
                             Exit Try
 
                             'AG 15/10/2014 BA-2011 - Update properly the OrderToExport field when the recalculated result is an accepted one
-                        ElseIf .AcceptedResult Then
+                        ElseIf (.AcceptedResult) Then
                             Dim orders_dlg As New OrdersDelegate
                             myGlobal = orders_dlg.SetNewOrderToExportValue(pDBConnection, , myOrderTestID)
                             'AG 15/10/2014 BA-2011
-
                         End If
 
-                        '3) Mark all other rerun as NOT ACCEPTED
-
+                        '(3) Mark the rest of RERUNS as NOT ACCEPTED
                         'AG 21/07/2010 - In recalculation mode do not change the accepted results
-                        'myGlobal = res_delegate.ResetAcceptedResultFlag(pDBConnection, myOrderTestID, myRerunNumber)
-                        If Not common(pItem).RecalculationFlag Then
+                        If (Not common(pItem).RecalculationFlag) Then
                             'For CONTROLS, results for all requested Reruns are accepted
                             If (preparation(pItem).SampleClass <> "CTRL") Then
                                 myGlobal = res_delegate.ResetAcceptedResultFlag(pDBConnection, myOrderTestID, myRerunNumber)
-                                If myGlobal.HasError Then
+                                If (myGlobal.HasError) Then
                                     myClassGlobalResult = myGlobal
                                     Exit Try
                                 End If
                             End If
 
-                            ''4) Update OrderTestStatus to CLOSED
+                            '(4) Update OrderTestStatus to CLOSED
                             Dim ot_delegate As New OrderTestsDelegate
 
-                            'AG 12/05/2010 - When the last ordertest replicate is calculated change ordertest status to CLOSED
-                            'For multiitems ordertest update the status only one time
-                            'myGlobal = ot_delegate.UpdateStatusByOrderTestId(pDBConnection, myOrderTestID, "ACCEPTED")
-                            If .ReplicateID = .MaxReplicates And pItem = 0 Then
+                            'AG 12/05/2010 - When the last OrderTest Replicate is calculated, change OrderTestStatus to CLOSED
+                            'For OrderTests with multiple items, update the status only once
+                            If (.ReplicateID = .MaxReplicates AndAlso pItem = 0) Then
                                 myGlobal = ot_delegate.UpdateStatusByOrderTestID(pDBConnection, myOrderTestID, "CLOSED")
-                                If myGlobal.HasError Then
+                                If (myGlobal.HasError) Then
                                     myClassGlobalResult = myGlobal
                                     Exit Try
                                 End If
@@ -5275,24 +5236,27 @@ Namespace Biosystems.Ax00.Calculations
         End Function
 
         ''' <summary>
-        ''' (Adapted from Ax5 ObtenerAvisosResultadosCONC)
-        ''' Evaluate the remarks for concentration results (replicates and average)
-        ''' 
+        ''' ** Adapted from Ax5 ObtenerAvisosResultadosCONC **
+        ''' Evaluate the remarks for Concentration results (replicates and average)
         ''' Evaluation can do:
         ''' -	Nothing or Add/Delete new remarks
         ''' 
         ''' The ExecutionAlarmsDS and ResultAvgAlarmsDS are updated with new alarms
         ''' </summary>
-        ''' <param name="pExecutionAlarmsDS"></param>
-        ''' <param name="pAverageAlarmsDS"></param>
-        ''' <returns></returns>
+        ''' <param name="pExecutionAlarmsDS">Typed DataSet WSExecutionAlarmsDS to return remarks for Replicate Results</param>
+        ''' <param name="pAverageAlarmsDS">Typed DataSet ResultAlarmsDS to return remarks for Average Results</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by AG 03/06/2010 (basic testing OK / complete testing Pending)
-        ''' Modified by AG 13/09/2010 (if conc not calculated dont add the 'Conc lower than 0' remark)
-        ''' Modified by AG 08/11/2010 - new remark Calibrator lot expired
+        ''' Created by:  AG 03/06/2010
+        ''' Modified by: AG 13/09/2010 - If CONC not calculated, do not add the 'CONC lower than 0' remark
+        '''              AG 08/11/2010 - Added new remark 'Calibrator Lot expired'
+        '''              SA 01/12/2014 - BA-2003 ==> When the preparation has been diluted to obtain the result, use the real 
+        '''                                          obtained CONC (the value before applying the PostDilutionFactor) to check if 
+        '''                                          the value is greater than the LinearityLimit
+        '''                            - Additionally, fixed a copy/paste error in validation of CONC out of Normality Range for Average Results 
         ''' </remarks>
-        Private Function GenerateConcentrationRemarks(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                      ByRef pExecutionAlarmsDS As WSExecutionAlarmsDS, ByRef pAverageAlarmsDS As ResultAlarmsDS) As GlobalDataTO
+        Private Function GenerateConcentrationRemarks(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pExecutionAlarmsDS As WSExecutionAlarmsDS, _
+                                                      ByRef pAverageAlarmsDS As ResultAlarmsDS) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -5302,332 +5266,279 @@ Namespace Biosystems.Ax00.Calculations
                 ReplID = preparation(item).ReplicateID - 1
 
                 myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
-
-                If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
-                        '1.- Conc NOT calculated [Replicate & Average remark]
-                        '(if test calibrates with Curve use Incorrect Curve)
-                        If test.ErrorBlankAbs <> "" Or calibrator.ErrorAbs <> "" Then
-                            If calibrator.NumberOfCalibrators = 1 Then
-                                'Conc NOT calculated
+                        '1.- CONC Not Calculated [Replicate & Average remarks]
+                        If (test.ErrorBlankAbs <> String.Empty OrElse calibrator.ErrorAbs <> String.Empty) Then
+                            If (calibrator.NumberOfCalibrators = 1) Then
+                                'CONC Not Calculated
                                 Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
                                 Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
 
-                                'AG 15/09/2010
-                                'Else
-                            ElseIf calibrator.NumberOfCalibrators > 1 Then
-                                'END AG 15/09/2010
-                                If test.ErrorBlankAbs = "" And calibrator.ErrorCalibration <> "" Then
-                                    'Incorrect curve
+                            ElseIf (calibrator.NumberOfCalibrators > 1) Then
+                                If (test.ErrorBlankAbs = String.Empty AndAlso calibrator.ErrorCalibration <> String.Empty) Then
+                                    'If Test calibrates with curve and the curve is incorrect
                                     Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CALIB_REMARK1.ToString)
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK1.ToString)
                                 End If
                             End If
-
-                            'AG 02/08/2010 - Check if conc has been calculated
                         Else
-                            If preparation(item).ErrorReplicateConc(ReplID) <> "" Then
-                                'Conc not Calculated
+                            'AG 02/08/2010 - Check if CONC has been calculated
+                            If (preparation(item).ErrorReplicateConc(ReplID) <> String.Empty) Then
+                                'Replicate CONC Not Calculated
                                 Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
                             End If
-                            If preparation(item).ErrorConc <> "" Then
-                                'Conc not Calculated
+
+                            If (preparation(item).ErrorConc <> String.Empty) Then
+                                'Average CONC Not Calculated
                                 Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
                             End If
                             'END AG 02/08/2010
-
                         End If
 
-                        '2.- Conc out of calibration curve (HIGH) [Replicate & Average remark]
-                        If calibrator.NumberOfCalibrators > 1 Then
-                            If preparation(item).ErrorReplicateConc(ReplID) = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString Then
-                                'Conc out of calibration curve (HIGH)
+                        '2.- CONC out of calibration curve (HIGH) [Replicate & Average remark]
+                        If (calibrator.NumberOfCalibrators > 1) Then
+                            If (preparation(item).ErrorReplicateConc(ReplID) = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString) Then
+                                'Replicate CONC out of calibration curve (HIGH)
                                 Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK2.ToString)
                             End If
 
-                            If preparation(item).ErrorConc = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString Then
-                                'Conc out of calibration curve (HIGH)
+                            If (preparation(item).ErrorConc = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString) Then
+                                'Average CONC out of calibration curve (HIGH)
                                 Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK2.ToString)
                             End If
                         End If
 
-                        '3 & 4.- 'Conc out of calibration curve (LOW)' or 'Conc < 0' [Replicate & Average remark]
-                        'AG 31/08/2010
+                        '3 & 4.- 'CONC out of calibration curve (LOW)' or 'CONC < 0' [Replicate & Average remark]
                         Dim sign As Integer = 1
-                        If calibrator.NumberOfCalibrators > 1 Then
-                            If Not calibrator.Curve.CurveGrowthType = "INC" Then
+                        If (calibrator.NumberOfCalibrators > 1) Then
+                            If (Not calibrator.Curve.CurveGrowthType = "INC") Then
                                 sign = -1
                             End If
                         End If
 
-                        If sign * preparation(item).ReplicateAbs(ReplID) < sign * test.BlankAbs Then
-                            If calibrator.NumberOfCalibrators > 1 Then
-                                'Conc out of calibration curve (LOW)
+                        If (sign * preparation(item).ReplicateAbs(ReplID) < sign * test.BlankAbs) Then
+                            If (calibrator.NumberOfCalibrators > 1) Then
+                                'Replicate Conc out of calibration curve (LOW)
                                 Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK3.ToString)
 
-                                'AG 13/09/2010 - Conc < 0 remark only if conc has been calcualted
-                                'Else
-                            ElseIf preparation(item).ErrorReplicateConc(ReplID) = "" Then
-                                'END AG 13/09/2010
-
-                                'Conc < 0
+                                'AG 13/09/2010 - Conc < 0 remark is generated only if CONC has been calculated
+                            ElseIf (preparation(item).ErrorReplicateConc(ReplID) = String.Empty) Then
                                 Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK4.ToString)
                             End If
 
                             'AG 31/08/2010
-                            If sign * preparation(item).Abs < sign * test.BlankAbs Then
-                                If calibrator.NumberOfCalibrators > 1 Then
-                                    'Conc out of calibration curve (LOW)
+                            If (sign * preparation(item).Abs < sign * test.BlankAbs) Then
+                                If (calibrator.NumberOfCalibrators > 1) Then
+                                    'Average CONC out of calibration curve (LOW)
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK3.ToString)
 
-                                    'AG 13/09/2010 - Conc < 0 remark only if conc has been calcualted
-                                    'Else
-                                ElseIf preparation(item).ErrorConc = "" Then
-                                    'END AG 13/09/2010
-
-                                    'Conc < 0
+                                    'AG 13/09/2010 - Conc < 0 remark is generated only if CONC has been calculated
+                                ElseIf (preparation(item).ErrorConc = String.Empty) Then
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK4.ToString)
                                 End If
                             End If
                         End If
 
-                        '5.- 'Conc > Linearity Limit [Replicate & Average remark]
-                        If test.LinearityLimit.InUse Then
-                            If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
-                                If preparation(item).ReplicateConc(ReplID) > test.LinearityLimit.Value Then
-                                    'Conc > Linearity Limit
+                        '5.- 'CONC > Linearity Limit [Replicate & Average remark]
+                        If (test.LinearityLimit.InUse) Then
+                            'BA-2003: When the preparation has been diluted to obtain the result, use the real obtained CONC (the value before applying the PostDilutionFactor)
+                            '         to check if the value is greater than the LinearityLimit 
+                            Dim myCONC As Single = 0
+
+                            If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
+                                myCONC = preparation(item).ReplicateConc(ReplID)
+                                If (Trim$(preparation(item).PostDilutionType) <> "NONE") Then myCONC = myCONC / test.PostDilutionFactor
+
+                                If (myCONC > test.LinearityLimit.Value) Then
+                                    'Replicate CONC > Linearity Limit
                                     Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK5.ToString)
                                 End If
                             End If
-                            If preparation(item).Conc <> ERROR_VALUE Then
-                                If preparation(item).Conc > test.LinearityLimit.Value Then
-                                    'Conc > Linearity Limit
+                            If (preparation(item).Conc <> ERROR_VALUE) Then
+                                myCONC = preparation(item).Conc
+                                If (Trim$(preparation(item).PostDilutionType) <> "NONE") Then myCONC = myCONC / test.PostDilutionFactor
+
+                                If (myCONC > test.LinearityLimit.Value) Then
+                                    'Average CONC > Linearity Limit
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK5.ToString)
                                 End If
                             End If
                         End If
 
-                        '6.- 'Conc < Detection Limit [Replicate & Average remark]
-                        If test.DetectionLimit.InUse Then
-                            If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
-                                If preparation(item).ReplicateConc(ReplID) < test.DetectionLimit.Value Then
-                                    'Conc > Detection Limit
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
-
-                                    'NOTE: If exist alarm detection limit then delete Non Linear Kinetics remark!!
-                                    '(Dont needed because the Non Linear Kinetics alarms is an average alarm!)¡
-                                    Dim linqRemarkToDelete As New List(Of WSExecutionAlarmsDS.twksWSExecutionAlarmsRow)
-                                    linqRemarkToDelete = (From a In pExecutionAlarmsDS.twksWSExecutionAlarms _
-                                                               Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
-                                                               Select a).ToList()
-
-                                    If (linqRemarkToDelete.Count > 0) Then
-                                        linqRemarkToDelete.First().Delete()
-                                        linqRemarkToDelete.First().AcceptChanges()
-                                    End If
-                                    linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
-
-                                End If
-                            End If
-
-                            If preparation(item).Conc <> ERROR_VALUE Then
-                                If preparation(item).Conc < test.DetectionLimit.Value Then
-                                    'Conc > Detection Limit
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
-
-                                    'NOTE: If exist alarm detection limit then delete Non Linear Kinetics remark!!
-                                    'Delete from local DS (pAverageAlarmsDS)
-                                    Dim linqRemarkToDelete As New List(Of ResultAlarmsDS.twksResultAlarmsRow)
-                                    linqRemarkToDelete = (From a In pAverageAlarmsDS.twksResultAlarms _
-                                                          Where String.Equals(a.AlarmID, GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString) _
-                                                          Select a).ToList()
-
-                                    If (linqRemarkToDelete.Count > 0) Then
-                                        linqRemarkToDelete.First().Delete()
-                                        linqRemarkToDelete.First().AcceptChanges()
-                                    End If
-                                    linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
-                                End If
-                            End If
-                        End If
-
-                        '7.- 'Conc out of normality range
-                        If test.ReferenceRange.InUse Then
-                            'Validate Normality Ranges for Replicate.
-                            If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
-                                'If preparation(item).ReplicateConc(ReplID) < test.ReferenceRange.Minimum Or _
-                                '    preparation(item).ReplicateConc(ReplID) > test.ReferenceRange.Maximum Then
-                                '    'Conc out of normality range
-                                '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
-                                'End If
-
-                                'TR 06/06/2012 -New Implementation.
-                                'Rep < Panic Min
-                                If preparation(item).ReplicateConc(ReplID) < test.ReferenceRange.Minimum Then
-                                    'Validate if panic is in use.
-                                    If test.BorderLineRange.InUse Then
-                                        If preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Minimum Then
-                                            'Conc. Lower than Normality Min And Greater than than panic Min.
-                                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                                 GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString())
-                                        End If
-                                    Else
-                                        'Conc. Lower than Normality Min
-                                        'If (preparation(item).SampleClass = "CTRL") Then  - For BT #1054
-                                        '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                        '                     GlobalEnumerates.CalculationRemarks.CONC_CTRL_REMARK7.ToString())
-                                        'Else
-                                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                         GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString())
-                                        'End If
-                                        
-                                    End If
-                                    'Rep > Panic Max
-                                ElseIf preparation(item).ReplicateConc(ReplID) > test.ReferenceRange.Maximum Then
-                                    'Validate if panic is in use.
-                                    If test.BorderLineRange.InUse Then
-                                        If preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Maximum Then
-                                            'Conc. Lower than Normality Max And lower than than panic Min.
-                                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                                 GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString())
-                                        End If
-                                    Else
-                                        'Conc. greater than Normality Max
-                                        'If (preparation(item).SampleClass = "CTRL") Then  - For BT #1054
-                                        '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                        '                     GlobalEnumerates.CalculationRemarks.CONC_CTRL_REMARK8.ToString())
-                                        'Else
-                                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                             GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
-                                        'End If
-                                    End If
-                                End If
-                                'TR 06/06/2012 -END.
-                            End If
-                            'Validate Normality Ranges for Concentration.
-                            If preparation(item).Conc <> ERROR_VALUE Then
-                                'If preparation(item).Conc < test.ReferenceRange.Minimum Or preparation(item).Conc > test.ReferenceRange.Maximum Then
-                                '    'Conc out of normality range
-                                '    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
-                                'End If
-
-                                'TR 06/06/2012 -New Implementation.
-                                If preparation(item).Conc < test.ReferenceRange.Minimum Then
-                                    'Validate if panic is in use
-                                    If test.BorderLineRange.InUse Then
-                                        If preparation(item).Conc > test.BorderLineRange.Minimum Then
-                                            'Conc out of normality range
-                                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                              item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
-                                        End If
-                                    Else
-                                        'Conc out of normality range
-                                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                          item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
-                                    End If
-
-                                ElseIf preparation(item).Conc > test.ReferenceRange.Maximum Then
-                                    If test.BorderLineRange.InUse Then
-                                        If preparation(item).Conc < test.BorderLineRange.Minimum Then
-                                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
-                                        End If
-                                    Else
-                                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
-                                    End If
-                                End If
-                                'TR 06/06/2012 -END.
-
-                            End If
-                        End If
-
-                        '8.- 'BorderLine (H)
-                        'Validate the Panic Ranges if in use
-                        If test.ReferenceRange.InUse And test.BorderLineRange.InUse Then
-                            If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
-                                'Validate Max Panic Ranges for Repl.
-                                If preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Maximum Then
-                                    ''H
-                                    'Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
-
-                                    'TR 06/06/2012 -New Implementation.
-                                    'Conc. higher than panic Max
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                         GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
-                                    'TR 06/06/2012 -END.
-                                End If
-                            End If
-
-                            If preparation(item).Conc <> ERROR_VALUE Then
-                                'Validate Max Panic Ranges for Conc.
-                                If preparation(item).Conc > test.BorderLineRange.Maximum Then
-                                    'H
-                                    'Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
-                                    'TR 06/06/2012 -New Implementation.
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
-                                    'TR 06/06/2012 -END.
-                                End If
-                            End If
-                        End If
-
-                        '9.- 'BorderLine (L)
-                        If test.ReferenceRange.InUse And test.BorderLineRange.InUse Then
-                            'Validate Min Panic Ranges for Repl.
-                            If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
-                                'If preparation(item).ReplicateConc(ReplID) > test.ReferenceRange.Maximum And _
-                                '    preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Maximum Then
-                                '    'BH
-                                '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
-                                'End If
-
-                                'TR 06/06/2012 -New Implementation.
-                                If preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Minimum Then
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                         GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
-                                End If
-                                'TR 06/06/2012 -END.
-                            End If
-                            'Validate Max Panic Ranges for Conc.
-                            If preparation(item).Conc <> ERROR_VALUE Then
-                                'If preparation(item).Conc > test.ReferenceRange.Maximum And preparation(item).Conc < test.BorderLineRange.Maximum Then
-                                '    'BH
-                                '    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
-                                'End If
-
-                                'TR 06/06/2012 -New Implementation.
-                                If preparation(item).Conc < test.BorderLineRange.Minimum Then
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
-                                End If
-                                'TR 06/06/2012 -END.
-                            End If
-                        End If
-
-                        '10.- 'BorderLine (L)
-                        'If test.ReferenceRange.InUse And test.BorderLineRange.InUse Then
+                        ''5.- 'Conc > Linearity Limit [Replicate & Average remark]
+                        'If test.LinearityLimit.InUse Then
                         '    If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
-                        '        If preparation(item).ReplicateConc(ReplID) < test.ReferenceRange.Minimum And _
-                        '            preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Minimum Then
-                        '            'L
-                        '            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                        '        If preparation(item).ReplicateConc(ReplID) > test.LinearityLimit.Value Then
+                        '            'Conc > Linearity Limit
+                        '            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK5.ToString)
                         '        End If
                         '    End If
-
                         '    If preparation(item).Conc <> ERROR_VALUE Then
-                        '        If preparation(item).Conc < test.ReferenceRange.Minimum And preparation(item).Conc > test.BorderLineRange.Minimum Then
-                        '            'L
-                        '            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                        '        If preparation(item).Conc > test.LinearityLimit.Value Then
+                        '            'Conc > Linearity Limit
+                        '            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK5.ToString)
                         '        End If
                         '    End If
                         'End If
 
-                        '11.- Calibration expiration date [Average remark] AG 08/11/2010
-                        'No manual result and the expiration date < calib calculation date
-                        If Not calibrator.ManualFactorFlag And calibrator.ExpirationDate < calibrator.CalibratorDate Then
+                        '6.- 'CONC < Detection Limit [Replicate & Average remark]
+                        If (test.DetectionLimit.InUse) Then
+                            If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
+                                If (preparation(item).ReplicateConc(ReplID) < test.DetectionLimit.Value) Then
+                                    'Replicate CONC > Detection Limit
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
+
+                                    'NOTE: If there is an alarm of Detection Limit then delete Non Linear Kinetics remark!!
+                                    '      (it is not needed because the Non Linear Kinetics alarms is an average alarm!)
+                                    Dim linqRemarkToDelete As New List(Of WSExecutionAlarmsDS.twksWSExecutionAlarmsRow)
+                                    linqRemarkToDelete = (From a As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In pExecutionAlarmsDS.twksWSExecutionAlarms _
+                                                         Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
+                                                        Select a).ToList()
+
+                                    If (linqRemarkToDelete.Count > 0) Then
+                                        linqRemarkToDelete.First().Delete()
+                                        linqRemarkToDelete.First().AcceptChanges()
+                                    End If
+                                    linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
+                                End If
+                            End If
+
+                            If (preparation(item).Conc <> ERROR_VALUE) Then
+                                If (preparation(item).Conc < test.DetectionLimit.Value) Then
+                                    'Average CONC > Detection Limit
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
+
+                                    'NOTE: If there is an alarm of Detection Limit then delete Non Linear Kinetics remark!!
+                                    '      Delete it from local DS (pAverageAlarmsDS)
+                                    Dim linqRemarkToDelete As New List(Of ResultAlarmsDS.twksResultAlarmsRow)
+                                    linqRemarkToDelete = (From a As ResultAlarmsDS.twksResultAlarmsRow In pAverageAlarmsDS.twksResultAlarms _
+                                                         Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
+                                                        Select a).ToList()
+
+                                    If (linqRemarkToDelete.Count > 0) Then
+                                        linqRemarkToDelete.First().Delete()
+                                        linqRemarkToDelete.First().AcceptChanges()
+                                    End If
+                                    linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
+                                End If
+                            End If
+                        End If
+
+                        '7.- 'CONC out of normality range
+                        If (test.ReferenceRange.InUse) Then
+                            'Validate Normality Ranges for the Replicate result
+                            If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
+                                'TR 06/06/2012 - New implementation
+
+                                'Replicate CONC < Panic Min
+                                If (preparation(item).ReplicateConc(ReplID) < test.ReferenceRange.Minimum) Then
+                                    'Validate if Panic is in use
+                                    If (test.BorderLineRange.InUse) Then
+                                        If (preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Minimum) Then
+                                            'Replicate CONC is lower than Normality Min and greater than than Panic Min
+                                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString())
+                                        End If
+                                    Else
+                                        'Replicate CONC lower than Normality Min
+                                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString())
+                                    End If
+
+                                    'Replicate CONC > Panic Max
+                                ElseIf (preparation(item).ReplicateConc(ReplID) > test.ReferenceRange.Maximum) Then
+                                    'Validate if Panic is in use
+                                    If (test.BorderLineRange.InUse) Then
+                                        If (preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Maximum) Then
+                                            'Replicate CONC is lower than Normality Max and lower than Panic Max
+                                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString())
+                                        End If
+                                    Else
+                                        'Replicate CONC greater than Normality Max
+                                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                    End If
+                                End If
+
+                                'TR 06/06/2012 - END
+                            End If
+
+                            'Validate Normality Ranges for the Average result
+                            If (preparation(item).Conc <> ERROR_VALUE) Then
+                                'TR 06/06/2012 - New implementation
+
+                                If (preparation(item).Conc < test.ReferenceRange.Minimum) Then
+                                    'Validate if Panic is in use
+                                    If (test.BorderLineRange.InUse) Then
+                                        If (preparation(item).Conc > test.BorderLineRange.Minimum) Then
+                                            'Average CONC out of normality range
+                                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+                                        End If
+                                    Else
+                                        'Average CONC out of normality range
+                                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+                                    End If
+
+                                ElseIf (preparation(item).Conc > test.ReferenceRange.Maximum) Then
+                                    'Validate if Panic is in use
+                                    If (test.BorderLineRange.InUse) Then
+                                        If (preparation(item).Conc < test.BorderLineRange.Maximum) Then
+                                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                        End If
+                                    Else
+                                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                    End If
+                                End If
+
+                                'TR 06/06/2012 - END
+                            End If
+                        End If
+
+                        '8.- BorderLine (H)
+                        If (test.ReferenceRange.InUse AndAlso test.BorderLineRange.InUse) Then
+                            'TR 06/06/2012 - New implementation
+
+                            If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
+                                If (preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Maximum) Then
+                                    'Replicate CONC is higher than Panic Max
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                                End If
+                            End If
+
+                            If (preparation(item).Conc <> ERROR_VALUE) Then
+                                If (preparation(item).Conc > test.BorderLineRange.Maximum) Then
+                                    'Average CONC is higher than Panic Max
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                                End If
+                            End If
+
+                            'TR 06/06/2012 - END
+                        End If
+
+                        '9.- BorderLine (L)
+                        If (test.ReferenceRange.InUse And test.BorderLineRange.InUse) Then
+                            'TR 06/06/2012 - New implementation
+
+                            If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
+                                If (preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Minimum) Then
+                                    'Replicate CONC is lower than Panic Min
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
+                                End If
+                            End If
+
+                            If (preparation(item).Conc <> ERROR_VALUE) Then
+                                If (preparation(item).Conc < test.BorderLineRange.Minimum) Then
+                                    'Average CONC is lower than Panic Min
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
+                                End If
+                            End If
+
+                            'TR 06/06/2012 - END
+                        End If
+
+                        '11.- Calibration Lot expiration date [Average remark] 
+                        '     AG 08/11/2010 - No manual result and the expiration date < calib calculation date
+                        If (Not calibrator.ManualFactorFlag AndAlso calibrator.ExpirationDate < calibrator.CalibratorDate) Then
                             Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK4.ToString)
                         End If
 
@@ -5641,8 +5552,6 @@ Namespace Biosystems.Ax00.Calculations
                         End If
                     End If
                 End If
-
-
             Catch ex As Exception
                 Me.CatchLaunched("GenerateConcentrationRemarks", ex)
                 If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection) 'AG 10/05/2010
@@ -6622,1787 +6531,6 @@ Namespace Biosystems.Ax00.Calculations
 
 #End Region
 
-#Region "To_Delete"
-        '''' <summary>
-        '''' Find and get the last calibrator results for the current test
-        '''' </summary>
-        '''' <remarks>
-        '''' Created by AG 26/02/2010 (Tested ...)
-        '''' </remarks>
-        'Private Sub GetLastCalibResultsOLD(ByVal pDBConnection As SqlClient.SqlConnection)
-        '    Try
-        '        'Initiate values
-        '        If calibrator.NumberOfCalibrators = 1 Then
-        '            calibrator.Factor = 1
-        '            calibrator.BlankAbsUsed = 0
-        '            calibrator.ErrorCalibration = ""
-        '            calibrator.CalibratorDate = DateTime.MinValue
-        '        Else
-        '            ReDim calibrator.Curve.Points(1, calibrator.Curve.CurvePointsNumber)
-        '            calibrator.BlankAbsUsed = 0
-        '            calibrator.ErrorCalibration = ""
-        '            calibrator.CalibratorDate = DateTime.MinValue
-        '        End If
-
-
-        '        Dim dbConnection As New SqlClient.SqlConnection
-        '        Dim res_delegate As New ResultsDelegate
-        '        Dim localres As New GlobalDataTO
-
-        '        localres = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not localres.HasError) And (Not localres.SetDatos Is Nothing) Then
-        '            dbConnection = CType(localres.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-
-        '                'Find the last OrderTestID belongs to the calibrator: testId-sampletype in analyzer                        
-        '                localres = res_delegate.GetLastExecutedCalibrator(dbConnection, test.TestID, calibrator.SampleType, test.TestVersion, myAnalyzerID, "", False)
-        '                If Not localres.HasError And Not localres.SetDatos Is Nothing Then
-        '                    Dim AdditionalElements As New WSAdditionalElementsDS
-        '                    AdditionalElements = CType(localres.SetDatos, WSAdditionalElementsDS)
-
-        '                    If AdditionalElements.WSAdditionalElementsTable.Rows.Count > 0 Then
-        '                        Dim foundOrderTestId As Integer = AdditionalElements.WSAdditionalElementsTable(0).PreviousOrderTestID
-
-
-        '                        'Get the calibrator results
-        '                        localres = res_delegate.GetAcceptedResults(dbConnection, foundOrderTestId, False, False)
-        '                        If Not localres.HasError And Not localres.SetDatos Is Nothing Then
-        '                            Dim lastResults As New ResultsDS
-        '                            lastResults = CType(localres.SetDatos, ResultsDS)
-        '                            If lastResults.twksResults.Rows.Count > 0 Then
-        '                                If Not lastResults.twksResults(0).IsCalibratorBlankAbsUsedNull Then calibrator.BlankAbsUsed = lastResults.twksResults(0).CalibratorBlankAbsUsed
-        '                                If Not lastResults.twksResults(0).IsCalibrationErrorNull Then calibrator.ErrorCalibration = lastResults.twksResults(0).CalibrationError
-        '                                If Not lastResults.twksResults(0).IsCurveGrowthTypeNull Then calibrator.Curve.CurveGrowthType = lastResults.twksResults(0).CurveGrowthType
-        '                                If Not lastResults.twksResults(0).IsCurveTypeNull Then calibrator.Curve.CurveType = lastResults.twksResults(0).CurveType
-        '                                If Not lastResults.twksResults(0).IsCurveAxisXTypeNull Then calibrator.Curve.CurveAxisXType = lastResults.twksResults(0).CurveAxisXType
-        '                                If Not lastResults.twksResults(0).IsCurveAxisYTypeNull Then calibrator.Curve.CurveAxisXType = lastResults.twksResults(0).CurveAxisYType
-        '                                If Not lastResults.twksResults(0).IsResultDateTimeNull Then calibrator.CalibratorDate = lastResults.twksResults(0).ResultDateTime 'AG 11/03/2010
-
-
-        '                                'if calibrator NOT is multitiem then we already get the results. Otherwise we need to get the curve results
-        '                                If calibrator.NumberOfCalibrators = 1 Then
-        '                                    If Not lastResults.twksResults(0).IsCalibratorFactorNull Then calibrator.Factor = lastResults.twksResults(0).CalibratorFactor
-        '                                    If Not lastResults.twksResults(0).IsABSValueNull Then calibrator.CalibratorAbs = lastResults.twksResults(0).ABSValue
-        '                                    If Not lastResults.twksResults(0).IsABS_ErrorNull Then calibrator.ErrorAbs = lastResults.twksResults(0).ABS_Error
-
-        '                                Else
-        '                                    For i As Integer = 0 To lastResults.twksResults.Rows.Count - 1
-        '                                        If Not lastResults.twksResults(i).IsABSValueNull Then calibrator.Curve.CalibratorAbs(i) = lastResults.twksResults(i).ABSValue
-        '                                        If Not lastResults.twksResults(i).IsABS_ErrorNull Then calibrator.Curve.ErrorAbs(i) = lastResults.twksResults(i).ABS_Error
-        '                                        If Not lastResults.twksResults(i).IsCONC_ValueNull Then calibrator.Curve.ConcCurve(i) = lastResults.twksResults(i).CONC_Value
-        '                                        If Not lastResults.twksResults(i).IsRelativeErrorCurveNull Then calibrator.Curve.ErrorCurve(i) = lastResults.twksResults(i).RelativeErrorCurve
-        '                                    Next i
-
-        '                                    'Read the curve points CurveResultID
-        '                                    'Dim Points(,) As Single '(1 <Abs or Conc>, CurvePoints <Point value>)
-        '                                    If Not lastResults.twksResults(0).IsCurveResultsIDNull Then
-        '                                        Dim curve_del As New CurveResultsDelegate
-
-        '                                        localres = curve_del.GetResults(dbConnection, lastResults.twksResults(0).CurveResultsID)
-        '                                        If Not localres.HasError And Not localres.SetDatos Is Nothing Then
-        '                                            Dim curveDS As New CurveResultsDS
-        '                                            curveDS = CType(localres.SetDatos, CurveResultsDS)
-
-        '                                            ReDim calibrator.Curve.Points(1, curveDS.twksCurveResults.Rows.Count - 1)
-        '                                            For i As Integer = 0 To curveDS.twksCurveResults.Rows.Count - 1
-        '                                                calibrator.Curve.Points(ABS_ID, i) = curveDS.twksCurveResults(i).ABSValue
-        '                                                calibrator.Curve.Points(CONC_ID, i) = curveDS.twksCurveResults(i).CONCValue
-        '                                            Next
-        '                                        End If
-
-        '                                    Else
-        '                                        myClassGlobalResult.HasError = True
-        '                                        myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.INCORRECT_DATA.ToString
-        '                                    End If
-        '                                End If 'If calibrator.NumberOfCalibrators = 1 Then
-        '                            End If 'If lastResults.twksResults.Rows.Count > 0 Then
-        '                        Else
-        '                            calibrator.ErrorCalibration = GlobalEnumerates.CalibrationFactorErrors.NON_MONOTONOUS_CURVE.ToString
-        '                        End If 'If Not localres.HasError And Not localres.SetDatos Is Nothing Then
-
-        '                    Else
-        '                        calibrator.ErrorCalibration = GlobalEnumerates.CalibrationFactorErrors.ABS_ERROR.ToString
-        '                    End If 'If AdditionalElements.WSAdditionalElementsTable.Rows.Count > 0 Then
-
-        '                End If
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        Me.CatchLaunched("GetLastCalibResults", ex)
-        '    End Try
-        'End Sub
-
-        '''' <summary>
-        '''' Get minimun ref range
-        '''' </summary>
-        '''' <param name="pdbConnection"></param>
-        '''' <param name="pTestID"></param>
-        '''' <param name="pSampleType"></param>
-        '''' <param name="pRangeType"></param>
-        '''' <param name="pExecutionsDS"></param>
-        '''' <returns>single</returns>
-        '''' <remarks>Created by: DL 23/08/2010</remarks>
-        'Public Function GetMinReferenceRange(ByVal pdbConnection As SqlClient.SqlConnection, _
-        '                                     ByVal pTestID As Integer, _
-        '                                     ByVal pSampleType As String, _
-        '                                     ByVal pRangeType As String, _
-        '                                     ByVal pExecutionsDS As ExecutionsDS, _
-        '                                     ByVal pTesType As String) As Single
-
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim resultData As New GlobalDataTO
-        '    Dim myMinimunValue As Single = -1
-
-        '    Try
-        '        ' DL 08/09/2010 {
-        '        ' Dim mySampleClass As String = pExecutionsDS.twksWSExecutions.Item(0).SampleClass.ToString.Trim
-
-        '        ' If mySampleClass = "PATIENT" Then
-        '        ' DL 08/09/2010 }
-
-        '        'RH: There is no need here to use a transaction, because we do not make
-        '        'any change or atomic operation over the database. We only read data.
-        '        'resultData = DAOBase.GetOpenDBTransaction(pdbConnection)
-        '        resultData = DAOBase.GetOpenDBConnection(pdbConnection)
-
-        '        If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myOrderTestID As Integer = pExecutionsDS.twksWSExecutions.Item(0).OrderTestID
-        '                Dim myTestRefRangesDelegate As New TestRefRangesDelegate()
-
-        '                resultData = myTestRefRangesDelegate.ReadByTestID(pdbConnection, pTestID, pSampleType, pRangeType, pTesType)
-
-        '                If Not resultData.HasError Then
-        '                    Dim myTestRefRanges As New TestRefRangesDS
-        '                    myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                    Select Case pRangeType
-
-        '                        Case "GENERIC"
-
-        '                            If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalLowerLimitNull Then
-        '                                myMinimunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalLowerLimit
-        '                            End If
-
-        '                        Case "DETAILED"
-
-        '                            Dim myOrderTestData As New OrderTestsDelegate
-        '                            resultData = myOrderTestData.GetTestID(pdbConnection, myOrderTestID)
-
-        '                            If Not resultData.HasError Then
-        '                                Dim myOrdersDelegate As New OrdersDelegate
-        '                                Dim myOrderTestDS As New OrderTestsDS
-        '                                Dim myOrderID As String
-        '                                Dim myPatientID As String = ""
-
-        '                                myOrderTestDS = CType(resultData.SetDatos, OrderTestsDS)
-        '                                myOrderID = myOrderTestDS.twksOrderTests.Item(0).OrderID
-        '                                resultData = myOrdersDelegate.ReadOrders(pdbConnection, myOrderID)
-
-        '                                If Not resultData.HasError Then
-        '                                    Dim myOrdersDS As New OrdersDS
-        '                                    myOrdersDS = CType(resultData.SetDatos, OrdersDS)
-        '                                    myPatientID = myOrdersDS.twksOrders.Item(0).PatientID
-        '                                End If
-
-        '                                If myPatientID <> "" Then
-        '                                    Dim myPatientDelegate As New PatientDelegate
-        '                                    resultData = myPatientDelegate.GetPatientData(pdbConnection, myPatientID)
-
-        '                                    If Not resultData.HasError Then
-        '                                        Dim myPatientDS As New PatientsDS
-        '                                        myPatientDS = CType(resultData.SetDatos, PatientsDS)
-
-        '                                        Dim bAge As Boolean = False
-        '                                        Dim bGender As Boolean = False
-
-        '                                        Dim qAgeRanges As New List(Of String)
-        '                                        qAgeRanges = (From a In myTestRefRanges.tparTestRefRanges _
-        '                                                      Order By a.AgeUnit _
-        '                                                      Group a By Age_ID = a.AgeUnit Into Group _
-        '                                                      Where Age_ID <> "" _
-        '                                                      Select Age_ID).ToList
-
-        '                                        If qAgeRanges.Count > 0 Then bAge = True
-
-        '                                        Dim qGenderRanges As New List(Of String)
-        '                                        qGenderRanges = (From a In myTestRefRanges.tparTestRefRanges _
-        '                                                         Order By a.Gender _
-        '                                                         Group a By Gender_ID = a.Gender Into Group _
-        '                                                         Where Gender_ID <> "" _
-        '                                                         Select Gender_ID).ToList
-
-        '                                        If qGenderRanges.Count > 0 Then bGender = True
-
-        '                                        If bGender And Not bAge Then
-        '                                            ' Gender
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByGender(pdbConnection, _
-        '                                                                                                     pTestID, _
-        '                                                                                                     pSampleType, _
-        '                                                                                                     myPatientDS.tparPatients.Item(0).Gender)
-        '                                        ElseIf bAge And Not bGender Then
-        '                                            ' Age
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByAge(pdbConnection, _
-        '                                                                                                  pTestID, _
-        '                                                                                                  pSampleType, _
-        '                                                                                                  myPatientDS.tparPatients.Item(0).Age)
-
-        '                                        ElseIf bAge And bGender Then
-        '                                            ' Gender + Age
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByGenderAge(pdbConnection, _
-        '                                                                                                        pTestID, _
-        '                                                                                                        pSampleType, _
-        '                                                                                                        myPatientDS.tparPatients.Item(0).Gender, _
-        '                                                                                                        myPatientDS.tparPatients.Item(0).Age)
-        '                                        End If
-
-        '                                        If Not resultData.HasError Then
-        '                                            myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                                            If myTestRefRanges.tparTestRefRanges.Count > 0 Then 'AG - add this condition to fix system error
-        '                                                If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalLowerLimitNull Then
-        '                                                    myMinimunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalLowerLimit
-        '                                                End If
-        '                                            End If
-
-        '                                        End If
-        '                                    End If
-        '                                End If
-        '                            End If
-        '                    End Select
-        '                End If
-
-        '                ''Close connection if needed
-        '                'If (Not resultData.HasError) Then
-        '                '    'When the Database Connection was opened locally, then the Commit is executed
-        '                '    If (pdbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                'Else
-        '                '    'When the Database Connection was opened locally, then the Rollback is executed
-        '                '    If (pdbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                'End If
-
-        '            End If
-        '        End If
-
-        '        ' DL 08/09/2010 {
-        '        'End If
-        '        ' DL 08/09/2010 }
-
-        '    Catch ex As Exception
-        '        Me.CatchLaunched("GetMinReferenceRange", ex)
-
-        '    Finally
-        '        If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-
-        '    Return myMinimunValue
-
-        'End Function
-
-        '''' <summary>
-        '''' Get minimun ref border
-        '''' </summary>
-        '''' <param name="pdbConnection"></param>
-        '''' <param name="pTestID"></param>
-        '''' <param name="pSampleType"></param>
-        '''' <param name="pRangeType"></param>
-        '''' <param name="pExecutionsDS"></param>
-        '''' <returns>single</returns>
-        '''' <remarks>Created by: DL 23/08/2010</remarks>
-        'Private Function GetMinReferenceBorder(ByVal pdbConnection As SqlClient.SqlConnection, _
-        '                                       ByVal pTestID As Integer, _
-        '                                       ByVal pSampleType As String, _
-        '                                       ByVal pRangeType As String, _
-        '                                       ByVal pExecutionsDS As ExecutionsDS) As Single
-
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim myMinimunValue As Single = -1
-
-        '    Try
-        '        'If pExecutionsDS.twksWSExecutions.Item(0).SampleClass.ToString.Trim = "PATIENT" And pRangeType = "GENERIC" Then
-        '        If pRangeType = "GENERIC" Then ' DL 09/09/2010
-        '            Dim myTestRefRangesDelegate As New TestRefRangesDelegate()
-
-        '            resultData = myTestRefRangesDelegate.ReadByTestID(pdbConnection, pTestID, pSampleType, pRangeType)
-
-        '            If Not resultData.HasError Then
-        '                Dim myTestRefRanges As New TestRefRangesDS
-        '                myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                If myTestRefRanges.tparTestRefRanges.Count > 0 Then 'AG
-        '                    If Not myTestRefRanges.tparTestRefRanges.Item(0).IsBorderLineLowerLimitNull Then
-        '                        myMinimunValue = myTestRefRanges.tparTestRefRanges.Item(0).BorderLineLowerLimit
-        '                    End If
-        '                End If
-
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        Me.CatchLaunched("MinRefBorder", ex)
-        '    End Try
-
-        '    Return myMinimunValue
-
-        'End Function
-
-
-        '''' <summary>
-        '''' Get minimun ref border
-        '''' </summary>
-        '''' <param name="pdbConnection"></param>
-        '''' <param name="pTestID"></param>
-        '''' <param name="pSampleType"></param>
-        '''' <param name="pRangeType"></param>
-        '''' <param name="pExecutionsDS"></param>
-        '''' <returns>single</returns>
-        '''' <remarks>Created by: DL 23/08/2010</remarks>
-        'Private Function GetMaxReferenceBorder(ByVal pdbConnection As SqlClient.SqlConnection, _
-        '                                       ByVal pTestID As Integer, _
-        '                                       ByVal pSampleType As String, _
-        '                                       ByVal pRangeType As String, _
-        '                                       ByVal pExecutionsDS As ExecutionsDS) As Single
-
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim myMaximunValue As Single = -1
-
-        '    Try
-        '        'If pExecutionsDS.twksWSExecutions.Item(0).SampleClass.ToString.Trim = "PATIENT" And pRangeType = "GENERIC" Then 
-        '        If pRangeType = "GENERIC" Then ' DL 09/09/2010
-
-        '            Dim myTestRefRangesDelegate As New TestRefRangesDelegate()
-
-        '            resultData = myTestRefRangesDelegate.ReadByTestID(pdbConnection, pTestID, pSampleType, pRangeType)
-
-        '            If Not resultData.HasError Then
-        '                Dim myTestRefRanges As New TestRefRangesDS
-        '                myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                If myTestRefRanges.tparTestRefRanges.Count > 0 Then 'AG
-        '                    If Not myTestRefRanges.tparTestRefRanges.Item(0).IsBorderLineUpperLimitNull Then
-        '                        myMaximunValue = myTestRefRanges.tparTestRefRanges.Item(0).BorderLineUpperLimit
-        '                    End If
-        '                End If
-
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        Me.CatchLaunched("MaxRefBorder", ex)
-        '    End Try
-
-        '    Return myMaximunValue
-
-        'End Function
-
-
-        '''' <summary>
-        '''' Get maximun ref range
-        '''' </summary>
-        '''' <param name="pdbConnection"></param>
-        '''' <param name="pTestID"></param>
-        '''' <param name="pSampleType"></param>
-        '''' <param name="pRangeType"></param>
-        '''' <param name="pExecutionsDS"></param>
-        '''' <returns>single</returns>
-        '''' <remarks>Created by: DL 23/08/2010</remarks>
-        'Public Function GetMaxReferenceRange(ByVal pdbConnection As SqlClient.SqlConnection, _
-        '                                     ByVal pTestID As Integer, _
-        '                                     ByVal pSampleType As String, _
-        '                                     ByVal pRangeType As String, _
-        '                                     ByVal pExecutionsDS As ExecutionsDS, _
-        '                                     ByVal pTestType As String) As Single
-
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim resultData As New GlobalDataTO
-        '    Dim myMaximunValue As Single = -1
-
-        '    Try
-        '        Dim mySampleClass As String = pExecutionsDS.twksWSExecutions.Item(0).SampleClass.ToString.Trim
-
-        '        'If mySampleClass = "PATIENT" Then
-
-        '        'RH: There is no need here to use a transaction, because we do not make
-        '        'any change or atomic operation over the database. We only read data.
-        '        'resultData = DAOBase.GetOpenDBTransaction(pdbConnection)
-        '        resultData = DAOBase.GetOpenDBConnection(pdbConnection)
-
-        '        If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myOrderTestID As Integer = pExecutionsDS.twksWSExecutions.Item(0).OrderTestID
-        '                Dim myTestRefRangesDelegate As New TestRefRangesDelegate()
-
-        '                resultData = myTestRefRangesDelegate.ReadByTestID(pdbConnection, pTestID, pSampleType, pRangeType, pTestType)
-
-        '                If Not resultData.HasError Then
-        '                    Dim myTestRefRanges As New TestRefRangesDS
-        '                    myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                    Select Case pRangeType
-
-        '                        Case "GENERIC"
-
-        '                            If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalUpperLimitNull Then
-        '                                myMaximunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalUpperLimit
-        '                            End If
-
-        '                        Case "DETAILED"
-
-        '                            Dim myOrderTestData As New OrderTestsDelegate
-        '                            resultData = myOrderTestData.GetTestID(pdbConnection, myOrderTestID)
-
-        '                            If Not resultData.HasError Then
-        '                                Dim myOrdersDelegate As New OrdersDelegate
-        '                                Dim myOrderTestDS As New OrderTestsDS
-        '                                Dim myOrderID As String
-        '                                Dim myPatientID As String = ""
-
-        '                                myOrderTestDS = CType(resultData.SetDatos, OrderTestsDS)
-        '                                myOrderID = myOrderTestDS.twksOrderTests.Item(0).OrderID
-        '                                resultData = myOrdersDelegate.ReadOrders(pdbConnection, myOrderID)
-
-        '                                If Not resultData.HasError Then
-        '                                    Dim myOrdersDS As New OrdersDS
-        '                                    myOrdersDS = CType(resultData.SetDatos, OrdersDS)
-        '                                    myPatientID = myOrdersDS.twksOrders.Item(0).PatientID
-        '                                End If
-
-        '                                If myPatientID <> "" Then
-        '                                    Dim myPatientDelegate As New PatientDelegate
-        '                                    resultData = myPatientDelegate.GetPatientData(pdbConnection, myPatientID)
-
-        '                                    If Not resultData.HasError Then
-        '                                        Dim myPatientDS As New PatientsDS
-        '                                        myPatientDS = CType(resultData.SetDatos, PatientsDS)
-
-        '                                        Dim bAge As Boolean = False
-        '                                        Dim bGender As Boolean = False
-
-        '                                        Dim qAgeRanges As New List(Of String)
-        '                                        qAgeRanges = (From a In myTestRefRanges.tparTestRefRanges _
-        '                                                      Order By a.AgeUnit _
-        '                                                      Group a By Age_ID = a.AgeUnit Into Group _
-        '                                                      Where Age_ID <> "" _
-        '                                                      Select Age_ID).ToList
-
-        '                                        If qAgeRanges.Count > 0 Then bAge = True
-
-        '                                        Dim qGenderRanges As New List(Of String)
-        '                                        qGenderRanges = (From a In myTestRefRanges.tparTestRefRanges _
-        '                                                         Order By a.Gender _
-        '                                                         Group a By Gender_ID = a.Gender Into Group _
-        '                                                         Where Gender_ID <> "" _
-        '                                                         Select Gender_ID).ToList
-
-        '                                        If qGenderRanges.Count > 0 Then bGender = True
-
-        '                                        If bGender And Not bAge Then
-        '                                            ' Gender
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByGender(pdbConnection, _
-        '                                                                                                     pTestID, _
-        '                                                                                                     pSampleType, _
-        '                                                                                                     myPatientDS.tparPatients.Item(0).Gender)
-        '                                        ElseIf bAge And Not bGender Then
-        '                                            ' Age
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByAge(pdbConnection, _
-        '                                                                                                  pTestID, _
-        '                                                                                                  test.SampleType, _
-        '                                                                                                  myPatientDS.tparPatients.Item(0).Age)
-
-        '                                        ElseIf bAge And bGender Then
-        '                                            ' Gender + Age
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByGenderAge(pdbConnection, _
-        '                                                                                                        pTestID, _
-        '                                                                                                        pSampleType, _
-        '                                                                                                        myPatientDS.tparPatients.Item(0).Gender, _
-        '                                                                                                        myPatientDS.tparPatients.Item(0).Age)
-        '                                        End If
-
-        '                                        If Not resultData.HasError Then
-        '                                            myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                                            If myTestRefRanges.tparTestRefRanges.Count > 0 Then 'AG - add this condition to fix system error
-        '                                                If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalUpperLimitNull Then
-        '                                                    myMaximunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalUpperLimit
-        '                                                End If
-        '                                            End If
-
-        '                                        End If
-        '                                    End If
-        '                                End If
-        '                            End If
-        '                    End Select
-
-        '                End If
-
-        '                ''Close connection if needed
-        '                'If (Not resultData.HasError) Then
-        '                '    'When the Database Connection was opened locally, then the Commit is executed
-        '                '    If (pdbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                'Else
-        '                '    'When the Database Connection was opened locally, then the Rollback is executed
-        '                '    If (pdbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                'End If
-
-
-        '            End If
-        '        End If
-        '        'End If
-
-        '    Catch ex As Exception
-        '        Me.CatchLaunched("GetMaxReferenceRange", ex)
-
-        '    Finally
-        '        If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-
-        '    Return myMaximunValue
-
-        'End Function
-
-        '''' <summary>
-        '''' Get ref range, both values in only one method.
-        '''' Returns range in output parameters pMinimunValue and pMaximunValue
-        '''' </summary>
-        '''' <param name="pdbConnection"></param>
-        '''' <param name="pTestID"></param>
-        '''' <param name="pSampleType"></param>
-        '''' <param name="pRangeType"></param>
-        '''' <param name="pOrderTestID"></param>
-        '''' <param name="pMinimunValue"></param>
-        '''' <param name="pMaximunValue"></param>
-        '''' <remarks>
-        '''' Created by: RH 09/16/2010 based on DL GetMinReferenceRange()
-        ''''             Merges GetMinReferenceRange() and GetMaxReferenceRange() for doing only one call per range
-        '''' </remarks>
-        'Public Sub GetReferenceRange(ByVal pdbConnection As SqlClient.SqlConnection, _
-        '                                     ByVal pTestID As Integer, _
-        '                                     ByVal pSampleType As String, _
-        '                                     ByVal pRangeType As String, _
-        '                                     ByVal pOrderTestID As Integer, _
-        '                                     ByVal pTesType As String, _
-        '                                     ByRef pMinimunValue As Nullable(Of Single), _
-        '                                     ByRef pMaximunValue As Nullable(Of Single))
-
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim resultData As New GlobalDataTO
-
-        '    Try
-
-        '        'RH: There is no need here to use a transaction, because we do not make
-        '        'any change or atomic operation over the database. We only read data.
-        '        'resultData = DAOBase.GetOpenDBTransaction(pdbConnection)
-        '        resultData = DAOBase.GetOpenDBConnection(pdbConnection)
-
-        '        If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myTestRefRangesDelegate As New TestRefRangesDelegate()
-
-        '                resultData = myTestRefRangesDelegate.ReadByTestID(pdbConnection, pTestID, pSampleType, pRangeType, pTesType)
-
-        '                If Not resultData.HasError Then
-        '                    Dim myTestRefRanges As New TestRefRangesDS
-        '                    myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                    pMinimunValue = Nothing
-        '                    pMaximunValue = Nothing
-
-        '                    If myTestRefRanges.tparTestRefRanges.Rows.Count = 0 Then 'Row not found                               
-        '                        Return
-        '                    End If
-
-        '                    Select Case pRangeType
-
-        '                        Case "GENERIC"
-
-        '                            If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalLowerLimitNull Then
-        '                                pMinimunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalLowerLimit
-        '                            End If
-
-        '                            If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalUpperLimitNull Then
-        '                                pMaximunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalUpperLimit
-        '                            End If
-
-        '                        Case "DETAILED"
-
-        '                            Dim myOrderTestData As New OrderTestsDelegate
-        '                            resultData = myOrderTestData.GetTestID(pdbConnection, pOrderTestID)
-
-        '                            If Not resultData.HasError Then
-        '                                Dim myOrdersDelegate As New OrdersDelegate
-        '                                Dim myOrderTestDS As New OrderTestsDS
-        '                                Dim myOrderID As String
-        '                                Dim myPatientID As String = ""
-
-        '                                myOrderTestDS = CType(resultData.SetDatos, OrderTestsDS)
-
-        '                                If myOrderTestDS.twksOrderTests.Rows.Count = 0 Then 'Row not found
-        '                                    Return
-        '                                End If
-
-        '                                myOrderID = myOrderTestDS.twksOrderTests.Item(0).OrderID
-
-        '                                resultData = myOrdersDelegate.ReadOrders(pdbConnection, myOrderID)
-
-        '                                If Not resultData.HasError Then
-        '                                    Dim myOrdersDS As New OrdersDS
-        '                                    myOrdersDS = CType(resultData.SetDatos, OrdersDS)
-        '                                    myPatientID = myOrdersDS.twksOrders.Item(0).PatientID
-        '                                End If
-
-        '                                If myPatientID <> "" Then
-        '                                    Dim myPatientDelegate As New PatientDelegate
-        '                                    resultData = myPatientDelegate.GetPatientData(pdbConnection, myPatientID)
-
-        '                                    If Not resultData.HasError Then
-        '                                        Dim myPatientDS As New PatientsDS
-        '                                        myPatientDS = CType(resultData.SetDatos, PatientsDS)
-
-        '                                        Dim bAge As Boolean = False
-        '                                        Dim bGender As Boolean = False
-
-        '                                        Dim qAgeRanges As New List(Of String)
-        '                                        qAgeRanges = (From a In myTestRefRanges.tparTestRefRanges _
-        '                                                      Order By a.AgeUnit _
-        '                                                      Group a By Age_ID = a.AgeUnit Into Group _
-        '                                                      Where Age_ID <> "" _
-        '                                                      Select Age_ID).ToList
-
-        '                                        If qAgeRanges.Count > 0 Then bAge = True
-
-        '                                        Dim qGenderRanges As New List(Of String)
-        '                                        qGenderRanges = (From a In myTestRefRanges.tparTestRefRanges _
-        '                                                         Order By a.Gender _
-        '                                                         Group a By Gender_ID = a.Gender Into Group _
-        '                                                         Where Gender_ID <> "" _
-        '                                                         Select Gender_ID).ToList
-
-        '                                        'If qGenderRanges.Count > 0 Then bGender = True
-        '                                        bGender = qGenderRanges.Count > 0
-
-        '                                        If bGender And Not bAge Then
-        '                                            ' Gender
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByGender( _
-        '                                                            pdbConnection, pTestID, pSampleType, _
-        '                                                            myPatientDS.tparPatients.Item(0).Gender, pTesType)
-        '                                        ElseIf bAge And Not bGender Then
-        '                                            ' Age
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByAge( _
-        '                                                            pdbConnection, pTestID, pSampleType, _
-        '                                                            myPatientDS.tparPatients.Item(0).Age, pTesType)
-
-        '                                        ElseIf bAge And bGender Then
-        '                                            ' Gender + Age
-        '                                            resultData = myTestRefRangesDelegate.GetDetailedByGenderAge( _
-        '                                                            pdbConnection, pTestID, pSampleType, _
-        '                                                            myPatientDS.tparPatients.Item(0).Gender, _
-        '                                                            myPatientDS.tparPatients.Item(0).Age, pTesType)
-        '                                        End If
-
-        '                                        If Not resultData.HasError Then
-        '                                            myTestRefRanges = CType(resultData.SetDatos, TestRefRangesDS)
-
-        '                                            If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalLowerLimitNull Then
-        '                                                pMinimunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalLowerLimit
-        '                                            End If
-
-        '                                            If Not myTestRefRanges.tparTestRefRanges.Item(0).IsNormalUpperLimitNull Then
-        '                                                pMaximunValue = myTestRefRanges.tparTestRefRanges.Item(0).NormalUpperLimit
-        '                                            End If
-
-        '                                        End If
-        '                                    End If
-        '                                End If
-        '                            End If
-        '                    End Select
-        '                End If
-
-        '                ''Close connection if needed
-        '                'If (Not resultData.HasError) Then
-        '                '    'When the Database Connection was opened locally, then the Commit is executed
-        '                '    If (pdbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                'Else
-        '                '    'When the Database Connection was opened locally, then the Rollback is executed
-        '                '    If (pdbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                'End If
-
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        Me.CatchLaunched("GetMinReferenceRange", ex)
-
-        '    Finally
-        '        If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-
-        'End Sub
-#End Region
-
-#Region "METHODS REPLACED FOR NEW ONES DUE TO PERFORMANCE ISSUES - TO DELETE"
-        ''' <summary>
-        ''' Calculation methods who initializes structures, execute calculation and finally write into database
-        ''' </summary>
-        ''' <param name="pExecutionID"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pRecalculusFlag"></param>
-        ''' <param name="pSampleClassRecalculated"></param>
-        ''' <param name="pManualRecalculationsFlag"></param>
-        ''' <returns>GlobalDataTo with set indicating if process successed or not</returns>
-        ''' <remarks>
-        ''' Created by AG 02/03/2010 (tested OK)
-        ''' Modified by AG 10/09/2010 - add optional parameter ManualRecalculusFlag (default value FALSE)
-        ''' Modified AG: 21/10/2014 BA-2011 calculate CALC tests only for patients accepted
-        ''' </remarks>
-        Public Function CalculateExecution(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                           ByVal pExecutionID As Integer, _
-                                           ByVal pAnalyzerID As String, _
-                                           ByVal pWorkSessionID As String, _
-                                           ByVal pRecalculusFlag As Boolean, _
-                                           ByVal pSampleClassRecalculated As String, _
-                                            ByVal pManualRecalculationsFlag As Boolean) As GlobalDataTO
-
-            Dim globalData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                'AG 29/06/2012 - Running Cycles lost - Solution!
-                'globalData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                'If (Not globalData.HasError) And (Not globalData.SetDatos Is Nothing) Then
-                '    dbConnection = CType(globalData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                'Dim StartTime As DateTime = Now
-                'Dim myLogAcciones As New ApplicationLogManager()
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-                'AG 10/09/2010
-                If pRecalculusFlag Then
-                    myManualRecalculationsFlag = pManualRecalculationsFlag
-                End If
-                'END AG 10/09/2010
-
-                'Init structures
-                globalData = Me.Init(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID, pRecalculusFlag, pSampleClassRecalculated)
-                If globalData.HasError Then
-                    globalData = myClassGlobalResult
-                    Exit Try
-                End If
-
-                globalData = Me.ExecuteCalculations()
-                If globalData.HasError Then
-                    globalData = myClassGlobalResult
-                    Exit Try
-                End If
-
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity("Calculate Execution Results: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "CalculationsDelegate.CalculateExecution", EventLogEntryType.Information, False)
-                'StartTime = Now
-
-                'Postposed!!!
-                'globalData = Me.SaveWaterResults()
-                'If globalData.HasError Then
-                '    globalData = myClassGlobalResult
-                '    Exit Try
-                'End If
-
-                'Save results
-                globalData = Me.SaveExecutionResults(dbConnection)
-                If globalData.HasError Then
-                    globalData = myClassGlobalResult
-                    Exit Try
-                End If
-
-                '' XBC 03/07/2012 - time estimation
-                'myLogAcciones.CreateLogActivity("Save Execution Results: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "CalculationsDelegate.CalculateExecution", EventLogEntryType.Information, False)
-                'StartTime = Now
-
-                'AG 03/06/2010 - Calculate & save results remarks
-                globalData = Me.GenerateResultsRemarks(dbConnection)
-                If globalData.HasError Then
-                    globalData = myClassGlobalResult
-                    Exit Try
-                End If
-                ''AG 03/06/2010
-                'myLogAcciones.CreateLogActivity("Calculate & Save remarks: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "CalculationsDelegate.CalculateExecution", EventLogEntryType.Information, False)
-
-                'AG 12/07/2010 - Calculated Tests operations (if execution OrderTestID is related with aa calculated test orderTestID)
-                If preparation(0).SampleClass = "PATIENT" AndAlso preparation(0).AcceptedResult Then  'Calculated test only for patients (AG 21/10/2014 BA-2011 add condition ACCEPTED!!)
-                    Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
-                    myCalcTestsDelegate.AnalyzerID = myAnalyzerID
-                    myCalcTestsDelegate.WorkSessionID = myWorkSessionID
-                    globalData = myCalcTestsDelegate.ExecuteCalculatedTest(dbConnection, myOrderTestID, myManualRecalculationsFlag)
-                    If globalData.HasError Then
-                        Exit Try
-                    End If
-                End If
-                'END AG 12/07/2010
-
-                'AG 22/07/2010 - Call recalculations mode if new blank or calibrator is received
-                If Not common(0).RecalculationFlag Then
-                    If preparation(0).SampleClass = "BLANK" Or preparation(0).SampleClass = "CALIB" Then
-                        Dim myRecalculations As New RecalculateResultsDelegate
-                        myRecalculations.AnalyzerModel = myAnalyzerModel
-
-                        'AG 15/10/2014 BA-2011 inform the new required parameters
-                        globalData = myRecalculations.RecalculateResults(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, False, False)
-                    End If
-                End If
-                'END AG 22/07/2010
-
-                'Debug.Print("CalculationsDelegate.CalculateExecution: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 05/06/2012 - time estimation
-
-                '    End If 'AG 29/06/2012 - Running Cycles lost - Solution!
-                'End If 'AG 29/06/2012 - Running Cycles lost - Solution!
-
-                '' XBC 03/07/2012 - time estimation
-
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                'myLogAcciones.CreateLogActivity("End Function: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                '                                "CalculationsDelegate.CalculateExecution", EventLogEntryType.Information, False)
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-
-            Catch ex As Exception
-                Me.CatchLaunched("CalculateExecution", ex)
-                'If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection) 'AG 29/06/2012 - Running Cycles lost - Solution!('AG 10/05/2010)
-            End Try
-            'AG 29/06/2012 - Running Cycles lost - Solution!
-            ''TR 18/10/2011 -place here to make sure on exit try to commit or rollback transaction.
-            'If (Not globalData.HasError) Then
-            '    'When the Database Connection was opened locally, then the Commit is executed
-            '    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-
-            'Else
-            '    'When the Database Connection was opened locally, then the Rollback is executed
-            '    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-            'End If
-
-            Return globalData
-        End Function
-
-        ''' <summary>
-        ''' Initializes sample information, test information and general information needed for ExecuteCalculation
-        ''' </summary>
-        ''' <param name="pExecutionID"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pRecalculusFlag"></param>
-        ''' <param name="pSampleClassRecalculated"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by:   AG ../02/2010 (Tested OK)
-        ''' Modified by:  DL 19/02/2010 
-        ''' Modified by:  AG 25/02/2010
-        ''' Modified by: GDS 29/04/2010 (Added pDBConnection parameter)
-        ''' Modified by AG 26/04/2011: improve speed reducing number of queries
-        ''' </remarks>
-        Private Function Init(ByVal pDBConnection As SqlClient.SqlConnection, _
-                              ByVal pExecutionID As Integer, _
-                              ByVal pAnalyzerID As String, _
-                              ByVal pWorkSessionID As String, _
-                              ByVal pRecalculusFlag As Boolean, _
-                              ByVal pSampleClassRecalculated As String) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                'Initializar global class variables
-                myAnalyzerID = pAnalyzerID
-                myWorkSessionID = pWorkSessionID
-                ReDim myExecutionID(0)
-                myExecutionID(0) = pExecutionID
-
-                'AG 29/06/2012 - Running Cycles lost - Solution!
-                'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                Dim myExecutionWell As Integer = 1
-
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myExecutionsDS As ExecutionsDS
-                        Dim myExecutionDelegate As New ExecutionsDelegate
-
-                        Dim SampleClass As String = ""
-                        Dim NumberOfCalibrators As Integer = 1
-
-                        'AG 26/04/2011
-                        ''Get the sampleclass related to the ExecutionID
-                        '' DL 24/02/2010
-                        'Dim myOrdersDelegate As New OrdersDelegate
-
-                        'resultData = myOrdersDelegate.GetSampleClass(dbConnection, _
-                        '                                             pExecutionID, _
-                        '                                             pAnalyzerID, _
-                        '                                             pWorkSessionID)
-
-                        'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                        '    Dim myOrderDetailsDS As New OrderDetailsDS
-                        '    myOrderDetailsDS = CType(resultData.SetDatos, OrderDetailsDS)
-                        '    SampleClass = myOrderDetailsDS.OrderDetails.Item(0).SampleClass
-                        'Else
-                        '    myClassGlobalResult = resultData
-                        '    Exit Try
-                        'End If
-
-                        'find the multiitem number & sample class                        
-                        'If SampleClass = "CALIB" Then
-                        resultData = myExecutionDelegate.GetNumberOfMultititem(dbConnection, _
-                                                                               pExecutionID)
-
-                        ' DL 24/02/2010
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim myExecutionDS As ExecutionsDS
-                            myExecutionDS = CType(resultData.SetDatos, ExecutionsDS)
-                            NumberOfCalibrators = myExecutionDS.twksWSExecutions(0).MultiItemNumber
-                            SampleClass = myExecutionDS.twksWSExecutions(0).SampleClass
-                        Else
-                            myClassGlobalResult = resultData
-                            Exit Try
-                        End If
-                        'End If
-
-                        If SampleClass = "CALIB" And NumberOfCalibrators > 1 Then
-                            'DL 24/02/2010
-                            resultData = myExecutionDelegate.GetExecutionMultititem(dbConnection, _
-                                                                                    pExecutionID)
-
-                            'AG 24/02/2010
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                myExecutionsDS = CType(resultData.SetDatos, ExecutionsDS)
-                            Else
-                                myClassGlobalResult = resultData
-                                Exit Try
-                            End If
-                            'AG 24/02/2010
-
-                            Dim myIndex As Integer = 0
-                            myOrderTestID = 0 'AG 10/08/2010
-
-                            For Each myExecutionRow As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                ReDim Preserve myExecutionID(myIndex)
-                                myExecutionID(myIndex) = myExecutionRow.ExecutionID
-
-                                ' Read execution data
-                                ' DL 24/02/2010
-                                resultData = myExecutionDelegate.GetExecution(dbConnection, _
-                                                                              myExecutionRow.ExecutionID, _
-                                                                              pAnalyzerID, _
-                                                                              pWorkSessionID)
-
-                                If myOrderTestID = 0 Then
-                                    myOrderTestID = myExecutionsDS.twksWSExecutions(0).OrderTestID  'Save into global class variable the ordertestid to calculate
-                                End If
-
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    myExecutionsDS = CType(resultData.SetDatos, ExecutionsDS)
-                                    myRerunNumber = myExecutionsDS.twksWSExecutions(0).RerunNumber
-
-                                    'AG 20/05/2010
-                                    If Not myExecutionsDS.twksWSExecutions(0).IsWellUsedNull Then myExecutionWell = myExecutionsDS.twksWSExecutions(0).WellUsed
-
-                                    ' Get common structure
-                                    InitCommon(dbConnection, _
-                                               myExecutionsDS, _
-                                               myIndex, _
-                                               pRecalculusFlag, _
-                                               pSampleClassRecalculated, myExecutionWell)
-
-                                    If myClassGlobalResult.HasError Then Exit Try
-
-                                    ' Get preparation structure
-                                    InitPreparation(dbConnection, _
-                                                    myExecutionsDS, _
-                                                    myIndex, _
-                                                    SampleClass)
-
-                                    If myClassGlobalResult.HasError Then Exit Try
-
-                                    myIndex = myIndex + 1
-                                Else
-                                    myClassGlobalResult = resultData
-                                    Exit Try
-                                End If
-                            Next myExecutionRow
-
-                        Else
-                            ' read execution data
-                            resultData = myExecutionDelegate.GetExecution(dbConnection, _
-                                                                          pExecutionID, _
-                                                                          pAnalyzerID, _
-                                                                          pWorkSessionID)
-
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                myExecutionsDS = CType(resultData.SetDatos, ExecutionsDS)
-                                ' Get common structure                                
-                                myOrderTestID = myExecutionsDS.twksWSExecutions(0).OrderTestID  'Save into global class variable the ordertestid to calculate
-                                myRerunNumber = myExecutionsDS.twksWSExecutions(0).RerunNumber
-
-                                'AG 20/05/2010
-                                If Not myExecutionsDS.twksWSExecutions(0).IsWellUsedNull Then myExecutionWell = myExecutionsDS.twksWSExecutions(0).WellUsed
-
-                                InitCommon(dbConnection, _
-                                           myExecutionsDS, _
-                                           0, _
-                                           pRecalculusFlag, _
-                                           pSampleClassRecalculated, myExecutionWell)
-
-                                If myClassGlobalResult.HasError Then Exit Try
-
-                                ' Get preparation structure
-                                InitPreparation(dbConnection, _
-                                                myExecutionsDS, _
-                                                0, _
-                                                SampleClass)
-
-                                If myClassGlobalResult.HasError Then Exit Try
-
-                            Else
-                                myClassGlobalResult = resultData
-                                Exit Try
-                            End If
-                        End If
-
-                        ' Get test structure
-                        InitTest(dbConnection, myExecutionsDS)
-                        If myClassGlobalResult.HasError Then Exit Try
-
-                        ' get calibrator structure                        
-                        'AG 01/09/2010
-                        'InitCalibration(dbConnection, myExecutionsDS)
-                        'If myClassGlobalResult.HasError Then Exit Try
-                        If Not String.Equals(preparation(0).SampleClass, "BLANK") Then
-                            InitCalibration(dbConnection, myExecutionsDS)
-                            If myClassGlobalResult.HasError Then Exit Try
-                        End If
-                        'END AG 01/09/2010
-
-                        ' Initialize data that needs several structures
-                        InitFieldsRelatedWithSeveralStructures(dbConnection, NumberOfCalibrators)
-
-                        If myClassGlobalResult.HasError Then Exit Try
-
-                    End If
-
-                    'TR 18/10/2011 -Commented and implemented outside the try
-                    'If (Not resultData.HasError) Then
-                    '    'When the Database Connection was opened locally, then the Commit is executed
-                    '    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-
-                    'Else
-                    '    'When the Database Connection was opened locally, then the Rollback is executed
-                    '    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                    'End If
-                    'TR 18/10/2011 -END.
-
-                Else
-                    myClassGlobalResult = resultData
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = "SYSTEM_ERROR"
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.Init", EventLogEntryType.Error, False)
-                'TR 18/10/2011 -Commented and implemented outside the try
-                'Finally
-                '    If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            'TR 18/10/2011 -implementation outside the try
-            If Not resultData.HasError AndAlso Not myClassGlobalResult.HasError Then
-                'When the Database Connection was opened locally, then the Commit is executed
-                'If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection) 'AG 29/06/2012 - Running Cycles lost - Solution!
-            Else
-                'When the Database Connection was opened locally, then the Rollback is executed
-                'If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)'AG 29/06/2012 - Running Cycles lost - Solution!
-            End If
-            'TR 18/10/2011 -Validate to close connection.
-            If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            'TR 18/10/2011 -END.
-
-            Return myClassGlobalResult
-        End Function
-
-        ''' <summary>
-        ''' Initializes common information
-        ''' </summary>
-        ''' <param name="pdbConnection"></param>
-        ''' <param name="pExecutionDS"></param>
-        ''' <param name="pDimension"></param>
-        ''' <remarks>
-        ''' Created by : DL 19/02/2010 - Tested AG 25/02/2010 (OK)
-        ''' Modified: AG 14/05/2010 -read the parameters using the Swparameterdelegate instead the baseline parameters!!! 
-        '''                         -change field names in BaseLinesDS
-        ''' Modified AG 17/05/2010 (use method GetBaseLineValues) - tested pending
-        '''          AG 20/05/2010 - add pExecutionWell parameter
-        '''          AG 26/04/2011 - improve speed
-        '''          AG 23/10/2013 - Initialize new properties in common structure (kineticsIncreaseInPause, useFirstR1SampleReadings)
-        ''' </remarks>
-        Private Sub InitCommon(ByVal pdbConnection As SqlClient.SqlConnection, _
-                               ByVal pExecutionDS As ExecutionsDS, _
-                               ByVal pDimension As Integer, ByVal pRecalculusFlag As Boolean, _
-                               ByVal pSampleClassRecalculated As String, ByVal pExecutionWell As Integer)
-
-            Dim myParametersDS As New ParametersDS
-            Dim resultData As New GlobalDataTO
-
-            Try
-                ReDim Preserve common(pDimension)
-
-                ' Get Execution Values & parameters
-                common(pDimension).RecalculationFlag = pRecalculusFlag
-                common(pDimension).SampleClassRecalculated = pSampleClassRecalculated
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsBaseLineIDNull Then common(pDimension).BaseLineID = pExecutionDS.twksWSExecutions.Item(0).BaseLineID
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsAdjustBaseLineIDNull Then common(pDimension).AdjustBaseLineID = pExecutionDS.twksWSExecutions.Item(0).AdjustBaseLineID 'AG 03/11/2011
-
-                'Get analyzer model (if not informed)
-                If myAnalyzerModel = "" Then
-                    Dim myAnalyzersDelegate As New AnalyzersDelegate
-                    resultData = myAnalyzersDelegate.GetAnalyzerModel(pdbConnection, pExecutionDS.twksWSExecutions.Item(0).AnalyzerID)
-                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                        Dim myAnalizerDS As New AnalyzersDS
-                        myAnalizerDS = CType(resultData.SetDatos, AnalyzersDS)
-                        myAnalyzerModel = myAnalizerDS.tcfgAnalyzers.Item(0).AnalyzerModel
-                    Else
-                        myClassGlobalResult = resultData
-                        Exit Try
-                    End If
-                End If
-
-                ' Get Parameters Values from tfmwswparameters
-                'AG 14/05/2010 - To read the parameter use the swParameterDelegate not the BaseLinesdelegate!!!
-                'Dim myWSBaseLinesDelegate As New WSBaseLinesDelegate
-                '...
-                '...
-                Dim myParams As New SwParametersDelegate
-                Dim myLinq As New List(Of ParametersDS.tfmwSwParametersRow)
-
-                'Read all parameters
-                resultData = myParams.ReadByAnalyzerModel(pdbConnection, myAnalyzerModel)
-                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                    myParametersDS = CType(resultData.SetDatos, ParametersDS)
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                'AG 24/10/2013 Task #1347
-                Dim limitsDlg As New FieldLimitsDelegate
-                Dim limitsDS As New FieldLimitsDS
-                Dim myLimitsLinq As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
-                resultData = limitsDlg.GetAllList(pdbConnection, myAnalyzerModel)
-                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                    limitsDS = CType(resultData.SetDatos, FieldLimitsDS)
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-                'AG 24/10/2013
-
-                ' LimitAbs
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.LIMIT_ABS.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).LimitAbs = myLinq(0).ValueNumeric
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                ' PathLength
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.PATH_LENGHT.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).PathLength = myLinq(0).ValueNumeric
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-
-                ' KineticsIncrease
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.KINETICS_INCREASE.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).KineticsIncrease = myLinq(0).ValueNumeric
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                ' AG 11/06/2010 - AnalyzerCycleMachine
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).CycleMachine = myLinq(0).ValueNumeric
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-                'END AG 11/06/2010
-
-                ' LinearCorrelationFactor
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.LINEAR_CORRELATION_FACTOR.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).LinearCorrelationFactor = myLinq(0).ValueNumeric
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                ' Reagent1Readings
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.REAGENT1_READINGS.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).Reagent1Readings = CInt(myLinq(0).ValueNumeric)
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                ' ExtrapolationMaximum
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.MAX_EXTRAPOLATION.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).ExtrapolationMaximum = CInt(myLinq(0).ValueNumeric)
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                ' Curve points number
-                If calibrator.Curve.CurvePointsNumber <= 0 Then
-                    myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                              Where a.ParameterName = GlobalEnumerates.SwParameters.CURVE_POINTS_NUMBER.ToString _
-                              Select a).ToList
-                    If myLinq.Count > 0 Then
-                        calibrator.Curve.CurvePointsNumber = CInt(myLinq(0).ValueNumeric)
-                    Else
-                        myClassGlobalResult = resultData
-                        Exit Try
-                    End If
-                End If
-
-                'AG 23/10/2013 Task #1347
-                'KineticsIncreaseInPause
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.SS_KINETICS_INCREASE.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).KineticsIncreaseInPause = myLinq(0).ValueNumeric
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                'UseFirstR1SampleReadings
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.R1SAMPLE1STREADINGSFORCALC.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).UseFirstR1SampleReadings = CInt(myLinq(0).ValueNumeric)
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                'SwReadingsOffset 
-                myLinq = (From a As ParametersDS.tfmwSwParametersRow In myParametersDS.tfmwSwParameters _
-                          Where a.ParameterName = GlobalEnumerates.SwParameters.SW_READINGSOFFSET.ToString _
-                          Select a).ToList
-                If myLinq.Count > 0 Then
-                    common(pDimension).SwReadingsOffset = CInt(myLinq(0).ValueNumeric)
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                'DefaultReadNumberR2Added, NumberOfReadingsReadingsWithR2
-                myLimitsLinq = (From a As FieldLimitsDS.tfmwFieldLimitsRow In limitsDS.tfmwFieldLimits _
-                                Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString _
-                                Select a).ToList
-                If myLimitsLinq.Count > 0 Then
-                    common(pDimension).DefaultReadNumberR2Added = CInt(myLimitsLinq(0).MinValue) - common(pDimension).SwReadingsOffset
-                    common(pDimension).NumberOfReadingsWithR2 = CInt(myLimitsLinq(0).MaxValue) - CInt(myLimitsLinq(0).MinValue) + 1
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-                'AG 23/10/2013 Task #1347
-
-                ' Get baseline values
-                'Dark values are get from twksWSBLines
-                'Light values are get from twksWSBLinesByWell
-                resultData = Me.GetBaseLineValues(pdbConnection, myAnalyzerID, myWorkSessionID, common(pDimension).BaseLineID, pExecutionWell, common(pDimension).AdjustBaseLineID)
-
-                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    Dim myBaseLineDS As New BaseLinesDS
-                    myBaseLineDS = CType(resultData.SetDatos, BaseLinesDS)
-
-                    'common(pDimension).BaseLineWell = myBaseLineDS.twksWSBaseLines(0).WellUsed
-
-                    ' Redim all properties of baseline
-                    ReDim common(pDimension).BaseLine(myBaseLineDS.twksWSBaseLines.Rows.Count - 1)
-                    ReDim common(pDimension).DarkCurrent(myBaseLineDS.twksWSBaseLines.Rows.Count - 1)
-                    ReDim common(pDimension).RefDarkCurrent(myBaseLineDS.twksWSBaseLines.Rows.Count - 1)
-                    ReDim common(pDimension).RefBaseLine(myBaseLineDS.twksWSBaseLines.Rows.Count - 1)
-
-                    Dim myIndex As Integer = 0
-
-                    For Each myBaseLineRow As BaseLinesDS.twksWSBaseLinesRow In myBaseLineDS.twksWSBaseLines.Rows
-                        If myIndex = 0 Then common(pDimension).BaseLineWell = myBaseLineDS.twksWSBaseLines(myIndex).WellUsed
-
-                        'AG 14/05/2010 - Use the new field names in DS
-                        common(pDimension).BaseLine(myIndex) = myBaseLineRow.MainLight
-                        common(pDimension).DarkCurrent(myIndex) = myBaseLineRow.MainDark
-                        common(pDimension).RefBaseLine(myIndex) = myBaseLineRow.RefLight
-                        common(pDimension).RefDarkCurrent(myIndex) = myBaseLineRow.RefDark
-                        myIndex = myIndex + 1
-                    Next myBaseLineRow
-                Else
-                    myClassGlobalResult = resultData
-                End If
-
-                myLinq = Nothing 'AG 25/02/2014 - #1521
-                myLimitsLinq = Nothing 'AG 24/10/2013
-
-            Catch ex As Exception
-                'AG 24/02/2010
-                'resultData.HasError = True
-                'resultData.ErrorCode = "SYSTEM_ERROR"
-                'resultData.ErrorMessage = ex.Message
-                '
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
-                Me.CatchLaunched("InitCommon", ex)
-            End Try
-        End Sub
-
-        ''' <summary>
-        ''' Initializes Calibrator structure for the specified Execution
-        ''' </summary>
-        ''' <param name="pdbConnection"></param>
-        ''' <param name="pExecutionsDS"></param>
-        ''' <remarks>
-        ''' </remarks>
-        ''' Created by : DL 23/02/2010
-        ''' Modified by: AG 26/02/2010 (Tested OK)
-        '''              SA 30/08/2010 - Call function GetCalibratorData (instead of calling GetCalibratorID plus
-        '''                              GetCalibrationData) to get CalibratorID and NumberOfCalibrators for the
-        '''                              specified Execution
-        '''              AG 02/09/2010 - Fix problems using alternative calibrator (the CalibratorID and NumberOfCalibrators arent initialized, keep 0 value)
-        Private Sub InitCalibration(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS)
-            Dim resultData As New GlobalDataTO
-
-            Try
-                calibrator.ErrorAbs = "" 'AG 27/08/2010
-                calibrator.ErrorCalibration = "" 'AG 27/08/2010
-                calibrator.ManualFactor = 1 'AG 09/11/2010
-                calibrator.ManualFactorFlag = False 'AG 09/11/2010
-
-                'SA 30/08/2010
-                'Get Execution data
-                Dim ExecutionsDelegate As New ExecutionsDelegate
-                'resultData = ExecutionsDelegate.GetCalibratorID(pdbConnection, pExecutionsDS.twksWSExecutions.Item(0).ExecutionID)
-                resultData = ExecutionsDelegate.GetCalibratorData(pdbConnection, pExecutionsDS.twksWSExecutions.Item(0).ExecutionID)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    Dim calibratorDataDS As TestSampleCalibratorDS = DirectCast(resultData.SetDatos, TestSampleCalibratorDS)
-
-                    If (calibratorDataDS.tparTestCalibrators.Rows.Count = 1) Then
-                        calibrator.CalibratorID = calibratorDataDS.tparTestCalibrators(0).CalibratorID
-                        calibrator.NumberOfCalibrators = calibratorDataDS.tparTestCalibrators(0).NumberOfCalibrators
-                        calibrator.ExpirationDate = calibratorDataDS.tparTestCalibrators(0).ExpirationDate 'AG 08/11/2010
-                    End If
-
-                    'Dim mywsRequiredElementsDS As New WSRequiredElementsDS
-                    'mywsRequiredElementsDS = CType(resultData.SetDatos, WSRequiredElementsDS)
-
-                    'If mywsRequiredElementsDS.twksWSRequiredElements.Rows.Count > 0 Then
-                    '    calibrator.CalibratorID = mywsRequiredElementsDS.twksWSRequiredElements.Item(0).CalibratorID
-
-                    '    'AG 05/03/2010
-                    '    Dim cal_delegate As New CalibratorsDelegate
-                    '    resultData = cal_delegate.GetCalibratorData(pdbConnection, calibrator.CalibratorID)
-                    '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    '        Dim calibDS As New CalibratorsDS
-                    '        calibDS = CType(resultData.SetDatos, CalibratorsDS)
-                    '        calibrator.NumberOfCalibrators = calibDS.tparCalibrators(0).NumberOfCalibrators
-                    '    Else
-                    '        myClassGlobalResult = resultData
-                    '        Exit Try
-                    '    End If
-                    '    'END AG 05/03/2010
-                    'End If
-                    'END SA 30/08/2010
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                ' Get Order Tests values from TwksOrderTests                
-                calibrator.TestID = test.TestID
-                calibrator.SampleType = test.SampleType
-
-                Dim myTestSamplesDelegate As New TestSamplesDelegate
-                Dim myTestSample As TestSamplesDS
-
-                'AG 11/06/2010
-                'resultData = myTestSamplesDelegate.GetSampleDataByTestID(pdbConnection, calibrator.TestID)
-                resultData = myTestSamplesDelegate.GetDefinition(pdbConnection, calibrator.TestID, calibrator.SampleType)
-                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    myTestSample = CType(resultData.SetDatos, TestSamplesDS)
-
-                    calibrator.CalibrationType = myTestSample.tparTestSamples.Item(0).CalibratorType
-                    calibrator.AlternativeSampleType = ""
-                    calibrator.Factor = 1
-
-                    Select Case calibrator.CalibrationType
-                        Case "FACTOR"
-                            If Not myTestSample.tparTestSamples.Item(0).IsCalibrationFactorNull Then
-                                calibrator.Factor = myTestSample.tparTestSamples.Item(0).CalibrationFactor
-                            Else
-                                myClassGlobalResult.HasError = True
-                                myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.INCORRECT_DATA.ToString
-                            End If
-
-                        Case "EXPERIMENT"
-
-                        Case "ALTERNATIV"
-                            If Not myTestSample.tparTestSamples.Item(0).IsSampleTypeAlternativeNull Then
-                                calibrator.AlternativeSampleType = myTestSample.tparTestSamples.Item(0).SampleTypeAlternative
-                                calibrator.SampleType = calibrator.AlternativeSampleType
-
-                                'AG 02/09/2010 - Initialize CalibratorID and NumberOfCalibrators using alternative calibrator
-                                resultData = ExecutionsDelegate.GetCalibratorData(pdbConnection, pExecutionsDS.twksWSExecutions.Item(0).ExecutionID, calibrator.TestID, calibrator.SampleType)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    Dim calibratorDataDS As New TestSampleCalibratorDS
-                                    calibratorDataDS = DirectCast(resultData.SetDatos, TestSampleCalibratorDS)
-
-                                    If (calibratorDataDS.tparTestCalibrators.Rows.Count = 1) Then
-                                        calibrator.CalibratorID = calibratorDataDS.tparTestCalibrators(0).CalibratorID
-                                        calibrator.NumberOfCalibrators = calibratorDataDS.tparTestCalibrators(0).NumberOfCalibrators
-                                        calibrator.ExpirationDate = calibratorDataDS.tparTestCalibrators(0).ExpirationDate  'AG 08/11/2010
-
-                                        'AG 22/11/2010 - Maybe the alternative is a FACTOR
-                                    ElseIf (calibratorDataDS.tparTestCalibrators.Rows.Count = 0) Then
-                                        resultData = myTestSamplesDelegate.GetDefinition(pdbConnection, calibrator.TestID, calibrator.SampleType)
-                                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                            myTestSample = CType(resultData.SetDatos, TestSamplesDS)
-                                            calibrator.CalibrationType = myTestSample.tparTestSamples.Item(0).CalibratorType
-                                            If calibrator.CalibrationType = "FACTOR" Then
-                                                If Not myTestSample.tparTestSamples.Item(0).IsCalibrationFactorNull Then
-                                                    calibrator.Factor = myTestSample.tparTestSamples.Item(0).CalibrationFactor
-                                                Else
-                                                    myClassGlobalResult.HasError = True
-                                                    myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.INCORRECT_DATA.ToString
-                                                End If
-                                            End If
-                                        End If
-                                        'END AG 22/11/2010
-
-                                    End If
-
-
-                                Else
-                                    myClassGlobalResult = resultData
-                                    Exit Try
-                                End If
-                                'END AG 02/09/201
-                            Else
-                                myClassGlobalResult.HasError = True
-                                myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.INCORRECT_DATA.ToString
-                            End If
-                    End Select
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                If calibrator.CalibrationType <> "FACTOR" Then 'AG 27/08/2010
-                    Dim testCalibratorData As New TestCalibratorsDelegate
-                    If calibrator.NumberOfCalibrators > 1 Then
-                        ReDim calibrator.Curve.CalibratorAbs(calibrator.NumberOfCalibrators - 1)
-                        ReDim calibrator.Curve.ErrorAbs(calibrator.NumberOfCalibrators - 1)
-                        ReDim calibrator.Curve.ConcCurve(calibrator.NumberOfCalibrators - 1)
-                        ReDim calibrator.Curve.ErrorCurve(calibrator.NumberOfCalibrators - 1)
-                        ReDim calibrator.Curve.Coefficient(3, 15) 'Idem Ax5
-
-                        resultData = testCalibratorData.GetTestCalibratorData(pdbConnection, calibrator.TestID, calibrator.SampleType)
-
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim TestSampleCalib As New TestSampleCalibratorDS
-                            TestSampleCalib = CType(resultData.SetDatos, TestSampleCalibratorDS)
-
-                            If Not TestSampleCalib.tparTestCalibrators(0).IsCurveGrowthTypeNull Then calibrator.Curve.CurveGrowthType = TestSampleCalib.tparTestCalibrators(0).CurveGrowthType
-                            If Not TestSampleCalib.tparTestCalibrators(0).IsCurveTypeNull Then calibrator.Curve.CurveType = TestSampleCalib.tparTestCalibrators(0).CurveType
-                            If Not TestSampleCalib.tparTestCalibrators(0).IsCurveAxisXTypeNull Then calibrator.Curve.CurveAxisXType = TestSampleCalib.tparTestCalibrators(0).CurveAxisXType
-                            If Not TestSampleCalib.tparTestCalibrators(0).IsCurveAxisYTypeNull Then calibrator.Curve.CurveAxisYType = TestSampleCalib.tparTestCalibrators(0).CurveAxisYType
-                        Else
-                            myClassGlobalResult = resultData
-                            Exit Try
-                        End If
-
-                    End If
-
-                    'AG 01/09/2010
-                    'resultData = testCalibratorData.GetTestCalibratorValues(pdbConnection, calibrator.TestID)
-                    resultData = testCalibratorData.GetTestCalibratorValues(pdbConnection, calibrator.TestID, calibrator.SampleType)
-
-                    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                        Dim TestCalibratorValuesData As New TestCalibratorValuesDS
-                        Dim myIndex As Integer = 0
-
-                        TestCalibratorValuesData = CType(resultData.SetDatos, TestCalibratorValuesDS)
-
-                        ReDim calibrator.TheoreticalConcentration(TestCalibratorValuesData.tparTestCalibratorValues.Rows.Count - 1)
-                        For Each TestCalibratorValuesDataRow As TestCalibratorValuesDS.tparTestCalibratorValuesRow In TestCalibratorValuesData.tparTestCalibratorValues.Rows
-                            calibrator.TheoreticalConcentration(myIndex) = TestCalibratorValuesDataRow.TheoricalConcentration
-
-                            myIndex = myIndex + 1
-                        Next TestCalibratorValuesDataRow
-                    Else
-                        myClassGlobalResult = resultData
-                        Exit Try
-                    End If
-                End If 'AG 27/08/2010
-
-            Catch ex As Exception
-                'AG 24/02/2010
-                'resultData.HasError = True
-                'resultData.ErrorCode = "SYSTEM_ERROR"
-                'resultData.ErrorMessage = ex.Message
-                '
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
-                Me.CatchLaunched("InitCalibration", ex)
-            End Try
-        End Sub
-
-        ''' <summary>
-        ''' Initializes preparation information
-        ''' </summary>
-        ''' <param name="pdbConnection"></param>
-        ''' <param name="pExecutionDS"></param>
-        ''' <param name="pDimension"></param>
-        ''' <remarks>
-        ''' </remarks>
-        ''' Created by : DL 23/02/2010
-        ''' Modified by: AG 25/02/2010 (Tested OK)
-        ''' Modified by AG 22/03/2011 - add ThermoWarningFlag, ClotValue
-        ''' Modified    AG 23/10/2013 - initialize new properties in preparation structure (PausedReadings())
-        '''             AG 15/10/2014 BA-2011 Initialize the AcceptedResult flag (if no results exists for the orderTestID – Rerun means new result, initiate to TRUE)
-        Private Sub InitPreparation(ByVal pdbConnection As SqlClient.SqlConnection, _
-                                    ByVal pExecutionDS As ExecutionsDS, _
-                                    ByVal pDimension As Integer, _
-                                    ByVal pSampleClass As String)
-
-            Dim resultData As New GlobalDataTO
-
-            Try
-                ReDim Preserve preparation(pDimension)
-
-                ' Get Execution values from twksWSExecutions
-                preparation(pDimension).PreparationID = pExecutionDS.twksWSExecutions.Item(0).ExecutionID
-                preparation(pDimension).SampleClass = pSampleClass
-
-                ' Always 1 except in Calibrator curve (only for some SampleClass = 2)
-                preparation(pDimension).MultiItemNumber = 1
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsMultiItemNumberNull Then
-                    preparation(pDimension).MultiItemNumber = pExecutionDS.twksWSExecutions.Item(0).MultiItemNumber
-                End If
-
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsReplicateNumberNull Then
-                    preparation(pDimension).ReplicateID = pExecutionDS.twksWSExecutions.Item(0).ReplicateNumber
-                End If
-
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsRerunNumberNull Then
-                    preparation(pDimension).ReRun = pExecutionDS.twksWSExecutions.Item(0).RerunNumber
-                End If
-
-                'AG 15/10/2014 BA-2011 - Initiate the AcceptedResult flag
-                preparation(pDimension).AcceptedResult = True 'Initiate TRUE supposing that the result still not exists
-                Dim resultDlg As New ResultsDelegate
-                resultData = resultDlg.ReadByOrderTestIDandRerunNumber(pdbConnection, myOrderTestID, preparation(pDimension).ReRun)
-                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                    If DirectCast(resultData.SetDatos, ResultsDS).twksResults.Rows.Count > 0 Then
-                        preparation(pDimension).AcceptedResult = DirectCast(resultData.SetDatos, ResultsDS).twksResults(0).AcceptedResultFlag
-                    End If
-                End If
-                'AG 15/10/2014 BA-2011
-
-                preparation(pDimension).PostDilutionType = "NONE"
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsPostDilutionTypeNull Then
-                    preparation(pDimension).PostDilutionType = pExecutionDS.twksWSExecutions.Item(0).PostDilutionType
-                End If
-
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsWellUsedNull Then
-                    preparation(pDimension).WellUsed = pExecutionDS.twksWSExecutions.Item(0).WellUsed
-                End If
-
-                'AG 22/03/2011 - ThermoWarningFlag, ClotValue
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsThermoWarningFlagNull Then
-                    preparation(pDimension).ThermoWarningFlag = pExecutionDS.twksWSExecutions.Item(0).ThermoWarningFlag
-                End If
-
-                If Not pExecutionDS.twksWSExecutions.Item(0).IsClotValueNull Then
-                    preparation(pDimension).PossibleClot = pExecutionDS.twksWSExecutions.Item(0).ClotValue
-                End If
-                'AG 22/03/2011
-
-                'AG 03/05/2010 - Database field deleted
-                'If Not pExecutionDS.twksWSExecutions.Item(0).IsRotorTurnNumberNull Then
-                '    preparation(pDimension).RotorTurn = pExecutionDS.twksWSExecutions.Item(0).RotorTurnNumber
-                'End If
-
-
-                ' Get Order Tests values from TwksOrderTests
-                Dim myOrderTestData As New OrderTestsDelegate
-
-                resultData = myOrderTestData.GetTestID(pdbConnection, pExecutionDS.twksWSExecutions.Item(0).OrderTestID)
-                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    Dim myOrderTestDS As New OrderTestsDS
-                    myOrderTestDS = CType(resultData.SetDatos, OrderTestsDS)
-                    preparation(pDimension).TestID = myOrderTestDS.twksOrderTests.Item(0).TestID
-
-                    If Not myOrderTestDS.twksOrderTests.Item(0).IsSampleTypeNull Then
-                        preparation(pDimension).SampleType = myOrderTestDS.twksOrderTests.Item(0).SampleType
-                    End If
-
-                    If Not myOrderTestDS.twksOrderTests.Item(0).IsReplicatesNumberNull Then
-                        preparation(pDimension).MaxReplicates = myOrderTestDS.twksOrderTests.Item(0).ReplicatesNumber
-                    End If
-
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                'Get data from TwksOrders                                
-                Select Case pSampleClass
-                    'Case "CALIB"
-                    '    ' calibrator id
-                    '    Dim mywsRequiredElementsDelegate As New WSRequiredElementsDelegate
-                    '    resultData = mywsRequiredElementsDelegate.GetCalibratorID(pdbConnection, pExecutionDS.twksWSExecutions.Item(0).ExecutionID)
-                    '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    '        Dim mywsRequiredElementsDS As New WSRequiredElementsDS
-                    '        mywsRequiredElementsDS = CType(resultData.SetDatos, WSRequiredElementsDS)
-
-                    '        preparation(pDimension).CalibratorID = mywsRequiredElementsDS.twksWSRequiredElements.Item(0).CalibratorID
-                    'Else
-                    '    myClassGlobalResult = resultData
-                    '    Exit Try
-                    'End If
-
-                    Case "CTRL"
-                        Dim mywsRequiredElementsDelegate As New WSRequiredElementsDelegate
-                        resultData = mywsRequiredElementsDelegate.GetControlID(pdbConnection, pExecutionDS.twksWSExecutions.Item(0).ExecutionID)
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            Dim mywsRequiredElementsDS As New WSRequiredElementsDS
-                            mywsRequiredElementsDS = CType(resultData.SetDatos, WSRequiredElementsDS)
-                            preparation(pDimension).ControlID = mywsRequiredElementsDS.twksWSRequiredElements.Item(0).ControlID
-                        Else
-                            myClassGlobalResult = resultData
-                            Exit Try
-                        End If
-                End Select
-
-                'Get Readings
-                Dim ReadingsData As New WSReadingsDelegate
-                Dim myIndex As Integer = 0
-
-                'Read the reaction complete readings
-                'AG 23/10/2013 Task #1347 (add last 6 parameters)
-                resultData = ReadingsData.GetReadingsByExecutionID(pdbConnection, myAnalyzerID, myWorkSessionID, pExecutionDS.twksWSExecutions.Item(0).ExecutionID, True, _
-                                                                   myAnalyzerModel, preparation(pDimension).TestID, common(pDimension).UseFirstR1SampleReadings, common(pDimension).DefaultReadNumberR2Added, _
-                                                                   common(pDimension).NumberOfReadingsWithR2, common(pDimension).SwReadingsOffset)
-                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                    Dim ReadingsDS As New twksWSReadingsDS
-                    ReadingsDS = CType(resultData.SetDatos, twksWSReadingsDS)
-
-                    For Each ReadingsRow As twksWSReadingsDS.twksWSReadingsRow In ReadingsDS.twksWSReadings.Rows
-                        If ReadingsRow.ReactionComplete = True Then
-                            ReDim Preserve preparation(pDimension).Readings(myIndex)
-                            ReDim Preserve preparation(pDimension).RefReadings(myIndex)
-                            ReDim Preserve preparation(pDimension).PausedReadings(myIndex) 'AG 23/10/2013 Task #1347
-                            preparation(pDimension).Readings(myIndex) = ReadingsRow.MainCounts
-                            preparation(pDimension).RefReadings(myIndex) = ReadingsRow.RefCounts
-                            preparation(pDimension).PausedReadings(myIndex) = ReadingsRow.Pause 'AG 23/10/2013 Task #1347
-                            myIndex = myIndex + 1
-                        End If
-                    Next ReadingsRow
-
-                    If ReadingsDS.twksWSReadings.Rows.Count = 0 Then
-                        myClassGlobalResult.HasError = True
-                        myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.INCORRECT_DATA.ToString
-                    End If
-
-                Else
-                    myClassGlobalResult = resultData
-                    Exit Try
-                End If
-
-                'AG 24/02/2010 - Redim result arrays using the max replicates
-                Dim MaxReplicates As Integer = preparation(pDimension).MaxReplicates
-
-                ReDim preparation(pDimension).InitialReplicateAbs(MaxReplicates - 1)
-                ReDim preparation(pDimension).MainFilterReplicateAbs(MaxReplicates - 1)
-                ReDim preparation(pDimension).ReplicateAbs(MaxReplicates - 1)
-                ReDim preparation(pDimension).Reagent1ReplicateAbs(common(0).Reagent1Readings - 1)
-                ReDim preparation(pDimension).ReplicateConc(MaxReplicates - 1)
-                ReDim preparation(pDimension).rKineticsReplicate(MaxReplicates - 1)
-                ReDim preparation(pDimension).KineticsCurve(MaxReplicates - 1, 1)
-                ReDim preparation(pDimension).SubstrateDepletionReplicate(MaxReplicates - 1)
-                ReDim preparation(pDimension).ErrorReplicateAbs(MaxReplicates - 1)
-                ReDim preparation(pDimension).ErrorReplicateConc(MaxReplicates - 1)
-                ReDim preparation(pDimension).ReplicateDate(MaxReplicates - 1)
-                ReDim preparation(pDimension).RepInUse(MaxReplicates - 1)
-                ReDim preparation(pDimension).ReplicateAlarms(MaxReplicates - 1)
-                ReDim preparation(pDimension).ErrorCurveReplicate(MaxReplicates - 1)
-                ReDim preparation(pDimension).WorkingReagentReplicateAbs(MaxReplicates - 1) 'AG 12/07/2010
-                ReDim preparation(pDimension).ReplicateExecutionID(MaxReplicates - 1) 'AG 14/08/2010
-
-            Catch ex As Exception
-                'AG 24/02/2010
-                'resultData.HasError = True
-                'resultData.ErrorCode = "SYSTEM_ERROR"
-                'resultData.ErrorMessage = ex.Message
-                '
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
-                Me.CatchLaunched("InitPreparation", ex)
-            End Try
-
-        End Sub
-#End Region
-
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
         ''' <summary>
         ''' For an specific Execution, call methods to get all needed data, initialize structures, execute calculations and finally 
@@ -8475,7 +6603,7 @@ Namespace Biosystems.Ax00.Calculations
                     'End If
 
                     'Save results
-                    globalData = Me.SaveExecutionResults(Nothing)
+                    globalData = Me.SaveExecutionResults(Nothing, pRecalculusFlag)
                     If (Not globalData.HasError) Then
                         'After saving the result for the replicate, update the Execution Status in the local DS
                         myExecutionsDS.twksWSExecutions.First.ExecutionStatus = "CLOSED"
@@ -9081,5 +7209,4 @@ Namespace Biosystems.Ax00.Calculations
         End Function
 #End Region
     End Class
-
 End Namespace

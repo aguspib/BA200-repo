@@ -1476,6 +1476,9 @@ Namespace Biosystems.Ax00.BL
         ''' Add/update a Result for an OrderTest/RerunNumber/MultipointNumber
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pResultsDS">Typed DataSet ResultsDS containing all data for the Result to update</param>
+        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. It is used as parameter when 
+        '''                               calling function UpdateResult</param> 
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: GDS 02/03/2010
@@ -1483,8 +1486,10 @@ Namespace Biosystems.Ax00.BL
         '''              SA 04/07/2012 - Changed implementation to allow saving several Results (the entry DS can contain results for all points
         '''                              or a multipoint Calibrator)
         '''              TR 19/07/2012 - For Control Results, get the CtrlSendingGroup for the corresponding OrderTest and inform it in the ResultsDS
+        '''              SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. It is used as parameter when calling function UpdateResult
         ''' </remarks>
-        Public Function SaveResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS) As GlobalDataTO
+        Public Function SaveResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
+                                    Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1506,7 +1511,8 @@ Namespace Biosystems.Ax00.BL
                             If (resultData.HasError) Then Exit For
 
                             If (DirectCast(resultData.SetDatos, ResultsDS).twksResults.Rows.Count > 0) Then
-                                resultData = mytwksResultDAO.UpdateResult(dbConnection, myResultDS)
+                                'BA-1616: Inform parameter pRecalculusFlag when call function UpdateResult
+                                resultData = mytwksResultDAO.UpdateResult(dbConnection, myResultDS, pRecalculusFlag)
                                 If (resultData.HasError) Then Exit For
                             Else
                                 'Search the Control Sending Group for the CTRL OrderTestID

@@ -714,65 +714,57 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' Save results 
+        ''' Save data of the specified Executions
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionsDS" ></param>
-        ''' <returns>Global Data To with set data as ExecutionsDS</returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExecutionsDS">Typed DataSet ExecutionsDS containing all data of the Executions to save</param>
+        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, new 
+        '''                               function SaveExecutionForRecalculus is called instead of SaveExecutionsResults to 
+        '''                               avoid the losing of some execution values</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by DL 01/03/2010
+        ''' Created by:  DL 01/03/2010
+        ''' Modified by: SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. It is used as parameter when 
+        '''                                          calling function SaveExecutionsResults
         ''' </remarks>
-        Public Function SaveExecutionsResults(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                              ByVal pExecutionsDS As ExecutionsDS) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+        Public Function SaveExecutionsResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS, _
+                                              Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection) 'GDS 30/04/2010
-
-                If (Not resultData.HasError) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'BA-1616: Inform parameter pRecalculusFlag when call function SaveExecutionsResults
                         Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-
-                        'AG 11/08/2010 - Implement the loop inside the DAO instead doing it on the
-                        'delegate in order to minimum changes
-                        resultData = mytwksWSExecutionsDAO.SaveExecutionsResults(dbConnection, pExecutionsDS)
-                        'For Each row As ExecutionsDS.twksWSExecutionsRow In pExecutionsDS.twksWSExecutions
-                        '...
-                        'Next
-                        'END AG 11/08/2010
+                        resultData = mytwksWSExecutionsDAO.SaveExecutionsResults(dbConnection, pExecutionsDS, pRecalculusFlag)
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-
                         Else
                             'When the Database Connection was opened locally, then the Rollback is executed
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
                     End If
-                End If
-
+                    End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
 
+                resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SaveExecutionsResults", EventLogEntryType.Error, False)
-
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
-
             Return resultData
-
         End Function
 
         ''' <summary>
@@ -5213,10 +5205,47 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' When the informed Execution belongs to a CALIBRATOR Order Test for a Multipoint Experimental Calibrator, this function searches and
+        ''' returns data of Executions for each one of the Calibrators points. NOTE: There is a NEW version of this function used in Calculations module,
+        ''' but this function is still used in WSRotorContentByPositionDelegate in function UpdateSamplePositionStatus
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExecutionID">Execution Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionDS with data of all Executions for an specific Multipoint Calibrator</returns>
+        ''' <remarks>
+        ''' Created by:          
+        ''' </remarks>
+        Public Function GetExecutionMultititem(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
+                        resultData = mytwksWSExecutionsDAO.GetExecutionsMultiItem(dbConnection, pExecutionID)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionMultititem", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "Private Methods"
-
         ''' <summary>
         ''' 
         ''' </summary>
@@ -9360,664 +9389,630 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "METHODS REPLACED FOR NEW ONES DUE TO PERFORMANCE ISSUES"
-        ''' <summary>
-        ''' Find the CLOSED Executions having the maximum ReplicateNumber for the same OrderTestID and RerunNumber. Executions of all MultiItemNumbers
-        ''' are returned excepting when parameter pOnlyMaxReplicate is TRUE, in which case, only the maximum MultiItemNumber for the Replicate is returned 
-        ''' of the informed ExecutionID
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pExecutionID">Execution Identifier</param>
-        ''' <param name="pOnlyMaxReplicate">Optional parameter. When TRUE, only the maximum MultiItemNumber for the Replicate is returned</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS with data of all obtained Executions</returns>
-        ''' <remarks>
-        ''' Created by:  AG 23/07/2010
-        ''' </remarks>
-        Public Function GetClosedExecutionsRelated(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                                   ByVal pExecutionID As Integer, Optional ByVal pOnlyMaxReplicate As Boolean = False) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSExecutionsDAO
-                        resultData = myDAO.GetClosedExecutionsRelated(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, pOnlyMaxReplicate)
-
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            Dim myEx_DS As New ExecutionsDS
-                            myEx_DS = CType(resultData.SetDatos, ExecutionsDS)
-                            resultData.SetDatos = myEx_DS
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetClosedExecutionsRelated", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get number of MultiItem 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pExecutionID">Execution Identifier></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetExecutionMultititem(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-                        resultData = mytwksWSExecutionsDAO.GetExecutionsMultiItem(dbConnection, pExecutionID)
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionMultititem", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get number of multiitem 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open Database Connection</param>
-        ''' <param name="pExecutionID">execution identifier></param>
-        ''' <returns></returns>
-        ''' <remarks></remarks>
-        Public Function GetNumberOfMultititem(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                              ByVal pExecutionID As Integer) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-
-                        resultData = mytwksWSExecutionsDAO.GetNumberOfMultititem(dbConnection, pExecutionID)
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNumberOfMultititem", EventLogEntryType.Error, False)
-
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-
-        End Function
-
-        ''' <summary>
-        ''' Search the affected CLOSED executions for the new blank or calibrator result
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pSampleClass"></param>
-        ''' <param name="pTestID"></param>
-        ''' <param name="pSampleType"></param>
-        ''' <returns>GlobalDataTo (ExecutionsDS)</returns>
-        ''' <remarks>Created by AG 23/07/2010</remarks>
-        Public Function ReadAffectedExecutions(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                       ByVal pSampleClass As String, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSExecutionsDAO
-
-                        Select Case pSampleClass
-                            Case "BLANK"
-                                resultData = myDAO.GetExecutionsAffectedByNewBlank(dbConnection, pAnalyzerID, pWorkSessionID, pSampleClass, pTestID)
-
-                            Case "CALIB"
-                                resultData = myDAO.GetExecutionsAffectedByNewCalib(dbConnection, pAnalyzerID, pWorkSessionID, pSampleClass, pTestID, pSampleType)
-
-                            Case Else
-                        End Select
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = "SYSTEM_ERROR"
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedExecutions", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Recalculate status for all not deleted existing executions with status PENDING or LOCKED
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pWorkInRunningMode">Flag indicating if the function is executed when a WorkSession is running in the Analyzer
-        '''                                  It is not necessary just now, but it is defined for future use if it is finally needed</param>
-        ''' <returns>GlobalDataTO containing sucess/error information</returns>
-        ''' <remarks>
-        ''' Created by:  SA 25/08/2010
-        ''' Modified by: SA 15/02/2011 - Sent all updates in the DataSet to the UpdateStatus function instead of sent them
-        '''                              one by one (for speed improvement)
-        '''              AG 19/09/2011 - Function renamed from RecalculateStatusForRerunExecutions to RecalculateStatusForNotDeletedExecutions, 
-        '''                              and added parameter pWorkInRunningMode to adapt the function for use working in running mode or not
-        '''              AG 22/12/2011 - Verification of locked Blanks and Calibrators have to be done only for Standard Tests
-        '''              AG 07/02/2012 - Original algorithm failed when we try to unlock a BLANKS, CALIBS (require BLANK), CTRLS or PATIENTS (require BLANK and CALIB)
-        '''                              ** The 1st time BLANKS were unlocked (OK), but not CALIBS, CTRLS or PATIENTS because the status of the BLANK was queried in 
-        '''                                 the Database before it has been updated 
-        '''                              ** The 2nd time, CALIBS were unlocked (OK) but not CTRLS or PATIENTS for a similar reason, the status of the CALIB was queried
-        '''                                 in the Database before it has been updated
-        '''                              ** The 3rd time, CTRLS and PATIENTS were unlocked (OK)
-        '''                              Solution: the new status is calculate in the same way as now, but the call to twksWSExecutionsDAO.Update has to be executed  
-        '''                                        for each different SampleClass and not at the end of the loop
-        '''              SA 09/03/2012 - Executions depending of required Elements marked as INCOMPLETE (there are volume in the Rotor, but the total quantity is not
-        '''                              enough for all the pending work); changed the function template  
-        '''              AG 20/04/2012 - Call method verifyBlankLocked (executionsDelegate) instead calling the ExecutionsDAO.VerifyUnlockedExecution
-        '''                              because if a previous result was selected to be used the Blank it could not be positioned)
-        ''' </remarks>
-        Public Function RecalculateStatusForNotDeletedExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                                 ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim newExecStatus As String = ""
-                        Dim rerunExecutions As New twksWSExecutionsDAO
-
-                        'Get all Pending and Locked Executions created for Reruns in the Analyzer WorkSession
-                        resultData = rerunExecutions.GetNotDeletedPendingExecutionDuringWSCreation(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myExecutionsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                            'Variables to control the loop and DataSet used to call Update function for all pending and locked Executions of each different SampleClass
-                            Dim currentOT As Integer = -1
-                            Dim currentSampleClass As String = String.Empty
-                            Dim updateBySampleClassExecutionsDS As New ExecutionsDS
-
-                            For Each rerunExec As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions
-                                'AG 07/02/2012 - When the SampleClass changes, the status of Executions of the previous one is updated
-                                If (currentSampleClass <> String.Empty AndAlso currentSampleClass <> rerunExec.SampleClass) Then
-                                    'Update Status of all Executions of the previous SampleClass 
-                                    If (updateBySampleClassExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                        resultData = UpdateStatus(dbConnection, updateBySampleClassExecutionsDS)
-                                    End If
-
-                                    updateBySampleClassExecutionsDS.Clear()
-                                    currentSampleClass = rerunExec.SampleClass
-                                End If
-                                'AG 07/02/2012
-
-                                If (rerunExec.OrderTestID <> currentOT) Then
-                                    currentOT = rerunExec.OrderTestID
-                                    currentSampleClass = rerunExec.SampleClass
-
-                                    Dim myWSOrderTests As New WSOrderTestsDelegate
-                                    resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, rerunExec.SampleClass, currentOT)
-
-                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        Dim reqElementsDS As WSOrderTestsForExecutionsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
-
-                                        newExecStatus = "PENDING"
-                                        For Each reqElement As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions
-                                            If (reqElement.ElementStatus = "NOPOS") Then
-                                                'If a required Element is NO POSITIONED, then the Execution is LOCKED
-                                                newExecStatus = "LOCKED"
-                                            Else
-                                                'If a required Element is POSITIONED or INCOMPLETE and the Execution is for an Standard Test, then it is verified
-                                                'if all elements for the needed Blank and Calibrator are also POSITIONED
-                                                If (rerunExec.ExecutionType = "PREP_STD") Then
-                                                    If (rerunExec.SampleClass = "CALIB") Then
-                                                        'The Calibrator is positioned, verify if the elements needed for the Blank are also positioned
-
-                                                        'AG 20/04/2012
-                                                        'resultData = rerunExecutions.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
-                                                        '                                                     reqElement.TestID, reqElement.SampleType)
-                                                        'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                        '    If (Not DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                        'Else
-                                                        '    'Error verifying if the required Blank Elements are locked
-                                                        '    Exit For
-                                                        'End If
-                                                        resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElement.TestID, reqElement.SampleType)
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                        Else
-                                                            'Error verifying if the required Blank Elements are locked
-                                                            Exit For
-                                                        End If
-                                                        'AG 20/04/2012
-
-                                                    ElseIf (rerunExec.SampleClass = "CTRL" OrElse rerunExec.SampleClass = "PATIENT") Then
-                                                        'The Control or Patient is positioned, verify if the required Calibrator is positioned
-                                                        resultData = VerifyLockedCalibrator(dbConnection, pWorkSessionID, pAnalyzerID, reqElement.TestID, reqElement.SampleType)
-                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then
-                                                                newExecStatus = "LOCKED"
-                                                            Else
-                                                                'The Calibrator is positioned, verify if the elements needed for the Blank are also positioned
-
-                                                                'AG 20/04/2012
-                                                                'resultData = rerunExecutions.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
-                                                                '                                                     reqElement.TestID, reqElement.SampleType)
-                                                                'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                '    If (Not DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                                'Else
-                                                                '    'Error verifying if the required Blank Elements are locked
-                                                                '    Exit For
-                                                                'End If
-
-                                                                resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElement.TestID, reqElement.SampleType)
-                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                    If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
-                                                                Else
-                                                                    'Error verifying if the required Blank Elements are locked
-                                                                    Exit For
-                                                                End If
-                                                                'AG 20/04/2012
-                                                            End If
-                                                        Else
-                                                            'Error verifying if the required Calibrator Elements are locked
-                                                            Exit For
-                                                        End If
-                                                    End If
-                                                End If
-                                            End If
-
-                                            If (newExecStatus = "LOCKED") Then Exit For
-                                        Next
-
-                                        rerunExec.BeginEdit()
-                                        rerunExec.ExecutionStatus = newExecStatus
-                                        rerunExec.EndEdit()
-                                    End If
-                                Else
-                                    rerunExec.BeginEdit()
-                                    rerunExec.ExecutionStatus = newExecStatus
-                                    rerunExec.EndEdit()
-                                End If
-
-                                'AG 07/02/2012 - Add row into executionsDS grouped by sampleClass to update 
-                                updateBySampleClassExecutionsDS.twksWSExecutions.ImportRow(rerunExec)
-                                updateBySampleClassExecutionsDS.AcceptChanges()
-                                'AG 07/02/2012
-                            Next
-
-                            'AG 07/02/2012 - now we update executions status grouped by sample class not at the loop ending
-                            'when the loop is endind we has to update only the updateBySampleClassExecutionsDS contents
-                            'Update the Status of the Reruns Executions
-                            'If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                            '    resultData = UpdateStatus(dbConnection, myExecutionsDS)
-                            'End If
-                            If (updateBySampleClassExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-                                resultData = UpdateStatus(dbConnection, updateBySampleClassExecutionsDS)
-                            End If
-                            'AG 07/02/2012
-                        End If
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Update inuse flag
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID "></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <param name="pInUse"></param>
-        ''' <returns></returns>
-        ''' <remarks>Created by AG 23/07/2010</remarks>
-        Public Function UpdateInUse(ByVal pDBConnection As SqlClient.SqlConnection, _
-                             ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                             ByVal pExecutionID As Integer, ByVal pInUse As Boolean) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        'Create DS
-                        Dim myExecutionsDS As New ExecutionsDS
-                        Dim myEx_Row As ExecutionsDS.twksWSExecutionsRow
-                        myEx_Row = myExecutionsDS.twksWSExecutions.NewtwksWSExecutionsRow
-
-                        myEx_Row.BeginEdit()
-                        With myEx_Row
-                            .AnalyzerID = pAnalyzerID
-                            .WorkSessionID = pWorkSessionID
-                            .ExecutionID = pExecutionID
-                            .InUse = pInUse
-                        End With
-                        myExecutionsDS.twksWSExecutions.AddtwksWSExecutionsRow(myEx_Row)
-                        myExecutionsDS.AcceptChanges()
-
-                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-                        resultData = mytwksWSExecutionsDAO.UpdateInUse(dbConnection, myExecutionsDS)
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso Not (dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData.HasError = True
-                resultData.ErrorCode = "SYSTEM_ERROR"
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateInUse", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Update the fields BaseLineID, WellUsed and RotorTurnNumber
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pExecutionsDS">Executions DataSet with the following fields informed (ExecutionID, BaseLineID, WellUsed, RotorTurnNumber)</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' Created by: GDS - 27/04/2010
-        ''' </remarks>
-        Public Function UpdateReadingsFields(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-                        resultData = mytwksWSExecutionsDAO.UpdateReadingsFields(dbConnection, pExecutionsDS)
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateReadingsFields", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        '''1) Update Execution status as CLOSEDNOK 
-        ''' 2) If Execution.ReplicateNumber = OrderTest.MaxReplicates then
-        ''' 2.1)____ OrderTestDelegate.UpdateStatusByOrderTestID(OrderTest, CLOSED)
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <param name="pOrderTestID" ></param>
-        ''' <param name="pOrderTestMaxReplicates" ></param>
-        ''' <param name="pSTDPrepFlag"></param>
-        ''' <returns>GlobalDataTo with error or not</returns>
-        ''' <remarks>AG 24/02/2011 - Tested ok
-        ''' AG 21/10/2011 - prepare business for shown closednok executions into results screen
-        ''' AG 19/03/2012 - add parameter pSTDPrepFlag (when TRUE (STD) alarms are added, when FALSE (ISE) no alarms are added)
-        ''' AG 25/06/2012 - ResultsDS informs also AnalyzerID and WorkSessionID
-        ''' </remarks>
-        Public Function UpdateStatusClosedNOK(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                              ByVal pWorkSessionID As String, ByVal pExecutionID As Integer, _
-                                              ByVal pOrderTestID As Integer, ByVal pOrderTestMaxReplicates As Integer, _
-                                              ByVal pSTDPrepFlag As Boolean) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-                If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-
-                        'Get all execution, with several MultiItemNumber, using the same OrderTestID - RerunNumber
-                        resultData = GetExecutionMultititem(dbConnection, pExecutionID)
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            Dim myExecutionsDS As New ExecutionsDS
-                            myExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                            If myExecutionsDS.twksWSExecutions.Rows.Count > 0 Then
-                                'Update EXECUTIONSTATUS to CLOSEDNOK + Add execution alarm (finished with optical errors)
-                                Dim execAlarmDlg As New WSExecutionAlarmsDelegate
-                                Dim execAlarmDS As New WSExecutionAlarmsDS
-                                Dim execAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow
-
-                                For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                    row.BeginEdit()
-                                    row.ExecutionStatus = "CLOSEDNOK"
-                                    row.InUse = False
-                                    row.ResultDate = DateTime.Now
-                                    row.EndEdit()
-
-                                    If pSTDPrepFlag Then 'STD executions add remark Finished with optical errors
-                                        execAlarmRow = execAlarmDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
-                                        execAlarmRow.ExecutionID = row.ExecutionID
-                                        execAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
-                                        execAlarmRow.AlarmDateTime = DateTime.Now
-                                        execAlarmDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(execAlarmRow)
-                                    Else 'ISE executions only mark as CLOSEDNOK but no alarm
-
-                                    End If
-
-                                Next
-                                myExecutionsDS.AcceptChanges()
-                                execAlarmDS.twksWSExecutionAlarms.AcceptChanges()
-                                resultData = UpdateStatus(dbConnection, myExecutionsDS)
-
-                                'AG 21/10/2011
-                                If Not resultData.HasError Then
-                                    If execAlarmDS.twksWSExecutionAlarms.Rows.Count > 0 Then
-                                        resultData = execAlarmDlg.Add(dbConnection, execAlarmDS)
-                                    End If
-                                End If
-
-                                'Exists results for OrderTest-MultiPointNumber-RerunNumber: Yes: Do nothing, No: Create empty result
-                                Dim createAvgResult As Boolean = False
-                                If Not resultData.HasError Then
-                                    Dim resultsDlg As New ResultsDelegate
-                                    Dim myResults As New ResultsDS
-                                    resultData = resultsDlg.GetAcceptedResults(dbConnection, pOrderTestID, True)
-                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                        myResults = CType(resultData.SetDatos, ResultsDS)
-                                    End If
-
-                                    If myResults.twksResults.Rows.Count = 0 Then
-                                        createAvgResult = True
-
-                                        Dim newResultsRow As ResultsDS.twksResultsRow
-                                        For Each executionsRow As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                            newResultsRow = myResults.twksResults.NewtwksResultsRow
-                                            newResultsRow.OrderTestID = pOrderTestID
-                                            newResultsRow.MultiPointNumber = executionsRow.MultiItemNumber
-                                            newResultsRow.RerunNumber = executionsRow.RerunNumber
-                                            newResultsRow.AcceptedResultFlag = False
-                                            newResultsRow.ManualResultFlag = False
-                                            newResultsRow.ValidationStatus = "CLOSEDNOK"
-                                            newResultsRow.ResultDateTime = DateTime.Now
-                                            newResultsRow.AnalyzerID = pAnalyzerID
-                                            newResultsRow.WorkSessionID = pWorkSessionID
-                                            myResults.twksResults.AddtwksResultsRow(newResultsRow)
-                                        Next
-                                        myResults.twksResults.AcceptChanges()
-                                        resultData = resultsDlg.SaveResults(dbConnection, myResults)
-                                    End If
-
-                                    If Not resultData.HasError Then
-                                        'When the average result is created: Add average alarm (finished with optical errors)
-                                        If createAvgResult Then
-                                            Dim resultAlarmDlg As New ResultAlarmsDelegate
-                                            Dim resultAlarmDS As New ResultAlarmsDS
-                                            Dim resultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
-
-                                            If pSTDPrepFlag Then 'STD executions add remark Finished with optical errors
-                                                For Each executionsRow As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
-                                                    resultAlarmRow = resultAlarmDS.twksResultAlarms.NewtwksResultAlarmsRow
-                                                    resultAlarmRow.OrderTestID = pOrderTestID
-                                                    resultAlarmRow.MultiPointNumber = executionsRow.MultiItemNumber
-                                                    resultAlarmRow.RerunNumber = executionsRow.RerunNumber
-                                                    resultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
-                                                    resultAlarmRow.AlarmDateTime = DateTime.Now
-                                                    resultAlarmDS.twksResultAlarms.AddtwksResultAlarmsRow(resultAlarmRow)
-                                                Next
-
-                                            Else 'ISE executions only mark as CLOSEDNOK but no alarm
-
-                                            End If
-                                            resultAlarmDS.twksResultAlarms.AcceptChanges()
-                                            If resultAlarmDS.twksResultAlarms.Rows.Count > 0 Then
-                                                resultData = resultAlarmDlg.Add(dbConnection, resultAlarmDS)
-                                            End If
-                                        End If
-                                    End If
-
-                                End If
-                                'AG 21/10/2011
-
-                                If Not resultData.HasError Then
-                                    'Finally update OrderTest and Order status
-                                    If myExecutionsDS.twksWSExecutions(0).ReplicateNumber = pOrderTestMaxReplicates Then
-                                        Dim ot_delegate As New OrderTestsDelegate
-                                        resultData = ot_delegate.UpdateStatusByOrderTestID(dbConnection, pOrderTestID, "CLOSED")
-                                    End If
-                                End If
-                            End If
-
-                        End If
-
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            'resultData.SetDatos = <value to return; if any>
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
-                    End If
-                End If
-
-            Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusClosedNOK", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
+        '        ''' <summary>
+        '        ''' Find the CLOSED Executions having the maximum ReplicateNumber for the same OrderTestID and RerunNumber. Executions of all MultiItemNumbers
+        '        ''' are returned excepting when parameter pOnlyMaxReplicate is TRUE, in which case, only the maximum MultiItemNumber for the Replicate is returned 
+        '        ''' of the informed ExecutionID
+        '        ''' </summary>
+        '        ''' <param name="pDBConnection">Open DB Connection</param>
+        '        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        '        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        '        ''' <param name="pExecutionID">Execution Identifier</param>
+        '        ''' <param name="pOnlyMaxReplicate">Optional parameter. When TRUE, only the maximum MultiItemNumber for the Replicate is returned</param>
+        '        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS with data of all obtained Executions</returns>
+        '        ''' <remarks>
+        '        ''' Created by:  AG 23/07/2010
+        '        ''' </remarks>
+        '        Public Function GetClosedExecutionsRelated(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        '                                                   ByVal pExecutionID As Integer, Optional ByVal pOnlyMaxReplicate As Boolean = False) As GlobalDataTO
+        '            Dim resultData As GlobalDataTO = Nothing
+        '            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '            Try
+        '                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '                    If (Not dbConnection Is Nothing) Then
+        '                        Dim myDAO As New twksWSExecutionsDAO
+        '                        resultData = myDAO.GetClosedExecutionsRelated(dbConnection, pAnalyzerID, pWorkSessionID, pExecutionID, pOnlyMaxReplicate)
+
+        '                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                            Dim myEx_DS As New ExecutionsDS
+        '                            myEx_DS = CType(resultData.SetDatos, ExecutionsDS)
+        '                            resultData.SetDatos = myEx_DS
+        '                        End If
+        '                    End If
+        '                End If
+        '            Catch ex As Exception
+        '                resultData = New GlobalDataTO()
+        '                resultData.HasError = True
+        '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '                Dim myLogAcciones As New ApplicationLogManager()
+        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetClosedExecutionsRelated", EventLogEntryType.Error, False)
+        '            Finally
+        '                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+        '            End Try
+        '            Return resultData
+        '        End Function
+
+        '        ''' <summary>
+        '        ''' Get number of multiitem 
+        '        ''' </summary>
+        '        ''' <param name="pDBConnection">Open Database Connection</param>
+        '        ''' <param name="pExecutionID">execution identifier></param>
+        '        ''' <returns></returns>
+        '        ''' <remarks></remarks>
+        '        Public Function GetNumberOfMultititem(ByVal pDBConnection As SqlClient.SqlConnection, _
+        '                                              ByVal pExecutionID As Integer) As GlobalDataTO
+
+        '            Dim resultData As New GlobalDataTO
+        '            Dim dbConnection As New SqlClient.SqlConnection
+
+        '            Try
+        '                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+        '                If (Not resultData.HasError) Then
+        '                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+
+        '                    If (Not dbConnection Is Nothing) Then
+        '                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
+
+        '                        resultData = mytwksWSExecutionsDAO.GetNumberOfMultititem(dbConnection, pExecutionID)
+        '                    End If
+        '                End If
+
+        '            Catch ex As Exception
+        '                resultData.HasError = True
+        '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '                Dim myLogAcciones As New ApplicationLogManager()
+        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNumberOfMultititem", EventLogEntryType.Error, False)
+
+        '            Finally
+        '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '            End Try
+
+        '            Return resultData
+
+        '        End Function
+
+        '        ' ''' <summary>
+        '        ' ''' Search the affected CLOSED executions for the new blank or calibrator result
+        '        ' ''' </summary>
+        '        ' ''' <param name="pDBConnection"></param>
+        '        ' ''' <param name="pAnalyzerID"></param>
+        '        ' ''' <param name="pWorkSessionID"></param>
+        '        ' ''' <param name="pSampleClass"></param>
+        '        ' ''' <param name="pTestID"></param>
+        '        ' ''' <param name="pSampleType"></param>
+        '        ' ''' <returns>GlobalDataTo (ExecutionsDS)</returns>
+        '        ' ''' <remarks>Created by AG 23/07/2010</remarks>
+        '        'Public Function ReadAffectedExecutions(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        '        '                               ByVal pSampleClass As String, ByVal pTestID As Integer, ByVal pSampleType As String) As GlobalDataTO
+        '        '    Dim resultData As New GlobalDataTO
+        '        '    Dim dbConnection As New SqlClient.SqlConnection
+
+        '        '    Try
+        '        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+        '        '        If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
+        '        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+
+        '        '            If (Not dbConnection Is Nothing) Then
+        '        '                Dim myDAO As New twksWSExecutionsDAO
+
+        '        '                Select Case pSampleClass
+        '        '                    Case "BLANK"
+        '        '                        resultData = myDAO.GetExecutionsAffectedByNewBlank(dbConnection, pAnalyzerID, pWorkSessionID, pSampleClass, pTestID)
+
+        '        '                    Case "CALIB"
+        '        '                        resultData = myDAO.GetExecutionsAffectedByNewCalib(dbConnection, pAnalyzerID, pWorkSessionID, pSampleClass, pTestID, pSampleType)
+
+        '        '                    Case Else
+        '        '                End Select
+        '        '            End If
+        '        '        End If
+
+        '        '    Catch ex As Exception
+        '        '        resultData.HasError = True
+        '        '        resultData.ErrorCode = "SYSTEM_ERROR"
+        '        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedExecutions", EventLogEntryType.Error, False)
+        '        '    Finally
+        '        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '        '    End Try
+
+        '        '    Return resultData
+        '        'End Function
+
+        '        ''' <summary>
+        '        ''' Recalculate status for all not deleted existing executions with status PENDING or LOCKED
+        '        ''' </summary>
+        '        ''' <param name="pDBConnection">Open DB Connection</param>
+        '        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        '        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        '        ''' <param name="pWorkInRunningMode">Flag indicating if the function is executed when a WorkSession is running in the Analyzer
+        '        '''                                  It is not necessary just now, but it is defined for future use if it is finally needed</param>
+        '        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        '        ''' <remarks>
+        '        ''' Created by:  SA 25/08/2010
+        '        ''' Modified by: SA 15/02/2011 - Sent all updates in the DataSet to the UpdateStatus function instead of sent them
+        '        '''                              one by one (for speed improvement)
+        '        '''              AG 19/09/2011 - Function renamed from RecalculateStatusForRerunExecutions to RecalculateStatusForNotDeletedExecutions, 
+        '        '''                              and added parameter pWorkInRunningMode to adapt the function for use working in running mode or not
+        '        '''              AG 22/12/2011 - Verification of locked Blanks and Calibrators have to be done only for Standard Tests
+        '        '''              AG 07/02/2012 - Original algorithm failed when we try to unlock a BLANKS, CALIBS (require BLANK), CTRLS or PATIENTS (require BLANK and CALIB)
+        '        '''                              ** The 1st time BLANKS were unlocked (OK), but not CALIBS, CTRLS or PATIENTS because the status of the BLANK was queried in 
+        '        '''                                 the Database before it has been updated 
+        '        '''                              ** The 2nd time, CALIBS were unlocked (OK) but not CTRLS or PATIENTS for a similar reason, the status of the CALIB was queried
+        '        '''                                 in the Database before it has been updated
+        '        '''                              ** The 3rd time, CTRLS and PATIENTS were unlocked (OK)
+        '        '''                              Solution: the new status is calculate in the same way as now, but the call to twksWSExecutionsDAO.Update has to be executed  
+        '        '''                                        for each different SampleClass and not at the end of the loop
+        '        '''              SA 09/03/2012 - Executions depending of required Elements marked as INCOMPLETE (there are volume in the Rotor, but the total quantity is not
+        '        '''                              enough for all the pending work); changed the function template  
+        '        '''              AG 20/04/2012 - Call method verifyBlankLocked (executionsDelegate) instead calling the ExecutionsDAO.VerifyUnlockedExecution
+        '        '''                              because if a previous result was selected to be used the Blank it could not be positioned)
+        '        ''' </remarks>
+        '        Public Function RecalculateStatusForNotDeletedExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        '                                                                 ByVal pWorkSessionID As String, ByVal pWorkInRunningMode As Boolean) As GlobalDataTO
+        '            Dim resultData As GlobalDataTO = Nothing
+        '            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+        '            Try
+        '                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+        '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+        '                    If (Not dbConnection Is Nothing) Then
+        '                        Dim newExecStatus As String = ""
+        '                        Dim rerunExecutions As New twksWSExecutionsDAO
+
+        '                        'Get all Pending and Locked Executions created for Reruns in the Analyzer WorkSession
+        '                        resultData = rerunExecutions.GetNotDeletedPendingExecutionDuringWSCreation(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode)
+        '                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                            Dim myExecutionsDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+        '                            'Variables to control the loop and DataSet used to call Update function for all pending and locked Executions of each different SampleClass
+        '                            Dim currentOT As Integer = -1
+        '                            Dim currentSampleClass As String = String.Empty
+        '                            Dim updateBySampleClassExecutionsDS As New ExecutionsDS
+
+        '                            For Each rerunExec As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions
+        '                                'AG 07/02/2012 - When the SampleClass changes, the status of Executions of the previous one is updated
+        '                                If (currentSampleClass <> String.Empty AndAlso currentSampleClass <> rerunExec.SampleClass) Then
+        '                                    'Update Status of all Executions of the previous SampleClass 
+        '                                    If (updateBySampleClassExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
+        '                                        resultData = UpdateStatus(dbConnection, updateBySampleClassExecutionsDS)
+        '                                    End If
+
+        '                                    updateBySampleClassExecutionsDS.Clear()
+        '                                    currentSampleClass = rerunExec.SampleClass
+        '                                End If
+        '                                'AG 07/02/2012
+
+        '                                If (rerunExec.OrderTestID <> currentOT) Then
+        '                                    currentOT = rerunExec.OrderTestID
+        '                                    currentSampleClass = rerunExec.SampleClass
+
+        '                                    Dim myWSOrderTests As New WSOrderTestsDelegate
+        '                                    resultData = myWSOrderTests.GetOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID, rerunExec.SampleClass, currentOT)
+
+        '                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                        Dim reqElementsDS As WSOrderTestsForExecutionsDS = DirectCast(resultData.SetDatos, WSOrderTestsForExecutionsDS)
+
+        '                                        newExecStatus = "PENDING"
+        '                                        For Each reqElement As WSOrderTestsForExecutionsDS.WSOrderTestsForExecutionsRow In reqElementsDS.WSOrderTestsForExecutions
+        '                                            If (reqElement.ElementStatus = "NOPOS") Then
+        '                                                'If a required Element is NO POSITIONED, then the Execution is LOCKED
+        '                                                newExecStatus = "LOCKED"
+        '                                            Else
+        '                                                'If a required Element is POSITIONED or INCOMPLETE and the Execution is for an Standard Test, then it is verified
+        '                                                'if all elements for the needed Blank and Calibrator are also POSITIONED
+        '                                                If (rerunExec.ExecutionType = "PREP_STD") Then
+        '                                                    If (rerunExec.SampleClass = "CALIB") Then
+        '                                                        'The Calibrator is positioned, verify if the elements needed for the Blank are also positioned
+
+        '                                                        'AG 20/04/2012
+        '                                                        'resultData = rerunExecutions.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
+        '                                                        '                                                     reqElement.TestID, reqElement.SampleType)
+        '                                                        'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                                        '    If (Not DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
+        '                                                        'Else
+        '                                                        '    'Error verifying if the required Blank Elements are locked
+        '                                                        '    Exit For
+        '                                                        'End If
+        '                                                        resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElement.TestID, reqElement.SampleType)
+        '                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
+        '                                                        Else
+        '                                                            'Error verifying if the required Blank Elements are locked
+        '                                                            Exit For
+        '                                                        End If
+        '                                                        'AG 20/04/2012
+
+        '                                                    ElseIf (rerunExec.SampleClass = "CTRL" OrElse rerunExec.SampleClass = "PATIENT") Then
+        '                                                        'The Control or Patient is positioned, verify if the required Calibrator is positioned
+        '                                                        resultData = VerifyLockedCalibrator(dbConnection, pWorkSessionID, pAnalyzerID, reqElement.TestID, reqElement.SampleType)
+        '                                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                                            If (DirectCast(resultData.SetDatos, Boolean)) Then
+        '                                                                newExecStatus = "LOCKED"
+        '                                                            Else
+        '                                                                'The Calibrator is positioned, verify if the elements needed for the Blank are also positioned
+
+        '                                                                'AG 20/04/2012
+        '                                                                'resultData = rerunExecutions.VerifyUnlockedExecution(dbConnection, pAnalyzerID, pWorkSessionID, "BLANK", _
+        '                                                                '                                                     reqElement.TestID, reqElement.SampleType)
+        '                                                                'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                                                '    If (Not DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
+        '                                                                'Else
+        '                                                                '    'Error verifying if the required Blank Elements are locked
+        '                                                                '    Exit For
+        '                                                                'End If
+
+        '                                                                resultData = VerifyLockedBlank(dbConnection, pWorkSessionID, pAnalyzerID, reqElement.TestID, reqElement.SampleType)
+        '                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+        '                                                                    If (DirectCast(resultData.SetDatos, Boolean)) Then newExecStatus = "LOCKED"
+        '                                                                Else
+        '                                                                    'Error verifying if the required Blank Elements are locked
+        '                                                                    Exit For
+        '                                                                End If
+        '                                                                'AG 20/04/2012
+        '                                                            End If
+        '                                                        Else
+        '                                                            'Error verifying if the required Calibrator Elements are locked
+        '                                                            Exit For
+        '                                                        End If
+        '                                                    End If
+        '                                                End If
+        '                                            End If
+
+        '                                            If (newExecStatus = "LOCKED") Then Exit For
+        '                                        Next
+
+        '                                        rerunExec.BeginEdit()
+        '                                        rerunExec.ExecutionStatus = newExecStatus
+        '                                        rerunExec.EndEdit()
+        '                                    End If
+        '                                Else
+        '                                    rerunExec.BeginEdit()
+        '                                    rerunExec.ExecutionStatus = newExecStatus
+        '                                    rerunExec.EndEdit()
+        '                                End If
+
+        '                                'AG 07/02/2012 - Add row into executionsDS grouped by sampleClass to update 
+        '                                updateBySampleClassExecutionsDS.twksWSExecutions.ImportRow(rerunExec)
+        '                                updateBySampleClassExecutionsDS.AcceptChanges()
+        '                                'AG 07/02/2012
+        '                            Next
+
+        '                            'AG 07/02/2012 - now we update executions status grouped by sample class not at the loop ending
+        '                            'when the loop is endind we has to update only the updateBySampleClassExecutionsDS contents
+        '                            'Update the Status of the Reruns Executions
+        '                            'If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
+        '                            '    resultData = UpdateStatus(dbConnection, myExecutionsDS)
+        '                            'End If
+        '                            If (updateBySampleClassExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
+        '                                resultData = UpdateStatus(dbConnection, updateBySampleClassExecutionsDS)
+        '                            End If
+        '                            'AG 07/02/2012
+        '                        End If
+
+        '                        If (Not resultData.HasError) Then
+        '                            'When the Database Connection was opened locally, then the Commit is executed
+        '                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                        Else
+        '                            'When the Database Connection was opened locally, then the Rollback is executed
+        '                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                        End If
+        '                    End If
+        '                End If
+
+        '            Catch ex As Exception
+        '                'When the Database Connection was opened locally, then the Rollback is executed
+        '                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+        '                resultData = New GlobalDataTO()
+        '                resultData.HasError = True
+        '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '                Dim myLogAcciones As New ApplicationLogManager()
+        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
+        '            Finally
+        '                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+        '            End Try
+        '            Return resultData
+        '        End Function
+
+        '        ''' <summary>
+        '        ''' Update inuse flag
+        '        ''' </summary>
+        '        ''' <param name="pDBConnection"></param>
+        '        ''' <param name="pAnalyzerID"></param>
+        '        ''' <param name="pWorkSessionID "></param>
+        '        ''' <param name="pExecutionID"></param>
+        '        ''' <param name="pInUse"></param>
+        '        ''' <returns></returns>
+        '        ''' <remarks>Created by AG 23/07/2010</remarks>
+        '        Public Function UpdateInUse(ByVal pDBConnection As SqlClient.SqlConnection, _
+        '                             ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        '                             ByVal pExecutionID As Integer, ByVal pInUse As Boolean) As GlobalDataTO
+        '            Dim resultData As New GlobalDataTO
+        '            Dim dbConnection As New SqlClient.SqlConnection
+
+        '            Try
+        '                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+        '                If (Not resultData.HasError) Then
+        '                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '                    If (Not dbConnection Is Nothing) Then
+
+        '                        'Create DS
+        '                        Dim myExecutionsDS As New ExecutionsDS
+        '                        Dim myEx_Row As ExecutionsDS.twksWSExecutionsRow
+        '                        myEx_Row = myExecutionsDS.twksWSExecutions.NewtwksWSExecutionsRow
+
+        '                        myEx_Row.BeginEdit()
+        '                        With myEx_Row
+        '                            .AnalyzerID = pAnalyzerID
+        '                            .WorkSessionID = pWorkSessionID
+        '                            .ExecutionID = pExecutionID
+        '                            .InUse = pInUse
+        '                        End With
+        '                        myExecutionsDS.twksWSExecutions.AddtwksWSExecutionsRow(myEx_Row)
+        '                        myExecutionsDS.AcceptChanges()
+
+        '                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
+        '                        resultData = mytwksWSExecutionsDAO.UpdateInUse(dbConnection, myExecutionsDS)
+
+        '                        If (Not resultData.HasError) Then
+        '                            'When the Database Connection was opened locally, then the Commit is executed
+        '                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                        Else
+        '                            'When the Database Connection was opened locally, then the Rollback is executed
+        '                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                        End If
+        '                    End If
+        '                End If
+
+        '            Catch ex As Exception
+        '                'When the Database Connection was opened locally, then the Rollback is executed
+        '                If (pDBConnection Is Nothing) AndAlso Not (dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+        '                resultData.HasError = True
+        '                resultData.ErrorCode = "SYSTEM_ERROR"
+        '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '                Dim myLogAcciones As New ApplicationLogManager()
+        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateInUse", EventLogEntryType.Error, False)
+        '            Finally
+        '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '            End Try
+        '            Return resultData
+        '        End Function
+
+        '        ''' <summary>
+        '        ''' Update the fields BaseLineID, WellUsed and RotorTurnNumber
+        '        ''' </summary>
+        '        ''' <param name="pDBConnection">Open DB Connection</param>
+        '        ''' <param name="pExecutionsDS">Executions DataSet with the following fields informed (ExecutionID, BaseLineID, WellUsed, RotorTurnNumber)</param>
+        '        ''' <returns>GlobalDataTO containing success/error information</returns>
+        '        ''' <remarks>
+        '        ''' Created by: GDS - 27/04/2010
+        '        ''' </remarks>
+        '        Public Function UpdateReadingsFields(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS) As GlobalDataTO
+        '            Dim resultData As New GlobalDataTO
+        '            Dim dbConnection As New SqlClient.SqlConnection
+
+        '            Try
+        '                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+        '                If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
+        '                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '                    If (Not dbConnection Is Nothing) Then
+        '                        Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
+        '                        resultData = mytwksWSExecutionsDAO.UpdateReadingsFields(dbConnection, pExecutionsDS)
+
+        '                        If (Not resultData.HasError) Then
+        '                            'When the Database Connection was opened locally, then the Commit is executed
+        '                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                        Else
+        '                            'When the Database Connection was opened locally, then the Rollback is executed
+        '                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                        End If
+        '                    End If
+        '                End If
+
+        '            Catch ex As Exception
+        '                'When the Database Connection was opened locally, then the Rollback is executed
+        '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+        '                resultData.HasError = True
+        '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '                Dim myLogAcciones As New ApplicationLogManager()
+        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateReadingsFields", EventLogEntryType.Error, False)
+        '            Finally
+        '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '            End Try
+        '            Return resultData
+        '        End Function
+
+        ' ''' <summary>
+        ' '''1) Update Execution status as CLOSEDNOK 
+        ' ''' 2) If Execution.ReplicateNumber = OrderTest.MaxReplicates then
+        ' ''' 2.1)____ OrderTestDelegate.UpdateStatusByOrderTestID(OrderTest, CLOSED)
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection"></param>
+        ' ''' <param name="pAnalyzerID"></param>
+        ' ''' <param name="pWorkSessionID"></param>
+        ' ''' <param name="pExecutionID"></param>
+        ' ''' <param name="pOrderTestID" ></param>
+        ' ''' <param name="pOrderTestMaxReplicates" ></param>
+        ' ''' <param name="pSTDPrepFlag"></param>
+        ' ''' <returns>GlobalDataTo with error or not</returns>
+        ' ''' <remarks>AG 24/02/2011 - Tested ok
+        ' ''' AG 21/10/2011 - prepare business for shown closednok executions into results screen
+        ' ''' AG 19/03/2012 - add parameter pSTDPrepFlag (when TRUE (STD) alarms are added, when FALSE (ISE) no alarms are added)
+        ' ''' AG 25/06/2012 - ResultsDS informs also AnalyzerID and WorkSessionID
+        ' ''' </remarks>
+        'Public Function UpdateStatusClosedNOK(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        '                                      ByVal pWorkSessionID As String, ByVal pExecutionID As Integer, _
+        '                                      ByVal pOrderTestID As Integer, ByVal pOrderTestMaxReplicates As Integer, _
+        '                                      ByVal pSTDPrepFlag As Boolean) As GlobalDataTO
+        '    Dim resultData As New GlobalDataTO
+        '    Dim dbConnection As New SqlClient.SqlConnection
+        '    Try
+        '        resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+        '        If (Not resultData.HasError) AndAlso (Not resultData.SetDatos Is Nothing) Then
+        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+        '            If (Not dbConnection Is Nothing) Then
+
+        '                'Get all execution, with several MultiItemNumber, using the same OrderTestID - RerunNumber
+        '                resultData = GetExecutionMultititem(dbConnection, pExecutionID)
+        '                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                    Dim myExecutionsDS As New ExecutionsDS
+        '                    myExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
+
+        '                    If myExecutionsDS.twksWSExecutions.Rows.Count > 0 Then
+        '                        'Update EXECUTIONSTATUS to CLOSEDNOK + Add execution alarm (finished with optical errors)
+        '                        Dim execAlarmDlg As New WSExecutionAlarmsDelegate
+        '                        Dim execAlarmDS As New WSExecutionAlarmsDS
+        '                        Dim execAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow
+
+        '                        For Each row As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
+        '                            row.BeginEdit()
+        '                            row.ExecutionStatus = "CLOSEDNOK"
+        '                            row.InUse = False
+        '                            row.ResultDate = DateTime.Now
+        '                            row.EndEdit()
+
+        '                            If pSTDPrepFlag Then 'STD executions add remark Finished with optical errors
+        '                                execAlarmRow = execAlarmDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
+        '                                execAlarmRow.ExecutionID = row.ExecutionID
+        '                                execAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
+        '                                execAlarmRow.AlarmDateTime = DateTime.Now
+        '                                execAlarmDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(execAlarmRow)
+        '                            Else 'ISE executions only mark as CLOSEDNOK but no alarm
+
+        '                            End If
+
+        '                        Next
+        '                        myExecutionsDS.AcceptChanges()
+        '                        execAlarmDS.twksWSExecutionAlarms.AcceptChanges()
+        '                        resultData = UpdateStatus(dbConnection, myExecutionsDS)
+
+        '                        'AG 21/10/2011
+        '                        If Not resultData.HasError Then
+        '                            If execAlarmDS.twksWSExecutionAlarms.Rows.Count > 0 Then
+        '                                resultData = execAlarmDlg.Add(dbConnection, execAlarmDS)
+        '                            End If
+        '                        End If
+
+        '                        'Exists results for OrderTest-MultiPointNumber-RerunNumber: Yes: Do nothing, No: Create empty result
+        '                        Dim createAvgResult As Boolean = False
+        '                        If Not resultData.HasError Then
+        '                            Dim resultsDlg As New ResultsDelegate
+        '                            Dim myResults As New ResultsDS
+        '                            resultData = resultsDlg.GetAcceptedResults(dbConnection, pOrderTestID, True)
+        '                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+        '                                myResults = CType(resultData.SetDatos, ResultsDS)
+        '                            End If
+
+        '                            If myResults.twksResults.Rows.Count = 0 Then
+        '                                createAvgResult = True
+
+        '                                Dim newResultsRow As ResultsDS.twksResultsRow
+        '                                For Each executionsRow As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
+        '                                    newResultsRow = myResults.twksResults.NewtwksResultsRow
+        '                                    newResultsRow.OrderTestID = pOrderTestID
+        '                                    newResultsRow.MultiPointNumber = executionsRow.MultiItemNumber
+        '                                    newResultsRow.RerunNumber = executionsRow.RerunNumber
+        '                                    newResultsRow.AcceptedResultFlag = False
+        '                                    newResultsRow.ManualResultFlag = False
+        '                                    newResultsRow.ValidationStatus = "CLOSEDNOK"
+        '                                    newResultsRow.ResultDateTime = DateTime.Now
+        '                                    newResultsRow.AnalyzerID = pAnalyzerID
+        '                                    newResultsRow.WorkSessionID = pWorkSessionID
+        '                                    myResults.twksResults.AddtwksResultsRow(newResultsRow)
+        '                                Next
+        '                                myResults.twksResults.AcceptChanges()
+        '                                resultData = resultsDlg.SaveResults(dbConnection, myResults)
+        '                            End If
+
+        '                            If Not resultData.HasError Then
+        '                                'When the average result is created: Add average alarm (finished with optical errors)
+        '                                If createAvgResult Then
+        '                                    Dim resultAlarmDlg As New ResultAlarmsDelegate
+        '                                    Dim resultAlarmDS As New ResultAlarmsDS
+        '                                    Dim resultAlarmRow As ResultAlarmsDS.twksResultAlarmsRow
+
+        '                                    If pSTDPrepFlag Then 'STD executions add remark Finished with optical errors
+        '                                        For Each executionsRow As ExecutionsDS.twksWSExecutionsRow In myExecutionsDS.twksWSExecutions.Rows
+        '                                            resultAlarmRow = resultAlarmDS.twksResultAlarms.NewtwksResultAlarmsRow
+        '                                            resultAlarmRow.OrderTestID = pOrderTestID
+        '                                            resultAlarmRow.MultiPointNumber = executionsRow.MultiItemNumber
+        '                                            resultAlarmRow.RerunNumber = executionsRow.RerunNumber
+        '                                            resultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
+        '                                            resultAlarmRow.AlarmDateTime = DateTime.Now
+        '                                            resultAlarmDS.twksResultAlarms.AddtwksResultAlarmsRow(resultAlarmRow)
+        '                                        Next
+
+        '                                    Else 'ISE executions only mark as CLOSEDNOK but no alarm
+
+        '                                    End If
+        '                                    resultAlarmDS.twksResultAlarms.AcceptChanges()
+        '                                    If resultAlarmDS.twksResultAlarms.Rows.Count > 0 Then
+        '                                        resultData = resultAlarmDlg.Add(dbConnection, resultAlarmDS)
+        '                                    End If
+        '                                End If
+        '                            End If
+
+        '                        End If
+        '                        'AG 21/10/2011
+
+        '                        If Not resultData.HasError Then
+        '                            'Finally update OrderTest and Order status
+        '                            If myExecutionsDS.twksWSExecutions(0).ReplicateNumber = pOrderTestMaxReplicates Then
+        '                                Dim ot_delegate As New OrderTestsDelegate
+        '                                resultData = ot_delegate.UpdateStatusByOrderTestID(dbConnection, pOrderTestID, "CLOSED")
+        '                            End If
+        '                        End If
+        '                    End If
+
+        '                End If
+
+
+        '                If (Not resultData.HasError) Then
+        '                    'When the Database Connection was opened locally, then the Commit is executed
+        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+        '                    'resultData.SetDatos = <value to return; if any>
+        '                Else
+        '                    'When the Database Connection was opened locally, then the Rollback is executed
+        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+        '                End If
+        '            End If
+        '        End If
+
+        '    Catch ex As Exception
+        '        'When the Database Connection was opened locally, then the Rollback is executed
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+        '        resultData.HasError = True
+        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
+
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusClosedNOK", EventLogEntryType.Error, False)
+        '    Finally
+        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+        '    End Try
+        '    Return resultData
+        'End Function
 #End Region
 
 #Region "NEW METHODS - FOR PERFORMANCE IMPROVEMENTS"
@@ -10775,7 +10770,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Prepare ISE executions after ISE conditionings (this method is called during the START WS process instead of calling CreateWSExecutions again)
         ''' Code copied from CreateWSExecutions
@@ -10844,8 +10838,6 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
-
-
 #End Region
 
 #Region "METHODS FOR MOVING DATA TO HISTORICS MODULE"
@@ -11033,1381 +11025,20 @@ Namespace Biosystems.Ax00.BL
 
 #End Region
 
-#Region "TO REVIEW - DELETE?"
-        '''' <summary>
-        '''' Evaluate the reamining time for each Std Test execution in pStdExecutionsTime and returns de maximum value
-        '''' </summary>
-        '''' <param name="pStdExecutionsTime"></param>
-        '''' <param name="pCycleMachine"></param>
-        '''' <returns>GlobalDataTo with data as Single (remaining seconds)</returns>
-        '''' <remarks>Created by AG 23/09/2010</remarks>
-        'Private Function CalculateStdTestExecutionsRemainingTime(ByRef pStdExecutionsTime As TimeEstimationDS, ByVal pCycleMachine As Single) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim finalTime As Single = 0
-        '    Try
-        '        'For each execution calculate the estimated remaining time
-        '        Dim pendingNumber As Integer = 0
-        '        For Each row In pStdExecutionsTime.vwksStdTestTimes
-        '            Dim exTimeLeft As Single = 0 'Execution time left
-
-        '            If row.ExecutionStatus = "PENDING" Then
-        '                exTimeLeft = (pendingNumber + row.TestCycles) * pCycleMachine
-        '                pendingNumber += 1
-
-        '            ElseIf row.ExecutionStatus = "INPROCESS" Then
-        '                'Calculate only if not calculation process is called
-        '                If row.TestCycles >= row.LastReadingCycle Then
-        '                    exTimeLeft = (row.TestCycles - row.LastReadingCycle) * pCycleMachine
-        '                End If
-
-        '            ElseIf row.ExecutionStatus = "CLOSED" Then
-        '                exTimeLeft = 0
-        '            End If
-
-        '            'Update the execution remaining time in DS
-        '            row.BeginEdit()
-        '            row.RemainingTime = exTimeLeft
-        '            row.AcceptChanges()
-        '        Next
-
-        '        'Search the maximum
-        '        finalTime = (From a In pStdExecutionsTime.vwksStdTestTimes Select a.RemainingTime).Max
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CalculateStdTestExecutionsRemainingTime", EventLogEntryType.Error, False)
-        '    End Try
-        '    resultData.SetDatos = finalTime
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Create the data related to an execution locked due volume missing alarm 
-        '''' (Based on Ax5)
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pAnalyzerID" ></param>
-        '''' <param name="pWorkSessionID" ></param>
-        '''' <param name="pExecutionID"></param>
-        '''' <returns>GlobalDataTo (String)</returns>
-        '''' <remarks>This method encodes the additional information due a Locked execution
-        '''' to decode this information use the method WSAnalyzerAlarmsDelegate.DecodeAdditionalInfo</remarks>
-        'Public Function EncodeAdditionalInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-        '                                                               ByVal pWorkSessionID As String, _
-        '                                                               ByVal pExecutionID As Integer, _
-        '                                                               ByVal pRotorPosition As Integer, _
-        '                                                               ByVal pAlarmCode As GlobalEnumerates.Alarms, _
-        '                                                               ByVal pReagentNumber As Integer) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then '(2)
-        '                Dim myDAO As New twksWSExecutionsDAO
-        '                resultData = myDAO.GetDataForAlarmAdditionalInfo(dbConnection, pAnalyzerID, _
-        '                                                                 pWorkSessionID, pExecutionID, pAlarmCode, pReagentNumber)
-
-        '                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-        '                    Dim myseparator As String = GlobalConstants.ADDITIONALINFO_ALARM_SEPARATOR
-
-        '                    'RH 27/01/2012 Use StringBuilder for massive strings concatenation
-        '                    'String class is INMUTABLE. StringBuilder Class is optimized for efficient concatenations
-        '                    Dim sb As New Text.StringBuilder
-
-        '                    'TO CONFIRM
-        '                    'Ax5 saves: SAMPLECLASS, SAMPLEID, TESTNAME, REPLICATE
-        '                    'Ax00 saves: SAMPLECLASS sep SAMPLE NAME sep TESTNAME sep REPLICATE
-        '                    '            Where SAMPLE NAME depends on sampleclass:
-        '                    '            "BLANK": Sample Name = Test Name
-        '                    '            "CALIB": Sample Name = Calibrator Name
-        '                    '            "CTRL": Sample Name = Control Name
-        '                    '            "PATIENT": Sample Name = PatientID or SampleID
-
-        '                    Dim additionalInfoDS As WSAnalyzerAlarmsDS
-
-        '                    additionalInfoDS = CType(resultData.SetDatos, WSAnalyzerAlarmsDS)
-
-        '                    If additionalInfoDS.AdditionalInfoPrepLocked.Rows.Count > 0 Then
-        '                        'SampleClass
-        '                        If Not additionalInfoDS.AdditionalInfoPrepLocked(0).IsSampleClassNull Then
-        '                            sb.Append(additionalInfoDS.AdditionalInfoPrepLocked(0).SampleClass)
-        '                        End If
-        '                        sb.Append(myseparator)
-
-        '                        'SampleID
-        '                        If Not additionalInfoDS.AdditionalInfoPrepLocked(0).IsSampleIDNull Then
-        '                            sb.Append(additionalInfoDS.AdditionalInfoPrepLocked(0).SampleID)
-        '                        End If
-        '                        sb.Append(myseparator)
-
-        '                        'Test name
-        '                        If Not additionalInfoDS.AdditionalInfoPrepLocked(0).IsTestNameNull Then
-        '                            sb.Append(additionalInfoDS.AdditionalInfoPrepLocked(0).TestName)
-        '                        End If
-        '                        sb.Append(myseparator)
-
-        '                        'Replicatenumber
-        '                        If Not additionalInfoDS.AdditionalInfoPrepLocked(0).IsReplicateNumberNull Then
-        '                            sb.Append(additionalInfoDS.AdditionalInfoPrepLocked(0).ReplicateNumber)
-        '                        End If
-        '                        sb.Append(myseparator)
-
-        '                        'RH 27/01/2010
-        '                        sb.Append(pRotorPosition.ToString())
-        '                        sb.Append(myseparator)
-
-        '                        sb.Append(pReagentNumber.ToString())
-        '                        'END RH
-
-        '                    End If
-
-        '                    resultData.SetDatos = sb.ToString()
-        '                End If
-
-        '            End If 'If (Not dbConnection Is Nothing) Then '(2)
-        '        End If 'If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.EncodeAdditionalInfo", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pExecutionID"></param>
-        '''' <param name="pAnalyzerID"></param>
-        '''' <param name="pWorkSessionID"></param>
-        '''' <returns></returns>
-        '''' <remarks></remarks>
-        'Public Function GetExecutionWithSampleClass(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer, _
-        '                                            Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") _
-        '                                            As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-        '                resultData = mytwksWSExecutionsDAO.GetExecutionWithSampleClass(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionWithSampleClass", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pSampleClass">Execution Identifier</param>
-        '''' <param name="pStatFlag">Analyzer Identifier</param>
-        '''' <param name="pWorkSession" ></param>
-        '''' <param name="pAnalyzerID" ></param>
-        '''' <param name="pExecutionType" ></param>
-        '''' <returns>Global Data To with set data as ExecutionsDS</returns>
-        '''' <remarks>
-        '''' Created by: GDS 19/04/2010
-        '''' AG 17/01/2011 - add pExecutionType parameter
-        '''' </remarks>
-        'Public Function GetNextPreparation(ByVal pDBConnection As SqlClient.SqlConnection, _
-        '                                   ByVal pSampleClass As String, _
-        '                                   ByVal pStatFlag As Boolean, _
-        '                                   ByVal pWorkSession As String, _
-        '                                   ByVal pAnalyzerID As String, ByVal pExecutionType As String) As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim executionDataDS As New ExecutionsDS
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-        '        If (Not resultData.HasError) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-
-        '                resultData = mytwksWSExecutionsDAO.GetNextPreparation(dbConnection, pSampleClass, pStatFlag, pWorkSession, pAnalyzerID, pExecutionType)
-
-        '                If (Not resultData.HasError) Then
-        '                    executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                    If executionDataDS.twksWSExecutions.Rows.Count > 0 Then
-        '                        resultData.SetDatos = executionDataDS.twksWSExecutions(0).ExecutionID
-
-        '                    Else
-        '                        resultData.SetDatos = GlobalConstants.NO_PENDING_PREPARATION_FOUND  'AG 21/04/2010 -1 NO_ITEMS_FOUNDS
-        '                    End If
-
-        '                End If
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPreparation", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-
-        '    Return resultData
-
-        'End Function
-
-        '''' <summary>
-        '''' Create all Executions for the specified Analyzer WorkSession
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        '''' <param name="pOrderTestID">Identifier of the Order Test for which a Rerun has been requested. Optional parameter</param>
-        '''' <param name="pPostDilutionType">Type of post Dilution to apply when a Rerun has been requested. Optional parameter</param>
-        '''' <returns>GlobalDataTO containing success/error information</returns>
-        '''' <remarks>
-        '''' Created by:  SA  09/02/2011
-        '''' </remarks>
-        'Public Function CreateWSExecutionsOLD15092011(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-        '                                   ByVal pWorkSessionID As String, Optional ByVal pOrderTestID As Integer = -1, _
-        '                                   Optional ByVal pPostDilutionType As String = "") As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
-
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim calledForRerun As Boolean = (pOrderTestID <> -1)
-
-        '                'Delete all Executions with status PENDING or LOCKED. If an OrderTestID is not informed, only Pending 
-        '                'and Locked Executions for Rerun=1 are deleted
-        '                Dim myDAO As New twksWSExecutionsDAO
-        '                resultData = myDAO.DeleteNotInCurseExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID)
-
-        '                If (Not resultData.HasError) Then
-        '                    'Get detailed information of all Order Tests to be executed in the WS
-        '                    Dim allOrderTestsDS As OrderTestsForExecutionsDS
-        '                    Dim myWSOrderTestsDelegate As New WSOrderTestsDelegate
-
-        '                    resultData = myWSOrderTestsDelegate.GetInfoOrderTestsForExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-
-        '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                        allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
-
-        '                        If (allOrderTestsDS.OrderTestsForExecutionsTable.Rows.Count > 0) Then
-        '                            'Get all executions for BLANKS included in the WorkSession
-        '                            Dim myBlankExecutionsDS As New ExecutionsDS
-        '                            resultData = CreateBlankExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-        '                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                                Dim myOrderTestID As Integer = -1
-        '                                'TR 29/08/2011 Create outside the FOR 
-        '                                Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-        '                                    If (rowBlank.OrderTestID <> myOrderTestID) Then
-        '                                        myOrderTestID = rowBlank.OrderTestID
-        '                                        'Search information for the Blank
-        '                                        blankInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                    Where a.OrderTestID = myOrderTestID _
-        '                                                   Select a).ToList()
-
-        '                                    End If
-
-        '                                    '...and complete fields for the Blank
-        '                                    If (blankInfo.Count = 1) Then
-        '                                        rowBlank.BeginEdit()
-        '                                        rowBlank.TestID = blankInfo(0).TestID
-        '                                        rowBlank.ReadingCycle = blankInfo(0).ReadingCycle
-        '                                        rowBlank.ReagentID = blankInfo(0).ReagentID
-        '                                        rowBlank.OrderID = blankInfo(0).OrderID
-        '                                        rowBlank.ElementID = NullElementID 'RH 07/04/2011
-        '                                        rowBlank.EndEdit()
-        '                                    End If
-        '                                Next
-        '                                myBlankExecutionsDS.AcceptChanges()
-        '                            End If
-
-        '                            'Get all executions for CALIBRATORS included in the WorkSession
-        '                            Dim myCalibratorExecutionsDS As ExecutionsDS
-
-        '                            If (Not resultData.HasError) Then
-        '                                resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-        '                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                    myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                                    Dim myOrderTestID As Integer = -1
-        '                                    'TR 29/08/2011 Create outside the FOR 
-        '                                    Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                    For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-        '                                        'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                        If (rowCalib.OrderTestID <> myOrderTestID) Then
-        '                                            myOrderTestID = rowCalib.OrderTestID
-        '                                            'Search information for the Calibrator
-        '                                            calibInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                        Where a.OrderTestID = myOrderTestID _
-        '                                                       Select a).ToList()
-        '                                        End If
-
-        '                                        '...and complete fields for the Calibrator
-        '                                        If (calibInfo.Count = 1) Then
-        '                                            rowCalib.BeginEdit()
-        '                                            rowCalib.TestID = calibInfo(0).TestID
-        '                                            rowCalib.SampleType = calibInfo(0).SampleType
-        '                                            rowCalib.ReadingCycle = calibInfo(0).ReadingCycle
-        '                                            rowCalib.ReagentID = calibInfo(0).ReagentID
-        '                                            rowCalib.OrderID = calibInfo(0).OrderID
-        '                                            rowCalib.ElementID = calibInfo(0).ElementID
-        '                                            rowCalib.EndEdit()
-        '                                        End If
-        '                                    Next
-        '                                    myCalibratorExecutionsDS.AcceptChanges()
-        '                                End If
-        '                            End If
-
-        '                            'Get all executions for CONTROLS included in the WorkSession
-        '                            Dim myControlExecutionsDS As ExecutionsDS
-
-        '                            If (Not resultData.HasError) Then
-        '                                resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-        '                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                    myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                                    Dim myOrderTestID As Integer = -1
-        '                                    'TR 29/08/2011 Create outside the FOR
-        '                                    Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                    For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-        '                                        'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                        If (rowControl.OrderTestID <> myOrderTestID) Then
-        '                                            myOrderTestID = rowControl.OrderTestID
-        '                                            'Search information for the Control
-        '                                            controlInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                          Where a.OrderTestID = myOrderTestID _
-        '                                                         Select a).ToList()
-        '                                        End If
-
-        '                                        '...and complete fields for the Control (more than one record is possible when several
-        '                                        'controls are used for the Test/Sample Type)
-        '                                        If (controlInfo.Count >= 1) Then
-        '                                            rowControl.BeginEdit()
-        '                                            rowControl.TestID = controlInfo(0).TestID
-        '                                            rowControl.SampleType = controlInfo(0).SampleType
-        '                                            rowControl.ReadingCycle = controlInfo(0).ReadingCycle
-        '                                            rowControl.ReagentID = controlInfo(0).ReagentID
-        '                                            rowControl.OrderID = controlInfo(0).OrderID
-        '                                            rowControl.ElementID = controlInfo(0).ElementID
-        '                                            rowControl.EndEdit()
-        '                                        End If
-        '                                    Next
-        '                                End If
-        '                            End If
-
-        '                            'Get all executions for PATIENT SAMPLES included in the WorkSession
-        '                            Dim myPatientExecutionsDS As ExecutionsDS
-
-        '                            If (Not resultData.HasError) Then
-        '                                resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
-        '                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                    myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                                    Dim myOrderTestID As Integer = -1
-        '                                    'TR 29/08/2011 Create outside the FOR
-        '                                    Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                    For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-        '                                        'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                        If (rowPatient.OrderTestID <> myOrderTestID) Then
-        '                                            myOrderTestID = rowPatient.OrderTestID
-
-        '                                            'Search information for the Patient Sample
-        '                                            patientInfo = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                          Where a.OrderTestID = myOrderTestID _
-        '                                                         Select a).ToList()
-        '                                        End If
-
-        '                                        '...and complete fields for the Patient Sample
-        '                                        If (patientInfo.Count = 1) Then
-        '                                            rowPatient.BeginEdit()
-        '                                            rowPatient.TestID = patientInfo(0).TestID
-        '                                            rowPatient.SampleType = patientInfo(0).SampleType
-        '                                            rowPatient.ReadingCycle = patientInfo(0).ReadingCycle
-        '                                            rowPatient.ReagentID = patientInfo(0).ReagentID
-        '                                            rowPatient.OrderID = patientInfo(0).OrderID
-        '                                            rowPatient.ElementID = Convert.ToInt32(patientInfo(0).OrderID.Substring(8, 4))
-        '                                            rowPatient.EndEdit()
-        '                                        End If
-        '                                    Next
-        '                                End If
-        '                            End If
-
-        '                            If (Not resultData.HasError) Then
-        '                                'Search all locked BLANKS to lock also all Calibrators, Control and Patient Samples
-        '                                'for the same Standard Test
-        '                                Dim lstLockedBlanks As List(Of Integer)
-        '                                lstLockedBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-        '                                                  Where a.ExecutionStatus = "LOCKED" _
-        '                                                 Select a.TestID Distinct).ToList()
-        '                                'TR 29/08/2011 Create outside the FOR
-        '                                Dim myTestID As Integer
-        '                                Dim lstLockedCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                'TR 29/08/2011 -END.
-        '                                For Each lockedBlank In lstLockedBlanks
-        '                                    'Dim myTestID As Integer = lockedBlank 
-        '                                    myTestID = lockedBlank
-        '                                    '...LOCK the correspondent Calibrators
-        '                                    'Dim lstLockedCalibs As New List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                    lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-        '                                                      Where a.TestID = myTestID _
-        '                                                    AndAlso a.ExecutionStatus <> "LOCKED" _
-        '                                                     Select a).ToList()
-
-        '                                    For Each lockedCalib In lstLockedCalibs
-        '                                        lockedCalib.BeginEdit()
-        '                                        lockedCalib.ExecutionStatus = "LOCKED"
-        '                                        lockedCalib.EndEdit()
-        '                                    Next
-
-
-        '                                    'TR 29/08/2011 commented and declare outside the for.
-        '                                    'Dim lstLockedCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                    '...LOCK the correspondent Controls
-        '                                    lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-        '                                                      Where a.TestID = myTestID _
-        '                                                    AndAlso a.ExecutionStatus <> "LOCKED" _
-        '                                                     Select a).ToList()
-
-        '                                    For Each lockedCtrl In lstLockedCtrls
-        '                                        lockedCtrl.BeginEdit()
-        '                                        lockedCtrl.ExecutionStatus = "LOCKED"
-        '                                        lockedCtrl.EndEdit()
-        '                                    Next
-
-        '                                    '...LOCK the correspondent Patients
-        '                                    'Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                    lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-        '                                                        Where a.ExecutionType = "PREP_STD" _
-        '                                                      AndAlso a.TestID = myTestID _
-        '                                                      AndAlso a.ExecutionStatus <> "LOCKED" _
-        '                                                       Select a).ToList()
-
-        '                                    For Each lockedPatient In lstLockedPatients
-        '                                        lockedPatient.BeginEdit()
-        '                                        lockedPatient.ExecutionStatus = "LOCKED"
-        '                                        lockedPatient.EndEdit()
-        '                                    Next
-        '                                Next
-
-        '                                myCalibratorExecutionsDS.AcceptChanges()
-        '                                myControlExecutionsDS.AcceptChanges()
-        '                                myPatientExecutionsDS.AcceptChanges()
-        '                            End If
-
-        '                            If (Not resultData.HasError) Then
-        '                                'Search all locked CALIBRATORS to lock also all Controls and Patient Samples
-        '                                'for the same Standard Test and SampleType
-        '                                Dim lstLockedCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                lstLockedCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-        '                                                  Where a.ExecutionStatus = "LOCKED" _
-        '                                                 Select a Order By a.OrderTestID).ToList()
-
-        '                                Dim myOrderTestID As Integer = -1
-        '                                'TR 29/08/2011 Create outside the FOR
-        '                                Dim lstAlternativeST As List(Of String)
-        '                                Dim myTestID As Integer
-        '                                Dim mySampleType As String
-        '                                Dim lstLockedCtrls As New List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                'TR 29/08/2011 -End
-        '                                For Each lockedCalib In lstLockedCalibs
-        '                                    If (myOrderTestID <> lockedCalib.OrderTestID) Then
-        '                                        'First verify if the Calibrator is used as alternative of another Sample Types for the same Test
-        '                                        myOrderTestID = lockedCalib.OrderTestID
-        '                                        'TR 29/08/2011 -Commented and declare outside the for.
-        '                                        'Dim lstAlternativeST As List(Of String)
-        '                                        lstAlternativeST = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                           Where a.SampleClass = "CALIB" _
-        '                                                         AndAlso Not a.IsAlternativeOrderTestIDNull _
-        '                                                         AndAlso a.AlternativeOrderTestID = myOrderTestID _
-        '                                                          Select a.SampleType Distinct).ToList
-
-        '                                        For i As Integer = 0 To (lstAlternativeST.Count)
-        '                                            'TR 29/08/2011 -Commented and declare outside the for.
-        '                                            'Dim myTestID As Integer = lockedCalib.TestID
-        '                                            'Dim mySampleType As String = lockedCalib.SampleType
-        '                                            myTestID = lockedCalib.TestID
-        '                                            mySampleType = lockedCalib.SampleType
-        '                                            'TR 29/08/2011 -END.
-
-        '                                            If (i > 0) Then mySampleType = lstAlternativeST(i - 1)
-
-        '                                            'TR 29/08/2011 -Commented and declare outside the for.
-        '                                            'Dim lstLockedCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                            '...LOCK the correspondent Controls
-        '                                            lstLockedCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-        '                                                              Where a.TestID = myTestID _
-        '                                                            AndAlso a.SampleType = mySampleType _
-        '                                                            AndAlso a.ExecutionStatus <> "LOCKED" _
-        '                                                             Select a).ToList()
-
-        '                                            For Each lockedCtrl In lstLockedCtrls
-        '                                                lockedCtrl.BeginEdit()
-        '                                                lockedCtrl.ExecutionStatus = "LOCKED"
-        '                                                lockedCtrl.EndEdit()
-        '                                            Next
-
-
-        '                                            'TR 29/08/2011 -Commented and declare outside the for.
-        '                                            'Dim lstLockedPatients As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                            '...LOCK the correspondent Patients.
-        '                                            lstLockedPatients = (From a In myPatientExecutionsDS.twksWSExecutions _
-        '                                                                Where a.ExecutionType = "PREP_STD" _
-        '                                                              AndAlso a.TestID = myTestID _
-        '                                                              AndAlso a.SampleType = mySampleType _
-        '                                                              AndAlso a.ExecutionStatus <> "LOCKED" _
-        '                                                               Select a).ToList()
-
-        '                                            For Each lockedPatient In lstLockedPatients
-        '                                                lockedPatient.BeginEdit()
-        '                                                lockedPatient.ExecutionStatus = "LOCKED"
-        '                                                lockedPatient.EndEdit()
-        '                                            Next
-        '                                        Next
-        '                                    End If
-        '                                Next
-
-        '                                myControlExecutionsDS.AcceptChanges()
-        '                                myPatientExecutionsDS.AcceptChanges()
-        '                            End If
-
-        '                            If (Not resultData.HasError) Then
-        '                                If (Not calledForRerun) Then
-        '                                    'Search all TestID/SampleType of all Patients requested for STAT, to mark as STAT
-        '                                    'all the needed Blanks, Calibrators and Controls
-        '                                    Dim lstSTATS As List(Of String)
-        '                                    lstSTATS = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                Where a.SampleClass = "PATIENT" _
-        '                                                AndAlso a.StatFlag = True _
-        '                                                AndAlso a.TestType = "STD" _
-        '                                                Select String.Format("{0}|{1}", a.TestID, a.SampleType) Distinct).ToList
-        '                                    'TR 29/08/2011 Create outside the FOR
-        '                                    Dim pos As Integer
-        '                                    Dim myTestID As Integer
-        '                                    Dim mySampleType As String
-        '                                    Dim lstBlkCalibCtrls As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                    Dim myOrderTestID As Integer
-        '                                    Dim lstBlanks As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                    'TR 29/08/2011 -END
-        '                                    For Each statPatient In lstSTATS
-        '                                        pos = statPatient.LastIndexOf("|")
-        '                                        myTestID = Convert.ToInt32(statPatient.Substring(0, pos))
-        '                                        mySampleType = statPatient.Substring(pos + 1)
-
-        '                                        'Search all Controls, Calibrators and Blanks for the TestID/SampleType
-        '                                        'TR 29/08/2011 -Commented and declare outside the for.
-        '                                        'Dim lstBlkCalibCtrls As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
-        '                                        lstBlkCalibCtrls = (From a In allOrderTestsDS.OrderTestsForExecutionsTable _
-        '                                                            Where a.TestID = myTestID _
-        '                                                            AndAlso ((a.SampleClass = "BLANK") _
-        '                                                            OrElse (a.SampleClass = "CALIB" AndAlso a.SampleType = mySampleType) _
-        '                                                            OrElse (a.SampleClass = "CTRL" AndAlso a.SampleType = mySampleType)) _
-        '                                                            Select a Order By a.SampleClass).ToList()
-
-        '                                        For Each blkCalibCtrlRow In lstBlkCalibCtrls
-        '                                            'TR 29/08/2011 -Commented and declare outside the for.
-        '                                            'Dim myOrderTestID As Integer = blkCalibCtrlRow.OrderTestID
-        '                                            myOrderTestID = blkCalibCtrlRow.OrderTestID
-        '                                            If (blkCalibCtrlRow.SampleClass = "CALIB") AndAlso (Not blkCalibCtrlRow.IsAlternativeOrderTestIDNull) Then
-        '                                                myOrderTestID = blkCalibCtrlRow.AlternativeOrderTestID
-        '                                            End If
-
-        '                                            'Search the OrderTestID to update the StatFlag
-        '                                            If (blkCalibCtrlRow.SampleClass = "BLANK") Then
-        '                                                'TR 29/08/2011 -Commented and declare outside the for.
-        '                                                'Dim lstBlanks As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                                lstBlanks = (From a In myBlankExecutionsDS.twksWSExecutions _
-        '                                                            Where a.OrderTestID = myOrderTestID _
-        '                                                           Select a).ToList()
-
-        '                                                For Each blank In lstBlanks
-        '                                                    blank.StatFlag = True
-        '                                                Next
-        '                                            ElseIf (blkCalibCtrlRow.SampleClass = "CALIB") Then
-        '                                                Dim lstCalibs As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                                lstCalibs = (From a In myCalibratorExecutionsDS.twksWSExecutions _
-        '                                                            Where a.OrderTestID = myOrderTestID _
-        '                                                           Select a).ToList()
-
-        '                                                For Each calibrator In lstCalibs
-        '                                                    calibrator.StatFlag = True
-        '                                                Next
-        '                                            ElseIf (blkCalibCtrlRow.SampleClass = "CTRL") Then
-        '                                                Dim lstCtrls As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                                                lstCtrls = (From a In myControlExecutionsDS.twksWSExecutions _
-        '                                                            Where a.OrderTestID = myOrderTestID _
-        '                                                           Select a).ToList()
-
-        '                                                For Each control In lstCtrls
-        '                                                    control.StatFlag = True
-        '                                                Next
-        '                                            End If
-        '                                        Next
-        '                                        myBlankExecutionsDS.AcceptChanges()
-        '                                        myCalibratorExecutionsDS.AcceptChanges()
-        '                                        myControlExecutionsDS.AcceptChanges()
-        '                                    Next
-        '                                End If
-        '                            End If
-
-        '                            'Unify all locked Executions and all pending Executions (all types) 
-        '                            Dim lockedExecutionsDS As New ExecutionsDS
-        '                            Dim pendingExecutionsDS As New ExecutionsDS
-
-        '                            If (Not resultData.HasError) Then
-        '                                'Move executions for BLANKS
-        '                                For Each blank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
-        '                                    If (blank.ExecutionStatus = "LOCKED") Then
-        '                                        lockedExecutionsDS.twksWSExecutions.ImportRow(blank)
-        '                                    ElseIf (blank.ExecutionStatus = "PENDING") Then
-        '                                        pendingExecutionsDS.twksWSExecutions.ImportRow(blank)
-        '                                    End If
-        '                                Next
-
-        '                                'Move executions for CALIBRATORS
-        '                                For Each calib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
-        '                                    If (calib.ExecutionStatus = "LOCKED") Then
-        '                                        lockedExecutionsDS.twksWSExecutions.ImportRow(calib)
-        '                                    ElseIf (calib.ExecutionStatus = "PENDING") Then
-        '                                        pendingExecutionsDS.twksWSExecutions.ImportRow(calib)
-        '                                    End If
-        '                                Next
-
-        '                                'Move executions for CONTROLS
-        '                                For Each ctrl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
-        '                                    If (ctrl.ExecutionStatus = "LOCKED") Then
-        '                                        lockedExecutionsDS.twksWSExecutions.ImportRow(ctrl)
-        '                                    ElseIf (ctrl.ExecutionStatus = "PENDING") Then
-        '                                        pendingExecutionsDS.twksWSExecutions.ImportRow(ctrl)
-        '                                    End If
-        '                                Next
-
-        '                                'Move executions for PATIENTS
-        '                                For Each patient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
-        '                                    If (patient.ExecutionStatus = "LOCKED") Then
-        '                                        lockedExecutionsDS.twksWSExecutions.ImportRow(patient)
-        '                                    ElseIf (patient.ExecutionStatus = "PENDING") Then
-        '                                        pendingExecutionsDS.twksWSExecutions.ImportRow(patient)
-        '                                    End If
-        '                                Next
-
-        '                                If (Not calledForRerun) Then
-        '                                    'Sort PENDING executions 
-        '                                    If (pendingExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-        '                                        pendingExecutionsDS.twksWSExecutions.DefaultView.Sort = _
-        '                                            "StatFlag DESC, SampleClass, ElementID, SampleType, " & _
-        '                                            "ExecutionType DESC, ReadingCycle DESC"
-
-
-        '                                        Dim executionDataDS As New ExecutionsDS
-        '                                        For Each pendingExecution As DataRow In pendingExecutionsDS.twksWSExecutions.DefaultView.ToTable.Rows
-        '                                            executionDataDS.twksWSExecutions.ImportRow(pendingExecution)
-        '                                        Next
-
-        '                                        'Sort by Contamination
-        '                                        resultData = SortWSExecutionsByContamination(dbConnection, executionDataDS)
-        '                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                            executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                                            'Sort Orders by ReadingCycle
-        '                                            resultData = SortWSExecutionsByElementGroupTime(executionDataDS)
-        '                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                                executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-        '                                                'Sort Orders by Contamination
-        '                                                resultData = SortWSExecutionsByElementGroupContamination(dbConnection, executionDataDS)
-        '                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '                                                    executionDataDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-        '                                                End If
-        '                                            End If
-        '                                        End If
-
-        '                                        'Finally, save the sorted PENDING executions
-        '                                        If (Not resultData.HasError) Then
-        '                                            resultData = myDAO.Create(dbConnection, executionDataDS)
-        '                                        End If
-        '                                    End If
-        '                                Else
-        '                                    'Save PENDING executions  
-        '                                    resultData = myDAO.Create(dbConnection, pendingExecutionsDS)
-        '                                End If
-
-        '                                'Save LOCKED executions
-        '                                If (lockedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
-        '                                    If (Not resultData.HasError) Then
-        '                                        resultData = myDAO.Create(dbConnection, lockedExecutionsDS)
-        '                                    End If
-        '                                End If
-
-        '                                'TR 26/07/2011 - After creating the executions then validate if paused
-        '                                If (Not resultData.HasError) Then
-        '                                    Dim tempExecutionDS As New ExecutionsDS
-        '                                    Dim myWSPausedOrderTestsDS As New WSPausedOrderTestsDS
-        '                                    Dim myWSPausedOrderTestsDelegate As New WSPausedOrderTestsDelegate
-        '                                    resultData = myWSPausedOrderTestsDelegate.ReadbyAnalyzerAndWorkSession(dbConnection, pAnalyzerID, pWorkSessionID)
-
-        '                                    If (Not resultData.HasError) Then
-        '                                        myWSPausedOrderTestsDS = DirectCast(resultData.SetDatos, WSPausedOrderTestsDS)
-
-        '                                        For Each pausedOTRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In _
-        '                                                                                            myWSPausedOrderTestsDS.twksWSPausedOrderTests.Rows
-        '                                            resultData = myDAO.ReadByOrderTestIDAndRerunNumber(dbConnection, pausedOTRow.OrderTestID, pausedOTRow.RerunNumber)
-
-        '                                            If resultData.HasError Then Exit For
-
-        '                                            tempExecutionDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-        '                                            If Not resultData.SetDatos Is Nothing AndAlso tempExecutionDS.twksWSExecutions.Count = 1 Then
-        '                                                'if found then update.
-        '                                                resultData = myDAO.UpdatePaused(dbConnection, True, tempExecutionDS.twksWSExecutions(0).ExecutionID)
-        '                                            End If
-        '                                        Next
-        '                                    End If
-        '                                End If
-        '                                'TR 26/07/2011 -END.
-
-        '                                If (Not resultData.HasError) Then
-        '                                    If (Not calledForRerun) Then
-        '                                        'Get all PENDING and LOCKED Executions created for Reruns in the Analyzer WorkSession
-        '                                        resultData = RecalculateStatusForNotDeletedExecutions(dbConnection, pAnalyzerID, pWorkSessionID, False)
-
-
-        '                                        'AG 08/09/2011 - when worksession is modified all samples rotor status can change 
-        '                                        'when add new tests using a tube with status finished (finished -> pending)
-
-        '                                        'Read the current samples rotor and get all disticnt elementID
-        '                                        Dim rcp_del As New WSRotorContentByPositionDelegate
-        '                                        resultData = rcp_del.ReadByCellNumber(dbConnection, pAnalyzerID, pWorkSessionID, "SAMPLES", -1)
-        '                                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-        '                                            Dim samplesRotorDS As New WSRotorContentByPositionDS
-        '                                            samplesRotorDS = CType(resultData.SetDatos, WSRotorContentByPositionDS)
-        '                                            Dim linqRes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
-        '                                            linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In samplesRotorDS.twksWSRotorContentByPosition _
-        '                                                    Where Not a.IsElementIDNull Select a).ToList
-
-        '                                            Dim newStatus As String = ""
-        '                                            For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In linqRes
-        '                                                newStatus = row.Status
-        '                                                resultData = rcp_del.UpdateSamplePositionStatus(dbConnection, -1, pWorkSessionID, pAnalyzerID, row.ElementID, _
-        '                                                                                                row.TubeContent, 1, newStatus, row.CellNumber)
-        '                                            Next
-
-        '                                        End If
-        '                                        'AG 08/09/2011
-
-        '                                    Else
-        '                                        'If function was called for a Rerun, change the Status of the Order Test to PENDING
-        '                                        Dim myOrderTestDelegate As New OrderTestsDelegate
-        '                                        resultData = myOrderTestDelegate.UpdateStatusByOrderTestID(dbConnection, pOrderTestID, "PENDING")
-        '                                    End If
-        '                                End If
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
-
-        '                If (Not resultData.HasError) Then
-        '                    'When the Database Connection was opened locally, then the Commit is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                Else
-        '                    'When the Database Connection was opened locally, then the Rollback is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                End If
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        'When the Database Connection was opened locally, then the Commit is executed
-        '        If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-        '        resultData = New GlobalDataTO()
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsOLD15092011", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-
-        '    Return resultData
-        'End Function
-
-
-        '''' <summary>
-        '''' Gets the list of Execution's Element groups sorted by Contamination.
-        '''' </summary>
-        '''' <param name="pExecutions">Dataset with structure of view vwksWSExecutions</param>
-        '''' <returns>
-        '''' GlobalDataTo indicating if an error has occurred or not.
-        '''' If succeed, returns an ExecutionsDS dataset with the ordered data (view vwksWSExecutions)
-        '''' </returns>
-        '''' <remarks>
-        '''' Created by:  RH - 08/06/2010
-        '''' Modified by: SA - Changed function called to get the R1 Contaminations for a one in the Delegated Class
-        '''' Modified by: RH 08/04/2011 Changed order field from OrderID to ElementID
-        '''' AG 19/09/2011 - 
-        ''''                 NOTE: This algorithm fails when contamination exists between classes or between patients
-        ''''                       Blank Last Test contaminates Calib first test ...
-        '''' </remarks>
-        'Public Function SortWSExecutionsByElementGroupContaminationNewAG(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutions As ExecutionsDS) As GlobalDataTO
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim contaminationsDataDS As ContaminationsDS = Nothing
-        '    'Dim contaminationsDAO As New tparContaminationsDAO
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-
-        '                'Load the contaminations
-        '                Dim myContaminationsDelegate As New ContaminationsDelegate
-        '                resultData = myContaminationsDelegate.GetContaminationsByType(dbConnection, "R1")
-        '                'resultData = contaminationsDAO.ReadByContaminationType(dbConnection, "R1")
-        '                If Not resultData.HasError Then
-        '                    contaminationsDataDS = DirectCast(resultData.SetDatos, ContaminationsDS)
-
-        '                    Dim qElementGroup As List(Of ExecutionsDS.twksWSExecutionsRow)
-        '                    Dim Index = 0
-        '                    Dim returnDS As New ExecutionsDS
-
-        '                    While Index < pExecutions.twksWSExecutions.Rows.Count
-                            '                        Dim StatFlag = pExecutions.twksWSExecutions(Index).StatFlag
-                            '                        Dim SampleClass = pExecutions.twksWSExecutions(Index).SampleClass
-
-                            '                        'For each ElementGroup inside the same Stat flag and Sample Class block
-                            '                        qElementGroup = (From wse In pExecutions.twksWSExecutions _
-                            '                                        Where wse.StatFlag = StatFlag AndAlso wse.SampleClass = SampleClass _
-                            '                                        Select wse).ToList()
-
-
-                            '                        Index += qElementGroup.Count
-
-                            '                        If SampleClass <> "PATIENT" Then
-                            '                            Dim Elements = (From wse In qElementGroup _
-                            '                                      Select wse.ElementID Distinct).ToList()
-
-                            '                            If Elements.Count > 1 Then 'Only works for more than one elements
-                            '                                Dim MaxPos = Elements.Count - 2
-
-                            '                                Dim contaminatorStatus As String = ""
-                            '                                Dim contaminatedStatus As String = ""
-
-                            '                                For i = 0 To MaxPos
-                            '                                    Dim CurrentElement = (From wse In qElementGroup _
-                            '                                                          Where wse.ElementID = Elements(i) _
-                            '                                                          Select wse).ToList()
-
-                            '                                    Dim NextElement = (From wse In qElementGroup _
-                            '                                                       Where wse.ElementID = Elements(i + 1) _
-                            '                                                       Select wse).ToList()
-
-                            '                                    'Check if there is contamination between last Execution
-
-                            '                                    'in ElementGroup(i) and first Execution in ElementGroup(i+1)
-                            '                                    Dim ReagentContaminatorID = CurrentElement(CurrentElement.Count - 1).ReagentID
-                            '                                    Dim ReagentContaminatedID = NextElement(0).ReagentID
-
-                            '                                    Dim contaminations = (From wse In contaminationsDataDS.tparContaminations _
-                            '                                                            Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                            '                                                            AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                            '                                                            Select wse).ToList()
-
-                            '                                    If contaminations.Count > 0 Then 'There is contamination
-                            '                                        If (i = MaxPos) Then
-                            '                                            'no free contamination movement is possible 
-
-                            '                                            'AG 23/06/2011 - this code cause exception in some cases (for instance ctrl AGP, ALB and AGP contaminates ALB)
-                            '                                            'ReagentContaminatedID = pExecutions.twksWSExecutions(Index).ReagentID
-                            '                                            ReagentContaminatedID = pExecutions.twksWSExecutions(Index - 1).ReagentID
-                            '                                            contaminations = (From wse In contaminationsDataDS.tparContaminations _
-                            '                                                                  Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                            '                                                                  AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                            '                                                                  Select wse).ToList()
-
-                            '                                            If contaminations.Count = 0 Then
-                            '                                                'If no contamination between ElementGroup(i) and first ElementGroup of the next 
-                            '                                                'Stat flag and Sample class block -> Move ElementGroup(i) at last position 
-                            '                                                'in its Stat flag and Sample class block
-                            '                                                For Each wse In CurrentElement
-                            '                                                    qElementGroup.Remove(wse)
-                            '                                                Next
-
-                            '                                                qElementGroup.AddRange(CurrentElement)
-
-                            '                                                'Update ElementGroup, because they were implicitly sorted by moving the executions order
-                            '                                                Elements = (From wse In qElementGroup _
-                            '                                                            Select wse.ElementID Distinct).ToList()
-
-                            '                                            End If
-                            '                                        End If
-                            '                                    Else
-                            '                                        'Search other ElementGroup (decreasing priority) inside the Stat flag and 
-                            '                                        'Sample Class block with no contamination and move it into position (i+1)
-                            '                                        For j = i + 2 To MaxPos + 1
-                            '                                            NextElement = (From wse In qElementGroup _
-                            '                                                           Where wse.ElementID = Elements(j) _
-                            '                                                           Select wse).ToList()
-
-                            '                                            ReagentContaminatedID = NextElement(0).ReagentID
-                            '                                            contaminations = (From wse In contaminationsDataDS.tparContaminations _
-                            '                                                                  Where wse.ReagentContaminatorID = ReagentContaminatorID _
-                            '                                                                  AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
-                            '                                                                  Select wse).ToList()
-
-                            '                                            If contaminations.Count = 0 Then 'no contamination and move it into position (i+1)
-                            '                                                For Each wse In NextElement
-                            '                                                    qElementGroup.Remove(wse)
-                            '                                                Next
-
-                            '                                                Dim InsertPos = qElementGroup.IndexOf(CurrentElement(CurrentElement.Count - 1)) + 1
-                            '                                                qElementGroup.InsertRange(InsertPos, NextElement)
-
-                            '                                                'Update ElementGroup, because they were implicitly sorted by moving the executions order
-                            '                                                Elements = (From wse In qElementGroup _
-                            '                                                          Select wse.ElementID Distinct).ToList()
-
-                            '                                                Exit For
-                            '                                            End If
-
-                            '                                        Next
-                            '                                    End If
-
-
-                            '                                Next
-                            '                            End If
-                            '                        End If
-
-                            '                        'Insert Element Groups in returning data set
-                            '                        For Each wse In qElementGroup
-                            '                            returnDS.twksWSExecutions.ImportRow(wse)
-                            '                        Next
-
-                            '                    End While
-
-                            '                    resultData.SetDatos = returnDS
-                            '                End If
-                            '            End If
-                            '        End If
-
-                            '    Catch ex As Exception
-                            '        resultData = New GlobalDataTO()
-                            '        resultData.HasError = True
-                            '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                            '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                            '        Dim myLogAcciones As New ApplicationLogManager()
-                            '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContamination", EventLogEntryType.Error, False)
-
-                            '    End Try
-                            '    Return resultData
-                            'End Function
-
-                            '''' <summary>
-                            '''' Get detailed information of all Executions (for Standard and ISE Tests)
-                            '''' </summary>
-                            '''' <param name="pDBConnection">Open DB Connection</param>
-                            '''' <param name="pWorkSessionID">Work Session Identifier</param>
-                            '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-                            '''' <returns>GlobalDataTO containing a typed DataSet WSExecutionsInfoDS with detailed information 
-                            ''''          of all Executions</returns>
-                            '''' <remarks>
-                            '''' Created by : SA 22/11/2010
-                            '''' </remarks>
-                            'Public Function GetExecutionsInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-                            '                                         ByVal pAnalyzerID As String) As GlobalDataTO
-                            '    Dim resultData As New GlobalDataTO
-                            '    Dim dbConnection As New SqlClient.SqlConnection
-
-                            '    Try
-                            '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                            '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-                            '            If (Not dbConnection Is Nothing) Then
-                            '                'Get ICONS for Standard Tests....
-                            '                Dim preloadedDataConfig As New PreloadedMasterDataDelegate
-                            '                Dim systemSTDTestIcon As Byte() = preloadedDataConfig.GetIconImage("TESTICON")
-                            '                Dim userSTDTestIcon As Byte() = preloadedDataConfig.GetIconImage("USERTEST")
-
-                            '                'Get details of Patient Executions...
-                            '                Dim myWSExecutionsDAO As New twksWSExecutionsDAO
-                            '                Dim myWSExecutionsInfoDS As New WSExecutionsInfoDS
-
-                            '                resultData = myWSExecutionsDAO.GetPatientExecutionsInfo(dbConnection, pWorkSessionID, pAnalyzerID)
-                            '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '                    myWSExecutionsInfoDS = DirectCast(resultData.SetDatos, WSExecutionsInfoDS)
-                            '                    If (myWSExecutionsInfoDS.twksWSExecutions.Rows.Count > 0) Then
-                            '                        'Get Icon for ISE Tests
-                            '                        Dim iseTestIcon As Byte() = preloadedDataConfig.GetIconImage("TISE_SYS")
-
-                            '                        'Get Icons for Routine and Stat Patient Samples
-                            '                        Dim routineIcon As Byte() = preloadedDataConfig.GetIconImage("ROUTINES")
-                            '                        Dim statIcon As Byte() = preloadedDataConfig.GetIconImage("STATS")
-
-                            '                        For Each patientExec As WSExecutionsInfoDS.twksWSExecutionsRow In myWSExecutionsInfoDS.twksWSExecutions.Rows
-                            '                            patientExec.BeginEdit()
-
-                            '                            'SampleClass Icon: Stat or Routine
-                            '                            If (Not patientExec.StatFlag) Then
-                            '                                patientExec.SampleClassIcon = routineIcon
-                            '                            Else
-                            '                                patientExec.SampleClassIcon = statIcon
-                            '                            End If
-
-                            '                            'TestType Icon: Standard Preloaded, Standard User Defined, or ISE 
-                            '                            If (patientExec.TestType = "STD") Then
-                            '                                If (patientExec.PreloadedTest) Then
-                            '                                    patientExec.TestTypeIcon = systemSTDTestIcon
-                            '                                Else
-                            '                                    patientExec.TestTypeIcon = userSTDTestIcon
-                            '                                End If
-                            '                            ElseIf (patientExec.TestType = "ISE") Then
-                            '                                patientExec.TestTypeIcon = iseTestIcon
-                            '                            End If
-                            '                            patientExec.EndEdit()
-                            '                        Next
-
-                            '                        'TR 04/08/211 -Set value to nothing to avoid memory used.
-                            '                        iseTestIcon = Nothing
-
-                            '                    End If
-                            '                End If
-
-                            '                If (Not resultData.HasError) Then
-                            '                    'Get details of all Calibrator Executions...
-                            '                    resultData = myWSExecutionsDAO.GetCalibratorExecutionsInfo(dbConnection, pWorkSessionID, pAnalyzerID)
-                            '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '                        Dim calibExecDS As New WSExecutionsInfoDS
-                            '                        calibExecDS = DirectCast(resultData.SetDatos, WSExecutionsInfoDS)
-
-                            '                        If (calibExecDS.twksWSExecutions.Rows.Count > 0) Then
-                            '                            'Get Icon for Calibrators
-                            '                            Dim calibratorIcon As Byte() = preloadedDataConfig.GetIconImage("CALIB")
-
-                            '                            For Each calibExec As WSExecutionsInfoDS.twksWSExecutionsRow In calibExecDS.twksWSExecutions.Rows
-                            '                                calibExec.BeginEdit()
-
-                            '                                'SampleClass Icon: Calibrator
-                            '                                calibExec.SampleClassIcon = calibratorIcon
-
-                            '                                'TestType Icon: Standard Preloaded or Standard User Defined
-                            '                                If (calibExec.PreloadedTest) Then
-                            '                                    calibExec.TestTypeIcon = systemSTDTestIcon
-                            '                                Else
-                            '                                    calibExec.TestTypeIcon = userSTDTestIcon
-                            '                                End If
-                            '                                calibExec.EndEdit()
-
-                            '                                'Import row to the final DS to return
-                            '                                myWSExecutionsInfoDS.twksWSExecutions.ImportRow(calibExec)
-                            '                            Next
-
-                            '                            'TR 04/08/211 -Set value to nothing to avoid memory used.
-                            '                            calibratorIcon = Nothing
-
-                            '                        End If
-                            '                    End If
-                            '                End If
-
-                            '                If (Not resultData.HasError) Then
-                            '                    'Get details of all Control Executions...
-                            '                    resultData = myWSExecutionsDAO.GetControlExecutionsInfo(dbConnection, pWorkSessionID, pAnalyzerID)
-                            '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '                        Dim ctrlExecDS As New WSExecutionsInfoDS
-                            '                        ctrlExecDS = DirectCast(resultData.SetDatos, WSExecutionsInfoDS)
-
-                            '                        If (ctrlExecDS.twksWSExecutions.Rows.Count > 0) Then
-                            '                            'Get Icon for Controls
-                            '                            Dim controlIcon As Byte() = preloadedDataConfig.GetIconImage("CTRL")
-
-                            '                            For Each ctrlExec As WSExecutionsInfoDS.twksWSExecutionsRow In ctrlExecDS.twksWSExecutions.Rows
-                            '                                ctrlExec.BeginEdit()
-
-                            '                                'SampleClass Icon: Control
-                            '                                ctrlExec.SampleClassIcon = controlIcon
-
-                            '                                'TestType Icon: Standard Preloaded or Standard User Defined
-                            '                                If (ctrlExec.PreloadedTest) Then
-                            '                                    ctrlExec.TestTypeIcon = systemSTDTestIcon
-                            '                                Else
-                            '                                    ctrlExec.TestTypeIcon = userSTDTestIcon
-                            '                                End If
-                            '                                ctrlExec.EndEdit()
-
-                            '                                'Import row to the final DS to return
-                            '                                myWSExecutionsInfoDS.twksWSExecutions.ImportRow(ctrlExec)
-                            '                            Next
-
-                            '                            'TR 04/08/211 -Set value to nothing to avoid memory used.
-                            '                            controlIcon = Nothing
-                            '                        End If
-                            '                    End If
-                            '                End If
-
-                            '                If (Not resultData.HasError) Then
-                            '                    'Get details of all Blank Executions...
-                            '                    resultData = myWSExecutionsDAO.GetBlankExecutionsInfo(dbConnection, pWorkSessionID, pAnalyzerID)
-                            '                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '                        Dim blankExecDS As New WSExecutionsInfoDS
-                            '                        blankExecDS = DirectCast(resultData.SetDatos, WSExecutionsInfoDS)
-
-                            '                        If (blankExecDS.twksWSExecutions.Rows.Count > 0) Then
-                            '                            'Get Icon for Blanks
-                            '                            Dim blankIcon As Byte() = preloadedDataConfig.GetIconImage("BLANK")
-
-                            '                            For Each blankExec As WSExecutionsInfoDS.twksWSExecutionsRow In blankExecDS.twksWSExecutions.Rows
-                            '                                blankExec.BeginEdit()
-
-                            '                                'SampleClass Icon: Calibrator
-                            '                                blankExec.SampleClassIcon = blankIcon
-
-                            '                                'TestType Icon: Standard Preloaded or Standard User Defined
-                            '                                If (blankExec.PreloadedTest) Then
-                            '                                    blankExec.TestTypeIcon = systemSTDTestIcon
-                            '                                Else
-                            '                                    blankExec.TestTypeIcon = userSTDTestIcon
-                            '                                End If
-                            '                                blankExec.EndEdit()
-
-                            '                                'Import row to the final DS to return
-                            '                                myWSExecutionsInfoDS.twksWSExecutions.ImportRow(blankExec)
-                            '                            Next
-                            '                            'TR 04/08/211 -Set value to nothing to avoid memory used.
-                            '                            blankIcon = Nothing
-                            '                        End If
-                            '                    End If
-                            '                End If
-                            '                'TR 04/08/211 -Set value to nothing to avoid memory used.
-                            '                systemSTDTestIcon = Nothing
-                            '                userSTDTestIcon = Nothing
-                            '                'TR 04/08/211 -END
-
-                            '                If (Not resultData.HasError) Then
-                            '                    resultData.SetDatos = myWSExecutionsInfoDS
-                            '                End If
-                            '            End If
-                            '        End If
-                            '    Catch ex As Exception
-                            '        resultData.HasError = True
-                            '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                            '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                            '        Dim myLogAcciones As New ApplicationLogManager()
-                            '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionsInfo", EventLogEntryType.Error, False)
-                            '    Finally
-                            '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-                            '    End Try
-                            '    Return resultData
-                            'End Function
-
-                            '''' <summary>
-                            '''' For the informed ExecutionID, get the position in SAMPLES Rotor where is placed the needed tube
-                            '''' </summary>
-                            '''' <param name="pDBConnection">Open DB Connection</param>
-                            '''' <param name="pWorkSessionID">Work Session Identifier</param>
-                            '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-                            '''' <param name="pExecutionID">Execution Identifier</param>
-                            '''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentByPositionDS with all information of the 
-                            ''''          position in Samples Rotor</returns>
-                            '''' <remarks>
-                            '''' Created by:  AG 13/05/2011
-                            '''' </remarks>
-                            'Public Function GetSampleRotorPositionByExecutionID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-                            '                                                    ByVal pAnalyzerID As String, ByVal pExecutionID As Integer) As GlobalDataTO
-                            '    Dim resultData As GlobalDataTO = Nothing
-                            '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-                            '    Try
-                            '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                            '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                            '            If (Not dbConnection Is Nothing) Then
-                            '                'Get all data of the specified Execution
-                            '                Dim myDAO As New twksWSExecutionsDAO
-                            '                resultData = myDAO.GetExecution(dbConnection, pExecutionID, pAnalyzerID, pWorkSessionID)
-
-                            '                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '                    Dim exDS As ExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
-
-                            '                    If (exDS.twksWSExecutions.Rows.Count > 0) Then
-                            '                        If (Not exDS.twksWSExecutions(0).IsSampleClassNull) Then
-                            '                            If (exDS.twksWSExecutions(0).SampleClass <> "BLANK") Then
-                            '                                'Search the Rotor position for Calibrators, Controls and Patient Samples
-                            '                                resultData = myDAO.GetSampleRotorPositionByExecutionID(dbConnection, pWorkSessionID, pAnalyzerID, pExecutionID)
-                            '                            Else
-                            '                                'Search the Rotor position for Blanks
-                            '                                resultData = myDAO.GetBLANKSampleRotorPositionByExecutionID(dbConnection, pWorkSessionID, pAnalyzerID, pExecutionID)
-                            '                            End If
-                            '                        End If
-                            '                    End If
-                            '                End If
-                            '            End If
-                            '        End If
-                            '    Catch ex As Exception
-                            '        resultData = New GlobalDataTO
-                            '        resultData.HasError = True
-                            '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                            '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                            '        Dim myLogAcciones As New ApplicationLogManager()
-                            '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSampleRotorPositionByExecutionID", EventLogEntryType.Error, False)
-                            '    Finally
-                            '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-                            '    End Try
-                            '    Return resultData
-                            'End Function
-
-                            '''' <summary>
-                            '''' Counts the number of Executions
-                            '''' </summary>
-                            '''' <param name="pDBConnection">Open DB Connection</param>
-                            '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-                            '''' <param name="pWorkSessionID">Work Session Identifier</param>
-                            '''' <returns>GlobalDataTO containing an integer value with the number of executions</returns>
-                            '''' <remarks>
-                            '''' Created by:  RH 27/09/2011
-                            '''' </remarks>
-                            'Public Function CountExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                            '                                ByVal pWorkSessionID As String) As GlobalDataTO
-                            '    Dim resultData As GlobalDataTO = Nothing
-                            '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-                            '    Try
-                            '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                            '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                            '            If (Not dbConnection Is Nothing) Then
-                            '                Dim myDAO As New twksWSExecutionsDAO()
-                            '                resultData = myDAO.CountExecutions(dbConnection, pAnalyzerID, pWorkSessionID)
-                            '            End If
-                            '        End If
-                            '    Catch ex As Exception
-                            '        resultData = New GlobalDataTO()
-                            '        resultData.HasError = True
-                            '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-                            '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                            '        Dim myLogAcciones As New ApplicationLogManager()
-                            '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountExecutions", EventLogEntryType.Error, False)
-                            '    Finally
-                            '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-                            '    End Try
-                            '    Return resultData
-                            'End Function
-
-                            '''' <summary>
-                            '''' Get all related execution by the order test id
-                            '''' this method is implemente for the ISE results.
-                            '''' </summary>
-                            '''' <param name="pDBConnection"></param>
-                            '''' <param name="pOrderTestID"></param>
-                            '''' <param name="pPreparationID"></param>
-                            '''' <returns></returns>
-                            '''' <remarks>
-                            '''' CREATE BY: TR 04/01/2011
-                            '''' </remarks>
-                            'Public Function GetISEExecutionsByOrderTestAndPreparationID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, ByVal pPreparationID As Integer) As GlobalDataTO
-
-                            '    Dim myGlobalDataTO As New GlobalDataTO
-                            '    Dim dbConnection As New SqlClient.SqlConnection
-
-                            '    Try
-                            '        myGlobalDataTO = DAOBase.GetOpenDBConnection(pDBConnection)
-                            '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-
-                            '            If (Not dbConnection Is Nothing) Then
-
-                            '                Dim myExecutionsDAO As New twksWSExecutionsDAO
-                            '                myGlobalDataTO = myExecutionsDAO.GetISEExecutionsByOrderTestAndPreparationID(dbConnection, pOrderTestID, pPreparationID)
-                            '            End If
-                            '        End If
-                            '    Catch ex As Exception
-                            '        myGlobalDataTO.HasError = True
-                            '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                            '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
-
-                            '        Dim myLogAcciones As New ApplicationLogManager()
-                            '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetISEExecutionsByOrderTestAndPreparationID", EventLogEntryType.Error, False)
-
-                            '    Finally
-                            '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-                            '    End Try
-                            '    Return myGlobalDataTO
-                            'End Function
-#End Region
-
 #Region "NEW FUNCTIONS TO IMPROVE PERFORMANCE OF MONITOR SCREEN"
 
-                            ''' <summary>
-                            ''' Get all data (headers and childs) that have to be shown in Samples grid in Monitor Screen 
-                            ''' </summary>
-                            ''' <param name="pDBConnection">Open DB Connection</param>
-                            ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-                            ''' <param name="pWorkSessionID">Work Session Identifier</param>
-                            ''' <param name="pBlankLabelText">Text used for the Blanks header in Monitor grid (in the active language)</param>
-                            ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS (subtable vwksWSExecutionsMonitorRow) with all data
-                            '''          (headers and childs) that have to be shown in Monitor Screen (Samples grid)</returns>
-                            ''' <remarks>
-                            ''' Created by: SA 11/03/2014 - BT #1524
-                            ''' </remarks>
+        ''' <summary>
+        ''' Get all data (headers and childs) that have to be shown in Samples grid in Monitor Screen 
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <param name="pBlankLabelText">Text used for the Blanks header in Monitor grid (in the active language)</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS (subtable vwksWSExecutionsMonitorRow) with all data
+        '''          (headers and childs) that have to be shown in Monitor Screen (Samples grid)</returns>
+        ''' <remarks>
+        ''' Created by: SA 11/03/2014 - BT #1524
+        ''' </remarks>
         Public Function GetDataForMonitorTabWS_NEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                    ByVal pBlankLabelText As String) As GlobalDataTO
             Dim myFinalWSDS As New ExecutionsDS

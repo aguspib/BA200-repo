@@ -390,7 +390,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
-
 #End Region
 
 #Region "Other Methods"
@@ -1050,7 +1049,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              AG 02/07/2012 - Changed the query to get also fields CompleteReadings and ValidReadings from twksWSExecutions
         '''              SA 11/07/2012 - Changed the query to get also field ExecutionType from twksWSExecutions and TestType, ReplicatesNumber,
         '''                              OrderID and ControlID from twksOrderTests
-        '''              XB 08/10/2014 - Get also KineticsLinear field to initialize preparation structure - BA-1970
+        '''              XB 08/10/2014 - BA-1970 ==> Changed the query to get also field KineticsLinear to initialize preparation structure
         ''' </remarks>
         Public Function GetExecution(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer, _
                                      Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
@@ -1421,7 +1420,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' 25/09/2013 - CF - v2.1.1 Original code from GetWSExecutionsResults modified to add the OrderList Param. 
         ''' Gets the worksession executionsresults filtered by the supplied orderlist. 
@@ -1484,7 +1482,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Get all the Execution Result Alarms (Blank or Calibrator Order Test)
         ''' </summary>
@@ -1544,7 +1541,6 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' Get the list of Executions with data to be monitored
@@ -1621,7 +1617,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
 
         End Function
-
 
         ''' <summary>
         ''' Get the list of Executions with data to be monitored
@@ -1843,7 +1838,6 @@ Namespace Biosystems.Ax00.DAL.DAO
 
         End Function
 
-
         ''' <summary>
         ''' Updates the ClotValue into the twksWSExecutions table
         ''' </summary>
@@ -1897,7 +1891,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
 
         End Function
-
 
         ''' <summary>
         ''' Updates the ClotValue into the twksWSExecutions table
@@ -2407,7 +2400,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Get if the ExecutionID has programmed contamination cuvette
         ''' </summary>
@@ -2481,7 +2473,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             End Try
             Return resultData
         End Function
-
 
         ''' <summary>
         ''' All pending executions wich reagent is contaminator that requires the wash solution with no volume are LOCKED
@@ -3165,7 +3156,6 @@ Namespace Biosystems.Ax00.DAL.DAO
 
         End Function
 
-
         ''' <summary>
         ''' Get data of all Executions in the specified Analyzer and WorkSession having the informed Status
         ''' Optionally, paused Executions are excluded and/or Executions having a type different of the informed one
@@ -3356,249 +3346,198 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 
         ''' <summary>
-        ''' 
+        ''' Save data of the specified Executions
         ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionsDS"></param>
-        ''' <returns></returns>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExecutionsDS">Typed DataSet ExecutionsDS containing all data of the Execution to save</param>
+        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, fields ABS_Initial, 
+        '''                               ABS_MainFilter, ABS_WorkReagent, SubstrateDepletion, rKinetics, KineticsInitialValue, KineticsSlope 
+        '''                               and KineticsLinear are not updated (to avoid the losing of these values)</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
-        ''' Created by: ???
-        ''' Modified b: AG 12/07/2010 (add Abs_MainFilter and Abs_WorkReagent) - OK
-        ''' Modified by AG: 26/07/2010 (dont update date)
-        ''' Modified by AG 11/08/2010 - Do loop for all rows in DS
+        ''' Created by: 
+        ''' Modified by: AG 12/07/2010 - Added fields Abs_MainFilter and Abs_WorkReagent
+        '''              AG 26/07/2010 - Do not update date
+        '''              AG 11/08/2010 - Do loop for all rows in DS
+        '''              SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. When value of this parameter is TRUE, 
+        '''                                          fields ABS_Initial, ABS_MainFilter, ABS_WorkReagent, SubstrateDepletion, rKinetics,  
+        '''                                          KineticsInitialValue, KineticsSlope and KineticsLinear are not updated (to avoid the 
+        '''                                          losing of these values)
         ''' </remarks>
-        Public Function SaveExecutionsResults(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                              ByVal pExecutionsDS As ExecutionsDS) As GlobalDataTO
-
+        Public Function SaveExecutionsResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS, _
+                                              Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
-
                 If (pDBConnection Is Nothing) Then
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-
                 Else
-
-                    If pExecutionsDS.twksWSExecutions.Rows.Count < 1 Then
+                    If (pExecutionsDS.twksWSExecutions.Rows.Count < 1) Then
                         resultData.HasError = True
                         resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-
                     Else
-                        'AG 11/08/2010 - add loop and change (0) to (i)
+                        'AG 11/08/2010 - Add loop and change (0) to (i)
+                        Dim cmdText As String = String.Empty
                         For i As Integer = 0 To pExecutionsDS.twksWSExecutions.Rows.Count - 1
-                            Dim cmdText As String = ""
-
-                            cmdText += "UPDATE twkswsexecutions SET "
-                            cmdText += "ABS_Value = "
+                            cmdText = String.Empty
+                            cmdText += " UPDATE twksWSExecutions SET "
 
                             'Verify if ABS_Value is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsABS_ValueNull Then
+                            cmdText += " ABS_Value = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsABS_ValueNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
-                                'cmdText = cmdText & pExecutionsDS.twksWSExecutions(0).ABS_Value.ToString.Replace(",", ".") & ", " & vbCrLf
-                                ' modified by DL 12/03/2010
                                 cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).ABS_Value) & ", " & vbCrLf
                             End If
 
-                            'AG 26/07/2010
-                            cmdText += "                            ResultDate = "
                             'Verify if ResultDate is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsResultDateNull Then
+                            cmdText += " ResultDate = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsResultDateNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
                                 cmdText = cmdText & " '" & CType(pExecutionsDS.twksWSExecutions(i).ResultDate.ToString(), DateTime).ToString("yyyyMMdd HH:mm:ss") & "', " & vbCrLf
                             End If
-                            'END AG 26/07/2010
-
-                            cmdText += "                            ABS_Error = "
 
                             'Verify if ABS_Error is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsABS_ErrorNull Then
+                            cmdText += " ABS_Error = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsABS_ErrorNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
                                 cmdText = cmdText & "'" & pExecutionsDS.twksWSExecutions(i).ABS_Error.ToString & "', " & vbCrLf
                             End If
 
-                            cmdText += "                            rkinetics = "
-
-                            'Verify if rkinetics is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsrkineticsNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-
-                            Else
-                                'cmdText = cmdText & pExecutionsDS.twksWSExecutions(0).rkinetics.ToString.Replace(",", ".") & ", " & vbCrLf
-                                'modified by dl 12/03/2010
-                                cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).rkinetics) & ", " & vbCrLf
-                            End If
-
-                            cmdText += "                            KineticsInitialValue = "
-
-                            'Verify if KineticsInitialValue is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsKineticsInitialValueNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-
-                            Else
-                                'cmdText = cmdText & pExecutionsDS.twksWSExecutions(0).KineticsInitialValue.ToString.Replace(",", ".") & ", " & vbCrLf
-                                ' modified by dl 12/03/2010
-                                cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).KineticsInitialValue) & ", " & vbCrLf
-                            End If
-
-                            cmdText += "                            KineticsSlope = "
-
-                            'Verify if KineticsSlope is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsKineticsSlopeNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-
-                            Else
-                                'cmdText = cmdText & pExecutionsDS.twksWSExecutions(0).KineticsSlope.ToString.Replace(",", ".") & ", " & vbCrLf
-                                ' modified by dl 12/03/2010
-                                cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).KineticsSlope) & ", " & vbCrLf
-                            End If
-
-                            cmdText += "                            KineticsLinear = "
-
-                            'Verify if KineticsLinear is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsKineticsLinearNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-
-                            Else
-
-                                If pExecutionsDS.twksWSExecutions(i).KineticsLinear = True Then
-                                    cmdText = cmdText & "1, " & vbCrLf
-
+                            'BA-1616: Fields SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, rKinetics, KineticsInitialValue, 
+                            '         KineticsSlope and KineticsLinear are updated only when parameter pRecalculusFlag is FALSE (to avoid the 
+                            '         loss of these values when the result is recalculated)
+                            If (Not pRecalculusFlag) Then
+                                'Verify if rkinetics is informed
+                                cmdText += " rkinetics = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsrkineticsNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
                                 Else
-                                    cmdText = cmdText & "0, " & vbCrLf
+                                    cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).rkinetics) & ", " & vbCrLf
                                 End If
 
-                            End If
-
-                            cmdText += "                            SubstrateDepletion = "
-
-                            'Verify if SubstrateDepletion is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsSubstrateDepletionNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-
-                            Else
-
-                                If pExecutionsDS.twksWSExecutions(i).SubstrateDepletion = True Then
-                                    cmdText = cmdText & "1," & vbCrLf
-
+                                'Verify if KineticsInitialValue is informed
+                                cmdText += " KineticsInitialValue = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsKineticsInitialValueNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
                                 Else
-                                    cmdText = cmdText & "0," & vbCrLf
+                                    cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).KineticsInitialValue) & ", " & vbCrLf
                                 End If
 
-                            End If
+                                'Verify if KineticsSlope is informed
+                                cmdText += " KineticsSlope = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsKineticsSlopeNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
+                                Else
+                                    cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).KineticsSlope) & ", " & vbCrLf
+                                End If
 
-                            cmdText += "                            InUse = "
+                                'Verify if KineticsLinear is informed
+                                cmdText += " KineticsLinear = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsKineticsLinearNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
+                                Else
+                                    If (pExecutionsDS.twksWSExecutions(i).KineticsLinear) Then
+                                        cmdText = cmdText & "1, " & vbCrLf
+                                    Else
+                                        cmdText = cmdText & "0, " & vbCrLf
+                                    End If
+                                End If
+
+                                'Verify if SubstrateDepletion is informed
+                                cmdText += " SubstrateDepletion = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsSubstrateDepletionNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
+                                Else
+                                    If (pExecutionsDS.twksWSExecutions(i).SubstrateDepletion) Then
+                                        cmdText = cmdText & "1," & vbCrLf
+                                    Else
+                                        cmdText = cmdText & "0," & vbCrLf
+                                    End If
+                                End If
+
+                                'Verify if ABS_Initial is informed
+                                cmdText += " ABS_Initial = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsABS_InitialNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
+                                Else
+                                    cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).ABS_Initial) & ", " & vbCrLf
+                                End If
+
+                                'Verify if ABS_MainFilter is informed
+                                cmdText += " ABS_MainFilter = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsABS_MainFilterNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
+                                Else
+                                    cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).ABS_MainFilter) & ", " & vbCrLf
+                                End If
+
+                                'Verify if ABS_WorkReagent is informed
+                                cmdText += " ABS_WorkReagent = "
+                                If (pExecutionsDS.twksWSExecutions(i).IsAbs_WorkReagentNull) Then
+                                    cmdText = cmdText & " NULL, " & vbCrLf
+                                Else
+                                    cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).Abs_WorkReagent) & ", " & vbCrLf
+                                End If
+                            End If
 
                             'Verify if InUse is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsInUseNull Then
+                            cmdText += " InUse = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsInUseNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
-
-                                If pExecutionsDS.twksWSExecutions(i).InUse = True Then
+                                If (pExecutionsDS.twksWSExecutions(i).InUse) Then
                                     cmdText = cmdText & "1," & vbCrLf
-
                                 Else
                                     cmdText = cmdText & "0," & vbCrLf
                                 End If
-
                             End If
-
-                            cmdText += "                            ABS_Initial = "
-
-                            'Verify if ABS_Initial is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsABS_InitialNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-
-                            Else
-                                'cmdText = cmdText & pExecutionsDS.twksWSExecutions(0).ABS_Initial.ToString.Replace(",", ".") & ", " & vbCrLf
-                                ' modified by dl 12/03/2010
-                                cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).ABS_Initial) & ", " & vbCrLf
-                            End If
-
-                            'AG 12/07/2010 - add Abs_MainFilter & Abs_WorkReagent
-                            cmdText += " ABS_MainFilter = "
-                            'Verify if ABS_MainFilter is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsABS_MainFilterNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-                            Else
-                                cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).ABS_MainFilter) & ", " & vbCrLf
-                            End If
-
-                            cmdText += " ABS_WorkReagent = "
-                            'Verify if ABS_WorkReagent is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsAbs_WorkReagentNull Then
-                                cmdText = cmdText & " NULL, " & vbCrLf
-                            Else
-                                cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).Abs_WorkReagent) & ", " & vbCrLf
-                            End If
-                            'END AG 12/07/2010
-
-
-                            cmdText += "                            CONC_Value = "
 
                             'Verify if CONC_Value is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsCONC_ValueNull Then
+                            cmdText += " CONC_Value = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsCONC_ValueNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
-                                'cmdText = cmdText & pExecutionsDS.twksWSExecutions(0).CONC_Value.ToString.Replace(",", ".") & ", " & vbCrLf
-                                ' modified by dl 12/03/2010
                                 cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).CONC_Value) & ", " & vbCrLf
                             End If
 
-                            cmdText += "                            CONC_Error = "
-
                             'Verify if CONC_Error is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsCONC_ErrorNull Then
+                            cmdText += " CONC_Error = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsCONC_ErrorNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
                                 cmdText = cmdText & "'" & pExecutionsDS.twksWSExecutions(i).CONC_Error & "', " & vbCrLf
                             End If
 
-                            cmdText += "                            CONC_CurveError = "
-
                             'Verify if CONC_Error is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsCONC_CurveErrorNull Then
-                                'AG 20/04/2010 - This is the last parameter
-                                'cmdText = cmdText & " NULL, " & vbCrLf
+                            cmdText += " CONC_CurveError = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsCONC_CurveErrorNull) Then
                                 cmdText = cmdText & " NULL, " & vbCrLf
-
                             Else
-                                'AG 20/04/2010 - This is the last parameter
-                                'cmdText = cmdText & ReplaceNumericString(pExecutionsDS.twksWSExecutions(0).CONC_CurveError) & "', " & vbCrLf
                                 cmdText = cmdText & "'" & ReplaceNumericString(pExecutionsDS.twksWSExecutions(i).CONC_CurveError) & "', " & vbCrLf
                             End If
 
-                            cmdText += "                            ExecutionStatus = "
-
                             'Verify if CONC_Error is informed
-                            If pExecutionsDS.twksWSExecutions(i).IsExecutionStatusNull Then
+                            cmdText += " ExecutionStatus = "
+                            If (pExecutionsDS.twksWSExecutions(i).IsExecutionStatusNull) Then
                                 cmdText = cmdText & " NULL " & vbCrLf
-
                             Else
                                 cmdText = cmdText & "'" & pExecutionsDS.twksWSExecutions(i).ExecutionStatus & "' " & vbCrLf
                             End If
 
                             'AG 20/04/2010 - PreparationID isnt update during calculation results
-                            'cmdText += "                            PreparationID = "
-
                             ''Verify if PreparationID is informed
+                            'cmdText += " PreparationID = "
                             'If pExecutionsDS.twksWSExecutions(i).IsPreparationIDNull Then
                             '    cmdText = cmdText & " NULL, " & vbCrLf
-
                             'Else
                             '    cmdText = cmdText & pExecutionsDS.twksWSExecutions(i).PreparationID.ToString() & vbCrLf
                             'End If
 
-                            cmdText += "Where ExecutionID = " & pExecutionsDS.twksWSExecutions(i).ExecutionID
+                            cmdText += " WHERE ExecutionID = " & pExecutionsDS.twksWSExecutions(i).ExecutionID
 
                             'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
                             Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -3613,13 +3552,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                             'AG 25/07/2014
 
                             'AG 11/08/2010
-                            If resultData.HasError Then Exit For
+                            If (resultData.HasError) Then Exit For
                         Next
                         'END AG 11/08/2010
-
                     End If
                 End If
-
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3628,9 +3565,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.SaveExecutionsResults", EventLogEntryType.Error, False)
             End Try
-
             Return resultData
-
         End Function
 
         ''' <summary>
@@ -4137,7 +4072,6 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Count executions in current WS by ExecutionStatus
         ''' </summary>
@@ -4186,7 +4120,63 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
+        ''' <summary>
+        ''' When the informed Execution belongs to a CALIBRATOR Order Test for a Multipoint Experimental Calibrator, this function searches and
+        ''' returns data of Executions for each one of the Calibrators points. NOTE: There is a NEW version of this function used in Calculations module,
+        ''' but this function is still used in WSRotorContentByPositionDelegate in function UpdateSamplePositionStatus
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pExecutionID">Execution Identifier</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionDS with data of all Executions for an specific Multipoint Calibrator</returns>
+        ''' <remarks>
+        ''' Created by:  DL 23/02/2010
+        ''' Modified by: AG 03/08/2010 - change the SQL query (the old fails when there are calibrator multiitem reruns)
+        '''              AG 24/02/2011 - Changed the SQL Query to return also the ReplicateNumber field
+        '''              AG 21/10/2011 - Changed the SQL Query to return also the RerunNumber field
+        '''              AG 21/12/2011 - Changed the SQL Query to return also the WellUsed field
+        '''              SA 01/12/2014 - Changed the SQL Query to use INNER JOIN. Changed the function template.
+        ''' </remarks>
+        Public Function GetExecutionsMultiItem(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
 
+            Try
+                resultData = GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim cmdText As String = " SELECT A.ExecutionID, A.WorkSessionID, A.AnalyzerID, A.OrdertestID, A.MultiItemNumber, " & vbCrLf & _
+                                                       " A.ReplicateNumber, A.RerunNumber, A.WellUsed " & vbCrLf & _
+                                                " FROM   twksWSExecutions A INNER JOIN twksWSExecutions B ON A.OrderTestID     = B.OrderTestID " & vbCrLf & _
+                                                                                                       " AND A.RerunNumber     = B.RerunNumber " & vbCrLf & _
+                                                                                                       " AND A.ReplicateNumber = B.ReplicateNumber " & vbCrLf & _
+                                                " WHERE  B.ExecutionID = " & pExecutionID.ToString & vbCrLf & _
+                                                " ORDER BY A.MultiItemNumber ASC"
+
+                        Dim executionDataDS As New ExecutionsDS
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
+                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
+                                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
+                            End Using
+                        End Using
+
+                        resultData.SetDatos = executionDataDS
+                        resultData.HasError = False
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetExecutionsMultiItem", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "Private Methods"
@@ -4314,557 +4304,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 #End Region
 
-#Region "METHODS REPLACED FOR NEW ONES DUE TO PERFORMANCE ISSUES"
-        ''' <summary>
-        ''' Delete all Executions for a group of Order Tests that fulfill the following condition: ALL their Executions 
-        ''' have Execution Status PENDING or LOCKED 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' 
-        ''' <returns>GlobalDataTO containing sucess/error information</returns>
-        ''' <remarks>
-        ''' Created by:  GDS 22/04/2010
-        ''' Modified by: DL  11/05/2010 - Added optional parameter to filter Executions by OrderTestID
-        '''              DL  11/05/2010 - When an OrderTestID has not been informed, delete only Pending and/or Locked
-        '''                               Executions that do not correspond to a Rerun request
-        '''              AG  20/09/2011 - Deletion affects only OrderTests having all his executions PENDING or LOCKED
-        '''              SA  29/11/2011 - Changed the SQL Query to improve the readibility 
-        '''              SA  31/05/2012 - Implementation changed due to bad performance of the previous query: a DS with the list of 
-        '''                               OrderTestIDs which executions can be deleted (because all of them have status PENDING or LOCKED)  
-        '''                               is received as entry parameter and the SQL Query was changed to delete executions by OrderTestID
-        ''' </remarks>
-        Public Function DeleteNotInCurseExecutions(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                                   ByVal pOrderTestsListDS As OrderTestsDS) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Try
-                If (pDBConnection Is Nothing) Then
-                    resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-                Else
-                    Dim i As Integer = 0
-                    Dim maxUpdates As Integer = 500
-                    Dim cmdText As New StringBuilder()
-
-                    For Each orderTestRow As OrderTestsDS.twksOrderTestsRow In pOrderTestsListDS.twksOrderTests
-                        cmdText.Append(" DELETE FROM twksWSExecutions ")
-                        cmdText.Append(" WHERE  AnalyzerID = ")
-                        cmdText.AppendFormat("'{0}'", pAnalyzerID.ToString)
-                        cmdText.Append(" AND    WorkSessionID = ")
-                        cmdText.AppendFormat("'{0}'", pWorkSessionID.ToString)
-                        cmdText.Append(" AND    OrderTestID = ")
-                        cmdText.AppendFormat("{0}", orderTestRow.OrderTestID)
-                        cmdText.Append(vbCrLf)
-
-                        i += 1
-                        If (i = maxUpdates) Then
-                            'Execute the SQL script
-                            Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
-                                resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
-                            End Using
-
-                            'Initialize the counter and the StringBuilder
-                            i = 0
-                            cmdText.Remove(0, cmdText.Length)
-                        End If
-                    Next orderTestRow
-
-                    If (Not resultData.HasError) Then
-                        If (cmdText.Length > 0) Then
-                            'Execute the remaining deletes...
-                            Using dbCmd As New SqlClient.SqlCommand(cmdText.ToString, pDBConnection)
-                                resultData.AffectedRecords += dbCmd.ExecuteNonQuery()
-                            End Using
-                        End If
-                    End If
-                End If
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.DeleteNotInCurseExecutions", EventLogEntryType.Error, False)
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Find the CLOSED Executions having the maximum ReplicateNumber for the same OrderTestID and RerunNumber. Executions of all MultiItemNumbers
-        ''' are returned excepting when parameter pOnlyMaxReplicate is TRUE, in which case, only the maximum MultiItemNumber for the Replicate is returned 
-        ''' of the informed ExecutionID
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">Work Session Identifier</param>
-        ''' <param name="pExecutionID">Execution Identifier</param>
-        ''' <param name="pOnlyMaxReplicate">Optional parameter. When TRUE, only the maximum MultiItemNumber for the Replicate is returned</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS with data of all obtained Executions</returns>
-        ''' <remarks>
-        ''' Created by:  AG 23/07/2010
-        ''' Modified by: AG 21/10/2011 - Changed the SQL by adding a filter by ExecutionStatus = 'CLOSED'</remarks>
-        Public Function GetClosedExecutionsRelated(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                                   ByVal pExecutionId As Integer, Optional ByVal pOnlyMaxReplicate As Boolean = False) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-
-                        If (pOnlyMaxReplicate) Then
-                            cmdText = "SELECT TOP 1 " 'Only 1 record
-                        Else
-                            cmdText = "SELECT " 'All records
-                        End If
-
-                        cmdText += " b.* FROM vwksWSExecutionsResults a, vwksWSExecutionsResults b "
-                        cmdText += " WHERE  a.ExecutionID = " & pExecutionId & " "
-                        cmdText += " AND  a.AnalyzerID = '" & pAnalyzerID & "' "
-                        cmdText += " AND a.WorkSessionID = '" & pWorkSessionID & "' "
-                        cmdText += " AND a.ExecutionStatus = 'CLOSED' " 'AG 21/10/2011
-                        cmdText += " AND a.OrderTestID = b.OrderTestID AND a.RerunNumber = b.RerunNumber "
-                        cmdText += " AND a.ExecutionStatus = b.ExecutionStatus " 'AG 21/10/2011
-                        cmdText += " ORDER BY b.MultiItemNumber DESC, b.ReplicateNumber DESC"
-
-                        Dim executionDataDS As New ExecutionsDS
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(executionDataDS.vwksWSExecutionsResults)
-                            End Using
-                        End Using
-
-                        resultData.SetDatos = executionDataDS
-                        resultData.HasError = False
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, ".twksWSExecutionsDAO.GetClosedExecutionsRelated", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get a list with execution ids from multitem execution
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pExecutionID">Execution Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionDS with data of the informed execution</returns>
-        ''' <remarks>
-        ''' Created by:  DL 23/02/2010
-        ''' Modified by: AG 03/08/2010 - change the SQL query (the old fails when there are calibrator multiitem reruns)
-        ''' Modified by: AG 24/02/2011 - return also the ReplicateNumber field
-        ''' AG 21/10/2011 - select also RerunNumber
-        ''' AG 21/12/2011 - select also WellUsed
-        ''' </remarks>
-        Public Function GetExecutionsMultiItem(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                               ByVal pExecutionID As Integer) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-            Dim executionDataDS As New ExecutionsDS
-
-            Try
-                resultData = GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-
-                        Dim Cmd As New SqlClient.SqlCommand
-                        Dim cmdText As String = ""
-
-                        'AG 03/08/2010
-                        'cmdText += "Select ExecutionID , WorkSessionID, AnalyzerID, OrdertestID, MultiItemNumber "
-                        'cmdText += "From   twksWSExecutions "
-                        'cmdText += "Where  OrderTestID in    (Select OrderTestID "
-                        'cmdText += "                          From twksWSExecutions "
-                        'cmdText += "                          Where ExecutionID = " & pExecutionID & ") "
-                        'cmdText += "  and ReplicateNumber in (Select ReplicateNumber "
-                        'cmdText += "                          From twksWSExecutions "
-                        'cmdText += "                          Where ExecutionID = " & pExecutionID & ") "
-                        'cmdText += "ORDER BY MultiItemNumber ASC"
-
-                        cmdText += "SELECT a.ExecutionID , a.WorkSessionID, a.AnalyzerID, a.OrdertestID, a.MultiItemNumber, a.ReplicateNumber, a.RerunNumber, a.WellUsed "
-                        cmdText += " FROM twksWSExecutions a, twksWSExecutions b "
-                        cmdText += " WHERE b.ExecutionID = " & pExecutionID
-                        cmdText += " AND a.OrderTestID = b.OrderTestID "
-                        cmdText += " AND a.ReplicateNumber = b.ReplicateNumber"
-                        cmdText += " AND a.RerunNumber = b.RerunNumber "
-                        cmdText += " ORDER BY MultiItemNumber ASC"
-                        'END AG 03/08/2010
-
-                        'Cmd.Connection = dbConnection
-                        'Cmd.CommandText = cmdText
-
-                        ''Fill the DataSet to return 
-                        'Dim dbDataAdapter As New SqlClient.SqlDataAdapter(Cmd)
-                        'dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-                            End Using
-                        End Using
-
-                        resultData.SetDatos = executionDataDS
-                        resultData.HasError = False
-                    End If
-
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetExecutionsMultiItem", EventLogEntryType.Error, False)
-
-            Finally
-
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-
-        End Function
-
-        ''' <summary>
-        ''' Search the affected CLOSED executions for the new blank result
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pSampleClass"></param>
-        ''' <param name="pTestID"></param>
-        ''' <returns></returns>
-        ''' <remarks>Created by AG 23/07/2010
-        ''' AG 04/01/2011 - add executiontype = prep_std
-        ''' AG 21/10/2011 add condition into Where: And ExecutionStatus = 'CLOSED'
-        ''' </remarks>
-        Public Function GetExecutionsAffectedByNewBlank(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                             ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                             ByVal pSampleClass As String, ByVal pTestID As Integer) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-
-                If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = ""
-
-                        cmdText += "SELECT * FROM vwksWSExecutionsResults "
-                        cmdText += " WHERE AnalyzerID = '" & pAnalyzerID & "' "
-                        cmdText += " AND WorkSessionID = '" & pWorkSessionID & "' "
-                        cmdText += " AND SampleClass <> '" & pSampleClass & "' "
-                        cmdText += " AND TestID = " & pTestID & " "
-                        cmdText += " AND ExecutionStatus = 'CLOSED' " 'AG 21/10/2011
-                        cmdText += " AND ExecutionType = 'PREP_STD'"
-                        cmdText += " ORDER BY SampleClass, ExecutionID"
-
-                        Dim dbCmd As New SqlClient.SqlCommand
-                        dbCmd.Connection = dbConnection
-                        dbCmd.CommandText = cmdText
-
-                        'Fill the DataSet to return 
-                        Dim executionDataDS As New ExecutionsDS
-                        Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                        dbDataAdapter.Fill(executionDataDS.vwksWSExecutionsResults)
-
-                        resultData.SetDatos = executionDataDS
-                        resultData.HasError = False
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetExecutionsAffectedByNewBlank", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Search all closed CTRL and PATIENT Executions affected by a new Calibrator result
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        ''' <param name="pSampleClass"></param>
-        ''' <param name="pTestID">Identifier of an Standard Test</param>
-        ''' <param name="pSampleType">SampleType Code</param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by:  AG 23/07/2010
-        ''' Modified by: AG 02/09/2010 - Changed the Query to filter data by SampleType or SampleTypeAlternative
-        '''              AG 04/01/2011 - Changed the Query to get only Executions corresponding to Standard Tests (ExecutionType=PREP_STD) 
-        '''              AG 21/10/2011 - Changed the Query to get only CLOSED Executions
-        ''' </remarks>
-        Public Function GetExecutionsAffectedByNewCalib(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                        ByVal pWorkSessionID As String, ByVal pSampleClass As String, ByVal pTestID As Integer, _
-                                                        ByVal pSampleType As String) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT * FROM vwksWSExecutionsResults " & vbCrLf & _
-                                                " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    TestID = " & pTestID.ToString & vbCrLf & _
-                                                " AND    ExecutionStatus = 'CLOSED' " & vbCrLf & _
-                                                " AND    ExecutionType = 'PREP_STD' " & vbCrLf & _
-                                                " AND    SampleClass <> 'BLANK' " & vbCrLf & _
-                                                " AND    SampleClass <> '" & pSampleClass.Trim & "' " & vbCrLf & _
-                                                " AND   (SampleType = '" & pSampleType.Trim & "' OR SampleTypeAlternative = '" & pSampleType.Trim & "') " & vbCrLf & _
-                                                " ORDER BY SampleClass, ExecutionID " & vbCrLf
-
-                        Dim executionDataDS As New ExecutionsDS
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(executionDataDS.vwksWSExecutionsResults)
-                            End Using
-                        End Using
-
-                        resultData.SetDatos = executionDataDS
-                        resultData.HasError = False
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetExecutionsAffectedByNewCalib", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Get the maximum MultiItem Number for the specified Execution 
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pExecutionID">Execution Identifier</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet ExecutionsDS with data of the specified ExecutionID</returns>
-        ''' <remarks>
-        ''' Created  by: DL 23/02/2010
-        ''' Modified by: DL 24/02/2010
-        '''              AG 26/04/2011 - Changed the query to ANSI format to improve the speed 
-        '''              SA 09/03/2012 - Changed the function template
-        ''' </remarks>''' 
-        Public Function GetNumberOfMultititem(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionID As Integer) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-                    If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT " & pExecutionID & " As ExecutionID, EX.WorkSessionID, EX.AnalyzerID, EX.OrderTestID, EX.RerunNumber, " & vbCrLf & _
-                                                         " MAX(EX2.MultiItemNumber) as MultiItemNumber, EX.ExecutionStatus, EX.ExecutionType, EX.SampleClass " & vbCrLf & _
-                                                " FROM     twksWSExecutions EX INNER JOIN twksWSExecutions EX2 ON EX.OrderTestID = EX2.OrderTestID  " & vbCrLf & _
-                                                " WHERE    EX.ExecutionID = " & pExecutionID & vbCrLf & _
-                                                " GROUP BY EX.WorkSessionID, EX.AnalyzerID, EX.OrderTestID, EX.RerunNumber, EX.ExecutionStatus, EX.ExecutionType, EX.SampleClass " & vbCrLf
-
-                        Dim myExecutionDS As New ExecutionsDS
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-                            Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-                                dbDataAdapter.Fill(myExecutionDS.twksWSExecutions)
-                            End Using
-                        End Using
-
-                        resultData.SetDatos = myExecutionDS
-                        resultData.HasError = False
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetNumberOfMultiitem", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Update the InUse (flag)
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pExecutionsDS"></param>
-        ''' <returns></returns>
-        ''' <remarks>
-        ''' Created by AG 23/07/2010
-        ''' </remarks>
-        Public Function UpdateInUse(ByVal pDBConnection As SqlClient.SqlConnection, _
-                              ByVal pExecutionsDS As ExecutionsDS) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-            Try
-
-                If (pDBConnection Is Nothing) Then
-                    resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-                Else
-                    If pExecutionsDS.twksWSExecutions.Rows.Count < 1 Then
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-
-                    ElseIf pExecutionsDS.twksWSExecutions(0).IsInUseNull Then
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    Else
-                        Dim cmdText As String = ""
-                        cmdText += "UPDATE twkswsexecutions SET "
-
-                        ''Verify if PreparationID is informed
-                        If Not pExecutionsDS.twksWSExecutions(0).IsInUseNull Then
-                            cmdText += " InUse = "
-                            If pExecutionsDS.twksWSExecutions(0).InUse = True Then
-                                cmdText += "1 "
-                            Else
-                                cmdText += "0 "
-                            End If
-                        End If
-
-                        cmdText += " Where ExecutionID = " & pExecutionsDS.twksWSExecutions(0).ExecutionID
-                        cmdText += " And AnalyzerID = '" & pExecutionsDS.twksWSExecutions(0).AnalyzerID & "' "
-                        cmdText += " And WorkSessionID = '" & pExecutionsDS.twksWSExecutions(0).WorkSessionID & "' "
-
-                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
-                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                            If resultData.AffectedRecords = 1 Then
-                                resultData.HasError = False
-                            Else
-                                resultData.HasError = True
-                                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                            End If
-                        End Using
-                        'AG 25/07/2014
-
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.UpdateInUse", EventLogEntryType.Error, False)
-            End Try
-
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Update the fields BaseLineID, WellUsed and RotorTurnNumber
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pExecutionsDS">Executions DataSet with the following fields informed (ExecutionID, BaseLineID, WellUsed, RotorTurnNumber)</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
-        ''' <remarks>
-        ''' Created by: GDS - 27/04/2010
-        ''' Modified by AG: 03/05/2010 (RotorTurnNumber is deleted from database)
-        ''' AG 03/01/2011 - update also AdjustBaseLineID field
-        ''' AG 19/05/2011 - update also HasReadings field
-        ''' </remarks>
-        Public Function UpdateReadingsFields(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                             ByVal pExecutionsDS As ExecutionsDS) As GlobalDataTO
-
-            Dim resultData As New GlobalDataTO
-
-            Try
-                If (pDBConnection Is Nothing) Then
-                    resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-
-                Else
-                    Dim cmdText As String
-
-                    If pExecutionsDS.twksWSExecutions.Rows.Count = 1 Then
-                        'AG 03/05/2010 - RotorTurnNumber field is deleted from database
-                        'cmdText = "UPDATE twksWSExecutions" & vbCrLf & _
-                        '          "  SET BaseLineID = " & pExecutionsDS.twksWSExecutions(0).BaseLineID & vbCrLf & _
-                        '          "    , WellUsed = " & pExecutionsDS.twksWSExecutions(0).WellUsed & vbCrLf & _
-                        '          "    , RotorTurnNumber = " & pExecutionsDS.twksWSExecutions(0).RotorTurnNumber & vbCrLf & _
-                        '          " WHERE ExecutionID = " & pExecutionsDS.twksWSExecutions(0).ExecutionID
-                        cmdText = "UPDATE twksWSExecutions" & vbCrLf & _
-                                  "  SET BaseLineID = " & pExecutionsDS.twksWSExecutions(0).BaseLineID & vbCrLf & _
-                                  "    , WellUsed = " & pExecutionsDS.twksWSExecutions(0).WellUsed & vbCrLf & _
-                                  "    , AdjustBaseLineID = " & pExecutionsDS.twksWSExecutions(0).AdjustBaseLineID & vbCrLf & _
-                                  "    , HasReadings = " & CStr(IIf(pExecutionsDS.twksWSExecutions(0).HasReadings, "1", "0")) & vbCrLf & _
-                                  " WHERE ExecutionID = " & pExecutionsDS.twksWSExecutions(0).ExecutionID
-
-                        'Execute the SQL sentence 
-                        'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
-                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                            resultData.HasError = False
-                        End Using
-                        'AG 25/07/2014
-
-                    Else
-                        resultData.HasError = True
-                        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.UpdateReadingsFields", EventLogEntryType.Error, False)
-            End Try
-
-            Return resultData
-
-        End Function
-
-#End Region
-
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
-
         ''' <summary>
         ''' Delete all Executions for a group of Order Tests that fulfill the following condition: ALL their Executions 
         ''' have Execution Status PENDING or LOCKED 
@@ -5051,8 +4491,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <returns>GlobalDataTO containing a typed DataSet with the list of affected Executions</returns>
         ''' <remarks>
         ''' Created by:  SA 13/07/2012 
-        ''' Modified by: SA 28/11/2014 - BA-1616 ==> Changed the SQL Query to get also field KineticsLinear from table twksWSExecutions, needed to 
-        '''                                          initialize the Preparation structure (in CalculationsDelegate) in case of re-calculations
+        ''' Modified by: SA 28/11/2014 - BA-1616 ==> Changed the SQL Query to get also field KineticsLinear from table twksWSExecutions, needed 
+        '''                                          to initialize the Preparation structure (in CalculationsDelegate) in case of re-calculations
         ''' </remarks>
         Public Function GetExecutionsAffectedByNewBlankOrCalib(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                                ByVal pWorkSessionID As String, ByVal pTestID As Integer, Optional ByVal pSampleType As String = "") _
@@ -5068,8 +4508,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT  WSE.ExecutionID, WSE.ExecutionStatus,  WSE.WorkSessionID, WSE.AnalyzerID, WSE.BaseLineID, WSE.WellUsed, " & vbCrLf & _
                                                        "  WSE.OrderTestID, WSE.PostDilutionType, WSE.ReplicateNumber, WSE.RerunNumber, WSE.MultiItemNumber, " & vbCrLf & _
                                                        "  WSE.SampleClass, WSE.AdjustBaseLineID, WSE.ThermoWarningFlag, WSE.ClotValue, WSE.ExecutionType,  " & vbCrLf & _
-                                                       "  WSE.KineticsLinear, WSE.ValidReadings, WSE.CompleteReadings, T.TestID, T.TestName, OT.TestType, OT.SampleType, " & vbCrLf & _
-                                                       "  OT.ReplicatesNumber AS ReplicatesTotalNum, OT.ControlID, OT.OrderID, O.SampleID " & vbCrLf & _
+                                                       "  WSE.KineticsLinear, WSE.ValidReadings, WSE.CompleteReadings, T.TestID, T.TestName, OT.TestType, " & vbCrLf & _
+                                                       "  OT.SampleType, OT.ReplicatesNumber AS ReplicatesTotalNum, OT.ControlID, OT.OrderID, O.SampleID " & vbCrLf & _
                                                 " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & vbCrLf & _
                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                             " INNER JOIN tparTests T ON OT.TestID = T.TestID AND OT.TestType = 'STD' " & vbCrLf & _
@@ -5792,960 +5232,6 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Return resultData
         End Function
-
-#End Region
-
-#Region "TO REVIEW - DELETE?"
-        'Public Function GetOrderTestWithExecutionClosed(ByVal pDBConnection As SqlClient.SqlConnection, _
-        '                                                ByVal pExecutionStatus As String, _
-        '                                                ByVal pRerun As Integer, _
-        '                                                ByVal pMultiItemNumber As Integer) As GlobalDataTO
-        '    'ByVal pAnalyzerID As String, _
-        '    'ByVal pWorkSessionID As String) As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-
-        '                Dim cmdText As String = ""
-        '                cmdText &= "  SELECT OrderTestID, ExecutionStatus, RerunNumber, MultiItemNumber " & vbCrLf
-        '                cmdText &= "    FROM twksWSExecutions" & vbCrLf
-        '                cmdText &= "GROUP BY OrderTestID, ExecutionStatus, RerunNumber, MultiItemNumber" & vbCrLf ', AnalyzerID, WorkSessionID  " & vbCrLf
-        '                cmdText &= "  HAVING ExecutionStatus = '" & pExecutionStatus & "'" & vbCrLf
-        '                cmdText &= "     AND RerunNumber = " & pRerun
-        '                cmdText &= "     AND MultiItemNumber = " & pMultiItemNumber & vbCrLf
-        '                'cmdText &= "     AND AnalyzerID = '" & pAnalyzerID & "'" & vbCrLf
-        '                'cmdText &= "     AND WorkSessionID = '" & pWorkSessionID & "'" & vbCrLf
-        '                cmdText &= "ORDER BY OrderTestID"
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim myDS As New ExecutionsDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(myDS.twksWSExecutions)
-
-        '                resultData.SetDatos = myDS
-        '                resultData.HasError = False
-
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetOrderTestWithExecutionClosed", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get detailed information of all Patient Executions (for Standard and ISE Tests)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet WSExecutionsInfoDS with detailed information 
-        ''''          of all Patient Executions</returns>
-        '''' <remarks>
-        '''' Created by : SA 22/11/2010
-        '''' </remarks>
-        'Public Function GetPatientExecutionsInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-        '                                         ByVal pAnalyzerID As String) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = ""
-        '                cmdText = " SELECT WSE.ExecutionID, WSE.SampleClass, WSE.StatFlag, WSE.MultiItemNumber, WSE.ReplicateNumber, WSE.ExecutionStatus, " & _
-        '                                 " WSE.RerunNumber, OT.OrderTestID, OT.TestType, OT.SampleType, T.TestName, T.PreloadedTest, " & _
-        '                                 " CASE WHEN O.PatientID IS NULL THEN O.SampleID ELSE O.PatientID END AS ElementName " & _
-        '                          " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & _
-        '                                                      " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-        '                                                      " INNER JOIN tparTests T ON OT.TestID = T.TestID " & _
-        '                          " WHERE  WSE.WorkSessionID = '" & pWorkSessionID & "' " & _
-        '                          " AND    WSE.AnalyzerID = '" & pAnalyzerID & "' " & _
-        '                          " AND    WSE.SampleClass = 'PATIENT' " & _
-        '                          " AND    OT.TestType = 'STD' " & _
-        '                          " UNION " & _
-        '                          " SELECT WSE.ExecutionID, WSE.SampleClass, WSE.StatFlag, WSE.MultiItemNumber, WSE.ReplicateNumber, WSE.ExecutionStatus, " & _
-        '                                 " WSE.RerunNumber, OT.OrderTestID, OT.TestType, OT.SampleType, IT.[Name] AS TestName, 0 AS PreloadedTest, " & _
-        '                                 " CASE WHEN O.PatientID IS NULL THEN O.SampleID ELSE O.PatientID END AS ElementName " & _
-        '                          " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & _
-        '                                                      " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-        '                                                      " INNER JOIN tparISETests IT ON OT.TestID = IT.ISETestID " & _
-        '                          " WHERE  WSE.WorkSessionID = '" & pWorkSessionID & "' " & _
-        '                          " AND    WSE.AnalyzerID = '" & pAnalyzerID & "' " & _
-        '                          " AND    WSE.SampleClass = 'PATIENT' " & _
-        '                          " AND    OT.TestType = 'ISE' " & _
-        '                          " ORDER BY WSE.ExecutionID "
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                Dim patientExecDS As New WSExecutionsInfoDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(patientExecDS.twksWSExecutions)
-
-        '                resultData.SetDatos = patientExecDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetPatientExecutionsInfo", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get detailed information of all Calibrator Executions (for Standard Tests)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet WSExecutionsInfoDS with detailed information 
-        ''''          of all Calibrator Executions</returns>
-        '''' <remarks>
-        '''' Created by : SA 22/11/2010
-        '''' </remarks>
-        'Public Function GetCalibratorExecutionsInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-        '                                            ByVal pAnalyzerID As String) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = ""
-        '                cmdText = " SELECT WSE.ExecutionID, WSE.SampleClass, WSE.StatFlag, WSE.MultiItemNumber, WSE.ReplicateNumber, WSE.ExecutionStatus, " & _
-        '                                 " WSE.RerunNumber, OT.OrderTestID, OT.TestType, OT.SampleType, T.TestName, T.PreloadedTest, C.CalibratorName AS ElementName " & _
-        '                          " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & _
-        '                                                      " INNER JOIN tparTests T ON OT.TestID = T.TestID " & _
-        '                                                      " INNER JOIN tparTestCalibrators TC ON OT.TestID = TC.TestID AND OT.SampleType = TC.SampleType " & _
-        '                                                      " INNER JOIN tparCalibrators C ON TC.CalibratorID = C.CalibratorID " & _
-        '                          " WHERE  WSE.WorkSessionID = '" & pWorkSessionID & "' " & _
-        '                          " AND    WSE.AnalyzerID = '" & pAnalyzerID & "' " & _
-        '                          " AND    WSE.SampleClass = 'CALIB' " & _
-        '                          " AND    OT.TestType = 'STD' " & _
-        '                          " ORDER BY WSE.ExecutionID "
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                Dim calibExecDS As New WSExecutionsInfoDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(calibExecDS.twksWSExecutions)
-
-        '                resultData.SetDatos = calibExecDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetCalibratorExecutionsInfo", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get detailed information of all Control Executions (for Standard Tests)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet WSExecutionsInfoDS with detailed information 
-        ''''          of all Control Executions</returns>
-        '''' <remarks>
-        '''' Created by : SA 22/11/2010
-        '''' Modified by: SA 14/02/2011 - Added join condition by Control Number to avoid duplicated records when more
-        ''''                              than one Control is used for a Test/Sample Type
-        ''''              SA 20/04/2011 - Query changed due to it had syntax errors
-        '''' </remarks>
-        'Public Function GetControlExecutionsInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-        '                                         ByVal pAnalyzerID As String) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = ""
-        '                ' DL 18/04/2011 Management of Controls in WS Preparation
-        '                'cmdText = " SELECT WSE.ExecutionID, WSE.SampleClass, WSE.StatFlag, WSE.MultiItemNumber, WSE.ReplicateNumber, WSE.ExecutionStatus, " & _
-        '                '                 " WSE.RerunNumber, OT.OrderTestID, OT.TestType, OT.SampleType, T.TestName, T.PreloadedTest, C.ControlName AS ElementName " & _
-        '                '          " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & _
-        '                '                                      " INNER JOIN tparTests T ON OT.TestID = T.TestID " & _
-        '                '                                      " INNER JOIN tparTestControls TC ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType AND TC.ControlNum = WSE.MultiItemNumber " & _
-        '                '                                      " INNER JOIN tparControls C ON TC.ControlID = C.ControlID" & _
-        '                '          " WHERE  WSE.WorkSessionID = '" & pWorkSessionID & "' " & _
-        '                '          " AND    WSE.AnalyzerID = '" & pAnalyzerID & "' " & _
-        '                '          " AND    WSE.SampleClass = 'CTRL' " & _
-        '                '          " AND    OT.TestType = 'STD' " & _
-        '                '          " ORDER BY WSE.ExecutionID "
-        '                cmdText &= "  SELECT WSE.ExecutionID, WSE.SampleClass, WSE.StatFlag, WSE.MultiItemNumber, WSE.ReplicateNumber, WSE.ExecutionStatus, " & vbCrLf
-        '                cmdText &= "         WSE.RerunNumber, OT.OrderTestID, OT.TestType, OT.SampleType, T.TestName, T.PreloadedTest, C.ControlName AS ElementName " & vbCrLf
-        '                cmdText &= "    FROM twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & vbCrLf
-        '                cmdText &= "                              INNER JOIN tparTests T ON OT.TestID = T.TestID " & vbCrLf
-        '                cmdText &= "                              INNER JOIN tparControls C ON OT.ControlID = C.ControlID" & vbCrLf
-        '                cmdText &= "   WHERE WSE.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
-        '                cmdText &= "     AND WSE.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf
-        '                cmdText &= "     AND WSE.SampleClass = 'CTRL' " & vbCrLf
-        '                cmdText &= "     AND OT.TestType = 'STD' " & vbCrLf
-        '                cmdText &= "ORDER BY WSE.ExecutionID"
-        '                ' End DL 18/04/2011
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                Dim ctrlExecDS As New WSExecutionsInfoDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(ctrlExecDS.twksWSExecutions)
-
-        '                resultData.SetDatos = ctrlExecDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetControlExecutionsInfo", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get detailed information of all Blank Executions (for Standard Tests)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet WSExecutionsInfoDS with detailed information 
-        ''''          of all Blank Executions</returns>
-        '''' <remarks>
-        '''' Created by : SA 22/11/2010
-        '''' </remarks>
-        'Public Function GetBlankExecutionsInfo(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-        '                                       ByVal pAnalyzerID As String) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = " SELECT WSE.ExecutionID, WSE.SampleClass, WSE.StatFlag, WSE.MultiItemNumber, WSE.ReplicateNumber, WSE.ExecutionStatus, " & _
-        '                                               " WSE.RerunNumber, OT.OrderTestID, OT.TestType, OT.SampleType, T.TestName, T.PreloadedTest, T.TestName AS ElementName " & _
-        '                                        " FROM   twksWSExecutions WSE INNER JOIN twksOrderTests OT ON WSE.OrderTestID = OT.OrderTestID " & _
-        '                                                                    " INNER JOIN tparTests T ON OT.TestID = T.TestID " & _
-        '                                        " WHERE  WSE.WorkSessionID = '" & pWorkSessionID & "' " & _
-        '                                        " AND    WSE.AnalyzerID = '" & pAnalyzerID & "' " & _
-        '                                        " AND    WSE.SampleClass = 'BLANK' " & _
-        '                                        " AND    OT.TestType = 'STD' " & _
-        '                                        " ORDER BY WSE.ExecutionID "
-
-        '                Dim blankExecDS As New WSExecutionsInfoDS
-        '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-        '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                        dbDataAdapter.Fill(blankExecDS.twksWSExecutions)
-        '                    End Using
-        '                End Using
-
-        '                resultData.SetDatos = blankExecDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData = New GlobalDataTO()
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetBlankExecutionsInfo", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' When a Stat Patient Order Test is included in a WorkSession, set StatFlag=True for executions of the required Blank, Calibrator 
-        '''' and Controls, but only when the status of these executions is PENDING
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <param name="pTestID">Test Identifier</param>
-        '''' <param name="pSampleType">Sample Type Code</param>
-        '''' <param name="pAlternativeST">Code of the Alternative SampleType. Optional parameter, informed only when for the specified
-        ''''                              Test and SampleType the Calibrator needed is an Alternative one</param>
-        '''' <returns>GlobalDataTO containing success/error information</returns>
-        '''' <remarks>
-        '''' Created by:  SA 21/04/2010
-        '''' Modified by: SA 10/05/2010 - Query changed to manages all posible cases (locked Executions and Alternative Calibrators were 
-        ''''                              not managed in the previous one)
-        ''''              SA 09/03/2012 - Implemented Using sentence
-        '''' </remarks>
-        'Public Function UpdateStatExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-        '                                     ByVal pTestID As Integer, ByVal pSampleType As String, Optional ByVal pAlternativeST As String = "") As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-
-        '    Try
-        '        If (pDBConnection Is Nothing) Then
-        '            resultData.HasError = True
-        '            resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
-        '        Else
-        '            Dim cmdText As String = " UPDATE twksWSExecutions " & vbCrLf & _
-        '                                    " SET    StatFlag = 1 " & vbCrLf & _
-        '                                    " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-        '                                    " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-        '                                    " AND   (ExecutionStatus = 'PENDING' OR ExecutionStatus = 'LOCKED') " & vbCrLf & _
-        '                                    " AND    OrderTestID IN (SELECT OrderTestID FROM vwksWSOrderTests " & vbCrLf & _
-        '                                                           " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-        '                                                           " AND   WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-        '                                                           " AND ((SampleClass = 'CTRL' AND TestID = " & pTestID.ToString & " AND SampleType = '" & pSampleType.Trim & "') " & vbCrLf
-
-        '            If (pAlternativeST.Trim = "") Then
-        '                cmdText &= " OR (SampleClass = 'CALIB' AND TestID = " & pTestID.ToString & " AND SampleType = '" & pSampleType.Trim & "') " & vbCrLf
-        '            Else
-        '                'Search Calibrator for the Alternative SampleType
-        '                cmdText &= " OR (SampleClass = 'CALIB' AND TestID = " & pTestID.ToString & " AND SampleType = '" & pAlternativeST.Trim & "') " & vbCrLf
-        '            End If
-
-        '            cmdText &= " OR (SampleClass = 'BLANK' AND TestID = " & pTestID.ToString & "))) " & vbCrLf
-
-        '            Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
-        '                resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-        '                resultData.HasError = False
-        '            End Using
-        '        End If
-        '    Catch ex As Exception
-        '        resultData = New GlobalDataTO()
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.UpdateStatExecutions", EventLogEntryType.Error, False)
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Counts the total number of Executions for the specified Analyzer and WorkSession
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        '''' <returns>GlobalDataTO containing an integer value with the total number of Executions for the specified 
-        ''''          Analyzer and WorkSession</returns>
-        '''' <remarks>
-        '''' Created by:  RH 27/09/2011
-        '''' </remarks>
-        'Public Function CountExecutions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-        '                                ByVal pWorkSessionID As String) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = String.Format("SELECT COUNT(ExecutionID) AS ExecutionsNumber " & _
-        '                                                      "FROM   twksWSExecutions " & _
-        '                                                      "WHERE  AnalyzerID    = N'{0}' " & _
-        '                                                      "AND    WorkSessionID = '{1}' ", _
-        '                                                      pAnalyzerID.Trim.Replace("'", "''"), pWorkSessionID.Trim)
-
-        '                Dim dbDataReader As SqlClient.SqlDataReader
-        '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-        '                    dbDataReader = dbCmd.ExecuteReader()
-
-        '                    If (dbDataReader.HasRows) Then
-        '                        dbDataReader.Read()
-
-        '                        If (dbDataReader.IsDBNull(0)) Then
-        '                            resultData.SetDatos = 0
-        '                        Else
-        '                            resultData.SetDatos = Convert.ToInt32(dbDataReader.Item("ExecutionsNumber"))
-        '                        End If
-        '                    End If
-        '                    dbDataReader.Close()
-        '                End Using
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData = New GlobalDataTO()
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.CountExecutions", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Calculate the Contamination Number of an Order Test
-        '''' </summary>
-        '''' <param name="pReagentIDs">List of ReagentIDs</param>
-        '''' <returns>GlobalDataTO containing an Integer Value with the total number of Contaminations found</returns>
-        '''' <remarks>
-        '''' Created by:  RH 10/06/2010
-        '''' </remarks>
-        'Public Function GetContaminationNumber(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pReagentIDs As List(Of Integer)) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        If (pReagentIDs.Count = 0) Then
-        '            resultData.SetDatos = 0
-        '            Return resultData
-        '        End If
-
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim myContaminationNumber As Integer = 0
-
-        '                Dim dbDataReader As SqlClient.SqlDataReader
-        '                Using dbCmd As New SqlClient.SqlCommand()
-        '                    dbCmd.Connection = dbConnection
-
-        '                    For i As Integer = 0 To pReagentIDs.Count - 2
-        '                        dbCmd.CommandText = String.Format(" SELECT ContaminationID FROM tparContaminations " & _
-        '                                                          " WHERE ReagentContaminatorID = {0} AND ReagentContaminatedID = {1} AND ContaminationType = 'R1' ", _
-        '                                                          pReagentIDs(i), pReagentIDs(i + 1))
-
-        '                        'Execute the SQL sentence
-        '                        dbDataReader = dbCmd.ExecuteReader()
-        '                        If (dbDataReader.HasRows) Then
-        '                            myContaminationNumber += 1
-        '                        End If
-
-        '                        dbDataReader.Close()
-        '                    Next
-        '                End Using
-
-        '                resultData.SetDatos = myContaminationNumber
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetContaminationNumber", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get the list of pending executions (vwksWSExecutions)
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <returns>GlobalDataTO indicating if an error has occurred or not. If succeed, returns an 
-        ''''          ExecutionsDS dataset with the data (view vwksWSExecutions)
-        '''' </returns>
-        '''' <remarks>
-        '''' Created by:  RH 20/09/2010
-        '''' </remarks>
-        'Public Function GetWSPendingExecutions(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
-        '                                           ByVal pWorkSessionID As String) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String
-
-        '                'Read from vwksWSExecutions view
-        '                cmdText = String.Format( _
-        '                    "SELECT * FROM vwksWSExecutions " & _
-        '                    "WHERE AnalyzerID = '{0}' AND WorkSessionID = '{1}'", _
-        '                    pAnalyzerID, pWorkSessionID)
-
-        '                Dim cmd As New SqlClient.SqlCommand
-        '                cmd.Connection = dbConnection
-        '                cmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim executionDataDS As New ExecutionsDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(cmd)
-        '                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-        '                resultData.SetDatos = executionDataDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetWSPendingExecutions", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get the list of Order Tests sorted by StatFlag, SampleClass, OrderID, ReadingCycle and OrderTestID
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <returns>GlobalDataTO indicating if an error has occurred or not. If succeed, returns an 
-        ''''          ExecutionsDS dataset with the sorted data (view vwksWSExecutions)
-        '''' </returns>
-        '''' <remarks>
-        '''' Created by:  RH 06/08/2010
-        '''' </remarks>
-        'Public Function GetWSExecutionsOrderByTime(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
-        '                                           ByVal pWorkSessionID As String) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String
-
-        '                'Read from vwksWSExecutions view
-        '                'cmdText = String.Format( _
-        '                '    "SELECT * FROM vwksWSExecutions " & _
-        '                '    "WHERE AnalyzerID = '{0}' AND WorkSessionID = '{1}' " & _
-        '                '    "ORDER BY StatFlag DESC, SampleClass, OrderID, ReadingCycle DESC, OrderTestID", _
-        '                '    pAnalyzerID, pWorkSessionID)
-
-        '                'RH 19/01/2011 new sort criteria (ExecutionType and SampleType) 
-        '                cmdText = String.Format( _
-        '                    "SELECT * FROM vwksWSExecutions " & _
-        '                    "WHERE AnalyzerID = '{0}' AND WorkSessionID = '{1}' " & _
-        '                    "ORDER BY StatFlag DESC, SampleClass, SampleType, OrderID, ExecutionType DESC, ElementID, ReadingCycle DESC, OrderTestID", _
-        '                    pAnalyzerID, pWorkSessionID)
-
-        '                Dim cmd As New SqlClient.SqlCommand
-        '                cmd.Connection = dbConnection
-        '                cmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim executionDataDS As New ExecutionsDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(cmd)
-        '                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-        '                resultData.SetDatos = executionDataDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetWSExecutionsOrderByTime", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get all Executions for the specified Order Test 
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pOrderTestID">Order Test Identifier</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier; optional parameter</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier; optional parameter</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet ExecutionDS with all Executions
-        ''''          for the specified Order Test</returns>
-        '''' <remarks>
-        '''' Created by:  DL 11/05/2010
-        '''' Modified by: DL - Added the optional to parameters pAnalyzerID and pWorkSessionID, and the validation
-        ''''                   to filter the SQL by these values when informed.
-        '''' </remarks>
-        'Public Function GetExecutionByOrderTest(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
-        '                                        Optional ByVal pAnalyzerID As String = "", Optional ByVal pWorkSessionID As String = "") _
-        '                                        As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = ""
-
-        '                cmdText &= "SELECT ExecutionID, WorkSessionID, AnalyzerID, BaseLineID, WellUsed, OrderTestID, " & vbCrLf
-        '                cmdText &= "       PostDilutionType, ReplicateNumber, RerunNumber, MultiItemNumber, SampleClass " & vbCrLf
-        '                cmdText &= "FROM   twksWSExecutions " & vbCrLf
-        '                cmdText &= "WHERE  OrderTestID = " & pOrderTestID & vbCrLf
-
-        '                If (pAnalyzerID <> "") Then cmdText &= "      AND AnalyzerID = '" & pAnalyzerID & "'"
-        '                If (pWorkSessionID <> "") Then cmdText &= "   AND WorkSessionID = '" & pWorkSessionID & "'" & vbCrLf
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim executionDataDS As New ExecutionsDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-        '                resultData.SetDatos = executionDataDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetExecutionByOrderTest", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get the list of locked executions
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        '''' <param name="pWorkSessionID">Work Session Identifier</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet ExecutionDS with data of the informed executions</returns>
-        '''' <remarks>
-        '''' Created by: RH - 06/08/2010
-        '''' </remarks>
-        'Public Function GetLockedExecutions(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
-        '                                           ByVal pWorkSessionID As String) As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim executionDataDS As New ExecutionsDS
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim Cmd As New SqlClient.SqlCommand
-        '                Dim cmdText As String
-
-        '                cmdText = String.Format( _
-        '                    "SELECT * FROM twksWSExecutions " & _
-        '                    "WHERE AnalyzerID = '{0}' AND WorkSessionID = '{1}' AND ExecutionStatus = 'LOCKED'", _
-        '                    pAnalyzerID, pWorkSessionID)
-
-        '                Cmd.Connection = dbConnection
-        '                Cmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(Cmd)
-        '                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-        '                resultData.SetDatos = executionDataDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetLockedExecutions", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-
-        '    Return resultData
-
-        'End Function
-
-        '''' <summary>
-        '''' 
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pExecutionID"></param>
-        '''' <param name="pAnalyzerID"></param>
-        '''' <param name="pWorkSessionID"></param>
-        '''' <returns></returns>
-        '''' <remarks>
-        '''' Created ???
-        '''' Modified by AG 03/01/2010 - add AdjustBaseLineID field
-        '''' </remarks>
-        'Public Function GetExecutionWithSampleClass(ByVal pDBConnection As SqlClient.SqlConnection, _
-        '                                            ByVal pExecutionID As Integer, _
-        '                                            Optional ByVal pAnalyzerID As String = "", _
-        '                                            Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim executionDataDS As New ExecutionsDS
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-
-        '                Dim cmdText As String = ""
-
-        '                'AG 03/05/2010 - Field rotorturnnumber is deleted from database
-        '                'cmdText &= " SELECT E.ExecutionID, E.WorkSessionID, E.AnalyzerID, E.BaseLineID, E.WellUsed, E.RotorTurnNumber, E.OrderTestID, "
-        '                'cmdText &= "       PostDilutionType, ReplicateNumber, RotorTurnNumber, RerunNumber, MultiItemNumber "
-        '                'cmdText &= " FROM   twksWSExecutions E, twksOrderTests OT, twksOrders O "
-        '                'cmdText &= " WHERE  ExecutionID = " & pExecutionID
-        '                'cmdText &= " AND E.OrderTestID = OT.OrderTestID "
-        '                'cmdText &= " AND OT.OrderID = O.OrderID "
-        '                cmdText &= " SELECT E.ExecutionID, E.WorkSessionID, E.AnalyzerID, E.BaseLineID, E.WellUsed, E.OrderTestID, "
-        '                cmdText &= "       PostDilutionType, ReplicateNumber, RerunNumber, MultiItemNumber, AdjustBaseLineID "
-        '                cmdText &= " FROM   twksWSExecutions E, twksOrderTests OT, twksOrders O "
-        '                cmdText &= " WHERE  ExecutionID = " & pExecutionID
-        '                cmdText &= " AND E.OrderTestID = OT.OrderTestID "
-        '                cmdText &= " AND OT.OrderID = O.OrderID "
-
-
-        '                If pWorkSessionID <> "" Then cmdText += "   and WorkSessionID = '" & pWorkSessionID & "'"
-
-        '                If pAnalyzerID <> "" Then cmdText += "   and AnalyzerID = '" & pAnalyzerID & "'"
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-        '                resultData.SetDatos = executionDataDS
-        '                resultData.HasError = False
-        '            End If
-
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetExecutionWithSampleClass", EventLogEntryType.Error, False)
-
-        '    Finally
-
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get the BLANK SAMPLE position used for pExecutionId value (this method works ONLY for blanks!!!)
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pWorkSessionID" ></param>
-        '''' <param name="pAnalyzerID" ></param>
-        '''' <param name="pExecutionID"></param>
-        '''' <returns>GlobalDataTO (WSRotorContentByPositionDS)</returns>
-        '''' <remarks>AG 13/05/2011</remarks>
-        'Public Function GetBLANKSampleRotorPositionByExecutionID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, _
-        '                                                         ByVal pAnalyzerID As String, ByVal pExecutionID As Integer) As GlobalDataTO
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-
-        '    Try
-        '        resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = ""
-        '                cmdText = " SELECT ex.OrderTestID, ex.SampleClass, ex.MultiItemNumber As MultiTubeNumber, re.ElementID, rcp.RingNumber , rcp.CellNumber, rcp.Status " & vbCrLf
-        '                cmdText &= " FROM twksWSExecutions ex INNER JOIN twksWSRequiredElemByOrderTest re ON ex.ordertestID = re.OrderTestID " & vbCrLf
-        '                cmdText &= " INNER JOIN twksWSRotorContentByPosition rcp ON re.ElementID = rcp.ElementID AND ex.WorkSessionID = rcp.WorkSessionID " & vbCrLf
-        '                cmdText &= " AND ex.AnalyzerID  = ex.AnalyzerID AND rcp.RotorType = 'SAMPLES' " & vbCrLf
-        '                cmdText &= " INNER JOIN twksWSRequiredElements re2 ON rcp.ElementID = re2.ElementID " & vbCrLf
-        '                cmdText &= " WHERE ex.ExecutionID = " & pExecutionID & " " & vbCrLf
-        '                cmdText &= " AND ex.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
-        '                cmdText &= " AND ex.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf
-        '                cmdText &= " AND (EX.MultiItemNumber = RE2.MultiItemNumber OR RE2.MultiItemNumber IS NULL) "
-
-        '                Dim dbCmd As New SqlClient.SqlCommand
-        '                dbCmd.Connection = dbConnection
-        '                dbCmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim myResultDataDS As New WSRotorContentByPositionDS
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                dbDataAdapter.Fill(myResultDataDS.twksWSRotorContentByPosition)
-
-        '                resultData.SetDatos = myResultDataDS
-        '                resultData.HasError = False
-
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "TwksWSExecutionsDAO.GetBLANKSampleRotorPositionByExecutionID", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-
-        'End Function
-
-        '''' <summary>
-        '''' Get all related execution by the order test id
-        '''' this methos is implemente for the ISE results. It get the 
-        '''' Get the ISE ResultID and the testID
-        '''' </summary>
-        '''' <param name="pDBConnection"></param>
-        '''' <param name="pOrderTestID">Order Test ID</param>
-        '''' <param name="pPreparationID" ></param>
-        '''' <returns></returns>
-        '''' <remarks>
-        '''' CREATE BY: TR 04/01/2011
-        '''' Modified AG 30/11/2011
-        '''' </remarks>
-        'Public Function GetISEExecutionsByOrderTestAndPreparationID(ByVal pDBConnection As SqlClient.SqlConnection, _
-        '                                            ByVal pOrderTestID As Integer, ByVal pPreparationID As Integer) As GlobalDataTO
-
-        '    Dim resultData As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Dim executionDataDS As New ExecutionsDS
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-
-        '        If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
-
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim Cmd As New SqlClient.SqlCommand
-        '                Dim cmdText As String = ""
-
-        '                cmdText &= "SELECT twksOrderTests.TestID, twksOrderTests.SampleType, tparISETests.ISE_ResultID, twksWSExecutions.*  " & vbCrLf
-        '                cmdText &= "  FROM twksWSExecutions INNER JOIN twksOrderTests ON twksWSExecutions.OrderTestID = twksOrderTests.OrderTestID INNER JOIN " & vbCrLf
-        '                cmdText &= "       tparISETests ON twksOrderTests.TestID = tparISETests.ISETestID" & vbCrLf
-        '                cmdText &= " WHERE twksWSExecutions.OrderTestID IN (SELECT twksOrderTests.OrderTestID FROM twksOrderTests "
-        '                cmdText &= "                                        WHERE OrderID In (Select OrderID  From  twksOrderTests where twksOrderTests.OrderTestID =" & pOrderTestID & ")"
-        '                cmdText &= "                                          AND TestType = 'ISE') "
-        '                cmdText &= " AND twksOrderTests.ReplicatesNumber >= twksWSExecutions.ReplicateNumber " & vbCrLf
-        '                cmdText &= " AND twksWSExecutions.ExecutionStatus = 'INPROCESS' " & vbCrLf 'AG 30/11/2011 - only the INPROCESS (not paused when were sent)
-        '                cmdText &= " AND twksWSExecutions.PreparationID = " & pPreparationID.ToString & vbCrLf 'AG 30/11/2011
-
-        '                Cmd.Connection = dbConnection
-        '                Cmd.CommandText = cmdText
-
-        '                'Fill the DataSet to return 
-        '                Dim dbDataAdapter As New SqlClient.SqlDataAdapter(Cmd)
-        '                dbDataAdapter.Fill(executionDataDS.twksWSExecutions)
-
-        '                resultData.SetDatos = executionDataDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-
-        '    Catch ex As Exception
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSExecutionsDAO.GetISEExecutionsByOrderTestAndPreparationID", EventLogEntryType.Error, False)
-
-        '    Finally
-        '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-
-        '    Return resultData
-
-        'End Function
 
 #End Region
 

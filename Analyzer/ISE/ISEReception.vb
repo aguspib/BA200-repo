@@ -348,7 +348,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                                               one than exists and applies)
         '''                                          ** Changed the way of getting Alarms for the Average Result, due to the previous process has several errors
         '''                                          ** For CONTROLS it is not needed to update field AcceptedResultFlag = FALSE for the previous Rerun results
-        ''' Modified by XB 28/11/2014 - recalculates calculated tests for ISE tests - BA-1867
+        ''' Modified by: XB 28/11/2014 - Recalculates calculated tests for ISE Tests - BA-1867
+        '''              SA 01/12/2014 - Call to deprecated function UpdateStatusClosedNOK has been changed for the new version of that function (UpdateStatusClosedNOK_NEW)
+        '''                              The old function was called by error and it has to be deleted
         ''' </remarks>
         Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
                                                  ByVal pISEMode As String, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
@@ -766,13 +768,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 Dim myExecutionDS As ExecutionsDS = DirectCast(myGlobalDataTO.SetDatos, ExecutionsDS)
-
-                                For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
-                                    'Mark the Execution as CLOSEDNOK
-                                    myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
-                                                                                               execRow.ReplicatesTotalNum, False)
-                                    If (myGlobalDataTO.HasError) Then Exit For
-                                Next
+                                'SA 01/12/2014 - Replaced the call to the old function UpdateStatusClosedNOK for its new version. The call to the previous version 
+                                '                remains in the code by error (it was forgotten to change it when this new version of ProcessISETESTResults was implemented)  
+                                myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK_NEW(dbConnection, myExecutionDS, False)
+                                'For Each execRow As ExecutionsDS.twksWSExecutionsRow In myExecutionDS.twksWSExecutions.Rows
+                                '    'Mark the Execution as CLOSEDNOK
+                                '    myGlobalDataTO = myExecutionDelegate.UpdateStatusClosedNOK(dbConnection, pAnalyzerID, pWorkSessionID, execRow.ExecutionID, execRow.OrderTestID, _
+                                '                                                               execRow.ReplicatesTotalNum, False)
+                                '    If (myGlobalDataTO.HasError) Then Exit For
+                                'Next
 
                                 'The ExecutionsDS will be the function return value
                                 myReturnValue = myExecutionDS
@@ -1462,7 +1466,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'end SGM 08/02/2012
 
-                
+
 
                 'SGM 11/01/2012
 
@@ -2684,7 +2688,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
 
-        
+
 
 #End Region
 
