@@ -497,6 +497,81 @@ Namespace Biosystems.Ax00.Calculations
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Validate if the concentration value is Between the Ref Ranges if APPLY.
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pOrderTestID"></param>
+        ''' <param name="pTestID"></param>
+        ''' <param name="pSampleType"></param>
+        ''' <param name="pCONC_Value"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' CREATED BY: TR 05/12/2011
+        ''' Moved From old InfoAnalyzer by XBC 16/02/2012
+        ''' AG 03/07/2012 - use the proper template (GET)
+        ''' </remarks>
+        Public Function IsValidISERefRanges(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOrderTestID As Integer, _
+                                             ByVal pTestID As Integer, ByVal pSampleType As String, ByVal pCONC_Value As Single) As GlobalDataTO
+
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                Dim myResult As Boolean = True
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        'Get the ISE TEST INFO 
+                        Dim myISETestSampleDelegate As New ISETestSamplesDelegate
+                        Dim myISETestSampleDS As New ISETestSamplesDS
+                        resultData = myISETestSampleDelegate.GetListByISETestID(dbConnection, pTestID, pSampleType)
+
+                        If Not resultData.HasError Then
+                            myISETestSampleDS = DirectCast(resultData.SetDatos, ISETestSamplesDS)
+
+                            If myISETestSampleDS.tparISETestSamples.Count > 0 Then
+                                Dim myOrderTestsDelegate As New OrderTestsDelegate
+                                'Get the Reference Range Interval defined for the Test.
+                                resultData = myOrderTestsDelegate.GetReferenceRangeInterval(dbConnection, pOrderTestID, "ISE", _
+                                                                                            pTestID, pSampleType, myISETestSampleDS.tparISETestSamples(0).ActiveRangeType)
+
+                                If Not resultData.HasError Then
+                                    'Validate the range
+                                    Dim myTestRefRangesDS As New TestRefRangesDS
+                                    myTestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
+
+                                    If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
+                                        If (myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit <> -1) And _
+                                           (myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit <> -1) Then
+                                            If (pCONC_Value < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) OrElse _
+                                               (pCONC_Value > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
+                                                myResult = False
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+                        End If
+                    End If
+                End If
+                resultData.SetDatos = myResult
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
 #End Region
 
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
@@ -933,7 +1008,6 @@ Namespace Biosystems.Ax00.Calculations
             Return resultData
         End Function
 #End Region
-
     End Class
 End Namespace
 
