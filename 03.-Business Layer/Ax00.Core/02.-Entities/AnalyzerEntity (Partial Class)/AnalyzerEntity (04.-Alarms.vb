@@ -2336,8 +2336,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSensors "></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by  AG 14/04/2011
-        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
+        ''' Created by:  AG 14/04/2011
+        ''' Modified by: XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
+        '''              IT 03/12/2014 - BA-2075
         ''' </remarks>
         Private Function UserSwANSINFTreatment(ByVal pSensors As Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)) As GlobalDataTO
 
@@ -2616,6 +2617,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 1, True)
                         Else
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 0, False)
+
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
                         End If
 
                         'AG 23/03/2012 - While ise is initiating save all the ansinf received (commented)
@@ -4322,8 +4327,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     'Some action button process required Wash instruction is bottle level OK before Sw sends it
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then
 
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
-
                         'AG 20/02/2012 - abort process
                         'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
                         If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
@@ -4362,8 +4365,6 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         End If
-                    Else
-                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
                     End If
                 End If
 

@@ -659,10 +659,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= vbNewLine
                     Next
 
-                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
-                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                    End Using
+                    If cmdText <> String.Empty Then
+                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                        End Using
+                    End If
                 End If
+
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

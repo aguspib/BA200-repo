@@ -1210,7 +1210,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                             End If
 
                                             If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                                                ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
+                                                ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
 
                                             ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess.ToString) = "INPROCESS" Then
                                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess, "CLOSED")
@@ -1230,7 +1230,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 'Sw must inform the start instrument process is OK
                                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
                                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                                                    ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
+                                                    'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
                                                 End If
 
                                             End If
@@ -4049,7 +4049,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                             If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "") Then
                                 ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
-                                Return
+                                Exit Select
                             End If
 
                         Case GlobalEnumerates.WarmUpProcessFlag.Wash
@@ -4063,7 +4063,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
 
                                     ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-                                    Return
+                                    Exit Select
                                 Else
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
@@ -4074,7 +4074,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Send a WASH instruction (Conditioning complete)
                                     ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
-                                    Return
+                                    Exit Select
                                 End If
 
                             End If
@@ -4126,74 +4126,78 @@ Namespace Biosystems.Ax00.Core.Entities
                             If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
 
                                 If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") And
-                                   (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "") Then
-
-                                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI"
-                                    Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
-                                    ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-                                    Return
-                                End If
-
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") Then
-                                    FinalizeWarmUpProcess()
-                                    Return
+                                   (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "") And
+                                   (CurrentInstructionAction = InstructionActions.None) Then
+                                    If (CheckIfWashingIsPossible()) Then
+                                        'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI"
+                                        CurrentInstructionAction = InstructionActions.FlightFilling
+                                        Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
+                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                    End If
+                                    Exit Select
                                 End If
 
                                 If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "END") And
-                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "") Then
-
-                                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
+                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "") And
+                                    (CurrentInstructionAction = InstructionActions.None) Then
+                                    'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
+                                    CurrentInstructionAction = InstructionActions.FlightReading
                                     Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
                                     ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-                                    Return
+                                    Exit Select
                                 End If
 
                                 If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END") And
-                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") Then
-
+                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "") And
+                                    (CurrentInstructionAction = InstructionActions.None) Then
                                     'AG 27/11/2014 BA-2066
-                                    'If (ProcessFlightReadAction(myAnalyzerFlagsDS)) Then
-                                    If (ProcessFlightReadAction(myAnalyzerFlagsDS)) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
-                                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
-                                        Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-
-                                        Return
-                                    Else
-                                        mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"
-                                        Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                                        ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-                                        Return
+                                    If (CheckIfWashingIsPossible()) Then
+                                        If (ProcessFlightReadAction(myAnalyzerFlagsDS)) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
+                                            'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
+                                            CurrentInstructionAction = InstructionActions.FlightEmptying
+                                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
+                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                        Else
+                                            'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = ""
+                                            CurrentInstructionAction = InstructionActions.FlightReading
+                                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                        End If
                                     End If
-
+                                    Exit Select
                                 End If
 
+                            End If
+
+                        Case WarmUpProcessFlag.ConfigureBarCode
+                                ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
+
+                        Case WarmUpProcessFlag.Finalize
+
+                            If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
                                 If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "END") Then
                                     FinalizeWarmUpProcess()
+                                    Exit Select
                                 End If
                             Else
                                 If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
                                     FinalizeWarmUpProcess()
+                                    Exit Select
                                 End If
                             End If
 
-                        Case WarmUpProcessFlag.ConfigureBarCode
-                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
+                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") Then
+                                FinalizeWarmUpProcess()
+                                Exit Select
+                            End If
+
                     End Select
 
 
-                    If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                        Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                        myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
-                    End If
+                ElseIf (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
 
-                End If
-
-
-                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
-
-                    Select flag
+                    Select Case flag
 
                         Case GlobalEnumerates.WarmUpProcessFlag.Wash
 
@@ -4203,6 +4207,12 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                     End Select
 
+                End If
+
+
+                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                    myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
 
             Catch ex As Exception

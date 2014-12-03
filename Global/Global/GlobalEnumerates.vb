@@ -2380,6 +2380,24 @@ Namespace Biosystems.Ax00.Global
             ProcessStaticBaseLine
             ProcessDynamicBaseLine
             ConfigureBarCode
+            Finalize
+        End Enum
+
+#End Region
+
+#Region "Instructions"
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Created by: IT 01/12/2014 - BA-2075
+        ''' </remarks>
+        Public Enum InstructionActions
+            None
+            FlightFilling
+            FlightReading
+            FlightEmptying
         End Enum
 
 #End Region

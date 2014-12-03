@@ -951,37 +951,40 @@ Namespace Biosystems.Ax00.Core.Entities
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_START
 
                         'IT 26/11/2014 - BA-2075 INI
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "INI")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "INI")
-                        End If
+                        Select Case CurrentInstructionAction
+                            Case GlobalEnumerates.InstructionActions.FlightFilling
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "INI")
+                            Case GlobalEnumerates.InstructionActions.FlightReading
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
+                            Case GlobalEnumerates.InstructionActions.FlightEmptying
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "INI")
+                        End Select
                         'IT 26/11/2014 - BA-2075 END
 
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE
 
                         'IT 26/11/2014 - BA-2075 INI
-                        'Fill rotor finishes
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
-
-                            'Read rotor finishes
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
-
-                            'Empty rotor finishes
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
-                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
-
-                        End If
-
-                        If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
-                        End If
+                        Select Case CurrentInstructionAction
+                            'Fill rotor finishes
+                            Case GlobalEnumerates.InstructionActions.FlightFilling
+                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
+                                    CurrentInstructionAction = InstructionActions.None
+                                End If
+                                'Read rotor finishes
+                            Case GlobalEnumerates.InstructionActions.FlightReading
+                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
+                                    CurrentInstructionAction = InstructionActions.None
+                                End If
+                                'Empty rotor finishes
+                            Case GlobalEnumerates.InstructionActions.FlightEmptying
+                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
+                                    CurrentInstructionAction = InstructionActions.None
+                                    ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize)
+                                End If
+                        End Select
                         'IT 26/11/2014 - BA-2075 END
                     Case Else
 
@@ -2102,27 +2105,75 @@ Namespace Biosystems.Ax00.Core.Entities
                     '2.	Washing         = 'INI'
                     '3.	BaseLine        = 'INI'
 
+
+
+                    'If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
+                    '    '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
+                    '    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                    '        stableSetupAchieved = False
+                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
+                    '    End If
+
+                    'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "INI" Then
+                    '    '2.	Re-send WASH instruction. Requires analyzer status STANDBY
+                    '    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                    '        stableSetupAchieved = False
+                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                    '    End If
+
+                    'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
+                    '    '3.	Re-send ALIGHT instruction (well CurrentWellAttribute). Requires analyzer status STANDBY
+                    '    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                    '        stableSetupAchieved = False
+                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                    '    End If
+
+                    'End If
+                    Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
                         '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                            stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.StartInstrument)
                         End If
 
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "INI" Then
                         '2.	Re-send WASH instruction. Requires analyzer status STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash)
                         End If
 
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
                         '3.	Re-send ALIGHT instruction (well CurrentWellAttribute). Requires analyzer status STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine)
                         End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
 
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                        End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                        End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                        End If
                     End If
 
 

@@ -95,6 +95,7 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property BaseLineTypeForCalculations As BaseLineType
         Property BaseLineTypeForWellReject As BaseLineType
         Property Model As String
+        Property CurrentInstructionAction As GlobalEnumerates.InstructionActions 'BA-2075
 
 #End Region
 

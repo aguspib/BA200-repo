@@ -1212,6 +1212,8 @@ Namespace Biosystems.Ax00.Core.Entities
         'SGM 29/05/2012
         Public Property FWUpdateResponseData As FWUpdateResponseTO Implements IAnalyzerEntity.FWUpdateResponseData '#REFACTORING
         Public Property AdjustmentsFilePath As String Implements IAnalyzerEntity.AdjustmentsFilePath '#REFACTORING
+        <DefaultValue(GlobalEnumerates.InstructionActions.None)>
+        Public Property CurrentInstructionAction As GlobalEnumerates.InstructionActions Implements IAnalyzerEntity.CurrentInstructionAction 'BA-2075
 
 #End Region
 
