@@ -1234,6 +1234,7 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
     '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
     '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
     Private Function MarkUnMarkCalculatedTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, _
                                                   Optional ByVal pVerifyComponents As Boolean = True, _
@@ -1485,6 +1486,90 @@ Public Class IWSTestSelectionAuxScreen
                                     lstCalculatedTest.First.CalcTestNames = RebuildStringList(lstCalculatedTest.First.CalcTestNames, myCurrentName.ToString)
                                 End If
                             End If
+
+                            ' XB 02/12/2014 - BA-1867
+                        ElseIf (testInFormula.TestType = "ISE") Then
+                            'Search position and current selection status of the Test in the list of ISE Tests
+                            Dim lstISETest As List(Of SelectedTestsDS.SelectedTestTableRow)
+                            lstISETest = (From b In iseTestList.SelectedTestTable _
+                                         Where b.TestID = Convert.ToInt32(testInFormula.Value) _
+                                        Select b).ToList
+
+                            If (lstISETest.Count = 1) Then
+                                If (pVerifyComponents) Then
+                                    'Only if the selection Status is different from the one that has been set for the Calculated Test...
+                                    If (lstISETest.First.Selected <> selectionStatus) Then
+                                        If (lstISETest.First.OTStatus = "OPEN") Then
+                                            MarkUnMarkISETestCell(lstISETest.First.Row, lstISETest.First.Col, myCurrentID, myCurrentName)
+                                        Else
+                                            'The ISE Test is PENDING... if the Calculated Test was unselected, then remove it 
+                                            'from the list of Calculated Test in which the ISE Tests is included
+                                            If (Not selectionStatus) Then
+                                                lstISETest.First.CalcTestIDs = RebuildStringList(lstISETest.First.CalcTestIDs, myCurrentID.ToString)
+                                                lstISETest.First.CalcTestNames = RebuildStringList(lstISETest.First.CalcTestNames, myCurrentName.ToString)
+                                            End If
+                                        End If
+                                    Else
+                                        'Link the ISE Test to the Calculated informing fields CalcTestIDs and CalcTestNames (when selecting)
+                                        If (selectionStatus) Then
+                                            If (lstISETest.First.CalcTestIDs.Trim = "") Then
+                                                lstISETest.First.CalcTestIDs = myCurrentID.ToString
+                                                lstISETest.First.CalcTestNames = myCurrentName.ToString
+                                            Else
+                                                lstISETest.First.CalcTestIDs &= ", " & myCurrentID.ToString
+                                                lstISETest.First.CalcTestNames &= ", " & myCurrentName.ToString
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    'The component Test remains selected, but the link with the Calculated Test is removed
+                                    lstISETest.First.CalcTestIDs = RebuildStringList(lstISETest.First.CalcTestIDs, myCurrentID.ToString)
+                                    lstISETest.First.CalcTestNames = RebuildStringList(lstISETest.First.CalcTestNames, myCurrentName.ToString)
+                                End If
+                            End If
+
+                        ElseIf (testInFormula.TestType = "OFFS") Then
+                            'Search position and current selection status of the Test in the list of OFFS Tests
+                            Dim lstOFFSTest As List(Of SelectedTestsDS.SelectedTestTableRow)
+                            lstOFFSTest = (From b In offSystemTestList.SelectedTestTable _
+                                           Where b.TestID = Convert.ToInt32(testInFormula.Value) _
+                                           Select b).ToList
+
+                            If (lstOFFSTest.Count = 1) Then
+                                If (pVerifyComponents) Then
+                                    'Only if the selection Status is different from the one that has been set for the Calculated Test...
+                                    If (lstOFFSTest.First.Selected <> selectionStatus) Then
+                                        If (lstOFFSTest.First.OTStatus = "OPEN") Then
+                                            MarkUnMarkOffSystemTestCell(lstOFFSTest.First.Row, lstOFFSTest.First.Col, myCurrentID, myCurrentName)
+                                        Else
+                                            'The OFFS Test is PENDING... if the Calculated Test was unselected, then remove it 
+                                            'from the list of Calculated Test in which the ISE Tests is included
+                                            If (Not selectionStatus) Then
+                                                lstOFFSTest.First.CalcTestIDs = RebuildStringList(lstOFFSTest.First.CalcTestIDs, myCurrentID.ToString)
+                                                lstOFFSTest.First.CalcTestNames = RebuildStringList(lstOFFSTest.First.CalcTestNames, myCurrentName.ToString)
+                                            End If
+                                        End If
+                                    Else
+                                        'Link the OFFS Test to the Calculated informing fields CalcTestIDs and CalcTestNames (when selecting)
+                                        If (selectionStatus) Then
+                                            If (lstOFFSTest.First.CalcTestIDs.Trim = "") Then
+                                                lstOFFSTest.First.CalcTestIDs = myCurrentID.ToString
+                                                lstOFFSTest.First.CalcTestNames = myCurrentName.ToString
+                                            Else
+                                                lstOFFSTest.First.CalcTestIDs &= ", " & myCurrentID.ToString
+                                                lstOFFSTest.First.CalcTestNames &= ", " & myCurrentName.ToString
+                                            End If
+                                        End If
+                                    End If
+                                Else
+                                    'The component Test remains selected, but the link with the Calculated Test is removed
+                                    lstOFFSTest.First.CalcTestIDs = RebuildStringList(lstOFFSTest.First.CalcTestIDs, myCurrentID.ToString)
+                                    lstOFFSTest.First.CalcTestNames = RebuildStringList(lstOFFSTest.First.CalcTestNames, myCurrentName.ToString)
+                                End If
+                            End If
+                            ' XB 02/12/2014 - BA-1867
+
+
                         End If
                     Next
 
@@ -1576,8 +1661,10 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
     '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
     '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
-    Private Function MarkUnMarkISETestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) As Boolean
+    Private Function MarkUnMarkISETestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, Optional ByVal pCalcTestID As Integer = 0, _
+                                           Optional ByVal pCalcTestName As String = "") As Boolean
         Dim selectedTest As Boolean = False
         Try
             Dim myTreeNode As New TreeNode()
@@ -1597,54 +1684,85 @@ Public Class IWSTestSelectionAuxScreen
                     'If not selected, then the selected status is set to true                    
                     qSelectedTest.First.Selected = True
                     selectedTest = True
+
+                    ' XB 02/12/2014 - BA-1867
+                    'If the Test is selected due to a Calculated Test was selected, link the CalcTest to it (ID and Name)
+                    If (pCalcTestID <> 0) Then
+                        If (qSelectedTest.First.CalcTestIDs.Trim = "") Then
+                            qSelectedTest.First.CalcTestIDs = pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames = pCalcTestName
+                        Else
+                            qSelectedTest.First.CalcTestIDs &= ", " & pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames &= ", " & pCalcTestName
+                        End If
+                    End If
+                    ' XB 02/12/2014 - BA-1867
                 Else
                     Dim canBeUnselected As Boolean = False
 
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
-                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
-                            Dim myTestID As Integer = -1
-                            Dim myTestType As String = String.Empty
-                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
+                            ' XB 02/12/2014 - BA-1867
+                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView, 
+                            'but this process is executed only when the Test is unselected by clicking in it, not when it is unselected
+                            'by unselect the Calculated Test in which Formula the Test is included 
+                            If (pCalcTestID = 0) Then
+                                ' XB 02/12/2014 - BA-1867
+                                'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                                Dim myTestID As Integer = -1
+                                Dim myTestType As String = String.Empty
+                                Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
 
-                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
-                            'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
-                                myTreeNode.Checked = False
+                                'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
+                                'Search the Profile on the TreeView to unchecked it
+                                If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
+                                    myTreeNode.Checked = False
 
-                                'Unselect also all the Tests in the Profile
-                                For Each myNode As TreeNode In myTreeNode.Nodes
-                                    myNode.Checked = myTreeNode.Checked
+                                    'Unselect also all the Tests in the Profile
+                                    For Each myNode As TreeNode In myTreeNode.Nodes
+                                        myNode.Checked = myTreeNode.Checked
 
-                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
-                                    '           the TestType and TestID
-                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
-                                        myTestType = myNode.Name.Split(CChar("|"))(0)
-                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+                                        'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                        '           the TestType and TestID
+                                        If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                            myTestType = myNode.Name.Split(CChar("|"))(0)
+                                            myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
 
-                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
-                                    End If
-                                Next
+                                            DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                        End If
+                                    Next
 
-                                'Search if the Test is also in another Test Profile 
-                                myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (myTreeNode.Name <> String.Empty) Then
-                                    If (myTreeNode.Parent Is Nothing) Then
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                    'Search if the Test is also in another Test Profile 
+                                    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                                    If (myTreeNode.Name <> String.Empty) Then
+                                        If (myTreeNode.Parent Is Nothing) Then
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                        Else
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                                        End If
                                     Else
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
-                                    End If
-                                Else
-                                    qSelectedTest.First.TestProfileID = 0
-                                    qSelectedTest.First.TestProfileName = ""
+                                        qSelectedTest.First.TestProfileID = 0
+                                        qSelectedTest.First.TestProfileName = ""
 
-                                    canBeUnselected = True
+                                        canBeUnselected = True
+                                    End If
                                 End If
+
+                                ' XB 02/12/2014 - BA-1867
+                            Else
+                                'Nothing to do, the Test remains selected because is linked to a selected Test Profile...
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
                             End If
+                            ' XB 02/12/2014 - BA-1867
+
+
 
                             'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
                             '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
@@ -1678,9 +1796,72 @@ Public Class IWSTestSelectionAuxScreen
 
                         'Finally, the Test is unselected
                         If (canBeUnselected) Then
+                            ' XB 02/12/2014 - BA-1867
+                            'qSelectedTest.First.Selected = False
+                            'selectedTest = False
+
+                            If (pCalcTestID <> 0) Then
+                                'Test is unselected due to a linked Calculated Test has been unselected
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
+
+                                'If the ISE Test is linked to other Calculated Tests, verify if they remain selected
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i As Integer = 0 To calcTests.Count - 1
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
+                                            If (Not lstCalPos.First.Selected) Then
+                                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, lstCalPos.First.TestID.ToString)
+                                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, lstCalPos.First.TestName)
+                                            End If
+                                        End If
+                                    Next i
+                                End If
+
+                                'El Test can be unselected when it is not linked to another selected Calculated Test
+                                canBeUnselected = (qSelectedTest.First.CalcTestIDs.Trim = "")
+                            Else
+                                'Test is unselected by clicking in it
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    'Get all different selected Calculated Tests to which the Test is linked
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i As Integer = 0 To calcTests.Count - 1
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'Only if the Calculated Test is currently selected, unselect it but without unselect its components
+                                            If (lstCalPos.First.Selected) Then
+                                                MarkUnMarkCalculatedTestCell(lstCalPos.First.Row, lstCalPos.First.Col, False)
+                                            End If
+                                        End If
+                                    Next i
+                                    qSelectedTest.First.CalcTestIDs = ""
+                                    qSelectedTest.First.CalcTestNames = ""
+                                End If
+                            End If
+                        End If
+
+                        'Finally, the Test is unselected
+                        If (canBeUnselected) Then
                             qSelectedTest.First.Selected = False
                             selectedTest = False
+                        Else
+                            'The Test recovers its previous status
+                            qSelectedTest.First.Selected = True
+                            selectedTest = True
                         End If
+                        ' XB 02/12/2014 - BA-1867
                     Else
                         'Only for Controls... if not all Controls needed for Test are included in the WorkSession
                         If (qSelectedTest.First.PartiallySelected) Then
@@ -1781,8 +1962,10 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           Tests included in the affected Profile (the Tests remain selected, but the Profile data is cleared 
     '''                                           because the Test Profile is not selected anymore). To clear those fields, a new function  
     '''                                           DeleteProfileInformation is called for each Tests included in the Profile (excepting the unselected one)
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
-    Private Function MarkUnMarkOffSystemTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer) As Boolean
+    Private Function MarkUnMarkOffSystemTestCell(ByVal pRowIndex As Integer, ByVal pColIndex As Integer, Optional ByVal pCalcTestID As Integer = 0, _
+                                                 Optional ByVal pCalcTestName As String = "") As Boolean
         Dim selectedTest As Boolean = False
         Try
             Dim myTreeNode As New TreeNode()
@@ -1802,54 +1985,86 @@ Public Class IWSTestSelectionAuxScreen
                     'If not selected, then the selected status is set to true                    
                     qSelectedTest.First.Selected = True
                     selectedTest = True
+
+                    ' XB 02/12/2014 - BA-1867
+                    'If the Test is selected due to a Calculated Test was selected, link the CalcTest to it (ID and Name)
+                    If (pCalcTestID <> 0) Then
+                        If (qSelectedTest.First.CalcTestIDs.Trim = "") Then
+                            qSelectedTest.First.CalcTestIDs = pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames = pCalcTestName
+                        Else
+                            qSelectedTest.First.CalcTestIDs &= ", " & pCalcTestID.ToString
+                            qSelectedTest.First.CalcTestNames &= ", " & pCalcTestName
+                        End If
+                    End If
+                    ' XB 02/12/2014 - BA-1867
                 Else
                     Dim canBeUnselected As Boolean = False
 
                     'Test can be unselected only if it has not been sent to the Analyzer
                     If (qSelectedTest.First.OTStatus = "OPEN") Then
                         If (Not qSelectedTest.First().IsTestProfileIDNull AndAlso qSelectedTest.First().TestProfileID > 0) Then
-                            'BT #1633 - Local variables needed to call new function DeleteProfileInformation
-                            Dim myTestID As Integer = -1
-                            Dim myTestType As String = String.Empty
-                            Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
 
-                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
-                            'Search the Profile on the TreeView to unchecked it
-                            If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
-                                myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
-                                myTreeNode.Checked = False
+                            ' XB 02/12/2014 - BA-1867
+                            'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView, 
+                            'but this process is executed only when the Test is unselected by clicking in it, not when it is unselected
+                            'by unselect the Calculated Test in which Formula the Test is included 
+                            If (pCalcTestID = 0) Then
+                                ' XB 02/12/2014 - BA-1867
+                                'BT #1633 - Local variables needed to call new function DeleteProfileInformation
+                                Dim myTestID As Integer = -1
+                                Dim myTestType As String = String.Empty
+                                Dim testProfileID As Integer = qSelectedTest.First().TestProfileID
 
-                                'Unselect also all the Tests in the Profile
-                                For Each myNode As TreeNode In myTreeNode.Nodes
-                                    myNode.Checked = myTreeNode.Checked
+                                'If the Test is linked to a selected Test Profile, the Profile has to be also unselected in the TreeView
+                                'Search the Profile on the TreeView to unchecked it
+                                If (bsProfilesTreeView.Nodes.Find(testProfileID.ToString, False).Length <> 0) Then
+                                    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(testProfileID.ToString, True).First, TreeNode)
+                                    myTreeNode.Checked = False
 
-                                    'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
-                                    '           the TestType and TestID
-                                    If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
-                                        myTestType = myNode.Name.Split(CChar("|"))(0)
-                                        myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
+                                    'Unselect also all the Tests in the Profile
+                                    For Each myNode As TreeNode In myTreeNode.Nodes
+                                        myNode.Checked = myTreeNode.Checked
 
-                                        DeleteProfileInformation(myTestType, myTestID, testProfileID)
-                                    End If
-                                Next
+                                        'BT #1633 - If it not the clicked Test, remove Profile Information from the SelectedTestsDS according 
+                                        '           the TestType and TestID
+                                        If (myNode.Name.Trim <> qSelectedTest.First().TestKey.Trim) Then
+                                            myTestType = myNode.Name.Split(CChar("|"))(0)
+                                            myTestID = Convert.ToInt32(myNode.Name.Split(CChar("|"))(1))
 
-                                'Search if the Test is also in another Test Profile 
-                                myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
-                                If (myTreeNode.Name <> String.Empty) Then
-                                    If (myTreeNode.Parent Is Nothing) Then
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                            DeleteProfileInformation(myTestType, myTestID, testProfileID)
+                                        End If
+                                    Next
+
+                                    'Search if the Test is also in another Test Profile 
+                                    myTreeNode = SearchNode(qSelectedTest.First.TestKey.ToString(), bsProfilesTreeView.Nodes)
+                                    If (myTreeNode.Name <> String.Empty) Then
+                                        If (myTreeNode.Parent Is Nothing) Then
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Text
+                                        Else
+                                            qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
+                                            qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
+                                        End If
                                     Else
-                                        qSelectedTest.First.TestProfileID = CType(myTreeNode.Parent.Name, Integer)
-                                        qSelectedTest.First.TestProfileName = myTreeNode.Parent.Text
-                                    End If
-                                Else
-                                    qSelectedTest.First.TestProfileID = 0
-                                    qSelectedTest.First.TestProfileName = ""
+                                        qSelectedTest.First.TestProfileID = 0
+                                        qSelectedTest.First.TestProfileName = ""
 
-                                    canBeUnselected = True
+                                        canBeUnselected = True
+                                    End If
                                 End If
+
+                                ' XB 02/12/2014 - BA-1867
+                            Else
+                                'Nothing to do, the Test remains selected because is linked to a selected Test Profile...
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
                             End If
+                            ' XB 02/12/2014 - BA-1867
+
+
 
                             'If (bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), False).Length <> 0) Then
                             '    myTreeNode = CType(bsProfilesTreeView.Nodes.Find(qSelectedTest.First().TestProfileID.ToString(), True).First, TreeNode)
@@ -1881,11 +2096,75 @@ Public Class IWSTestSelectionAuxScreen
                             canBeUnselected = True
                         End If
 
+                            'Finally, the Test is unselected
+                        If (canBeUnselected) Then
+                            ' XB 02/12/2014 - BA-1867
+                            'qSelectedTest.First.Selected = False
+                            'selectedTest = False
+
+                            If (pCalcTestID <> 0) Then
+                                'Test is unselected due to a linked Calculated Test has been unselected
+                                'Search the Calculated Test ID in field CalcTestIDs to remove it
+                                'Search the Calculated Test Name in field CalcTestNames to remove it
+                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, pCalcTestID.ToString)
+                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, pCalcTestName)
+
+                                'If the ISE Test is linked to other Calculated Tests, verify if they remain selected
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i As Integer = 0 To calcTests.Count - 1
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
+                                            If (Not lstCalPos.First.Selected) Then
+                                                qSelectedTest.First.CalcTestIDs = RebuildStringList(qSelectedTest.First.CalcTestIDs, lstCalPos.First.TestID.ToString)
+                                                qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, lstCalPos.First.TestName)
+                                            End If
+                                        End If
+                                    Next i
+                                End If
+
+                                'El Test can be unselected when it is not linked to another selected Calculated Test
+                                canBeUnselected = (qSelectedTest.First.CalcTestIDs.Trim = "")
+                            Else
+                                'Test is unselected by clicking in it
+                                If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
+                                    'Get all different selected Calculated Tests to which the Test is linked
+                                    Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
+                                    For i As Integer = 0 To calcTests.Count - 1
+                                        'Get position of the Calculated Test in the correspondent array
+                                        Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
+                                        lstCalPos = (From a In calculatedTestList.SelectedTestTable _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Select a).ToList()
+                                        If (lstCalPos.Count = 1) Then
+                                            'Only if the Calculated Test is currently selected, unselect it but without unselect its components
+                                            If (lstCalPos.First.Selected) Then
+                                                MarkUnMarkCalculatedTestCell(lstCalPos.First.Row, lstCalPos.First.Col, False)
+                                            End If
+                                        End If
+                                    Next i
+                                    qSelectedTest.First.CalcTestIDs = ""
+                                    qSelectedTest.First.CalcTestNames = ""
+                                End If
+                            End If
+                        End If
+
                         'Finally, the Test is unselected
                         If (canBeUnselected) Then
                             qSelectedTest.First.Selected = False
                             selectedTest = False
+                        Else
+                            'The Test recovers its previous status
+                            qSelectedTest.First.Selected = True
+                            selectedTest = True
                         End If
+                        ' XB 02/12/2014 - BA-1867
+
                     End If
                 End If
 
@@ -2736,6 +3015,7 @@ Public Class IWSTestSelectionAuxScreen
     '''                                           before add it to the final list of selected Tests. Besides, set value of screen attribute 
     '''                                           IncompleteTestAttribute to TRUE to notify the User that some of the selected Tests were removed 
     '''                                           due to they have an incomplete Calibration programming 
+    '''              XB 02/12/2014 - Add functionality cases for ISE and OFFS tests included into a CALC test - BA-1867
     ''' </remarks>
     Private Sub AcceptTestSelection()
         Try
@@ -2837,6 +3117,66 @@ Public Class IWSTestSelectionAuxScreen
                 End If
             Next selectedRow
 
+            ' XB 02/12/2014 - BA-1867
+            'Get the list of ISE Tests that have been selected...
+            Dim qSelISETests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            qSelISETests = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
+                           Where a.Selected = True OrElse a.PartiallySelected = True _
+                          Select a).ToList()
+
+            'Add all selected ISE Tests to the DataSet to return
+            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelISETests
+                'Verify if it has been already included in the list of Selected Tests
+                Dim myTestID As Integer = selectedRow.TestID
+                Dim mySampleType As String = selectedRow.SampleType
+
+                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+                                Where a.TestType = "ISE" _
+                              AndAlso a.SampleType = mySampleType _
+                              AndAlso a.TestID = myTestID _
+                               Select a).ToList()
+
+                If (qSelectedTest.Count = 0) Then
+                    If (mySampleID <> String.Empty) Then
+                        selectedRow.SampleID = mySampleID
+                        selectedRow.SampleIDType = mySampleIDType
+                    End If
+
+                    'Add the ISE Test to the list of Selected Tests
+                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+                End If
+            Next selectedRow
+
+            'Get the list of OffSystem Tests that have been selected...
+            Dim qSelOffSystemTests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            qSelOffSystemTests = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
+                                 Where a.Selected = True OrElse a.PartiallySelected = True _
+                                Select a).ToList()
+
+            'Add all selected OffSystem Tests to the DataSet to return
+            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelOffSystemTests
+                'Verify if it has been already included in the list of Selected Tests
+                Dim myTestID As Integer = selectedRow.TestID
+                Dim mySampleType As String = selectedRow.SampleType
+
+                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+                                Where a.TestType = "OFFS" _
+                              AndAlso a.SampleType = mySampleType _
+                              AndAlso a.TestID = myTestID _
+                               Select a).ToList()
+
+                If (qSelectedTest.Count = 0) Then
+                    If (mySampleID <> String.Empty) Then
+                        selectedRow.SampleID = mySampleID
+                        selectedRow.SampleIDType = mySampleIDType
+                    End If
+
+                    'Add the OffSystem Test to the list of Selected Tests
+                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+                End If
+            Next selectedRow
+            ' XB 02/12/2014 - BA-1867
+
             'Get the list of Calculated Tests that have been selected...
             If (SampleClassAttribute = "PATIENT") Then
                 'Dim qSelCalcTests As List(Of SelectedTestsDS.SelectedTestTableRow)
@@ -2898,64 +3238,66 @@ Public Class IWSTestSelectionAuxScreen
                 Next selCalcTestRow
             End If
 
-            'Get the list of ISE Tests that have been selected...
-            'Dim qSelISETests As New List(Of SelectedTestsDS.SelectedTestTableRow)
-            Dim qSelISETests As List(Of SelectedTestsDS.SelectedTestTableRow)
-            qSelISETests = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
-                           Where a.Selected = True _
-                          Select a).ToList()
+            ' XB 02/12/2014 - BA-1867
+            ''Get the list of ISE Tests that have been selected...
+            ''Dim qSelISETests As New List(Of SelectedTestsDS.SelectedTestTableRow)
+            'Dim qSelISETests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            'qSelISETests = (From a As SelectedTestsDS.SelectedTestTableRow In iseTestList.SelectedTestTable _
+            '               Where a.Selected = True _
+            '              Select a).ToList()
 
-            'Add all selected ISE Tests to the DataSet to return
-            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelISETests
-                'Verify if it has been already included in the list of Selected Tests
-                Dim myTestID As Integer = selectedRow.TestID
-                Dim mySampleType As String = selectedRow.SampleType
+            ''Add all selected ISE Tests to the DataSet to return
+            'For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelISETests
+            '    'Verify if it has been already included in the list of Selected Tests
+            '    Dim myTestID As Integer = selectedRow.TestID
+            '    Dim mySampleType As String = selectedRow.SampleType
 
-                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
-                                Where a.TestType = "ISE" _
-                              AndAlso a.SampleType = mySampleType _
-                              AndAlso a.TestID = myTestID _
-                               Select a).ToList()
+            '    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+            '                    Where a.TestType = "ISE" _
+            '                  AndAlso a.SampleType = mySampleType _
+            '                  AndAlso a.TestID = myTestID _
+            '                   Select a).ToList()
 
-                If (qSelectedTest.Count = 0) Then
-                    If (mySampleID <> String.Empty) Then
-                        selectedRow.SampleID = mySampleID
-                        selectedRow.SampleIDType = mySampleIDType
-                    End If
+            '    If (qSelectedTest.Count = 0) Then
+            '        If (mySampleID <> String.Empty) Then
+            '            selectedRow.SampleID = mySampleID
+            '            selectedRow.SampleIDType = mySampleIDType
+            '        End If
 
-                    'Add the ISE Test to the list of Selected Tests
-                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
-                End If
-            Next selectedRow
+            '        'Add the ISE Test to the list of Selected Tests
+            '        ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+            '    End If
+            'Next selectedRow
 
-            'Get the list of OffSystem Tests that have been selected...
-            Dim qSelOffSystemTests As List(Of SelectedTestsDS.SelectedTestTableRow)
-            qSelOffSystemTests = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
-                                 Where a.Selected = True _
-                                Select a).ToList()
+            ''Get the list of OffSystem Tests that have been selected...
+            'Dim qSelOffSystemTests As List(Of SelectedTestsDS.SelectedTestTableRow)
+            'qSelOffSystemTests = (From a As SelectedTestsDS.SelectedTestTableRow In offSystemTestList.SelectedTestTable _
+            '                     Where a.Selected = True _
+            '                    Select a).ToList()
 
-            'Add all selected OffSystem Tests to the DataSet to return
-            For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelOffSystemTests
-                'Verify if it has been already included in the list of Selected Tests
-                Dim myTestID As Integer = selectedRow.TestID
-                Dim mySampleType As String = selectedRow.SampleType
+            ''Add all selected OffSystem Tests to the DataSet to return
+            'For Each selectedRow As SelectedTestsDS.SelectedTestTableRow In qSelOffSystemTests
+            '    'Verify if it has been already included in the list of Selected Tests
+            '    Dim myTestID As Integer = selectedRow.TestID
+            '    Dim mySampleType As String = selectedRow.SampleType
 
-                qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
-                                Where a.TestType = "OFFS" _
-                              AndAlso a.SampleType = mySampleType _
-                              AndAlso a.TestID = myTestID _
-                               Select a).ToList()
+            '    qSelectedTest = (From a As SelectedTestsDS.SelectedTestTableRow In ListOfSelectedTestsAttribute.SelectedTestTable _
+            '                    Where a.TestType = "OFFS" _
+            '                  AndAlso a.SampleType = mySampleType _
+            '                  AndAlso a.TestID = myTestID _
+            '                   Select a).ToList()
 
-                If (qSelectedTest.Count = 0) Then
-                    If (mySampleID <> String.Empty) Then
-                        selectedRow.SampleID = mySampleID
-                        selectedRow.SampleIDType = mySampleIDType
-                    End If
+            '    If (qSelectedTest.Count = 0) Then
+            '        If (mySampleID <> String.Empty) Then
+            '            selectedRow.SampleID = mySampleID
+            '            selectedRow.SampleIDType = mySampleIDType
+            '        End If
 
-                    'Add the OffSystem Test to the list of Selected Tests
-                    ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
-                End If
-            Next selectedRow
+            '        'Add the OffSystem Test to the list of Selected Tests
+            '        ListOfSelectedTestsAttribute.SelectedTestTable.ImportRow(selectedRow)
+            '    End If
+            'Next selectedRow
+            ' XB 02/12/2014 - BA-1867
 
             'Close the screen
             Me.Close()

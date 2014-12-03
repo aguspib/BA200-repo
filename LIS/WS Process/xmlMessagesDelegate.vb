@@ -1752,6 +1752,7 @@ Namespace Biosystems.Ax00.LISCommunications
         '''                              of values of the entry parameter row
         '''              SA 23/05/2013 - Fixed error: when calling function Read in TestsDelegate, pass the ID of the Standard Test as parameter instead of the 
         '''                              ID of the Calculated Test
+        '''              XB 02/12/2014 - Add functionality to includes ISE and OFFS into CALC tests - BA-1867
         ''' </remarks>
         Private Function ValidationsForAddCALCOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                          ByVal pEntryRow As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow) As GlobalDataTO
@@ -1835,7 +1836,24 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                 newRowToReturn.ReplicatesNumber = 1
                                                             End If
                                                             linqRes = Nothing
-                                                        Else
+
+                                                            ' XB 02/12/2014 - BA-1867
+                                                            'Else
+                                                            '    Dim myTests As New TestsDelegate
+                                                            '    resultData = myTests.Read(Nothing, newRowToReturn.TestID)
+
+                                                            '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                            '        Dim myTestsDS As TestsDS = DirectCast(resultData.SetDatos, TestsDS)
+
+                                                            '        If (myTestsDS.tparTests.Rows.Count > 0) Then
+                                                            '            newRowToReturn.TestName = myTestsDS.tparTests(0).TestName
+                                                            '            newRowToReturn.ReplicatesNumber = myTestsDS.tparTests(0).ReplicatesNumber
+                                                            '            newRowToReturn.SetFormulaTextNull()
+                                                            '        End If
+                                                            '    End If
+                                                            'End If
+
+                                                        ElseIf (newRowToReturn.TestType = "STD") Then
                                                             Dim myTests As New TestsDelegate
                                                             resultData = myTests.Read(Nothing, newRowToReturn.TestID)
 
@@ -1848,7 +1866,34 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                     newRowToReturn.SetFormulaTextNull()
                                                                 End If
                                                             End If
+                                                        ElseIf (newRowToReturn.TestType = "ISE") Then
+                                                            Dim myISETests As New ISETestsDelegate
+                                                            resultData = myISETests.Read(Nothing, newRowToReturn.TestID)
+
+                                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                Dim myISETestsDS As ISETestsDS = DirectCast(resultData.SetDatos, ISETestsDS)
+
+                                                                If (myISETestsDS.tparISETests.Rows.Count > 0) Then
+                                                                    newRowToReturn.TestName = myISETestsDS.tparISETests(0).Name
+                                                                    newRowToReturn.ReplicatesNumber = 1
+                                                                    newRowToReturn.SetFormulaTextNull()
+                                                                End If
+                                                            End If
+                                                        ElseIf (newRowToReturn.TestType = "OFFS") Then
+                                                            Dim myOFFSTests As New OffSystemTestsDelegate
+                                                            resultData = myOFFSTests.Read(Nothing, newRowToReturn.TestID)
+
+                                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                Dim myOFFSTestsDS As OffSystemTestsDS = DirectCast(resultData.SetDatos, OffSystemTestsDS)
+
+                                                                If (myOFFSTestsDS.tparOffSystemTests.Rows.Count > 0) Then
+                                                                    newRowToReturn.TestName = myOFFSTestsDS.tparOffSystemTests(0).Name
+                                                                    newRowToReturn.ReplicatesNumber = 1
+                                                                    newRowToReturn.SetFormulaTextNull()
+                                                                End If
+                                                            End If
                                                         End If
+                                                        ' XB 02/12/2014 - BA-1867
                                                         toReturnData.tparSavedWSOrderTests.AddtparSavedWSOrderTestsRow(newRowToReturn)
                                                     Next
                                                 End If
