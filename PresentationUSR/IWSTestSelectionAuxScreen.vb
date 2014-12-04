@@ -5563,14 +5563,14 @@ Public Class IWSTestSelectionAuxScreen
                                 qSelectedTest = (From a In iseTestList.SelectedTestTable _
                                                 Where a.TestKey = myNodeName _
                                                Select a).ToList()
-                                remainSelected = False
+                                remainSelected = (qSelectedTest.First.CalcTestIDs.Trim <> "") ' False
 
                             Case "OFFS"
                                 'Search the Off System Test included in the selected Profile to select it
                                 qSelectedTest = (From a In offSystemTestList.SelectedTestTable _
                                                 Where a.TestKey = myNodeName _
                                                Select a).ToList()
-                                remainSelected = False
+                                remainSelected = (qSelectedTest.First.CalcTestIDs.Trim <> "") ' False
                         End Select
 
                         If (qSelectedTest.Count > 0) Then
