@@ -911,17 +911,24 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Update a specific row of twksResults
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pResultsDS">twksResults DataSet</param>
+        ''' <param name="pResultsDS">Typed DataSet ResultsDS containing all data for the Result to update</param>
+        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, fields ABS_Initial, 
+        '''                               ABS_MainFilter, ABS_WorkReagent and SubstrateDepletion are not updated (to avoid the losing 
+        '''                               of these values)</param> 
         ''' <returns>GlobalDataTO containing a typed DataSet ResultsDS with all affected records</returns> 
         ''' <remarks>
         ''' Created by: GDS 02/03/2010 
         ''' Modified by: RH 05/20/2010 - Added parameters ExportStatus and Printed
         '''              AG 12/07/2010 - Added ABS_WorkReagent (tested ok)
         '''              AG 21/07/2010 - If AcceptedResultFlag is not informed, do not update it
-        '''              AG 10/11/2010 - Add ManualResult and ManualResultText fields
-        '''              AG 01/07/2011 - Add columns CurveSlope, CurveOffset, CurveCorrelation
+        '''              AG 10/11/2010 - Added ManualResult and ManualResultText fields
+        '''              AG 01/07/2011 - Added columns CurveSlope, CurveOffset, CurveCorrelation
+        '''              SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. When value of this parameter is TRUE, 
+        '''                                          fields ABS_Initial, ABS_MainFilter, ABS_WorkReagent and SubstrateDepletion are not   
+        '''                                          updated (to avoid the losing of these values)
         ''' </remarks>
-        Public Function UpdateResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS) As GlobalDataTO
+        Public Function UpdateResult(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsDS As ResultsDS, _
+                                     Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -929,253 +936,211 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim cmdText As String
-                    With pResultsDS.twksResults(0)
-                        cmdText = "UPDATE twksResults SET"
-
-                        If .IsValidationStatusNull Then
-                            cmdText += " ValidationStatus = NULL"
+                    Dim cmdText As String = " UPDATE twksResults SET "
+                    With (pResultsDS.twksResults.First)
+                        If (.IsValidationStatusNull) Then
+                            cmdText &= " ValidationStatus = NULL"
                         Else
-                            cmdText += " ValidationStatus = '" & .ValidationStatus & "'"
+                            cmdText &= " ValidationStatus = '" & .ValidationStatus & "'"
                         End If
 
-                        If .IsTestVersionNull Then
-                            cmdText += ", TestVersion = NULL"
+                        If (.IsTestVersionNull) Then
+                            cmdText &= ", TestVersion = NULL"
                         Else
-                            cmdText += ", TestVersion = " & .TestVersion.ToString
+                            cmdText &= ", TestVersion = " & .TestVersion.ToString
                         End If
 
-                        If .IsAcceptedResultFlagNull Then
+                        If (.IsAcceptedResultFlagNull) Then
                             'AG 21/07/2010
-                            'cmdText += ", AcceptedResultFlag = 'False'"
+                            'cmdText &= ", AcceptedResultFlag = 0"
                         Else
-                            cmdText += ", AcceptedResultFlag = '" & .AcceptedResultFlag.ToString & "'"
+                            cmdText &= ", AcceptedResultFlag = " & IIf(.AcceptedResultFlag, 1, 0).ToString
                         End If
 
-                        If .IsManualResultFlagNull Then
-                            cmdText += ", ManualResultFlag = 'False'"
+                        If (.IsManualResultFlagNull) Then
+                            cmdText &= ", ManualResultFlag = 0"
                         Else
-                            cmdText += ", ManualResultFlag = '" & .ManualResultFlag.ToString & "'"
+                            cmdText &= ", ManualResultFlag = " & IIf(.ManualResultFlag, 1, 0).ToString
                         End If
 
-                        If .IsExportStatusNull Then
-                            cmdText += ", ExportStatus = NULL"
+                        If (.IsExportStatusNull) Then
+                            cmdText &= ", ExportStatus = NULL"
                         Else
-                            cmdText += ", ExportStatus = '" & .ExportStatus & "'"
+                            cmdText &= ", ExportStatus = '" & .ExportStatus & "'"
                         End If
 
-                        If .IsPrintedNull Then
-                            cmdText += ", Printed = 'False'"
+                        If (.IsPrintedNull) Then
+                            cmdText &= ", Printed = 0"
                         Else
-                            cmdText += ", Printed = '" & .Printed.ToString & "'"
+                            cmdText &= ", Printed = " & IIf(.Printed, 1, 0).ToString
                         End If
 
-                        If .IsABSValueNull Then
-                            cmdText += ", ABSValue = NULL"
+                        If (.IsABSValueNull) Then
+                            cmdText &= ", ABSValue = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", ABSValue = " & pResultsDS.twksResults(0).ABSValue.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", ABSValue = " & .ABSValue.ToSQLString()
-                            cmdText += ", ABSValue = " & ReplaceNumericString(.ABSValue)
+                            cmdText &= ", ABSValue = " & ReplaceNumericString(.ABSValue)
                         End If
 
-                        If .IsABS_ErrorNull Then
-                            cmdText += ", ABS_Error = NULL"
+                        If (.IsABS_ErrorNull) Then
+                            cmdText &= ", ABS_Error = NULL"
                         Else
-                            cmdText += ", ABS_Error = '" & .ABS_Error & "'"
+                            cmdText &= ", ABS_Error = '" & .ABS_Error & "'"
                         End If
 
-                        If .IsSubstrateDepletionNull Then
-                            cmdText += ", SubstrateDepletion = NULL"
+                        'BA-1616: Fields SubstrateDepletion, ABS_Initial, ABS_MainFilter and ABS_WorkReagent are updated only when
+                        '         parameter pRecalculusFlag is FALSE (to avoid the loss of these values when the result is recalculated)
+                        If (Not pRecalculusFlag) Then
+                            If (.IsSubstrateDepletionNull) Then
+                                cmdText &= ", SubstrateDepletion = NULL"
+                            Else
+                                cmdText &= ", SubstrateDepletion = " & .SubstrateDepletion.ToString
+                            End If
+
+                            If (.IsABS_InitialNull) Then
+                                cmdText &= ", ABS_Initial = NULL"
+                            Else
+                                cmdText &= ", ABS_Initial = " & ReplaceNumericString(.ABS_Initial)
+                            End If
+
+                            If (.IsABS_MainFilterNull) Then
+                                cmdText &= ", ABS_MainFilter = NULL"
+                            Else
+                                cmdText &= ", ABS_MainFilter = " & ReplaceNumericString(.ABS_MainFilter)
+                            End If
+
+                            If (.IsAbs_WorkReagentNull) Then
+                                cmdText &= ", ABS_WorkReagent = NULL"
+                            Else
+                                cmdText &= ", ABS_WorkReagent = " & ReplaceNumericString(.Abs_WorkReagent)
+                            End If
+                        End If
+                        
+                        If (.IsCalibratorFactorNull) Then
+                            cmdText &= ", CalibratorFactor = NULL"
                         Else
-                            cmdText += ", SubstrateDepletion = " & .SubstrateDepletion.ToString
+                            cmdText &= ", CalibratorFactor = " & ReplaceNumericString(.CalibratorFactor)
                         End If
 
-                        If .IsABS_InitialNull Then
-                            cmdText += ", ABS_Initial = NULL"
+                        If (.IsCalibrationErrorNull) Then
+                            cmdText &= ", CalibrationError = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", ABS_Initial = " & pResultsDS.twksResults(0).ABS_Initial.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", ABS_Initial = " & .ABS_Initial.ToSQLString()
-                            cmdText += ", ABS_Initial = " & ReplaceNumericString(.ABS_Initial)
+                            cmdText &= ", CalibrationError = '" & .CalibrationError & "'"
                         End If
 
-                        If .IsABS_MainFilterNull Then
-                            cmdText += ", ABS_MainFilter = NULL"
+                        If (.IsCalibratorBlankAbsUsedNull) Then
+                            cmdText &= ", CalibratorBlankAbsUsed = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", ABS_MainFilter = " & pResultsDS.twksResults(0).ABS_MainFilter.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", ABS_MainFilter = " & .ABS_MainFilter.ToSQLString()
-                            cmdText += ", ABS_MainFilter = " & ReplaceNumericString(.ABS_MainFilter)
+                            cmdText &= ", CalibratorBlankAbsUsed = " & ReplaceNumericString(.CalibratorBlankAbsUsed)
                         End If
 
-                        'AG 12/07/2010
-                        If .IsAbs_WorkReagentNull Then
-                            cmdText += ", ABS_WorkReagent = NULL"
+                        If (.IsCurveResultsIDNull) Then
+                            cmdText &= ", CurveResultsID = NULL"
                         Else
-                            cmdText += ", ABS_WorkReagent = " & ReplaceNumericString(.Abs_WorkReagent)
-                        End If
-                        'END AG 12/07/2010
-
-
-                        If .IsCalibratorFactorNull Then
-                            cmdText += ", CalibratorFactor = NULL"
-                        Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", CalibratorFactor = " & pResultsDS.twksResults(0).CalibratorFactor.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", CalibratorFactor = " & .CalibratorFactor.ToSQLString()
-                            cmdText += ", CalibratorFactor = " & ReplaceNumericString(.CalibratorFactor)
+                            cmdText &= ", CurveResultsID = " & .CurveResultsID.ToString
                         End If
 
-                        If .IsCalibrationErrorNull Then
-                            cmdText += ", CalibrationError = NULL"
+                        If (.IsCurveGrowthTypeNull) Then
+                            cmdText &= ", CurveGrowthType = NULL"
                         Else
-                            cmdText += ", CalibrationError = '" & .CalibrationError & "'"
+                            cmdText &= ", CurveGrowthType = '" & .CurveGrowthType & "'"
                         End If
 
-                        If .IsCalibratorBlankAbsUsedNull Then
-                            cmdText += ", CalibratorBlankAbsUsed = NULL"
+                        If (.IsCurveTypeNull) Then
+                            cmdText &= ", CurveType = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", CalibratorBlankAbsUsed = " & pResultsDS.twksResults(0).CalibratorBlankAbsUsed.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", CalibratorBlankAbsUsed = " & .CalibratorBlankAbsUsed.ToSQLString()
-                            cmdText += ", CalibratorBlankAbsUsed = " & ReplaceNumericString(.CalibratorBlankAbsUsed)
+                            cmdText &= ", CurveType = '" & .CurveType & "'"
                         End If
 
-                        If .IsCurveResultsIDNull Then
-                            cmdText += ", CurveResultsID = NULL"
+                        If (.IsCurveAxisXTypeNull) Then
+                            cmdText &= ", CurveAxisXType = NULL"
                         Else
-                            cmdText += ", CurveResultsID = " & .CurveResultsID.ToString
+                            cmdText &= ", CurveAxisXType = '" & .CurveAxisXType & "'"
                         End If
 
-                        If .IsCurveGrowthTypeNull Then
-                            cmdText += ", CurveGrowthType = NULL"
+                        If (.IsCurveAxisYTypeNull) Then
+                            cmdText &= ", CurveAxisYType = NULL"
                         Else
-                            cmdText += ", CurveGrowthType = '" & .CurveGrowthType & "'"
+                            cmdText &= ", CurveAxisYType = '" & .CurveAxisYType & "'"
                         End If
 
-                        If .IsCurveTypeNull Then
-                            cmdText += ", CurveType = NULL"
+                        If (.IsRelativeErrorCurveNull) Then
+                            cmdText &= ", RelativeErrorCurve = NULL"
                         Else
-                            cmdText += ", CurveType = '" & .CurveType & "'"
+                            cmdText &= ", RelativeErrorCurve = " & ReplaceNumericString(.RelativeErrorCurve)
                         End If
 
-                        If .IsCurveAxisXTypeNull Then
-                            cmdText += ", CurveAxisXType = NULL"
+                        If (.IsCurveSlopeNull) Then
+                            cmdText &= ", CurveSlope = NULL"
                         Else
-                            cmdText += ", CurveAxisXType = '" & .CurveAxisXType & "'"
+                            cmdText &= ", CurveSlope = " & ReplaceNumericString(.CurveSlope)
                         End If
 
-                        If .IsCurveAxisYTypeNull Then
-                            cmdText += ", CurveAxisYType = NULL"
+                        If (.IsCurveOffsetNull) Then
+                            cmdText &= ", CurveOffset = NULL"
                         Else
-                            'AG 12/03/2010
-                            'cmdText += ", CurveAxisYType = '" & pResultsDS.twksResults(0).IsCurveAxisYTypeNull.ToString & "'" & vbCrLf
-                            cmdText += ", CurveAxisYType = '" & .CurveAxisYType & "'"
-                            'AG 12/03/2010
+                            cmdText &= ", CurveOffset = " & ReplaceNumericString(.CurveOffset)
                         End If
 
-                        If .IsRelativeErrorCurveNull Then
-                            cmdText += ", RelativeErrorCurve = NULL"
+                        If (.IsCurveCorrelationNull) Then
+                            cmdText &= ", CurveCorrelation = NULL"
                         Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", RelativeErrorCurve = " & pResultsDS.twksResults(0).RelativeErrorCurve.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", RelativeErrorCurve = " & .RelativeErrorCurve.ToSQLString()
-                            cmdText += ", RelativeErrorCurve = " & ReplaceNumericString(.RelativeErrorCurve)
+                            cmdText &= ", CurveCorrelation = " & ReplaceNumericString(.CurveCorrelation)
                         End If
 
-                        'AG 01/07/2011
-                        If .IsCurveSlopeNull Then
-                            cmdText += ", CurveSlope = NULL"
+                        If (.IsCONC_ValueNull) Then
+                            cmdText &= ", CONC_Value = NULL"
                         Else
-                            cmdText += ", CurveSlope = " & ReplaceNumericString(.CurveSlope)
+                            cmdText &= ", CONC_Value = " & ReplaceNumericString(.CONC_Value)
                         End If
 
-                        If .IsCurveOffsetNull Then
-                            cmdText += ", CurveOffset = NULL"
+                        If (.IsCONC_ErrorNull) Then
+                            cmdText &= ", CONC_Error = NULL"
                         Else
-                            cmdText += ", CurveOffset = " & ReplaceNumericString(.CurveOffset)
+                            cmdText &= ", CONC_Error = '" & .CONC_Error & "'"
                         End If
 
-                        If .IsCurveCorrelationNull Then
-                            cmdText += ", CurveCorrelation = NULL"
+                        If (.IsResultDateTimeNull) Then
+                            cmdText &= ", ResultDateTime = NULL"
                         Else
-                            cmdText += ", CurveCorrelation = " & ReplaceNumericString(.CurveCorrelation)
-                        End If
-                        'AG 01/07/2011
-
-                        If .IsCONC_ValueNull Then
-                            cmdText += ", CONC_Value = NULL"
-                        Else
-                            'AG 10/06/2010
-                            '' modified by dl 12/03/2010
-                            ''cmdText += ", CONC_Value = " & pResultsDS.twksResults(0).CONC_Value.ToString.Replace(",", ".") & vbCrLf
-                            'cmdText += ", CONC_Value = " & .CONC_Value.ToSQLString()
-                            cmdText += ", CONC_Value = " & ReplaceNumericString(.CONC_Value)
-                        End If
-
-                        If .IsCONC_ErrorNull Then
-                            cmdText += ", CONC_Error = NULL"
-                        Else
-                            cmdText += ", CONC_Error = '" & .CONC_Error & "'"
-                        End If
-
-                        If .IsResultDateTimeNull Then
-                            cmdText += ", ResultDateTime = NULL"
-                        Else
-                            cmdText += ", ResultDateTime = '" & .ResultDateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
+                            cmdText &= ", ResultDateTime = '" & .ResultDateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
                         End If
 
                         'AG 10/11/2010 - Add new fields ManualResult and ManualResultText
-                        If .IsManualResultNull Then
-                            cmdText += ", ManualResult = NULL"
+                        If (.IsManualResultNull) Then
+                            cmdText &= ", ManualResult = NULL"
                         Else
-                            cmdText += ", ManualResult = " & ReplaceNumericString(.ManualResult)
+                            cmdText &= ", ManualResult = " & ReplaceNumericString(.ManualResult)
                         End If
 
-                        If .IsManualResultTextNull Then
-                            cmdText += ", ManualResultText = NULL"
+                        If (.IsManualResultTextNull) Then
+                            cmdText &= ", ManualResultText = NULL"
                         Else
-                            cmdText += ", ManualResultText = N'" & .ManualResultText.ToString.Replace("'", "''") & "'"
+                            cmdText &= ", ManualResultText = N'" & .ManualResultText.ToString.Replace("'", "''") & "'"
                         End If
-
                         'END AG 10/11/2010
 
-                        If .IsTS_UserNull Then
-                            cmdText += ", TS_User = ''"
+                        If (.IsTS_UserNull) Then
+                            cmdText &= ", TS_User = ''"
                         Else
-                            cmdText += ", TS_User = '" & .TS_User & "'"
+                            cmdText &= ", TS_User = N'" & .TS_User.Replace("'", "''") & "'"
                         End If
 
-                        If .IsTS_DateTimeNull Then 'If .IsResultDateTimeNull Then 
-                            cmdText += ", TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "'"
+                        If (.IsTS_DateTimeNull) Then
+                            cmdText &= ", TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "'"
                         Else
-                            cmdText += ", TS_DateTime = '" & .TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
+                            cmdText &= ", TS_DateTime = '" & .TS_DateTime.ToString("yyyyMMdd HH:mm:ss") & "'"
                         End If
 
-                        cmdText += " WHERE OrderTestID      = " & .OrderTestID & _
-                                   "  AND RerunNumber      = " & .RerunNumber & _
-                                   "  AND MultiPointNumber = " & .MultiPointNumber
+                        cmdText &= " WHERE OrderTestID      = " & .OrderTestID.ToString & _
+                                   " AND   RerunNumber      = " & .RerunNumber.ToString & _
+                                   " AND   MultiPointNumber = " & .MultiPointNumber.ToString
                     End With
 
                     'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
-                    'Dim dbCmd As New SqlCommand
-                    'dbCmd.Connection = pDBConnection
-                    'dbCmd.CommandText = cmdText
-                    'resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
                         resultData.HasError = False
                     End Using
-                    'AG 25/07/2014
-
                 End If
             Catch ex As Exception
                 resultData.HasError = True

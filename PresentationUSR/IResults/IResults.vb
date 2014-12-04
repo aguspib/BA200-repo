@@ -1920,204 +1920,6 @@ Public Class IResults
     End Sub
 
     ''' <summary>
-    ''' Gets the list of Order Tests Results from the Executions
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  RH 15/07/2010
-    ''' Modified by: AG 01/12/2010 - Adapted for ISE and OFF-SYSTEM tests
-    '''              SA 25/01/2011 - Changed the way of getting the Reference Range Intervals, also get all Patients
-    '''                              having only OFF-SYSTEM Order Tests and add them to ExecutionsResultsDS.vwksWSExecutionsResults
-    '''              RH 31/01/2011 - Remove the previous code for getting OffSystem info because does not work properly.
-    '''                              We need executionRow.OrderStatus, which do not exist in ResultsDS.vwksResultsRow.
-    '''                              Also breakes the logic of the method. Now all the executions (STD, ISE and OFFS) come
-    '''                              at the beginning from myExecutionDelegate.GetWSExecutionsResults() as it was planned before,
-    '''                              and not in slices
-    ''' </remarks>
-    Private Sub LoadExecutionsResultsOLD_RH31022011()
-        Dim StartTime As DateTime = Now 'AG 21/06/2012 - time estimation
-        Try
-            Dim resultData As GlobalDataTO
-            Dim myExecutionDelegate As New ExecutionsDelegate
-
-            resultData = myExecutionDelegate.GetWSExecutionsResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-
-            If (Not resultData.HasError) Then
-                ExecutionsResultsDS = CType(resultData.SetDatos, ExecutionsDS)
-
-                AverageResultsDS.vwksResults.Clear()
-                AverageResultsDS.vwksResultsAlarms.Clear()    'AG 28/07/2010 - Clear average alarms
-                ExecutionsResultsDS.vwksWSExecutionsAlarms.Clear() 'AG 28/07/2010 - Clear executions alarms
-                IsOrderPrinted.Clear() 'RH 06/10/2010 Very important!
-
-                Dim OrderTestList As List(Of Integer) = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                                         Select row.OrderTestID Distinct).ToList()
-
-                Dim myResultsDelegate As New ResultsDelegate
-                For Each OrderTestID As Integer In OrderTestList
-                    'Get all results for current OrderTestID.
-                    resultData = myResultsDelegate.GetResults(Nothing, OrderTestID)
-                    If (Not resultData.HasError) Then
-                        For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                            AverageResultsDS.vwksResults.ImportRow(resultRow)
-                        Next resultRow
-                    Else
-                        ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                        Exit For
-                    End If
-                Next OrderTestID
-
-                'Get Calculated Results
-                resultData = myResultsDelegate.GetCalculatedTestResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                    Next
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-
-                'AG 01/12/2010 - Get ISE & OffSystem tests Results
-                resultData = myResultsDelegate.GetISEOFFSTestResults(Nothing, ActiveAnalyzer, ActiveWorkSession)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ResultsDS.vwksResultsRow In CType(resultData.SetDatos, ResultsDS).vwksResults.Rows
-                        AverageResultsDS.vwksResults.ImportRow(resultRow)
-                    Next resultRow
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-                'END AG 01/12/2010
-
-                'Read Reference Range Limits
-                Dim MinimunValue As Nullable(Of Single) = Nothing
-                Dim MaximunValue As Nullable(Of Single) = Nothing
-
-                'TR 06/06/2012 -Variable to set the Panic Values.
-                Dim PanicMinimunValue As Nullable(Of Single) = Nothing
-                Dim PanicMaximunValue As Nullable(Of Single) = Nothing
-
-
-                For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                    If (Not resultRow.IsActiveRangeTypeNull) Then
-                        Dim mySampleType As String = String.Empty
-                        If (String.Compare(resultRow.TestType, "CALC", False) <> 0) Then mySampleType = resultRow.SampleType
-
-                        'Get the Reference Range for the Test/SampleType according the TestType and the Type of Range
-                        Dim myOrderTestsDelegate As New OrderTestsDelegate
-                        resultData = myOrderTestsDelegate.GetReferenceRangeInterval(Nothing, resultRow.OrderTestID, resultRow.TestType, _
-                                                                                    resultRow.TestID, mySampleType, resultRow.ActiveRangeType)
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim myTestRefRangesDS As TestRefRangesDS = DirectCast(resultData.SetDatos, TestRefRangesDS)
-
-                            If (myTestRefRangesDS.tparTestRefRanges.Rows.Count = 1) Then
-                                MinimunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit
-                                MaximunValue = myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit
-                                'TR -06/06/2012 -Validate if the panic limits are not null.
-                                If Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineLowerLimitNull AndAlso _
-                                      Not myTestRefRangesDS.tparTestRefRanges(0).IsBorderLineUpperLimitNull Then
-                                    PanicMinimunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineLowerLimit
-                                    PanicMaximunValue = myTestRefRangesDS.tparTestRefRanges(0).BorderLineUpperLimit
-                                End If
-                            End If
-                        End If
-
-                        If (MinimunValue.HasValue AndAlso MaximunValue.HasValue) Then
-                            If (MinimunValue <> -1 AndAlso MaximunValue <> -1) Then
-                                resultRow.NormalLowerLimit = MinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                resultRow.NormalUpperLimit = MaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                            End If
-                            'TR 06/06/2012 -Set the panic values 
-                            If (PanicMinimunValue <> -1 AndAlso PanicMaximunValue <> -1) Then
-                                resultRow.PanicLowerLimit = PanicMinimunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                                resultRow.PanicUpperLimit = PanicMaximunValue.Value.ToStringWithDecimals(resultRow.DecimalsAllowed)
-                            End If
-                        End If
-                    End If
-                Next resultRow
-
-                'Get Average Result Alarms
-                resultData = myResultsDelegate.GetResultAlarms(Nothing)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ResultsDS.vwksResultsAlarmsRow In CType(resultData.SetDatos, ResultsDS).vwksResultsAlarms.Rows
-                        AverageResultsDS.vwksResultsAlarms.ImportRow(resultRow)
-                    Next resultRow
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-
-                'Get Execution Result Alarms
-                resultData = myExecutionDelegate.GetWSExecutionResultAlarms(Nothing)
-                If (Not resultData.HasError) Then
-                    For Each resultRow As ExecutionsDS.vwksWSExecutionsAlarmsRow In CType(resultData.SetDatos, ExecutionsDS).vwksWSExecutionsAlarms.Rows
-                        ExecutionsResultsDS.vwksWSExecutionsAlarms.ImportRow(resultRow)
-                    Next resultRow
-                Else
-                    ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-                End If
-
-                Dim RowIndex As Integer = 0 'RH 10/04/2012
-
-                'TR 06/06/2012 *-Set the panic range limit on alarm if exist.
-                GetPanicRangeValuesExecutions()
-                GetPanicRangeValuesAverage()
-                'TR 06/06/2012 -END.
-
-                'RH 21/09/2010
-                'Fill ExecutionsResultsDS.vwksWSExecutionsResults colums PrintAvailable and HIS_Sent
-                For Each executionRow As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-                    If executionRow.SampleClass = "PATIENT" Then
-                        If IsOrderPrinted.ContainsKey(executionRow.OrderID) Then 'Already computed
-                            executionRow.PrintAvailable = Not IsOrderPrinted(executionRow.OrderID)
-                            executionRow.HIS_Sent = IsOrderHISSent(executionRow.OrderID)
-                        Else
-                            Dim PrintedFalse As Integer = 0
-                            Dim HISSent As Integer = 0
-                            Dim relatedResults As Integer = 0
-
-                            For Each resultRow As ResultsDS.vwksResultsRow In AverageResultsDS.vwksResults.Rows
-                                If String.Compare(resultRow.OrderID, executionRow.OrderID, False) = 0 Then
-                                    If Not resultRow.Printed Then PrintedFalse += 1
-
-                                    'AG 18/11/2010
-                                    'relatedResults += 1
-                                    'If resultRow.ExportStatus = "SENT" Then HISSent += 1
-                                    If resultRow.AcceptedResultFlag = True Then
-                                        relatedResults += 1
-                                        If resultRow.ExportStatus = "SENT" Then HISSent += 1
-                                    End If
-                                    'END AG 18/11/2010
-
-                                    'Take advantage of this loop for setting Result Patient Name
-                                    resultRow.PatientName = executionRow.PatientName
-                                    resultRow.PatientID = executionRow.PatientID
-                                End If
-                            Next resultRow
-
-                            executionRow.PrintAvailable = (PrintedFalse > 0)
-                            executionRow.HIS_Sent = (HISSent = relatedResults)
-
-                            IsOrderPrinted(executionRow.OrderID) = Not executionRow.PrintAvailable
-                            IsOrderHISSent(executionRow.OrderID) = executionRow.HIS_Sent
-                        End If
-                    End If
-
-                    'RH 10/04/2012
-                    executionRow.RowIndex = RowIndex 'IMPORTANT!!! The index starts in zero
-                    RowIndex += 1
-                    'END RH 10/04/2012
-
-                Next executionRow
-            Else
-                ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, Me)
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadExecutionsResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-        Debug.Print("IResults.LoadExecutionsResults: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
-    End Sub
-
-    ''' <summary>
     ''' For Each Execution validate the alarm ID to add the panic reference values.
     ''' </summary>
     ''' <remarks>
@@ -2216,9 +2018,9 @@ Public Class IResults
     ''' <param name="pMultipoinNumber">Multipoint Number</param>
     ''' <returns></returns>
     ''' <remarks>
-    ''' Created by: TR 07/06/2012</remarks>
-    Private Function GetRangeAlarmsLetter(ByVal pOrderTestID As Integer, _
-                                          ByVal pRerunNumber As Integer, ByVal pMultipoinNumber As Integer) As String
+    ''' Created by: TR 07/06/2012
+    ''' </remarks>
+    Private Function GetRangeAlarmsLetter(ByVal pOrderTestID As Integer, ByVal pRerunNumber As Integer, ByVal pMultipoinNumber As Integer) As String
         Dim myResult As String = String.Empty
         Try
             'AverageResultsDS.vwksResultsAlarms
@@ -2269,11 +2071,11 @@ Public Class IResults
     ''' <param name="pExecutionID"></param>
     ''' <returns></returns>
     ''' <remarks>
-    ''' Created by:  TR 08/06/2012</remarks>
+    ''' Created by:  TR 08/06/2012
+    ''' </remarks>
     Private Function GetReplicatesRangeAlarmsLetter(ByVal pExecutionID As Integer) As String
         Dim myResult As String = String.Empty
         Try
-            'AverageResultsDS.vwksResultsAlarms
             Dim myExecutionsAlarmsList As New List(Of ExecutionsDS.vwksWSExecutionsAlarmsRow)
             myExecutionsAlarmsList = (From row In ExecutionsResultsDS.vwksWSExecutionsAlarms _
                              Where row.ExecutionID = pExecutionID _
@@ -4563,7 +4365,6 @@ Public Class IResults
     ''' <remarks>
     ''' Created by: RH 02/11/2011
     ''' </remarks>
-
     Private Sub SetPostDilutionText(ByRef Row As ResultsDS.XtraSamplesRow, ByVal PostDilutionType As String, ByVal pRerun As Integer)
         If pRerun > 1 Then
             Select Case PostDilutionType
@@ -4739,162 +4540,6 @@ Public Class IResults
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " UpdateAverageFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Change accepted result (different rerun result) for a OrderTestID
-    ''' </summary>
-    ''' <param name="RowValues"></param>
-    ''' <param name="pSampleClass" ></param>
-    ''' <remarks></remarks>
-    Private Sub ChangeAcceptedResult(ByVal RowValues As ResultsDS.vwksResultsRow, ByVal pSampleClass As String)
-        Try
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
-            Dim myGlobal As GlobalDataTO
-
-            Dim executionToRecalculate As Integer = -1
-
-            If String.Compare(RowValues.TestType, "STD", False) = 0 Then
-                'Get the maximum replicate belongs the selected OrderTestID, RerunNumber 
-                Dim maxItemNumber As Integer = _
-                                (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                                 Where row.OrderTestID = RowValues.OrderTestID _
-                                 AndAlso row.RerunNumber = RowValues.RerunNumber _
-                                 Select row.MultiItemNumber).Max()
-
-                Dim maxReplicate As Integer = _
-                    (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                     Where row.OrderTestID = RowValues.OrderTestID _
-                     AndAlso row.RerunNumber = RowValues.RerunNumber _
-                     Select row.ReplicateNumber).Max()
-
-                executionToRecalculate = _
-                    (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                     Where row.OrderTestID = RowValues.OrderTestID _
-                     AndAlso row.RerunNumber = RowValues.RerunNumber _
-                     AndAlso row.MultiItemNumber = maxItemNumber _
-                     AndAlso row.ReplicateNumber = maxReplicate _
-                     Select row.ExecutionID).Max()
-
-            Else 'ISE, OFFS, CALC
-                executionToRecalculate = -1
-            End If
-
-            Cursor = Cursors.WaitCursor     'AG 14/10/2010
-
-            'AG 15/10/2014 BA-2011
-            'myGlobal = myRecalDelegate.ChangeAcceptedResult(Nothing, AnalyzerIDField, WorkSessionIDField, RowValues.OrderTestID, RowValues.RerunNumber, executionToRecalculate, RowValues.TestType, pSampleClass)
-            Dim myExportStatus As String = ""
-            If Not RowValues.IsExportStatusNull Then myExportStatus = RowValues.ExportStatus
-            myGlobal = myRecalDelegate.ChangeAcceptedResult(Nothing, AnalyzerIDField, WorkSessionIDField, RowValues.OrderTestID, RowValues.RerunNumber, executionToRecalculate, RowValues.TestType, pSampleClass, RowValues.ExportStatus)
-            'AG 15/10/2014 BA-2011
-
-            Dim actionAllowed As Boolean = False
-
-            If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                actionAllowed = CType(myGlobal.SetDatos, Boolean)
-
-                If actionAllowed Then
-                    'UpdateScreenGlobalDSWithAffectedResults()
-
-                    UpdateAverageFromDB(RowValues.TestName)
-
-                    'AG 24/11/2010 - After change accepted result the HIS export icon maybe changes
-                    If bsTestDetailsTabControl.SelectedTab.Name = bsSamplesTab.Name Then
-                        UpdateSamplesListDataGrid()
-                    Else
-                        UpdatePatientList = True
-                    End If
-                    'AG 24/11/2010 
-                End If
-            End If
-
-        Catch ex As Exception
-            Me.Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ChangeAcceptedResult ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        Finally
-            Cursor = Cursors.Default
-
-        End Try
-    End Sub
-
-    ''' <summary>
-    ''' Change calibration type between Experimental or Factor due the manual calibration factor feature
-    ''' </summary>
-    ''' <param name="pUseManualFactor"></param>
-    ''' <param name="pDgv"></param>
-    ''' <param name="RowValues"></param>
-    ''' <param name="pManualFactorValue"></param>
-    ''' <remarks>
-    ''' Created by: AG 09/11/2010
-    ''' </remarks>
-    Private Sub ChangeCalibrationType(ByVal pUseManualFactor As Boolean, ByRef pDgv As BSDataGridView, ByVal RowValues As ResultsDS.vwksResultsRow, _
-                                      ByVal pManualFactorValue As Single)
-        Try
-            Dim myRecalDelegate As New RecalculateResultsDelegate
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
-            Dim myGlobal As New GlobalDataTO
-
-            'Get the maximum replicate belongs the selected OrderTestID, RerunNumber 
-            Dim maxItemNumber As Integer = _
-                            (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                             Where row.OrderTestID = RowValues.OrderTestID _
-                             AndAlso row.RerunNumber = RowValues.RerunNumber _
-                             Select row.MultiItemNumber).Max
-
-            If maxItemNumber = 1 Then
-                Cursor = Cursors.WaitCursor     'AG 14/10/2010
-
-                'Get some execution for recalculation works properly
-                Dim myExecution As Integer = _
-                (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
-                 Where row.OrderTestID = RowValues.OrderTestID _
-                 AndAlso row.RerunNumber = RowValues.RerunNumber _
-                 AndAlso row.MultiItemNumber = maxItemNumber _
-                 Select row.ExecutionID).Max
-
-                myGlobal = myRecalDelegate.UpdateManualCalibrationFactor(Nothing, AnalyzerIDField, WorkSessionIDField, pUseManualFactor, _
-                                                                             pManualFactorValue, myExecution, RowValues.OrderTestID, RowValues.MultiPointNumber, RowValues.RerunNumber)
-
-
-                Dim actionAllowed As Boolean = False
-                If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
-                    actionAllowed = CType(myGlobal.SetDatos, Boolean)
-
-                    If actionAllowed Then
-                        UpdateScreenGlobalDSWithAffectedResults()
-                        'AG 24/11/2010 - After manual factor recalculations the HIS export icon maybe changes
-                        If String.Compare(bsTestDetailsTabControl.SelectedTab.Name, bsSamplesTab.Name, False) = 0 Then
-                            UpdateSamplesListDataGrid()
-                            'Else
-                            'AG 24/11/2010 - After manual factor recalculations the HIS export icon maybe changes= True
-                        End If
-                        'AG 24/11/2010 
-
-                        'AG 26/07/2012 - new versions set the strike row when grid is repainted
-                        'If pUseManualFactor Then
-                        '    pDgv.CurrentRow.DefaultCellStyle.Font = StrikeFont
-                        '    pDgv.CurrentCell.Style.Font = RegularFont
-                        'Else
-                        '    pDgv.CurrentRow.DefaultCellStyle.Font = RegularFont
-                        'End If
-
-                    End If
-
-                End If
-                Cursor = Cursors.Default
-            End If
-
-        Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ChangeCalibrationType ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-            Cursor = Cursors.Default    'AG 14/10/2010
-        Finally
-            Cursor = Cursors.Default
         End Try
     End Sub
 
@@ -5925,14 +5570,14 @@ Public Class IResults
     ''' Manage the process of manual export of results to LIS 
     ''' </summary>
     ''' <remarks>
-    ''' Created by: SA 18/09/2014 - BA-1927 ==> * Code moved from event ExportButton.Click
-    '''                                         * Before start the process, verify if LIS Connection is enabled. If it is not available, stop the process
-    '''                                         * Count the number of results to Export before start the process. If it is greater than 100, show the warning 
-    '''                                           message (using multilanguage) and stop the process
-    '''                                         * Call new function ActivateDeactivateAllButtons to deactivate/activate buttons when the process starts/finishes
-    '''                                         * Refresh the list of Patients also when the Export to LIS has been executed from Tests View to update CheckBox 
-    '''                                           ExportToLIS for all Patients which results have been exported 
-    ''' AG 30/09/2014 - BA-1440 inform that is a manual exportation when call method InvokeUploadResultsLIS
+    ''' Created by:  SA 18/09/2014 - BA-1927 ==> * Code moved from event ExportButton.Click
+    '''                                          * Before start the process, verify if LIS Connection is enabled. If it is not available, stop the process
+    '''                                          * Count the number of results to Export before start the process. If it is greater than 100, show the warning 
+    '''                                            message (using multilanguage) and stop the process
+    '''                                          * Call new function ActivateDeactivateAllButtons to deactivate/activate buttons when the process starts/finishes
+    '''                                          * Refresh the list of Patients also when the Export to LIS has been executed from Tests View to update CheckBox 
+    '''                                            ExportToLIS for all Patients which results have been exported 
+    ''' Modified by: AG 30/09/2014 - BA-1440 ==> Inform that is a manual exportation when call method InvokeUploadResultsLIS
     ''' </remarks>
     Private Sub ExportResultsToLIS()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6229,7 +5874,6 @@ Public Class IResults
         End Try
         Return connectEnabled
     End Function
-
 #End Region
 
 #Region "TO DELETE"
@@ -6322,144 +5966,5 @@ Public Class IResults
 
     'End Sub
     ' XB 26/02/2014 - task #1529
-
-    'AG 04/06/2012
-    'Private Sub IResults_Activated(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Activated
-    '    elapsedTime = Now.Subtract(startTime).TotalMilliseconds
-    'End Sub
-
-    '''' <summary>
-    '''' Get texts in the current application language for all screen controls
-    '''' </summary>
-    '''' <remarks>
-    '''' '<param name="pLanguageID"> The current Language of Application </param>
-    '''' Created by: PG 20/10/2010
-    '''' 
-    '''' </remarks>
-    'Private Sub GetScreenLabelsGraph(ByVal ReplicateGraph As bsResultsChart)
-    '    Try
-    '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-    '        ReplicateGraph.CalibratorNumberCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_CalibNo", LanguageID) + ":"
-    '        ReplicateGraph.SampleCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_SampleVolume", LanguageID) + ":"
-    '        ReplicateGraph.TestCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Test", LanguageID) + ":"
-    '        ReplicateGraph.WellCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Well", LanguageID) + ":"
-    '        ReplicateGraph.ReplicateCaption = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Rep", LanguageID) + ":"
-
-    '        ReplicateGraph.ChartAbs1Title = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs1", LanguageID) + ":"
-    '        ReplicateGraph.ChartAbs2Title = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs2", LanguageID) + ":"
-    '        ReplicateGraph.ChartDiffTitle = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Diff", LanguageID) + ":"
-
-    '        ReplicateGraph.ExitButtonToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_ExitBtnTTip", LanguageID)
-
-    '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabelsGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage(Me.Name & ".GetScreenLabelsGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
-    '    End Try
-    'End Sub
-
-    '''' <summary>
-    '''' Get texts in the current application language for all screen controls
-    '''' </summary>
-    '''' <remarks>
-    '''' <param name="pLanguageID"> The current Language of Application </param>
-    '''' Created by: PG 20/10/2010
-    '''' </remarks>
-    'Private Sub GetScreenLabelsAxesGraph(ByVal ReplicateGraph As bsResultsChart)
-    '    Try
-    '        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-
-    '        'For Chart
-    '        ReplicateGraph.ChartVerticalAxisName = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", LanguageID)
-    '        ReplicateGraph.ChartHorizontalAxisName = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Cycles", LanguageID)
-
-    '        ReplicateGraph.ChartCycleGrid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Tests_Cycle", LanguageID)
-    '        ReplicateGraph.ChartAbs1Grid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs1_Short", LanguageID)
-    '        ReplicateGraph.ChartAbs2Grid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Abs2_Short", LanguageID)
-    '        ReplicateGraph.ChartDiffGrid = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CurveReplicate_Diff_Short", LanguageID)
-
-    '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabelsAxesGraph ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage(Me.Name & ".GetScreenLabelsAxesGraph ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
-    '    End Try
-    'End Sub
-
-    'Private Sub DataGridView_ShownEditor(ByVal sender As Object, ByVal e As System.EventArgs) Handles DataGridView.ShownEditor
-    '    If TypeOf (TryCast(sender, GridView)).ActiveEditor Is CheckEdit Then
-    '        Dim edit As CheckEdit = TryCast((TryCast(sender, GridView)).ActiveEditor, CheckEdit)
-    '        AddHandler edit.CheckedChanged, AddressOf CheckedChanged
-    '    End If
-    'End Sub
-
-
-    'Private Sub CheckedChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) 'Handles OrderToExportCheckBox.CheckedChanged
-
-    '    Try
-    '        Cursor = Cursors.WaitCursor
-
-    '        Dim myPatientID As String = DataGridView.GetRowCellValue(DataGridView.FocusedRowHandle, "PatientID")
-    '        Dim myOrderToExport As Boolean = Convert.ToBoolean(DataGridView.GetRowCellValue(DataGridView.FocusedRowHandle, "OrderToExport"))
-    '        Dim myOrderToPrint As Boolean = Convert.ToBoolean(DataGridView.GetRowCellValue(DataGridView.FocusedRowHandle, "OrderToPrint"))
-
-    '        Select Case DataGridView.FocusedColumn.FieldName
-    '            Case "OrderToPrint"
-
-    '                'If myOrderToPrint Then
-    '                '    myOrderToPrint = False
-    '                'Else
-    '                '    myOrderToPrint = True
-    '                'End If
-
-    '                'RH 24/03/2011 A more simple way to obtain the same result
-    '                myOrderToPrint = Not myOrderToPrint
-
-    '            Case "OrderToExport"
-
-    '                'If myOrderToExport Then
-    '                '    myOrderToExport = False
-    '                'Else
-    '                '    myOrderToExport = True
-    '                'End If
-
-    '                'RH 24/03/2011 A more simple way to obtain the same result
-    '                myOrderToExport = Not myOrderToExport
-    '        End Select
-
-    '        Dim myOrdersDelegate As New OrdersDelegate
-    '        'Dim resultData As New GlobalDataTO
-    '        Dim resultData As GlobalDataTO
-    '        resultData = myOrdersDelegate.UpdateOutputBySampleID(Nothing, myPatientID, myOrderToPrint, myOrderToExport)
-
-    '        ' Update Data Set
-    '        If Not resultData.HasError Then
-    '            For Each Row As ExecutionsDS.vwksWSExecutionsResultsRow In ExecutionsResultsDS.vwksWSExecutionsResults
-    '                If Row.PatientID = myPatientID AndAlso Row.SampleClass = "PATIENT" Then
-    '                    Row.OrderToPrint = myOrderToPrint
-    '                    Row.OrderToExport = myOrderToExport
-    '                    'Row.AcceptChanges()
-    '                End If
-    '            Next Row
-
-    '            'RH 25/03/2011
-    '            ExecutionsResultsDS.vwksWSExecutionsResults.AcceptChanges()
-
-    '        End If
-
-    '        'Cursor = Cursors.Default
-
-    '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " OrderToExportCheckBox_CheckedChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-    '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-    '    Finally
-    '        'RH 24/03/2011 Move Cursor = Cursors.Default here because we want to restore the default cursor in any case
-    '        'wherever there is an exception or not
-    '        Cursor = Cursors.Default
-
-    '    End Try
-
-    'End Sub
 #End Region
 End Class

@@ -534,7 +534,7 @@ Public Class FormSergio
             Dim myAnalyzer As New AnalyzerManager("", "")
             myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
             Dim myISEResultsDelegate As New ISEReception(myAnalyzer)
-            myGlobal = myISEResultsDelegate.ProcessISETESTResults(Nothing, 22, myISEResultTO, "SimpleMode", "2012032701", "SN0000099999_Ax400")
+            myGlobal = myISEResultsDelegate.ProcessISETESTResultsNEW(Nothing, 22, myISEResultTO, "SimpleMode", "2012032701", "SN0000099999_Ax400")
 
         Catch ex As Exception
             Throw ex
