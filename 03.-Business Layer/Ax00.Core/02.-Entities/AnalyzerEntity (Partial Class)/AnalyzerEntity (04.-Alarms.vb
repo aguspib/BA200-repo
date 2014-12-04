@@ -1697,7 +1697,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         If wellBaseLineAutoPausesSession <> 0 Then
                             pAlarmList.Add(pAlarmCode)
                             pAlarmStatusList.Add(True)
-                            If Not pAdditionalInfoList Is Nothing Then 'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
+                            If Not pAdditionalInfoList Is Nothing Then
                                 pAdditionalInfoList.Add(pAddInfo)
                             End If
                         End If
@@ -4568,211 +4568,202 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Dim alarmIDEnumList As New List(Of GlobalEnumerates.Alarms)
             For Each row As String In pAlarmStringCodes
+                'AG 04/12/2014 BA-2146 code improvement
+                alarmIDEnumList.Add(DirectCast([Enum].Parse(GetType(GlobalEnumerates.Alarms), row), GlobalEnumerates.Alarms))
+
                 'This select must be updated with every alarmID added into enumerate GlobalEnumerates.Alarms
-                Select Case row
-                    Case "MAIN_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
-                    Case "MAIN_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
+                'Select Case row
+                '    Case "MAIN_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
+                '    Case "MAIN_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
 
-                    Case "WASH_CONTAINER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-                    Case "WASH_CONTAINER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
+                '    Case "WASH_CONTAINER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
+                '    Case "WASH_CONTAINER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
 
-                    Case "HIGH_CONTAMIN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-                    Case "HIGH_CONTAMIN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
+                '    Case "HIGH_CONTAMIN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
+                '    Case "HIGH_CONTAMIN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
 
-                    Case "R1_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-                        'DL 31/07/2012. Begin. Remove R1_TEMP_SYSTEM_ERR
-                    Case "R1_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-                        'Case "R1_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR)
-                        'Case "R1_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "R1_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
-                    Case "R1_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN)
-                    Case "BOTTLE_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) 'TR 01/10/2012 -Botlle locked alarm.
-                    Case "R1_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
-                    Case "R1_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
-                    Case "FRIDGE_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
-                    Case "FRIDGE_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-                    Case "FRIDGE_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-                    Case "FRIDGE_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-                        'DL 31/07/2012. Begin Remove FRIDGE_TEMP_SYS_ERR
-                    Case "FRIDGE_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
-                        'Case "FRIDGE_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR)
-                        'Case "FRIDGE_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "FRIDGE_STATUS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
-                    Case "FRIDGE_STATUS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
+                '    Case "R1_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
+                '        'DL 31/07/2012. Begin. Remove R1_TEMP_SYSTEM_ERR
+                '    Case "R1_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
+                '        'Case "R1_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR)
+                '        'Case "R1_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "R1_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
+                '    Case "R1_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN)
+                '    Case "BOTTLE_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) 'TR 01/10/2012 -Botlle locked alarm.
+                '    Case "R1_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
+                '    Case "R1_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
+                '    Case "FRIDGE_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
+                '    Case "FRIDGE_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
+                '    Case "FRIDGE_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
+                '    Case "FRIDGE_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
+                '        'DL 31/07/2012. Begin Remove FRIDGE_TEMP_SYS_ERR
+                '    Case "FRIDGE_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
+                '        'Case "FRIDGE_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR)
+                '        'Case "FRIDGE_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "FRIDGE_STATUS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
+                '    Case "FRIDGE_STATUS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
 
-                    Case "R2_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-                        'DL 31/07/2012. Begin. Remove R2_TEMP_SYSTEM_ERR
-                    Case "R2_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
-                        'Case "R2_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR)
-                        'Case "R2_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "R2_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
-                    Case "R2_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN)
-                    Case "R2_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
-                    Case "R2_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
-                    Case "WATER_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-                    Case "WATER_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
-                    Case "WASTE_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-                    Case "WASTE_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
-                    Case "REACT_ROTOR_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
-                    Case "FRIDGE_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
-                    Case "REACT_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
-                    Case "REACT_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-                    Case "REACT_MISSING_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
-                    Case "REACT_ENCODER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
-                    Case "REACT_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-                    Case "REACT_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
-                        'DL 31/07/2012. Begin. Remove REACT_TEMP_SYS_ERR
-                    Case "REACT_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
-                        'Case "REACT_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR)
-                        'Case "REACT_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "REACT_SAFESTOP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_SAFESTOP_ERR)
-                    Case "WS_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-                        'DL 31/07/2012. Begin. Remove WS_TEMP_SYSTEM_ERR
-                    Case "WS_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
-                        'Case "WS_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR)
-                        'Case "WS_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
+                '    Case "R2_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
+                '        'DL 31/07/2012. Begin. Remove R2_TEMP_SYSTEM_ERR
+                '    Case "R2_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
+                '        'Case "R2_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR)
+                '        'Case "R2_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "R2_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
+                '    Case "R2_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN)
+                '    Case "R2_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
+                '    Case "R2_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
+                '    Case "WATER_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
+                '    Case "WATER_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
+                '    Case "WASTE_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
+                '    Case "WASTE_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
+                '    Case "REACT_ROTOR_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
+                '    Case "FRIDGE_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
+                '    Case "REACT_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
+                '    Case "REACT_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
+                '    Case "REACT_MISSING_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
+                '    Case "REACT_ENCODER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
+                '    Case "REACT_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
+                '    Case "REACT_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
+                '        'DL 31/07/2012. Begin. Remove REACT_TEMP_SYS_ERR
+                '    Case "REACT_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
+                '        'Case "REACT_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR)
+                '        'Case "REACT_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "REACT_SAFESTOP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_SAFESTOP_ERR)
+                '    Case "WS_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
+                '        'DL 31/07/2012. Begin. Remove WS_TEMP_SYSTEM_ERR
+                '    Case "WS_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
+                '        'Case "WS_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR)
+                '        'Case "WS_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
 
-                    Case "WS_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
-                    Case "CLOT_DETECTION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
-                    Case "CLOT_DETECTION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
-                    Case "CLOT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)   'DL 13/06/2012
+                '    Case "WS_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
+                '    Case "CLOT_DETECTION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
+                '    Case "CLOT_DETECTION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
+                '    Case "CLOT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)   'DL 13/06/2012
 
-                    Case "S_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
-                    Case "S_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN)
-                    Case "DS_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN)
-                    Case "S_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR)
-                    Case "S_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
-                    Case "S_OBSTRUCTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)
+                '    Case "S_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
+                '    Case "S_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN)
+                '    Case "DS_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN)
+                '    Case "S_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR)
+                '    Case "S_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
+                '    Case "S_OBSTRUCTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)
 
-                    Case "S_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
-                    Case "S_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
+                '    Case "S_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
+                '    Case "S_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
 
-                    Case "R1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_H_HOME_ERR)
-                    Case "R1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_V_HOME_ERR)
-                    Case "R2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_H_HOME_ERR)
-                    Case "R2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_V_HOME_ERR)
-                    Case "S_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_H_HOME_ERR)
-                    Case "S_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_V_HOME_ERR)
-                    Case "STIRRER1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_H_HOME_ERR)
-                    Case "STIRRER1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_V_HOME_ERR)
-                    Case "STIRRER2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_H_HOME_ERR)
-                    Case "STIRRER2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_V_HOME_ERR)
-                    Case "FRIDGE_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_HOME_ERR)
-                    Case "SAMPLES_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SAMPLES_HOME_ERR)
-                    Case "REACTIONS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACTIONS_HOME_ERR)
-                    Case "WS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_HOME_ERR)
-                    Case "WS_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PUMP_HOME_ERR)
-                    Case "R1_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_PUMP_HOME_ERR)
-                    Case "R2_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_PUMP_HOME_ERR)
-                    Case "S_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_PUMP_HOME_ERR)
+                '    Case "R1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_H_HOME_ERR)
+                '    Case "R1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_V_HOME_ERR)
+                '    Case "R2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_H_HOME_ERR)
+                '    Case "R2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_V_HOME_ERR)
+                '    Case "S_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_H_HOME_ERR)
+                '    Case "S_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_V_HOME_ERR)
+                '    Case "STIRRER1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_H_HOME_ERR)
+                '    Case "STIRRER1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_V_HOME_ERR)
+                '    Case "STIRRER2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_H_HOME_ERR)
+                '    Case "STIRRER2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_V_HOME_ERR)
+                '    Case "FRIDGE_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_HOME_ERR)
+                '    Case "SAMPLES_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SAMPLES_HOME_ERR)
+                '    Case "REACTIONS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACTIONS_HOME_ERR)
+                '    Case "WS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_HOME_ERR)
+                '    Case "WS_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PUMP_HOME_ERR)
+                '    Case "R1_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_PUMP_HOME_ERR)
+                '    Case "R2_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_PUMP_HOME_ERR)
+                '    Case "S_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_PUMP_HOME_ERR)
 
-                    Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                    Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                    Case "RECOVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.RECOVER_ERR)
-                    Case "INST_REJECTED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_WARN)
-                    Case "PH_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PH_BOARD_ERR)
-                    Case "GLF_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_RESET_ERR)
-                    Case "SFX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_RESET_ERR)
-                    Case "JEX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_RESET_ERR)
+                '    Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
+                '    Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
+                '    Case "RECOVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.RECOVER_ERR)
+                '    Case "INST_REJECTED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_WARN)
+                '    Case "PH_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PH_BOARD_ERR)
+                '    Case "GLF_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_RESET_ERR)
+                '    Case "SFX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_RESET_ERR)
+                '    Case "JEX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_RESET_ERR)
 
-                        'DL 13/06/2012. Begin
-                    Case "R1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_BOARD_ERR)
-                    Case "R1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_RESET_ERR)
-                    Case "R2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_BOARD_ERR)
-                    Case "R2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_RESET_ERR)
-                    Case "S_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_BOARD_ERR)
-                    Case "S_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_RESET_ERR)
-                    Case "STIRRER1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_BOARD_ERR)
-                    Case "STIRRER1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_RESET_ERR)
-                    Case "STIRRER2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_BOARD_ERR)
-                    Case "STIRRER2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_RESET_ERR)
-                    Case "R1_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_BOARD_ERR)
-                    Case "R1_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_RESET_ERR)
-                    Case "R2_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_BOARD_ERR)
-                    Case "R2_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_RESET_ERR)
-                    Case "S_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_BOARD_ERR)
-                    Case "S_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_RESET_ERR)
-                    Case "FRIDGE_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_BOARD_ERR)
-                    Case "FRIDGE_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_RESET_ERR)
-                    Case "S_ROTOR_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_BOARD_ERR)
-                    Case "S_ROTOR_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_RESET_ERR)
-                    Case "GLF_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_BOARD_ERR)
-                    Case "SFX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_BOARD_ERR)
-                    Case "JEX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_BOARD_ERR)
-                        'DL 13/06/2012. End
+                '        'DL 13/06/2012. Begin
+                '    Case "R1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_BOARD_ERR)
+                '    Case "R1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_RESET_ERR)
+                '    Case "R2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_BOARD_ERR)
+                '    Case "R2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_RESET_ERR)
+                '    Case "S_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_BOARD_ERR)
+                '    Case "S_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_RESET_ERR)
+                '    Case "STIRRER1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_BOARD_ERR)
+                '    Case "STIRRER1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_RESET_ERR)
+                '    Case "STIRRER2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_BOARD_ERR)
+                '    Case "STIRRER2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_RESET_ERR)
+                '    Case "R1_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_BOARD_ERR)
+                '    Case "R1_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_RESET_ERR)
+                '    Case "R2_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_BOARD_ERR)
+                '    Case "R2_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_RESET_ERR)
+                '    Case "S_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_BOARD_ERR)
+                '    Case "S_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_RESET_ERR)
+                '    Case "FRIDGE_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_BOARD_ERR)
+                '    Case "FRIDGE_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_RESET_ERR)
+                '    Case "S_ROTOR_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_BOARD_ERR)
+                '    Case "S_ROTOR_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_RESET_ERR)
+                '    Case "GLF_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_BOARD_ERR)
+                '    Case "SFX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_BOARD_ERR)
+                '    Case "JEX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_BOARD_ERR)
+                '        'DL 13/06/2012. End
 
-                    Case "ISE_OFF_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                    Case "ISE_FAILED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR)
-                    Case "ISE_TIMEOUT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                '    Case "ISE_OFF_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                '    Case "ISE_FAILED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR)
+                '    Case "ISE_TIMEOUT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
 
-                        ' XBC 21/03/2012
-                    Case "ISE_RP_INVALID_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-                    Case "ISE_RP_NOT_INSTALL" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-                    Case "ISE_RP_DEPLETED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
-                    Case "ISE_ELEC_WRONG_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-                    Case "ISE_CP_INSTALL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-                    Case "ISE_CP_WRONG" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
-                    Case "ISE_LONG_DEACT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-                    Case "ISE_RP_EXPIRED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
-                    Case "ISE_ELEC_CONS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
-                    Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
-                    Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
-                    Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
-                        '
-                    Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                    Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                    Case "PREP_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PREP_LOCKED_WARN)
-                    Case "COMMS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.COMMS_ERR)
-                    Case "REPORTSATLOADED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REPORTSATLOADED_WARN)
-                    Case "ADJUST_NO_EXIST" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ADJUST_NO_EXIST)
+                '        ' XBC 21/03/2012
+                '    Case "ISE_RP_INVALID_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
+                '    Case "ISE_RP_NOT_INSTALL" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
+                '    Case "ISE_RP_DEPLETED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
+                '    Case "ISE_ELEC_WRONG_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
+                '    Case "ISE_CP_INSTALL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
+                '    Case "ISE_CP_WRONG" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
+                '    Case "ISE_LONG_DEACT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
+                '    Case "ISE_RP_EXPIRED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
+                '    Case "ISE_ELEC_CONS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
+                '    Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
+                '    Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
+                '    Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
+                '        '
+                '    Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                '    Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                '    Case "PREP_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PREP_LOCKED_WARN)
+                '    Case "COMMS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.COMMS_ERR)
+                '    Case "REPORTSATLOADED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REPORTSATLOADED_WARN)
+                '    Case "ADJUST_NO_EXIST" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ADJUST_NO_EXIST)
 
-                        'BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
-                    Case "WS_PAUSE_MODE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN)
+                '        'BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
+                '    Case "WS_PAUSE_MODE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN)
 
-                    Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'TR 21/10/2013 Bug #1339 add this alamr on User app.
-                        '
-                        'Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)                     'DL 27/07/2012 
-                        'Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)     'DL 27/07/2012 
-                        'Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)       'DL 27/07/2012 
-                        'Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)           'DL 27/07/2012 
-                        'Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)           'DL 27/07/2012 
-                        'Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)                     'DL 27/07/2012 
-                        'Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)                     'DL 27/07/2012 
-                        'Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)           'DL 27/07/2012 
-                        'Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR) 'DL 27/07/2012 
-                        'Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'DL 27/07/2012 
-                        'Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)       'DL 27/07/2012 
-                        'Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)       'DL 27/07/2012 
+                '    Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'TR 21/10/2013 Bug #1339 add this alamr on User app.
 
-                End Select
+                'End Select
 
-                ' XBC 18/10/2012 - Alarms treatment for Service
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                If GlobalBase.IsServiceAssembly Then
-                    Select Case row
-                        Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)
-                        Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)
-                        Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)
-                        Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)
-                        Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)
-                        Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)
-                        Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)
-                        Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)
-                        Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR)
-                        Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR)
-                        Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)
-                        Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)
-                        Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                        Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                    End Select
-                End If
-                ' XBC 18/10/2012 
+                '' XBC 18/10/2012 - Alarms treatment for Service
+                ''SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                ''If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                'If GlobalBase.IsServiceAssembly Then
+                '    Select Case row
+                '        Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)
+                '        Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)
+                '        Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)
+                '        Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)
+                '        Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)
+                '        Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)
+                '        Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)
+                '        Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)
+                '        Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR)
+                '        Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR)
+                '        Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)
+                '        Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)
+                '        Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
+                '        Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
+                '    End Select
+                'End If
+                '' XBC 18/10/2012 
+                'AG 04/12/2014 BA-2146
 
             Next
             Return alarmIDEnumList
