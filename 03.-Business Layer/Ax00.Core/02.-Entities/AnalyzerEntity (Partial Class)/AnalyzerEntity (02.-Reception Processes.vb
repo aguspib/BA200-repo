@@ -375,6 +375,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Translation method
                             Dim myAlarmsReceivedList As New List(Of GlobalEnumerates.Alarms)
                             Dim myAlarmsStatusList As New List(Of Boolean)
+                            Dim myAlarmsErrorCodeList As New List(Of Integer) 'AG 04/12/2014 BA-2146
+
                             Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
                             Dim myErrorCode As New List(Of Integer)
                             ' XBC 16/10/2012
@@ -410,8 +412,20 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             'end SGM 02/07/2012
 
+                            'AG 04/12/2014 BA-2146
+                            Dim index As Integer = 0
+                            Dim errorCodeID As Integer = -1
+                            'AG 04/12/2014 BA-2146
+
                             For Each alarmID As GlobalEnumerates.Alarms In myAlarms
-                                PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
+                                'AG 04/12/2014 BA-2146 - Method 
+                                'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
+                                errorCodeID = -1
+                                If index <= myErrorCode.Count - 1 Then
+                                    errorCodeID = myErrorCode(index)
+                                End If
+                                PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True, errorCodeID, myAlarmsErrorCodeList)
+                                'AG 04/12/2014 BA-2146
                             Next
 
                             ' XBC 16/10/2012 - Alarms treatment for Service
@@ -435,7 +449,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList)
                                     ' XBC 16/10/2012
                                 Else
-                                    myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
+                                    'AG 04/12/2014 BA-2146
+                                    'myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
+                                    myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList, Nothing, myAlarmsErrorCodeList)
+                                    'AG 04/12/2014 BA-2146
                                 End If
 
                             Else 'if not new alarms sure the ansinfo instruction is activated
@@ -1300,6 +1317,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '    If (Not dbConnection Is Nothing) Then
                 Dim myAlarmsReceivedList As New List(Of GlobalEnumerates.Alarms)
                 Dim myAlarmsStatusList As New List(Of Boolean)
+                Dim myAlarmsErrorCodeList As New List(Of Integer) 'AG 04/12/2014 BA-2146
 
                 '1- Read the different instruction fields (implement in the same way as we do for instance at ProcessStatusReceived)
                 '   and fill the internal alarm & alarm status lists using the method PrepareLocalAlarmList 
@@ -1391,8 +1409,20 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
                 'end SGM 09/11/2012
 
+                'AG 04/12/2014 BA-2146
+                Dim index As Integer = 0
+                Dim errorCodeID As Integer = -1
+                'AG 04/12/2014 BA-2146
+
                 For Each alarmID As GlobalEnumerates.Alarms In myAlarms
-                    PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
+                    'AG 04/12/2014 BA-2146 - Method 
+                    'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
+                    errorCodeID = -1
+                    If index <= myErrorCode.Count - 1 Then
+                        errorCodeID = myErrorCode(index)
+                    End If
+                    PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True, errorCodeID, myAlarmsErrorCodeList)
+                    'AG 04/12/2014 BA-2146
                 Next
 
                 'AG 02/03/2012
@@ -1420,7 +1450,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
                             ' XBC 16/10/2012
                         Else
-                            myGlobal = ManageAlarms(dbConnection, myAlarmsReceivedList, myAlarmsStatusList)
+                            'AG 04/12/2014 BA-2146
+                            'myGlobal = ManageAlarms(dbConnection, myAlarmsReceivedList, myAlarmsStatusList)
+                            myGlobal = ManageAlarms(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, Nothing, myAlarmsErrorCodeList)
+                            'AG 04/12/2014 BA-2146
                         End If
                     End If
 

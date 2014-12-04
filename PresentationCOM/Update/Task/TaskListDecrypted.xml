@@ -2163,7 +2163,7 @@
       BEGIN
       ALTER TABLE [Ax00].[dbo].twksWSBLines ADD Type [nvarchar](15) NOT NULL DEFAULT 'STATIC'
       END
-      
+
       SET ANSI_PADDING ON
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_twksWSBLines') = 1)
       BEGIN
@@ -2187,60 +2187,84 @@
       SET ANSI_PADDING ON
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwSwParameters_1') = 1)
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters DROP CONSTRAINT PK_tfmwSwParameters_1
+      ALTER TABLE [Ax00].[dbo].tfmwSwParameters DROP CONSTRAINT PK_tfmwSwParameters_1
       END
 
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwSwParameters' AND sc.name = 'ParameterID') = 1
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters DROP COLUMN [ParameterID]
+      ALTER TABLE [Ax00].[dbo].tfmwSwParameters DROP COLUMN [ParameterID]
       END
 
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwSwParameters' AND sc.name = 'ParameterID') = 0
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters ADD [ParameterID] [int] IDENTITY(1,1) NOT NULL
+      ALTER TABLE [Ax00].[dbo].tfmwSwParameters ADD [ParameterID] [int] IDENTITY(1,1) NOT NULL
       END
 
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwSwParameters_1') = 0)
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwSwParameters ADD  CONSTRAINT [PK_tfmwSwParameters_1] PRIMARY KEY CLUSTERED 
+      ALTER TABLE [Ax00].[dbo].tfmwSwParameters ADD  CONSTRAINT [PK_tfmwSwParameters_1] PRIMARY KEY CLUSTERED
       (
-	      [ParameterID] ASC
+      [ParameterID] ASC
       )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
       END
 
       SET ANSI_PADDING OFF
-      GO  
-      
-    
+      GO
+
+
       SET ANSI_PADDING ON
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwPreloadedRanges') = 1)
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits DROP CONSTRAINT PK_tfmwPreloadedRanges
+      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits DROP CONSTRAINT PK_tfmwPreloadedRanges
       END
 
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'tfmwFieldLimits' AND sc.name = 'IndexID') = 0
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits ADD [IndexID] [int] IDENTITY(1,1) NOT NULL
+      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits ADD [IndexID] [int] IDENTITY(1,1) NOT NULL
       END
 
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'PK' AND name = 'PK_tfmwFieldLimits_1') = 0)
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits ADD  CONSTRAINT PK_tfmwFieldLimits_1 PRIMARY KEY CLUSTERED 
+      ALTER TABLE [Ax00].[dbo].tfmwFieldLimits ADD  CONSTRAINT PK_tfmwFieldLimits_1 PRIMARY KEY CLUSTERED
       (
-	      [IndexID] ASC
+      [IndexID] ASC
       )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
       END
 
       SET ANSI_PADDING OFF
       GO
-      
+
       IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSBLinesByWell' AND sc.name = 'Type') = 0
       BEGIN
-	      ALTER TABLE [Ax00].[dbo].twksWSBLinesByWell ADD Type [nvarchar](15) NOT NULL DEFAULT 'STATIC'
+      ALTER TABLE [Ax00].[dbo].twksWSBLinesByWell ADD Type [nvarchar](15) NOT NULL DEFAULT 'STATIC'
       END
       SET ANSI_PADDING OFF
       GO
-      
+
+      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSAnalyzerAlarms' AND sc.name = 'ErrorCode') = 0
+      BEGIN
+      ALTER TABLE [dbo].twksWSAnalyzerAlarms ADD ErrorCode SmallInt NULL
+      END
+      GO
+
+
+
+
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vwksAlarmsMonitor') = 1)
+      DROP VIEW [dbo].vwksAlarmsMonitor
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vwksAlarmsMonitor]
+      AS
+      SELECT     AA.AlarmID, AA.AnalyzerID, AA.AlarmDateTime, AA.AlarmItem, AA.WorkSessionID, AA.AdditionalInfo, AA.AlarmStatus, A.AlarmSource, A.AlarmType, A.Name,
+      A.Description, A.Solution, AA.OKDateTime, (CASE WHEN AA.OKDateTime IS NULL THEN NULL ELSE DateDiff(second, AA.AlarmDateTime, AA.OKDateTime) END)
+      AS AlarmPeriodSEC, AA.ErrorCode
+      FROM         dbo.tfmwAlarms AS A INNER JOIN
+      dbo.twksWSAnalyzerAlarms AS AA ON A.AlarmID = AA.AlarmID
+      GO
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.13'
