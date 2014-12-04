@@ -4012,7 +4012,9 @@ Namespace Biosystems.Ax00.Calculations
         ''' Created by:  AG 02/03/2010 
         ''' Modified by: AG 11/08/2010 - For multipoint Calibrators, the current Replicate is saved and also the previous one
         '''              SA 03/12/2014 - BA-1616 ==> In the call to function SaveExecutionsResults, inform parameter that indicates if 
-        '''                                          the Execution has been re-calculated (field RecalculationFlag in structure common)
+        '''                                          the Execution has been re-calculated (field RecalculationFlag in structure common) 
+        '''                                          and also the parameter that indicates if the Executions to save are for a Multipoint
+        '''                                          Calibrator
         ''' </remarks>
         Private Sub SaveReplicateResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pItem As Integer)
             Try
@@ -4098,8 +4100,11 @@ Namespace Biosystems.Ax00.Calculations
                             ex_results.twksWSExecutions.AddtwksWSExecutionsRow(ex_Row)
                         Next
 
-                        '(2) Save into Database                    
-                        myClassGlobalResult = ex_delegate.SaveExecutionsResults(pDBConnection, ex_results, common(pItem).RecalculationFlag)
+                        '(2) Save into Database    
+                        '    BA-1616: inform new optional parameters to indicate if it is a re-calculation and/or if the Executions to save 
+                        '             are for an Experimental Calibrator
+                        myClassGlobalResult = ex_delegate.SaveExecutionsResults(pDBConnection, ex_results, common(pItem).RecalculationFlag, _
+                                                                               (calibrator.NumberOfCalibrators > 1))
                     End With
                 End If
             Catch ex As Exception
@@ -4388,7 +4393,6 @@ Namespace Biosystems.Ax00.Calculations
             End Try
         End Sub
 
-
         ''' <summary>
         ''' SAVE VALUES IN TABLE tcalcExecutionsPartialResults the partial absorbance results: 
         ''' </summary>
@@ -4422,7 +4426,6 @@ Namespace Biosystems.Ax00.Calculations
             End Try
 
         End Sub
-
 
         ''' <summary>
         ''' SAVE VALUES IN TABLE tcalcExecutionsR1Results the reagent1 results: 
@@ -4495,7 +4498,6 @@ Namespace Biosystems.Ax00.Calculations
 
             Return myGlobal
         End Function
-
 #End Region
 
 #Region "Validate and Auxiliary methods"

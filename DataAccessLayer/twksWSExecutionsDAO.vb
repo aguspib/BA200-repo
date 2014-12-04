@@ -3353,19 +3353,26 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, fields ABS_Initial, 
         '''                               ABS_MainFilter, ABS_WorkReagent, SubstrateDepletion, rKinetics, KineticsInitialValue, KineticsSlope 
         '''                               and KineticsLinear are not updated (to avoid the losing of these values)</param>
+        ''' <param name="pMultipointCalib">Optional parameter with default value FALSE. When it is informed as TRUE, fields SubstrateDepletion, 
+        '''                                rKinetics, KineticsInitialValue, KineticsSlope and KineticsLinear are updated only for the last Replicate
+        '''                                to avoid loss the values for the previous Replicates</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: 
         ''' Modified by: AG 12/07/2010 - Added fields Abs_MainFilter and Abs_WorkReagent
         '''              AG 26/07/2010 - Do not update date
         '''              AG 11/08/2010 - Do loop for all rows in DS
-        '''              SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. When value of this parameter is TRUE, 
+        '''              SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag; when value of this parameter is TRUE, 
         '''                                          fields ABS_Initial, ABS_MainFilter, ABS_WorkReagent, SubstrateDepletion, rKinetics,  
         '''                                          KineticsInitialValue, KineticsSlope and KineticsLinear are not updated (to avoid the 
-        '''                                          losing of these values)
+        '''                                          loss of these values). Added new optional parameter pMultipointCalib; when value of 
+        '''                                          this parameter is TRUE, fields SubstrateDepletion, rKinetics, KineticsInitialValue, 
+        '''                                          KineticsSlope and KineticsLinear are saved only for the last Calibrator point to avoid 
+        '''                                          the loss of these values for some of the replicates 
         ''' </remarks>
         Public Function SaveExecutionsResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS, _
-                                              Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
+                                              Optional ByVal pRecalculusFlag As Boolean = False, _
+                                              Optional ByVal pMultipointCalib As Boolean = False) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -3377,8 +3384,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                         resultData.HasError = True
                         resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                     Else
-                        'AG 11/08/2010 - Add loop and change (0) to (i)
                         Dim cmdText As String = String.Empty
+                        Dim saveKineticsFields As Boolean = (Not pRecalculusFlag AndAlso Not pMultipointCalib)
+
                         For i As Integer = 0 To pExecutionsDS.twksWSExecutions.Rows.Count - 1
                             cmdText = String.Empty
                             cmdText += " UPDATE twksWSExecutions SET "
@@ -3407,10 +3415,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                 cmdText = cmdText & "'" & pExecutionsDS.twksWSExecutions(i).ABS_Error.ToString & "', " & vbCrLf
                             End If
 
-                            'BA-1616: Fields SubstrateDepletion, ABS_Initial, ABS_MainFilter, ABS_WorkReagent, rKinetics, KineticsInitialValue, 
-                            '         KineticsSlope and KineticsLinear are updated only when parameter pRecalculusFlag is FALSE (to avoid the 
-                            '         loss of these values when the result is recalculated)
-                            If (Not pRecalculusFlag) Then
+                            'BA-1616: Fields SubstrateDepletion, rKinetics, KineticsInitialValue, KineticsSlope and KineticsLinear are updated only 
+                            '         when parameter pRecalculusFlag is FALSE (to avoid the loss of these values when the result is recalculated). 
+                            '         Besides, when the Executions being updated are for a Multipoint Calibrator, these fields are updated only for 
+                            '         the last Replicate to avoid the loss of values for the previous Replicates
+                            If (saveKineticsFields OrElse (pMultipointCalib AndAlso i = pExecutionsDS.twksWSExecutions.Rows.Count - 1)) Then
                                 'Verify if rkinetics is informed
                                 cmdText += " rkinetics = "
                                 If (pExecutionsDS.twksWSExecutions(i).IsrkineticsNull) Then
@@ -3458,7 +3467,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                         cmdText = cmdText & "0," & vbCrLf
                                     End If
                                 End If
+                            End If
 
+                            'BA-1616: Fields ABS_Initial, ABS_MainFilter, and ABS_WorkReagent, are updated only when parameter 
+                            '         pRecalculusFlag is FALSE (to avoid the loss of these values when the result is recalculated)
+                            If (Not pRecalculusFlag) Then
                                 'Verify if ABS_Initial is informed
                                 cmdText += " ABS_Initial = "
                                 If (pExecutionsDS.twksWSExecutions(i).IsABS_InitialNull) Then

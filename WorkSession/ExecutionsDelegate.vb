@@ -718,17 +718,21 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pExecutionsDS">Typed DataSet ExecutionsDS containing all data of the Executions to save</param>
-        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, new 
-        '''                               function SaveExecutionForRecalculus is called instead of SaveExecutionsResults to 
-        '''                               avoid the losing of some execution values</param>
+        ''' <param name="pRecalculusFlag">Optional parameter with default value FALSE. When it is informed as TRUE, fields ABS_Initial, 
+        '''                               ABS_MainFilter, ABS_WorkReagent, SubstrateDepletion, rKinetics, KineticsInitialValue, KineticsSlope 
+        '''                               and KineticsLinear are not updated (to avoid the losing of these values)</param>
+        ''' <param name="pMultipointCalib">Optional parameter with default value FALSE. When it is informed as TRUE, fields SubstrateDepletion, 
+        '''                                rKinetics, KineticsInitialValue, KineticsSlope and KineticsLinear are updated only for the last Replicate
+        '''                                to avoid loss the values for the previous Replicates</param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  DL 01/03/2010
-        ''' Modified by: SA 03/12/2014 - BA-1616 ==> Added new optional parameter pRecalculusFlag. It is used as parameter when 
-        '''                                          calling function SaveExecutionsResults
+        ''' Modified by: SA 03/12/2014 - BA-1616 ==> Added new optional parameters pRecalculusFlag and pMultipointCalib. They are used as 
+        '''                                          parameters when calling function SaveExecutionsResults
         ''' </remarks>
         Public Function SaveExecutionsResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pExecutionsDS As ExecutionsDS, _
-                                              Optional ByVal pRecalculusFlag As Boolean = False) As GlobalDataTO
+                                              Optional ByVal pRecalculusFlag As Boolean = False, _
+                                              Optional ByVal pMultipointCalib As Boolean = False) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -737,9 +741,9 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'BA-1616: Inform parameter pRecalculusFlag when call function SaveExecutionsResults
+                        'BA-1616: Inform parameters pRecalculusFlag and pMultipointCalib when call function SaveExecutionsResults
                         Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
-                        resultData = mytwksWSExecutionsDAO.SaveExecutionsResults(dbConnection, pExecutionsDS, pRecalculusFlag)
+                        resultData = mytwksWSExecutionsDAO.SaveExecutionsResults(dbConnection, pExecutionsDS, pRecalculusFlag, pMultipointCalib)
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -749,7 +753,7 @@ Namespace Biosystems.Ax00.BL
                             If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
                         End If
                     End If
-                    End If
+                End If
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
