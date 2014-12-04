@@ -4133,6 +4133,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                         CurrentInstructionAction = InstructionActions.FlightFilling
                                         Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
                                         ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                    Else
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
                                     End If
                                     Exit Select
                                 End If
@@ -4163,6 +4166,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
                                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
                                         End If
+                                    Else
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
                                     End If
                                     Exit Select
                                 End If
@@ -4195,17 +4201,47 @@ Namespace Biosystems.Ax00.Core.Entities
                     End Select
 
 
-                ElseIf (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
+                    'ElseIf (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED") Then
 
-                    Select Case flag
+                    '    Select Case flag
 
-                        Case GlobalEnumerates.WarmUpProcessFlag.Wash
+                    '        Case GlobalEnumerates.WarmUpProcessFlag.Wash
+                    '            If (CheckIfWashingIsPossible()) Then
+                    '                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "END" AndAlso
+                    '                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "CANCELED" Then
+                    '                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                    '                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                    '                End If
+                    '            End If
+                    '        Case GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine
+                    '            If (CheckIfWashingIsPossible()) Then
+                    '                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "END" AndAlso
+                    '                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED" Then
+                    '                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                    '                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "")
+                    '                End If
+                    '            End If
 
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "END" AndAlso
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "CANCELED" Then
-                                ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
-                            End If
-                    End Select
+                    '        Case GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine
+                    '            If (BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
+                    '                If (CheckIfWashingIsPossible()) Then
+
+                    '                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END" AndAlso
+                    '                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "CANCELED" Then
+                    '                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                    '                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
+                    '                    End If
+
+                    '                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "END" AndAlso
+                    '                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "CANCELED" Then
+                    '                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                    '                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
+                    '                    End If
+
+
+                    '                End If
+                    '            End If
+                    '    End Select
 
                 End If
 

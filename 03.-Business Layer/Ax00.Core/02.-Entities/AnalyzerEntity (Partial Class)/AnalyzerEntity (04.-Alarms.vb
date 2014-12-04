@@ -2617,11 +2617,11 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 1, True)
                         Else
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 0, False)
-
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
-                            ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
                         End If
+
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
 
                         'AG 23/03/2012 - While ise is initiating save all the ansinf received (commented)
                     Else

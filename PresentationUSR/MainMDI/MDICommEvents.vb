@@ -2553,6 +2553,7 @@ Partial Public Class IAx00MainMDI
     ''' AG 01/04/2011 - Creation
     ''' Modified by: AG 09/03/2012
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 01/12/2014 - BA-2075
     ''' </remarks>
     Private Sub ShowAlarmsOrSensorsWarningMessages(ByVal pRefreshEvent As GlobalEnumerates.UI_RefreshEvents, ByVal pRefreshDS As UIRefreshDS)
 
@@ -2640,9 +2641,11 @@ Partial Public Class IAx00MainMDI
                     If lnqRes(0).Value = 1 Then
                         'Message ) Wup aborted due bottle alars - "You must solve the level alarms in bottle and tank before continue"
                         'ShowAlarmWarningMessages(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS)
+                        'BA-2075
                         If String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED") OrElse _
-                           String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED") Then
-
+                           String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED") OrElse _
+                           String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill), "CANCELED") OrElse _
+                           String.Equals(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty), "CANCELED") Then
                             myMessageIDList.Add(GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
                             If Not String.Equals(messageType, "Error") Then messageType = "Warning"
                         End If
