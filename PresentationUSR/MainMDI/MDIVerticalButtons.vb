@@ -643,6 +643,7 @@ Partial Public Class IAx00MainMDI
     ''' <param name="myAx00Status"></param>
     ''' <remarks>AG 09/01/2013 - refactoring
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 01/12/2014 - BA-2075
     ''' </remarks>
     Private Sub ApplyRulesForStandBy(ByVal myAx00Ready As Boolean, ByVal myAx00Action As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal myAx00Status As GlobalEnumerates.AnalyzerManagerStatus)
         Try
@@ -683,9 +684,12 @@ Partial Public Class IAx00MainMDI
                     Dim warmUpPaused As Boolean = False
                     Dim abortPaused As Boolean = False
                     Dim shutDownPaused As Boolean = False
+                    'BA-2075
                     If AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) = "PAUSED" AndAlso _
-                       (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED" OrElse _
-                       String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine), "CANCELED", False) = 0) Then
+                        (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED" OrElse _
+                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED" OrElse _
+                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED" OrElse _
+                        AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED") Then
                         warmUpPaused = True
                     ElseIf String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess), "PAUSED", False) = 0 AndAlso _
                        String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing), "CANCELED", False) = 0 Then

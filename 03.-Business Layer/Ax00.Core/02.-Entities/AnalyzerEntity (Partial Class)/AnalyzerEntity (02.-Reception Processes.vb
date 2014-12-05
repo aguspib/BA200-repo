@@ -1246,8 +1246,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 'paused because there is not reactions rotor ... in this case when a valid alight is received
                                                 'Sw must inform the start instrument process is OK
                                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
-                                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                                                    'ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
+                                                    'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
+                                                    ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
                                                 End If
 
                                             End If
@@ -4166,6 +4166,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                         CurrentInstructionAction = InstructionActions.FlightFilling
                                         Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
                                         ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                    Else
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
                                     End If
                                     Exit Select
                                 End If
@@ -4196,6 +4199,9 @@ Namespace Biosystems.Ax00.Core.Entities
                                             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
                                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
                                         End If
+                                    Else
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
                                     End If
                                     Exit Select
                                 End If
@@ -4232,12 +4238,15 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     Select Case flag
 
-                        Case GlobalEnumerates.WarmUpProcessFlag.Wash
-
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "END" AndAlso
-                                mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "CANCELED" Then
-                                ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                        Case GlobalEnumerates.WarmUpProcessFlag.Finalize
+                            If (CheckIfWashingIsPossible()) Then
+                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") OrElse
+                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
+                                    FinalizeWarmUpProcess()
+                                    Exit Select
+                                End If
                             End If
+
                     End Select
 
                 End If
