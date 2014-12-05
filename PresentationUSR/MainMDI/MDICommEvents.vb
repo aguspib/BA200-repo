@@ -1207,7 +1207,7 @@ Partial Public Class IAx00MainMDI
                         Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
                         myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
                                 GlobalEnumerates.Alarms.COMMS_ERR.ToString(), AnalyzerIDAttribute, _
-                                DateTime.Now, 1, WorkSessionIDAttribute, Nothing, True, Nothing)
+                                DateTime.Now, 1, WorkSessionIDAttribute, Nothing, True, Nothing, Nothing) 'AG 04/12/2014 BA-2146 (inform ErrorCode as Nothing) 
 
                         Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
                         myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary

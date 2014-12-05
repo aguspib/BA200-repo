@@ -21,6 +21,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  TR 15/03/2011
         ''' Modified by: AG 25/03/2011 - Added field AlarmStatus; allow NULL values in field WorkSessionID
         '''              AG 23/07/2012 - Added field OKDateTime
+        '''              AG 04/12/2014 BA-2146 added field ErrorCode
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerAlarmsDS As WSAnalyzerAlarmsDS) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -31,7 +32,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String = ""
                     Dim values As String = ""
-                    Dim keys As String = "(AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AlarmStatus, OKDateTime, AdditionalInfo)"
+                    Dim keys As String = "(AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AlarmStatus, OKDateTime, AdditionalInfo, ErrorCode)"
 
                     For Each AnalyzerAlarmRow As WSAnalyzerAlarmsDS.twksWSAnalyzerAlarmsRow In pAnalyzerAlarmsDS.twksWSAnalyzerAlarms.Rows
                         values = ""
@@ -65,6 +66,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Else
                             values &= "'" & AnalyzerAlarmRow.AdditionalInfo.Trim & "'"
                         End If
+
+                        'AG 04/12/2014 BA-2146 added column ErrorCode
+                        If (AnalyzerAlarmRow.IsErrorCodeNull) Then
+                            values &= ", NULL "
+                        Else
+                            values &= ", " & AnalyzerAlarmRow.ErrorCode.ToString & " "
+                        End If
+                        'AG 04/12/2014 BA-2146
 
                         cmdText &= "INSERT INTO twksWSAnalyzerAlarms  " & keys & " VALUES (" & values & ") " & vbNewLine
                     Next
@@ -459,6 +468,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 10/02/2014 - BT #1496 ==> Added optional parameter pWorkSessionID: when it is informed, besides by AnalyzerID,
         '''                                           Alarms are filtered also by WorkSessionID. Changed the SQL Query to apply the filter
         '''                                           when the optional parameter is informed
+        '''              AG 04/12/2014 BA-2146 get also column ErrorCode form view
         ''' </remarks>
         Public Function GetAlarmsMonitor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                          Optional ByVal pWorkSessionID As String = "") As GlobalDataTO
@@ -471,7 +481,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AdditionalInfo, " & vbCrLf & _
-                                                       " AlarmStatus, AlarmSource, AlarmType, Name, Description, Solution, OKDateTime, AlarmPeriodSEC " & vbCrLf & _
+                                                       " AlarmStatus, AlarmSource, AlarmType, Name, Description, Solution, OKDateTime, AlarmPeriodSEC, ErrorCode " & vbCrLf & _
                                                 " FROM   vwksAlarmsMonitor " & vbCrLf & _
                                                 " WHERE  AnalyzerID = " & String.Format("'{0}'", pAnalyzerID.Trim) & vbCrLf
 

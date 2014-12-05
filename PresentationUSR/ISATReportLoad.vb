@@ -1005,7 +1005,7 @@ Public Class ISATReportLoad
                 Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
                 myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
                         GlobalEnumerates.Alarms.REPORTSATLOADED_WARN.ToString(), IAx00MainMDI.ActiveAnalyzer, _
-                        DateTime.Now, 1, IAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
+                        DateTime.Now, 1, IAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing, Nothing) 'AG 04/12/2014 BA-2146 (inform ErrorCode as Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
 
                 Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
                 myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary
