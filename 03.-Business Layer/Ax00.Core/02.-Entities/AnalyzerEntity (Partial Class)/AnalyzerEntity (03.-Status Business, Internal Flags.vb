@@ -884,8 +884,13 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "END")
 
                             'AG 24/05/2012 - If start instrument wash paused and wash not finished sent the wash
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
-                                ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash) 'BA-2075
+                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" AndAlso _
+                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then 'Send Wash
+                                'Case Start instrument failed before wash was performed (for example no reactions missing)
+                                'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
+                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True) 'Send a WASH instruction (Conditioning complete)
+
                             Else
                                 'Else Alight
                                 'User execute the change reaction rotor when start instrument OK: Sw instructions NRotor + Alight
