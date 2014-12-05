@@ -222,7 +222,7 @@
 '                                                    myExecutionAlarmsRow = myExecutionsAlarmsDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
 '                                                    myExecutionAlarmsRow.ExecutionID = execRow.ExecutionID
 '                                                    myExecutionAlarmsRow.AlarmDateTime = DateTime.Now
-'                                                    myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+'                                                    myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK7.ToString
 '                                                    myExecutionsAlarmsDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(myExecutionAlarmsRow)
 '                                                End If
 '                                                ''TR 05/12/2011 -END
@@ -299,7 +299,7 @@
 '                                                        myResultAlarmRow.OrderTestID = ResultRow.OrderTestID
 '                                                        myResultAlarmRow.RerunNumber = ResultRow.RerunNumber
 '                                                        myResultAlarmRow.MultiPointNumber = 1
-'                                                        myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+'                                                        myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
 '                                                        myResultAlarmRow.AlarmDateTime = Now
 '                                                        myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
 
@@ -322,7 +322,7 @@
 '                                                                myResultExecutionsAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, WSExecutionAlarmsDS)
 '                                                                'myResultExecutionsAlarmsDS
 '                                                                For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-'                                                                    If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString Then
+'                                                                    If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString Then
 '                                                                        'Before adding the row validate if not exist in curren Dataset
 '                                                                        If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = ResultRow.OrderTestID _
 '                                                                                                                       AndAlso a.RerunNumber = ResultRow.RerunNumber _
@@ -612,7 +612,7 @@
 '                                                    myResultAlarmRow.OrderTestID = res_DS.twksResults(0).OrderTestID
 '                                                    myResultAlarmRow.RerunNumber = res_DS.twksResults(0).RerunNumber
 '                                                    myResultAlarmRow.MultiPointNumber = 1
-'                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+'                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
 '                                                    myResultAlarmRow.AlarmDateTime = Now
 '                                                    myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
 
@@ -639,7 +639,7 @@
 '                                                                    myResultExecutionsAlarmsDS = DirectCast(resultData.SetDatos, WSExecutionAlarmsDS)
 '                                                                    'myResultExecutionsAlarmsDS
 '                                                                    For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-'                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString Then
+'                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString Then
 '                                                                            'Before adding the row validate if not exist in curren Dataset
 '                                                                            If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = res_DS.twksResults(0).OrderTestID _
 '                                                                                                                               AndAlso a.RerunNumber = res_DS.twksResults(0).RerunNumber _

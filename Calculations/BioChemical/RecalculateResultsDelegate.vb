@@ -455,9 +455,9 @@ Namespace Biosystems.Ax00.Calculations
                         'If a Normality Range was found for the ISE Test/Sample Type, validate the Concentration value
                         If (lowerLimit <> -1 AndAlso upperLimit <> -1) Then
                             If (pCONC_Value < lowerLimit) Then
-                                validationResult = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                validationResult = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                             ElseIf (pCONC_Value > upperLimit) Then
-                                validationResult = GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                                validationResult = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
                             End If
                         End If
                     End If
@@ -1628,7 +1628,7 @@ Namespace Biosystems.Ax00.Calculations
                                                     myResultAlarmRow.OrderTestID = res_DS.twksResults(0).OrderTestID
                                                     myResultAlarmRow.RerunNumber = res_DS.twksResults(0).RerunNumber
                                                     myResultAlarmRow.MultiPointNumber = 1
-                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                    myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                     myResultAlarmRow.AlarmDateTime = Now
                                                     myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
 
@@ -1655,7 +1655,7 @@ Namespace Biosystems.Ax00.Calculations
                                                                     myResultExecutionsAlarmsDS = DirectCast(resultData.SetDatos, WSExecutionAlarmsDS)
                                                                     'myResultExecutionsAlarmsDS
                                                                     For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString Then
+                                                                        If Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString Then
                                                                             'Before adding the row validate if not exist in curren Dataset
                                                                             If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = res_DS.twksResults(0).OrderTestID _
                                                                                                                                AndAlso a.RerunNumber = res_DS.twksResults(0).RerunNumber _

@@ -2584,37 +2584,37 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Else
                     'result error
-                    Dim myAlarm As CalculationRemarks
+                    Dim myAlarm As Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myAlarm = CalculationRemarks.ISE_mVOutB
+                            myAlarm = Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myAlarm = CalculationRemarks.ISE_mVOutA_SER
+                                myAlarm = Alarms.ISE_mVOutA_SER
                             Else
-                                myAlarm = CalculationRemarks.ISE_mVOutB_URI
+                                myAlarm = Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myAlarm = CalculationRemarks.ISE_mVNoiseB
+                            myAlarm = Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myAlarm = CalculationRemarks.ISE_mVNoiseA_SER
+                                myAlarm = Alarms.ISE_mVNoiseA_SER
                             Else
-                                myAlarm = CalculationRemarks.ISE_mVNoiseB_URI
+                                myAlarm = Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myAlarm = CalculationRemarks.ISE_Drift_SER
+                                myAlarm = Alarms.ISE_Drift_SER
                             Else
-                                myAlarm = CalculationRemarks.ISE_Drift_CAL
+                                myAlarm = Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myAlarm = CalculationRemarks.ISE_OutSlope
+                            myAlarm = Alarms.ISE_OutSlope
 
                         Case ISEErrorTO.ISEResultErrorCodes.None
                             myGlobal.SetDatos = "" : Exit Try
@@ -2924,10 +2924,10 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                                                     If (execRow.CONC_Value < Convert.ToSingle(.First.NormalLowerLimit)) Then
                                                                         'Set lower alarm value
-                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                                     ElseIf (execRow.CONC_Value > Convert.ToSingle(.First.NormalUpperLimit)) Then
                                                                         'Set hight alarm value
-                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK8.ToString
                                                                     End If
 
                                                                 Else
@@ -3064,10 +3064,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                                                     If Convert.ToInt16(ResultRow.CONC_Value) <> -1 Then
                                                                         If (ResultRow.CONC_Value < Convert.ToSingle(.First.NormalLowerLimit)) Then
                                                                             'Set lower alarm value
-                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                                         ElseIf (ResultRow.CONC_Value > Convert.ToSingle(.First.NormalUpperLimit)) Then
                                                                             'Set hight alarm value
-                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
                                                                         End If
                                                                     End If
                                                                 End If
@@ -3108,7 +3108,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                             myResultExecutionsAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, WSExecutionAlarmsDS)
 
                                                             For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                                                If (Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString) Then
+                                                                If (Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString) Then
                                                                     'Before adding the row validate if not exist in curren Dataset
                                                                     If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = ResultRow.OrderTestID _
                                                                                                                    AndAlso a.RerunNumber = ResultRow.RerunNumber _

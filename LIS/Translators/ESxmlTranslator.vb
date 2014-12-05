@@ -4748,10 +4748,10 @@ Namespace Biosystems.Ax00.LISCommunications
                     '    ' ES library is not capable to accept a lot of remarks, so by now this functionality is disabled
                     '    'For Each rowAlarm As ResultsDS.vwksResultsAlarmsRow In pAlarms
                     '    '    Select Case rowAlarm.AlarmID
-                    '    '        Case CalculationRemarks.CONC_REMARK7.ToString : ResultFlagId.InnerText = "L" : Exit For
-                    '    '        Case CalculationRemarks.CONC_REMARK8.ToString : ResultFlagId.InnerText = "H" : Exit For
-                    '    '        Case CalculationRemarks.CONC_REMARK9.ToString : ResultFlagId.InnerText = "LL" : Exit For
-                    '    '        Case CalculationRemarks.CONC_REMARK10.ToString : ResultFlagId.InnerText = "HH" : Exit For
+                    '    '        Case Alarms.CONC_REMARK7.ToString : ResultFlagId.InnerText = "L" : Exit For
+                    '    '        Case Alarms.CONC_REMARK8.ToString : ResultFlagId.InnerText = "H" : Exit For
+                    '    '        Case Alarms.CONC_REMARK9.ToString : ResultFlagId.InnerText = "LL" : Exit For
+                    '    '        Case Alarms.CONC_REMARK10.ToString : ResultFlagId.InnerText = "HH" : Exit For
                     '    '    End Select
                     '    'Next
                     '    ResultFlagId.InnerText = "See Analyzer remarks for this LIS order"
