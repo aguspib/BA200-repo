@@ -369,8 +369,6 @@ Partial Public Class WSAnalyzerAlarmsDS
 
         Private columnOKDateTime As Global.System.Data.DataColumn
 
-        Private columnErrorCode As Global.System.Data.DataColumn
-
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -471,14 +469,6 @@ Partial Public Class WSAnalyzerAlarmsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public ReadOnly Property ErrorCodeColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnErrorCode
-            End Get
-        End Property
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -515,9 +505,9 @@ Partial Public Class WSAnalyzerAlarmsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtwksWSAnalyzerAlarmsRow(ByVal AlarmID As String, ByVal AnalyzerID As String, ByVal AlarmDateTime As Date, ByVal AlarmItem As Integer, ByVal WorkSessionID As String, ByVal AdditionalInfo As String, ByVal AlarmStatus As Boolean, ByVal OKDateTime As Date, ByVal ErrorCode As Integer) As twksWSAnalyzerAlarmsRow
+        Public Overloads Function AddtwksWSAnalyzerAlarmsRow(ByVal AlarmID As String, ByVal AnalyzerID As String, ByVal AlarmDateTime As Date, ByVal AlarmItem As Integer, ByVal WorkSessionID As String, ByVal AdditionalInfo As String, ByVal AlarmStatus As Boolean, ByVal OKDateTime As Date) As twksWSAnalyzerAlarmsRow
             Dim rowtwksWSAnalyzerAlarmsRow As twksWSAnalyzerAlarmsRow = CType(Me.NewRow, twksWSAnalyzerAlarmsRow)
-            Dim columnValuesArray() As Object = New Object() {AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AdditionalInfo, AlarmStatus, OKDateTime, ErrorCode}
+            Dim columnValuesArray() As Object = New Object() {AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AdditionalInfo, AlarmStatus, OKDateTime}
             rowtwksWSAnalyzerAlarmsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtwksWSAnalyzerAlarmsRow)
             Return rowtwksWSAnalyzerAlarmsRow
@@ -548,7 +538,6 @@ Partial Public Class WSAnalyzerAlarmsDS
             Me.columnAdditionalInfo = MyBase.Columns("AdditionalInfo")
             Me.columnAlarmStatus = MyBase.Columns("AlarmStatus")
             Me.columnOKDateTime = MyBase.Columns("OKDateTime")
-            Me.columnErrorCode = MyBase.Columns("ErrorCode")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -570,8 +559,6 @@ Partial Public Class WSAnalyzerAlarmsDS
             MyBase.Columns.Add(Me.columnAlarmStatus)
             Me.columnOKDateTime = New Global.System.Data.DataColumn("OKDateTime", GetType(Date), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnOKDateTime)
-            Me.columnErrorCode = New Global.System.Data.DataColumn("ErrorCode", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnErrorCode)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -741,8 +728,6 @@ Partial Public Class WSAnalyzerAlarmsDS
 
         Private columnOKDateTime As Global.System.Data.DataColumn
 
-        Private columnErrorCode As Global.System.Data.DataColumn
-
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -907,14 +892,6 @@ Partial Public Class WSAnalyzerAlarmsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public ReadOnly Property ErrorCodeColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnErrorCode
-            End Get
-        End Property
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -967,10 +944,9 @@ Partial Public Class WSAnalyzerAlarmsDS
                     ByVal SolResourceID As String, _
                     ByVal AlarmTypeImage() As Byte, _
                     ByVal AlarmPeriodSEC As Integer, _
-                    ByVal OKDateTime As Date, _
-                    ByVal ErrorCode As Integer) As vwksAlarmsMonitorRow
+                    ByVal OKDateTime As Date) As vwksAlarmsMonitorRow
             Dim rowvwksAlarmsMonitorRow As vwksAlarmsMonitorRow = CType(Me.NewRow, vwksAlarmsMonitorRow)
-            Dim columnValuesArray() As Object = New Object() {AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AdditionalInfo, AlarmStatus, AlarmSource, AlarmType, Name, Description, Solution, SolResourceID, AlarmTypeImage, AlarmPeriodSEC, OKDateTime, ErrorCode}
+            Dim columnValuesArray() As Object = New Object() {AlarmID, AnalyzerID, AlarmDateTime, AlarmItem, WorkSessionID, AdditionalInfo, AlarmStatus, AlarmSource, AlarmType, Name, Description, Solution, SolResourceID, AlarmTypeImage, AlarmPeriodSEC, OKDateTime}
             rowvwksAlarmsMonitorRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowvwksAlarmsMonitorRow)
             Return rowvwksAlarmsMonitorRow
@@ -1009,7 +985,6 @@ Partial Public Class WSAnalyzerAlarmsDS
             Me.columnAlarmTypeImage = MyBase.Columns("AlarmTypeImage")
             Me.columnAlarmPeriodSEC = MyBase.Columns("AlarmPeriodSEC")
             Me.columnOKDateTime = MyBase.Columns("OKDateTime")
-            Me.columnErrorCode = MyBase.Columns("ErrorCode")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1047,8 +1022,6 @@ Partial Public Class WSAnalyzerAlarmsDS
             MyBase.Columns.Add(Me.columnAlarmPeriodSEC)
             Me.columnOKDateTime = New Global.System.Data.DataColumn("OKDateTime", GetType(Date), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnOKDateTime)
-            Me.columnErrorCode = New Global.System.Data.DataColumn("ErrorCode", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnErrorCode)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1684,21 +1657,6 @@ Partial Public Class WSAnalyzerAlarmsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property ErrorCode() As Integer
-            Get
-                Try
-                    Return CType(Me(Me.tabletwksWSAnalyzerAlarms.ErrorCodeColumn), Integer)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'ErrorCode' in table 'twksWSAnalyzerAlarms' is DBNull.", e)
-                End Try
-            End Get
-            Set(value As Integer)
-                Me(Me.tabletwksWSAnalyzerAlarms.ErrorCodeColumn) = value
-            End Set
-        End Property
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsAlarmIDNull() As Boolean
             Return Me.IsNull(Me.tabletwksWSAnalyzerAlarms.AlarmIDColumn)
         End Function
@@ -1791,18 +1749,6 @@ Partial Public Class WSAnalyzerAlarmsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetOKDateTimeNull()
             Me(Me.tabletwksWSAnalyzerAlarms.OKDateTimeColumn) = Global.System.Convert.DBNull
-        End Sub
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Function IsErrorCodeNull() As Boolean
-            Return Me.IsNull(Me.tabletwksWSAnalyzerAlarms.ErrorCodeColumn)
-        End Function
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Sub SetErrorCodeNull()
-            Me(Me.tabletwksWSAnalyzerAlarms.ErrorCodeColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 
@@ -2063,21 +2009,6 @@ Partial Public Class WSAnalyzerAlarmsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Property ErrorCode() As Integer
-            Get
-                Try
-                    Return CType(Me(Me.tablevwksAlarmsMonitor.ErrorCodeColumn), Integer)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'ErrorCode' in table 'vwksAlarmsMonitor' is DBNull.", e)
-                End Try
-            End Get
-            Set(value As Integer)
-                Me(Me.tablevwksAlarmsMonitor.ErrorCodeColumn) = value
-            End Set
-        End Property
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsAlarmIDNull() As Boolean
             Return Me.IsNull(Me.tablevwksAlarmsMonitor.AlarmIDColumn)
         End Function
@@ -2266,18 +2197,6 @@ Partial Public Class WSAnalyzerAlarmsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetOKDateTimeNull()
             Me(Me.tablevwksAlarmsMonitor.OKDateTimeColumn) = Global.System.Convert.DBNull
-        End Sub
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Function IsErrorCodeNull() As Boolean
-            Return Me.IsNull(Me.tablevwksAlarmsMonitor.ErrorCodeColumn)
-        End Function
-
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Sub SetErrorCodeNull()
-            Me(Me.tablevwksAlarmsMonitor.ErrorCodeColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

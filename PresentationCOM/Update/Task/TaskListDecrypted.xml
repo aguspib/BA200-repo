@@ -2240,34 +2240,9 @@
       END
       SET ANSI_PADDING OFF
       GO
-
-      IF (SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id WHERE so.xtype = 'U' AND so.name = 'twksWSAnalyzerAlarms' AND sc.name = 'ErrorCode') = 0
-      BEGIN
-      ALTER TABLE [dbo].twksWSAnalyzerAlarms ADD ErrorCode SmallInt NULL
-      END
-      GO
-
-
-
-
-      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'v' AND name = 'vwksAlarmsMonitor') = 1)
-      DROP VIEW [dbo].vwksAlarmsMonitor
-      GO
-      SET ANSI_NULLS ON
-      GO
-      SET QUOTED_IDENTIFIER ON
-      GO
-      CREATE VIEW [dbo].[vwksAlarmsMonitor]
-      AS
-      SELECT     AA.AlarmID, AA.AnalyzerID, AA.AlarmDateTime, AA.AlarmItem, AA.WorkSessionID, AA.AdditionalInfo, AA.AlarmStatus, A.AlarmSource, A.AlarmType, A.Name,
-      A.Description, A.Solution, AA.OKDateTime, (CASE WHEN AA.OKDateTime IS NULL THEN NULL ELSE DateDiff(second, AA.AlarmDateTime, AA.OKDateTime) END)
-      AS AlarmPeriodSEC, AA.ErrorCode
-      FROM         dbo.tfmwAlarms AS A INNER JOIN
-      dbo.twksWSAnalyzerAlarms AS AA ON A.AlarmID = AA.AlarmID
-      GO
     </StructureScript>
     <UpdateScript>
-      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.13'
+      UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.4', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.20'
       GO
 
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwSwParameters') = 1)
