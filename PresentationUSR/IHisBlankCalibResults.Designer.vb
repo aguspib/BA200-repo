@@ -121,6 +121,7 @@ Partial Class IHisBlankCalibResults
         Me.testNameTextBox.IsNumeric = False
         Me.testNameTextBox.Location = New System.Drawing.Point(338, 62)
         Me.testNameTextBox.Mandatory = False
+        Me.testNameTextBox.MaxLength = 16
         Me.testNameTextBox.Name = "testNameTextBox"
         Me.testNameTextBox.Size = New System.Drawing.Size(170, 21)
         Me.testNameTextBox.TabIndex = 4

@@ -80,6 +80,7 @@ Public Class IHisBlankCalibResults
 #End Region
 
 #Region "Private Methods"
+
 #Region " Multilanguage Support "
     ''' <summary>
     ''' Gets the image by its key
@@ -441,7 +442,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.ShowCaption = False
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'Absorbance
@@ -594,7 +595,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.AllowSize = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
             'Additional Info
@@ -610,15 +611,12 @@ Public Class IHisBlankCalibResults
 
             GraphColumn.ColumnEdit = pictureEdit
 
-
             'For wrapping text
             Dim largeTextEdit As DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit
             largeTextEdit = TryCast(xtraBlanksGrid.RepositoryItems.Add("MemoEdit"),  _
                                     DevExpress.XtraEditors.Repository.RepositoryItemMemoEdit)
 
             RemarksColumn.ColumnEdit = largeTextEdit
-
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".InitializeBlankResultsGrid ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeBlankResultsGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
@@ -629,10 +627,12 @@ Public Class IHisBlankCalibResults
     ''' <summary>
     ''' Initialize calibrator grid
     ''' </summary>
-    ''' <remarks>AG 22/10/2012
-    ''' Modified by: AG 29/10/2012 (AG + EF meeting): Merge by TestName. Sort columns Date, Test, Type, CalibName, Remark Alert
-    '''                                  Date - Test - Type - Calib Name - Lot - ...
-    '''              XB 25/09/2014 - Add TestVersion column to can filter by it when select the calibrator chart result from Historics - BA-1863
+    ''' <remarks>
+    ''' Created by:  AG 22/10/2012
+    ''' Modified by: AG 29/10/2012 - Merge by TestName. Sort columns Date, Test, Type, CalibName, Remark Alert, Test, Type, Calib Name, Lot... (AG + EF meeting)
+    '''              XB 25/09/2014 - BA-1863 ==> Added TestVersion column to allow filter by it when select the Calibrator chart result from Historics
+    '''              SA 09/12/2014 - BA-1011 ==> Added new hidden column ManualResultFlag to allow change the font of ABSValue column to StrikeOut when 
+    '''                                          ManualResultFlag is True (which mean the CalibratorFactor shown was entered manually)
     ''' </remarks>
     Private Sub InitializeCalibResultsGrid()
         Try
@@ -652,14 +652,15 @@ Public Class IHisBlankCalibResults
             Dim GraphColumn As New DevExpress.XtraGrid.Columns.GridColumn()
             Dim RemarksColumn As New DevExpress.XtraGrid.Columns.GridColumn()
             Dim AnalyzerIDColumn As New DevExpress.XtraGrid.Columns.GridColumn()
-            Dim TestVersionColumn As New DevExpress.XtraGrid.Columns.GridColumn()   ' XB 25/09/2014 - BA-1863
+            Dim TestVersionColumn As New DevExpress.XtraGrid.Columns.GridColumn()       'BA-1863 - XB 25/09/2014
+            Dim ManualResultFlagColumn As New DevExpress.XtraGrid.Columns.GridColumn()  'BA-1011
 
             With CalibratorGridView
                 .Columns.AddRange(New DevExpress.XtraGrid.Columns.GridColumn() _
                                   {DateColumn, CalibratorNameColumn, LotNumberColumn, NumberOfCalibratorsColumn, _
                                    TestNameColumn, SampleTypeColumn, RemarksAlertColumn, AbsColumn, _
                                    TheoricalConcColumn, UnitColumn, CalibratorFactorColumn, CalibratorLimitsColumn, _
-                                   GraphColumn, RemarksColumn, AnalyzerIDColumn, TestVersionColumn})
+                                   GraphColumn, RemarksColumn, AnalyzerIDColumn, TestVersionColumn, ManualResultFlagColumn})
 
                 .OptionsView.AllowCellMerge = True 'AG 29/10/2012
                 .OptionsView.GroupDrawMode = DevExpress.XtraGrid.Views.Grid.GroupDrawMode.Default
@@ -685,7 +686,7 @@ Public Class IHisBlankCalibResults
                 .GroupCount = 0
                 .OptionsMenu.EnableColumnMenu = False
                 .ColumnPanelRowHeight = 30
-                .ColumnPanelRowHeight += CInt(.ColumnPanelRowHeight / 4) 'add additional height for Wrap header columns
+                .ColumnPanelRowHeight += CInt(.ColumnPanelRowHeight / 4) 'Add additional height for Wrap header columns
             End With
 
             'Date Column
@@ -729,7 +730,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.ShowCaption = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'Calibrator Name column
@@ -787,7 +788,7 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.ShowCaption = False
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.True 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center
             End With
 
             'Absorbance
@@ -907,25 +908,29 @@ Public Class IHisBlankCalibResults
                 .OptionsColumn.AllowSize = True
                 .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
                 .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False 'AG 29/10/2012
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Near
             End With
 
-            ' XB 25/09/2014 - BA-1863
+            'XB 25/09/2014 - BA-1863
             'Test Version column
             With TestVersionColumn
-                .Caption = "Test Version"
+                .Caption = String.Empty
                 .FieldName = "TestVersionNumber"
                 .DisplayFormat.FormatType = DevExpress.Utils.FormatType.Numeric
                 .Name = "TestVersionNumber"
                 .Visible = False
-                .Width = 100
-                .OptionsColumn.AllowSize = True
-                .OptionsColumn.ShowCaption = True
-                .OptionsColumn.AllowMerge = DevExpress.Utils.DefaultBoolean.False
-                .OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False
-                .AppearanceCell.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Far
+                .Width = 0
             End With
-            ' XB 25/09/2014 - BA-1863
+            'XB 25/09/2014 - BA-1863
+
+            'BA-1011: ManualResultFlag (hidden column)  
+            With ManualResultFlagColumn
+                .Caption = String.Empty
+                .FieldName = "ManualResultFlag"
+                .Name = "ManualResultFlag"
+                .Visible = False
+                .Width = 0
+            End With
 
             'Additional Info
             'Not in v1
@@ -1591,22 +1596,41 @@ Public Class IHisBlankCalibResults
 #End Region
 
 #Region " Grid Events "
-
     ''' <summary>
-    ''' 
+    ''' When in the grid row value of field ManualResultFlag is TRUE, all row cells excepting TestName, SampleType, CalibratorFactor and GraphImage) 
+    ''' are  shown striked-out, which means that value shown in cell CalibratorFactor was informed manually by the final User
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks></remarks>
-    Private Sub BlankGridView_SelectionChanged(ByVal sender As System.Object, ByVal e As DevExpress.Data.SelectionChangedEventArgs) Handles BlankGridView.SelectionChanged, CalibratorGridView.SelectionChanged
+    ''' <remarks>
+    ''' Created by:  SA 09/12/2014 - BA-1011
+    ''' </remarks>
+    Private Sub CalibratorGridView_RowCellStyle(sender As Object, e As DevExpress.XtraGrid.Views.Grid.RowCellStyleEventArgs) Handles CalibratorGridView.RowCellStyle
+        Try
+            Dim View As DevExpress.XtraGrid.Views.Grid.GridView = TryCast(sender, DevExpress.XtraGrid.Views.Grid.GridView)
 
+            If (Not IsDBNull(View.GetRowCellValue(e.RowHandle, View.Columns("ManualResultFlag")))) Then
+                Dim manualResultFlag As Boolean = Convert.ToBoolean(View.GetRowCellValue(e.RowHandle, View.Columns("ManualResultFlag")))
+                If (manualResultFlag) Then
+                    If (e.Column.FieldName <> "TestName" AndAlso e.Column.FieldName <> "SampleType" AndAlso _
+                        e.Column.FieldName <> "CalibratorFactor" AndAlso e.Column.FieldName <> "GraphImage") Then
+                        Dim myFontName As String = xtraCalibratorsGrid.Font.Name
+                        Dim myFontSize As Single = xtraCalibratorsGrid.Font.Size
+
+                        e.Appearance.Font = New Font(myFontName, myFontSize, FontStyle.Strikeout)
+                    End If
+                End If
+            End If
+        Catch ex As Exception
+            Cursor = Cursors.Default
+            CreateLogActivity(ex.Message, Name & ".CalibratorGridView_RowCellStyle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Name & ".CalibratorGridView_RowCellStyle", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
+        Finally
+            Cursor = Cursors.Default
+        End Try
     End Sub
 
     ''' <summary>
     ''' Processes the mouse click event over the cells (calibrator grid)
     ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
     ''' <remarks>
     ''' Created by: AG 23/10/2012
     ''' </remarks>
@@ -1645,13 +1669,10 @@ Public Class IHisBlankCalibResults
         End Try
     End Sub
 
-
-    ''' <summary>
-    ''' 
-    ''' </summary>
-    ''' <param name="sender"></param>
-    ''' <param name="e"></param>
-    ''' <remarks>JB 23/10/2012 (copied and adapted to screen AG 23/10/2012)</remarks>
+    ''' <summary></summary>
+    ''' <remarks>
+    ''' Created by: AG 23/10/2012
+    ''' </remarks>
     Private Sub BlankGridView_MouseMove(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles BlankGridView.MouseMove, CalibratorGridView.MouseMove
         Try
             If sender Is Nothing Then Return
@@ -1690,8 +1711,6 @@ Public Class IHisBlankCalibResults
         End Try
 
     End Sub
-
-
 #End Region
 
 #End Region
