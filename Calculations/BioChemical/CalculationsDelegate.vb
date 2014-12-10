@@ -5442,6 +5442,7 @@ Namespace Biosystems.Ax00.Calculations
                             End If
                         End If
 
+
                         'If (test.DetectionLimit.InUse) Then
                         'If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
                         '    If (preparation(item).ReplicateConc(ReplID) < test.DetectionLimit.Value) Then
