@@ -5256,6 +5256,9 @@ Namespace Biosystems.Ax00.Calculations
         '''                                          obtained CONC (the value before applying the PostDilutionFactor) to check if 
         '''                                          the value is greater than the LinearityLimit
         '''                            - Additionally, fixed a copy/paste error in validation of CONC out of Normality Range for Average Results 
+        '''              SA 10/12/2014 - BA-2003 ==> When the preparation has been diluted to obtain the result, use the real 
+        '''                                          obtained CONC (the value before applying the PostDilutionFactor) to check if 
+        '''                                          the value is lesser than the DetectionLimit
         ''' </remarks>
         Private Function GenerateConcentrationRemarks(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pExecutionAlarmsDS As WSExecutionAlarmsDS, _
                                                       ByRef pAverageAlarmsDS As ResultAlarmsDS) As GlobalDataTO
@@ -5388,13 +5391,20 @@ Namespace Biosystems.Ax00.Calculations
 
                         '6.- 'CONC < Detection Limit [Replicate & Average remark]
                         If (test.DetectionLimit.InUse) Then
+                            'BA-2003: When the preparation has been diluted to obtain the result, use the real obtained CONC (the value before applying the PostDilutionFactor)
+                            '         to check if the value is lesser than the LinearityLimit 
+                            Dim myCONC As Single = 0
+
                             If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
-                                If (preparation(item).ReplicateConc(ReplID) < test.DetectionLimit.Value) Then
-                                    'Replicate CONC > Detection Limit
+                                myCONC = preparation(item).ReplicateConc(ReplID)
+                                If (Trim$(preparation(item).PostDilutionType) <> "NONE") Then myCONC = myCONC / test.PostDilutionFactor
+
+                                If (myCONC < test.DetectionLimit.Value) Then
+                                    'Replicate CONC < Detection Limit
                                     Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
 
-                                    'NOTE: If there is an alarm of Detection Limit then delete Non Linear Kinetics remark!!
-                                    '      (it is not needed because the Non Linear Kinetics alarms is an average alarm!)
+                                    'NOTE: If there is an alarm of Detection Limit then the Non Linear Kinetics Remark has to be deleted
+                                    '      (it is not needed because the Non Linear Kinetics alarm is an Average alarm)!!
                                     Dim linqRemarkToDelete As New List(Of WSExecutionAlarmsDS.twksWSExecutionAlarmsRow)
                                     linqRemarkToDelete = (From a As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In pExecutionAlarmsDS.twksWSExecutionAlarms _
                                                          Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
@@ -5404,17 +5414,20 @@ Namespace Biosystems.Ax00.Calculations
                                         linqRemarkToDelete.First().Delete()
                                         linqRemarkToDelete.First().AcceptChanges()
                                     End If
-                                    linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
+                                    linqRemarkToDelete = Nothing
                                 End If
                             End If
 
                             If (preparation(item).Conc <> ERROR_VALUE) Then
-                                If (preparation(item).Conc < test.DetectionLimit.Value) Then
-                                    'Average CONC > Detection Limit
+                                myCONC = preparation(item).Conc
+                                If (Trim$(preparation(item).PostDilutionType) <> "NONE") Then myCONC = myCONC / test.PostDilutionFactor
+
+                                If (myCONC < test.DetectionLimit.Value) Then
+                                    'Average CONC < Detection Limit
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
 
-                                    'NOTE: If there is an alarm of Detection Limit then delete Non Linear Kinetics remark!!
-                                    '      Delete it from local DS (pAverageAlarmsDS)
+                                    'NOTE: If there is an alarm of Detection Limit then the Non Linear Kinetics Remark has to be deleted
+                                    '      from local DS (pAverageAlarmsDS)
                                     Dim linqRemarkToDelete As New List(Of ResultAlarmsDS.twksResultAlarmsRow)
                                     linqRemarkToDelete = (From a As ResultAlarmsDS.twksResultAlarmsRow In pAverageAlarmsDS.twksResultAlarms _
                                                          Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
@@ -5424,10 +5437,52 @@ Namespace Biosystems.Ax00.Calculations
                                         linqRemarkToDelete.First().Delete()
                                         linqRemarkToDelete.First().AcceptChanges()
                                     End If
-                                    linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
+                                    linqRemarkToDelete = Nothing
                                 End If
                             End If
                         End If
+
+                        'If (test.DetectionLimit.InUse) Then
+                        'If (preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE) Then
+                        '    If (preparation(item).ReplicateConc(ReplID) < test.DetectionLimit.Value) Then
+                        '        'Replicate CONC > Detection Limit
+                        '        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
+
+                        '        'NOTE: If there is an alarm of Detection Limit then delete Non Linear Kinetics remark!!
+                        '        '      (it is not needed because the Non Linear Kinetics alarms is an average alarm!)
+                        '        Dim linqRemarkToDelete As New List(Of WSExecutionAlarmsDS.twksWSExecutionAlarmsRow)
+                        '        linqRemarkToDelete = (From a As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In pExecutionAlarmsDS.twksWSExecutionAlarms _
+                        '                             Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
+                        '                            Select a).ToList()
+
+                        '        If (linqRemarkToDelete.Count > 0) Then
+                        '            linqRemarkToDelete.First().Delete()
+                        '            linqRemarkToDelete.First().AcceptChanges()
+                        '        End If
+                        '        linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
+                        '    End If
+                        'End If
+
+                        'If (preparation(item).Conc <> ERROR_VALUE) Then
+                        '    If (preparation(item).Conc < test.DetectionLimit.Value) Then
+                        '        'Average CONC > Detection Limit
+                        '        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
+
+                        '        'NOTE: If there is an alarm of Detection Limit then delete Non Linear Kinetics remark!!
+                        '        '      Delete it from local DS (pAverageAlarmsDS)
+                        '        Dim linqRemarkToDelete As New List(Of ResultAlarmsDS.twksResultAlarmsRow)
+                        '        linqRemarkToDelete = (From a As ResultAlarmsDS.twksResultAlarmsRow In pAverageAlarmsDS.twksResultAlarms _
+                        '                             Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
+                        '                            Select a).ToList()
+
+                        '        If (linqRemarkToDelete.Count > 0) Then
+                        '            linqRemarkToDelete.First().Delete()
+                        '            linqRemarkToDelete.First().AcceptChanges()
+                        '        End If
+                        '        linqRemarkToDelete = Nothing 'AG 25/02/2014 - #1521
+                        '    End If
+                        'End If
+                        'End If
 
                         '7.- 'CONC out of normality range
                         If (test.ReferenceRange.InUse) Then
