@@ -774,6 +774,14 @@ Namespace Biosystems.Ax00.Global
             MAX_SQL_MEMORYUSAGE      'AG 24/02/2014 - #1520 Max SQL service memory usage. When limit exceeded a message inform the user to close the app
 
             MAX_QCRESULTS_TO_ACCUMULATE 'BA-1885
+
+            ' XB 09/12/2014 - BA-1872
+            WAITING_TIME_OFF
+            SYSTEM_TIME_OFFSET
+            WAITING_TIME_DEFAULT
+            WAITING_TIME_FAST
+            WAITING_TIME_ISE_FAST
+            WAITING_TIME_ISE_OFFSET
         End Enum
 
 

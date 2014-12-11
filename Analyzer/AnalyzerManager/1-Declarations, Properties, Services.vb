@@ -30,10 +30,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private myParamsQueue As New List(Of Object)    ' XBC 24/05/2010
         Private useRequestFlag As Boolean = False 'Ag 02/11/2010 - Flag for start using request (True when START instruction finish) / Return to False on send ENDRUN or ABORT
         Private waitingTimer As New Timer() ' AG 07/05/2010 - waiting time (watchdog)
-        Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
-        Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
-        Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
-        Private Const WAITING_TIME_FAST As Integer = 2 'SECONDS Default timeout considered
+
+        ' XB 09/12/2014 - Parametizers all these values - BA-1872
+        'Private Const WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
+        'Private Const SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
+        'Private Const WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
+        'Private Const WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
+        Private WAITING_TIME_OFF As Integer = -1 'Wacthdoc off
+        Private SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
+        Private WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
+        Private WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
+        Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECCONDS waiting time for ISE module timeout (E:61) - BA-1872
+        Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECCONDS waiting time for ISE repetitions - BA-1872
+        ' XB 09/12/2014 - Parametizers all these values - BA-1872
 
         'Class variables to inform the presentation layer about UI refresh after instruction receptions
         'AG 07/10/2011 - Duplicate the refresh variable due:
@@ -1327,6 +1336,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Deactivate waiting time control
                 InitializeTimerControl(WAITING_TIME_OFF)
 
+                Debug.Print("SALTA TIMER WAITING_TIME_EXPIRED !!!!")
                 ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED, True)
 
             Catch ex As Exception
@@ -1349,6 +1359,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
                 MyClass.ClearQueueToSend()
 
+                Debug.Print("SALTA TIMER START_TASK_TIMEOUT !!!!")
                 MyClass.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START_TASK_TIMEOUT, True)
 
             Catch ex As Exception
@@ -1370,6 +1381,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Deactivate waiting time control
                 MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
                 numRepetitionsSTATE += 1
+
+                Debug.Print("SALTA TIMER STATE !!!!")
                 MyClass.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START_TASK_TIMEOUT, True)
 
             Catch ex As Exception
@@ -1694,6 +1707,32 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 AddHandler thermoR2ArmWarningTimer.Elapsed, AddressOf thermoR2ArmWarningTimer_Timer
                 'END AG 05/01/2012
 
+                ' XB 09/12/2014 - Read timer values from Parameters table - BA-1872
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.WAITING_TIME_OFF.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_OFF = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.SYSTEM_TIME_OFFSET.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    SYSTEM_TIME_OFFSET = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.WAITING_TIME_DEFAULT.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_DEFAULT = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.WAITING_TIME_FAST.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_FAST = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.WAITING_TIME_ISE_FAST.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_ISE_FAST = CInt(myGlobalDataTO.SetDatos)
+                End If
+                myGlobalDataTO = mySwParameterDelegate.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.WAITING_TIME_ISE_OFFSET.ToString, Nothing)
+                If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
+                    WAITING_TIME_ISE_OFFSET = CInt(myGlobalDataTO.SetDatos)
+                End If
+                ' XB 09/12/2014 - Read timer values from Parameters table - BA-1872
 
             Catch ex As Exception
                 classInitializationErrorAttribute = True
@@ -3071,6 +3110,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
                                     Exit Select
 
+                                    ' XB 10/12/2014 - BA-1872
+                                ElseIf MyClass.myStartTaskInstructionsQueue.Contains(AnalyzerManagerSwActionList.RUNNING) Then
+                                    Debug.Print("RUNNING lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...")
+                                    MyClass.RUNNINGLost = True
+                                    Dim myLogAcciones As New ApplicationLogManager()
+                                    myLogAcciones.CreateLogActivity("RUNNING lost !!! [WAITING_TIME_EXPIRED] ... sending STATE ...", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
+                                    myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
+                                    Exit Select
+                                    ' XB 10/12/2014 - BA-1872
+
                                 Else
                                     ' XB 26/09/2014 - BA-1872
 
@@ -3119,7 +3168,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                     Else
                                         ' Instruction has not started by Fw, so is need to send it again
-                                        myLogAcciones.CreateLogActivity("Repeat STATE Instruction [" & MyClass.numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                        myLogAcciones.CreateLogActivity("Repeat STATE Instruction [" & MyClass.numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
                                         myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
                                         MyClass.InitializeTimerSTATEControl(WAITING_TIME_FAST)
                                     End If
@@ -3167,7 +3216,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                     Else
                                         ' Instruction has not started by Fw, so is need to send it again
-                                        myLogAcciones.CreateLogActivity("Repeat STATE Instruction [" & MyClass.numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                        myLogAcciones.CreateLogActivity("Repeat STATE Instruction [" & MyClass.numRepetitionsSTATE.ToString & "]", "AnalyzerManager.ManagerAnalyzer", EventLogEntryType.Error, False)
                                         myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.STATE)
                                         MyClass.InitializeTimerSTATEControl(WAITING_TIME_FAST)
                                     End If

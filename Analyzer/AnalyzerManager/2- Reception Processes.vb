@@ -58,6 +58,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XB 30/09/2014 - BA-1872
                 If MyClass.ISECMDLost Or MyClass.RUNNINGLost Then
                     'Deactivate waiting time control
+                    Debug.Print("Deactivate waiting time control ...")
                     numRepetitionsSTATE = 0
                     MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
                 End If
@@ -343,9 +344,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.ISE_ACTION_START Then
                         Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - ISE Action Start =34")
                         'MyClass.ISE_Manager.StopInstructionStartedTimer()
+
                         ' Update the interval of the Timer with the expected time received from the Analyzer
-                        Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
-                        MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                        If myExpectedTimeRaw <= 0 Then
+                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
+                            MyClass.InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
+                        Else
+                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                            MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
+                        End If
                     End If
 
                 End If
@@ -354,6 +361,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XB 06/11/2014 - BA-1872
                 If MyClass.RUNNINGLost Then
                     MyClass.RUNNINGLost = False
+
+                    If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
+                        If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess.ToString) = "INPROCESS") AndAlso _
+                             (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.EnterRunning.ToString) = "INI") Then
+                            myActionValue = AnalyzerManagerAx00Actions.RUNNING_END
+                            AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END
+                        End If
+                    End If
 
                     If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY AndAlso _
                        AnalyzerCurrentActionAttribute <> AnalyzerManagerAx00Actions.RUNNING_START AndAlso _
@@ -409,12 +424,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action Start =7 UPDATED TIME TO [" & AppLayer.MaxWaitTime.ToString & "] seconds")
                     ' Update the interval of the Timer with the expected time received from the Analyzer
                     Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
+                    MyClass.InitializeTimerControl(WAITING_TIME_OFF)    ' This timer is disabled because this operation is managed by StartTaskTimer
                     MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)
                     StartingRunningFirstTime = True
                 End If
 
                 If AnalyzerCurrentActionAttribute = AnalyzerManagerAx00Actions.RUNNING_END Or _
-                   AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                   AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     If StartingRunningFirstTime Then
                         StartingRunningFirstTime = False
                         Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - RUNNING Action END =8")
@@ -592,6 +608,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                             RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                         Else
+                                            Debug.Print("Deactivate waiting time control (2) ...")
+                                            numRepetitionsSTATE = 0
+                                            MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
+
+                                            myLogAcciones.CreateLogActivity("Waiting because error 61 [" & MyClass.WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                                            Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
+                                            While myDateTime > DateTime.Now
+                                                ' spending time ...
+                                            End While
+                                            myLogAcciones.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+
                                             ' Instruction has not started by Fw, so is need to send it again
                                             myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
                                             myGlobal = MyClass.SendStartTaskinQueue()

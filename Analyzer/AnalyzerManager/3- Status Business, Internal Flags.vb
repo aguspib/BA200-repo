@@ -2615,7 +2615,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 MyClass.ClearStartTaskQueueToSend()
 
-                ' XB 29/09/2014 - BA-1872
+                ' XB 09/12/2014 - BA-1872
                 Dim myISECMD As Biosystems.Ax00.Global.ISECommandTO = Nothing
                 If queuedAction = AnalyzerManagerSwActionList.ISE_CMD AndAlso Not queuedSwAdditionalParameters Is Nothing Then
                     myISECMD = CType(queuedSwAdditionalParameters, Biosystems.Ax00.Global.ISECommandTO)
@@ -2623,8 +2623,23 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If (Not myISECMD Is Nothing AndAlso _
                     (myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Or myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION)) Then
                     ' Special case for ISE save consumptions
-                    myGlobal = MyClass.ISE_Manager.SaveConsumptions()
-                    ' XB 29/09/2014 - BA-1872
+
+                    If myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION Then
+                        myISECMD.ISECommandID = ISECommands.WRITE_DALLAS
+                        myGlobal = ManageAnalyzer(queuedAction, True, Nothing, queuedSwAdditionalParameters, queuedFwScriptID, queuedFwParams)
+                        If Not myGlobal.HasError Then
+                            myISECMD.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION
+                        End If
+                    ElseIf myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION Then
+                        myISECMD.ISECommandID = ISECommands.WRITE_DALLAS
+                        myGlobal = ManageAnalyzer(queuedAction, True, Nothing, queuedSwAdditionalParameters, queuedFwScriptID, queuedFwParams)
+                        If Not myGlobal.HasError Then
+                            myISECMD.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION
+                        End If
+                    End If
+
+                    'myGlobal = MyClass.ISE_Manager.SaveConsumptions()
+                    ' XB 09/12/2014 - BA-1872
                 Else
                     myGlobal = ManageAnalyzer(queuedAction, True, Nothing, queuedSwAdditionalParameters, queuedFwScriptID, queuedFwParams)
                 End If
