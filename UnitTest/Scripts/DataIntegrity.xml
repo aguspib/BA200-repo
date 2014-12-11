@@ -3108,6 +3108,17 @@
     </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>VALIDATE New Alarm Exist COMMS_TIMEOUT_ERR </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwAlarms WHERE AlarmID = 'COMMS_TIMEOUT_ERR') = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation> 
 </DBIntegrityDS>
 
 
