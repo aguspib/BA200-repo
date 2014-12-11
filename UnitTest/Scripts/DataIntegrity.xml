@@ -3095,7 +3095,7 @@
       SELECT 'False'
     </Script>
     <Result>True</Result>
-    </IntegrityValidation>
+  </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.11</Version>
     <Label>New SW Parameters for Analyzer layer timers have been added to tfmwSwParameters table</Label>
@@ -3110,8 +3110,30 @@
       ELSE
       SELECT 'False'
     </Script>
+  </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>Column ManualResultFlag has been added to view vhisWSBlankCalibResults</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM sys.syscolumns sc INNER JOIN sys.sysobjects so ON sc.id = so.id
+      WHERE  so.xtype = 'V' AND so.name = 'vhisWSBlankCalibResults' AND sc.name = 'ManualResultFlag') = 1)
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
     <Result>True</Result>
   </IntegrityValidation>
+  <IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>VALIDATE New Alarm Exist COMMS_TIMEOUT_ERR </Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwAlarms WHERE AlarmID = 'COMMS_TIMEOUT_ERR') = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation> 
 </DBIntegrityDS>
 
 

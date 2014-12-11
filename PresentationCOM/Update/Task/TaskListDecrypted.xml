@@ -3009,6 +3009,34 @@
                             dbo.twksResults ON dbo.twksOrderTests.OrderTestID = dbo.twksResults.OrderTestID
       WHERE     (dbo.twksResults.AcceptedResultFlag = 1) AND (dbo.twksResults.CONC_Error IS NULL)
       GO
+      
+      USE [Ax00]
+      GO 
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'V' AND name = 'vhisWSBlankCalibResults') = 1)
+	      DROP VIEW [dbo].[vhisWSBlankCalibResults]
+      GO
+      SET ANSI_NULLS ON
+      GO
+      SET QUOTED_IDENTIFIER ON
+      GO
+      CREATE VIEW [dbo].[vhisWSBlankCalibResults]	AS			
+      SELECT DISTINCT hres.HistOrderTestID, hres.AnalyzerID, hres.ResultDateTime, hres.ABSValue, hres.ABSWorkReagent, hres.KineticBlankLimit, hres.ABSInitial, hres.ABSMainFilter, 
+                      hres.BlankAbsorbanceLimit, hres.AlarmList, hres.FactorLowerLimit, hres.FactorUpperLimit, hot.SampleClass, hot.SampleType, hts.TestName, 
+                      tcfg.FixedItemDesc AS MeasureUnit, hca.CalibratorName, hca.LotNumber, hca.NumberOfCalibrators, htc.TheoreticalConcentration, hres.MultiPointNumber, 
+                      hres.WorkSessionID, hts.CalibPointUsed, hts.DecimalsAllowed, hres.RemarkAlert, htc.TestVersionNumber, hot.TestType, hts.TestID, hts.TestPosition, 
+                      hts.TestLongName, hres.ManualResultFlag, (CASE WHEN hres.ManualResultFlag = 1 THEN hres.ManualResult ELSE hres.CalibratorFactor END) AS CalibratorFactor
+      FROM            dbo.thisWSResults AS hres INNER JOIN dbo.thisWSOrderTests AS hot ON hres.HistOrderTestID = hot.HistOrderTestID AND hres.AnalyzerID = hot.AnalyzerID 
+                                                                                      AND hres.WorkSessionID = hot.WorkSessionID 
+						                            			  INNER JOIN dbo.vhisTestSamples AS hts ON hot.HistTestID = hts.HistTestID AND hot.TestType = hts.TestType 
+										                                                                 AND hts.TestVersionNumber = COALESCE (hot.TestVersionNumber, 0) 
+					                                 LEFT OUTER JOIN dbo.thisCalibrators AS hca ON hot.HistCalibratorID = hca.HistCalibratorID 
+									                         LEFT OUTER JOIN dbo.thisTestCalibratorsValues AS htc ON hot.HistCalibratorID = htc.HistCalibratorID 
+                                                                                               AND hot.SampleType = htc.SampleType 
+									                                                                             AND hot.TestVersionNumber = htc.TestVersionNumber 
+                                                                                               AND hot.HistTestID = htc.HistTestID 
+																						                                                   AND hres.MultiPointNumber = htc.CalibratorNum 
+									                         LEFT OUTER JOIN dbo.tcfgMasterData AS tcfg ON tcfg.SubTableID = 'TEST_UNITS' AND tcfg.ItemID = hot.MeasureUnit
+      WHERE     		  hot.SampleClass &lt;&gt; 'PATIENT'
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.1.1', ServiceSoftware = '1.3.1', FirmwareScripts = '1.3.0', Firmware = '2.14', DBSoftware = '3.11'
@@ -3018,6 +3046,12 @@
       GO
       IF ((SELECT COUNT(*) FROM dbo.tfmwFieldLimits WHERE LimitID = 'PREPARATION_VOLUME' AND AnalyzerModel = 'A400' AND MinValue = 180) = 0)
       UPDATE dbo.tfmwFieldLimits SET MinValue = 180 WHERE LimitID = 'PREPARATION_VOLUME' AND AnalyzerModel = 'A400'
+      GO
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwAlarms') = 1)
+      BEGIN
+      INSERT INTO tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, Freeze, OKType, LISValue)
+      VALUES('COMMS_TIMEOUT_ERR', 'INS', 'ERROR', 'Timeout communications with Analyzer', 'COMMS_TIMEOUT_ERR', 'Analyzer doesn''t respond', 'ALM_COMMS_TIMEOUT_ERR', 'Try to perform the same action again', 'SOL_COMMS_TIMEOUT_ERR', 0, 0, NULL, 1, NULL)
+      END
       GO
     </UpdateScript>
   </AppVersion>
