@@ -4072,7 +4072,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        'Verify if the Internal Virtual Rotor for Reagents has been created, and in this case, get the ID
+                        'Verify if the Internal Virtual Rotor for Samples has been created, and in this case, get the ID
                         Dim myVirtualRotorsDelegate As New VirtualRotorsDelegate
 
                         resultData = myVirtualRotorsDelegate.GetVRotorsByRotorType(dbConnection, "SAMPLES", True)
