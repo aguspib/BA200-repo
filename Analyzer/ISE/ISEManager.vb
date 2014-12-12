@@ -429,6 +429,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by SGM 12/03/2012
         ''' Modified by XB 30/09/2014 - Deactivate old timeout management - Remove too restrictive limitations because timeouts - BA-1872
+        '''             XB 12/12/2014 - When ISE is Off set IsISEInitiatedOKAttr attribute to FALSE because the correct inicialization is required again - BA-2178
         ''' </remarks>
         Public Property IsISESwitchON() As Boolean
             Get
@@ -443,6 +444,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XBC 03/10/2012 - Correction : When ISE is switch off set Ise as initialized
                 If Not value Then
                     MyClass.IsISEInitializationDoneAttr = True
+                    MyClass.IsISEInitiatedOKAttr = False    ' XB 12/12/2014 - BA-2178
                 End If
                 ' XBC 03/10/2012
 

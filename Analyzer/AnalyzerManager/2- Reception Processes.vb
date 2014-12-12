@@ -608,20 +608,23 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                             RaiseEvent SendEvent(GlobalEnumerates.AnalyzerManagerSwActionList.WAITING_TIME_EXPIRED.ToString)
                                         Else
-                                            Debug.Print("Deactivate waiting time control (2) ...")
-                                            numRepetitionsSTATE = 0
-                                            MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
+                                            If myStartTaskInstructionsQueue.Count > 0 Then
+                                                Debug.Print("Deactivate waiting time control (2) ...")
+                                                numRepetitionsSTATE = 0
+                                                MyClass.InitializeTimerSTATEControl(WAITING_TIME_OFF)
 
-                                            myLogAcciones.CreateLogActivity("Waiting because error 61 [" & MyClass.WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
-                                            Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
-                                            While myDateTime > DateTime.Now
-                                                ' spending time ...
-                                            End While
-                                            myLogAcciones.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                                                myLogAcciones.CreateLogActivity("Waiting because error 61 [" & MyClass.WAITING_TIME_ISE_FAST.ToString & "] seconds ...", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
+                                                Dim myDateTime As DateTime = DateAdd(DateInterval.Second, WAITING_TIME_ISE_FAST, DateTime.Now)
+                                                While myDateTime > DateTime.Now
+                                                    ' spending time ...
+                                                End While
+                                                myLogAcciones.CreateLogActivity("Waiting because error 61 consumed ! ", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Information, False)
 
-                                            ' Instruction has not started by Fw, so is need to send it again
-                                            myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
-                                            myGlobal = MyClass.SendStartTaskinQueue()
+                                                ' Instruction has not started by Fw, so is need to send it again
+                                                myLogAcciones.CreateLogActivity("Repeat Start Task Instruction because error 61 [" & MyClass.numRepetitionsTimeout.ToString & "]", "AnalyzerManager.ProcessStatusReceived", EventLogEntryType.Error, False)
+                                                myGlobal = MyClass.SendStartTaskinQueue()
+                                            End If
+
                                         End If
 
                                     End If

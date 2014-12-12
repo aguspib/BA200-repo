@@ -3614,6 +3614,7 @@ Public Class IISEUtilities
 
     ''' Modified by SA 14/05/2012 - Call to function IsThereAnyISETest changed by call to new function IsThereAnyTestByType 
     '''                             informing TestType parameter as ISE
+    '''             XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
     Private Function ValidateISEAction(ByVal pNode As TreeNode) As Boolean
 
         Dim resultValue As Boolean = True
@@ -3714,8 +3715,14 @@ Public Class IISEUtilities
                 ' general validations
                 If myISEManager.IsISEModuleInstalled Then ' XBC 19/04/2012 
 
-                    'resultValue = resultValue And myISEManager.IsISECommsOk
-                    resultValue = resultValue And myISEManager.IsISESwitchON
+                    ' XB 12/12/2014 - BA-2178
+                    ''resultValue = resultValue And myISEManager.IsISECommsOk
+                    'resultValue = resultValue And myISEManager.IsISESwitchON
+                    If myAction <> "INIT_ISE" Then
+                        resultValue = resultValue And myISEManager.IsISESwitchON
+                    End If
+                    ' XB 12/12/2014 - BA-2178
+
                 End If
 
             End If
@@ -3734,6 +3741,8 @@ Public Class IISEUtilities
         Return resultValue
     End Function
 
+    ''' Modified by XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
+    ''' 
     Private Function ValidateNodeByBlock(ByVal pNode As TreeNode) As Boolean
         Dim resultValue As Boolean = False
         Try
@@ -3794,9 +3803,11 @@ Public Class IISEUtilities
                         End If
                     End If
 
+                    ' XB 12/12/2014 - BA-2178
+                    ' If Not MyClass.myISEManager.IsISESwitchON Then
+                    If Not MyClass.myISEManager.IsISESwitchON And pNode.Tag.ToString <> "INIT_ISE" Then
+                        ' XB 12/12/2014 - BA-2178
 
-
-                    If Not MyClass.myISEManager.IsISESwitchON Then
                         resultValue = False
                     End If
 
@@ -4637,8 +4648,8 @@ Public Class IISEUtilities
         End Try
     End Sub
 
-
-
+    ''' Modified by XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
+    ''' 
     Private Sub BsScreenActionsTreeView_NodeMouseClick(ByVal sender As Object, ByVal e As System.Windows.Forms.TreeNodeMouseClickEventArgs) Handles BsActionsTreeView.NodeMouseClick
         Try
 
@@ -4693,7 +4704,11 @@ Public Class IISEUtilities
                                 Me.BsTimesUpDown.Value = 1
                                 If MyClass.ValidateISEAction(currNode) Then
                                     MyClass.CurrentActionNode = currNode
-                                    If Not myISEManager.IsLongTermDeactivation Then
+
+                                    ' XB 12/12/2014 - BA-2178
+                                    ' If Not myISEManager.IsLongTermDeactivation Then
+                                    If Not myISEManager.IsLongTermDeactivation AndAlso currNode.Tag.ToString <> "INIT_ISE" Then
+                                        ' XB 12/12/2014 - BA-2178
                                         Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
                                     Else
                                         Me.BsAdjustButton.Enabled = True
