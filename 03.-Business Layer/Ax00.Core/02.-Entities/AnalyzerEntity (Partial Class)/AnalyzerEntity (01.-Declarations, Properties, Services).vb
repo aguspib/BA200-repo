@@ -2140,6 +2140,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''          XB 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
         '''          XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
         '''          AG 15/04/2014 - #1591 do not send START while analyzer is starting pause
+        '''          AG 11/12/2014 BA-2170 Analyzer does not becomes ready when receives an ANSFBLD instruction. This is an exception to the general rule!!
         ''' </remarks>
         Public Function ManageAnalyzer(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
                                        Optional ByVal pInstructionReceived As List(Of InstructionParameterTO) = Nothing, _
@@ -2212,18 +2213,13 @@ Namespace Biosystems.Ax00.Core.Entities
                             If Not AnalyzerIsReadyAttribute Then
                                 Select Case pAction
                                     'AG 26/03/2012 - all reception instructions except status set analyzerisready = True (exception Running)
-                                    'Case GlobalEnumerates.AnalyzerManagerSwActionList.BASELINE_RECEIVED, GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED, _
-                                    '    GlobalEnumerates.AnalyzerManagerSwActionList.ANSERR_RECEIVED, GlobalEnumerates.AnalyzerManagerSwActionList.ANSINF_RECEIVED
-
-                                    '    AnalyzerIsReadyAttribute = True
-
-                                    'Case GlobalEnumerates.AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
-                                    '    If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                                    '        AnalyzerIsReadyAttribute = True
-                                    '    End If
-                                    'Case Else
                                     Case GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED
                                         'Do nothing ... when the status instruction is treated the Software updates the AnalyzerIsReadyAttribute
+
+                                        'AG 11/12/2014 BA-2170
+                                    Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                        'Exception: The analyzer will be ready when receives STATUS with A:47
+                                        'AG 11/12/2014
 
                                     Case Else
                                         If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then

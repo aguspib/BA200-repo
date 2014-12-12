@@ -1391,7 +1391,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>Integer indicating the excluded well from rejection parameters (if -1 no excluded wells)</returns>
         ''' <remarks>
-        ''' AG 26/09/2012 - infoRejection string get new value only if current value is ""</remarks>
+        ''' AG 26/09/2012 - infoRejection string get new value only if current value is ""
+        ''' AG 11/12/2014 BA-2170 more information, well abs when rejected</remarks>
         Private Function TreatWellRejectionResults() As Integer
             Dim myExcludedWell As Integer = -1
             Try
@@ -1407,7 +1408,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     wellBL.rejected = True
                                     'If Not myListOfRejectedWells.Contains(wellBL.well) Then myListOfRejectedWells.Add(wellBL.well)
                                     If wellBL.rejected AndAlso String.Compare(infoRejection, "", False) = 0 Then 'AG 26/09/2012
-                                        infoRejection = "Well: " & wellBL.well & ", Wavelenght ID: " & wl + 1 & ", Avg Abs(wavelenght): " & .absAVG(wl) & ", SD(wavelenght): " & .absSD(wl) 'AG 14/05/2012 (AG 17/09/2012 add 1 to the wavelenght ID)
+                                        'infoRejection = "Well: " & wellBL.well & ", Wavelenght ID: " & wl + 1 & ", Avg Abs(wavelenght): " & .absAVG(wl) & ", SD(wavelenght): " & .absSD(wl) 'AG 14/05/2012 (AG 17/09/2012 add 1 to the wavelenght ID)
+                                        infoRejection = "Well: " & wellBL.well & ", Wavelenght ID: " & wl + 1 & ", Well Abs: " & wellBL.Abs(wl) & ", Avg Abs(wavelenght): " & .absAVG(wl) & ", SD(wavelenght): " & .absSD(wl) 'AG 11/12/2014 BA-2170 (add the well abs)
                                     End If
 
                                 End If

@@ -569,6 +569,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by AG 02/03/2011 - add parameter pNextWell
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
         '''             AG 14/11/2014 BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
+        '''             AG 11/12/2014 BA-2170 use new value "MIDDLE" for flag DynamicBL_Read
         ''' </remarks>
         Private Function ManageStandByStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -1000,7 +1001,12 @@ Namespace Biosystems.Ax00.Core.Entities
                             'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
 
                             'Read rotor finishes
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+
+                            'AG 11/12/2014 BA-2170
+                            'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "MIDDLE" Then
+                            'AG 11/12/2014 BA-2170
+
                             Dim validResults As Boolean = True
 
                             '1. Validate results
