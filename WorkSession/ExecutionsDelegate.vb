@@ -9886,7 +9886,7 @@ Namespace Biosystems.Ax00.BL
                                     If pSTDPrepFlag Then 'STD executions add remark Finished with optical errors
                                         execAlarmRow = execAlarmDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
                                         execAlarmRow.ExecutionID = row.ExecutionID
-                                        execAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
+                                        execAlarmRow.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK13.ToString
                                         execAlarmRow.AlarmDateTime = DateTime.Now
                                         execAlarmDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(execAlarmRow)
                                     Else 'ISE executions only mark as CLOSEDNOK but no alarm
@@ -9949,7 +9949,7 @@ Namespace Biosystems.Ax00.BL
                                                     resultAlarmRow.OrderTestID = pOrderTestID
                                                     resultAlarmRow.MultiPointNumber = executionsRow.MultiItemNumber
                                                     resultAlarmRow.RerunNumber = executionsRow.RerunNumber
-                                                    resultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
+                                                    resultAlarmRow.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK13.ToString
                                                     resultAlarmRow.AlarmDateTime = DateTime.Now
                                                     resultAlarmDS.twksResultAlarms.AddtwksResultAlarmsRow(resultAlarmRow)
                                                 Next
@@ -10655,7 +10655,7 @@ Namespace Biosystems.Ax00.BL
                             If (pSTDPrepFlag) Then
                                 execAlarmRow = execAlarmDS.twksWSExecutionAlarms.NewtwksWSExecutionAlarmsRow
                                 execAlarmRow.ExecutionID = row.ExecutionID
-                                execAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
+                                execAlarmRow.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK13.ToString
                                 execAlarmRow.AlarmDateTime = DateTime.Now
                                 execAlarmDS.twksWSExecutionAlarms.AddtwksWSExecutionAlarmsRow(execAlarmRow)
                             Else
@@ -10707,7 +10707,7 @@ Namespace Biosystems.Ax00.BL
                                             resultAlarmRow.OrderTestID = executionsRow.OrderTestID
                                             resultAlarmRow.MultiPointNumber = executionsRow.MultiItemNumber
                                             resultAlarmRow.RerunNumber = executionsRow.RerunNumber
-                                            resultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK13.ToString
+                                            resultAlarmRow.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK13.ToString
                                             resultAlarmRow.AlarmDateTime = DateTime.Now
                                             resultAlarmDS.twksResultAlarms.AddtwksResultAlarmsRow(resultAlarmRow)
                                         Else

@@ -7863,37 +7863,37 @@ Namespace Biosystems.Ax00.Core.Entities
 
                 Else
 
-                    Dim myRemarkID As CalculationRemarks
+                    Dim myRemarkID As GlobalEnumerates.Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myRemarkID = CalculationRemarks.ISE_mVOutB
+                            myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = CalculationRemarks.ISE_mVOutA_SER
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutA_SER
                             Else
-                                myRemarkID = CalculationRemarks.ISE_mVOutB_URI
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myRemarkID = CalculationRemarks.ISE_mVNoiseB
+                            myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = CalculationRemarks.ISE_mVNoiseA_SER
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseA_SER
                             Else
-                                myRemarkID = CalculationRemarks.ISE_mVNoiseB_URI
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myRemarkID = CalculationRemarks.ISE_Drift_SER
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_Drift_SER
                             Else
-                                myRemarkID = CalculationRemarks.ISE_Drift_CAL
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myRemarkID = CalculationRemarks.ISE_OutSlope
+                            myRemarkID = GlobalEnumerates.Alarms.ISE_OutSlope
 
                     End Select
 

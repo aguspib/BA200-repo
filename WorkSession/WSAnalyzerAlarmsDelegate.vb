@@ -687,16 +687,16 @@ Namespace Biosystems.Ax00.BL
                                 If myError.StartsWith("R") Then
                                     Dim myISEErrorCode As ISEErrorTO.ISEResultErrorCodes = ISEErrorTO.ISEResultErrorCodes.None
                                     myError = myError.Substring(1)
-                                    Dim myRemark As CalculationRemarks
+                                    Dim myRemark As Alarms
                                     myISEErrorCode = CType(CInt(myError), ISEErrorTO.ISEResultErrorCodes)
                                     If CInt(myISEErrorCode) > 1 Then
                                         Select Case myISEErrorCode
-                                            Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample : myRemark = CalculationRemarks.ISE_Drift_SER
-                                            Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine : myRemark = CalculationRemarks.ISE_mVNoiseB_URI
-                                            Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample : myRemark = CalculationRemarks.ISE_mVNoiseA_SER
-                                            Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine : myRemark = CalculationRemarks.ISE_mVOutB_URI
-                                            Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample : myRemark = CalculationRemarks.ISE_mVOutA_SER
-                                            Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges : myRemark = CalculationRemarks.ISE_OutSlope
+                                            Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample : myRemark = Alarms.ISE_Drift_SER
+                                            Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine : myRemark = Alarms.ISE_mVNoiseB_URI
+                                            Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample : myRemark = Alarms.ISE_mVNoiseA_SER
+                                            Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine : myRemark = Alarms.ISE_mVOutB_URI
+                                            Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample : myRemark = Alarms.ISE_mVOutA_SER
+                                            Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges : myRemark = Alarms.ISE_OutSlope
                                         End Select
                                     End If
 

@@ -1317,16 +1317,16 @@ Namespace Biosystems.Ax00.BL
                                                             myResultAlarmRow.OrderTestID = offSystemTestResult.OrderTestID
                                                             myResultAlarmRow.RerunNumber = 1
                                                             myResultAlarmRow.MultiPointNumber = 1
-                                                            'myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                            'myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                             'TR 19/07/2012 -Validate the result value to set the corresponding alarm
                                                             If (Convert.ToSingle(offSystemTestResult.ResultValue) < _
                                                                 myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) Then
                                                                 'set lower alarm value.
-                                                                myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                                myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                             ElseIf (Convert.ToSingle(offSystemTestResult.ResultValue) > _
                                                                     myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
                                                                 'set hight alarm value.
-                                                                myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                                                                myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
                                                             End If
                                                             'TR 19/07/2012 -END
                                                             myResultAlarmRow.AlarmDateTime = Now

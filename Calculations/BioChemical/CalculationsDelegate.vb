@@ -4893,7 +4893,7 @@ Namespace Biosystems.Ax00.Calculations
                         exitFor = True
 
                         'Abs > Optical Limit
-                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK1.ToString)
+                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK1.ToString)
                     End If
                     If exitFor Then Exit For
 
@@ -4904,7 +4904,7 @@ Namespace Biosystems.Ax00.Calculations
                             If preparation(item).PartialReplicateAbs(ReplID, j) = ERROR_VALUE And preparation(item).ErrorReplicateAbs(ReplID) = GlobalEnumerates.AbsorbanceErrors.ABS_LIMIT.ToString Then
                                 exitFor = True
                                 'Abs > Optical Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK1.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK1.ToString)
                             End If
                             If exitFor Then Exit For
                         Next
@@ -4917,25 +4917,25 @@ Namespace Biosystems.Ax00.Calculations
                         If calibrator.NumberOfCalibrators > 1 And calibrator.Curve.CurveGrowthType = "DEC" Then
                             If preparation(item).ReplicateAbs(ReplID) > test.BlankAbs Then
                                 'Sample Abs > Blank Abs (when curve is decrease)
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK3.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK3.ToString)
                             End If
 
                             'If preparation(item).Abs > test.BlankAbs Then
                             If preparation(item).Abs > test.BlankAbs AndAlso preparation(item).Abs <> ERROR_VALUE Then 'AG 07/11/2012 - when error value not inform this remark
                                 'Sample Abs > Blank Abs (when curve is decrease)
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK3.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK3.ToString)
                             End If
 
                         Else
                             If preparation(item).ReplicateAbs(ReplID) < test.BlankAbs Then
                                 'Sample Abs < Blank Abs
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK2.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK2.ToString)
                             End If
 
                             'If preparation(item).Abs < test.BlankAbs   Then
                             If preparation(item).Abs < test.BlankAbs AndAlso preparation(item).Abs <> ERROR_VALUE Then 'AG 07/11/2012 when error value not inform this remark
                                 'Sample Abs < Blank Abs
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK2.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK2.ToString)
                             End If
 
                         End If
@@ -4945,14 +4945,14 @@ Namespace Biosystems.Ax00.Calculations
                     If test.AnalysisMode = "MRK" Or test.AnalysisMode = "BRK" Then
                         If Not preparation(item).KineticsLinear Then
                             'Non Linear kinetics
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK4.ToString)
                         End If
 
                         'AG 08/02/2012 - apply sign because it has been removed when KineticsCurve(ReplID, 1) value is asigned
                         'If preparation(item).KineticsCurve(ReplID, 1) < 0 Then
                         If sign * preparation(item).KineticsCurve(ReplID, 1) < 0 Then
                             'Absorbance increase < 0
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK6.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK6.ToString)
                         End If
                     End If
 
@@ -4960,19 +4960,19 @@ Namespace Biosystems.Ax00.Calculations
                     If test.AnalysisMode = "BRDIF" Or test.AnalysisMode = "MRFT" Or test.AnalysisMode = "BRFT" Then
                         If preparation(item).ReplicateAbs(ReplID) < 0 Then
                             'Absorbance < 0
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK5.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK5.ToString)
                         End If
                     End If
 
                     '7.- Substrate depletion [replicate and average remark]
                     If preparation(item).SubstrateDepletionReplicate(ReplID) = True Then
                         'Substrate depletion sample
-                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK7.ToString)
+                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK7.ToString)
                     End If
 
                     If preparation(item).SubstrateDepletion > 0 Then
                         'Substrate depletion sample
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK7.ToString)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK7.ToString)
                     End If
 
                     '8.- Prozone effect
@@ -4984,33 +4984,33 @@ Namespace Biosystems.Ax00.Calculations
                     '9.- Thermo Warning (AG 22/03/2011)
                     If preparation(item).ThermoWarningFlag Then
                         'Replicate level remark
-                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK9.ToString)
+                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK9.ToString)
 
                         'Average level remark
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK9.ToString)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK9.ToString)
                     End If
 
                     '10.- Possible clot(AG 22/03/2011)
                     If preparation(item).PossibleClot = "CP" Then 'Possible clot
                         'Replicate level remark
-                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK10.ToString)
+                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK10.ToString)
 
                         'Average level remark
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK10.ToString)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK10.ToString)
 
                     ElseIf preparation(item).PossibleClot = "CD" Then 'Clot detected
                         'Replicate level remark
-                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK11.ToString)
+                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK11.ToString)
 
                         'Average level remark
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK11.ToString)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK11.ToString)
 
                     ElseIf preparation(item).PossibleClot = "BS" Then 'Possible clot
                         'Replicate level remark
-                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK12.ToString)
+                        Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK12.ToString)
 
                         'Average level remark
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.ABS_REMARK12.ToString)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.ABS_REMARK12.ToString)
 
                     End If
 
@@ -5055,13 +5055,13 @@ Namespace Biosystems.Ax00.Calculations
                         If test.ReactionType = "INC" Then
                             If preparation(item).PartialReplicateAbs(ReplID, 0) > test.BlankAbsorbanceLimit.Value Then
                                 'Main Abs > Blank Abs Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK1.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK1.ToString)
                             End If
 
                         Else 'Reaction decrease
                             If preparation(item).PartialReplicateAbs(ReplID, 0) < test.BlankAbsorbanceLimit.Value Then
                                 'Main Abs < Blank Abs Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK2.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK2.ToString)
                             End If
 
                         End If
@@ -5073,13 +5073,13 @@ Namespace Biosystems.Ax00.Calculations
                         If test.ReactionType = "INC" Then
                             If preparation(item).PartialReplicateAbs(ReplID, 1) > test.BlankAbsorbanceLimit.Value Then
                                 'Main Abs > Blank Abs Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK1.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK1.ToString)
                             End If
 
                         Else 'Reaction decrease
                             If preparation(item).PartialReplicateAbs(ReplID, 1) < test.BlankAbsorbanceLimit.Value Then
                                 'Main Abs < Blank Abs Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK2.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK2.ToString)
                             End If
 
                         End If
@@ -5092,13 +5092,13 @@ Namespace Biosystems.Ax00.Calculations
                         If preparation(item).WorkingReagentReplicateAbs(ReplID) > test.BlankAbsorbanceLimit.Value Then
                             'END AG 12/07/2010
                             'Abs Work Reagent > Blank Abs Limit
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK3.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK3.ToString)
                         End If
 
                         'AG 26/07/2010
                         If preparation(item).WorkingReagentAbs > test.BlankAbsorbanceLimit.Value Then
                             'Abs Work Reagent > Blank Abs Limit
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.BLANK_REMARK3.ToString)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.BLANK_REMARK3.ToString)
                         End If
                         'END AG 26/07/2010
                     End If
@@ -5110,13 +5110,13 @@ Namespace Biosystems.Ax00.Calculations
                         If preparation(item).WorkingReagentReplicateAbs(ReplID) < test.BlankAbsorbanceLimit.Value Then
                             'END AG 12/07/2010
                             'Abs Work Reagent < Blank Abs Limit
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK4.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK4.ToString)
                         End If
 
                         'AG 26/07/2010
                         If preparation(item).WorkingReagentAbs < test.BlankAbsorbanceLimit.Value Then
                             'Abs Work Reagent < Blank Abs Limit
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.BLANK_REMARK4.ToString)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.BLANK_REMARK4.ToString)
                         End If
                         'END AG 26/07/2010
                     End If
@@ -5126,23 +5126,23 @@ Namespace Biosystems.Ax00.Calculations
                         If test.ReactionType = "INC" Then   'Increase
                             If preparation(item).InitialReplicateAbs(ReplID) > test.BlankAbsorbanceLimit.Value Then
                                 'Blank Abs Initial > Blank Abs Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK5.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK5.ToString)
                             End If
 
                             If preparation(item).InitialAbs > test.BlankAbsorbanceLimit.Value Then
                                 'Blank Abs Initial > Blank Abs Limit
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.BLANK_REMARK5.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.BLANK_REMARK5.ToString)
                             End If
 
                         Else    'Decrease
                             If preparation(item).InitialReplicateAbs(ReplID) < test.BlankAbsorbanceLimit.Value Then
                                 'Blank Abs Initial < Blank Abs Limit
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK6.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK6.ToString)
                             End If
 
                             If preparation(item).InitialAbs < test.BlankAbsorbanceLimit.Value Then
                                 'Blank Abs Initial < Blank Abs Limit
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.BLANK_REMARK6.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.BLANK_REMARK6.ToString)
                             End If
                         End If
                     End If
@@ -5155,13 +5155,13 @@ Namespace Biosystems.Ax00.Calculations
                     If test.AnalysisMode = "MRK" Or test.AnalysisMode = "BRK" Then
                         If preparation(item).KineticsCurve(ReplID, 1) > test.KineticBlankLimit.Value Then
                             'Kinetic Blank > Linetic blank Limit
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK7.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK7.ToString)
                         End If
                         Dim sign As Integer = 1
                         If test.ReactionType = "DEC" Then sign = -1
                         If sign * preparation(item).ReplicateAbs(ReplID) > test.KineticBlankLimit.Value Then
                             '(Abs T2 - Abs T1)*RT > Kinetic Blank Limit
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK8.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK8.ToString)
                         End If
                     End If
 
@@ -5178,7 +5178,7 @@ Namespace Biosystems.Ax00.Calculations
 
                         If (partialAbs2 - partialAbs1) * sign > test.KineticBlankLimit.Value Then
                             '(Abs T2 - Abs T1)*RT > Kinetic Blank Limit
-                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.BLANK_REMARK8.ToString)
+                            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.BLANK_REMARK8.ToString)
                         End If
                     End If
                     'AG 04/11/2011
@@ -5218,7 +5218,7 @@ Namespace Biosystems.Ax00.Calculations
                     If calibrator.ErrorCalibration <> "" Then
                         For item = 0 To UBound(preparation)
                             'Incorrect curve
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK1.ToString)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CALIB_REMARK1.ToString)
                         Next
 
                         'AG 14/08/2010 - Show replicate remarks when multi calibrator
@@ -5233,10 +5233,10 @@ Namespace Biosystems.Ax00.Calculations
                             For replID As Integer = 0 To preparation(calibID).ReplicateID - 1
                                 If preparation(calibID).ErrorReplicateConc(replID) = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString Then
                                     'Conc out of calibration curve (HIGH)
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, preparation(calibID).ReplicateExecutionID(replID), GlobalEnumerates.CalculationRemarks.CONC_REMARK2.ToString)
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, preparation(calibID).ReplicateExecutionID(replID), GlobalEnumerates.Alarms.CONC_REMARK2.ToString)
                                 ElseIf sign * preparation(calibID).ReplicateAbs(replID) < sign * test.BlankAbs Then
                                     'Conc out of calibration curve (LOW)
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, preparation(calibID).ReplicateExecutionID(replID), GlobalEnumerates.CalculationRemarks.CONC_REMARK3.ToString)
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, preparation(calibID).ReplicateExecutionID(replID), GlobalEnumerates.Alarms.CONC_REMARK3.ToString)
                                 End If
                             Next
                         Next
@@ -5250,21 +5250,21 @@ Namespace Biosystems.Ax00.Calculations
                     If test.FactorLimit.InUse And calibrator.Factor <> ERROR_VALUE Then
                         If calibrator.Factor < test.FactorLimit.Minimum Or calibrator.Factor > test.FactorLimit.Maximum Then
                             'Calculated factor is beyond limits
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK2.ToString)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CALIB_REMARK2.ToString)
                         End If
                     End If
 
                     '3.- Calculated factor NOT calculated [Average remark]
                     If calibrator.Factor = ERROR_VALUE Then
                         'Calculated factor NOT calculated
-                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK3.ToString)
+                        Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CALIB_REMARK3.ToString)
                     End If
 
                 End If
 
                 'AG 08/11/2010 - Calibration expiration date [Average remark]
                 If Not calibrator.ManualFactorFlag And calibrator.ExpirationDate < Now Then
-                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK4.ToString)
+                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CALIB_REMARK4.ToString)
                 End If
                 'END AG 08/11/2010
 
@@ -5312,8 +5312,8 @@ Namespace Biosystems.Ax00.Calculations
                         If test.ErrorBlankAbs <> "" Or calibrator.ErrorAbs <> "" Then
                             If calibrator.NumberOfCalibrators = 1 Then
                                 'Conc NOT calculated
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK1.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK1.ToString)
 
                                 'AG 15/09/2010
                                 'Else
@@ -5321,8 +5321,8 @@ Namespace Biosystems.Ax00.Calculations
                                 'END AG 15/09/2010
                                 If test.ErrorBlankAbs = "" And calibrator.ErrorCalibration <> "" Then
                                     'Incorrect curve
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CALIB_REMARK1.ToString)
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK1.ToString)
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CALIB_REMARK1.ToString)
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CALIB_REMARK1.ToString)
                                 End If
                             End If
 
@@ -5330,11 +5330,11 @@ Namespace Biosystems.Ax00.Calculations
                         Else
                             If preparation(item).ErrorReplicateConc(ReplID) <> "" Then
                                 'Conc not Calculated
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK1.ToString)
                             End If
                             If preparation(item).ErrorConc <> "" Then
                                 'Conc not Calculated
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK1.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK1.ToString)
                             End If
                             'END AG 02/08/2010
 
@@ -5344,12 +5344,12 @@ Namespace Biosystems.Ax00.Calculations
                         If calibrator.NumberOfCalibrators > 1 Then
                             If preparation(item).ErrorReplicateConc(ReplID) = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString Then
                                 'Conc out of calibration curve (HIGH)
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK2.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK2.ToString)
                             End If
 
                             If preparation(item).ErrorConc = GlobalEnumerates.ConcentrationErrors.OUT_HIGH.ToString Then
                                 'Conc out of calibration curve (HIGH)
-                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK2.ToString)
+                                Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK2.ToString)
                             End If
                         End If
 
@@ -5365,7 +5365,7 @@ Namespace Biosystems.Ax00.Calculations
                         If sign * preparation(item).ReplicateAbs(ReplID) < sign * test.BlankAbs Then
                             If calibrator.NumberOfCalibrators > 1 Then
                                 'Conc out of calibration curve (LOW)
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK3.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK3.ToString)
 
                                 'AG 13/09/2010 - Conc < 0 remark only if conc has been calcualted
                                 'Else
@@ -5373,14 +5373,14 @@ Namespace Biosystems.Ax00.Calculations
                                 'END AG 13/09/2010
 
                                 'Conc < 0
-                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK4.ToString)
+                                Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK4.ToString)
                             End If
 
                             'AG 31/08/2010
                             If sign * preparation(item).Abs < sign * test.BlankAbs Then
                                 If calibrator.NumberOfCalibrators > 1 Then
                                     'Conc out of calibration curve (LOW)
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK3.ToString)
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK3.ToString)
 
                                     'AG 13/09/2010 - Conc < 0 remark only if conc has been calcualted
                                     'Else
@@ -5388,7 +5388,7 @@ Namespace Biosystems.Ax00.Calculations
                                     'END AG 13/09/2010
 
                                     'Conc < 0
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK4.ToString)
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK4.ToString)
                                 End If
                             End If
                         End If
@@ -5398,13 +5398,13 @@ Namespace Biosystems.Ax00.Calculations
                             If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
                                 If preparation(item).ReplicateConc(ReplID) > test.LinearityLimit.Value Then
                                     'Conc > Linearity Limit
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK5.ToString)
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK5.ToString)
                                 End If
                             End If
                             If preparation(item).Conc <> ERROR_VALUE Then
                                 If preparation(item).Conc > test.LinearityLimit.Value Then
                                     'Conc > Linearity Limit
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK5.ToString)
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK5.ToString)
                                 End If
                             End If
                         End If
@@ -5414,13 +5414,13 @@ Namespace Biosystems.Ax00.Calculations
                             If preparation(item).ReplicateConc(ReplID) <> ERROR_VALUE Then
                                 If preparation(item).ReplicateConc(ReplID) < test.DetectionLimit.Value Then
                                     'Conc > Detection Limit
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK6.ToString)
 
                                     'NOTE: If exist alarm detection limit then delete Non Linear Kinetics remark!!
                                     '(Dont needed because the Non Linear Kinetics alarms is an average alarm!)¡
                                     Dim linqRemarkToDelete As New List(Of WSExecutionAlarmsDS.twksWSExecutionAlarmsRow)
                                     linqRemarkToDelete = (From a In pExecutionAlarmsDS.twksWSExecutionAlarms _
-                                                               Where a.AlarmID = GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString _
+                                                               Where a.AlarmID = GlobalEnumerates.Alarms.ABS_REMARK4.ToString _
                                                                Select a).ToList()
 
                                     If (linqRemarkToDelete.Count > 0) Then
@@ -5435,13 +5435,13 @@ Namespace Biosystems.Ax00.Calculations
                             If preparation(item).Conc <> ERROR_VALUE Then
                                 If preparation(item).Conc < test.DetectionLimit.Value Then
                                     'Conc > Detection Limit
-                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK6.ToString)
+                                    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK6.ToString)
 
                                     'NOTE: If exist alarm detection limit then delete Non Linear Kinetics remark!!
                                     'Delete from local DS (pAverageAlarmsDS)
                                     Dim linqRemarkToDelete As New List(Of ResultAlarmsDS.twksResultAlarmsRow)
                                     linqRemarkToDelete = (From a In pAverageAlarmsDS.twksResultAlarms _
-                                                          Where String.Equals(a.AlarmID, GlobalEnumerates.CalculationRemarks.ABS_REMARK4.ToString) _
+                                                          Where String.Equals(a.AlarmID, GlobalEnumerates.Alarms.ABS_REMARK4.ToString) _
                                                           Select a).ToList()
 
                                     If (linqRemarkToDelete.Count > 0) Then
@@ -5460,7 +5460,7 @@ Namespace Biosystems.Ax00.Calculations
                                 'If preparation(item).ReplicateConc(ReplID) < test.ReferenceRange.Minimum Or _
                                 '    preparation(item).ReplicateConc(ReplID) > test.ReferenceRange.Maximum Then
                                 '    'Conc out of normality range
-                                '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+                                '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK7.ToString)
                                 'End If
 
                                 'TR 06/06/2012 -New Implementation.
@@ -5471,16 +5471,16 @@ Namespace Biosystems.Ax00.Calculations
                                         If preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Minimum Then
                                             'Conc. Lower than Normality Min And Greater than than panic Min.
                                             Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                                 GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString())
+                                                                 GlobalEnumerates.Alarms.CONC_REMARK7.ToString())
                                         End If
                                     Else
                                         'Conc. Lower than Normality Min
                                         'If (preparation(item).SampleClass = "CTRL") Then  - For BT #1054
                                         '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                        '                     GlobalEnumerates.CalculationRemarks.CONC_CTRL_REMARK7.ToString())
+                                        '                     GlobalEnumerates.Alarms.CONC_CTRL_REMARK7.ToString())
                                         'Else
                                         Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                         GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString())
+                                                         GlobalEnumerates.Alarms.CONC_REMARK7.ToString())
                                         'End If
                                         
                                     End If
@@ -5491,16 +5491,16 @@ Namespace Biosystems.Ax00.Calculations
                                         If preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Maximum Then
                                             'Conc. Lower than Normality Max And lower than than panic Min.
                                             Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                                 GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString())
+                                                                 GlobalEnumerates.Alarms.CONC_REMARK8.ToString())
                                         End If
                                     Else
                                         'Conc. greater than Normality Max
                                         'If (preparation(item).SampleClass = "CTRL") Then  - For BT #1054
                                         '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                        '                     GlobalEnumerates.CalculationRemarks.CONC_CTRL_REMARK8.ToString())
+                                        '                     GlobalEnumerates.Alarms.CONC_CTRL_REMARK8.ToString())
                                         'Else
                                         Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                             GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                                             GlobalEnumerates.Alarms.CONC_REMARK8.ToString)
                                         'End If
                                     End If
                                 End If
@@ -5510,7 +5510,7 @@ Namespace Biosystems.Ax00.Calculations
                             If preparation(item).Conc <> ERROR_VALUE Then
                                 'If preparation(item).Conc < test.ReferenceRange.Minimum Or preparation(item).Conc > test.ReferenceRange.Maximum Then
                                 '    'Conc out of normality range
-                                '    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+                                '    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK7.ToString)
                                 'End If
 
                                 'TR 06/06/2012 -New Implementation.
@@ -5520,23 +5520,23 @@ Namespace Biosystems.Ax00.Calculations
                                         If preparation(item).Conc > test.BorderLineRange.Minimum Then
                                             'Conc out of normality range
                                             Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                              item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+                                                              item + 1, GlobalEnumerates.Alarms.CONC_REMARK7.ToString)
                                         End If
                                     Else
                                         'Conc out of normality range
                                         Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                          item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString)
+                                                          item + 1, GlobalEnumerates.Alarms.CONC_REMARK7.ToString)
                                     End If
 
                                 ElseIf preparation(item).Conc > test.ReferenceRange.Maximum Then
                                     If test.BorderLineRange.InUse Then
                                         If preparation(item).Conc < test.BorderLineRange.Minimum Then
                                             Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                                      item + 1, GlobalEnumerates.Alarms.CONC_REMARK8.ToString)
                                         End If
                                     Else
                                         Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                                      item + 1, GlobalEnumerates.Alarms.CONC_REMARK8.ToString)
                                     End If
                                 End If
                                 'TR 06/06/2012 -END.
@@ -5551,12 +5551,12 @@ Namespace Biosystems.Ax00.Calculations
                                 'Validate Max Panic Ranges for Repl.
                                 If preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Maximum Then
                                     ''H
-                                    'Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                    'Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK8.ToString)
 
                                     'TR 06/06/2012 -New Implementation.
                                     'Conc. higher than panic Max
                                     Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                         GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                                                         GlobalEnumerates.Alarms.CONC_REMARK10.ToString)
                                     'TR 06/06/2012 -END.
                                 End If
                             End If
@@ -5565,10 +5565,10 @@ Namespace Biosystems.Ax00.Calculations
                                 'Validate Max Panic Ranges for Conc.
                                 If preparation(item).Conc > test.BorderLineRange.Maximum Then
                                     'H
-                                    'Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString)
+                                    'Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK8.ToString)
                                     'TR 06/06/2012 -New Implementation.
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                                                      item + 1, GlobalEnumerates.Alarms.CONC_REMARK10.ToString)
                                     'TR 06/06/2012 -END.
                                 End If
                             End If
@@ -5581,13 +5581,13 @@ Namespace Biosystems.Ax00.Calculations
                                 'If preparation(item).ReplicateConc(ReplID) > test.ReferenceRange.Maximum And _
                                 '    preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Maximum Then
                                 '    'BH
-                                '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
+                                '    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK9.ToString)
                                 'End If
 
                                 'TR 06/06/2012 -New Implementation.
                                 If preparation(item).ReplicateConc(ReplID) < test.BorderLineRange.Minimum Then
                                     Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), _
-                                                         GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
+                                                         GlobalEnumerates.Alarms.CONC_REMARK9.ToString)
                                 End If
                                 'TR 06/06/2012 -END.
                             End If
@@ -5595,13 +5595,13 @@ Namespace Biosystems.Ax00.Calculations
                             If preparation(item).Conc <> ERROR_VALUE Then
                                 'If preparation(item).Conc > test.ReferenceRange.Maximum And preparation(item).Conc < test.BorderLineRange.Maximum Then
                                 '    'BH
-                                '    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
+                                '    Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK9.ToString)
                                 'End If
 
                                 'TR 06/06/2012 -New Implementation.
                                 If preparation(item).Conc < test.BorderLineRange.Minimum Then
                                     Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, _
-                                                      item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK9.ToString)
+                                                      item + 1, GlobalEnumerates.Alarms.CONC_REMARK9.ToString)
                                 End If
                                 'TR 06/06/2012 -END.
                             End If
@@ -5613,14 +5613,14 @@ Namespace Biosystems.Ax00.Calculations
                         '        If preparation(item).ReplicateConc(ReplID) < test.ReferenceRange.Minimum And _
                         '            preparation(item).ReplicateConc(ReplID) > test.BorderLineRange.Minimum Then
                         '            'L
-                        '            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                        '            Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.CONC_REMARK10.ToString)
                         '        End If
                         '    End If
 
                         '    If preparation(item).Conc <> ERROR_VALUE Then
                         '        If preparation(item).Conc < test.ReferenceRange.Minimum And preparation(item).Conc > test.BorderLineRange.Minimum Then
                         '            'L
-                        '            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CONC_REMARK10.ToString)
+                        '            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CONC_REMARK10.ToString)
                         '        End If
                         '    End If
                         'End If
@@ -5628,7 +5628,7 @@ Namespace Biosystems.Ax00.Calculations
                         '11.- Calibration expiration date [Average remark] AG 08/11/2010
                         'No manual result and the expiration date < calib calculation date
                         If Not calibrator.ManualFactorFlag And calibrator.ExpirationDate < calibrator.CalibratorDate Then
-                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.CalculationRemarks.CALIB_REMARK4.ToString)
+                            Me.AddResultAlarm(pAverageAlarmsDS, myOrderTestID, myRerunNumber, item + 1, GlobalEnumerates.Alarms.CALIB_REMARK4.ToString)
                         End If
 
                         'Close connection if needed
@@ -5736,7 +5736,7 @@ Namespace Biosystems.Ax00.Calculations
 
                                 If existProzone Then
                                     'Add Remark: Prozone sample possible (dilute manually and repeat)
-                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.CalculationRemarks.ABS_REMARK8.ToString)
+                                    Me.AddExecutionAlarm(pExecutionAlarmsDS, myExecutionID(item), GlobalEnumerates.Alarms.ABS_REMARK8.ToString)
                                 End If
 
                             End If 'If prozoneAbsorbance(0, 0) <> ERROR_VALUE And ...

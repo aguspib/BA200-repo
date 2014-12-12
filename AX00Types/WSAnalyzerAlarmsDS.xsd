@@ -25,7 +25,6 @@
               <xs:element name="AdditionalInfo" msprop:nullValue="_empty" msprop:Generator_ColumnPropNameInRow="AdditionalInfo" msprop:Generator_ColumnVarNameInTable="columnAdditionalInfo" msprop:Generator_ColumnPropNameInTable="AdditionalInfoColumn" msprop:Generator_UserColumnName="AdditionalInfo" type="xs:string" minOccurs="0" />
               <xs:element name="AlarmStatus" msprop:Generator_ColumnVarNameInTable="columnAlarmStatus" msprop:Generator_ColumnPropNameInRow="AlarmStatus" msprop:Generator_ColumnPropNameInTable="AlarmStatusColumn" msprop:Generator_UserColumnName="AlarmStatus" type="xs:boolean" minOccurs="0" />
               <xs:element name="OKDateTime" msprop:Generator_ColumnVarNameInTable="columnOKDateTime" msprop:Generator_ColumnPropNameInRow="OKDateTime" msprop:Generator_ColumnPropNameInTable="OKDateTimeColumn" msprop:Generator_UserColumnName="OKDateTime" type="xs:dateTime" minOccurs="0" />
-              <xs:element name="ErrorCode" msprop:Generator_ColumnVarNameInTable="columnErrorCode" msprop:Generator_ColumnPropNameInRow="ErrorCode" msprop:Generator_ColumnPropNameInTable="ErrorCodeColumn" msprop:Generator_UserColumnName="ErrorCode" type="xs:int" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
@@ -48,7 +47,6 @@
               <xs:element name="AlarmTypeImage" msprop:nullValue="_null" msprop:Generator_ColumnPropNameInRow="AlarmTypeImage" msprop:Generator_ColumnVarNameInTable="columnAlarmTypeImage" msprop:Generator_ColumnPropNameInTable="AlarmTypeImageColumn" msprop:Generator_UserColumnName="AlarmTypeImage" type="xs:base64Binary" minOccurs="0" />
               <xs:element name="AlarmPeriodSEC" msprop:Generator_ColumnVarNameInTable="columnAlarmPeriodSEC" msprop:Generator_ColumnPropNameInRow="AlarmPeriodSEC" msprop:Generator_ColumnPropNameInTable="AlarmPeriodSECColumn" msprop:Generator_UserColumnName="AlarmPeriodSEC" type="xs:int" minOccurs="0" />
               <xs:element name="OKDateTime" msprop:Generator_ColumnVarNameInTable="columnOKDateTime" msprop:Generator_ColumnPropNameInRow="OKDateTime" msprop:Generator_ColumnPropNameInTable="OKDateTimeColumn" msprop:Generator_UserColumnName="OKDateTime" type="xs:dateTime" minOccurs="0" />
-              <xs:element name="ErrorCode" msprop:Generator_ColumnVarNameInTable="columnErrorCode" msprop:Generator_ColumnPropNameInRow="ErrorCode" msprop:Generator_ColumnPropNameInTable="ErrorCodeColumn" msprop:Generator_UserColumnName="ErrorCode" type="xs:int" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>

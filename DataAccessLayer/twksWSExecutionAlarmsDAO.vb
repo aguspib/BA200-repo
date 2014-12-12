@@ -282,8 +282,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = " SELECT DISTINCT EA.AlarmID " & vbCrLf & _
                                                 " FROM   twksWSExecutionAlarms EA INNER JOIN twksWSExecutions E ON EA.ExecutionID = E.ExecutionID " & vbCrLf & _
-                                                " WHERE  EA.AlarmID NOT IN ('" & GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString & "', " & vbCrLf & _
-                                                                           "'" & GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString & "') " & vbCrLf & _
+                                                " WHERE  EA.AlarmID NOT IN ('" & GlobalEnumerates.Alarms.CONC_REMARK7.ToString & "', " & vbCrLf & _
+                                                                           "'" & GlobalEnumerates.Alarms.CONC_REMARK8.ToString & "') " & vbCrLf & _
                                                 " AND    E.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    E.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND    E.OrderTestID = " & pOrderTestID & vbCrLf & _

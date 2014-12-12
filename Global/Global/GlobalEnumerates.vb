@@ -759,6 +759,7 @@ Namespace Biosystems.Ax00.Global
 
         'Instrument Alarm list
         Public Enum Alarms
+            'Instrument Alarms!!!
             NONE 'Null alarm. Defined for Sw requirements
 
             ''''''''''''''''
@@ -997,13 +998,16 @@ Namespace Biosystems.Ax00.Global
             INST_COMMAND_WARN           'Error with Command script                  | FW ERROR CODE:  43 | DL 27/07/2012 
             INST_LOADADJ_WARN           'Error Loading Adjustments                  | FW ERROR CODE:  45 | DL 27/07/2012 
 
-            ''''''''''''''''
-            'IMPORTANT NOTE: Every alarm added into this enumerate must be also added into method ConvertToAlarmIDEnumerate (in AnalyzerManager class) select case
-            ''''''''''''''''
-        End Enum
 
-        'Calculation remarks List
-        Public Enum CalculationRemarks
+
+            '***********************
+            'Calculations remarks!!!
+            '***********************
+            'AG 05/12/2014 BA-2146 code improvement
+            'Calculations remarks!!!. In previous versions there were defined in enum CaalculationRemarks but it is better to unify this enum
+            'because every alarm added into this enumerate must be also added into method ConvertToAlarmIDEnumerate (in AnalyzerManager class) select case
+            'Now I have improve the method ConvertToAlarmIDEnumerate that automatically converts all alarms from String to enum but it demands use all alarms defined in tfmwAlarms exists in the same enumerate
+
             'Generic absorbance remarks
             ABS_REMARK1 'Abs > Optical Limit
             ABS_REMARK2 'Sample Abs < Blank Abs
@@ -1069,8 +1073,78 @@ Namespace Biosystems.Ax00.Global
             ISE_OutSlope
 
             QC_OUT_OF_RANGE 'AG 20/07/2012
-
         End Enum
+
+        'AG 04/12/2014 BA-2146 code improvement. Comment this enum and use the Enum Alarms
+        ''Calculation remarks List
+        'Public Enum CaalculationRemarks
+        '    'Generic absorbance remarks
+        '    ABS_REMARK1 'Abs > Optical Limit
+        '    ABS_REMARK2 'Sample Abs < Blank Abs
+        '    ABS_REMARK3 'Sample Abs > Blank Abs
+        '    ABS_REMARK4 'Non Linear Kinetics
+        '    ABS_REMARK5 'Absorbance < 0
+        '    ABS_REMARK6 'Absorbance increase < 0
+        '    ABS_REMARK7 'Substrate depletion sample
+        '    ABS_REMARK8 'Prozone sample possible (dilute manually and repeat)
+        '    ABS_REMARK9 'Reactions Rotor Thermo warning (NEW 22/03/2011)
+        '    ABS_REMARK10 'Possible clot (NEW 22/03/2011)
+        '    ABS_REMARK11 'clot detected (NEW 31/03/2011)
+        '    ABS_REMARK12 'Fluid system blocked (NEW 31/03/2011)
+        '    ABS_REMARK13 'Finished with optical errors (NEW 21/10/2011)
+
+        '    'Blank Remarks
+        '    BLANK_REMARK1 'Main Abs > Blank Abs Limit
+        '    BLANK_REMARK2 'Main Abs < Blank Abs Limit
+        '    BLANK_REMARK3 'Abs Work Reagent > Blank Abs Limit
+        '    BLANK_REMARK4 'Abs Work Reagent < Blank Abs Limit
+        '    BLANK_REMARK5 'Blank Abs Initial > Blank Abs Limit
+        '    BLANK_REMARK6 'Blank Abs Initial < Blank Abs Limit
+        '    BLANK_REMARK7 'Kinetic blank > Kinetic Blank Limit
+        '    BLANK_REMARK8 '(Abs T2 - Abs T1) * RT > Kinetic Blank Limit
+
+        '    'Calibration Remarks
+        '    CALIB_REMARK1 'Incorrect curve
+        '    CALIB_REMARK2 'Calculated Factor beyond limits
+        '    CALIB_REMARK3 'Calibration factor NOT calculated
+        '    CALIB_REMARK4 'Calibration Lot Expired
+
+        '    'Concentration Remarks
+        '    CONC_REMARK1 'Conc NOT calculated
+        '    CONC_REMARK2 'CONC out of calibration curve (HIGH)
+        '    CONC_REMARK3 'CONC out of calibration curve (LOW)
+        '    CONC_REMARK4 'Conc < 0
+        '    CONC_REMARK5 'Conc > Linearity Limit
+        '    CONC_REMARK6 'Conc < Detection Limit
+        '    CONC_REMARK7 'Conc out of Normality Range
+        '    CONC_REMARK8 'H
+        '    CONC_REMARK9 'BH
+        '    CONC_REMARK10 'B
+        '    CONC_REMARK11 'Some standard tests with remarks
+
+        '    ''ISE Remarks
+        '    'ISE_REMARK1 '????
+        '    'ISE_REMARK2 'mV Out n.2
+        '    'ISE_REMARK3 'mV Out n.3
+        '    'ISE_REMARK4 'mV Noise n.4
+        '    'ISE_REMARK5 'mV Noise n.5
+        '    'ISE_REMARK6 'Cal A Drift
+        '    'ISE_REMARK7 'Out of Slope/Machine Ranges
+
+        '    'ISE results remarks SGM 25/07/2012
+        '    ISE_mVOutB
+        '    ISE_mVOutA_SER
+        '    ISE_mVOutB_URI
+        '    ISE_mVNoiseB
+        '    ISE_mVNoiseA_SER
+        '    ISE_mVNoiseB_URI
+        '    ISE_Drift_SER
+        '    ISE_Drift_CAL
+        '    ISE_OutSlope
+
+        '    QC_OUT_OF_RANGE 'AG 20/07/2012
+
+        'End Enum
 
         'INTERNAL CLASS FLAGS AG 25/02/2011
         Public Enum AnalyzerManagerFlags

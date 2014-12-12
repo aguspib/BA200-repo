@@ -1174,7 +1174,7 @@ Namespace Biosystems.Ax00.BL
                                                 qcResultRow.VisibleResultValue > openQCResultsROW.MaxRange) Then
                                                 'Insert Alarm QC_OUT_OF_RANGE in tqcResult Alarms for the result
                                                 InsertNewQcResultAlarmNEW(myQCResultAlarmsDS, qcResultRow.QCControlLotID, qcResultRow.QCTestSampleID, _
-                                                                          pAnalyzerID, qcResultRow.RunsGroupNumber, qcResultRow.RunNumber, GlobalEnumerates.CalculationRemarks.QC_OUT_OF_RANGE.ToString)
+                                                                          pAnalyzerID, qcResultRow.RunsGroupNumber, qcResultRow.RunNumber, GlobalEnumerates.Alarms.QC_OUT_OF_RANGE.ToString)
                                             End If
                                         End If
 
@@ -4327,7 +4327,7 @@ Namespace Biosystems.Ax00.BL
         '                                    If (qcResultRow.VisibleResultValue < openQCResultsROW.MinRange OrElse _
         '                                        qcResultRow.VisibleResultValue > openQCResultsROW.MaxRange) Then
         '                                        'Insert Alarm QC_OUT_OF_RANGE in tqcResult Alarms for the result.
-        '                                        InsertNewQcResultAlarmOLD(myQCResultAlarmsDS, qcResultRow, GlobalEnumerates.CalculationRemarks.QC_OUT_OF_RANGE.ToString)
+        '                                        InsertNewQcResultAlarmOLD(myQCResultAlarmsDS, qcResultRow, GlobalEnumerates.Alarms.QC_OUT_OF_RANGE.ToString)
         '                                    End If
         '                                End If
 

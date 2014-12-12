@@ -554,13 +554,17 @@ Public Class IBarCodesConfig
     ''' </summary>
     ''' <remarks>
     ''' Created by: RH 14/07/2011
+    ''' AG 10/12/2014 BA-2168 Limit BARCODE_LIMIT is defined by model. So read it informing the model
     ''' </remarks>
     Private Sub LoadBarCodeBounds()
         Try
             Dim resultData As GlobalDataTO = Nothing
             Dim myFieldLimitsDelegate As New FieldLimitsDelegate
 
-            resultData = myFieldLimitsDelegate.GetList(Nothing, GlobalEnumerates.FieldLimitsEnum.BARCODE_LIMIT)
+            'AG 10/12/2014 BA-2168
+            'resultData = myFieldLimitsDelegate.GetList(Nothing, GlobalEnumerates.FieldLimitsEnum.BARCODE_LIMIT)
+            resultData = myFieldLimitsDelegate.GetList(Nothing, GlobalEnumerates.FieldLimitsEnum.BARCODE_LIMIT, AnalyzerModel)
+
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim myFieldLimitsDS As FieldLimitsDS = DirectCast(resultData.SetDatos, FieldLimitsDS)
 
