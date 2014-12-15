@@ -3851,9 +3851,10 @@ Public Class IISEUtilities
     ''' </summary>
     ''' <returns></returns>
     ''' <remarks>
-    ''' Modified by XBC 31/08/2012 - Add special case from PrepareLoadingMode 
+    ''' Modified by XB 31/08/2012 - Add special case from PrepareLoadingMode 
     '''                              managed with the Optional parameter (pLoadingScreen). 
     '''                              For the case when Initialization ISE module is required
+    '''             XB 12/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
     ''' </remarks>
     Private Function ValidateISEAvailability(Optional ByVal pLoadingScreen As Boolean = False) As Boolean
         Dim resultValue As Boolean = False
@@ -3870,6 +3871,14 @@ Public Class IISEUtilities
                             resultValue = False
                         Else
                             resultValue = MyClass.myISEManager.IsISESwitchON
+
+                            ' XB 15/12/2014 - BA-2178
+                            If Not myISEManager.IsISEOnceInitiatedOK OrElse Not myISEManager.IsISEInitiatedOK Then
+                                If myISEManager.IsISEModuleInstalled Then
+                                    resultValue = True
+                                End If
+                            End If
+                            ' XB 15/12/2014 - BA-2178
 
                             ' XBC 27/07/2012 - While User is intalling the module all functions under its Node must be Enable
                             If MyClass.IsInstallGroupNodeActive Then
@@ -4800,6 +4809,8 @@ Public Class IISEUtilities
         End Try
     End Sub
 
+    ''' Modified by XB 15/12/2014 - Enable Initialization ISE action when ISE is OFF - BA-2178
+    ''' 
     Private Sub IIseAdjustments_KeyUp(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyUp
         Try
 
@@ -4834,7 +4845,15 @@ Public Class IISEUtilities
                                     Me.BsTimesUpDown.Value = 1
                                     If MyClass.ValidateISEAction(Me.BsActionsTreeView.SelectedNode) Then
                                         MyClass.CurrentActionNode = Me.BsActionsTreeView.SelectedNode
-                                        Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
+
+                                        ' XB 15/12/2014 - BA-2178
+                                        If Me.BsActionsTreeView.SelectedNode.Tag.ToString = "INIT_ISE" Then
+                                            Me.BsAdjustButton.Enabled = True
+                                        Else
+                                            ' XB 15/12/2014 - BA-2178
+                                            Me.BsAdjustButton.Enabled = MyClass.ValidateISEAvailability
+                                        End If
+
                                     End If
                                 End If
                             End If

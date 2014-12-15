@@ -444,7 +444,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XBC 03/10/2012 - Correction : When ISE is switch off set Ise as initialized
                 If Not value Then
                     MyClass.IsISEInitializationDoneAttr = True
-                    MyClass.IsISEInitiatedOKAttr = False    ' XB 12/12/2014 - BA-2178
+                    ' XB 12/12/2014 - BA-2178
+                    MyClass.IsISEInitiatedOKAttr = False
+                    MyClass.IsISEOnceInitiatedOKAttr = False
+                    ' XB 12/12/2014 - BA-2178
                 End If
                 ' XBC 03/10/2012
 
