@@ -25,6 +25,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: SA 26/10/2010 - Added field OnlyForISE to the SQL sentence; added the N preffix for multilanguage of field PatientID 
         '''              AG 30/08/2011 - Added Barcode fields: ScannedPosition, BarcodeInfo, BarcodeStatus
         '''              AG 03/02/2012 - Added Status field ... NULL or DEPLETED or FEW
+        '''              SA 15/12/2014 - BA-1972 ==> Do not insert positions in the entry DataSet that are marked with InvalidPosition = True, which
+        '''                                          means the ID of the element is missing (due to an error which cause is unkown and that cannot be
+        '''                                          reproduced)
         ''' </remarks>
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                ByVal pRotorType As String, ByVal pVirtualRotorPositionsDS As VirtualRotorPosititionsDS) As GlobalDataTO
@@ -35,111 +38,109 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    For Each tparVirtualRotorPositionsRow As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow _
-                                                          In pVirtualRotorPositionsDS.tparVirtualRotorPosititions
-                        Dim cmdText As String = " INSERT INTO twksWSNotInUseRotorPositions (AnalyzerID, RotorType, RingNumber, CellNumber, WorkSessionID, " & vbCrLf & _
-                                                                                          " TubeContent, ReagentID, SolutionCode, CalibratorID, ControlID, " & vbCrLf & _
-                                                                                          " MultiItemNumber, SampleType, PatientID, OrderID, PredilutionFactor, " & vbCrLf & _
-                                                                                          " Status, OnlyForISE, ScannedPosition, BarcodeInfo, BarcodeStatus) " & vbCrLf & _
-                                  " VALUES('" & pAnalyzerID & "', " & vbCrLf & _
-                                          "'" & pRotorType & "', " & vbCrLf & _
-                                                tparVirtualRotorPositionsRow.RingNumber & ", " & vbCrLf & _
-                                                tparVirtualRotorPositionsRow.CellNumber & ", " & vbCrLf & _
-                                          "'" & pWorkSessionID & "', " & vbCrLf & _
-                                          "'" & tparVirtualRotorPositionsRow.TubeContent & "', " & vbCrLf
+                    For Each tparVirtualRotorPositionsRow As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In pVirtualRotorPositionsDS.tparVirtualRotorPosititions
+                        If (Not tparVirtualRotorPositionsRow.InvalidPosition) Then
+                            Dim cmdText As String = " INSERT INTO twksWSNotInUseRotorPositions (AnalyzerID, RotorType, RingNumber, CellNumber, WorkSessionID, " & vbCrLf & _
+                                                                                              " TubeContent, ReagentID, SolutionCode, CalibratorID, ControlID, " & vbCrLf & _
+                                                                                              " MultiItemNumber, SampleType, PatientID, OrderID, PredilutionFactor, " & vbCrLf & _
+                                                                                              " Status, OnlyForISE, ScannedPosition, BarcodeInfo, BarcodeStatus) " & vbCrLf & _
+                                                    " VALUES(N'" & pAnalyzerID.Trim.Replace("'", "''") & "', " & vbCrLf & _
+                                                             "'" & pRotorType.Trim & "', " & vbCrLf & _
+                                                                   tparVirtualRotorPositionsRow.RingNumber & ", " & vbCrLf & _
+                                                                   tparVirtualRotorPositionsRow.CellNumber & ", " & vbCrLf & _
+                                                             "'" & pWorkSessionID.Trim & "', " & vbCrLf & _
+                                                             "'" & tparVirtualRotorPositionsRow.TubeContent.Trim & "', " & vbCrLf
 
-                        If (tparVirtualRotorPositionsRow.IsReagentIDNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= tparVirtualRotorPositionsRow.ReagentID & ", " & vbCrLf
+                            If (tparVirtualRotorPositionsRow.IsReagentIDNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= tparVirtualRotorPositionsRow.ReagentID & ", " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsSolutionCodeNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= " '" & tparVirtualRotorPositionsRow.SolutionCode.Trim & "', " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsCalibratorIDNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= tparVirtualRotorPositionsRow.CalibratorID & ", " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsControlIDNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= tparVirtualRotorPositionsRow.ControlID & ", " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsMultiItemNumberNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= tparVirtualRotorPositionsRow.MultiItemNumber & ", " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsSampleTypeNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= " '" & tparVirtualRotorPositionsRow.SampleType & "', " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsPatientIDNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= " N'" & tparVirtualRotorPositionsRow.PatientID.Replace("'", "''") & "', " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsOrderIDNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= " '" & tparVirtualRotorPositionsRow.OrderID & "', " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsPredilutionFactorNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= ReplaceNumericString(tparVirtualRotorPositionsRow.PredilutionFactor) & ", " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsStatusNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= " '" & tparVirtualRotorPositionsRow.Status.Trim & "', " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsOnlyForISENull) Then
+                                cmdText &= " 0, " & vbCrLf
+                            Else
+                                cmdText &= Convert.ToInt32(tparVirtualRotorPositionsRow.OnlyForISE) & ", " & vbCrLf
+                            End If
+
+                            'Barcode fields
+                            If (tparVirtualRotorPositionsRow.IsScannedPositionNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= Convert.ToInt32(tparVirtualRotorPositionsRow.ScannedPosition) & ", " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsBarcodeInfoNull) Then
+                                cmdText &= " NULL, " & vbCrLf
+                            Else
+                                cmdText &= " N'" & tparVirtualRotorPositionsRow.BarcodeInfo.Replace("'", "''") & "', " & vbCrLf
+                            End If
+
+                            If (tparVirtualRotorPositionsRow.IsBarcodeStatusNull) Then
+                                cmdText &= " NULL) " & vbCrLf
+                            Else
+                                cmdText &= " N'" & tparVirtualRotorPositionsRow.BarcodeStatus.Replace("'", "''") & "') " & vbCrLf
+                            End If
+
+                            'Execute the SQL sentence 
+                            Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                                resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                            End Using
                         End If
-
-                        If (tparVirtualRotorPositionsRow.IsSolutionCodeNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= " '" & tparVirtualRotorPositionsRow.SolutionCode & "', " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsCalibratorIDNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= tparVirtualRotorPositionsRow.CalibratorID & ", " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsControlIDNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= tparVirtualRotorPositionsRow.ControlID & ", " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsMultiItemNumberNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= tparVirtualRotorPositionsRow.MultiItemNumber & ", " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsSampleTypeNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= " '" & tparVirtualRotorPositionsRow.SampleType & "', " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsPatientIDNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= " N'" & tparVirtualRotorPositionsRow.PatientID.Replace("'", "''") & "', " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsOrderIDNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= " '" & tparVirtualRotorPositionsRow.OrderID & "', " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsPredilutionFactorNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= ReplaceNumericString(tparVirtualRotorPositionsRow.PredilutionFactor) & ", " & vbCrLf
-                        End If
-
-                        'AG 03/02/2012
-                        If (tparVirtualRotorPositionsRow.IsStatusNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= " N'" & tparVirtualRotorPositionsRow.Status.Replace("'", "''") & "', " & vbCrLf
-                        End If
-                        'AG 03/02/2012
-
-                        If (tparVirtualRotorPositionsRow.IsOnlyForISENull) Then
-                            cmdText &= " 0, " & vbCrLf
-                        Else
-                            cmdText &= Convert.ToInt32(tparVirtualRotorPositionsRow.OnlyForISE) & ", " & vbCrLf
-                        End If
-
-                        'Barcode fields
-                        If (tparVirtualRotorPositionsRow.IsScannedPositionNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= Convert.ToInt32(tparVirtualRotorPositionsRow.ScannedPosition) & ", " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsBarcodeInfoNull) Then
-                            cmdText &= " NULL, " & vbCrLf
-                        Else
-                            cmdText &= " N'" & tparVirtualRotorPositionsRow.BarcodeInfo.Replace("'", "''") & "', " & vbCrLf
-                        End If
-
-                        If (tparVirtualRotorPositionsRow.IsBarcodeStatusNull) Then
-                            cmdText &= " NULL) " & vbCrLf
-                        Else
-                            cmdText &= " N'" & tparVirtualRotorPositionsRow.BarcodeStatus.Replace("'", "''") & "') " & vbCrLf
-                        End If
-                        'Barcode fields
-
-                        'Execute the SQL sentence 
-                        Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
-                            resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
-                        End Using
                     Next
                 End If
             Catch ex As Exception
