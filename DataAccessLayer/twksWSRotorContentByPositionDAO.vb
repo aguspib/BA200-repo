@@ -1447,7 +1447,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''          all the Analyzer Rotors, without session.
         ''' </returns>
         ''' <remarks>
-        ''' Created by: JV 03/12/2013 #1384
+        ''' Created by:  JV 03/12/2013 - BA-1384
+        ''' Modified by: SA 16/12/2014 - BA-1972 ==> Changed both sub-queries to get also field ControlID (positions with NOT IN USE Controls should indicate 
+        '''                                          the ID of the Control)
         ''' </remarks>
         Public Function GetRotorContentPositionsResetDone(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
@@ -1462,7 +1464,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, " & vbCrLf & _
                                                        " RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, RCP.Status, " & vbCrLf & _
                                                        " RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, RE.TubeContent, RE.ElementStatus, RE.CalibratorID, " & vbCrLf & _
-                                                       " RE.MultiItemNumber, RE.ReagentID, RE.SolutionCode, " & vbCrLf & _
+                                                       " RE.MultiItemNumber, RE.ReagentID, RE.SolutionCode, RE.ControlID, " & vbCrLf & _
                                                        "(CASE WHEN RIP.InProcessTestsNumber IS NULL THEN 0 ELSE 1 END) AS InProcessElement " & vbCrLf & _
                                                 " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSRequiredElements RE " & vbCrLf & _
                                                                                                      " ON RCP.WorkSessionID = RE.WorkSessionID " & vbCrLf & _
@@ -1478,7 +1480,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                 " RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & vbCrLf & _
                                                                 " (CASE WHEN NU.Status IS NULL THEN RCP.Status ELSE NU.Status END), NU.ScannedPosition, NU.BarcodeInfo, NU.BarcodeStatus, NU.TubeContent, " & vbCrLf & _
                                                                 " NULL as ElementStatus, NU.CalibratorID, NU.MultiItemNumber, NU.ReagentID, " & vbCrLf & _
-                                                                " NU.SolutionCode, 0 AS InProcessElement  " & vbCrLf & _
+                                                                " NU.SolutionCode, NU.ControlID, 0 AS InProcessElement  " & vbCrLf & _
                                                 " FROM   twksWSRotorContentByPosition RCP INNER JOIN twksWSNotInUseRotorPositions NU " & vbCrLf & _
                                                                                                 " ON RCP.AnalyzerID    = NU.AnalyzerID " & vbCrLf & _
                                                                                                " AND RCP.RotorType     = NU.RotorType " & vbCrLf & _
