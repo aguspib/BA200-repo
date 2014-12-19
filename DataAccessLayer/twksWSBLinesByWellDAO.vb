@@ -838,6 +838,86 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
+
+        ''' <summary>
+        ''' Delete all records using pIDToDelete
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pIDToDelete"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 19/12/2014 BA-2181 (1)</remarks>
+        Public Function DeleteByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIDToDelete As Integer) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = " DELETE twksWSBLinesByWell " & vbCrLf & _
+                                            " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                            " AND WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                            " AND    BaseLineID = " & pIDToDelete.ToString
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.DeleteByID", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Update all records with pCurrentID to pNewID
+        ''' (before update the method deletes all records (if any) that uses pNewID)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pCurrentID"></param>
+        ''' <param name="pNewID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 19/12/2014 BA-2181 (1)</remarks>
+        Public Function UpdateByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pCurrentID As Integer, ByVal pNewID As Integer) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = String.Empty
+                    cmdText &= " UPDATE twksWSBLinesByWell SET BaseLineID = " & pNewID.ToString & vbCrLf & _
+                               " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " AND  WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " AND  BaseLineID = " & pCurrentID.ToString
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesByWellDAO.UpdateByID", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
 #End Region
+
     End Class
 End Namespace
