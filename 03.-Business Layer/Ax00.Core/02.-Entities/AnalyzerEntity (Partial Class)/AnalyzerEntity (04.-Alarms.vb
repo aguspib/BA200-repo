@@ -3809,8 +3809,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pSensor"></param>
         ''' <param name="pNewValue"></param>
         ''' <param name="pUIEventForChangesFlag"></param>
-        ''' <remarks></remarks>
-        Private Function UpdateSensorValuesAttribute(ByVal pSensor As GlobalEnumerates.AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean
+        ''' <remarks>
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Function UpdateSensorValuesAttribute(ByVal pSensor As GlobalEnumerates.AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean Implements IAnalyzerEntity.UpdateSensorValuesAttribute
             'NOTE: Do not implement Try .. Catch due the methods who call it implements it
 
             Dim flagChanges As Boolean = False
@@ -4412,14 +4414,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' 
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks></remarks>
-        Private Function CheckIfWashingIsPossible() As Boolean
+        ''' <remarks>
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Function CheckIfWashingIsPossible() As Boolean Implements IAnalyzerEntity.CheckIfWashingIsPossible
 
             Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
             Dim bottleErrAlarm As Boolean = False
             Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
-            Dim myGlobal As New GlobalDataTO
-            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
             If ExistBottleAlarms() Then
                 bottleErrAlarm = True

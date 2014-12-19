@@ -71,6 +71,6 @@ Namespace Biosystems.Ax00.Core.Entities
                                                       ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
 
 #End Region
-    End Class
 
+    End Class
 End Namespace

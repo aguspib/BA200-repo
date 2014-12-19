@@ -108,6 +108,7 @@
     <Compile Include="02.-Entities\StaticBaseLineEntity.vb" />
     <Compile Include="03.-Enums\AnalyzerModelEnum.vb" />
     <Compile Include="03.-Enums\BarcodeWorksessionActionsEnum.vb" />
+    <Compile Include="04.-Services\RotorChangeServices.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

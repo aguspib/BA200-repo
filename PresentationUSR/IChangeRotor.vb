@@ -104,6 +104,7 @@ Public Class IChangeRotor
     ''' Modified by: XB 06/11/2013 - BT #1150 / BT #1151 ==> Added additional protections against other performing operations (Shutting Down, Aborting WS) 
     '''              SA 22/04/2014 - BT #1595 ==> Added Connected=False to the list of conditions verified to disable screen buttons 
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
     ''' </remarks>
     Private Sub EnableButtons()
         Try
@@ -132,6 +133,8 @@ Public Class IChangeRotor
             If (disableButtons) Then
                 bsChangeRotortButton.Enabled = False
                 bsContinueButton.Enabled = False
+                bsChangeRotorFinalizeButton.Enabled = False 'BA-2143
+                bsChangeRotorReadButton.Enabled = False 'BA-2143
             Else
                 If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") AndAlso _
                    (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = String.Empty) AndAlso _
@@ -300,6 +303,7 @@ Public Class IChangeRotor
     ''' Modified by: SA 16/04/2014 - BT #1595 ==> Call to function EnableButtons has been commented to avoid bad enabling of the screen buttons
     '''                                           during the light adjustment process 
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
@@ -370,6 +374,15 @@ Public Class IChangeRotor
                     Cursor = Cursors.Default
                 End If
                 'AG 15/03/2012
+
+                'IT 19/12/2014 - BA-2143 (INI)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR)
+                If (sensorValue = 1) Then
+                    bsChangeRotorReadButton.Enabled = True
+                    bsChangeRotorFinalizeButton.Enabled = True
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR) = 0 'Once updated UI clear sensor
+                End If
+                'IT 19/12/2014 - BA-2143 (END)
 
                 RefreshDoneField = True 'RH 28/03/2012
             End If
@@ -447,6 +460,7 @@ Public Class IChangeRotor
     ''' <param name="e"></param>
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
     ''' </remarks>
     Private Sub bsChangeRotortButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsChangeRotortButton.Click
         Dim resultData As New GlobalDataTO
@@ -456,73 +470,49 @@ Public Class IChangeRotor
             dxProgressBar.Position = 0
 
             If (AnalyzerController.IsAnalyzerInstantiated) Then
-                Dim myCurrentAlarms As List(Of GlobalEnumerates.Alarms)
-                myCurrentAlarms = AnalyzerController.Instance.Analyzer.Alarms
 
                 bsChangeRotortButton.Enabled = False
                 bsContinueButton.Enabled = False
+                bsChangeRotorFinalizeButton.Enabled = False 'BA-2143
+                bsChangeRotorReadButton.Enabled = False 'BA-2143
 
-                'AG 20/02/2012 - The following condition is added into a public method
-                'If myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR) _
-                '   OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN) _
-                '   OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR) _
-                '   OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse myCurrentAlarms.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
                 If AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
                     'Show message
                     ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED"
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "CANCELED"
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED"
                     bsChangeRotortButton.Enabled = True
-
                 Else
                     ScreenWorkingProcess = True
                     IAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
                     IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS"
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = ""
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = ""
-
-                    'TR 28/10/2011 -Turn off Sound alarm
-                    AnalyzerController.Instance.Analyzer.StopAnalyzerRinging()
-                    If Not resultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
-                        resultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.INFO, True, Nothing, GlobalEnumerates.Ax00InfoInstructionModes.STP) 'Stop ANSINF
-                        If Not resultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
-                            resultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, GlobalEnumerates.Ax00WashStationControlModes.UP, "")
-                        End If
-
-                        If Not resultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
-                            'Disable buttons
-                            'DL 28/02/2012
-                            dxProgressBar.Visible = False
-                            bsStatusImage.Visible = False
-                            'DL 28/02/2012
-
-                            bsChangeRotortButton.Enabled = False
-                            bsCancelButton.Enabled = False
-
-                        Else
-
-                            ScreenWorkingProcess = False
-
-                            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = ""
-                            If resultData.HasError Then
-                                ShowMessage("Warning", resultData.ErrorCode)
-
-                                'DL 28/02/2012
-                                dxProgressBar.Visible = True
-                                dxProgressBar.Position = dxProgressBar.Properties.Maximum
-
-                                bsStatusImage.Image = Image.FromFile(WRONGIconName)
-                                bsStatusImage.Visible = True
-
-                                IAx00MainMDI.EnableButtonAndMenus(True)
-                                IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Enable vertical action buttons bar
-                                'DL 28/02/2012
-                            End If
-                        End If
-                    End If
                 End If
+
+                Try
+                    If AnalyzerController.Instance.ChangeRotorStartProcess() Then
+                        'Disable buttons
+                        'DL 28/02/2012
+                        dxProgressBar.Visible = False
+                        bsStatusImage.Visible = False
+                        'DL 28/02/2012
+
+                        bsChangeRotortButton.Enabled = False
+                        bsCancelButton.Enabled = False
+                    End If
+                Catch ex As Exception
+                    ScreenWorkingProcess = False
+                    ShowMessage("Warning", resultData.ErrorCode)
+
+                    'DL 28/02/2012
+                    dxProgressBar.Visible = True
+                    dxProgressBar.Position = dxProgressBar.Properties.Maximum
+
+                    bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                    bsStatusImage.Visible = True
+
+                    IAx00MainMDI.EnableButtonAndMenus(True)
+                    IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Enable vertical action buttons bar
+                    'DL 28/02/2012
+                End Try
+
             End If
 
             IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
@@ -544,6 +534,7 @@ Public Class IChangeRotor
     ''' <param name="e"></param>
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 19/12/2014 - BA-2143
     ''' </remarks>
     Private Sub bsContinueButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsContinueButton.Click
         Dim resultData As New GlobalDataTO
@@ -553,98 +544,84 @@ Public Class IChangeRotor
             If (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then 'AG 25/05/2012
                 'Show message
                 ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED"
-                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "CANCELED"
-                AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED"
                 'AG 25/05/2012
             Else
                 ' goneSecondReject = False
                 bsChangeRotortButton.Enabled = False
                 ExistBaseLineInitError = False
+            End If
 
-                If (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.Connected Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS"
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = ""
-                    AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = ""
+            Try
+                If AnalyzerController.Instance.ChangeRotorContinueProcess() Then
 
-                    resultData = AnalyzerController.Instance.Analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True, Nothing, Nothing, Nothing)
+                    IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
+                    statusMDIChangedFlag = True
 
-                    If Not resultData.HasError AndAlso AnalyzerController.Instance.Analyzer.Connected Then
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
-                        statusMDIChangedFlag = True
-                        AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
+                    'DL 28/02/2012. Begin
+                    dxProgressBar.Position = 0
+                    dxProgressBar.Visible = True
+                    dxProgressBar.Show()
 
-                        'DL 28/02/2012. Begin
-                        dxProgressBar.Position = 0
-                        dxProgressBar.Visible = True
-                        dxProgressBar.Show()
+                    Dim Dt1 As DateTime = DateTime.Now
+                    Dim Dt2 As DateTime
+                    Dim Span As TimeSpan
 
-                        Dim Dt1 As DateTime = DateTime.Now
-                        Dim Dt2 As DateTime
-                        Dim Span As TimeSpan
+                    bsContinueButton.Enabled = False
 
-                        bsContinueButton.Enabled = False
+                    While ScreenWorkingProcess
+                        Dt2 = DateTime.Now
+                        Span = Dt2.Subtract(Dt1)
 
-                        While ScreenWorkingProcess
-                            Dt2 = DateTime.Now
-                            Span = Dt2.Subtract(Dt1)
+                        If Span.TotalSeconds > DefaultLightAdjustTime Then
+                            dxProgressBar.Position = DefaultLightAdjustTime
+                        Else
+                            dxProgressBar.Position = CInt(Span.TotalSeconds)
+                        End If
 
-                            If Span.TotalSeconds > DefaultLightAdjustTime Then
-                                dxProgressBar.Position = DefaultLightAdjustTime
-                            Else
-                                dxProgressBar.Position = CInt(Span.TotalSeconds)
-                            End If
-
-                            dxProgressBar.Show()
-                            Application.DoEvents()
-
-                            If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
-                        End While
-
-                        dxProgressBar.Position = dxProgressBar.Properties.Maximum
                         dxProgressBar.Show()
                         Application.DoEvents()
 
-                        'dl 26/09/2012
-                        If Not AnalyzerController.Instance.Analyzer.Connected Then
-                            IAx00MainMDI.EnableButtonAndMenus(False)
-                        Else
-                            IAx00MainMDI.EnableButtonAndMenus(True)
-                            IAx00MainMDI.SetActionButtonsEnableProperty(True)
-                        End If
-                        'IAx00MainMDI.EnableButtonAndMenus(True)
-                        'IAx00MainMDI.SetActionButtonsEnableProperty(True)
-                        'dl 26/09/2012
+                        If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
+                    End While
 
-                        If Not ExistBaseLineInitError Then
-                            bsStatusImage.Visible = True
-                            bsStatusImage.Image = Image.FromFile(OKIconName)
+                    dxProgressBar.Position = dxProgressBar.Properties.Maximum
+                    dxProgressBar.Show()
+                    Application.DoEvents()
 
-                        Else
-                            bsStatusImage.Visible = True
-                            bsStatusImage.Image = Image.FromFile(WRONGIconName)
-                        End If
+                    'dl 26/09/2012
+                    If Not AnalyzerController.Instance.Analyzer.Connected Then
+                        IAx00MainMDI.EnableButtonAndMenus(False)
+                    Else
+                        IAx00MainMDI.EnableButtonAndMenus(True)
+                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                    End If
 
-                        'DL 26/09/2012. begin
-                        If Not AnalyzerController.Instance.Analyzer.Connected Then
-                            dxProgressBar.Visible = False
-                            bsStatusImage.Visible = False
-                            '   bsCancelButton.Enabled = True
-                        End If
-                        'DL 26/09/2012. end
+                    If Not ExistBaseLineInitError Then
+                        bsStatusImage.Visible = True
+                        bsStatusImage.Image = Image.FromFile(OKIconName)
 
-                    ElseIf resultData.HasError Then
-                        ShowMessage("Warning", resultData.ErrorCode)
+                    Else
+                        bsStatusImage.Visible = True
+                        bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                    End If
 
-                        'DL 28/02/2012. begin
+                    'DL 26/09/2012. begin
+                    If Not AnalyzerController.Instance.Analyzer.Connected Then
                         dxProgressBar.Visible = False
                         bsStatusImage.Visible = False
-                        'DL 28/02/2012. end
-
+                        '   bsCancelButton.Enabled = True
                     End If
-                End If
+                    'DL 26/09/2012. end
 
-            End If
+                End If
+            Catch ex As Exception
+                ShowMessage("Warning", resultData.ErrorCode)
+
+                'DL 28/02/2012. begin
+                dxProgressBar.Visible = False
+                bsStatusImage.Visible = False
+                'DL 28/02/2012. end
+            End Try
 
             IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
             Cursor = Cursors.Default        'DL 04/04/2012
@@ -657,7 +634,46 @@ Public Class IChangeRotor
             ShowMessage(Me.Name & ".bsContinueButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
-#End Region
 
+    Private Sub bsChangeRotorReadButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorReadButton.Click
+        Try
+
+            CreateLogActivity("Btn Read", Me.Name & ".bsChangeRotorReadButton_Click", EventLogEntryType.Information, False)
+            bsChangeRotorFinalizeButton.Enabled = False
+            bsChangeRotorReadButton.Enabled = False
+            bsChangeRotortButton.Enabled = False
+            AnalyzerController.Instance.ChangeRotorRepeatDynamicBaseLineReadStep()
+
+            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            Cursor = Cursors.Default
+
+        Catch ex As Exception
+            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            Cursor = Cursors.Default
+
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorReadButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsChangeRotorReadButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+    Private Sub bsChangeRotorFinalizeButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorFinalizeButton.Click
+        Try
+
+            CreateLogActivity("Btn Finalize", Me.Name & ".bsChangeRotorFinalizeButton_Click", EventLogEntryType.Information, False)
+            bsChangeRotorFinalizeButton.Enabled = False
+            bsChangeRotorReadButton.Enabled = False
+            bsChangeRotortButton.Enabled = False
+            AnalyzerController.Instance.ChangeRotorFinalizeProcess()
+
+        Catch ex As Exception
+            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            Cursor = Cursors.Default
+
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorFinalizeButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".bsChangeRotorFinalizeButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+        End Try
+    End Sub
+
+#End Region
 
 End Class

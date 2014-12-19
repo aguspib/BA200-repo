@@ -96,6 +96,8 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Property BaseLineTypeForWellReject As BaseLineType
         Property Model As String
         Property CurrentInstructionAction As GlobalEnumerates.InstructionActions 'BA-2075
+        Property FlightInitFailures As Integer 'BA-2143
+        Property DynamicBaselineInitializationFailures As Integer 'BA-2143
 
 #End Region
 
@@ -109,6 +111,9 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
                                                    ByVal pResponseValue As String, _
                                                    ByVal pTreated As Boolean)
+
+        Event ReceivedStatusInformationEventHandler() 'BA-2143
+        Event ProcessFlagEventHandler(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags) 'BA-2143
 
 #End Region
 
@@ -182,7 +187,14 @@ Namespace Biosystems.Ax00.Core.Interfaces
         Function ExistSomeAlarmThatRequiresStopWS() As Boolean
         Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO 'AG 20/11/2014 BA-2065
         Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As GlobalEnumerates.WarmUpProcessFlag) 'IT 01/12/2014 - BA-2075
-
+        'IT 19/12/2014 - BA-2143 (INI)
+        Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, ByVal pNewValue As String)
+        Sub ResetBaseLineFailuresCounters()
+        Sub SetAnalyzerNotReady()
+        Function CheckIfWashingIsPossible() As Boolean
+        Function UpdateSensorValuesAttribute(ByVal pSensor As GlobalEnumerates.AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean
+        Function ProcessFlightReadAction() As Boolean
+        'IT 19/12/2014 - BA-2143 (END)
 #End Region
 
     End Interface

@@ -570,6 +570,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
         '''             AG 14/11/2014 - BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
         '''             IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        '''             IT 19/12/2014 - Ba-2143
         ''' </remarks>
         Private Function ManageStandByStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -787,36 +788,6 @@ Namespace Biosystems.Ax00.Core.Entities
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then 'AG 08/03/2012
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
 
-                            'AG 24/05/2012
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
-                            'Case Start instrument failed before wash was performed (for example no reactions missing)
-                            'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
-
-                            'Send the ALIGHT
-                            'Delete the current reactions rotor status (configuration) and crete a new one
-                            Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
-                            myGlobal = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, AnalyzerIDAttribute)
-
-                            'Before send ALIGHT process ... delete the all ALIGHT/FLIGHT results
-                            If Not myGlobal.HasError Then
-                                Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
-                                If Not myGlobal.HasError Then
-                                    'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                    ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                                    'AG 12/09/2011 - when change rotor is performed the ALIGHt well starts in 1, ignore the well field in status instruction (RPalazon, JGelabert, STortosa)
-                                    'myGlobal = Me.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
-
-                                    'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                        SetAnalyzerNotReady()
-                                    End If
-                                End If
-                            End If
-                            'AG 24/05/2012
-
                         End If
 
                         'Ax00 STARTS the go to SLEEP process
@@ -882,44 +853,6 @@ Namespace Biosystems.Ax00.Core.Entities
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.NEW_ROTOR_END
                         If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "END")
-
-                            'AG 24/05/2012 - If start instrument wash paused and wash not finished sent the wash
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" AndAlso _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then 'Send Wash
-                                'Case Start instrument failed before wash was performed (for example no reactions missing)
-                                'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True) 'Send a WASH instruction (Conditioning complete)
-
-                            Else
-                                'Else Alight
-                                'User execute the change reaction rotor when start instrument OK: Sw instructions NRotor + Alight
-
-                                'Delete the current reactions rotor status (configuration) and crete a new one
-                                Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
-                                myGlobal = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, AnalyzerIDAttribute)
-
-                                'Before send ALIGHT process ... delete the all ALIGHT/FLIGHT results
-                                If Not myGlobal.HasError Then
-                                    Dim ALightDelg As New WSBLinesDelegate
-                                    myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
-                                    If Not myGlobal.HasError Then
-                                        'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                        ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
-                                        'AG 12/09/2011 - when change rotor is performed the ALIGHt well starts in 1, ignore the well field in status instruction (RPalazon, JGelabert, STortosa)
-                                        'myGlobal = Me.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
-
-                                        'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                            SetAnalyzerNotReady()
-                                        End If
-                                    End If
-                                End If
-                            End If
-                            'AG 24/05/2012
-
                         End If
 
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START
@@ -975,6 +908,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
                                     CurrentInstructionAction = InstructionActions.None
+                                    RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) 'BA-2143
                                 End If
                                 'Read rotor finishes
                             Case GlobalEnumerates.InstructionActions.FlightReading
@@ -988,6 +922,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
                                     CurrentInstructionAction = InstructionActions.None
                                     ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize)
+                                    RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) 'BA-2143
                                 End If
                         End Select
                         'IT 26/11/2014 - BA-2075 END
@@ -1921,9 +1856,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pFlagsDS"></param>
         ''' <param name="pFlagCode"></param>
         ''' <param name="pNewValue"></param>
-        ''' <remarks>AG 01/03/2011 - Tested PENDING</remarks>
-        Private Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, _
-                                            ByVal pNewValue As String)
+        ''' <remarks>AG 01/03/2011 - Tested PENDING
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, _
+                                            ByVal pNewValue As String) Implements IAnalyzerEntity.UpdateSessionFlags
             Try
                 'Update dictionary flags variables
                 mySessionFlags(pFlagCode.ToString) = pNewValue

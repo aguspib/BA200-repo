@@ -3,14 +3,22 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports System.Globalization
+Imports Biosystems.Ax00.Core.Services
 
 Namespace Biosystems.Ax00.App
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by:  IT 19/12/2014 - BA-2143
+    ''' </remarks>
     Public NotInheritable Class AnalyzerController
         Implements IAnalyzerController
 
         Private Shared ReadOnly _instance As New Lazy(Of AnalyzerController)(Function() New AnalyzerController(), System.Threading.LazyThreadSafetyMode.ExecutionAndPublication)
         Private _factory As IAnalyzerFactory
+        Private _rotorChangeServices As RotorChangeServices 'BA-2143
 
         Private Sub New()
         End Sub
@@ -115,6 +123,65 @@ Namespace Biosystems.Ax00.App
             Return myGlobal
 
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Modified by:  IT 19/12/2014 - BA-2143
+        ''' </remarks>
+        Public Function ChangeRotorStartProcess() As Boolean
+            Try
+                _rotorChangeServices = New RotorChangeServices(Analyzer)
+                Return _rotorChangeServices.StartProcess()
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Modified by:  IT 19/12/2014 - BA-2143
+        ''' </remarks>
+        Public Function ChangeRotorContinueProcess() As Boolean
+            Try
+                Return _rotorChangeServices.ContinueProcess()
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by:  IT 19/12/2014 - BA-2143
+        ''' </remarks>
+        Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
+            Try
+                _rotorChangeServices.RepeatDynamicBaseLineReadStep()
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by:  IT 19/12/2014 - BA-2143
+        ''' </remarks>
+        Public Sub ChangeRotorFinalizeProcess()
+            Try
+                _rotorChangeServices.EmptyAndFinalizeProcess()
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
 
 #End Region
 

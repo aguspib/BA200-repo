@@ -1215,6 +1215,27 @@ Namespace Biosystems.Ax00.Core.Entities
         <DefaultValue(GlobalEnumerates.InstructionActions.None)>
         Public Property CurrentInstructionAction As GlobalEnumerates.InstructionActions Implements IAnalyzerEntity.CurrentInstructionAction 'BA-2075
 
+        'IT 19/12/2014 - BA-2143
+        Public Property FlightInitFailures As Integer Implements IAnalyzerEntity.FlightInitFailures
+            Get
+                Return FLIGHT_INIT_FAILURES
+            End Get
+            Set(ByVal value As Integer)
+                FLIGHT_INIT_FAILURES = value
+            End Set
+        End Property
+
+        'IT 19/12/2014 - BA-2143
+        Public Property DynamicBaselineInitializationFailures As Integer Implements IAnalyzerEntity.DynamicBaselineInitializationFailures
+            Get
+                Return dynamicbaselineInitializationFailuresAttribute
+            End Get
+            Set(ByVal value As Integer)
+                dynamicbaselineInitializationFailuresAttribute = value
+            End Set
+        End Property
+
+
 #End Region
 
 #Region "Events definition & methods"
@@ -1399,6 +1420,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ' SGM 15/04/2011 
         'Public Shared Event SensorValuesChangedEvent(ByVal pSensorValuesChangedDT As UIRefreshDS.SensorValueChangedDataTable)
 
+        Public Event ReceivedStatusInformationEventHandler() Implements IAnalyzerEntity.ReceivedStatusInformationEventHandler 'IT 19/12/2014 - BA-2143
+        Public Event ProcessFlagEventHandler(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags) Implements IAnalyzerEntity.ProcessFlagEventHandler 'IT 19/12/2014 - BA-2143
 
         ''' <summary>
         ''' Detects that the ISE data aimed to be displayed in the Monitor has been changed

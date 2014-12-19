@@ -2404,6 +2404,7 @@ Namespace Biosystems.Ax00.Global
             'Used for User Sw (change rotor utility): 
             WASHSTATION_CTRL_PERFORMED 'Washing station is up. Requires clear value (=0) after his treatment
             NEW_ROTOR_PERFORMED 'Change rotor process is finished. Requires clear value (=0) after his treatment
+            DYNAMIC_BASELINE_ERROR 'Indicate if dynamic baseline has errors (BA-2143)
 
             'Enter Running process
             BARCODE_WARNINGS 'Used for User Sw:

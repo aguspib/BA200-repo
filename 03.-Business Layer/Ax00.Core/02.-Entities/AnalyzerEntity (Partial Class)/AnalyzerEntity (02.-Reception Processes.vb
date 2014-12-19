@@ -982,6 +982,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              01/03/2011 - ANSAL is rename as ANSBLD (ANSBL and ANSDL are removed) - Tested PENDING
         '''              AG 28/10/2014 - BA-2057
         '''              IT 01/12/2014 - BA-2075
+        '''              IT 19/12/2014 - BA-2143
         ''' </remarks>
         Private Function ProcessBaseLineReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -1233,23 +1234,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BASELINEprocess, "CLOSED")
 
                                             ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
-                                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "CLOSED")
-
-                                                'Remove alarm change rotor recommend
-                                                If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
-                                                    myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                                                End If
-
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED, 1, True) 'Inform the FALSE sensor the new rotor process is finished for UI refresh
-
-                                                'AG 26/03/2012 - Special case: maybe the user was starting the instrument and the process has been
-                                                'paused because there is not reactions rotor ... in this case when a valid alight is received
-                                                'Sw must inform the start instrument process is OK
-                                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" Then
-                                                    'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS")
-                                                    ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize) 'BA-2075
-                                                End If
-
+                                                RaiseEvent ProcessFlagEventHandler(AnalyzerManagerFlags.BaseLine) 'BA-2143
                                             End If
 
                                             'Update analyzer session flags into DataBase
@@ -2563,6 +2548,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by  AG  07/04/2011
         ''' Modified by XB 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
         '''             XB 30/01/2013 - Add Trace log information about malfunctions on temperature values (Bugs tracking #1122)
+        '''             IT 19/12/2014 - BA-2143
         ''' </remarks>
         Private Function ProcessInformationStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
@@ -2931,6 +2917,8 @@ Namespace Biosystems.Ax00.Core.Entities
                 Else
                     UserSwANSINFTreatment(mySensors)
                 End If
+
+                RaiseEvent ReceivedStatusInformationEventHandler() 'BA-2143
 
                 If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING Then
                     'Debug.Print("AnalyzerManager.ProcessInformationStatusReceived: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 11/06/2012 - time estimation
@@ -3862,7 +3850,7 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Error, invalid structure for the instruction
                     End If
 
-               
+
                 End If
 
             Catch ex As Exception
@@ -3885,8 +3873,9 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
         ''' AG 27/11/2014 BA-2066
         ''' AG 28/11/2014 BA-2066 reorganize code in order to refresh monitor when valid results and when much times invalid!!!
+        ''' IT 19/12/2014 - BA-2143 (Accessibility Level)
         ''' </remarks>
-        Private Function ProcessFlightReadAction(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS) As Boolean
+        Public Function ProcessFlightReadAction() As Boolean Implements IAnalyzerEntity.ProcessFlightReadAction
 
             Dim validResults As Boolean = True
             Dim myGlobal As New GlobalDataTO
@@ -3925,22 +3914,22 @@ Namespace Biosystems.Ax00.Core.Entities
 
             End If
 
-                'If still not active, generate base line alarm (error)
-                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                    If AlarmList.Count > 0 Then
-                        If GlobalBase.IsServiceAssembly Then
-                            'Alarms treatment for Service
-                        Else
-                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                            myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
-                        End If
+            'If still not active, generate base line alarm (error)
+            If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                If AlarmList.Count > 0 Then
+                    If GlobalBase.IsServiceAssembly Then
+                        'Alarms treatment for Service
+                    Else
+                        Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                        myGlobal = ManageAlarms(Nothing, AlarmList, AlarmStatusList)
+                        Dim myLogAcciones As New ApplicationLogManager()
+                        myLogAcciones.CreateLogActivity("Alarm generated during dynamic base line convertion to well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessFlightReadAction", EventLogEntryType.Information, False) 'AG 28/06/2012
                     End If
                 End If
+            End If
 
-                Return validResults
+            Return validResults
 
         End Function
 
@@ -4051,8 +4040,11 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Reset the baseline failed tentatives (ALIGHT and FLIGHT) when valid results are received
         ''' 
         ''' </summary>
-        ''' <remarks>AG 27/11/2014 BA-2066</remarks>
-        Private Sub ResetBaseLineFailuresCounters()
+        ''' <remarks>
+        ''' Created by:  AG 27/11/2014 - BA-2066
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Sub ResetBaseLineFailuresCounters() Implements IAnalyzerEntity.ResetBaseLineFailuresCounters
             baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
             dynamicbaselineInitializationFailuresAttribute = 0 'Reset FLIGHT failures counter
         End Sub
@@ -4188,7 +4180,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     (CurrentInstructionAction = InstructionActions.None) Then
                                     'AG 27/11/2014 BA-2066
                                     If (CheckIfWashingIsPossible()) Then
-                                        If (ProcessFlightReadAction(myAnalyzerFlagsDS)) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
+                                        If (ProcessFlightReadAction()) OrElse (dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES) Then
                                             'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI"
                                             CurrentInstructionAction = InstructionActions.FlightEmptying
                                             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
@@ -4209,8 +4201,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
 
                         Case WarmUpProcessFlag.ConfigureBarCode
-                                ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
 
                         Case WarmUpProcessFlag.Finalize
 
@@ -4239,13 +4231,18 @@ Namespace Biosystems.Ax00.Core.Entities
                     Select Case flag
 
                         Case GlobalEnumerates.WarmUpProcessFlag.Finalize
-                            If (CheckIfWashingIsPossible()) Then
-                                If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") OrElse
-                                    (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
-                                    FinalizeWarmUpProcess()
-                                    Exit Select
+                            If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) <> "INPROCESS") Then
+                                If (CheckIfWashingIsPossible()) Then
+                                    If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "CANCELED") OrElse
+                                        (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "END") Then
+                                        FinalizeWarmUpProcess()
+                                        Exit Select
+                                    End If
                                 End If
                             End If
+                        Case WarmUpProcessFlag.ConfigureBarCode
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
 
                     End Select
 
@@ -5760,8 +5757,10 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Method for code common used
         ''' </summary>
         ''' <remarks>
-        ''' AG 14/03/2011</remarks>
-        Private Sub SetAnalyzerNotReady()
+        ''' Created by:  AG 14/03/2011
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Sub SetAnalyzerNotReady() Implements IAnalyzerEntity.SetAnalyzerNotReady
             If AnalyzerIsReadyAttribute Then
                 AnalyzerIsReadyAttribute = False
                 'Me.InitializeTimerControl(WAITING_TIME_DEFAULT) 'AG 18/07/2011 - commment this line
