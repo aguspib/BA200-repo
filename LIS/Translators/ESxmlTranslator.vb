@@ -5161,7 +5161,6 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' </summary>
         ''' <param name="XmlDoc">Xml document in which the node and subnodes will be added</param>
         ''' <param name="pESOrderID"></param>
-        ''' <param name="pLISOrderID"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by SGM 08/02/2013

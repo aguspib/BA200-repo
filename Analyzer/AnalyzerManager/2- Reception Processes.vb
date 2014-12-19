@@ -1622,7 +1622,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstructionReceived"></param>
         ''' <returns> GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
-        ''' Creation: AG 14/03/2011
+        ''' Created by:  AG 14/03/2011
+        ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings
         ''' </remarks>
         Private Function ProcessHwAlarmDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -1655,7 +1657,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    errorNumber = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    errorNumber = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 Dim errorCode As Integer = 0
@@ -1673,7 +1675,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        errorCode = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                        errorCode = CInt(myInstParamTO.ParameterValue)
 
                         'SGM 16/10/2012 - Ommit these alarms in order to avoid endless loop
                         'E:20 (INST_REJECTED_ERR)
@@ -2747,9 +2749,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by  AG  07/04/2011
-        ''' Modified by XB 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
-        '''             XB 30/01/2013 - Add Trace log information about malfunctions on temperature values (Bugs tracking #1122)
+        ''' Created by:  AG 07/04/2011
+        ''' Modified by: XB 29/01/2013 - Changed IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+        '''              XB 30/01/2013 - Added Trace log information about malfunctions on temperature values (Bugs tracking #1122)
+        '''              SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings
         ''' </remarks>
         Private Function ProcessInformationStatusReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
 
@@ -2781,7 +2785,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_GENERAL, CSng(myIntValue))
                 End If
 
@@ -2795,7 +2799,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_REACTIONS, CSng(myIntValue))
                 End If
 
@@ -2809,7 +2813,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_FRIDGE, CSng(myIntValue))
                 End If
 
@@ -2823,7 +2827,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.COVER_SAMPLES, CSng(myIntValue))
                 End If
 
@@ -2837,7 +2841,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.WATER_DEPOSIT, CSng(myIntValue))
                 End If
 
@@ -2851,7 +2855,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.WASTE_DEPOSIT, CSng(myIntValue))
                 End If
 
@@ -2865,7 +2869,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.BOTTLE_WASHSOLUTION, CSng(myIntValue))
                 End If
 
@@ -2877,7 +2881,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE, CSng(myIntValue))
                 End If
 
@@ -2982,7 +2986,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myIntValue = CInt(myInstParamTO.ParameterValue)
                     mySensors.Add(GlobalEnumerates.AnalyzerSensors.FRIDGE_STATUS, CSng(myIntValue))
                 End If
 
@@ -3000,7 +3004,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ' Nothing to do
                 Else
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        myIntValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                        myIntValue = CInt(myInstParamTO.ParameterValue)
                         mySensors.Add(GlobalEnumerates.AnalyzerSensors.ISE_STATUS, CSng(myIntValue))
 
                         ''SGM 17/02/2012 ISE Module is switched On
@@ -3152,9 +3156,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              LIS with ES)
         '''              SA 18/12/2014 - BA-1999 ==> In the call to function PrepareUIRefreshEventNum2, if RotorType is REAGENTS, inform value of parameters for 
         '''                                          RealValue and RemainingTestsNumber when these fields are informed for the position in the DS returned by 
-        '''                                          function ManageBarcodeInstruction. When function GetItemByParameterIndex returns an Integer value, the way of 
-        '''                                          get the returned value has been changed: instead of use DirectCast(CInt(value), Integer) - This has not sense!, 
-        '''                                          use CType(value, Integer). Replaced all String.Compare by comparisons using = 
+        '''                                          function ManageBarcodeInstruction. Additionally, when function GetItemByParameterIndex returns an Integer value, 
+        '''                                          the way of get the returned value has been changed: instead of use DirectCast(CInt(value), Integer) - This has 
+        '''                                          not sense!, use CType(value, Integer). Replaced all String.Compare by comparisons using = 
         ''' </remarks>
         Private Function ProcessCodeBarInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef pRotorType As String) As GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
@@ -3454,7 +3458,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     'Service SW management
 
                                     'XBC 16/12/2011
-                                    'Inform all fields but RealVolume and TestLeft
                                     For Each row In barCodeDS.twksWSRotorContentByPosition.Rows
                                         If (row.IsRotorTypeNull) Then myRotorType = String.Empty Else myRotorType = row.RotorType
                                         If (row.IsCellNumberNull) Then myCellNumber = -1 Else myCellNumber = row.CellNumber
@@ -3468,17 +3471,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         If (row.IsTubeTypeNull) Then myTubeType = String.Empty Else myTubeType = row.TubeType
                                         If (row.IsTubeContentNull) Then myTubeContent = String.Empty Else myTubeContent = row.TubeContent
 
-                                        'BA-1999: For Positions in Reagents Rotor, keep values of RealVolume and RemainingTestsNumber when they are informed
-                                        myTestsLeft = -1
-                                        myRealVolume = -1
-                                        If (myRotorType = "REAGENTS") Then
-                                            If (Not row.IsRealVolumeNull) Then myRealVolume = row.RealVolume
-                                            If (Not row.IsRemainingTestsNumberNull) Then myTestsLeft = row.RemainingTestsNumber
-                                        End If
-
-                                        'Inform all fields, including RealVolume and TestLeft when they are informed for the Rotor Position
+                                        'Inform all fields but RealVolume and TestLeft (SERVICE SW requires only RotorType, CellNumber and BarcodeInfo,
+                                        'but the rest of fields are informed because the function PrepareUIRefreshEventNum2 needs them)
                                         myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ, _
-                                                                             myRotorType, myCellNumber, myStatus, myElementStatus, myRealVolume, myTestsLeft, _
+                                                                             myRotorType, myCellNumber, myStatus, myElementStatus, -1, -1, _
                                                                              myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, myScannedPosition, myElementId, _
                                                                              myMultiTubeNumber, myTubeType, myTubeContent)
                                     Next

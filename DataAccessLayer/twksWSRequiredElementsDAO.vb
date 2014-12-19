@@ -2009,7 +2009,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim var As New GlobalBase
-                        Dim cmdText As String
+                        Dim cmdText As String = String.Empty
                         cmdText &= "SELECT   RE.TubeContent, RE.ElementID, RE.SolutionCode, RE.ElementStatus, MR.ResourceText AS SolutionName, " & vbCrLf
                         cmdText &= "         RE.RequiredVolume, PMD.Position AS SortElement, 1 AS SortGroup " & vbCrLf
                         cmdText &= "FROM     twksWSRequiredElements RE INNER JOIN tfmwPreloadedMasterData PMD  " & vbCrLf

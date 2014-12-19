@@ -75,7 +75,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 27/08/2012</remarks>
+        ''' <remarks>
+        ''' Created by:  AG 27/08/2012
+        ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings</remarks>
         Private Function ProcessANSPRDReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -94,7 +97,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    recoveryMode = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    recoveryMode = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 'AG 04/12/2013 - BT #1397 protection because when recovery is started in pause mode Softw has to send
@@ -346,7 +349,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pInstructionReceived"></param>
         ''' <returns>GlobalDataTo with data as List (of PrepWithProblemTO))</returns>
-        ''' <remarks>AG 19/09/2012</remarks>
+        ''' <remarks>
+        ''' Created by:  AG 19/09/2012
+        ''' Modified by: SA 19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                              due to the first one is redundant and produces building warnings
+        ''' </remarks>
         Private Function DecodeANSTINInstruction(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -362,7 +369,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        valueN = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                        valueN = CInt(myInstParamTO.ParameterValue)
                     Else
                         myGlobal.HasError = True
                     End If
@@ -517,7 +524,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
                                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                                    prepID = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                                    prepID = CInt(myInstParamTO.ParameterValue)
                                 Else
                                     Exit For
                                 End If
@@ -532,7 +539,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
                                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                                    errorCode = DirectCast(CLng(myInstParamTO.ParameterValue), Long)
+                                    errorCode = CLng(myInstParamTO.ParameterValue)
                                 Else
                                     Exit For
                                 End If

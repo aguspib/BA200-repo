@@ -248,8 +248,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstructionReceived"></param>
         ''' <returns> GlobalDataTo indicating if an error has occurred or not</returns>
         ''' <remarks>
-        ''' Creatied by XBC 16/11/2010
-        ''' Modified by XBC 04/05/2011 - command instruction already defined
+        ''' Created by:  XBC 16/11/2010
+        ''' Modified by: XBC 04/05/2011 - Command instruction already defined
+        '''              SA  19/12/2014 - Replaced sentences DirectCast(CInt(myInstParamTO.ParameterValue), Integer) by CInt(myInstParamTO.ParameterValue)
+        '''                               due to the first one is redundant and produces building warnings
         ''' </remarks>
         Private Function ProcessFwCommandAnswerReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
@@ -283,7 +285,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim myResultValue As Integer
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    myResultValue = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    myResultValue = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 ' Get Ph Main Read Counts values in case its exists
@@ -294,7 +296,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    Me.OpticCenterResultsAttr.CountsMain = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    Me.OpticCenterResultsAttr.CountsMain = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 ' Get Ph Ref Read Counts values in case its exists
@@ -305,7 +307,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    Me.OpticCenterResultsAttr.CountsRef = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    Me.OpticCenterResultsAttr.CountsRef = CInt(myInstParamTO.ParameterValue)
                 End If
 
                 ' XBC 21/12/2011 - Add Encoder functionality
@@ -317,7 +319,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    Me.OpticCenterResultsAttr.Encoder = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+                    Me.OpticCenterResultsAttr.Encoder = CInt(myInstParamTO.ParameterValue)
                 End If
                 ' XBC 21/12/2011 - Add Encoder functionality
 

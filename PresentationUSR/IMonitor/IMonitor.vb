@@ -1903,7 +1903,7 @@ Public Class IMonitor
     ''' Finish the auto create WS with LIS
     ''' </summary>
     ''' <remarks>
-    ''' AG 31/01/2014 - BT #1486 (v211 patch D + v300)</remarks>
+    ''' AG 31/01/2014 - BT #1486 (v211 patch D + v300)
     ''' </remarks>
     Private Sub ExecuteAutoCreateWSLastStep()
         Try

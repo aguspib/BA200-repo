@@ -709,12 +709,12 @@ Public Class IRestPointUpdateProc
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Not allow move form and mantain the center location in center parent
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: DL 27/07/2011
-    ''' </remarks>
+    ' ''' <summary>
+    ' ''' Not allow move form and mantain the center location in center parent
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by: DL 27/07/2011
+    ' ''' </remarks>
     'Protected Overrides Sub WndProc(ByRef m As Message)
     '    'If m.Msg = WM_WINDOWPOSCHANGING Then
     '    '    Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, _

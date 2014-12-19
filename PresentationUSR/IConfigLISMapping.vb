@@ -353,8 +353,6 @@ Public Class IConfigLISMapping
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
-            Dim resultData As GlobalDataTO
-
             Cursor = Cursors.WaitCursor
             LoadingScreen = True
 

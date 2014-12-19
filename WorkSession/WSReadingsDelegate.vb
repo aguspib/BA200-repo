@@ -354,21 +354,21 @@ Namespace Biosystems.Ax00.BL
         End Function
 
 
-        ''' <summary>
-        ''' Get all readings for an specific preparation and validate all readings are valid
-        ''' (Valid readings means != SATURATED_READING and != READING_ERROR
-        ''' 
-        ''' (In case calibrator multiitem check readings for all executions belongs the same OrderTestID - RerunNumber)
-        ''' </summary>
-        ''' <param name="pDBConnection"></param>
-        ''' <param name="pAnalyzerID"></param>
-        ''' <param name="pWorkSessionID"></param>
-        ''' <param name="pExecutionID"></param>
-        ''' <returns>GlobalDataTO with Setdata as boolean</returns>
-        ''' <remarks>
-        ''' Created by AG 08/06/2010 (Tested OK)
-        ''' Modified AG 23/10/2013 Method commented, it is not used. Task #1347
-        ''' </remarks>
+        ' ''' <summary>
+        ' ''' Get all readings for an specific preparation and validate all readings are valid
+        ' ''' (Valid readings means != SATURATED_READING and != READING_ERROR
+        ' ''' 
+        ' ''' (In case calibrator multiitem check readings for all executions belongs the same OrderTestID - RerunNumber)
+        ' ''' </summary>
+        ' ''' <param name="pDBConnection"></param>
+        ' ''' <param name="pAnalyzerID"></param>
+        ' ''' <param name="pWorkSessionID"></param>
+        ' ''' <param name="pExecutionID"></param>
+        ' ''' <returns>GlobalDataTO with Setdata as boolean</returns>
+        ' ''' <remarks>
+        ' ''' Created by AG 08/06/2010 (Tested OK)
+        ' ''' Modified AG 23/10/2013 Method commented, it is not used. Task #1347
+        ' ''' </remarks>
         'Public Function ValidateByExecutionID(ByVal pDBConnection As SqlConnection, _
         '                                     ByVal pAnalyzerID As String, _
         '                                     ByVal pWorkSessionID As String, _

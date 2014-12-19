@@ -81,6 +81,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Return myGlobalDataTO
         End Function
 
+        ''' <summary>
         ''' Verify if there is a Calibrator in Customer DB with the same Name of a Factory Calibrator (new or updated), and in this case, rename
         ''' the Calibrator in Customer BD by adding as many "R" letters as needed at the beginning of the Name until get an unique Name
         ''' </summary>

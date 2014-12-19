@@ -782,7 +782,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' For the informed STD TestID and SampleType, search all requested Blank and Calibrator Order Tests that have to be positioned (ToSendFlag = TRUE) 
         ''' but that have not been selected yet for it (OpenOTFlag = TRUE)
         ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection<</param>
+        ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
         ''' <param name="pTestID">Standard Test Identifier</param>
         ''' <param name="pSampleType">Sample Type Code</param>

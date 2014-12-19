@@ -1217,8 +1217,8 @@ Public Class IWSSampleRequest
     '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     '''              XB 06/03/2013 - Implement again ToUpper because is not redundant but using invariant mode.
     '''              TR 11/03/2013 - Execute function only when OTStatus = OPEN AndAlso LISRequest = FALSE
-    '''                              In the first LINQ, change filter OTStatus <> OPEN by the following one
-    '''                              (OTStatus <> OPEN OrElse LISRequest = TRUE)   
+    '''                              In the first LINQ, change filter (OTStatus different of OPEN) by the following one
+    '''                              (OTStatus different of OPEN OrElse LISRequest = TRUE)   
     ''' </remarks>
     Private Sub ChangePatientOrderPriority()
         Try
@@ -5019,9 +5019,10 @@ Public Class IWSSampleRequest
     ''' Created by:  SA 15/04/2010 - Code moved from the event
     ''' Modified by: SA 19/06/2012 - Validations to set the ReadOnly status of the NumReplicates will depend not only in the 
     '''                              Order Test Status, but also in the TestType; the linq is filtered by TestType
-    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus <> OPEN OrElse LISRequest = TRUE).
-    '''                              Set selected column as ReadOnly when (OTStatus <> OPEN).
-    '''                              Change filter OTStatus <> OPEN in both LINQs by the following one: (OTStatus <> OPEN OrElse LISRequest = TRUE)
+    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus different of OPEN OrElse LISRequest = TRUE).
+    '''                              Set selected column as ReadOnly when (OTStatus different of OPEN).
+    '''                              Change filter OTStatus different of OPEN in both LINQs by the following one: 
+    '''                              (OTStatus different of OPEN OrElse LISRequest = TRUE)
     ''' </remarks>
     Private Sub PostPaintControlRow()
         Try
@@ -5095,10 +5096,10 @@ Public Class IWSSampleRequest
     '''              SA 18/01/2011 - Column selected will be always read only for requested Off-System Tests
     '''              XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
     '''              XB 06/03/2013 - Implement again ToUpper because is not redundant but using invariant mode
-    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus <> OPEN OrElse LISRequest = TRUE).
-    '''                            - Set selected column as ReadOnly when (OTStatus <> OPEN OrElse TestType = OFFS)
-    '''                            - Change filter OTStatus <> OPEN in both LINQs by the following one:
-    '''                               (OTStatus <> OPEN OrElse LISRequest = TRUE)  
+    '''              TR 11/03/2013 - Set readOnlyColumns = TRUE when (OTStatus different of OPEN OrElse LISRequest = TRUE).
+    '''                            - Set selected column as ReadOnly when (OTStatus different of OPEN OrElse TestType = OFFS)
+    '''                            - Change filter OTStatus different of OPEN in both LINQs by the following one:
+    '''                               (OTStatus different of OPEN OrElse LISRequest = TRUE)  
     ''' </remarks>
     Private Sub PostPaintPatientRow()
         Try
@@ -7224,16 +7225,19 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub UnSelectRelatedCalcTest(ByVal pSampleID As String, ByVal pStatFlag As Boolean, ByVal pCalcTestIDs As String)
         Try
+            Dim myIndex As Integer = 0
             Dim calcIDs() As String = pCalcTestIDs.Split(CChar(", "))
             Dim lstCalcTest As List(Of WorkSessionResultDS.PatientsRow)
 
             For i As Integer = 0 To calcIDs.Length - 1
+                myIndex = i
+
                 'Search the Calculated Test to unselect it - 
                 lstCalcTest = (From a In myWorkSessionResultDS.Patients _
                               Where a.SampleID.ToUpperInvariant = pSampleID.ToUpperInvariant _
                             AndAlso a.StatFlag = pStatFlag _
                             AndAlso a.TestType = "CALC" _
-                            AndAlso a.TestID = Convert.ToInt32(calcIDs(i)) _
+                            AndAlso a.TestID = Convert.ToInt32(calcIDs(myIndex)) _
                              Select a).ToList()
 
                 If (lstCalcTest.Count = 1) Then
