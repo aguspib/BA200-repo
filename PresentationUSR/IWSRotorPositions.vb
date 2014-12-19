@@ -301,7 +301,7 @@ Public Class IWSRotorPositions
         End Set
     End Property
 
-    '13/01/2010 TR - Definition of screen property to inform the Analizer Model
+    '13/01/2010 TR - Definition of screen property to inform the Analyzer Model
     Public WriteOnly Property AnalyzerModel() As String
         Set(ByVal value As String)
             AnalyzerModelAttribute = value
@@ -1256,7 +1256,6 @@ Public Class IWSRotorPositions
         End Try
     End Sub
 
-
     ''' <summary>
     ''' Add and fill one row (in a typed DataSet WSRotorContentByPositionDS) with information of the 
     ''' Element that has been dragged 
@@ -1729,7 +1728,7 @@ Public Class IWSRotorPositions
                             End If
                         Else
                             Dim auxIconPath As String = ""
-                            Dim myRotorPicture As Object
+                            Dim myRotorPicture As Object = Nothing
 
                             If (pRotorType = "SAMPLES") Then
                                 myRotorPicture = Me.SamplesTab
@@ -4870,15 +4869,15 @@ Public Class IWSRotorPositions
         Try
             If (mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) Then 'Modified: VR 24/12/2009 - Patch Added
                 'RH 13/09/2011 Do nothing if it is the same position
-                If mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber = pRingNumber AndAlso _
-                mySelectedElementInfo.twksWSRotorContentByPosition(0).CellNumber = pCellNumber Then Return
+                If (mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber = pRingNumber AndAlso _
+                    mySelectedElementInfo.twksWSRotorContentByPosition(0).CellNumber = pCellNumber) Then Return
 
                 'RH 10/10/2011 For Reagents, inner ring to outer ring position changing is not allowed
                 'when TubeType = "BOTTLE3" and BarCodeInfo <> String.Empty
-                If String.Compare(myRotorTypeForm, "REAGENTS", False) = 0 Then
-                    If (mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber > pRingNumber) _
-                    AndAlso (mySelectedElementInfo.twksWSRotorContentByPosition(0).TubeType = "BOTTLE3") _
-                    AndAlso (mySelectedElementInfo.twksWSRotorContentByPosition(0).BarCodeInfo <> String.Empty) Then Return
+                If (myRotorTypeForm = "REAGENTS") Then
+                    If (mySelectedElementInfo.twksWSRotorContentByPosition(0).RingNumber > pRingNumber) AndAlso _
+                       (mySelectedElementInfo.twksWSRotorContentByPosition(0).TubeType = "BOTTLE3") AndAlso _
+                       (mySelectedElementInfo.twksWSRotorContentByPosition(0).BarCodeInfo <> String.Empty) Then Return
                 End If
 
                 Dim myGlobalDataTO As GlobalDataTO
@@ -4898,15 +4897,14 @@ Public Class IWSRotorPositions
 
                     'TR 09/03/2012 -Validate if element status is Pos then Update the status for the same element id to POS
                     If (mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "POS") Then
-                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, _
-                                                 mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "POS")
+                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "POS")
+
                     ElseIf mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementStatus = "INCOMPLETE" Then
-                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, _
-                                                 mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "INCOMPLETE")
+                        SetElementsStatusByElementID(AnalyzerIDAttribute, WorkSessionIDAttribute, mySelectedElementInfo.twksWSRotorContentByPosition(0).ElementID, "INCOMPLETE")
                     End If
                     'TR 09/03/2012 -END 
 
-                    ' XB 27/08/2013
+                    'XB 27/08/2013
                     Dim myBarcodePositionsWithNoRequestsDelegate As New BarcodePositionsWithNoRequestsDelegate
                     myGlobalDataTO = myBarcodePositionsWithNoRequestsDelegate.UpdateCellNumber(Nothing, pCellNumber, _
                                                                                                mySelectedElementInfo.twksWSRotorContentByPosition(0).AnalyzerID, _
@@ -4918,11 +4916,10 @@ Public Class IWSRotorPositions
                         ShowMessage(Me.Name & ".ChangeElementPosition", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
                         Exit Try
                     End If
-                    ' XB 27/08/2013
+                    'XB 27/08/2013
 
                     'Reload the info area with the new information 
                     ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, pRingNumber, pCellNumber)
-                    'TR 19/01/2010 END
                 Else
                     ShowMessage(Me.Name & ".ChangeElementPosition", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
                 End If
@@ -6299,6 +6296,7 @@ Public Class IWSRotorPositions
     '''                                           during the Pause
     '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
     '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
+    '''              SA 18/12/2014 - Changed declaration of String list AffectedISEElectrodes to remove a build warning: it is now declared as New List (Of String)
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6323,7 +6321,7 @@ Public Class IWSRotorPositions
 
             'SGM 07/09/2012 - Check if there is any pending ISE Calibration
             Dim iseModuleReady As Boolean = True
-            Dim AffectedISEElectrodes As List(Of String) 'SGM 07/09/2012
+            Dim AffectedISEElectrodes As New List(Of String) 'SGM 07/09/2012
             Dim showISELockedMessage As Boolean = False 'SGM 07/09/2012
 
             'Verify there is at least an ISE Test requested in the WorkSession
@@ -6433,8 +6431,6 @@ Public Class IWSRotorPositions
             ScreenWorkingProcess = False
         End Try
     End Sub
-
-
 
     ''' <summary>
     ''' Validate if there are Barcode position with no request and Enable or Disable Button BarcodeWarningButton.
@@ -6617,282 +6613,247 @@ Public Class IWSRotorPositions
     ''' </summary>
     ''' <param name="pRefreshDS"></param>
     ''' <remarks>
-    ''' AG 12/04/2011 - creation - Tested
-    ''' TR - adapt for barcode reception (using ROTORPOSITION_CHANGED)
-    ''' AG 22/09/2011 - Use the same method but 2 event types ROTORPOSITION_CHANGED or BARCODE_POSITION_READ due they have different updating screen dataset business
-    ''' AG 07/06/2012 - change code to improve execution time
+    ''' Created by:  AG 12/04/2011
+    ''' Modified by: TR            - Function adapted for Barcode reception (using ROTORPOSITION_CHANGED)
+    '''              AG 22/09/2011 - Use the same function but for two event types (ROTORPOSITION_CHANGED or BARCODE_POSITION_READ) due to they have 
+    '''                              different updating screen dataset business
+    '''              AG 07/06/2012 - Changed code to improve execution time
+    '''              XB 28/02/2014 - BA-1523 ==> No refresh if screen is closing
+    '''              IT 03/06/2014 - BA-1644 ==> No refresh if screen is disposed
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
+            If (isClosingFlag) Then Return 'AG 03/08/2012
+            RefreshDoneField = False 'RH 28/03/2012
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
-            If isClosingFlag Then Return 'AG 03/08/2012
-
-            RefreshDoneField = False 'RH 28/03/2012
             Dim myLocalEventType As GlobalEnumerates.UI_RefreshEvents = GlobalEnumerates.UI_RefreshEvents.NONE
 
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED) Then
+            If (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED)) Then
                 'This event has to update only CellStatus, elementStatus and optionally TestLeft, RealVolume
                 myLocalEventType = GlobalEnumerates.UI_RefreshEvents.ROTORPOSITION_CHANGED
-            ElseIf pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
+
+            ElseIf (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ)) Then
                 myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ
             End If
 
-            If myLocalEventType <> GlobalEnumerates.UI_RefreshEvents.NONE Then
+            If (myLocalEventType <> GlobalEnumerates.UI_RefreshEvents.NONE) Then
+                If (myRotorContentByPositionDSForm Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
 
-                Dim selectedPosition As Boolean = False
-                Dim existSelection As Boolean = False 'True there is only one rotor position selected!!!
-                Dim myLinqRes As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
-                If myRotorContentByPositionDSForm Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
-
+                Dim myLinqRes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                 myLinqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                             Where a.Selected = True AndAlso a.RotorType = myRotorTypeForm _
-                             Select a).ToList()
+                            Where a.Selected = True AndAlso a.RotorType = myRotorTypeForm _
+                           Select a).ToList()
 
-                If myLinqRes.Count = 1 Then
-                    existSelection = True
-                End If
+                Dim existSelection As Boolean = (myLinqRes.Count = 1) 'True if is only one rotor position selected!!!
+                Dim selectedPosition As Boolean = False
 
-                'Update internal RotorContentByPositionDS structure (myRotorContentByPositionDSForm and use a temporal structure for paint screen)
                 'AG 07/06/2012
-                'Dim tmpPositionDS As New WSRotorContentByPositionDS
-                Dim tmpReagentsPositionDS As New WSRotorContentByPositionDS
+                'Update internal RotorContentByPositionDS structure (myRotorContentByPositionDSForm and use a temporal structure for paint screen)
                 Dim tmpSamplesPositionDS As New WSRotorContentByPositionDS
+                Dim tmpReagentsPositionDS As New WSRotorContentByPositionDS
 
                 For Each updatedRow As UIRefreshDS.RotorPositionsChangedRow In pRefreshDS.RotorPositionsChanged.Rows
-                    If Not updatedRow.IsAnalyzerIDNull And Not updatedRow.IsWorkSessionIDNull _
-                        And Not updatedRow.IsRotorTypeNull And Not updatedRow.IsCellNumberNull Then
+                    If (Not updatedRow.IsAnalyzerIDNull AndAlso Not updatedRow.IsWorkSessionIDNull AndAlso _
+                        Not updatedRow.IsRotorTypeNull AndAlso Not updatedRow.IsCellNumberNull) Then
+                        If (myRotorContentByPositionDSForm Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
 
-                        If myRotorContentByPositionDSForm Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
+                        'Search the row in myRotorContentByPositionDSForm to update data 
+                        myLinqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
+                                    Where a.AnalyzerID = updatedRow.AnalyzerID _
+                                  AndAlso a.WorkSessionID = updatedRow.WorkSessionID _
+                                  AndAlso a.RotorType = updatedRow.RotorType _
+                                  AndAlso a.CellNumber = updatedRow.CellNumber _
+                                   Select a).ToList()
 
-                        'Search the row in myRotorContentByPositionDSForm and update DATA
-                        myLinqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
-                                     myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                                     Where a.AnalyzerID = updatedRow.AnalyzerID _
-                                     And a.WorkSessionID = updatedRow.WorkSessionID _
-                                     And a.RotorType = updatedRow.RotorType _
-                                     And a.CellNumber = updatedRow.CellNumber _
-                                     Select a).ToList()
-
-                        If myLinqRes.Count > 0 Then
-                            ''updatedRow.Status = "NOT_INUSE" AndAlso
-                            'TR 07/09/2011 -Validate if position has a positioned element to change status on treeView 
-                            'AG 13/06/2014 #1661 - add condition Not myLinqRes(0).IsElementIDNull
-                            If myLinqRes(0).ElementStatus = "POS" AndAlso Not myLinqRes(0).IsElementIDNull Then
+                        If (myLinqRes.Count > 0) Then
+                            'TR 07/09/2011 - Validate if the cell contains a positioned Element to change the status on TreeView 
+                            'AG 13/06/2014 - BA-1661: Added condition Not myLinqRes(0).IsElementIDNull
+                            If (myLinqRes(0).ElementStatus = "POS" AndAlso Not myLinqRes(0).IsElementIDNull) Then
                                 'Change the tree status 
-
-                                If bsElementsTreeView Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
-
+                                If (bsElementsTreeView Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
                                 ChangeTreeRotorElementsStatus(bsElementsTreeView.Nodes, False, myLinqRes(0), myRotorTypeForm)
                             End If
-                            'TR 07/09/2011 -END.
 
                             myLinqRes(0).BeginEdit()
-
-                            If Not updatedRow.IsStatusNull Then
+                            If (Not updatedRow.IsStatusNull) Then
                                 myLinqRes(0).Status = updatedRow.Status
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetStatusNull()
                             End If
 
-                            If Not updatedRow.IsElementStatusNull Then
+                            If (Not updatedRow.IsElementStatusNull) Then
                                 myLinqRes(0).ElementStatus = updatedRow.ElementStatus
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetElementStatusNull()
                             End If
 
-                            If Not updatedRow.IsRealVolumeNull Then
+                            If (Not updatedRow.IsRealVolumeNull) Then
                                 myLinqRes(0).RealVolume = updatedRow.RealVolume
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
-
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetRealVolumeNull()
                             End If
 
-                            If Not updatedRow.IsRemainingTestsNumberNull Then
+                            If (Not updatedRow.IsRemainingTestsNumberNull) Then
                                 myLinqRes(0).RemainingTestsNumber = updatedRow.RemainingTestsNumber
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetRemainingTestsNumberNull()
                             End If
 
-                            If Not updatedRow.IsBarCodeInfoNull Then
+                            If (Not updatedRow.IsBarCodeInfoNull) Then
                                 myLinqRes(0).BarCodeInfo = updatedRow.BarCodeInfo
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetBarCodeInfoNull()
                             End If
 
-                            If Not updatedRow.IsBarcodeStatusNull Then
+                            If (Not updatedRow.IsBarcodeStatusNull) Then
                                 myLinqRes(0).BarcodeStatus = updatedRow.BarcodeStatus
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetBarcodeStatusNull()
                             End If
 
-                            'TR 01/09/2011 -Update new inserted columns.
-                            If Not updatedRow.IsScannedPositionNull Then
+                            If (Not updatedRow.IsScannedPositionNull) Then
                                 myLinqRes(0).ScannedPosition = updatedRow.ScannedPosition
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetScannedPositionNull()
                             End If
 
-                            If Not updatedRow.IsElementIDNull Then
+                            If (Not updatedRow.IsElementIDNull) Then
                                 myLinqRes(0).ElementID = updatedRow.ElementID
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetElementIDNull()
                             End If
 
-                            If Not updatedRow.IsMultiTubeNumberNull Then
+                            If (Not updatedRow.IsMultiTubeNumberNull) Then
                                 myLinqRes(0).MultiTubeNumber = updatedRow.MultiTubeNumber
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetMultiTubeNumberNull()
                             End If
 
-                            If Not updatedRow.IsTubeTypeNull Then
+                            If (Not updatedRow.IsTubeTypeNull) Then
                                 myLinqRes(0).TubeType = updatedRow.TubeType
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetTubeTypeNull()
                             End If
 
-                            If Not updatedRow.IsTubeContentNull Then
+                            If (Not updatedRow.IsTubeContentNull) Then
                                 myLinqRes(0).TubeContent = updatedRow.TubeContent
-                                'Else - AG 22/09/2011 - set to null this field only in barcode mode
-                            ElseIf myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ Then
+                                'Else - AG 22/09/2011 - Set to Null this field only in Barcode mode
+                            ElseIf (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ) Then
                                 myLinqRes(0).SetTubeContentNull()
                             End If
-                            'TR 01/09/2011 -END.
-
                             myLinqRes(0).EndEdit()
 
-                            'If needed update the flag that inform us refresh position information is also needed
-                            If existSelection Then
-                                If myLinqRes(0).Selected Then selectedPosition = True Else selectedPosition = False
+                            'When needed, update the flag that inform us that refresh  the position information is also needed
+                            If (existSelection) Then
+                                selectedPosition = (myLinqRes(0).Selected)
                             End If
 
+                            If (myRotorContentByPositionDSForm Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
+
                             'Refresh screen using UpdateRotorTreeViewArea method (use a temporal DS only with the updated position)
-                            'tmpPositionDS.Clear()
-                            'AG 07/06/2012
-                            'Dim tmpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-                            'tmpRow = tmpPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
-                            'tmpRow = myLinqRes(0)
-                            'tmpPositionDS.twksWSRotorContentByPosition.ImportRow(tmpRow)
-                            'tmpPositionDS.AcceptChanges()
-                            'myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AcceptChanges()
-
-                            If myRotorContentByPositionDSForm Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
-
                             Dim tmpRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-                            If updatedRow.RotorType = "REAGENTS" Then
+                            If (updatedRow.RotorType = "REAGENTS") Then
                                 tmpRow = tmpReagentsPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
                                 tmpRow = myLinqRes(0)
                                 tmpReagentsPositionDS.twksWSRotorContentByPosition.ImportRow(tmpRow)
                                 tmpReagentsPositionDS.AcceptChanges()
                                 myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AcceptChanges()
-                            ElseIf updatedRow.RotorType = "SAMPLES" Then
+
+                            ElseIf (updatedRow.RotorType = "SAMPLES") Then
                                 tmpRow = tmpSamplesPositionDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
                                 tmpRow = myLinqRes(0)
                                 tmpSamplesPositionDS.twksWSRotorContentByPosition.ImportRow(tmpRow)
                                 tmpSamplesPositionDS.AcceptChanges()
                                 myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AcceptChanges()
                             End If
-                            'AG 07/06/2012
-                            If selectedPosition Then
-                                'Reload the info area with the new information 
 
-                                If mySelectedElementInfo Is Nothing Then Exit Sub ' XB 28/02/2014 - #1523 No refresh if screen is closing
+                            If (selectedPosition) Then
+                                'Reload the info Area with the new information 
+                                If (mySelectedElementInfo Is Nothing) Then Exit Sub 'XB 28/02/2014 - #1523 No refresh if screen is closing
 
                                 mySelectedElementInfo = GetLocalPositionInfo(myLinqRes(0).RingNumber, myLinqRes(0).CellNumber, False)
                                 ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myLinqRes(0).RingNumber, myLinqRes(0).CellNumber)
                             End If
-
                         End If
                     End If
                 Next
 
-                'TR 21/11/2013 - BT #1380(2)
+                'TR 21/11/2013 - BT #1380 (2) - Get all Element INPROCESS in Reagents Rotor
                 Dim myWSRotorPosInProcessDS As New RotorPositionsInProcessDS
                 Dim myWSRotorPosInProcessDelegate As New WSRotorPositionsInProcessDelegate
-                'Get the all the elements
+
                 myGlobalDataTO = myWSRotorPosInProcessDelegate.ReadAllReagents(Nothing, AnalyzerIDAttribute)
-                If Not myGlobalDataTO.HasError Then
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     myWSRotorPosInProcessDS = DirectCast(myGlobalDataTO.SetDatos, RotorPositionsInProcessDS)
 
-                    Dim myRCPList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
                     'Validate if the element in proces change status and is finished.
-                    For Each PosInProcess As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In _
-                                            myRotorContentByPositionDSForm.twksWSRotorContentByPosition.Where(Function(a) _
-                                                                                                a.InProcessElement).ToList()
-                        If (From a In myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess _
-                            Where a.AnalyzerID = PosInProcess.AnalyzerID _
-                            AndAlso a.CellNumber = PosInProcess.CellNumber).Count = 0 Then
+                    For Each PosInProcess As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow _
+                                          In myRotorContentByPositionDSForm.twksWSRotorContentByPosition.Where(Function(a) a.InProcessElement).ToList()
+
+                        If ((From a In myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess _
+                            Where a.AnalyzerID = PosInProcess.AnalyzerID AndAlso a.CellNumber = PosInProcess.CellNumber).Count = 0) Then
+                            'Position is NOT INPROCESS, update value and import to the temporary structure used to update the Rotor Positions
                             PosInProcess.InProcessElement = False
-                            'Impor to the temporal structure use to update the positions.
                             tmpReagentsPositionDS.twksWSRotorContentByPosition.ImportRow(PosInProcess)
                         End If
                     Next
 
                     'Go throught each position in process and change value Posinprocess = true
-                    For Each PosInProcess As RotorPositionsInProcessDS.twksWSRotorPositionsInProcessRow In _
-                                                        myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess.Rows
-                        'Validate if position is in Process
+                    Dim myRCPList As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+                    For Each PosInProcess As RotorPositionsInProcessDS.twksWSRotorPositionsInProcessRow In myWSRotorPosInProcessDS.twksWSRotorPositionsInProcess.Rows
+                        'Validate if the Element in the Reagents Rotor Position is in Process
                         myRCPList = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                                     Where a.AnalyzerID = PosInProcess.AnalyzerID _
-                                     AndAlso a.CellNumber = PosInProcess.CellNumber _
-                                     Select a).ToList()
+                                    Where a.AnalyzerID = PosInProcess.AnalyzerID _
+                                  AndAlso a.CellNumber = PosInProcess.CellNumber _
+                                   Select a).ToList()
 
-                        If myRCPList.Count > 0 Then
-                            'Position is in proces update value.
+                        If (myRCPList.Count > 0) Then
+                            'Position is INPROCESS, update value and import to the temporary structure used to update the Rotor Positions
                             myRCPList.First.InProcessElement = True
-                            'Impor to the temporal structure use to update the positions.
                             tmpReagentsPositionDS.twksWSRotorContentByPosition.ImportRow(myRCPList.First())
                         End If
-                        'Clear the objec
                         myRCPList.Clear()
                     Next
-
-                    'Set values to nothing 
                     myRCPList = Nothing
                     myWSRotorPosInProcessDS = Nothing
-
                 Else
                     ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR, myGlobalDataTO.ErrorMessage)
                 End If
-                'TR 21/11/2013 -BT #1380(2) END.
+                'TR 21/11/2013 -BT #1380 (2) END.
 
                 'AG 07/06/2012
-                'UpdateRotorTreeViewArea(tmpPositionDS, myLinqRes(0).RotorType)
-                If tmpReagentsPositionDS.twksWSRotorContentByPosition.Rows.Count > 0 Then
+                If (tmpReagentsPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                     UpdateRotorTreeViewArea(tmpReagentsPositionDS, "REAGENTS")
                 End If
 
-                If tmpSamplesPositionDS.twksWSRotorContentByPosition.Rows.Count > 0 Then
+                If (tmpSamplesPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                     UpdateRotorTreeViewArea(tmpSamplesPositionDS, "SAMPLES")
                 End If
                 'AG 07/06/2012
 
                 'AG-TR 10/05/2012 -validate the processingbeforerunnin.
-                If myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ AndAlso IAx00MainMDI.processingBeforeRunning <> "0" Then
-                    'isScanningProcess = False
+                If (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ AndAlso IAx00MainMDI.processingBeforeRunning <> "0") Then
                     ScreenWorkingProcess = False
                     Me.Enabled = True 'Enable the screen
-                    'IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE)
                 End If
 
                 RefreshDoneField = True 'RH 28/03/2012
             End If
 
-            'AG 15/03/2012 - when FREEZE appears while UI is disabled because screen is working Sw must reactivate UI
-            If mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then
+            'AG 15/03/2012 - When FREEZE appears while UI is disabled because screen is working, Sw must reactivate UI
+            If (mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1) Then
                 ScreenWorkingProcess = False 'Process finished
                 IAx00MainMDI.EnableButtonAndMenus(True)
                 IAx00MainMDI.SetActionButtonsEnableProperty(True)
@@ -6903,15 +6864,13 @@ Public Class IWSRotorPositions
             'AG 15/03/2012
 
             'AG 28/03/2012 -scan barcode, check rotor volume, ... buttons must be disabled if cover open while the cover detection is enabled
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
+            If (pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)) Then
                 ValidateScanningButtonEnabled()
                 ValidateCheckRotorVolumeButtonEnabled()
                 'RefreshDoneField = True 'AG 28/03/2012 The button activion or not depending the covers is is a special case
                 '                                       in this case do not activate the field
             End If
             'AG 28/03/2012
-
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

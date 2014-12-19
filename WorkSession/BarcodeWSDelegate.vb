@@ -46,14 +46,14 @@ Namespace Biosystems.Ax00.BL
         '''                                 them in tables of WS Not In Use Rotor Positions and WS Rotor Positions respectively
         '''              SG 12/03/2013    - Informed field PatientID in VirtualRotorPositionsDS with value of field ExternalPID 
         '''              SA 09/09/2013    - Write a warning in the application LOG if the process of creation a new Empty WS was stopped due to a previous one still exists
-        '''              XB/JC 09/10/2013 - BT #1274 ==> Correction on Load Virtual Rotors 
-        '''              SA/JV 12/12/2013 - BT #1384 ==> When NOT IN USE Positions in Reagents Rotor are processed, if the position Status is DEPLETED or FEW, the current 
-        '''                                              value of fields Status and RealVolume have to be keep
-        '''              SA 21/03/2014    - BT #1545 ==> Changes to divide AddWorkSession process in several DB Transactions. When value of global flag 
-        '''                                              NEWAddWorkSession is TRUE, call new version of function AddWorkSession 
-        '''              SA 26/03/2014    - BT #1552 ==> For all Special Solutions in the WS, updates the Element Status to POS (there is at least a Bottle
-        '''                                              of the Special Solution positioned in the Reagents Rotor)
-        '''              AG 07/10/2014 - BA-1979 add traces into log when NO INUSE rotor is saved with invalid values in order to find the origin
+        '''              XB/JC 09/10/2013 - BA-1274 ==> Correction on Load Virtual Rotors 
+        '''              SA/JV 12/12/2013 - BA-1384 ==> When NOT IN USE Positions in Reagents Rotor are processed, if the position Status is DEPLETED or FEW, the current 
+        '''                                             value of fields Status and RealVolume have to be keep
+        '''              SA 21/03/2014    - BA-1545 ==> Changes to divide AddWorkSession process in several DB Transactions. When value of global flag 
+        '''                                             NEWAddWorkSession is TRUE, call new version of function AddWorkSession 
+        '''              SA 26/03/2014    - BA-1552 ==> For all Special Solutions in the WS, updates the Element Status to POS (there is at least a Bottle
+        '''                                             of the Special Solution positioned in the Reagents Rotor)
+        '''              AG 07/10/2014    - BA-1979 ==> Added traces into log when NOT INUSE Rotor Position has an invalid value (in order to find the origin of the problem)
         ''' </remarks>
         Public Function ManageBarcodeInstruction(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarCodeRotorContentDS As WSRotorContentByPositionDS, _
                                                  ByVal pRotorType As String) As GlobalDataTO
@@ -68,8 +68,8 @@ Namespace Biosystems.Ax00.BL
                         If (Not manualEntryFlag) Then manualEntryTubeType = String.Empty
 
                         Dim myAnalyzerID As String = String.Empty
-                        Dim myWorkSessionID As String = String.Empty
                         Dim myWSStatus As String = String.Empty
+                        Dim myWorkSessionID As String = String.Empty
 
                         If (pBarCodeRotorContentDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                             If (Not pBarCodeRotorContentDS.twksWSRotorContentByPosition(0).IsAnalyzerIDNull) Then myAnalyzerID = pBarCodeRotorContentDS.twksWSRotorContentByPosition(0).AnalyzerID
@@ -322,12 +322,6 @@ Namespace Biosystems.Ax00.BL
                                                                             'SA/JV 12/12/2013 - BT #1384
                                                                             If (Not rcpNoInUseRow.IsStatusNull AndAlso (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW")) Then
                                                                                 newRow.RealVolume = rcpNoInUseRow.RealVolume
-
-                                                                                If rcpNoInUseRow.IsRealVolumeNull AndAlso pRotorType = "REAGENTS" Then
-                                                                                    Dim myLogAccionesAux As New ApplicationLogManager()
-                                                                                    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!!", "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
-                                                                                End If
-
                                                                                 newRow.Status = rcpNoInUseRow.Status
                                                                             End If
                                                                         End If
@@ -339,7 +333,7 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                     newNoInUseDS.AcceptChanges()
 
-                                                    'AG 07/10/2014 BA-1979 add classCalledFrom parameter
+                                                    'AG 07/10/2014 BA-1979 Add classCalledFrom parameter
                                                     resultData = noInUseDelegate.Add(dbConnection, myAnalyzerID, pRotorType, myWorkSessionID, newNoInUseDS, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.BarcodeResultsManagement)
                                                 End If
                                             End If
@@ -634,6 +628,7 @@ Namespace Biosystems.Ax00.BL
                                 'Different business for SAMPLES & REAGENTS
                                 If (pRotorType = "SAMPLES") Then
                                     resultData = SaveOKReadSamplesRotorPosition(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, pBarCodeResPosition, pCurrentContentRow)
+
                                 ElseIf (pRotorType = "REAGENTS") Then
                                     resultData = SaveOKReadReagentsRotorPosition(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, pBarCodeResPosition, pCurrentContentRow)
                                 End If
@@ -914,10 +909,12 @@ Namespace Biosystems.Ax00.BL
         '''                              of the required Element when it is loading in DS UpdatedRcpDS. Besides, add the Element to the Reagents list 
         '''                              needed to calculate the needed Reagents volume and bottles only when TubeContent = REAGENT, ignore Special
         '''                              and Washing Solutions 
-        '''              JV 09/01/2014 - BT #1443 ==> Added changes to update the Position Status with the Status saved in the table of Historic Reagent Bottles 
-        '''              SA 26/03/2014 - BT #1552 ==> When the scanned position contains an Special Solution that exists as Required Element in the active WS,
-        '''                                           save the ElementID in the list of Element IDs which Element Status has to be updated to POS 
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
+        '''              JV 09/01/2014 - BA-1443 ==> Added changes to update the Position Status with the Status saved in the table of Historic Reagent Bottles 
+        '''              SA 26/03/2014 - BA-1552 ==> When the scanned position contains an Special Solution that exists as Required Element in the active WS,
+        '''                                          save the ElementID in the list of Element IDs which Element Status has to be updated to POS 
+        '''              XB 07/10/2014 - BA-1978 ==> Added log traces to catch NULL wrong assignment on RealVolume field 
+        '''              SA 18/12/2014 - BA-1999 ==> Undo changes made by BA-1978 because they do not work: if field BottleVolume is NULL, an error is raised when the
+        '''                                          value is assigned to a field RealVolume in the local DataSet, and the code to write in the LOG is never reached
         ''' </remarks>
         Private Function SaveOKReadReagentsRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                          ByVal pRotorType As String, ByVal pBarCodeResPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
@@ -961,7 +958,7 @@ Namespace Biosystems.Ax00.BL
                                     UpdatedRcpDS.Clear()
 
                                     If (decodedDataDS.DecodedReagentsFields(0).IsExternalReagentFlag) Then
-                                        'Update barcode fields (note that BarcodeStatus changes from OK to UNKNOWN)
+                                        'Update Barcode fields (note that BarcodeStatus changes from OK to UNKNOWN)
                                         'Inform in RotorContentByPosition --> ElementID=NULL, MultiTubeNumber=1, TubeType (BottleType), RealVolume (BottleVolume) 
                                         '                                     Status=NO_INUSE, BarcodeStatus=UNKNOWN, BarcodeInfo, ScannedPosition=True
                                         If (Not resultData.HasError) Then
@@ -978,10 +975,10 @@ Namespace Biosystems.Ax00.BL
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                            If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
-                                                Dim myLogAccionesAux As New ApplicationLogManager()
-                                                myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (1)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
-                                            End If
+                                            'If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                            '    Dim myLogAccionesAux As New ApplicationLogManager()
+                                            '    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (1)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                            'End If
 
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
@@ -1035,10 +1032,10 @@ Namespace Biosystems.Ax00.BL
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                                If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
-                                                    Dim myLogAccionesAux As New ApplicationLogManager()
-                                                    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (2)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
-                                                End If
+                                                'If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                '    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                '    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (2)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                                'End If
 
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
@@ -1070,10 +1067,10 @@ Namespace Biosystems.Ax00.BL
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                                If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
-                                                    Dim myLogAccionesAux As New ApplicationLogManager()
-                                                    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (3)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
-                                                End If
+                                                'If decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                '    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                '    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (3)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                                'End If
 
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "INUSE"
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
@@ -1093,9 +1090,10 @@ Namespace Biosystems.Ax00.BL
                                                         Dim myReagentsBottlesDS As HisReagentsBottlesDS = DirectCast(resultData.SetDatos, HisReagentsBottlesDS)
 
                                                         If (myReagentsBottlesDS.thisReagentsBottles.Count > 0) Then
-                                                            'TR 01/10/2012 - Validate if the Bottle is Locked due to invalid refill
                                                             'JV 09/01/2014 - BT #1443: Update the Position Status with the Status saved in the table of Historic Reagent Bottles 
                                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myReagentsBottlesDS.thisReagentsBottles(0).Status
+
+                                                            'TR 01/10/2012 - Validate if the Bottle is Locked due to invalid refill
                                                             If (myReagentsBottlesDS.thisReagentsBottles(0).BottleStatus = "LOCKED") Then
                                                                 'Update the Rotor Position Status with the Bottle Status found on Historic table
                                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myReagentsBottlesDS.thisReagentsBottles(0).BottleStatus
@@ -1104,11 +1102,10 @@ Namespace Biosystems.Ax00.BL
                                                             'Update the Rotor Position Volume with the Bottle Volume saved on Historic table
                                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = myReagentsBottlesDS.thisReagentsBottles(0).BottleVolume
 
-                                                            If myReagentsBottlesDS.thisReagentsBottles(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
-                                                                Dim myLogAccionesAux As New ApplicationLogManager()
-                                                                myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (4)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
-                                                            End If
-
+                                                            'If myReagentsBottlesDS.thisReagentsBottles(0).IsBottleVolumeNull AndAlso pRotorType = "REAGENTS" Then
+                                                            '    Dim myLogAccionesAux As New ApplicationLogManager()
+                                                            '    myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!! (4)", "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                                                            'End If
                                                         End If
 
                                                         'Calculate the Number of Tests that can be executed with the Real Bottle Volume 
@@ -1122,7 +1119,7 @@ Namespace Biosystems.Ax00.BL
                                                         End If
                                                     End If
                                                 Else
-                                                    'BT #1552 - When it is a BioSystems SPECIAL SOLUTION belonging to the WorkSession: add it into Special Solutions list
+                                                    'BA-1552 - When it is a BioSystems SPECIAL SOLUTION belonging to the WorkSession: add it into Special Solutions list
                                                     If (Not specSolsElemIdList.Contains(myReqElement.twksWSRequiredElements(0).ElementID)) Then specSolsElemIdList.Add(myReqElement.twksWSRequiredElements(0).ElementID)
                                                 End If
                                             End If
@@ -1201,7 +1198,7 @@ Namespace Biosystems.Ax00.BL
         '''                              (needed to update the WS Status from OPEN to PENDING when the WS Required Elements are created after scanning the Samples Rotor -> new 
         '''                              functionality added for LIS with ES)
         '''             TR 22/07/2013    When user set the barcode manualy by default the tube type is Tube, now user can introduce barcode for pediatrics tubes, then if the
-        '''                             element with barcode is(required or not) and the tube type is Pediatric then do not change the tube type. BugTracking #1195.
+        '''                              element with barcode is(required or not) and the tube type is Pediatric then do not change the tube type. BugTracking #1195.
         ''' </remarks>
         Private Function SaveOKReadSamplesRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                         ByVal pRotorType As String, ByVal pBarCodeResPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
@@ -1700,7 +1697,6 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
-
         ''' <summary>
         ''' Decode the Barcode Reagent read (Sw must use the Reagents Barcode configuration fixed by factory)
         ''' </summary>
@@ -2127,7 +2123,6 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
-
 #End Region
 
 #Region "Private Methods"

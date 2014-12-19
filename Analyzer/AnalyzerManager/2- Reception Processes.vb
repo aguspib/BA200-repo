@@ -3137,122 +3137,123 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return myGlobal
         End Function
 
-
-
-
         ''' <summary>
         ''' SW has received and ANSCBR instruction 
         ''' </summary>
-        ''' <param name="pInstructionReceived"></param>
-        ''' <param name="pRotorType" >Input = "" , Output inform the rotor type read by the barcode reader</param>
-        ''' <returns></returns>
+        ''' <param name="pInstructionReceived">List of objects InstructionParameterTO containing all values in the ANSCBR Instruction
+        '''                                    received from analyzer</param>
+        ''' <param name="pRotorType">By Reference (output) parameter. It is received empty and returned with the Rotor Type read by the Barcode Reader</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by:  AG 22/06/2011 
         ''' Modified by: SA 11/06/2013 - When load the WSRotorContentByPositionDS that has to be passed as parameter when calling function ManageBarcodeInstruction
         '''                              in BarcodeWSDelegate, inform field WSStatus with value of WorkSessionStatusAttribute (needed to update the WS Status from 
         '''                              OPEN to PENDING when the WS Required Elements are created after scanning the Samples Rotor -> new functionality added for
         '''                              LIS with ES)
+        '''              SA 18/12/2014 - BA-1999 ==> In the call to function PrepareUIRefreshEventNum2, if RotorType is REAGENTS, inform value of parameters for 
+        '''                                          RealValue and RemainingTestsNumber when these fields are informed for the position in the DS returned by 
+        '''                                          function ManageBarcodeInstruction. When function GetItemByParameterIndex returns an Integer value, the way of 
+        '''                                          get the returned value has been changed: instead of use DirectCast(CInt(value), Integer) - This has not sense!, 
+        '''                                          use CType(value, Integer). Replaced all String.Compare by comparisons using = 
         ''' </remarks>
         Private Function ProcessCodeBarInstructionReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO), ByRef pRotorType As String) As GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Dim myGlobal As New GlobalDataTO
 
             Try
-                'InitializeTimerControl(WAITING_TIME_OFF) 'AG 13/02/2012 - the waiting timer is disabled on every reception process ('AG 18/07/2011)
-
                 myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
-
-                If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
-
+                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         'AG 11/10/2011 - Check if the pInstructionReceived parameters are correct or not
                         Dim auxStr() As String = InstructionReceivedAttribute.Split(CChar(";"))
                         Dim parameterSeparatorsNumber As Integer = auxStr.Length - 1
-                        If pInstructionReceived.Count <> parameterSeparatorsNumber Then
+
+                        If (pInstructionReceived.Count <> parameterSeparatorsNumber) Then
                             'There is some ';' character inside data. The instruction InstructionReceivedAttribute requires a new decode with additional business
 
                             'Get the samples barcode full total size configured
-                            Dim settingsDlg As New UserSettingsDelegate
                             Dim sampleBarcodeFullTotal As Integer
-                            myGlobal = settingsDlg.GetCurrentValueBySettingID(dbConnection, GlobalEnumerates.UserSettingsEnum.BARCODE_FULL_TOTAL.ToString())
-                            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                                sampleBarcodeFullTotal = CType(myGlobal.SetDatos, Integer)
-                            End If
+                            Dim settingsDlg As New UserSettingsDelegate
 
-                            If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                            myGlobal = settingsDlg.GetCurrentValueBySettingID(dbConnection, GlobalEnumerates.UserSettingsEnum.BARCODE_FULL_TOTAL.ToString())
+                            If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                sampleBarcodeFullTotal = CType(myGlobal.SetDatos, Integer)
+
                                 Dim myLax00 As New LAX00Interpreter
-                                myGlobal = myLax00.ReadWithAdditionalBusiness(InstructionReceivedAttribute, GlobalEnumerates.AppLayerInstrucionReception.ANSCBR, sampleBarcodeFullTotal)
-                                If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
-                                    Dim myParameterTOList As New List(Of ParametersTO)
-                                    myParameterTOList = CType(myGlobal.SetDatos, List(Of ParametersTO))
+                                myGlobal = myLax00.ReadWithAdditionalBusiness(InstructionReceivedAttribute, GlobalEnumerates.AppLayerInstrucionReception.ANSCBR, _
+                                                                              sampleBarcodeFullTotal)
+                                If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                    Dim myParameterTOList As List(Of ParametersTO) = CType(myGlobal.SetDatos, List(Of ParametersTO))
 
                                     Dim myInstruction As New Instructions
                                     myGlobal = myInstruction.GenerateReception(myParameterTOList)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         pInstructionReceived = DirectCast(myGlobal.SetDatos, List(Of InstructionParameterTO))
                                     End If
                                 End If
                             End If
-
                         End If
                         'AG 11/10/2011
 
+                        Dim errorFlag As Boolean = True
                         Dim myUtilities As New Utilities
                         Dim myInstParamTO As New InstructionParameterTO
-                        Dim errorFlag As Boolean = True
 
                         'Get Reader selector (parameter index 3)
                         Dim rotorSelected As Integer = 0
                         myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                            If IsNumeric(myInstParamTO.ParameterValue) Then
-                                rotorSelected = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+
+                            If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                rotorSelected = CType(myInstParamTO.ParameterValue, Integer)
                                 errorFlag = False
                             End If
                         End If
-                        If errorFlag = True Then
+
+                        If (errorFlag) Then
                             myGlobal.HasError = True
                             Exit Try
                         End If
 
 
-                        ' Get status (parameter index 4)
+                        'Get Status (parameter index 4)
                         Dim barCodeStatus As Integer = 0
                         myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                            If IsNumeric(myInstParamTO.ParameterValue) Then
-                                barCodeStatus = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                                'Debug.Print("STATUS : " & barCodeStatus.ToString)
+
+                            If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                barCodeStatus = CType(myInstParamTO.ParameterValue, Integer)
                                 errorFlag = False
                             End If
                         End If
-                        If errorFlag = True Then
+
+                        If (errorFlag) Then
                             myGlobal.HasError = True
                             Exit Try
                         End If
 
 
-                        ' Get number of reads (parameter index 5)
+                        'Get Number of Reads (parameter index 5)
                         Dim readsNumber As Integer = 0
                         myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
-                        If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                        If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                            If IsNumeric(myInstParamTO.ParameterValue) Then
-                                readsNumber = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+
+                            If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                readsNumber = CType(myInstParamTO.ParameterValue, Integer)
                                 errorFlag = False
                             End If
                         End If
-                        If errorFlag = True Then
+
+                        If (errorFlag) Then
                             myGlobal.HasError = True
                             Exit Try
                         End If
 
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-
                         Select Case barCodeStatus
                             Case GlobalEnumerates.Ax00AnsCodeBarStatus.CONFIG_DONE
                                 'Configuration done OK
@@ -3260,7 +3261,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'If myApplicationName.ToUpper.Contains("SERVICE") Then
                                 'Service Sw
                                 'TODO business
-
                                 'Else
                                 'User Sw
                                 'If connection process in process then sent the general config instruction
@@ -3268,11 +3268,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 'Read the general configuration and sent the CONFIG instruction
                                 'The analyzer answers with a Status instruction action = config done
-
-                                If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES Then
-                                    ' When Codebar SAMPLES CONFIG_DONE is received then Codebar REAGENTS CONFIG instruction is sent
+                                If (rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES) Then
+                                    'When Codebar SAMPLES CONFIG_DONE is received then Codebar REAGENTS CONFIG instruction is sent
                                     Dim BarCodeDS As New AnalyzerManagerDS
                                     Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
+
                                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                                     With rowBarCode
                                         .RotorType = "REAGENTS"
@@ -3281,44 +3281,41 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End With
                                     BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                                     BarCodeDS.AcceptChanges()
+
                                     myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
 
-                                ElseIf rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS Then
-
-                                    'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                    'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                    If GlobalBase.IsServiceAssembly Then
-                                        'Service Sw
+                                ElseIf (rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS) Then
+                                    'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                    If (GlobalBase.IsServiceAssembly) Then
+                                        'Service SW
                                         myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
                                     Else
                                         'User Sw
-                                        ' When Codebar REAGENTS CONFIG_DONE is received then General CONFIG instruction is sent
-                                        If String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString), "INPROCESS", False) = 0 Then
+                                        'When Codebar REAGENTS CONFIG_DONE is received then General CONFIG instruction is sent
+                                        If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS") Then
                                             myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
-                                        ElseIf String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS", False) = 0 Then
+
+                                        ElseIf (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
                                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
                                             myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
                                         End If
                                     End If
-
                                 End If
 
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    'Service Sw
-                                    ' Nothing by now
+                                'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                If (GlobalBase.IsServiceAssembly) Then
+                                    'Service Sw - Nothing by now
                                 Else
                                     'User Sw
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
+                                    If (Not myGlobal.HasError AndAlso ConnectedAttribute) Then
                                         'AG + TR 03/02/2014 - BT #1490 (if change barcode config in sleep the action button becomes disable)
-                                        ''SA + AG 11/12/2012 Not integrated in v1.0.0 
-                                        ''If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES Then 'After configurate SAMPLES barcode the SW configures automatically the REAGENTS barcode 
+                                        'SA + AG 11/12/2012 - Not integrated in v1.0.0 
+                                        'If (rotorSelected = GlobalEnumerates.Ax00CodeBarReader.SAMPLES) Then 'After configurate SAMPLES barcode the SW configures automatically the REAGENTS barcode 
                                         'SetAnalyzerNotReady()
-                                        ''End If
-                                        ''SA + AG 11/12/2012 
+                                        'End If
+                                        'SA + AG 11/12/2012 
 
-                                        'Leave analyzer ready only in sleeping mode and after received reagents rotor
+                                        'Leave Analyzer ready only in sleeping mode and after received reagents rotor
                                         If Not (AnalyzerStatusAttribute = AnalyzerManagerStatus.SLEEPING AndAlso rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS) Then
                                             SetAnalyzerNotReady()
                                         End If
@@ -3326,17 +3323,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                 End If
 
-                                'End If
-                                'End If
-                                ' XBC 13/02/2012 - CODEBR Configuration instruction
-
-
-
+                                'XBC 13/02/2012 - CODEBR Configuration instruction
                             Case GlobalEnumerates.Ax00AnsCodeBarStatus.CODEBAR_ERROR
                                 'Code bar reader error
                                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
+                                If (GlobalBase.IsServiceAssembly) Then
                                     'Service Sw
                                     'TODO business
                                     'Else
@@ -3346,79 +3337,83 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                             Case GlobalEnumerates.Ax00AnsCodeBarStatus.FULL_ROTOR_DONE, _
-                                GlobalEnumerates.Ax00AnsCodeBarStatus.SINGLE_POS_DONE, _
-                                GlobalEnumerates.Ax00AnsCodeBarStatus.TEST_MODE_ANSWER, _
-                                GlobalEnumerates.Ax00AnsCodeBarStatus.TEST_MODE_ENDED
-                                ' XBC 28/03/2012 - Add Answers TEST_MODE_ANSWER, TEST_MODE_ENDED
+                                 GlobalEnumerates.Ax00AnsCodeBarStatus.SINGLE_POS_DONE, _
+                                 GlobalEnumerates.Ax00AnsCodeBarStatus.TEST_MODE_ANSWER, _
+                                 GlobalEnumerates.Ax00AnsCodeBarStatus.TEST_MODE_ENDED
+                                'XBC 28/03/2012 - Add Answers TEST_MODE_ANSWER, TEST_MODE_ENDED
                                 'Code bar readings results ... save them into twksRotorContentByPosition table
                                 Dim barCodeDS As New WSRotorContentByPositionDS
                                 Dim row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
-                                Const offset As Integer = 3
 
+                                Const offset As Integer = 3
                                 For itera As Integer = 0 To readsNumber - 1
-                                    '''''''''
-                                    'Get Data FIELDS
-                                    ' Get number of reads (parameter index 6)
+                                    'Get Number of Reads (parameter index 6)
                                     Dim readPosition As Integer = 0
                                     myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                                        If IsNumeric(myInstParamTO.ParameterValue) Then
-                                            readPosition = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
-                                            'Debug.Print("READ POS : " & readPosition.ToString)
+
+                                        If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                            readPosition = CType(myInstParamTO.ParameterValue, Integer)
                                             errorFlag = False
                                         End If
                                     End If
-                                    If errorFlag = True Then
+
+                                    If (errorFlag) Then
                                         myGlobal.HasError = True
-                                        Exit For
+                                        Exit Try
                                     End If
 
-                                    ' Get diagnostics (parameter index 7)
+                                    'Get diagnostics (parameter index 7)
                                     Dim diagnostics As Integer = 0
                                     myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                                        If IsNumeric(myInstParamTO.ParameterValue) Then
-                                            diagnostics = DirectCast(CInt(myInstParamTO.ParameterValue), Integer)
+
+                                        If (IsNumeric(myInstParamTO.ParameterValue)) Then
+                                            diagnostics = CType(myInstParamTO.ParameterValue, Integer)
                                             errorFlag = False
                                         End If
                                     End If
-                                    If errorFlag = True Then
+
+                                    If (errorFlag) Then
                                         myGlobal.HasError = True
-                                        Exit For
+                                        Exit Try
                                     End If
 
-                                    ' Get value (parameter index 8)
-                                    Dim value As String = ""
+                                    'Get value (parameter index 8)
+                                    Dim value As String = String.Empty
                                     myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
-                                    If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
+
                                         value = myInstParamTO.ParameterValue
                                         errorFlag = False
                                     End If
-                                    If errorFlag = True Then
+
+                                    If (errorFlag) Then
                                         myGlobal.HasError = True
-                                        Exit For
+                                        Exit Try
                                     End If
 
-                                    '''''''''
                                     'Add into dataset
                                     row = barCodeDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow
                                     row.AnalyzerID = AnalyzerIDAttribute
                                     row.WorkSessionID = WorkSessionIDAttribute
-                                    row.WSStatus = WorkSessionStatusAttribute  'SA 11/06/2013: Inform status of the active WorkSession
+                                    row.WSStatus = WorkSessionStatusAttribute   'SA 11/06/2013: Inform status of the active WorkSession
                                     row.CellNumber = readPosition
-                                    If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS Then
+
+                                    If (rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS) Then
                                         row.RotorType = "REAGENTS"
                                     Else
                                         row.RotorType = "SAMPLES"
                                     End If
-                                    pRotorType = row.RotorType 'Inform the byRef parameter!!
+                                    pRotorType = row.RotorType    'Inform the byRef parameter!!
 
                                     row.SetBarCodeInfoNull()
                                     row.SetBarcodeStatusNull()
                                     row.SetScannedPositionNull()
+
                                     Select Case diagnostics
                                         Case GlobalEnumerates.Ax00AnsCodeBarDiagnosis.OK
                                             row.BarcodeStatus = "OK"
@@ -3433,57 +3428,63 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         Case GlobalEnumerates.Ax00AnsCodeBarDiagnosis.BAD_CODE
                                             row.BarcodeStatus = "ERROR"
                                             row.ScannedPosition = True
-                                            'row.BarCodeInfo = "" 'Clear the wrong barcode contents (use "" due in DAO this is the condition to set to NULL)
                                             row.BarCodeInfo = value 'Save the barcode read value
-
                                     End Select
                                     barCodeDS.twksWSRotorContentByPosition.AddtwksWSRotorContentByPositionRow(row)
-
                                 Next
                                 barCodeDS.AcceptChanges()
 
                                 Dim myRotorType As String = "SAMPLES"
-                                Dim myCellNumber As Integer = -1    ' XBC 16/12/2011
-                                Dim myStatus As String = ""
-                                Dim myElementStatus As String = ""
-                                Dim myBarcodeInfo As String = ""
-                                Dim myBarcodeStatus As String = ""
-                                Dim myScannedPosition As Boolean = Nothing
+                                Dim myStatus As String = String.Empty
+                                Dim myTubeType As String = String.Empty
+                                Dim myBarcodeInfo As String = String.Empty
+                                Dim myTubeContent As String = String.Empty
+                                Dim myElementStatus As String = String.Empty
+                                Dim myBarcodeStatus As String = String.Empty
+
                                 Dim myElementId As Integer = -1
+                                Dim myTestsLeft As Integer = -1
+                                Dim myRealVolume As Single = -1
+                                Dim myCellNumber As Integer = -1    'XBC 16/12/2011
                                 Dim myMultiTubeNumber As Integer = -1
-                                Dim myTubeType As String = ""
-                                Dim myTubeContent As String = ""
+                                Dim myScannedPosition As Boolean = Nothing
 
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    'Service Sw management
+                                'SG 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                                If (GlobalBase.IsServiceAssembly) Then
+                                    'Service SW management
 
-                                    ' XBC 16/12/2011
+                                    'XBC 16/12/2011
                                     'Inform all fields but RealVolume and TestLeft
                                     For Each row In barCodeDS.twksWSRotorContentByPosition.Rows
+                                        If (row.IsRotorTypeNull) Then myRotorType = String.Empty Else myRotorType = row.RotorType
+                                        If (row.IsCellNumberNull) Then myCellNumber = -1 Else myCellNumber = row.CellNumber
+                                        If (row.IsStatusNull) Then myStatus = String.Empty Else myStatus = row.Status
+                                        If (row.IsElementStatusNull) Then myElementStatus = String.Empty Else myElementStatus = row.ElementStatus
+                                        If (row.IsBarCodeInfoNull) Then myBarcodeInfo = String.Empty Else myBarcodeInfo = row.BarCodeInfo
+                                        If (row.IsBarcodeStatusNull) Then myBarcodeStatus = String.Empty Else myBarcodeStatus = row.BarcodeStatus
+                                        If (row.IsScannedPositionNull) Then myScannedPosition = Nothing Else myScannedPosition = row.ScannedPosition
+                                        If (row.IsElementIDNull) Then myElementId = -1 Else myElementId = row.ElementID
+                                        If (row.IsMultiTubeNumberNull) Then myMultiTubeNumber = -1 Else myMultiTubeNumber = row.MultiTubeNumber
+                                        If (row.IsTubeTypeNull) Then myTubeType = String.Empty Else myTubeType = row.TubeType
+                                        If (row.IsTubeContentNull) Then myTubeContent = String.Empty Else myTubeContent = row.TubeContent
 
-                                        If row.IsRotorTypeNull Then myRotorType = "" Else myRotorType = row.RotorType
-                                        If row.IsCellNumberNull Then myCellNumber = -1 Else myCellNumber = row.CellNumber
-                                        If row.IsStatusNull Then myStatus = "" Else myStatus = row.Status
-                                        If row.IsElementStatusNull Then myElementStatus = "" Else myElementStatus = row.ElementStatus
-                                        If row.IsBarCodeInfoNull Then myBarcodeInfo = "" Else myBarcodeInfo = row.BarCodeInfo
-                                        If row.IsBarcodeStatusNull Then myBarcodeStatus = "" Else myBarcodeStatus = row.BarcodeStatus
-                                        If row.IsScannedPositionNull Then myScannedPosition = Nothing Else myScannedPosition = row.ScannedPosition
-                                        If row.IsElementIDNull Then myElementId = -1 Else myElementId = row.ElementID
-                                        If row.IsMultiTubeNumberNull Then myMultiTubeNumber = -1 Else myMultiTubeNumber = row.MultiTubeNumber
-                                        If row.IsTubeTypeNull Then myTubeType = "" Else myTubeType = row.TubeType
-                                        If row.IsTubeContentNull Then myTubeContent = "" Else myTubeContent = row.TubeContent
+                                        'BA-1999: For Positions in Reagents Rotor, keep values of RealVolume and RemainingTestsNumber when they are informed
+                                        myTestsLeft = -1
+                                        myRealVolume = -1
+                                        If (myRotorType = "REAGENTS") Then
+                                            If (Not row.IsRealVolumeNull) Then myRealVolume = row.RealVolume
+                                            If (Not row.IsRemainingTestsNumberNull) Then myTestsLeft = row.RemainingTestsNumber
+                                        End If
 
+                                        'Inform all fields, including RealVolume and TestLeft when they are informed for the Rotor Position
                                         myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ, _
-                                                                            myRotorType, myCellNumber, myStatus, myElementStatus, _
-                                                                            -1, -1, myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, _
-                                                                            myScannedPosition, myElementId, myMultiTubeNumber, myTubeType, myTubeContent)
+                                                                             myRotorType, myCellNumber, myStatus, myElementStatus, myRealVolume, myTestsLeft, _
+                                                                             myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, myScannedPosition, myElementId, _
+                                                                             myMultiTubeNumber, myTubeType, myTubeContent)
                                     Next
-                                    ' XBC 16/12/2011
-
+                                    'XBC 16/12/2011
                                 Else
-                                    'User Sw management
+                                    'User SW management
                                     'AG temporally uncommented 'Initial instruction testings
                                     'Update twksWSRotorContentByPosition barcode & barcode status
                                     'If barCodeDS.twksWSRotorContentByPosition.Rows.Count > 0 Then
@@ -3494,80 +3495,68 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     'AG temporally commented when uncoment previous code
                                     Dim bcWSDelegate As New BarcodeWSDelegate
-                                    'Dim myRotorType As String = "SAMPLES"
-                                    If rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS Then myRotorType = "REAGENTS"
-                                    myGlobal = bcWSDelegate.ManageBarcodeInstruction(dbConnection, barCodeDS, myRotorType)
+                                    If (rotorSelected = GlobalEnumerates.Ax00CodeBarReader.REAGENTS) Then myRotorType = "REAGENTS"
 
                                     'Generate the UIRefresh DataSET (only for the positions read)
-                                    If Not myGlobal.HasError Then
-                                        Dim currentRotorTypeContentDS As New WSRotorContentByPositionDS
-                                        Dim linqRes As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
-
-                                        currentRotorTypeContentDS = CType(myGlobal.SetDatos, WSRotorContentByPositionDS) 'The current whole rotor (by rotortype)
-
-                                        'Dim myStatus As String = ""
-                                        'Dim myElementStatus As String = ""
-                                        'Dim myBarcodeInfo As String = ""
-                                        'Dim myBarcodeStatus As String = ""
-                                        'Dim myScannedPosition As Boolean = Nothing
-                                        'Dim myElementId As Integer = -1
-                                        'Dim myMultiTubeNumber As Integer = -1
-                                        'Dim myTubeType As String = ""
-                                        'Dim myTubeContent As String = ""
+                                    myGlobal = bcWSDelegate.ManageBarcodeInstruction(dbConnection, barCodeDS, myRotorType)
+                                    If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
+                                        Dim currentRotorTypeContentDS As WSRotorContentByPositionDS = DirectCast(myGlobal.SetDatos, WSRotorContentByPositionDS) 'The current whole rotor (by rotortype)
 
                                         'The UIRefresh event has only the rotor positions read by barcode
+                                        Dim linqRes As New List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                         For Each row In barCodeDS.twksWSRotorContentByPosition.Rows
-                                            linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow _
-                                                       In currentRotorTypeContentDS.twksWSRotorContentByPosition _
-                                                       Where String.Compare(a.RotorType, row.RotorType, False) = 0 And a.CellNumber = row.CellNumber _
-                                                       Select a).ToList
+                                            linqRes = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In currentRotorTypeContentDS.twksWSRotorContentByPosition _
+                                                      Where a.RotorType = row.RotorType AndAlso a.CellNumber = row.CellNumber _
+                                                     Select a).ToList
 
+                                            If (linqRes.Count > 0) Then
+                                                If (linqRes(0).IsStatusNull) Then myStatus = String.Empty Else myStatus = linqRes(0).Status
+                                                If (linqRes(0).IsElementStatusNull) Then myElementStatus = String.Empty Else myElementStatus = linqRes(0).ElementStatus
+                                                If (linqRes(0).IsBarCodeInfoNull) Then myBarcodeInfo = String.Empty Else myBarcodeInfo = linqRes(0).BarCodeInfo
+                                                If (linqRes(0).IsBarcodeStatusNull) Then myBarcodeStatus = String.Empty Else myBarcodeStatus = linqRes(0).BarcodeStatus
+                                                If (linqRes(0).IsScannedPositionNull) Then myScannedPosition = Nothing Else myScannedPosition = linqRes(0).ScannedPosition
+                                                If (linqRes(0).IsElementIDNull) Then myElementId = -1 Else myElementId = linqRes(0).ElementID
+                                                If (linqRes(0).IsMultiTubeNumberNull) Then myMultiTubeNumber = -1 Else myMultiTubeNumber = linqRes(0).MultiTubeNumber
+                                                If (linqRes(0).IsTubeTypeNull) Then myTubeType = String.Empty Else myTubeType = linqRes(0).TubeType
+                                                If (linqRes(0).IsTubeContentNull) Then myTubeContent = String.Empty Else myTubeContent = linqRes(0).TubeContent
 
-                                            If linqRes.Count > 0 Then
-                                                If linqRes(0).IsStatusNull Then myStatus = "" Else myStatus = linqRes(0).Status
-                                                If linqRes(0).IsElementStatusNull Then myElementStatus = "" Else myElementStatus = linqRes(0).ElementStatus
-                                                If linqRes(0).IsBarCodeInfoNull Then myBarcodeInfo = "" Else myBarcodeInfo = linqRes(0).BarCodeInfo
-                                                If linqRes(0).IsBarcodeStatusNull Then myBarcodeStatus = "" Else myBarcodeStatus = linqRes(0).BarcodeStatus
-                                                If linqRes(0).IsScannedPositionNull Then myScannedPosition = Nothing Else myScannedPosition = linqRes(0).ScannedPosition
-                                                If linqRes(0).IsElementIDNull Then myElementId = -1 Else myElementId = linqRes(0).ElementID
-                                                If linqRes(0).IsMultiTubeNumberNull Then myMultiTubeNumber = -1 Else myMultiTubeNumber = linqRes(0).MultiTubeNumber
-                                                If linqRes(0).IsTubeTypeNull Then myTubeType = "" Else myTubeType = linqRes(0).TubeType
-                                                If linqRes(0).IsTubeContentNull Then myTubeContent = "" Else myTubeContent = linqRes(0).TubeContent
+                                                'BA-1999: For Positions in Reagents Rotor, keep values of RealVolume and RemainingTestsNumber when they are informed
+                                                myTestsLeft = -1
+                                                myRealVolume = -1
+                                                If (myRotorType = "REAGENTS") Then
+                                                    If (Not linqRes(0).IsRealVolumeNull) Then myRealVolume = linqRes(0).RealVolume
+                                                    If (Not linqRes(0).IsRemainingTestsNumberNull) Then myTestsLeft = linqRes(0).RemainingTestsNumber
+                                                End If
 
-                                                'Inform all fields but RealVolume and TestLeft
+                                                'Inform all fields, including RealVolume and TestLeft when they are informed for the Rotor Position
                                                 myGlobal = PrepareUIRefreshEventNum2(dbConnection, GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ, _
                                                                                      linqRes(0).RotorType, linqRes(0).CellNumber, myStatus, myElementStatus, _
-                                                                                      -1, -1, myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, _
-                                                                                      myScannedPosition, myElementId, myMultiTubeNumber, myTubeType, myTubeContent)
+                                                                                     myRealVolume, myTestsLeft, myBarcodeInfo, myBarcodeStatus, Nothing, Nothing, myScannedPosition, _
+                                                                                     myElementId, myMultiTubeNumber, myTubeType, myTubeContent)
                                             End If
-                                            If myGlobal.HasError Then Exit For
+                                            If (myGlobal.HasError) Then Exit For
                                         Next
-                                        linqRes = Nothing 'AG 02/08/2012 - free memory
+                                        linqRes = Nothing
                                     End If
-                                    'AG temporally commented
-
-                                End If 'If myApplicationName.ToUpper.Contains("SERVICE") Then
-
+                                    'AG temporally commented when uncoment previous code
+                                End If
                         End Select
 
                         'XB + AG 05/03/2012 - Update analyzer session flags into DataBase
-                        If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                        If (myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0) Then
                             Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                             myGlobal = myFlagsDelg.Update(dbConnection, myAnalyzerFlagsDS)
                         End If
-
                     End If
                 End If
-
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessCodeBarInstructionReceived", EventLogEntryType.Error, False)
             End Try
-
 
             'We have used Exit Try so we have to sure the connection becomes properly closed here
             If (Not dbConnection Is Nothing) Then
@@ -3580,10 +3569,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
                 dbConnection.Close()
             End If
-
             Return myGlobal
         End Function
-
 
         ''' <summary>
         ''' The last sent preparation has been accepted by Analyzer
