@@ -393,6 +393,9 @@ Namespace Biosystems.Ax00.BL
         '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
         '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
         '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
+        '''              SA 22/12/2014 - BA-1999 ==> Before update field in the DS of Not In Use Rotor Positions, verify the DS has a row to avoid errors when
+        '''                                          a position with BarcodeStatus = UNKNOWN is moved to another position in Reagents Rotor (in this case, the 
+        '''                                          position Status is NO_INUSE but there is not a row in table twksWSNotInUseRotorPositions)
         ''' </remarks>
         Public Function ChangeElementPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                               ByVal pToRingNumber As Integer, ByVal pToCellNumber As Integer, ByVal pToBarCodeStatus As String, _
@@ -453,12 +456,17 @@ Namespace Biosystems.Ax00.BL
                                 If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                                     myNotInUsePositionDS = DirectCast(dataToReturn.SetDatos, VirtualRotorPosititionsDS)
 
-                                    'Update the Ring/Cell fields with values of the target position
-                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.RingNumber = pToRingNumber
-                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.CellNumber = pToCellNumber
+                                    'BA-1999: Before change the Ring and Cell Number, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                    '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
+                                    '         to move them to another position) 
+                                    If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                        'Update the Ring/Cell fields with values of the target position
+                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.RingNumber = pToRingNumber
+                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.CellNumber = pToCellNumber
 
-                                    'Delete the position from table of NOT IN USE Rotor Positions for the active WorkSession
-                                    dataToReturn = myNotInUsePositionsDelegate.Delete(dbConnection, pWSRotorContentByPositionDS)
+                                        'Delete the position from table of NOT IN USE Rotor Positions for the active WorkSession
+                                        dataToReturn = myNotInUsePositionsDelegate.Delete(dbConnection, pWSRotorContentByPositionDS)
+                                    End If
                                 End If
                             End If
                         End If
@@ -495,11 +503,11 @@ Namespace Biosystems.Ax00.BL
                                                 pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType = myReagentTubeTypesDS.ReagentTubeTypes(0).TubeCode
                                                 pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RealVolume = myReagentTubeTypesDS.ReagentTubeTypes(0).TubeVolume
 
-                                                If (String.Compare(pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status, "NO_INUSE", False) <> 0) Then
+                                                If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status <> "NO_INUSE") Then
                                                     'Update also the position Status to IN_USE, due to the new bottle is full
                                                     pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "INUSE"
 
-                                                    If (String.Compare(pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeContent, "REAGENT", False) = 0) Then
+                                                    If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeContent = "REAGENT") Then
                                                         'Calculate the number of remaining Tests that can be executed with the volume of the new positioned Bottle, and also if the 
                                                         'total volume of all positioned Reagent Bottles is enough for the Work Session. Update the Rotor Position and also the Element Status
                                                         Dim myWSRotorContentByPosDelegate As New WSRotorContentByPositionDelegate
@@ -522,13 +530,18 @@ Namespace Biosystems.Ax00.BL
                                                         End If
                                                     End If
                                                 Else
-                                                    'Set to NULL the position Status, and update also the TubeType for the new one
-                                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.SetStatusNull()
-                                                    myNotInUsePositionDS.tparVirtualRotorPosititions.First.TubeType = pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
+                                                    'BA-1999: Before change the Status and TubeType, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                                    '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
+                                                    '         to move them to another position) 
+                                                    If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                                        'Set to NULL the position Status, and update also the TubeType for the new one
+                                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.SetStatusNull()
+                                                        myNotInUsePositionDS.tparVirtualRotorPosititions.First.TubeType = pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).TubeType
 
-                                                    'Update the Rotor Cell / Position 
-                                                    'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
-                                                    dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition5) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+                                                        'Update the Rotor Cell / Position 
+                                                        'dataToReturn = rotorContentPosition.Update(dbConnection, pWSRotorContentByPositionDS)
+                                                        dataToReturn = Update(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, pWSRotorContentByPositionDS, ClassCalledFrom.ChangeElementPosition5) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
+                                                    End If
                                                 End If
                                             Else
                                                 'The bottle size is the same, update the Rotor Cell / Position informing the Element positioned in it
@@ -542,7 +555,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         If (Not dataToReturn.HasError) Then
-                            If (String.Compare(pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status, "NO_INUSE", False) = 0) Then
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE") Then
                                 If (pToBarCodeStatus = "UNKNOWN") Then
                                     'When the destination position has BarcodeStatus = UNKNOWN, the target position already exists in the table of Not In Use Elements
                                     'and it should be updated; however, due to update function does not exist, the target position has to be deleted before continuing
@@ -550,12 +563,16 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 If (Not dataToReturn.HasError) Then
-                                    'AG 07/10/2014 BA-1979 add classCalledFrom parameter
-                                    'Add the new NOT IN USE Position in with the same information of the previous one
-                                    dataToReturn = myNotInUsePositionsDelegate.Add(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
-                                                                                   pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
-                                                                                   pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
-                                                                                   myNotInUsePositionDS, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.ChangeElementPosition)
+                                    'BA-1999: Before call the Add function, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                    '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions) 
+                                    If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
+                                        'BA-1979: Added classCalledFrom parameter
+                                        'Add the new NOT IN USE Position in with the same information of the previous one
+                                        dataToReturn = myNotInUsePositionsDelegate.Add(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
+                                                                                       pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
+                                                                                       pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).WorkSessionID, _
+                                                                                       myNotInUsePositionDS, WSNotInUseRotorPositionsDelegate.ClassCalledFrom.ChangeElementPosition)
+                                    End If
                                 End If
                             End If
                         End If
