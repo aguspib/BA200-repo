@@ -997,6 +997,7 @@ Namespace Biosystems.Ax00.BL
 
                                         'BA-1999: For Reagents, search if the bottle exists on table thisReagentsBottles. If it exists, 
                                         '         then read the last volume detected
+                                        Dim myPositionStatus As String = String.Empty
                                         Dim myReagentsBottlesDS As New HisReagentsBottlesDS
                                         Dim myhisReagentsBottlesDelegate As New HisReagentBottlesDelegate
                                         Dim myRealVolume As Single = decodedDataDS.DecodedReagentsFields(0).BottleVolume
@@ -1009,6 +1010,14 @@ Namespace Biosystems.Ax00.BL
                                                 If (myReagentsBottlesDS.thisReagentsBottles.Count > 0) Then
                                                     'The Rotor Position Volume will be updated with the Bottle Volume saved on Historic table
                                                     myRealVolume = myReagentsBottlesDS.thisReagentsBottles(0).BottleVolume
+
+                                                    'Update the Rotor Position Status with the Bottle Status found on Historic table
+                                                    If (myReagentsBottlesDS.thisReagentsBottles(0).BottleStatus = "LOCKED") Then
+                                                        'The Bottle is Locked due to invalid refill...
+                                                        myPositionStatus = myReagentsBottlesDS.thisReagentsBottles(0).BottleStatus
+                                                    Else
+                                                        myPositionStatus = myReagentsBottlesDS.thisReagentsBottles(0).Status
+                                                    End If
                                                 End If
                                             End If
                                         End If
@@ -1066,7 +1075,8 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                 End If
 
-                                                UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
+                                                If (myPositionStatus = String.Empty) Then myPositionStatus = "NO_INUSE"
+                                                UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myPositionStatus
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
 
                                                 UpdatedRcpDS.AcceptChanges()
@@ -1095,13 +1105,7 @@ Namespace Biosystems.Ax00.BL
 
                                                 If (reagentID <> -1) Then
                                                     If (myReagentsBottlesDS.thisReagentsBottles.Count > 0) Then
-                                                        'Update the Rotor Position Status with the Bottle Status found on Historic table
-                                                        If (myReagentsBottlesDS.thisReagentsBottles(0).BottleStatus = "LOCKED") Then
-                                                            'The Bottle is Locked due to invalid refill...
-                                                            UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myReagentsBottlesDS.thisReagentsBottles(0).BottleStatus
-                                                        Else
-                                                            UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myReagentsBottlesDS.thisReagentsBottles(0).Status
-                                                        End If
+                                                        
                                                     End If
 
                                                     'Calculate the number of Tests that can be executed with the available bottle volume
@@ -1114,7 +1118,8 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                 End If
 
-                                                UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "INUSE"
+                                                If (myPositionStatus = String.Empty) Then myPositionStatus = "INUSE"
+                                                UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myPositionStatus
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
 
                                                 UpdatedRcpDS.AcceptChanges()
