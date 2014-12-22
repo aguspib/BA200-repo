@@ -161,14 +161,15 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <param name="pDBConnection">Open Database Connection</param>
         ''' <param name="pTestID">Test Identifier</param>
-        ''' <param name="pSampleType"></param>
+        ''' <param name="pSampleType">Sample Type Code</param>
         ''' <returns>GlobalDataTO containing a typed DataSet TestReagentsDS with the list of Reagents Volume required for the informed Test</returns>
         ''' <remarks>
         ''' Created by:  TR 01/03/2010
         ''' Modified by: SA 29/02/2012 - Changed the function template 
-        ''' AG 03/07/2012 - define parameter SampleType as optional (used only for calculations)
+        '''              AG 03/07/2012 - Added optional parameter pSampleType (used for Calculations and Update Version process)
         ''' </remarks>
-        Public Function GetReagentsVolumesByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, Optional ByVal pSampleType As String = "") As GlobalDataTO
+        Public Function GetReagentsVolumesByTestID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, _
+                                                   Optional ByVal pSampleType As String = "") As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 

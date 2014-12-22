@@ -2447,9 +2447,10 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by:  TR 15/11/2013 - BT #1383
+        ''' Created by:  TR 15/11/2013 - BA-1383
+        ''' Modified by: SA 22/12/2014 - BA-1999 ==> Function changed from Private to Public to allow call it when the Reagents Rotor is scanned. 
         ''' </remarks>
-        Private Function CalculateRemainingTestNotInUseReagent(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSession As String, _
+        Public Function CalculateRemainingTestNotInUseReagent(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSession As String, _
                                                                ByVal pReagentID As Integer, pReagentNumber As Integer, ByVal pRealBottleVolume As Single, _
                                                                ByVal pBottleType As String) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -2459,7 +2460,6 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-
                         Dim myTestID As Integer = 0
                         Dim numRemainingTests As Integer = 0
                         Dim myTestReagentVolume As Single = 0
@@ -2471,61 +2471,60 @@ Namespace Biosystems.Ax00.BL
                         Dim myTestReagentsDS As New TestReagentsDS
                         Dim mytestReagentsVolumeDS As New TestReagentsVolumesDS
 
+                        'Get the Test that use the Reagent and if it is used as first or second Reagent to set the Volume
+                        myGlobalDataTO = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, pReagentID)
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                            'Get the Test that use the Reagent and if it is used as first or second Reagent to set the Volume
-                            myGlobalDataTO = myTestReagentDelegate.GetTestReagentsByReagentID(dbConnection, pReagentID)
+                            myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
+
+                            If (myTestReagentsDS.tparTestReagents.Count > 0) Then
+                                'Get TestID and ReagentNumber 
+                                myTestID = myTestReagentsDS.tparTestReagents(0).TestID
+                                pReagentNumber = myTestReagentsDS.tparTestReagents(0).ReagentNumber
+                            End If
+                        End If
+
+                        ''Get the required volume for this Test
+                        If (myTestID > 0) Then
+                            myGlobalDataTO = myTestReagentVolumeDelegate.GetReagentsVolumesByTestID(dbConnection, myTestID)
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                myTestReagentsDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsDS)
-                                If (myTestReagentsDS.tparTestReagents.Count > 0) Then
-                                    'Get TestID and ReagentNumber 
-                                    myTestID = myTestReagentsDS.tparTestReagents(0).TestID
-                                    pReagentNumber = myTestReagentsDS.tparTestReagents(0).ReagentNumber
+                                'Get the required volume depending on if the Test uses the Reagent as first or second
+                                mytestReagentsVolumeDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsVolumesDS)
+
+                                If (mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).Count > 0) Then
+                                    myTestReagentVolume = mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).First().ReagentVolume
                                 End If
                             End If
+                        End If
 
-                            'Get the required volume for this Test
-                            If (myTestID > 0) Then
-                                myGlobalDataTO = myTestReagentVolumeDelegate.GetReagentsVolumesByTestID(dbConnection, myTestID)
+                        'Get the Section defined for the Bottle according its size 
+                        Dim reagentBottles As New ReagentTubeTypesDelegate
+                        myGlobalDataTO = reagentBottles.GetVolumeByTubeType(dbConnection, pBottleType)
+
+                        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                            Dim reagentBottlesDS As ReagentTubeTypesDS = DirectCast(myGlobalDataTO.SetDatos, ReagentTubeTypesDS)
+
+                            If (reagentBottlesDS.ReagentTubeTypes.Rows.Count = 1) Then
+                                'Calculate the death volume for the bottle according its size
+                                myGlobalDataTO = reagentBottles.CalculateDeathVolByBottleType(dbConnection, pBottleType, reagentBottlesDS.ReagentTubeTypes.First.Section)
                                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                    'Get the required volume depending on if the Test uses the Reagent as first or second
-                                    mytestReagentsVolumeDS = DirectCast(myGlobalDataTO.SetDatos, TestReagentsVolumesDS)
-                                    If (mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).Count > 0) Then
-                                        myTestReagentVolume = mytestReagentsVolumeDS.tparTestReagentsVolumes.Where(Function(a) a.ReagentNumber = pReagentNumber).First().ReagentVolume
-                                    End If
-                                End If
-                            End If
+                                    Dim deathBottleVol As Single = CType(myGlobalDataTO.SetDatos, Single)
 
-                            'Get the Section defined for the Bottle according its size 
-                            Dim reagentBottles As New ReagentTubeTypesDelegate
-                            myGlobalDataTO = reagentBottles.GetVolumeByTubeType(dbConnection, pBottleType)
-
-                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                Dim reagentBottlesDS As ReagentTubeTypesDS = DirectCast(myGlobalDataTO.SetDatos, ReagentTubeTypesDS)
-
-                                If (reagentBottlesDS.ReagentTubeTypes.Rows.Count = 1) Then
-                                    'Calculate the death volume for the bottle according its size
-                                    myGlobalDataTO = reagentBottles.CalculateDeathVolByBottleType(dbConnection, pBottleType, reagentBottlesDS.ReagentTubeTypes.First.Section)
-
-                                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                        Dim deathBottleVol As Single = CType(myGlobalDataTO.SetDatos, Single)
-
-                                        'Finally, calculate the number of Tests that can be executed with the remaining volume (excluding the death volume)
-                                        If ((pRealBottleVolume - deathBottleVol) < 0) Then
-                                            numRemainingTests = 0
-                                        Else
-                                            Dim preparationVolume As Single = CType((myTestReagentVolume) / 1000, Single)
-                                            If (preparationVolume > 0) Then
-                                                numRemainingTests = CType(Math.Truncate((pRealBottleVolume - deathBottleVol) / preparationVolume), Integer)
-                                            End If
+                                    'Finally, calculate the number of Tests that can be executed with the remaining volume (excluding the death volume)
+                                    If ((pRealBottleVolume - deathBottleVol) < 0) Then
+                                        numRemainingTests = 0
+                                    Else
+                                        Dim preparationVolume As Single = CType((myTestReagentVolume) / 1000, Single)
+                                        If (preparationVolume > 0) Then
+                                            numRemainingTests = CType(Math.Truncate((pRealBottleVolume - deathBottleVol) / preparationVolume), Integer)
                                         End If
                                     End If
                                 End If
                             End If
-
-                            'Set the result value to the GlobalDataTO 
-                            myGlobalDataTO.SetDatos = numRemainingTests
-                            myGlobalDataTO.HasError = False
                         End If
+
+                        'Set the result value to the GlobalDataTO 
+                        myGlobalDataTO.SetDatos = numRemainingTests
+                        myGlobalDataTO.HasError = False
                     End If
                 End If
             Catch ex As Exception
