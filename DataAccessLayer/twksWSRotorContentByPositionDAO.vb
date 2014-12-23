@@ -1363,13 +1363,16 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA 26/01/2010 - Changed the way of opening the DB Connection to fulfill the new template
         '''              SA 30/03/2012 - Changed subquery for NOT IN USE positions: value of Barcode fields has to be get from table
         '''                              twksWSNotInUseRotorPositions instead of from table twksWSRotorContentByPosition
-        '''              SA 08/11/2013 - BT #1358 ==> Changed both subqueries to get also field CalibratorID
-        '''              JV 08/11/2013 - BT #1358 ==> Changed both subqueries to get also fields MultiItemNumber, ReagentID and SolutionCode
-        '''              TR 18/11/2013 - BT #1359 ==> In the first subquery, added a Left Join with table twksWSRotorPositionsInProcess to allow inform
-        '''                                           flag InProcessElement = TRUE for those elements that are still needed for the execution of the 
-        '''                                           active Work Session. Only second Reagents and Washing Solutions needed to avoid R2 Well Contaminations
-        '''                                           will have information in table twksWSRotorPositionsInProcess; for any other element (IN USE or NOT IN USE)
-        '''                                           flag InProcessElement will be returned as FALSE
+        '''              SA 08/11/2013 - BA-1358 ==> Changed both subqueries to get also field CalibratorID
+        '''              JV 08/11/2013 - BA-1358 ==> Changed both subqueries to get also fields MultiItemNumber, ReagentID and SolutionCode
+        '''              TR 18/11/2013 - BA-1359 ==> In the first subquery, added a Left Join with table twksWSRotorPositionsInProcess to allow inform
+        '''                                          flag InProcessElement = TRUE for those elements that are still needed for the execution of the 
+        '''                                          active Work Session. Only second Reagents and Washing Solutions needed to avoid R2 Well Contaminations
+        '''                                          will have information in table twksWSRotorPositionsInProcess; for any other element (IN USE or NOT IN USE)
+        '''                                          flag InProcessElement will be returned as FALSE
+        '''              SA 23/12/2014 - BA-1999 ==> Changed the first subquery to get also positions in Reagents Rotor with BarcodeStatus = UNKNOWN (external
+        '''                                          Reagents); the current query does not return these positions due to they have position Status = NO_INUSE 
+        '''                                          but are not saved in table twksWSNotInUseRotorPositions 
         ''' </remarks>
         Public Function GetRotorContentPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
@@ -1394,7 +1397,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                     " AND RCP.CellNumber = RIP.CellNumber " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.Status       <> 'NO_INUSE' " & vbCrLf & _
+                                                " AND   (RCP.Status       <> 'NO_INUSE' " & vbCrLf & _
+                                                " OR    (RCP.Status        = 'NO_INUSE' AND RCP.BarcodeStatus = 'UNKNOWN')) " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT DISTINCT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, " & vbCrLf & _
                                                                 " RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & vbCrLf & _
@@ -1450,6 +1454,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Created by:  JV 03/12/2013 - BA-1384
         ''' Modified by: SA 16/12/2014 - BA-1972 ==> Changed both sub-queries to get also field ControlID (positions with NOT IN USE Controls should indicate 
         '''                                          the ID of the Control)
+        '''              SA 23/12/2014 - BA-1999 ==> Changed the first subquery to get also positions in Reagents Rotor with BarcodeStatus = UNKNOWN (external
+        '''                                          Reagents); the current query does not return these positions due to they have position Status = NO_INUSE 
+        '''                                          but are not saved in table twksWSNotInUseRotorPositions 
         ''' </remarks>
         Public Function GetRotorContentPositionsResetDone(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
@@ -1474,7 +1481,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                                     " AND RCP.CellNumber = RIP.CellNumber " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                " AND    RCP.Status       <> 'NO_INUSE' " & vbCrLf & _
+                                                " AND   (RCP.Status       <> 'NO_INUSE' " & vbCrLf & _
+                                                " OR    (RCP.Status        = 'NO_INUSE' AND RCP.BarcodeStatus = 'UNKNOWN')) " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT DISTINCT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, " & vbCrLf & _
                                                                 " RCP.ElementID, RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, " & vbCrLf & _
