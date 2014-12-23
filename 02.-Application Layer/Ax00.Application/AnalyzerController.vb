@@ -183,6 +183,20 @@ Namespace Biosystems.Ax00.App
             End Try
         End Sub
 
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks>
+        ''' Modified by:  IT 19/12/2014 - BA-2143
+        ''' </remarks>
+        Public Sub ChangeRotorCloseProcess()
+            Try
+                _rotorChangeServices = Nothing
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
 #End Region
 
 #Region "Private Methods"

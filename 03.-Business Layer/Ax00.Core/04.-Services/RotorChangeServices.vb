@@ -312,23 +312,22 @@ Namespace Biosystems.Ax00.Core.Services
             End If
 
             If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
-                If (_forceEmptyAndFinalize) Then
-                    Return RotorChangeStepsEnum.DynamicBaseLineEmpty
-                End If
 
-                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED") Then
-                    Return RotorChangeStepsEnum.Washing
-                End If
+                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "END") Then
+                    If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "CANCELED") Then
+                        Return RotorChangeStepsEnum.Washing
+                    End If
 
-                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
-                    Return RotorChangeStepsEnum.StaticBaseLine
+                    If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
+                        Return RotorChangeStepsEnum.StaticBaseLine
+                    End If
                 End If
 
                 If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
                     Return RotorChangeStepsEnum.DynamicBaseLineFill
                 End If
 
-                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED") Then
+                If ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
                     Return RotorChangeStepsEnum.DynamicBaseLineEmpty
                 End If
 

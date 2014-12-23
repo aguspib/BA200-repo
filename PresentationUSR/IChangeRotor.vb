@@ -435,6 +435,7 @@ Public Class IChangeRotor
 #Region "Events"
 
     Private Sub bsCancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCancelButton.Click
+        AnalyzerController.Instance.ChangeRotorCloseProcess() 'BA-2143
         ExitScreen()
     End Sub
 
@@ -660,10 +661,15 @@ Public Class IChangeRotor
         Try
 
             CreateLogActivity("Btn Finalize", Me.Name & ".bsChangeRotorFinalizeButton_Click", EventLogEntryType.Information, False)
-            bsChangeRotorFinalizeButton.Enabled = False
-            bsChangeRotorReadButton.Enabled = False
-            bsChangeRotortButton.Enabled = False
-            AnalyzerController.Instance.ChangeRotorFinalizeProcess()
+
+            If (AnalyzerController.Instance.Analyzer.ExistBottleAlarms) Then
+                ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
+            Else
+                bsChangeRotorFinalizeButton.Enabled = False
+                bsChangeRotorReadButton.Enabled = False
+                bsChangeRotortButton.Enabled = False
+                AnalyzerController.Instance.ChangeRotorFinalizeProcess()
+            End If
 
         Catch ex As Exception
             IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
