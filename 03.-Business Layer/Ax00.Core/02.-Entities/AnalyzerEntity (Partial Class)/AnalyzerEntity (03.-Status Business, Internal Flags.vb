@@ -906,20 +906,21 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Fill rotor finishes
                             Case GlobalEnumerates.InstructionActions.FlightFilling
                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
+                                    SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
                                     CurrentInstructionAction = InstructionActions.None
                                     RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) 'BA-2143
                                 End If
                                 'Read rotor finishes
                             Case GlobalEnumerates.InstructionActions.FlightReading
                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
+                                    SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
                                     CurrentInstructionAction = InstructionActions.None
+                                    RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) 'BA-2143
                                 End If
                                 'Empty rotor finishes
                             Case GlobalEnumerates.InstructionActions.FlightEmptying
                                 If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
-                                    UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
+                                    SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
                                     CurrentInstructionAction = InstructionActions.None
                                     ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize)
                                     RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) 'BA-2143
