@@ -798,6 +798,54 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+
+        ''' <summary>
+        ''' Search the last baselineID (minor or equal) than pPreviousID with the same type as pType parameter
+        ''' (this method is created because it is needed for excel results creation with dynamic base line)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pPreviousID"></param>
+        ''' <param name="pWellUsed"></param>
+        ''' <param name="pType"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 07/01/2015 BA-2182</remarks>
+        Public Function GetPreviousBaseLineIDByType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                    ByVal pPreviousID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesByWellDAO
+                        resultData = myDAO.GetPreviousBaseLineIDByType(dbConnection, pAnalyzerID, pWorkSessionID, pPreviousID, pWellUsed, pType)
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSBLinesByWellDelegate.GetPreviousBaseLineIDByType", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
+
 #End Region
 
     End Class
