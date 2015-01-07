@@ -1023,8 +1023,8 @@ Namespace Biosystems.Ax00.BL
                                         End If
 
                                         'BA-1999 ==> This part is common for both IN USE and NOT IN USE Rotor Positions
-                                        'Verify if there are bottles of the Reagent or Special Solution already positioned in the Rotor (to assign 
-                                        'value of MultitubeNumber)
+                                        '            Verify if there are bottles of the Reagent or Special Solution already positioned in  
+                                        '            the Rotor (to assign value of MultitubeNumber)
                                         Dim myMultiTubeNumber As Integer = 1
                                         Dim rcpNoInUseDelegate As New WSNotInUseRotorPositionsDelegate
 
@@ -1075,7 +1075,7 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                 End If
 
-                                                If (myPositionStatus = String.Empty) Then myPositionStatus = "NO_INUSE"
+                                                If (myPositionStatus = String.Empty OrElse myPositionStatus = "INUSE") Then myPositionStatus = "NO_INUSE"
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myPositionStatus
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
 
@@ -1104,10 +1104,6 @@ Namespace Biosystems.Ax00.BL
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = myRealVolume
 
                                                 If (reagentID <> -1) Then
-                                                    If (myReagentsBottlesDS.thisReagentsBottles.Count > 0) Then
-                                                        
-                                                    End If
-
                                                     'Calculate the number of Tests that can be executed with the available bottle volume
                                                     resultData = reqElementDlg.CalculateRemainingTests(dbConnection, pWorkSessionID, myReqElement.twksWSRequiredElements(0).ElementID, _
                                                                                                        UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume, _
