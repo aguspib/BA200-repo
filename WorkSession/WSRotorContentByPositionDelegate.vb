@@ -396,6 +396,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 22/12/2014 - BA-1999 ==> Before update field in the DS of Not In Use Rotor Positions, verify the DS has a row to avoid errors when
         '''                                          a position with BarcodeStatus = UNKNOWN is moved to another position in Reagents Rotor (in this case, the 
         '''                                          position Status is NO_INUSE but there is not a row in table twksWSNotInUseRotorPositions)
+        '''              SA 08/01/2015 - BA-1999 ==> When it is verified is the Element to move is NOT IN USE in the active Work Session, if Position Status is 
+        '''                                          different of NO_INUSE, but field ElementID is not informed, it means the Position is NOT IN USE, but it contains
+        '''                                          a bottle that is DEPLETED, FEW or LOCKED; then, both conditions have to be checked
         ''' </remarks>
         Public Function ChangeElementPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                               ByVal pToRingNumber As Integer, ByVal pToCellNumber As Integer, ByVal pToBarCodeStatus As String, _
@@ -445,7 +448,9 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             'The moved TUBE/BOTTLE is NOT IN USE in the current WorkSession
-                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE") Then
+                            'BA-1999: Positions with Status DEPLETED, FEW or LOCKED but without ElementID are also NOT IN USE
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE" OrElse _
+                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull()) Then
                                 'Get the information of the NOT IN USE Position to move
                                 dataToReturn = myNotInUsePositionsDelegate.GetPositionContent(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
                                                                                               pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
@@ -456,7 +461,7 @@ Namespace Biosystems.Ax00.BL
                                 If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                                     myNotInUsePositionDS = DirectCast(dataToReturn.SetDatos, VirtualRotorPosititionsDS)
 
-                                    'BA-1999: Before change the Ring and Cell Number, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                    'BA-1999: Before change the Ring and Cell Number, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
                                     '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
                                     '         to move them to another position) 
                                     If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
@@ -530,7 +535,7 @@ Namespace Biosystems.Ax00.BL
                                                         End If
                                                     End If
                                                 Else
-                                                    'BA-1999: Before change the Status and TubeType, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                                    'BA-1999: Before change the Status and TubeType, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
                                                     '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
                                                     '         to move them to another position) 
                                                     If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
@@ -555,7 +560,9 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         If (Not dataToReturn.HasError) Then
-                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE") Then
+                            'BA-1999: Positions with Status DEPLETED, FEW or LOCKED but without ElementID are also NOT IN USE
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE" OrElse _
+                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull()) Then
                                 If (pToBarCodeStatus = "UNKNOWN") Then
                                     'When the destination position has BarcodeStatus = UNKNOWN, the target position already exists in the table of Not In Use Elements
                                     'and it should be updated; however, due to update function does not exist, the target position has to be deleted before continuing
@@ -563,7 +570,7 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 If (Not dataToReturn.HasError) Then
-                                    'BA-1999: Before call the Add function, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                    'BA-1999: Before call the Add function, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
                                     '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions) 
                                     If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
                                         'BA-1979: Added classCalledFrom parameter
