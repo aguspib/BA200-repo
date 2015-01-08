@@ -2013,7 +2013,8 @@ Namespace Biosystems.Ax00.BL
                                                           row.BaseLineID, row.WellUsed, GlobalEnumerates.BaseLineType.STATIC.ToString)
                                         If Not resultdata.HasError AndAlso Not resultdata.SetDatos Is Nothing Then
                                             If DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
-                                                If (DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID < dynamicBLId) Then
+                                                'Show the STATIC id only when it is higher than the dynamic. Else (it is the same, write '?'). Minor has no sense and '?' will be shown too
+                                                If (DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID > dynamicBLId) Then
                                                     BaseLineID = DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID.ToString
                                                 End If
                                             End If
@@ -3168,7 +3169,8 @@ Namespace Biosystems.Ax00.BL
                                                                                   pExecutionList(replicateNumber).BaseLineID, pExecutionList(replicateNumber).WellUsed, GlobalEnumerates.BaseLineType.STATIC.ToString)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             If DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
-                                If (DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID < dynamicBLId) Then
+                                'Show the STATIC id only when it is higher than the dynamic. Else (it is the same, write '?'). Minor has no sense and '?' will be shown too
+                                If (DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID > dynamicBLId) Then
                                     idValueForHeader = DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID.ToString
                                 End If
                             End If
