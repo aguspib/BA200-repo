@@ -6297,6 +6297,7 @@ Public Class IWSRotorPositions
     '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
     '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     '''              SA 18/12/2014 - Changed declaration of String list AffectedISEElectrodes to remove a build warning: it is now declared as New List (Of String)
+    '''              XB 08/01/2015 - Pumps Calibration do not lock ISE preparations during Running (even Pause) - BA-2187
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6340,12 +6341,18 @@ Public Class IWSRotorPositions
                                     Dim isNeeded As Boolean = CBool(resultData.SetDatos)
                                     If isNeeded Then
 
-                                        ' XB 23/05/2014 - BT #1639
-                                        If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                                           (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                        ' XB 08/01/2015 - BA-2187
+                                        '' XB 23/05/2014 - BT #1639
+                                        'If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                                        '   (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                        '    iseModuleReady = False
+                                        'End If
+
+                                        If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                                             iseModuleReady = False
                                         End If
-                                        ' XB 23/05/2014 - BT #1639
+                                        '' XB 23/05/2014 - BT #1639
+                                        ' XB 08/01/2015 - BA-2187
 
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
@@ -6359,6 +6366,28 @@ Public Class IWSRotorPositions
                                             If PumpsCalibrationRequired Then
                                                 showISELockedMessage = True
                                             End If
+
+                                            ' XB 08/01/2015 - BA-2187
+                                            If iseModuleReady Then
+                                                If mdiAnalyzerCopy.AllowScanInRunning Then
+                                                    ' Check if ISE Electrodes calibration is required
+                                                    Dim ElectrodesCalibrationRequired As Boolean = False
+                                                    resultData = mdiAnalyzerCopy.ISE_Manager.CheckElectrodesCalibrationIsNeeded
+                                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                        ElectrodesCalibrationRequired = CType(resultData.SetDatos, Boolean)
+                                                    End If
+
+                                                    ' Check if ISE Bubble calibration is required
+                                                    Dim BubbleCalibrationRequired As Boolean = False
+                                                    resultData = mdiAnalyzerCopy.ISE_Manager.CheckBubbleCalibrationIsNeeded
+                                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                        BubbleCalibrationRequired = CType(resultData.SetDatos, Boolean)
+                                                    End If
+
+                                                    iseModuleReady = Not (ElectrodesCalibrationRequired And BubbleCalibrationRequired)
+                                                End If
+                                            End If
+                                            ' XB 08/01/2015 - BA-2187
                                         End If
                                         ' XB 28/10/2013
                                     End If
