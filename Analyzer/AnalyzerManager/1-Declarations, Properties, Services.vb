@@ -349,6 +349,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ' XB 29/01/2014 - Task #1438
         Private BarcodeStartInstrExpectedAttr As Boolean
 
+        ' XB 07/01/2014 - Create these new Attributes - BA-1178
+        Private ShutDownisPendingAttr As Boolean = False
+        Private StartSessionisPendingAttr As Boolean = False
 #End Region
 
 #Region "Properties"
@@ -1219,6 +1222,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 BarcodeStartInstrExpectedAttr = value
             End Set
         End Property
+
+        ' XB 07/01/2014 - Create these new Properties - BA-1178
+        Public Property ShutDownisPending As Boolean
+            Get
+                Return ShutDownisPendingAttr
+            End Get
+            Set(value As Boolean)
+                ShutDownisPendingAttr = value
+            End Set
+        End Property
+
+        Public Property StartSessionisPending As Boolean
+            Get
+                Return StartSessionisPendingAttr
+            End Get
+            Set(value As Boolean)
+                StartSessionisPendingAttr = value
+            End Set
+        End Property
+        ' XB 07/01/2014 - BA-1178
 
 #End Region
 

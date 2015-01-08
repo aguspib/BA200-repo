@@ -3408,6 +3408,8 @@ Public Class IWSRotorPositions
     '''                              ShowMessage 
     '''              TR 12/01/2010 - Show the question message before rotor is reset
     '''              DL 05/10/2011 - Included when status = FREE and barcodestatus = ERROR
+    '''              SA 08/01/2015 - BA-1999 ==> Added a call to function ClearSelection to clean the global DS of Selected 
+    '''                                          Elements once the reset has been executed
     ''' </remarks>
     Private Sub ResetRotor(ByVal pRotorType As String, ByVal pAnalizerID As String)
         Try
@@ -3436,25 +3438,22 @@ Public Class IWSRotorPositions
 
                     If (Not myGlobalTo.HasError) Then
                         'Prepare all the position controls
-                        PreparePositionsControls(pRotorType) 'RH 15/02/2010
+                        PreparePositionsControls(pRotorType)
+                        InitializeScreen(True, pRotorType)
 
-                        InitializeScreen(True, pRotorType) 'AG 11/11/2010 - add 2on parameter
+                        'BA-1999: Clean the DS of selected Rotor Positions
+                        ClearSelection()
                     Else
                         'Error reseting the Rotor
                         ShowMessage(Me.Name & ".ResetRotor", myGlobalTo.ErrorCode, myGlobalTo.ErrorMessage, Me)
                     End If
-
                 End If
-
             End If
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResetRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         Finally
             Me.Cursor = Cursors.Default
-
         End Try
     End Sub
 

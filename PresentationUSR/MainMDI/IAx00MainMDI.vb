@@ -110,9 +110,13 @@ Partial Public Class IAx00MainMDI
     Private NotDisplayErrorCommsMsg As Boolean = False ' XBC 20/06/2012
     Private NotDisplayShutDownConfirmMsg As Boolean = False ' XBC 26/06/2012
 
-    ' XBC 13/07/2012
-    Private ShutDownisPending As Boolean = False
-    Private StartSessionisPending As Boolean = False
+    ' XB 07/01/2014 - Replace these variables as Attributes - BA-1178
+    '' XBC 13/07/2012
+    'Private ShutDownisPending As Boolean = False
+    'Private StartSessionisPending As Boolean = False
+    Private ShutDownisPendingAttribute As Boolean = False
+    Private StartSessionisPendingAttribute As Boolean = False
+    ' XB 07/01/2014 - BA-1178
 
     ' XB 28/04/2014 - Task #1587
     'Private StartSessionisInitialPUGsent As Boolean = False
@@ -496,6 +500,32 @@ Partial Public Class IAx00MainMDI
             autoWSNotFinishedButGoRunningAttribute = value
         End Set
     End Property
+
+    ' XB 07/01/2014 - Create these new properties - BA-1178
+    Public Property ShutDownisPending As Boolean
+        Get
+            Return ShutDownisPendingAttribute
+        End Get
+        Set(value As Boolean)
+            ShutDownisPendingAttribute = value
+            If (Not MDIAnalyzerManager Is Nothing) Then
+                MDIAnalyzerManager.ShutDownisPending = value
+            End If
+        End Set
+    End Property
+
+    Public Property StartSessionisPending As Boolean
+        Get
+            Return StartSessionisPendingAttribute
+        End Get
+        Set(value As Boolean)
+            StartSessionisPendingAttribute = value
+            If (Not MDIAnalyzerManager Is Nothing) Then
+                MDIAnalyzerManager.StartSessionisPending = value
+            End If
+        End Set
+    End Property
+    ' XB 07/01/2014 - BA-1178
 
 #End Region
 
