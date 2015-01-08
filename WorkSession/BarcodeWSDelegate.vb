@@ -54,6 +54,7 @@ Namespace Biosystems.Ax00.BL
         '''              SA 26/03/2014    - BA-1552 ==> For all Special Solutions in the WS, updates the Element Status to POS (there is at least a Bottle
         '''                                             of the Special Solution positioned in the Reagents Rotor)
         '''              AG 07/10/2014    - BA-1979 ==> Added traces into log when NOT INUSE Rotor Position has an invalid value (in order to find the origin of the problem)
+        '''              SA 08/01/2014    - BA-1999 ==> 
         ''' </remarks>
         Public Function ManageBarcodeInstruction(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarCodeRotorContentDS As WSRotorContentByPositionDS, _
                                                  ByVal pRotorType As String) As GlobalDataTO
@@ -285,9 +286,12 @@ Namespace Biosystems.Ax00.BL
                                                                     'In Reagents Rotor, Not InUse positions marked as not scanned should remains with the same information as before
                                                                     If (Not rcpNoInUseRow.IsSolutionCodeNull) Then newRow.SolutionCode = rcpNoInUseRow.SolutionCode
                                                                     If (Not rcpNoInUseRow.IsReagentIDNull) Then newRow.ReagentID = rcpNoInUseRow.ReagentID
-
                                                                     If (Not rcpNoInUseRow.IsRealVolumeNull) Then newRow.RealVolume = rcpNoInUseRow.RealVolume
-                                                                    If (Not rcpNoInUseRow.IsStatusNull AndAlso (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW")) Then
+
+                                                                    'BA-1999: If the NOT IN USE Rotor Position is LOCKED due to an invalid refill, this Status has to be preserved 
+                                                                    '         when the Position is saved in table twksWSNotInUseRotorPositions
+                                                                    If (Not rcpNoInUseRow.IsStatusNull AndAlso _
+                                                                       (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW" OrElse rcpNoInUseRow.Status = "LOCKED")) Then
                                                                         newRow.Status = rcpNoInUseRow.Status
                                                                     End If
                                                                 End If
@@ -319,8 +323,11 @@ Namespace Biosystems.Ax00.BL
                                                                             If (Not decodedDataDS.DecodedReagentsFields(0).IsBottleTypeNull) Then newRow.TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                                                             If (Not decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull) Then newRow.RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                                                            'SA/JV 12/12/2013 - BT #1384
-                                                                            If (Not rcpNoInUseRow.IsStatusNull AndAlso (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW")) Then
+                                                                            'BA-1999: If the NOT IN USE Rotor Position is LOCKED due to an invalid refill, this Status (and the RealVolume) has to be preserved 
+                                                                            '         when the Position is saved in table twksWSNotInUseRotorPositions (same process applied to NOT IN USE Positions with Status
+                                                                            '         DEPLETED or FEW
+                                                                            If (Not rcpNoInUseRow.IsStatusNull AndAlso _
+                                                                               (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW" OrElse rcpNoInUseRow.Status = "LOCKED")) Then
                                                                                 newRow.RealVolume = rcpNoInUseRow.RealVolume
                                                                                 newRow.Status = rcpNoInUseRow.Status
                                                                             End If
