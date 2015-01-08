@@ -58,7 +58,7 @@
 		<comments>Contact:  Your local administrator</comments>
 		<template>Intel;1033</template>
 		<lastauthor>Administrator</lastauthor>
-		<revnumber>{ACA98E8C-D609-408D-B1BF-751D42B2C005}</revnumber>
+		<revnumber>{0AB09AE2-41C0-4C4A-91FF-D3FF1EBDAEF0}</revnumber>
 		<lastprinted/>
 		<createdtm>06/21/1999 14:00</createdtm>
 		<lastsavedtm>07/14/2000 17:50</lastsavedtm>
@@ -3849,7 +3849,7 @@
 		<col key="yes" def="s72">ISProductConfiguration</col>
 		<col def="S255">ProductConfigurationFlags</col>
 		<col def="I4">GeneratePackageCode</col>
-		<row><td>Default Configuration</td><td/><td>1</td></row>
+		<row><td>Default Configuration</td><td/><td>0</td></row>
 	</table>
 
 	<table name="ISProductConfigurationInstance">
@@ -5912,7 +5912,7 @@ TgBlAHQAdwBvAHIAawABAEQAZQBmAGEAdQBsAHQAIABDAG8AbgBmAGkAZwB1AHIAYQB0AGkAbwBuAA==
 		<row><td>ProductID</td><td>none</td><td/></row>
 		<row><td>ProductLanguage</td><td>1033</td><td/></row>
 		<row><td>ProductName</td><td>BA400</td><td/></row>
-		<row><td>ProductVersion</td><td>3.1.0</td><td/></row>
+		<row><td>ProductVersion</td><td>3.1.1</td><td/></row>
 		<row><td>ProgressType0</td><td>install</td><td/></row>
 		<row><td>ProgressType1</td><td>Installing</td><td/></row>
 		<row><td>ProgressType2</td><td>installed</td><td/></row>
