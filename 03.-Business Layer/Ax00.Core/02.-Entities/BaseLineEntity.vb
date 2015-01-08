@@ -398,6 +398,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Exit For
                                 End If
                             Next
+
+                            'AG 08/01/2014 BA-2197 after restart the application this flag must be reseted again
+                            rejectionParameters.wellsNotUsedAfterALight = 0
+                            InitializationComplete = False
+                            'AG 08/01/2014
                         End If
 
                         linqRes = Nothing
