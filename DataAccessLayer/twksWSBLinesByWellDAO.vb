@@ -627,8 +627,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
         ''' <summary>
-        ''' Delete all BaseLines by Well for the specified Analyzer Work Session except the informed in parameter DataSet
-        ''' Remove only the records with Type = STATIC
+        ''' If pBLType = STATIC then: Delete all the STATIC records, except the max baseLineID of each well (NOTE: the max baselineID can be STATIC or DYNAMIC)
+        ''' If pBLType = DYNAMIC then: Delete all the DYNAMIC records, except the max baselineID of each well (max baselineID for DYNAMIC)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -638,9 +638,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <remarks>
         ''' AG 17/11/2014 BA-2065
         ''' AG 21/11/2014 BA-2065 remove only records with type STATIC
+        ''' AG 08/01/2014 BA-2182 (step 4) new parameters and different query depending pBLType
         ''' </remarks>
-        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                            ByVal pLastValuesDS As BaseLinesDS) As GlobalDataTO
+        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pBLType As String, _
+                                            Optional ByVal pLastValuesDS As BaseLinesDS = Nothing, Optional ByVal pMaxDynamicID As Integer = -1) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -649,15 +650,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = String.Empty
-                    For Each row As BaseLinesDS.twksWSBaseLinesRow In pLastValuesDS.twksWSBaseLines
+
+                    If pBLType = GlobalEnumerates.BaseLineType.STATIC.ToString AndAlso Not pLastValuesDS Is Nothing Then
+                        For Each row As BaseLinesDS.twksWSBaseLinesRow In pLastValuesDS.twksWSBaseLines
+                            cmdText &= " DELETE twksWSBLinesByWell " & vbCrLf & _
+                                       " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                       " AND    WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                       " AND WellUsed = " & row.WellUsed & vbCrLf & _
+                                       " AND Type = '" & GlobalEnumerates.BaseLineType.STATIC.ToString.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                       " AND BaseLineID <>" & row.BaseLineID & vbCrLf
+                            cmdText &= vbNewLine
+                        Next
+
+                    ElseIf pBLType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString AndAlso pMaxDynamicID > -1 Then
                         cmdText &= " DELETE twksWSBLinesByWell " & vbCrLf & _
                                    " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND    WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                   " AND WellUsed = " & row.WellUsed & vbCrLf & _
-                                   " AND Type = '" & GlobalEnumerates.BaseLineType.STATIC.ToString.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                   " AND BaseLineID <>" & row.BaseLineID & vbCrLf
-                        cmdText &= vbNewLine
-                    Next
+                                   " AND Type = '" & GlobalEnumerates.BaseLineType.DYNAMIC.ToString.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                   " AND BaseLineID <" & pMaxDynamicID & vbCrLf
+
+                    End If
 
                     If cmdText <> "" Then
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -682,12 +694,15 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </summary>
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
         ''' <param name="NewBaseLineID"></param>
+        ''' <param name="pType"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' AG 21/11/2014 BA-2065
+        ''' AG 08/01/2015 BA-2182 add pWorkSessionID
         ''' </remarks>
-        Public Function UpdateBaseLineIDByType(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal NewBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
+        Public Function UpdateBaseLineIDByType(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal NewBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -698,6 +713,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = String.Empty
                     cmdText &= " UPDATE twksWSBLinesByWell SET BaseLineID = " & NewBaseLineID & vbCrLf & _
                                " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " AND  WorkSessionID = N'" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                " AND  Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
