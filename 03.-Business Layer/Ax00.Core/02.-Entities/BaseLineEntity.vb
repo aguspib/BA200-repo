@@ -1189,12 +1189,19 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pWellAbsorbance"></param>
         ''' <param name="pDiodePosition"></param>
         ''' <param name="pAddToRejectionParameters" ></param>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modify AG 08/01/2015 BA-2197 when pWell already exists in rejectionParameter.wellUsed we has to update the well(diode) absorbance instead of add new item to list
+        '''                              (A) pwell not exits: (ORIGINAL CODE)
+        '''                                  - Add the well into list .wellUsed
+        '''                                  - Add the well absorbance (by led) into list .absByWell
+        '''                              (B) pwell already exists (NEW CODE for BA-2197)
+        '''                                  - Get the position into list .wellUsed where exists pWell -- position
+        '''                                  - Update the well absorbance (by led): .absByWELL(pDiodePosition).Abs(position) = new well abs by led
+        ''' </remarks>
         Private Sub InitialiazeWellRejectionControl(ByVal pWell As Integer, ByVal pWellAbsorbance As Single, ByVal pDiodePosition As Integer, ByVal pAddToRejectionParameters As Boolean)
             Try
 
                 If pAddToRejectionParameters Then
-
                     With rejectionParameters
                         'Add well used, increment initialization item and flags into average control
                         If Not .wellUsed.Contains(pWell) Then
@@ -1203,6 +1210,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             .initializationParameterItem += 1
                         End If
 
+                        Dim wellCurrentIndex As Integer = -1 'AG 08/01/204 BA-2197
+
                         '1st in Initialization mode: Add absorbance to average control
                         If .absByWELL Is Nothing Then
                             ReDim Preserve .absByWELL(pDiodePosition)
@@ -1210,38 +1219,57 @@ Namespace Biosystems.Ax00.Core.Entities
                         ElseIf .absByWELL.Length - 1 < pDiodePosition Then
                             ReDim Preserve .absByWELL(pDiodePosition)
                             .absByWELL(pDiodePosition).Abs = New List(Of Single)
+
+                            'AG 08/01/2015 BA-2197
+                        Else
+                            wellCurrentIndex = .wellUsed.FindIndex(Function(x) x = pWell)
+                            If .absByWELL(pDiodePosition).Abs.Count - 1 < wellCurrentIndex Then
+                                wellCurrentIndex = -1
+                            End If
+                            'AG 08/01/2015 BA-2197
                         End If
-                        .absByWELL(pDiodePosition).Abs.Add(pWellAbsorbance)
+
+                        'AG 08/01/2015 BA-2197
+                        '.absByWELL(pDiodePosition).Abs.Add(pWellAbsorbance)
+                        If wellCurrentIndex = -1 Then
+                            'Just added
+                            .absByWELL(pDiodePosition).Abs.Add(pWellAbsorbance)
+                        Else
+                            'Not added, well already exsits in structure
+                            .absByWELL(pDiodePosition).Abs(wellCurrentIndex) = pWellAbsorbance
+                        End If
+                        'AG 08/01/2015
 
                     End With
 
-                    Else
-                        'The well is discarted due some diode position has absorbance error
-                        'Remove it from rejectionparameters structure
-                        If pDiodePosition > 0 Then
-                            With rejectionParameters
-                                If .wellUsed.Contains(pWell) Then
-                                    .wellUsed.RemoveRange(.wellUsed.Count - 1, 1)
-                                    .rejected.RemoveRange(.rejected.Count - 1, 1)
-                                    If .initializationParameterItem > 0 Then .initializationParameterItem -= 1
-                                End If
+                Else
+                    'The well is discarted due some diode position has absorbance error
+                    'Remove it from rejectionparameters structure
+                    If pDiodePosition > 0 Then
+                        With rejectionParameters
+                            If .wellUsed.Contains(pWell) Then
+                                .wellUsed.RemoveRange(.wellUsed.Count - 1, 1)
+                                .rejected.RemoveRange(.rejected.Count - 1, 1)
+                                If .initializationParameterItem > 0 Then .initializationParameterItem -= 1
+                            End If
 
-                                If .absByWELL Is Nothing Then
-                                    'No items ... do nothing
-                                ElseIf .absByWELL(0).Abs.Count = 1 Then
-                                    'Only one item ... remove it
-                                    Erase .absByWELL
-                                Else
-                                    'Several items (wells) in struture ... Remove only current wellBL
-                                    For wl As Integer = 0 To pDiodePosition - 1
-                                        .absByWELL(wl).Abs.RemoveRange(0, 1)
-                                    Next
+                            If .absByWELL Is Nothing Then
+                                'No items ... do nothing
+                            ElseIf .absByWELL(0).Abs.Count = 1 Then
+                                'Only one item ... remove it
+                                Erase .absByWELL
+                            Else
+                                'Several items (wells) in struture ... Remove only current wellBL
+                                For wl As Integer = 0 To pDiodePosition - 1
+                                    .absByWELL(wl).Abs.RemoveRange(0, 1)
+                                Next
 
-                                End If
-                            End With
-                        End If
-
+                            End If
+                        End With
                     End If
+
+                End If
+
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
