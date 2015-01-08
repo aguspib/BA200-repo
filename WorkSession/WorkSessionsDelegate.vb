@@ -3970,6 +3970,8 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA    19/04/2011
         ''' Modified by: AG/SA 06/02/2012 - Before save the non free positions in the Internal Reagents Virtual Rotor, for cells having Status 
         '''                                 DEPLETED or FEW, save also the status; for the rest of positions, save Status as NULL
+        '''              SA    08/01/2015 - BA-1999 ==> For cells having Status LOCKED, save also this Status. Remove from the loop to set Status NULL
+        '''                                             all cells having Status NULL or having Status DEPLETED, FEW or LOCKED
         ''' </remarks>
         Private Function SaveReagentsRotorPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                     ByVal pWorkSessionID As String) As GlobalDataTO
@@ -4002,8 +4004,12 @@ Namespace Biosystems.Ax00.BL
                                 Dim myReagentsPositions As VirtualRotorPosititionsDS = DirectCast(resultData.SetDatos, VirtualRotorPosititionsDS)
                                 If (myReagentsPositions.tparVirtualRotorPosititions.Count > 0) Then
                                     'Get all positions with Status different of DEPLETED and FEW and set Status = NULL for all of them
-                                    Dim linqRes As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow) = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In myReagentsPositions.tparVirtualRotorPosititions _
-                                                                                                                       Where String.Compare(a.Status, "DEPLETED", False) <> 0 AndAlso String.Compare(a.Status, "FEW", False) <> 0 _
+                                    Dim linqRes As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow) = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow _
+                                                                                                                               In myReagentsPositions.tparVirtualRotorPosititions _
+                                                                                                                   Where Not a.IsStatusNull() _
+                                                                                                                     AndAlso a.Status <> "DEPLETED" _
+                                                                                                                     AndAlso a.Status <> "FEW" _
+                                                                                                                     AndAlso a.Status <> "LOCKED" _
                                                                                                                       Select a).ToList
 
                                     For Each element As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
@@ -4011,6 +4017,8 @@ Namespace Biosystems.Ax00.BL
                                         element.SetStatusNull()
                                         element.EndEdit()
                                     Next
+                                    myReagentsPositions.AcceptChanges()
+                                    linqRes = Nothing
 
                                     'Save the Internal Virtual Rotor for Reagents with the content of all positions 
                                     resultData = myVirtualRotorsDelegate.Save(dbConnection, "REAGENTS", myReagentsPositions, "INTERNAL_REAGENTS_ROTOR", True)
@@ -4062,6 +4070,8 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  DL 04/08/2011
         ''' Modified by: AG/SA 06/02/2012 - Before save the non free positions in the Internal Reagents Virtual Rotor, for cells having Status 
         '''                                 DEPLETED or FEW, save also the status; for the rest of positions, save Status as NULL
+        '''              SA    08/01/2015 - BA-1999 ==> Remove from the loop to set Status NULL all cells having already Status NULL or having 
+        '''                                             Status DEPLETED or FEW
         ''' </remarks>
         Private Function SaveSamplesRotorPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -4094,8 +4104,11 @@ Namespace Biosystems.Ax00.BL
 
                                 If (mySamplesPositions.tparVirtualRotorPosititions.Count > 0) Then
                                     'Get all positions with Status different of DEPLETED and FEW and set Status = NULL for all of them
-                                    Dim linqRes As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow) = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In mySamplesPositions.tparVirtualRotorPosititions _
-                                                                                                                       Where String.Compare(a.Status, "DEPLETED", False) <> 0 AndAlso String.Compare(a.Status, "FEW", False) <> 0 _
+                                    Dim linqRes As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow) = (From a As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow _
+                                                                                                                               In mySamplesPositions.tparVirtualRotorPosititions _
+                                                                                                                   Where Not a.IsStatusNull() _
+                                                                                                                     AndAlso a.Status <> "DEPLETED" _
+                                                                                                                     AndAlso a.Status <> "FEW" _
                                                                                                                       Select a).ToList
 
                                     For Each element As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes
@@ -4103,6 +4116,8 @@ Namespace Biosystems.Ax00.BL
                                         element.SetStatusNull()
                                         element.EndEdit()
                                     Next
+                                    mySamplesPositions.AcceptChanges()
+                                    linqRes = Nothing
 
                                     'Save the Internal Virtual Rotor for Samples with the content of all positions 
                                     resultData = myVirtualRotorsDelegate.Save(dbConnection, "SAMPLES", mySamplesPositions, "INTERNAL_SAMPLES_ROTOR", True)
