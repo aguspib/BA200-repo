@@ -6383,7 +6383,7 @@ Public Class IWSRotorPositions
                                                         BubbleCalibrationRequired = CType(resultData.SetDatos, Boolean)
                                                     End If
 
-                                                    iseModuleReady = Not (ElectrodesCalibrationRequired And BubbleCalibrationRequired)
+                                                    iseModuleReady = (Not ElectrodesCalibrationRequired) And (Not BubbleCalibrationRequired)
                                                 End If
                                             End If
                                             ' XB 08/01/2015 - BA-2187
