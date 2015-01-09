@@ -1289,6 +1289,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                              instead of from table twksWSRotorContentByPosition
         '''              SA 08/01/2015 - BA-1999 ==> Changed the second subquery to remove the filter by Position Status = 'NO_INUSE', to allow to get also 
         '''                                          NOT IN USE Positions with Status DEPLETED, FEW or LOCKED
+        '''              SA 09/01/2015 - BA-1999 ==> Added a new subquery to get also NOT IN USE Positions with Barcode Status UNKNOWN or ERROR
         ''' </remarks>
         Public Function GetReagentsRotorPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                   ByVal pWorkSessionID As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -1320,6 +1321,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
                                                 " AND   RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND   RCP.RotorType     = 'REAGENTS' " & vbCrLf & _
+                                                " UNION " & vbCrLf & _
+                                                " SELECT " & pVirtualRotorID.ToString & " AS VirtualRotorID, RCP.RingNumber, RCP.CellNumber, NULL AS TubeContent, RCP.TubeType, " & vbCrLf & _
+                                                         " RCP.MultiTubeNumber, NULL AS ReagentID, NULL AS SolutionCode, NULL AS MultiItemNumber, RCP.RealVolume, RCP.Status, " & vbCrLf & _
+                                                         " RCP.BarcodeInfo, RCP.BarcodeStatus, RCP.ScannedPosition, 'BIOSYSTEMS' AS TS_User, GETDATE() AS TS_DateTime " & vbCrLf & _
+                                                " FROM   twksWSRotorContentByPosition RCP " & vbCrLf & _
+                                                " WHERE RCP.AnalyzerID    = '" & pAnalyzerID & "' " & vbCrLf & _
+                                                " AND   RCP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                " AND   RCP.RotorType     = 'REAGENTS' " & vbCrLf & _
+                                                " AND   RCP.Status        = 'NO_INUSE' " & vbCrLf & _
+                                                " AND   RCP.BarcodeStatus IN ('UNKNOWN', 'ERROR') " & vbCrLf & _
                                                 " ORDER BY RCP.RingNumber, RCP.CellNumber "
 
                         '" AND   RCP.Status        = 'NO_INUSE' " & vbCrLf & _
@@ -1381,6 +1392,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                                          to get also FREE Positions. 
         '''                                          Changed the second subquery by removing the filter by Status (it is not needed due to an INNER JOIN is used) to 
         '''                                          allow also to get NOT IN USE Positions with Status DEPLETED, FEW or LOCKED); besides, return NO_INUSE as Status.  
+        '''              SA 09/01/2015 - BA-1999 ==> Changed the first subquery to add a new condition to get also NOT IN USE Rotor Positions with Barcode Status = ERROR
         ''' </remarks>
         Public Function GetRotorContentPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
@@ -1406,6 +1418,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND  ((RCP.Status       <> 'NO_INUSE' AND RCP.ElementID IS NOT NULL) " & vbCrLf & _
+                                                " OR    (RCP.Status        = 'NO_INUSE' AND RCP.BarcodeStatus = 'UNKNOWN') " & vbCrLf & _
                                                 " OR    (RCP.Status        = 'NO_INUSE' AND RCP.BarcodeStatus = 'UNKNOWN') " & vbCrLf & _
                                                 " OR    (RCP.Status        = 'FREE')) " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
@@ -1470,7 +1483,10 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''                                          to get also FREE Positions. 
         '''                                          Changed the second subquery by removing the filter by Status (it is not needed due to an INNER JOIN is used) to 
         '''                                          allow also to get NOT IN USE Positions with Status DEPLETED, FEW or LOCKED)
-        ''' </remarks>
+        '''              SA 09/01/2015 - BA-1999 ==> Changed the first subquery to remove the LEFT OUTER JOIN with table twksWSRotorPositionsInProcess due to this 
+        '''                                          function is called when the WorkSession Status is EMPTY or OPEN and there are not Positions In Process; besides,
+        '''                                          added a new condition to get also NOT IN USE Rotor Positions with Barcode Status = ERROR
+        '''         ''' </remarks>
         Public Function GetRotorContentPositionsResetDone(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) _
                                                  As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -1489,13 +1505,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSRequiredElements RE " & vbCrLf & _
                                                                                                      " ON RCP.WorkSessionID = RE.WorkSessionID " & vbCrLf & _
                                                                                                     " AND RCP.ElementID     = RE.ElementID " & vbCrLf & _
-                                                                                        " LEFT OUTER JOIN twksWSRotorPositionsInProcess RIP " & vbCrLf & _
-                                                                                                     " ON RCP.RotorType  = RIP.RotorType " & vbCrLf & _
-                                                                                                    " AND RCP.CellNumber = RIP.CellNumber " & vbCrLf & _
                                                 " WHERE  RCP.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND  ((RCP.Status       <> 'NO_INUSE' AND RCP.ElementID IS NOT NULL) " & vbCrLf & _
                                                 " OR    (RCP.Status        = 'NO_INUSE' AND RCP.BarcodeStatus = 'UNKNOWN') " & vbCrLf & _
+                                                " OR    (RCP.Status        = 'NO_INUSE' AND RCP.BarcodeStatus = 'ERROR') " & vbCrLf & _
                                                 " OR    (RCP.Status        = 'FREE')) " & vbCrLf & _
                                                 " UNION " & vbCrLf & _
                                                 " SELECT DISTINCT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, " & vbCrLf & _
