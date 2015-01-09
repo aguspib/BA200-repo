@@ -1500,8 +1500,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.RotorType, RCP.RingNumber, RCP.CellNumber, RCP.WorkSessionID, RCP.ElementID, " & vbCrLf & _
                                                        " RCP.MultiTubeNumber, RCP.TubeType, RCP.RealVolume, RCP.RemainingTestsNumber, RCP.Status, " & vbCrLf & _
                                                        " RCP.ScannedPosition, RCP.BarcodeInfo, RCP.BarcodeStatus, RE.TubeContent, RE.ElementStatus, RE.CalibratorID, " & vbCrLf & _
-                                                       " RE.MultiItemNumber, RE.ReagentID, RE.SolutionCode, RE.ControlID, " & vbCrLf & _
-                                                       "(CASE WHEN RIP.InProcessTestsNumber IS NULL THEN 0 ELSE 1 END) AS InProcessElement " & vbCrLf & _
+                                                       " RE.MultiItemNumber, RE.ReagentID, RE.SolutionCode, RE.ControlID, 0 AS InProcessElement " & vbCrLf & _
                                                 " FROM   twksWSRotorContentByPosition RCP LEFT OUTER JOIN twksWSRequiredElements RE " & vbCrLf & _
                                                                                                      " ON RCP.WorkSessionID = RE.WorkSessionID " & vbCrLf & _
                                                                                                     " AND RCP.ElementID     = RE.ElementID " & vbCrLf & _
