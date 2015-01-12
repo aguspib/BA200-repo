@@ -911,9 +911,9 @@ Namespace Biosystems.Ax00.BL
                             If (elementID <> -1) Then
                                 newReturnRow.ElementID = elementID
 
-                                If (Not contentIsBottle) Then
+                                If (contentIsBottle) Then
                                     'Reagents and Additional Solutions
-                                    newReturnRow.Status = "PENDING"
+                                    newReturnRow.Status = "INUSE"
                                     newReturnRow.ElementStatus = "POS"
 
                                     If (Not rowDS.IsRealVolumeNull) Then
@@ -928,7 +928,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
                                 Else
                                     'Patient Samples, Controls, Calibrators and Additional Solutions in Tube
-                                    newReturnRow.Status = "INUSE"
+                                    newReturnRow.Status = "PENDING"
                                     newReturnRow.ElementStatus = "POS"
                                 End If
 
