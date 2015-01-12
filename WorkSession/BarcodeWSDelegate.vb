@@ -919,7 +919,8 @@ Namespace Biosystems.Ax00.BL
         '''              SA 22/12/2014 - BA-1999 ==> For NOT IN USE Reagents, search if there is information for the bottle in table of Historic Reagent Bottles and
         '''                                          in this case, assign the saved Volume to the Rotor Position. Besides, calculate the number of Tests that can be
         '''                                          executed with the remaining volume. If there is historic information for the Reagent Bottle and it is LOCKED, 
-        '''                                          ignore that Status; only DEPLETED or FEW Status has to be assigned to the Rotor Position instead of NO_INUSE
+        '''                                          ignore that Status; only DEPLETED or FEW Status has to be assigned to the Rotor Position instead of NO_INUSE.
+        '''                                          For External Reagents (BarcodeStatus = UNKNOWN), FREE Status is assigned
         ''' </remarks>
         Private Function SaveOKReadReagentsRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                          ByVal pRotorType As String, ByVal pBarCodeResPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
@@ -983,7 +984,7 @@ Namespace Biosystems.Ax00.BL
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                            UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
+                                            UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "FREE" '"NO_INUSE"
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
                                             UpdatedRcpDS.AcceptChanges()
                                             updateAdditonalRcpFlag = True

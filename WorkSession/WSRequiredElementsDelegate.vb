@@ -742,6 +742,7 @@ Namespace Biosystems.Ax00.BL
         '''              XB 07/10/2014 - BA-1978 ==> Added log traces to catch NULL wrong assignment on RealVolume field 
         '''              SA 09/01/2015 - BA-1999 ==> If the TubeContent is not informed for the Position but it has a Barcode with Status UNKNOWN or ERROR,  
         '''                                          the Position Status is set to FREE
+        '''              SA 12/01/2015 - BA-1999 ==> For IN USE and NOT IN USE Reagents, calculate the Number of Tests that can be executed with the available Bottle Volume
         ''' </remarks>
         Public Function FindElementIDRelatedWithRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                               ByVal pRotorType As String, ByVal pRotorLoadedDS As VirtualRotorPosititionsDS, _
@@ -756,6 +757,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim returnDS As New WSRotorContentByPositionDS
                         Dim commandDAO As New twksWSRequiredElementsDAO
+                        Dim rcpDelegate As New WSRotorContentByPositionDelegate
 
                         Dim elementID As Integer = -1
                         Dim contentIsBottle As Boolean = False
@@ -876,8 +878,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     If (Not rowDS.IsPredilutionFactorNull) Then patientRow.PredilutionFactor = rowDS.PredilutionFactor
-                                    'patient.OrderTestsDetails.AddOrderTestsDetailsRow(patientRow)
-
+                                  
                                     resultData = commandDAO.GetPatientElements(dbConnection, pWorkSessionID, patientRow)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                         myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
@@ -918,6 +919,12 @@ Namespace Biosystems.Ax00.BL
                                     If (Not rowDS.IsRealVolumeNull) Then
                                         'Assign the Bottle Volume
                                         newReturnRow.RealVolume = rowDS.RealVolume
+
+                                        'BA-1999: For IN USE Reagents, calculate the number of tests that can be executed with the available Bottle Volume
+                                        If (rowDS.TubeContent = "REAGENT") Then
+                                            resultData = CalculateRemainingTests(dbConnection, pWorkSessionID, elementID, rowDS.RealVolume, rowDS.TubeType)
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then newReturnRow.RemainingTestsNumber = CType(resultData.SetDatos, Integer)
+                                        End If
                                     End If
                                 Else
                                     'Patient Samples, Controls, Calibrators and Additional Solutions in Tube
@@ -936,6 +943,16 @@ Namespace Biosystems.Ax00.BL
                             ElseIf (Not rowDS.IsTubeContentNull) Then
                                 'If ElementID not found but TubeContent is not null:  Status = NO_INUSE
                                 newReturnRow.Status = "NO_INUSE"
+
+                                'BA-1999: For NOT IN USE Reagents, calculate the number of tests that can be executed with the available Bottle Volume
+                                If (rowDS.TubeContent = "REAGENT") Then
+                                    If (Not rowDS.IsReagentIDNull AndAlso Not rowDS.IsMultiItemNumberNull AndAlso Not rowDS.IsRealVolumeNull AndAlso Not rowDS.IsTubeTypeNull) Then
+                                        resultData = rcpDelegate.CalculateRemainingTestNotInUseReagent(dbConnection, pWorkSessionID, rowDS.ReagentID, rowDS.MultiItemNumber, _
+                                                                                                       rowDS.RealVolume, rowDS.TubeType)
+
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then newReturnRow.RemainingTestsNumber = CType(resultData.SetDatos, Integer)
+                                    End If
+                                End If
                             Else
                                 newReturnRow.Status = "FREE"
                             End If

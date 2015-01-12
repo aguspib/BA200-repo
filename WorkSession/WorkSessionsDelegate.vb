@@ -2834,6 +2834,8 @@ Namespace Biosystems.Ax00.BL
         '''              SA 10/02/2012 - For Additional Solutions, count the number of not depleted bottles to mark the required Element as POS or NOPOS
         '''              SA 15/02/2012 - Process for Reagents updated due implementation of function CalculateReagentStatus has been changed
         '''              SA 16/04/2013 - Added parameter to indicate if the function has to search also Patient Samples elements
+        '''              SA 12/01/2015 - BA-1999 ==> For Reagents, remove the call to function CalculateRemainingTests due to the number of tests that can be
+        '''                                          executed with the available bottle volume is now calculated and returned by function FindElementIDRelatedWithRotorPosition
         ''' </remarks>
         Public Function FindElementsInNotInUsePosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String, _
                                                        ByVal pFindPatients As Boolean) As GlobalDataTO
@@ -2853,15 +2855,14 @@ Namespace Biosystems.Ax00.BL
                             Dim myAnalyzerModelRotorsConfDS As AnalyzerModelRotorsConfigDS = DirectCast(myGlobalDataTO.SetDatos, AnalyzerModelRotorsConfigDS)
 
                             Dim testLeft As Integer = 0
-                            'Dim additionalVolumes As Single = 0
                             Dim myElementStatus As String = String.Empty
 
                             Dim returnDS As WSRotorContentByPositionDS
-                            'Dim myRotorContentDS As WSRotorContentByPositionDS
+                            Dim myVirtualRotorPosDS As VirtualRotorPosititionsDS
                             Dim rotorContentByPositionDelegate As New WSRotorContentByPositionDelegate
 
-                            Dim myVirtualRotorPosDS As VirtualRotorPosititionsDS
-                            'Dim vRotorDelegate As New VirtualRotorsPositionsDelegate
+                            Dim myHisReagentsBottlesDS As HisReagentsBottlesDS
+                            Dim myhisReagentsBottlesDelegate As New HisReagentBottlesDelegate
 
                             Dim notInUseRotorPositionsDelegate As New WSNotInUseRotorPositionsDelegate
                             Dim myBCPosWithNoRequestDelegate As New BarcodePositionsWithNoRequestsDelegate
@@ -2872,6 +2873,7 @@ Namespace Biosystems.Ax00.BL
 
                             Dim previousElementID As Integer
                             Dim lstReagentPositions As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+
                             For Each rotorTypeDS As AnalyzerModelRotorsConfigDS.tfmwAnalyzerModelRotorsConfigRow In myAnalyzerModelRotorsConfDS.tfmwAnalyzerModelRotorsConfig.Rows
                                 'Search all not IN_USE positions that exists in the Analyzer Rotors for the informed Work Session
                                 myGlobalDataTO = notInUseRotorPositionsDelegate.GetRotorPositionsByWorkSession(dbConnection, pAnalyzerID, rotorTypeDS.RotorType, pWorkSessionID, pFindPatients)
@@ -2886,14 +2888,14 @@ Namespace Biosystems.Ax00.BL
 
                                             myGlobalDataTO = rotorContentByPositionDelegate.UpdateNotInUseRotorPosition(dbConnection, returnDS)
                                             If (Not myGlobalDataTO.HasError) Then
-                                                If (String.Compare(rotorTypeDS.RotorType, "SAMPLES", False) = 0) Then
+                                                If (rotorTypeDS.RotorType = "SAMPLES") Then
                                                     For Each elementsDR As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In returnDS.twksWSRotorContentByPosition
                                                         'Update the element Status for all types of elements positioned in Samples Rotor
                                                         myGlobalDataTO = myRequiredElementsDelegate.UpdateStatus(dbConnection, elementsDR.ElementID, elementsDR.ElementStatus)
                                                         If (myGlobalDataTO.HasError) Then Exit For
 
                                                         'For Patient Samples, if they exist in table of Incomplete Patient Samples, delete the position
-                                                        If (String.Compare(elementsDR.TubeContent, "PATIENT", False) = 0 AndAlso (Not elementsDR.IsScannedPositionNull) AndAlso elementsDR.ScannedPosition) Then
+                                                        If (elementsDR.TubeContent = "PATIENT" AndAlso (Not elementsDR.IsScannedPositionNull) AndAlso elementsDR.ScannedPosition) Then
                                                             myGlobalDataTO = myBCPosWithNoRequestDelegate.DeletePosition(dbConnection, pAnalyzerID, pWorkSessionID, _
                                                                                                                          elementsDR.RotorType, elementsDR.CellNumber)
                                                             If (myGlobalDataTO.HasError) Then Exit For
@@ -2909,46 +2911,66 @@ Namespace Biosystems.Ax00.BL
 
                                                     previousElementID = 0
                                                     For Each elementsDR As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In lstReagentPositions
-                                                        'Calculate the number of Tests that can be executed according the current volume of the Reagent bottle
-                                                        testLeft = 0
-                                                        If (String.Compare(elementsDR.Status, "DEPLETED", False) <> 0) Then
-
-                                                            'TR 01/10/2012 -Validate if barcode is not null to validate if bottle exist on histreagensBottles
-                                                            If Not elementsDR.IsBarCodeInfoNull AndAlso elementsDR.BarcodeStatus = "OK" Then
-                                                                'Search on histReagentBottles table 
-                                                                Dim myhisReagentsBottlesDelegate As New HisReagentBottlesDelegate
+                                                        'For not depleted scanned Reagents, validate if there is information for the Bottle in the historic of Reagents
+                                                        If (elementsDR.Status <> "DEPLETED") Then
+                                                            If (Not elementsDR.IsBarCodeInfoNull AndAlso elementsDR.BarcodeStatus = "OK") Then
                                                                 myGlobalDataTO = myhisReagentsBottlesDelegate.ReadByBarCode(dbConnection, elementsDR.BarCodeInfo)
-                                                                If Not myGlobalDataTO.HasError Then
-                                                                    Dim myHisReagentsBottlesDS As HisReagentsBottlesDS
+
+                                                                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                                                     myHisReagentsBottlesDS = DirectCast(myGlobalDataTO.SetDatos, HisReagentsBottlesDS)
-                                                                    'Validate if Bottle exist on table.
-                                                                    If myHisReagentsBottlesDS.thisReagentsBottles.Count > 0 Then
-                                                                        'Udate the volume found on historic ASK ?? is update the volume
+                                                                    If (myHisReagentsBottlesDS.thisReagentsBottles.Count > 0) Then
                                                                         elementsDR.RealVolume = myHisReagentsBottlesDS.thisReagentsBottles(0).BottleVolume
-                                                                        If myHisReagentsBottlesDS.thisReagentsBottles(0).BottleStatus = "LOCKED" Then
-                                                                            'Set status locked
-                                                                            elementsDR.Status = "LOCKED"
-                                                                        End If
+                                                                        If (myHisReagentsBottlesDS.thisReagentsBottles(0).BottleStatus = "LOCKED") Then elementsDR.Status = "LOCKED"
                                                                     End If
                                                                 End If
                                                             End If
-                                                            'Get the Reagent status on historic if exist.
-                                                            'TR 01/10/2012 -END
 
-                                                            'Calculate the remaining number of Tests 
-                                                            myGlobalDataTO = myRequiredElementsDelegate.CalculateRemainingTests(dbConnection, pWorkSessionID, elementsDR.ElementID, _
-                                                                                                                                elementsDR.RealVolume, elementsDR.TubeType)
-                                                            If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                                                testLeft = CType(myGlobalDataTO.SetDatos, Integer)
-                                                                'Update information of the Rotor Position: Real Volume and Remaining Tests
-                                                                myGlobalDataTO = rotorContentByPositionDelegate.UpdateByRotorTypeAndCellNumber(dbConnection, pAnalyzerID, pWorkSessionID, rotorTypeDS.RotorType, _
-                                                                                                                                               elementsDR.CellNumber, elementsDR.Status, elementsDR.RealVolume, _
-                                                                                                                                               testLeft, True, False)
-                                                                If (myGlobalDataTO.HasError) Then Exit For
-                                                            Else
-                                                                'Error calculating the number of remaining tests for the current bottle volume
-                                                                Exit For
-                                                            End If
+                                                            'If (String.Compare(elementsDR.Status, "DEPLETED", False) <> 0) Then
+                                                            '    'TR 01/10/2012 -Validate if barcode is not null to validate if bottle exist on histreagensBottles
+                                                            '    If Not elementsDR.IsBarCodeInfoNull AndAlso elementsDR.BarcodeStatus = "OK" Then
+                                                            '        'Search on histReagentBottles table 
+                                                            '        'Dim myhisReagentsBottlesDelegate As New HisReagentBottlesDelegate
+                                                            '        myGlobalDataTO = myhisReagentsBottlesDelegate.ReadByBarCode(dbConnection, elementsDR.BarCodeInfo)
+                                                            '        If Not myGlobalDataTO.HasError Then
+                                                            '            'Dim myHisReagentsBottlesDS As HisReagentsBottlesDS
+                                                            '            myHisReagentsBottlesDS = DirectCast(myGlobalDataTO.SetDatos, HisReagentsBottlesDS)
+                                                            '            'Validate if Bottle exist on table.
+                                                            '            If myHisReagentsBottlesDS.thisReagentsBottles.Count > 0 Then
+                                                            '                'Udate the volume found on historic ASK ?? is update the volume
+                                                            '                elementsDR.RealVolume = myHisReagentsBottlesDS.thisReagentsBottles(0).BottleVolume
+                                                            '                If myHisReagentsBottlesDS.thisReagentsBottles(0).BottleStatus = "LOCKED" Then
+                                                            '                    'Set status locked
+                                                            '                    elementsDR.Status = "LOCKED"
+                                                            '                End If
+                                                            '            End If
+                                                            '        End If
+                                                            '    End If
+                                                            '    'Get the Reagent status on historic if exist.
+                                                            '    'TR 01/10/2012 -END
+
+                                                            'Update information of the Rotor Position: Real Volume and Remaining Tests
+                                                            testLeft = 0
+                                                            If (Not elementsDR.IsRemainingTestsNumberNull) Then testLeft = elementsDR.RemainingTestsNumber
+
+                                                            myGlobalDataTO = rotorContentByPositionDelegate.UpdateByRotorTypeAndCellNumber(dbConnection, pAnalyzerID, pWorkSessionID, rotorTypeDS.RotorType, _
+                                                                                                                                           elementsDR.CellNumber, elementsDR.Status, elementsDR.RealVolume, _
+                                                                                                                                           testLeft, True, False)
+                                                            If (myGlobalDataTO.HasError) Then Exit For
+
+                                                            ''Calculate the remaining number of Tests 
+                                                            'myGlobalDataTO = myRequiredElementsDelegate.CalculateRemainingTests(dbConnection, pWorkSessionID, elementsDR.ElementID, _
+                                                            '                                                                    elementsDR.RealVolume, elementsDR.TubeType)
+                                                            'If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                                                            '    testLeft = CType(myGlobalDataTO.SetDatos, Integer)
+                                                            '    'Update information of the Rotor Position: Real Volume and Remaining Tests
+                                                            '    myGlobalDataTO = rotorContentByPositionDelegate.UpdateByRotorTypeAndCellNumber(dbConnection, pAnalyzerID, pWorkSessionID, rotorTypeDS.RotorType, _
+                                                            '                                                                                   elementsDR.CellNumber, elementsDR.Status, elementsDR.RealVolume, _
+                                                            '                                                                                   testLeft, True, False)
+                                                            '    If (myGlobalDataTO.HasError) Then Exit For
+                                                            'Else
+                                                            '    'Error calculating the number of remaining tests for the current bottle volume
+                                                            '    Exit For
+                                                            'End If
                                                         End If
 
                                                         If (elementsDR.ElementID <> previousElementID) Then
@@ -2992,7 +3014,7 @@ Namespace Biosystems.Ax00.BL
                                                     If (Not myGlobalDataTO.HasError) Then
                                                         'PROCESS FOR ADDITIONAL SOLUTIONS...
                                                         lstReagentPositions = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In returnDS.twksWSRotorContentByPosition _
-                                                                              Where String.Compare(a.TubeContent, "REAGENT", False) <> 0 _
+                                                                              Where a.TubeContent <> "REAGENT" _
                                                                              Select a).ToList()
 
                                                         For Each elementsDR As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In lstReagentPositions
