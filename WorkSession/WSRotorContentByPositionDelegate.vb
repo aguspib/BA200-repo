@@ -3866,6 +3866,9 @@ Namespace Biosystems.Ax00.BL
         '''              AG 07/10/2014 - BA-1979 ==> Replaced call to function twksWSRotorContentByPositionDAO.Update by a call to function Update 
         '''                                          in this Delegate, informing the process who is updating the content of the Rotor Position (to 
         '''                                          search which process is inserting invalid values: positions with TubeContent but not element ID)
+        '''              SA 12/01/2015 - BA-1999 ==> When calling function CalculateReagentStatus, update the ElementStatus field also when the returned Status 
+        '''                                          is NOPOS (currently, it is updated only when the returned Status is incomplete, and if all positioned Reagent
+        '''                                          bottles are DEPLETED, the element is shown positioned in the TreeView of required Elements in Rotor Positioning Screen)
         ''' </remarks>
         Public Function LoadRotor(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                   ByVal pRotorType As String, ByVal pVirtualRotorID As Integer) As GlobalDataTO
@@ -3911,14 +3914,19 @@ Namespace Biosystems.Ax00.BL
                                                             Select e Order By e.ElementID).Distinct.ToList
 
                                             Dim immPreviousRow As Integer = 0
-                                            Dim previousEleStatus As String = ""
+                                            Dim myReagentStatus As String = String.Empty
+                                            Dim previousEleStatus As String = String.Empty
                                             Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow = Nothing
+
                                             For Each myReagentContentROW As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myReagentTubes
                                                 If (myReagentContentROW.ElementID <> immPreviousRow) Then
                                                     myGlobalDataTO = myRequiredElementsDelegate.CalculateReagentStatus(dbConnection, pAnalyzerID, pRotorType, myReagentContentROW.ElementID, True)
                                                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                                                        If (DirectCast(myGlobalDataTO.SetDatos, String) = "INCOMPLETE") Then
-                                                            myReagentContentROW.ElementStatus = "INCOMPLETE"
+                                                        myReagentStatus = DirectCast(myGlobalDataTO.SetDatos, String)
+
+                                                        'BA-1999: If the returned Reagent Status is NOPOS (all positioned bottles are DEPLETED), ElementStatus field is also updated
+                                                        If (myReagentStatus = "INCOMPLETE" OrElse myReagentStatus = "NOPOS") Then
+                                                            myReagentContentROW.ElementStatus = myReagentStatus
                                                             previousEleStatus = myReagentContentROW.ElementStatus
                                                         End If
 
