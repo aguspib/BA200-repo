@@ -40,6 +40,16 @@ Namespace Biosystems.Ax00.BL
                                   "IA", "IB", "IC", "ID", "IE", "IF", "IG", "IH", "II", "IJ", "IK", "IL", "IM", "IN", "IO", "IP", "IQ", "IR", "IS", "IT", "IU", "IV"}
 
         Private ReadOnly XlsSingleFormat As String = "0{0}0###" 'RH 15/02/2012
+
+        'AG 12/01/2015 BA-2182 (3) - sheets numbers by contents
+        Private sheetADJUSTBL_ID As Integer = 1
+        Private sheetDYNAMICBL_ID As Integer = 2
+        Private sheetSTATICWELLBL_ID As Integer = 3
+        Private sheetCOUNTS_ID As Integer = 4
+        Private sheetABSORBANCES_ID As Integer = 5
+        Private sheetCOMPLETE_ID As Integer = 6
+        Private sheetRESULTS_ID As Integer = 7
+
 #End Region
 
 #Region "Main Public Methods"
@@ -111,13 +121,13 @@ Namespace Biosystems.Ax00.BL
 
                                     'BA-2067
                                     If pBaseLineType = BaseLineType.DYNAMIC.ToString() Then
-                                        resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, 2, BaseLineType.DYNAMIC.ToString())
+                                        resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, sheetDYNAMICBL_ID, BaseLineType.DYNAMIC.ToString())
                                     End If
 
                                     If Not resultdata.HasError AndAlso myWorkSessionsDS.twksWorkSessions.Rows.Count > 0 Then
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, 3, BaseLineType.STATIC.ToString()) 'BA-2067
+                                            resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, sheetSTATICWELLBL_ID, BaseLineType.STATIC.ToString()) 'BA-2067
                                         Else
                                             'Exit Function
                                             Return resultdata
@@ -353,49 +363,69 @@ Namespace Biosystems.Ax00.BL
                 pBook = myWorkbook.GetType.InvokeMember("Add", Reflection.BindingFlags.InvokeMethod, Nothing, myWorkbook, Nothing)
                 pBook.GetType.InvokeMember("SaveAs", Reflection.BindingFlags.InvokeMethod, Nothing, pBook, New Object() {"" & pFileName & ""})
                 pWorkSheets = myWorkbook.GetType().InvokeMember("Worksheets", BindingFlags.GetProperty, Nothing, pBook, Nothing)
+
+                'AG 12/01/2015 BA-2182 (3)
+                Dim sheetName As String = String.Empty
+
                 ' add new pages
                 ' add page absorbances
+                'AG 12/01/2015 BA-2182 (3) Set the proper sheet number. Depeding the base line type the number of worksheets are different
+                If pBaseLineType <> GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                    'Renumber sheets ID
+                    sheetSTATICWELLBL_ID -= 1
+                    sheetCOUNTS_ID -= 1
+                    sheetABSORBANCES_ID -= 1
+                    sheetCOMPLETE_ID -= 1
+                    sheetRESULTS_ID -= 1
+                End If
+
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOUNTS_ID}) 'New Object() {4}
                 ' add page Complete
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {5})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetABSORBANCES_ID}) 'New Object() {5}
 
                 'RH 13/07/2011 Add page Results
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOMPLETE_ID}) 'New Object() {6}
 
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetRESULTS_ID}) 'New Object() {7}
                 ' end add pages
+                'AG 12/01/2015 BA-2182
 
                 ' Rename Pages
                 ' Rename Page 1
-                Dim sheetName As String = String.Empty
-                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "BL with ADJUSTMENT", "BaseLine").ToString 'AG 12/01/2015 BA-2182 (3)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {1})
+                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "BL with ADJUSTMENT", "BaseLine").ToString
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetADJUSTBL_ID}) 'New Object() {1}
+                'AG 12/01/2015 BA-2182 (3)
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
                 ' Rename page 2
                 If (pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString) Then 'AG 12/01/2015 BA-2182 (3)
                     sheetName = "Dynamic BL by well"
-                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
+                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetDYNAMICBL_ID}) 'New Object() {2}
                     myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
                 End If
+                'AG 12/01/2015 BA-2182
+
                 ' Rename page 3
-                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Static BL by well", "Base Line by Well").ToString 'AG 12/01/2015 BA-2182 (3)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
+                'AG 12/01/2015 BA-2182 (3)
+                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Static BL by well", "Base Line by Well").ToString
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetSTATICWELLBL_ID}) 'New Object() {3}
+                'AG 12/01/2015 BA-2182 (3)
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
+
                 ' Rename page 4
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOUNTS_ID}) 'New Object() {4}
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Counts"})
                 ' Rename page 5
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {5})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetABSORBANCES_ID}) 'New Object() {5}
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Absorbances"})
                 ' Rename page 6
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOMPLETE_ID}) 'New Object() {6}
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Complete"})
                 'RH 13/07/2011 Rename page 7
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetRESULTS_ID}) ''New Object() {7}
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Results"})
 
                 'AG 12/01/2015 BA-2182 comment this code. Only the required sheets are created
@@ -656,7 +686,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myWSStatus As String = ""
 
                 ' Selecet base line sheet
-                myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {1})
+                myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {sheetADJUSTBL_ID})
 
                 ' Ini Header 
                 'AG 07/11/2014 BA-2067 Different header depending the base line typ
@@ -875,7 +905,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet count sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOUNTS_ID})
 
                 ' Ini Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1141,7 +1171,7 @@ Namespace Biosystems.Ax00.BL
 
                 ' Selecet Absorbance Sheet ( 5 )
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, _
-                                                            Nothing, pWorkSheets, New Object() {5})
+                                                            Nothing, pWorkSheets, New Object() {sheetABSORBANCES_ID})
 
                 ' Write Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1468,7 +1498,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet complete sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOMPLETE_ID})
 
                 ' Ini Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1917,7 +1947,7 @@ Namespace Biosystems.Ax00.BL
 
                 ' Select Results By Replicates Sheet ( 7 )
                 XlsPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, _
-                                                            Nothing, pWorkSheets, New Object() {7})
+                                                            Nothing, pWorkSheets, New Object() {sheetRESULTS_ID})
 
                 ' Write Header 
                 XlsPageHeader = String.Format("Results WorkSessionID: {0} Creation Date: {1} by {2}", _
@@ -3186,7 +3216,7 @@ Namespace Biosystems.Ax00.BL
                 Else
                     'Base line type STATIC
                     If Not pExecutionList(replicateNumber).IsBaseLineIDNull Then
-                        idValueForHeader = pExecutionList(replicateNumber).IsBaseLineIDNull.ToString
+                        idValueForHeader = pExecutionList(replicateNumber).BaseLineID.ToString
                     End If
                 End If
                 myreplhead &= idValueForHeader 'Add the proper baseline ID value to the header string
