@@ -6343,6 +6343,8 @@ Public Class IWSRotorPositions
                                         'End If
 
                                         If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                                            Debug.Print("STANDBY ____________________________________________________________")
+                                            Debug.Print("LOCK ISE (1) ____________________________________________________________")
                                             iseModuleReady = False
                                         End If
                                         '' XB 23/05/2014 - BT #1639
@@ -6351,6 +6353,7 @@ Public Class IWSRotorPositions
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
                                         If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                            Debug.Print("RUNNING ____________________________________________________________")
                                             ' Check if ISE Pumps calibration is required
                                             Dim PumpsCalibrationRequired As Boolean = False
                                             resultData = mdiAnalyzerCopy.ISE_Manager.CheckPumpsCalibrationIsNeeded
@@ -6364,6 +6367,9 @@ Public Class IWSRotorPositions
                                             ' XB 08/01/2015 - BA-2187
                                             If iseModuleReady Then
                                                 If mdiAnalyzerCopy.AllowScanInRunning Then
+                                                    ' PAUSE mode 
+                                                    Debug.Print("PAUSE ____________________________________________________________")
+
                                                     ' Check if ISE Electrodes calibration is required
                                                     Dim ElectrodesCalibrationRequired As Boolean = False
                                                     resultData = mdiAnalyzerCopy.ISE_Manager.CheckElectrodesCalibrationIsNeeded
@@ -6379,7 +6385,20 @@ Public Class IWSRotorPositions
                                                     End If
 
                                                     iseModuleReady = (Not ElectrodesCalibrationRequired) And (Not BubbleCalibrationRequired)
+                                                    If Not iseModuleReady Then Debug.Print("LOCK ISE (2) ____________________________________________________________")
+
+                                                Else
+                                                    Debug.Print("NOT IN PAUSE ____________________________________________________________")
+                                                    ' USUAL Running
                                                 End If
+
+                                                If iseModuleReady Then
+                                                    If mdiAnalyzerCopy.LockISE Then
+                                                        Debug.Print("LOCK ISE (3) ____________________________________________________________")
+                                                        iseModuleReady = False
+                                                    End If
+                                                End If
+
                                             End If
                                             ' XB 08/01/2015 - BA-2187
                                         End If
