@@ -347,8 +347,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         ' Update the interval of the Timer with the expected time received from the Analyzer
                         If myExpectedTimeRaw <= 0 Then
-                            Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
-                            MyClass.InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
+                            If Not SetTimeISEOffsetFirstTime Then
+                                SetTimeISEOffsetFirstTime = True
+                                Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_ISE_OFFSET.ToString & "] seconds")
+                                MyClass.InitializeTimerStartTaskControl(WAITING_TIME_ISE_OFFSET)
+                            End If
                         Else
                             Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & AppLayer.MaxWaitTime.ToString & "] seconds")
                             MyClass.InitializeTimerStartTaskControl(AppLayer.MaxWaitTime)

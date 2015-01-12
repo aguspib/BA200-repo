@@ -110,9 +110,13 @@ Partial Public Class IAx00MainMDI
     Private NotDisplayErrorCommsMsg As Boolean = False ' XBC 20/06/2012
     Private NotDisplayShutDownConfirmMsg As Boolean = False ' XBC 26/06/2012
 
-    ' XBC 13/07/2012
-    Private ShutDownisPending As Boolean = False
-    Private StartSessionisPending As Boolean = False
+    ' XB 07/01/2014 - Replace these variables as Attributes - BA-1178
+    '' XBC 13/07/2012
+    'Private ShutDownisPending As Boolean = False
+    'Private StartSessionisPending As Boolean = False
+    Private ShutDownisPendingAttribute As Boolean = False
+    Private StartSessionisPendingAttribute As Boolean = False
+    ' XB 07/01/2014 - BA-1178
 
     ' XB 28/04/2014 - Task #1587
     'Private StartSessionisInitialPUGsent As Boolean = False
@@ -125,7 +129,12 @@ Partial Public Class IAx00MainMDI
     Private StartSessionisBMCLsent As Boolean = False
     Private isStartInstrumentActivating As Boolean = False
     Private executeSTD As Boolean = False
-    Private LockISE As Boolean = False
+
+    ' XB 09/01/2014 - Replace this variable as Attribute - BA-2187
+    'Private LockISE As Boolean = False
+    Private LockISEAttribute As Boolean = False
+    ' XB 09/01/2014 - BA-2187
+
     Private SkipCALB As Boolean = False
     Private SkipPMCL As Boolean = False
     Private SkipBMCL As Boolean = False
@@ -494,6 +503,45 @@ Partial Public Class IAx00MainMDI
     Public WriteOnly Property autoWSNotFinishedButGoRunning As Boolean
         Set(value As Boolean)
             autoWSNotFinishedButGoRunningAttribute = value
+        End Set
+    End Property
+
+    ' XB 07/01/2014 - Create these new properties - BA-1178
+    Public Property ShutDownisPending As Boolean
+        Get
+            Return ShutDownisPendingAttribute
+        End Get
+        Set(value As Boolean)
+            ShutDownisPendingAttribute = value
+            If (Not MDIAnalyzerManager Is Nothing) Then
+                MDIAnalyzerManager.ShutDownisPending = value
+            End If
+        End Set
+    End Property
+
+    Public Property StartSessionisPending As Boolean
+        Get
+            Return StartSessionisPendingAttribute
+        End Get
+        Set(value As Boolean)
+            StartSessionisPendingAttribute = value
+            If (Not MDIAnalyzerManager Is Nothing) Then
+                MDIAnalyzerManager.StartSessionisPending = value
+            End If
+        End Set
+    End Property
+    ' XB 07/01/2014 - BA-1178
+
+    ' XB 09/01/2014 - Create this new property - BA-2187
+    Public Property LockISE As Boolean
+        Get
+            Return LockISEAttribute
+        End Get
+        Set(value As Boolean)
+            LockISEAttribute = value
+            If (Not MDIAnalyzerManager Is Nothing) Then
+                MDIAnalyzerManager.LockISE = value
+            End If
         End Set
     End Property
 
@@ -4914,7 +4962,7 @@ Partial Public Class IAx00MainMDI
             End If
 
             If Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes Then
-                If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                If Not MDIAnalyzerManager.ISE_Manager Is Nothing AndAlso MDIAnalyzerManager.ISE_Manager.IsISEModuleReady Then
 
                     'SGM 01/10/2012 - If no calibration is needed set ISE preparations as PENDING
                     'Dim myOrderTestsDelegate As New OrderTestsDelegate

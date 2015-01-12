@@ -24,6 +24,7 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "Manage barcode instruction methods LEVEL #1 (Public)"
+       
         ''' <summary>
         ''' Implements the business related with the reception of a barcode read instruction in Sample / Reagents Rotor
         ''' </summary>
@@ -54,6 +55,8 @@ Namespace Biosystems.Ax00.BL
         '''              SA 26/03/2014    - BA-1552 ==> For all Special Solutions in the WS, updates the Element Status to POS (there is at least a Bottle
         '''                                             of the Special Solution positioned in the Reagents Rotor)
         '''              AG 07/10/2014    - BA-1979 ==> Added traces into log when NOT INUSE Rotor Position has an invalid value (in order to find the origin of the problem)
+        '''              SA 09/01/2014    - BA-1999 ==> Changed the linq used to get NOT INUSE Reagents Rotor Positions: besides positions with Status = NO_INUSE, get also
+        '''                                             positions without ElementID but Status = DEPLETED or FEW
         ''' </remarks>
         Public Function ManageBarcodeInstruction(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarCodeRotorContentDS As WSRotorContentByPositionDS, _
                                                  ByVal pRotorType As String) As GlobalDataTO
@@ -211,7 +214,7 @@ Namespace Biosystems.Ax00.BL
                                             myNoInUsePosition = (From e As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In currentContentDS.twksWSRotorContentByPosition _
                                                                 Where e.RotorType = pRotorType _
                                                               AndAlso (e.Status = "NO_INUSE" _
-                                                               OrElse (e.Status <> "FREE" AndAlso e.IsElementIDNull)) _
+                                                               OrElse (e.IsElementIDNull AndAlso (e.Status = "DEPLETED" OrElse e.Status = "FEW"))) _
                                                                Select e).ToList
 
                                             If (myNoInUsePosition.Count > 0) Then
@@ -285,7 +288,6 @@ Namespace Biosystems.Ax00.BL
                                                                     'In Reagents Rotor, Not InUse positions marked as not scanned should remains with the same information as before
                                                                     If (Not rcpNoInUseRow.IsSolutionCodeNull) Then newRow.SolutionCode = rcpNoInUseRow.SolutionCode
                                                                     If (Not rcpNoInUseRow.IsReagentIDNull) Then newRow.ReagentID = rcpNoInUseRow.ReagentID
-
                                                                     If (Not rcpNoInUseRow.IsRealVolumeNull) Then newRow.RealVolume = rcpNoInUseRow.RealVolume
                                                                     If (Not rcpNoInUseRow.IsStatusNull AndAlso (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW")) Then
                                                                         newRow.Status = rcpNoInUseRow.Status
@@ -319,7 +321,6 @@ Namespace Biosystems.Ax00.BL
                                                                             If (Not decodedDataDS.DecodedReagentsFields(0).IsBottleTypeNull) Then newRow.TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                                                             If (Not decodedDataDS.DecodedReagentsFields(0).IsBottleVolumeNull) Then newRow.RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                                                            'SA/JV 12/12/2013 - BT #1384
                                                                             If (Not rcpNoInUseRow.IsStatusNull AndAlso (rcpNoInUseRow.Status = "DEPLETED" OrElse rcpNoInUseRow.Status = "FEW")) Then
                                                                                 newRow.RealVolume = rcpNoInUseRow.RealVolume
                                                                                 newRow.Status = rcpNoInUseRow.Status
@@ -917,7 +918,9 @@ Namespace Biosystems.Ax00.BL
         '''                                          value is assigned to a field RealVolume in the local DataSet, and the code to write in the LOG is never reached
         '''              SA 22/12/2014 - BA-1999 ==> For NOT IN USE Reagents, search if there is information for the bottle in table of Historic Reagent Bottles and
         '''                                          in this case, assign the saved Volume to the Rotor Position. Besides, calculate the number of Tests that can be
-        '''                                          executed with the remaining volume.  
+        '''                                          executed with the remaining volume. If there is historic information for the Reagent Bottle and it is LOCKED, 
+        '''                                          ignore that Status; only DEPLETED or FEW Status has to be assigned to the Rotor Position instead of NO_INUSE.
+        '''                                          For External Reagents (BarcodeStatus = UNKNOWN), FREE Status is assigned
         ''' </remarks>
         Private Function SaveOKReadReagentsRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                          ByVal pRotorType As String, ByVal pBarCodeResPosition As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow, _
@@ -981,7 +984,7 @@ Namespace Biosystems.Ax00.BL
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).TubeType = decodedDataDS.DecodedReagentsFields(0).BottleType
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).RealVolume = decodedDataDS.DecodedReagentsFields(0).BottleVolume
 
-                                            UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE"
+                                            UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = "FREE" '"NO_INUSE"
                                             UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
                                             UpdatedRcpDS.AcceptChanges()
                                             updateAdditonalRcpFlag = True
@@ -1075,7 +1078,8 @@ Namespace Biosystems.Ax00.BL
                                                     End If
                                                 End If
 
-                                                If (myPositionStatus = String.Empty OrElse myPositionStatus = "INUSE") Then myPositionStatus = "NO_INUSE"
+                                                'Preserve DEPLETED or FEW Status read from Reagents On Board table; ignore the LOCKED Status for NO_INUSE Reagents
+                                                If (myPositionStatus = String.Empty OrElse myPositionStatus = "INUSE" OrElse myPositionStatus = "LOCKED") Then myPositionStatus = "NO_INUSE"
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).Status = myPositionStatus
                                                 UpdatedRcpDS.twksWSRotorContentByPosition(0).EndEdit()
 

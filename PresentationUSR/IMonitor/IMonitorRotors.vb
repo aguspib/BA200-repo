@@ -1835,10 +1835,12 @@ Partial Public Class IMonitor
     ''' <param name="pCellNumber">Cell Number of the selected Rotor Position</param>
     ''' <remarks>
     ''' Created by: 
-    ''' Modified by: TR 15/11/2013 - BT #1383 => Send information required to calculate the remaining test for Reagents with 
+    ''' Modified by: TR 15/11/2013 - BA-1383 ==> Send information required to calculate the remaining test for Reagents with 
     '''                                          status NOT INUSE.
-    '''              TR 28/03/2014 - BT #1562 Show the expiration date on screen. get the value from the reagent barcode if exist.
-    '''              WE 07/10/2014 - BA #1965 Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+    '''              TR 28/03/2014 - BA-1562 ==> Show the expiration date on screen. get the value from the reagent barcode if exist.
+    '''              WE 07/10/2014 - BA-1965 ==> Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+    '''              SA 09/01/2015 - BA-1999 ==> When position Status is FREE, if BarcodeStatus is UNKNOWN, the Barcode has to be shown in the 
+    '''                                          corresponding field in Info Area 
     ''' </remarks>
     Private Sub ShowPositionInfoArea(ByVal pRotorType As String, ByVal pRingNumber As Integer, ByVal pCellNumber As Integer)
         Try
@@ -1860,7 +1862,8 @@ Partial Public Class IMonitor
                 End If
 
                 'If the current Position Status is FREE , it is not needed look additional data in the DataBase
-                If (currentStatus = "FREE" AndAlso barcodeStatus <> "ERROR") Then
+                'BA-1999: exclude from the area cleaning positions with Status FREE but BarcodeStatus = UNKNOWN
+                If (currentStatus = "FREE" AndAlso barcodeStatus <> "ERROR" AndAlso barcodeStatus <> "UNKNOWN") Then
                     CleanInfoArea(False)
 
                     If (pRotorType = "SAMPLES") Then

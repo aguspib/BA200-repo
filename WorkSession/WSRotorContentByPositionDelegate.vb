@@ -396,6 +396,9 @@ Namespace Biosystems.Ax00.BL
         '''              SA 22/12/2014 - BA-1999 ==> Before update field in the DS of Not In Use Rotor Positions, verify the DS has a row to avoid errors when
         '''                                          a position with BarcodeStatus = UNKNOWN is moved to another position in Reagents Rotor (in this case, the 
         '''                                          position Status is NO_INUSE but there is not a row in table twksWSNotInUseRotorPositions)
+        '''              SA 08/01/2015 - BA-1999 ==> When it is verified is the Element to move is NOT IN USE in the active Work Session, if Position Status is 
+        '''                                          different of NO_INUSE, but field ElementID is not informed, it means the Position is NOT IN USE, but it contains
+        '''                                          a bottle that is DEPLETED, FEW or LOCKED; then, both conditions have to be checked
         ''' </remarks>
         Public Function ChangeElementPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSRotorContentByPositionDS As WSRotorContentByPositionDS, _
                                               ByVal pToRingNumber As Integer, ByVal pToCellNumber As Integer, ByVal pToBarCodeStatus As String, _
@@ -445,7 +448,9 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             'The moved TUBE/BOTTLE is NOT IN USE in the current WorkSession
-                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE") Then
+                            'BA-1999: Positions with Status DEPLETED, FEW or LOCKED but without ElementID are also NOT IN USE
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE" OrElse _
+                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull()) Then
                                 'Get the information of the NOT IN USE Position to move
                                 dataToReturn = myNotInUsePositionsDelegate.GetPositionContent(dbConnection, pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).AnalyzerID, _
                                                                                               pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).RotorType, _
@@ -456,7 +461,7 @@ Namespace Biosystems.Ax00.BL
                                 If (Not dataToReturn.HasError AndAlso Not dataToReturn.SetDatos Is Nothing) Then
                                     myNotInUsePositionDS = DirectCast(dataToReturn.SetDatos, VirtualRotorPosititionsDS)
 
-                                    'BA-1999: Before change the Ring and Cell Number, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                    'BA-1999: Before change the Ring and Cell Number, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
                                     '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
                                     '         to move them to another position) 
                                     If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
@@ -530,7 +535,7 @@ Namespace Biosystems.Ax00.BL
                                                         End If
                                                     End If
                                                 Else
-                                                    'BA-1999: Before change the Status and TubeType, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                                    'BA-1999: Before change the Status and TubeType, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
                                                     '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions and then an error is raised when try
                                                     '         to move them to another position) 
                                                     If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
@@ -555,7 +560,9 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         If (Not dataToReturn.HasError) Then
-                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE") Then
+                            'BA-1999: Positions with Status DEPLETED, FEW or LOCKED but without ElementID are also NOT IN USE
+                            If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).Status = "NO_INUSE" OrElse _
+                                pWSRotorContentByPositionDS.twksWSRotorContentByPosition(0).IsElementIDNull()) Then
                                 If (pToBarCodeStatus = "UNKNOWN") Then
                                     'When the destination position has BarcodeStatus = UNKNOWN, the target position already exists in the table of Not In Use Elements
                                     'and it should be updated; however, due to update function does not exist, the target position has to be deleted before continuing
@@ -563,7 +570,7 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 If (Not dataToReturn.HasError) Then
-                                    'BA-1999: Before call the Add function, verify if the DS has a row (due to positions with BarcodeStatus = UNKNOWN 
+                                    'BA-1999: Before call the Add function, verify if the DS has a row (due to positions with BarcodeStatus = ERROR 
                                     '         have Status NOT IN USE but do not exist in table twksWSNotInUseRotorPositions) 
                                     If (myNotInUsePositionDS.tparVirtualRotorPosititions.Rows.Count > 0) Then
                                         'BA-1979: Added classCalledFrom parameter
@@ -3889,20 +3896,17 @@ Namespace Biosystems.Ax00.BL
                                     resultDS = DirectCast(myGlobalDataTO.SetDatos, WSRotorContentByPositionDS)
 
                                     'Update positions in the physical Rotor
-                                    'Dim myRotorContentByPositionDAO As New twksWSRotorContentByPositionDAO
-                                    'myGlobalDataTO = myRotorContentByPositionDAO.Update(dbConnection, resultDS)
                                     myGlobalDataTO = Update(dbConnection, pRotorType, resultDS, ClassCalledFrom.LoadRotor) 'AG 07/10/2014 BA-1979 call the Update method  in delegate instead of in DAO
 
                                     If (Not myGlobalDataTO.HasError) Then
                                         If (pRotorType = "REAGENTS") Then
-
                                             'Get Rotor Positions containing required Reagents to calculate its status (POS or INCOMPLETE)
                                             'Use TubeContent = REAGENT and ElementID NOT NULL, and sort data by ElementID; for each Reagent, calculate the Reagent Status just once
                                             '(due to it is possible to have several bottles of the same Reagent placed in the Rotor)
                                             Dim myReagentTubes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                             myReagentTubes = (From e As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In resultDS.twksWSRotorContentByPosition _
                                                              Where e.RotorType = "REAGENTS" _
-                                                           AndAlso String.Compare(e.TubeContent, "REAGENT", False) = 0 _
+                                                           AndAlso e.TubeContent = "REAGENT" _
                                                        AndAlso Not e.IsElementIDNull _
                                                             Select e Order By e.ElementID).Distinct.ToList
 
@@ -3912,7 +3916,6 @@ Namespace Biosystems.Ax00.BL
                                             For Each myReagentContentROW As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myReagentTubes
                                                 If (myReagentContentROW.ElementID <> immPreviousRow) Then
                                                     myGlobalDataTO = myRequiredElementsDelegate.CalculateReagentStatus(dbConnection, pAnalyzerID, pRotorType, myReagentContentROW.ElementID, True)
-
                                                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                                         If (DirectCast(myGlobalDataTO.SetDatos, String) = "INCOMPLETE") Then
                                                             myReagentContentROW.ElementStatus = "INCOMPLETE"
@@ -3943,7 +3946,7 @@ Namespace Biosystems.Ax00.BL
                                             Dim myTubes As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                             myTubes = (From e As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In resultDS.twksWSRotorContentByPosition _
                                                       Where e.RotorType = pRotorType _
-                                                    AndAlso String.Compare(e.TubeContent, "REAGENT", False) <> 0 _
+                                                    AndAlso e.TubeContent <> "REAGENT" _
                                                 AndAlso Not e.IsElementIDNull _
                                                      Select e Order By e.ElementID).Distinct.ToList
 
@@ -3971,9 +3974,6 @@ Namespace Biosystems.Ax00.BL
 
                                         Dim noInUseDelegate As New WSNotInUseRotorPositionsDelegate
                                         Dim myNoInUseVirtualPosition As New VirtualRotorPosititionsDS
-
-                                        'Dim vRotorDS As New VirtualRotorPosititionsDS
-                                        'Dim vRotorDelegate As New VirtualRotorsPositionsDelegate
                                         Dim virtualRotorPosition As List(Of VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow)
 
                                         For Each noInUseRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myNotInUseCells
@@ -4020,31 +4020,27 @@ Namespace Biosystems.Ax00.BL
                                             ' JC 20/09/2013 - Fix Bug #1274
                                             ' Check if there was any error and the 
                                             ' LoadRotor is necessary continue
-                                            If myGlobalDataTO.HasError Then
-
+                                            If (myGlobalDataTO.HasError) Then
                                                 ' if error was decodifing sample type
                                                 ' set the sample with Error and paint the sample at Rotor Position with a cross 
                                                 ' continue with next sample from virtual rotor 
-                                                If myGlobalDataTO.ErrorMessage = "Barcode Sample Type Error" Then
+                                                If (myGlobalDataTO.ErrorMessage = "Barcode Sample Type Error") Then
                                                     RowRotorContentByPos.BarcodeStatus = "ERROR"
                                                     myGlobalDataTO.HasError = False
                                                     Continue For
                                                 End If
-
                                             End If ' END JC 20/09/2013 - Fix Bug #1274
 
-                                            If Not myGlobalDataTO.HasError Then
-
+                                            If (Not myGlobalDataTO.HasError) Then
                                                 ' JC 20-09-2013 
                                                 'if there wasnot any error on decode, and BarcodeStatus has Error value, set as Ok.
                                                 ' special case: Rotor was saved with sample barcode status = error and restored when
                                                 ' barcode configuration has changed and now, the sample may be is correct
-                                                If RowRotorContentByPos.BarcodeStatus = "ERROR" Then
+                                                If (RowRotorContentByPos.BarcodeStatus = "ERROR") Then
                                                     RowRotorContentByPos.BarcodeStatus = "OK"
                                                 End If ' END JC 20/09/2013 - Fix Bug #1274
                                                 ' XB+JC 09/10/2013 
 
-                                                'If Not myGlobalDataTO.HasError Then
                                                 Dim decodedDataDS As BarCodesDS = DirectCast(myGlobalDataTO.SetDatos, BarCodesDS)
 
                                                 'new incorpore sample type
@@ -4055,7 +4051,7 @@ Namespace Biosystems.Ax00.BL
                                                                          AndAlso a.CellNumber = RowRotorContentByPos.CellNumber _
                                                                           Select a).ToList
 
-                                                    If virtualRotorPosition.Count > 0 Then
+                                                    If (virtualRotorPosition.Count > 0) Then
                                                         row.BeginEdit()
                                                         row.SampleType = virtualRotorPosition.First.SampleType
                                                         row.EndEdit()
@@ -4072,14 +4068,10 @@ Namespace Biosystems.Ax00.BL
                                                                          AndAlso Not row.IsBarCodeInfoNull _
                                                                           Select row).ToList
 
-
                                                 Dim noTestRequestDlg As New BarcodePositionsWithNoRequestsDelegate
                                                 myGlobalDataTO = noTestRequestDlg.AddPosition(dbConnection, pAnalyzerID, pWorkSessionID, pRotorType, RowRotorContentByPos.CellNumber, decodedDataDS)
-
                                             End If
                                         Next
-
-                                        'DL 30/04/2013. End Changes v2.0.0
                                     End If
                                 End If
                             End If

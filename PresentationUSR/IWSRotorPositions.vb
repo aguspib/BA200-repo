@@ -2760,10 +2760,12 @@ Public Class IWSRotorPositions
     '''              TR 20/01/2010 - Remove part of the code that duplicate the functionality of StatusInfoAreaControl function.
     '''              AG 28/01/2010 - show the tube contents description not the code
     '''              SA 26/10/2010 - Changed the way of getting the description of the Tube Content
-    '''              TR 15/11/2013 - BT #1383 Complete the information required to get the Remaining test for reagents with status NOT INUSE.
-    '''              JV 02/12/2013 - BT #1419 Don't show NumTestsRemaining when barcode is unknown.
-    '''              TR 28/03/2014 - BT #1562 Show the expiration date on screen. get the value from the reagent barcode if exist.
-    '''              WE 07/10/2014 - BA #1965 Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+    '''              TR 15/11/2013 - BA-1383 ==> Complete the information required to get the Remaining test for reagents with status NOT INUSE.
+    '''              JV 02/12/2013 - BA-1419 ==> Don't show NumTestsRemaining when barcode is unknown.
+    '''              TR 28/03/2014 - BA-1562 ==> Show the expiration date on screen. get the value from the reagent barcode if exist.
+    '''              WE 07/10/2014 - BA-1965 ==> Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+    '''              SA 09/01/2015 - BA-1999 ==> When position Status is FREE, if BarcodeStatus is UNKNOWN, the Barcode has to be shown in the 
+    '''                                          corresponding field in Info Area 
     ''' </remarks>
     Private Sub ShowPositionInfoArea(ByVal pAnalyzerID As String, ByVal pRotorType As String, _
                                      ByVal pRingNumber As Integer, ByVal pCellNumber As Integer)
@@ -2784,8 +2786,9 @@ Public Class IWSRotorPositions
             End If
 
             'If the current Position Status is FREE , it is not needed look additional data in the DataBase
-            If (currentStatus = "FREE" AndAlso barcodeStatus <> "ERROR") Then 'AG 05/10/2011 - Change condition
-                CleanInfoArea(False, True) 'AG 03/10/2011 - Only in this case add optional parameter to TRUE for not disable barcode controls
+            'BA-1999: exclude from the area cleaning positions with Status FREE but BarcodeStatus = UNKNOWN
+            If (currentStatus = "FREE" AndAlso barcodeStatus <> "ERROR" AndAlso barcodeStatus <> "UNKNOWN") Then 'AG 05/10/2011 - Change condition
+                CleanInfoArea(False, True)  'AG 03/10/2011 - Only in this case add optional parameter to TRUE for not disable barcode controls
 
                 If (pRotorType = "SAMPLES") Then
                     bsSampleCellTextBox.Text = pCellNumber
@@ -3042,7 +3045,8 @@ Public Class IWSRotorPositions
                             bsReagentsRefillPosButton.Enabled = False
                             bsReagentsCheckVolumePosButton.Enabled = False
 
-                            If (barcodeStatus = "ERROR") Then
+                            'BA-1999: enable button for DELETE Position also when BarcodeStatus is UNKNOWN
+                            If (barcodeStatus = "ERROR" OrElse barcodeStatus = "UNKNOWN") Then
                                 bsReagentsDeletePosButton.Enabled = True
                             Else
                                 bsReagentsDeletePosButton.Enabled = False
@@ -3065,181 +3069,173 @@ Public Class IWSRotorPositions
         End Try
     End Sub
 
-    ''' <summary>
+
+   	 ''' <summary>
     ''' Get the information that has to be shown in the Report related to the Rotor and the Info Area section
     ''' </summary>
     ''' <param name="pAnalyzerID">Analyzer identifier</param>
     ''' <param name="pRotorType">Rotor type</param>
     ''' <remarks>
-    '''               Created by:  JV - 14/11/2013 - #1382: Get the info for the report using the 'ShowPositionInfoArea' method way to obtain the data.
-    '''               Modified by: JV - 19/11/2013 - #1382: The status description in the report must be the same as the screen legend. I can not use the 'GetStatusDescOnCurrentLanguage' function used in ShowPositionInfoArea
-    '''                            JV - 28/11/2013 - #1412: Show the used and no-used wells in the report. Unify all the status treated and their info.
-    '''                                                     Include the column 'CellNumber' in the Reagents table (CellPositionInformationDS), due to it was impossible to associate rows with 'ElementID=Null' between tables in dataset
-    '''                            JV - 29/11/2013 - #1419: Order correctly by well and don't show values "Type, Volume and/or Tests" depending the barcode status: error or unknown.
-    '''                            JV - 03/12/2013 - #1384: Changes in ElementId when reset the session and mantain status
-    '''                            TR - 28/03/2014 - #1562: Show the Expiration Date on te report.
-    '''                            XB - 03/06/2014 - #1648: Change the sort of this report alphabetically by the name of the reagent
-    '''                            WE - 07/10/2014 - #1965: Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+    ''' Created by:  JV 14/11/2013 - BA-1382 ==> Get the info for the report using the 'ShowPositionInfoArea' method way to obtain the data.
+    ''' Modified by: JV 19/11/2013 - BA-1382 ==> The status description in the report must be the same as the screen legend. I can not use 
+    '''                                          the 'GetStatusDescOnCurrentLanguage' function used in ShowPositionInfoArea
+    '''              JV 28/11/2013 - BA-1412 ==> Show the used and no-used wells in the report. Unify all the status treated and their info.
+    '''                                          Include the column 'CellNumber' in the Reagents table (CellPositionInformationDS), due to it was 
+    '''                                          impossible to associate rows with 'ElementID=Null' between tables in dataset
+    '''              JV 29/11/2013 - BA-1419 ==> Order correctly by CellNumber and don't show values "Type, Volume and/or Tests" depending the 
+    '''                                          Barcode Status: error or unknown
+    '''              JV 03/12/2013 - BA-1384 ==> Changes in ElementID when reset the session and mantain status
+    '''              TR 28/03/2014 - BA-1562 ==> Show the Expiration Date on the report.
+    '''              XB 03/06/2014 - BA-1648 ==> Change the sort of this report alphabetically by the name of the reagent
+    '''              WE 07/10/2014 - BA-1965 ==> Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes)
+    '''              SA 09/01/2015 - BA-1999 ==> Changed the linq used to get NOT EMPTY cells in the Rotor to get also positions with Status FREE but 
+    '''                                          Barcode Status ERROR or UNKNOWN
     ''' </remarks>
     Private Sub GetInfoAreaForReport(ByVal pAnalyzerID As String, ByVal pRotorType As String)
         Try
-            'Select the rotor type cells and the positions with bottle
-            Dim myCellsDS As WSRotorContentByPositionDS
-            Dim myCellsTable As New WSRotorContentByPositionDS.twksWSRotorContentByPositionDataTable
-            Dim lStatus As New List(Of String) From {"FREE"}
+            'Select all not empty Cells in the specified Rotor
+            Dim query As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AsEnumerable _
+                                                                                                      Where a.AnalyzerID = AnalyzerIDAttribute _
+                                                                                                    AndAlso a.WorkSessionID = WorkSessionIDAttribute _
+                                                                                                    AndAlso a.RotorType = pRotorType _
+                                                                                                    AndAlso (a.Status <> "FREE" _
+                                                                                                     OrElse (Not a.IsBarcodeStatusNull AndAlso (a.BarcodeStatus = "UNKNOWN" OrElse a.BarcodeStatus = "ERROR"))) _
+                                                                                                   Order By a.CellNumber _
+                                                                                                     Select a)
+            If (query.Count > 0) Then
+                Dim myCellsTable As New WSRotorContentByPositionDS.twksWSRotorContentByPositionDataTable
+                query.CopyToDataTable(myCellsTable, LoadOption.OverwriteChanges)
 
-            Dim query As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = _
-                            (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition.AsEnumerable _
-                                Where a.AnalyzerID = AnalyzerIDAttribute _
-                                And a.WorkSessionID = WorkSessionIDAttribute _
-                                And a.RotorType = pRotorType _
-                                And Not lStatus.Contains(a.Status) _
-                                OrElse (a.Status = "FREE" And a.BarcodeStatus = "ERROR") _
-                                Order By a.CellNumber _
-                                Select a)
+                Dim myCellsDS As WSRotorContentByPositionDS
+                myCellsDS = New WSRotorContentByPositionDS()
+                myCellsDS.Tables.Clear()
+                myCellsDS.Tables.Add(myCellsTable)
 
-            If Not (query.Count > 0) Then
-                Return
-            End If
+                'Read from DB data of all not empty Cells in the specified Rotor
+                Dim myGlobalDataTO As GlobalDataTO
+                Dim positionInformation As New WSRotorContentByPositionDelegate
 
-            query.CopyToDataTable(myCellsTable, LoadOption.OverwriteChanges)
+                myGlobalDataTO = positionInformation.GetPositionInfoForReport(Nothing, myCellsDS)
+                If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+                    Dim myCellPosInfoDS As CellPositionInformationDS = DirectCast(myGlobalDataTO.SetDatos, CellPositionInformationDS)
 
-            'Get all the information of the Rotor Positions from the Database
-            Dim myGlobalDataTO As GlobalDataTO
-            Dim positionInformation As New WSRotorContentByPositionDelegate
-            myCellsDS = New WSRotorContentByPositionDS()
-            myCellsDS.Tables.Clear()
-            myCellsDS.Tables.Add(myCellsTable)
-            'Use this method similar to 'GetPositionInfo', just modified for the report usage (treat more than one row of the WSRotorContentByPositionDS)
-            myGlobalDataTO = positionInformation.GetPositionInfoForReport(Nothing, myCellsDS)
-            If (Not myGlobalDataTO.HasError) Then
-                'Get the returned information
-                Dim myCellPosInfoDS As CellPositionInformationDS
-                myCellPosInfoDS = CType(myGlobalDataTO.SetDatos, CellPositionInformationDS)
+                    Dim myReport As New DataTable(myCellPosInfoDS.ReportTable.TableName)
+                    myReport = myCellPosInfoDS.ReportTable.Clone()
+                    myCellPosInfoDS.Tables.Remove(myCellPosInfoDS.ReportTable.TableName)
+                    myCellPosInfoDS.Tables.Add(myReport)
 
-                Dim myReport As New DataTable(myCellPosInfoDS.ReportTable.TableName)
-                myReport = myCellPosInfoDS.ReportTable.Clone()
-                myCellPosInfoDS.Tables.Remove(myCellPosInfoDS.ReportTable.TableName)
-                myCellPosInfoDS.Tables.Add(myReport)
-                Select Case myRotorTypeForm
-                    Case "REAGENTS"
-                        Dim row As DataRow
-                        Dim myReagent As IEnumerable(Of CellPositionInformationDS.ReagentsRow)
-                        Dim myCellsQuery As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = _
-                            From x In myCellsTable Select x 'Where Not x.IsElementIDNull Select x
+                    Select Case (myRotorTypeForm)
+                        Case "REAGENTS"
+                            Dim row As DataRow
+                            Dim myReagent As IEnumerable(Of CellPositionInformationDS.ReagentsRow)
+                            Dim myCellsQuery As IEnumerable(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow) = (From x In myCellsTable Select x)
 
-                        Dim myExpirationDate As Date 'TR 10/04/2014 BT#1583
+                            Dim myExpirationDate As Date 'TR 10/04/2014 BT#1583
+                            For Each dr As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myCellsQuery
+                                row = myReport.NewRow()
+                                row(0) = dr.CellNumber
 
-                        For Each dr As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myCellsQuery
+                                myReagent = (From x In myCellPosInfoDS.Reagents Where x.CellNumber = dr.CellNumber Select x)
+                                If (myReagent.Count > 0 AndAlso Not myReagent.First.IsReagentNameNull) Then row(1) = myReagent.First.ReagentName
 
-                            row = myReport.NewRow()
-                            row(0) = dr.CellNumber
-                            myReagent = From x In myCellPosInfoDS.Reagents Where x.CellNumber = dr.CellNumber Select x
+                                'TR 28/03/2014 #1562
+                                If (Not dr.IsBarCodeInfoNull) Then row(2) = dr.BarCodeInfo
+                                If (dr.BarcodeStatus = "OK" AndAlso dr.BarCodeInfo <> "") Then
+                                    If (myReagent.Count > 0) Then
+                                        myReagent.First().BeginEdit()
 
-                            If myReagent.Count > 0 AndAlso Not myReagent.First.IsReagentNameNull Then row(1) = myReagent.First.ReagentName
-                            If Not dr.IsBarCodeInfoNull Then row(2) = dr.BarCodeInfo
+                                        'TR 10/04/2014 BT #1583
+                                        myExpirationDate = Date.MinValue 'initialize variable
+                                        'WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
+                                        If (myCellPosInfoDS.PositionInformation(0).Content = "REAGENT") Then
+                                            'Get the expiration date
+                                            myExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
 
-                            'TR 28/03/2014 #1562
-                            If dr.BarcodeStatus = "OK" AndAlso dr.BarCodeInfo <> "" Then
-                                If myReagent.Count > 0 Then
-                                    myReagent.First().BeginEdit()
+                                            'Validate if date is correct (different than the minimun date value).
+                                            If (myExpirationDate > Date.MinValue) Then
+                                                myReagent.First().ExpirationDate = myExpirationDate
+                                                myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                            End If
+                                        End If
+                                        'WE 07/10/2014 BA-1965 - End.
 
-                                    'TR 10/04/2014 BT#1583
-                                    myExpirationDate = Date.MinValue 'initialize variable
-                                    ' WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
-                                    If myCellPosInfoDS.PositionInformation(0).Content = "REAGENT" Then
-                                        'Get the expiration date
-                                        myExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
-                                        ' Validate if date is correct (different than the minimun date value).
-                                        If myExpirationDate > Date.MinValue Then
-                                            myReagent.First().ExpirationDate = myExpirationDate
-                                            myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
+                                        myReagent.First().LotNumber = GetReagentLotNumberFromBarCode(dr.BarCodeInfo)
+                                        myReagent.First().EndEdit()
+
+                                        'TR 10/04/2014 BT#1583 Validate the date to be shown on report.
+                                        If (myExpirationDate > Date.MinValue) Then
+                                            'Set the Formated Date to be shown on Report
+                                            row("ExpDateFormated") = myReagent.First().ExpDateFormated
+                                        Else
+                                            row("ExpDateFormated") = String.Empty
                                         End If
                                         'TR 10/04/2014 BT#1583
-                                        'myReagent.First().ExpirationDate = GetReagentExpDateFromBarCode(dr.BarCodeInfo)
-                                        'myReagent.First().ExpDateFormated = myReagent.First().ExpirationDate.ToString("MM/yyyy")
-                                    End If
-                                    ' WE 07/10/2014 BA-1965 - End.
 
-                                    myReagent.First().LotNumber = GetReagentLotNumberFromBarCode(dr.BarCodeInfo)
-                                    myReagent.First().EndEdit()
-
-                                    'TR 10/04/2014 BT#1583 Validate the date to be shown on report.
-                                    If myExpirationDate > Date.MinValue Then
-                                        'Set the Formated Date to be shown on Report
-                                        row("ExpDateFormated") = myReagent.First().ExpDateFormated
-                                    Else
-                                        row("ExpDateFormated") = String.Empty
+                                        'TR 06/05/2014 -Validate if LotNumber is a valid number to show on report
+                                        If (IsNumeric(myReagent.First().LotNumber) AndAlso CInt(myReagent.First().LotNumber) > 0) Then
+                                            'Set the lot number to shown on report
+                                            row("LotNumber") = myReagent.First().LotNumber
+                                        Else
+                                            row("LotNumber") = String.Empty
+                                        End If
                                     End If
-                                    'TR 10/04/2014 BT#1583
-
-                                    'TR 06/05/2014 -Validate if LotNumber is a valid number to show on report
-                                    If IsNumeric(myReagent.First().LotNumber) AndAlso CInt(myReagent.First().LotNumber) > 0 Then
-                                        'Set the lot number to shown on report
-                                        row("LotNumber") = myReagent.First().LotNumber
-                                    Else
-                                        row("LotNumber") = ""
-                                    End If
-                                    'TR 06/05/2014 -END
                                 End If
-                            End If
-                            'TR 28/03/2014 #1562 -END
 
-                            If myReagent.Count > 0 AndAlso Not myReagent.First.IsExpirationDateNull Then
-                                row(3) = myReagent.First.ExpirationDate.ToString(SystemInfoManager.OSDateFormat)
-                            End If
+                                If (myReagent.Count > 0 AndAlso Not myReagent.First.IsExpirationDateNull) Then
+                                    row(3) = myReagent.First.ExpirationDate.ToString(SystemInfoManager.OSDateFormat)
+                                End If
 
-                            If Not dr.IsTubeTypeNull Then
+                                If (Not dr.IsTubeTypeNull) Then
+                                    Dim result As List(Of TubeSizeTO) = (From a In AllTubeSizeList _
+                                                                        Where a.RingNumber = dr.RingNumber _
+                                                                      AndAlso a.RotorType = myRotorTypeForm _
+                                                                      AndAlso a.TubeCode = dr.TubeType _
+                                                                       Select a).ToList()
+                                    row(4) = IIf(result.Count > 0, result.First.FixedTubeName, String.Empty)
+                                End If
 
-                                Dim result As List(Of TubeSizeTO) = (From a In AllTubeSizeList _
-                                                                     Where a.RingNumber = dr.RingNumber _
-                                                                     AndAlso String.Compare(a.RotorType, myRotorTypeForm, False) = 0 _
-                                                                     AndAlso a.TubeCode = dr.TubeType _
-                                                                     Select a).ToList()
-                                row(4) = IIf(result.Count > 0, result.First.FixedTubeName, String.Empty)
-                            End If
-                            If Not dr.IsRealVolumeNull Then row(5) = dr.RealVolume.ToStringWithDecimals(2, True)
-                            If myReagent.Count > 0 AndAlso Not myReagent.First.IsRemainingTestsNull Then row(6) = myReagent.First.RemainingTests.ToString
-                            If dr.Status = "FREE" AndAlso dr.BarcodeStatus = "ERROR" Then
-                                row(4) = String.Empty
-                                row(5) = String.Empty
-                                row(6) = String.Empty
-                                row(7) = bsBarcodeErrorRGLabel.Text
-                                row(8) = dr.BarcodeStatus
-                            ElseIf dr.BarcodeStatus = "UNKNOWN" Then
-                                row(6) = String.Empty
-                                row(7) = bsUnknownLabel.Text
-                                row(8) = dr.Status
-                            Else
-                                Select Case dr.Status
-                                    Case "FEW"
-                                        row(7) = bsLegReagLowVolLabel.Text
-                                    Case "DEPLETED"
-                                        row(7) = bsLegReagDepleteLabel.Text
-                                    Case Else
-                                        row(7) = String.Empty
-                                End Select
-                                row(8) = dr.Status
-                            End If
-                            myReport.Rows.Add(row)
-                        Next
+                                If (Not dr.IsRealVolumeNull) Then row(5) = dr.RealVolume.ToStringWithDecimals(2, True)
+                                If (myReagent.Count > 0 AndAlso Not myReagent.First.IsRemainingTestsNull) Then row(6) = myReagent.First.RemainingTests.ToString
 
-                        ' XB 03/06/2014 - BT #1648
-                        'myReport.DefaultView.Sort = myReport.Columns(0).ColumnName & " " & "ASC"
-                        myReport.DefaultView.Sort = myReport.Columns(1).ColumnName & " " & "ASC"
+                                If (dr.BarcodeStatus = "ERROR") Then
+                                    row(4) = String.Empty
+                                    row(5) = String.Empty
+                                    row(6) = String.Empty
+                                    row(7) = bsBarcodeErrorRGLabel.Text
+                                    row(8) = dr.BarcodeStatus
+                                ElseIf (dr.BarcodeStatus = "UNKNOWN") Then
+                                    row(6) = String.Empty
+                                    row(7) = bsUnknownLabel.Text
+                                    row(8) = dr.Status
+                                Else
+                                    Select Case dr.Status
+                                        Case "FEW"
+                                            row(7) = bsLegReagLowVolLabel.Text
+                                        Case "DEPLETED"
+                                            row(7) = bsLegReagDepleteLabel.Text
+                                        Case Else
+                                            row(7) = String.Empty
+                                    End Select
+                                    row(8) = dr.Status
+                                End If
+                                myReport.Rows.Add(row)
+                            Next
 
-                        myReport = myReport.DefaultView.ToTable()
-                    Case Else
-                        'Nothing to do
-                        Return
-                End Select
-                myCellPosInfoDS.AcceptChanges()
-                'Finally we launch the report
-                XRManager.ShowRotorContentByPositionReport(myCellPosInfoDS)
-            Else
-                ShowMessage(Me.Name & ".GetInfoAreaForReport", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
+                            'XB 03/06/2014 - BT #1648
+                            myReport.DefaultView.Sort = myReport.Columns(1).ColumnName & " " & "ASC"
+                            myReport = myReport.DefaultView.ToTable()
+                        Case Else
+                            'Nothing to do
+                            Return
+                    End Select
+                    myCellPosInfoDS.AcceptChanges()
+
+                    'Finally we launch the report
+                    XRManager.ShowRotorContentByPositionReport(myCellPosInfoDS)
+                Else
+                    ShowMessage(Me.Name & ".GetInfoAreaForReport", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
+                End If
             End If
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetInfoAreaForReport", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetInfoAreaForReport", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -3254,7 +3250,9 @@ Public Class IWSRotorPositions
     ''' <returns>The status name on the application language.</returns>
     ''' <remarks>
     ''' Created by:  TR 29/04/2011
-    ''' Modified by: AG 06/10/2011 - Add pBarCodeStatus parameter for show new status due Barcode Error</remarks>
+    ''' Modified by: AG 06/10/2011 - Add pBarCodeStatus parameter for show new status due Barcode Error
+    '''              SA 09/01/2014 - BA-1999 ==> If BarcodeStatus is UNKNOWN the position is shown also as NOT IN USE
+    ''' </remarks>
     Private Function GetStatusDescOnCurrentLanguage(ByVal pItemID As String, ByVal pBarcodeStatus As String) As String
         Dim myResult As String = ""
         Try
@@ -3272,7 +3270,8 @@ Public Class IWSRotorPositions
             End Select
 
             'AG 06/10/2011 - Add Barcode Status information (by now, if Barcode Status is ERROR, status to shown will be NOT IN USE)
-            If (pBarcodeStatus = "ERROR") Then myItemID = "NO_INUSE"
+            'BA-1999: If BarcodeStatus is UNKNOWN the position is shown also as NOT IN USE
+            If (pBarcodeStatus = "ERROR" OrElse pBarcodeStatus = "UNKNOWN") Then myItemID = "NO_INUSE"
 
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
@@ -3284,8 +3283,8 @@ Public Class IWSRotorPositions
                 If (myPreloMasterDS.tfmwPreloadedMasterData.Count > 0) Then myResult = myPreloMasterDS.tfmwPreloadedMasterData(0).FixedItemDesc
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetStatusLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusDescOnCurrentLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".GetStatusDescOnCurrentLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
     End Function
@@ -3408,6 +3407,8 @@ Public Class IWSRotorPositions
     '''                              ShowMessage 
     '''              TR 12/01/2010 - Show the question message before rotor is reset
     '''              DL 05/10/2011 - Included when status = FREE and barcodestatus = ERROR
+    '''              SA 08/01/2015 - BA-1999 ==> Added a call to function ClearSelection to clean the global DS of Selected 
+    '''                                          Elements once the reset has been executed
     ''' </remarks>
     Private Sub ResetRotor(ByVal pRotorType As String, ByVal pAnalizerID As String)
         Try
@@ -3436,29 +3437,26 @@ Public Class IWSRotorPositions
 
                     If (Not myGlobalTo.HasError) Then
                         'Prepare all the position controls
-                        PreparePositionsControls(pRotorType) 'RH 15/02/2010
+                        PreparePositionsControls(pRotorType)
+                        InitializeScreen(True, pRotorType)
 
-                        InitializeScreen(True, pRotorType) 'AG 11/11/2010 - add 2on parameter
+                        'BA-1999: Clean the DS of selected Rotor Positions
+                        ClearSelection()
                     Else
                         'Error reseting the Rotor
                         ShowMessage(Me.Name & ".ResetRotor", myGlobalTo.ErrorCode, myGlobalTo.ErrorMessage, Me)
                     End If
-
                 End If
-
             End If
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ResetRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         Finally
             Me.Cursor = Cursors.Default
-
         End Try
     End Sub
 
-    ''' <summary>
+   	    ''' <summary>
     ''' To Save the Virtual Rotor Position Details
     ''' </summary>
     ''' <remarks>
@@ -3471,30 +3469,26 @@ Public Class IWSRotorPositions
     '''              DL 08/01/2010 - Changes and testing (Testing: OK)
     '''              AG 26/01/2010 - Changes in virtual rotor selection auxiliar screen
     '''              AG 14/03/2011 - define private
+    '''              SA 09/01/2014 - BA-1999 ==> Changed the linq used to count NOT EMPTY cells in the Rotor to get also positions with Status FREE but 
+    '''                                          Barcode Status ERROR or UNKNOWN
     ''' </remarks>
     Private Sub SaveVirtualRotor(ByVal pRotorType As String)
         Try
+            'BA-1999: Count also positions with Status FREE but BarcodeStatus ERROR or UNKNOWN
+            Dim myElemFree As Integer = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
+                                        Where a.RotorType = pRotorType _
+                                      AndAlso (a.Status <> "FREE" _
+                                       OrElse (Not a.IsBarcodeStatusNull AndAlso (a.BarcodeStatus = "UNKNOWN" OrElse a.BarcodeStatus = "ERROR"))) _
+                                       Select a.Status).Count
 
-            Dim myElemFree As Integer = 0
-            myElemFree = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
-                          Where a.RotorType = pRotorType AndAlso a.Status <> "FREE" _
-                          Select a.Status).Count
-
-            If myElemFree > 0 Then
-
-                'RH 19/10/2010 Introduce the Using statement
+            If (myElemFree > 0) Then
+                'RH 19/10/2010 - Introduce the Using statement
                 Using myLoadSaveAuxScreen As New IWSLoadSaveAuxScreen()
                     myLoadSaveAuxScreen.ScreenUse = "VROTORS"
                     myLoadSaveAuxScreen.SourceButton = "SAVE"
                     myLoadSaveAuxScreen.RotorType = pRotorType
 
-                    'If (pRotorType = "SAMPLES") Then
-                    '    myLoadSaveAuxScreen.NameProperty = VirtualSampleRotorName
-                    'ElseIf (pRotorType = "REAGENTS") Then
-                    '    myLoadSaveAuxScreen.NameProperty = VirtualReagentRotorName
-                    'End If
-
-                    'RH 15/02/2011 Simplified code
+                    'RH 15/02/2011 - Simplified code
                     If (pRotorType = "SAMPLES") Then
                         myLoadSaveAuxScreen.NameProperty = VirtualSampleRotorName
                     Else
@@ -3509,26 +3503,21 @@ Public Class IWSRotorPositions
                         If (pRotorType = "SAMPLES") Then
                             VirtualSampleRotorID = myLoadSaveAuxScreen.IDProperty
                             VirtualSampleRotorName = myLoadSaveAuxScreen.NameProperty
-
                         Else
                             VirtualReagentRotorID = myLoadSaveAuxScreen.IDProperty
                             VirtualReagentRotorName = myLoadSaveAuxScreen.NameProperty
                         End If
 
                         GenerateAndSaveVRotorPositionDS(myRotorContentByPositionDSForm, pRotorType, myLoadSaveAuxScreen.IDProperty, myLoadSaveAuxScreen.NameProperty)
-                        'RH 15/02/2011 END
                     End If
                 End Using
             Else
                 'ShowMessage(Me.Name & ".SaveVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, , Me)
-                ShowMessage("AX00", GlobalEnumerates.Messages.EMPTYROTOR.ToString)
+                ShowMessage("BAX00", GlobalEnumerates.Messages.EMPTYROTOR.ToString)
             End If
-
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SaveVirtualRotor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SaveVirtualRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-
         Finally
             Me.Cursor = Cursors.Default
         End Try
@@ -4822,6 +4811,7 @@ Public Class IWSRotorPositions
     '''              RH 13/09/2011 - Added new conditions: Position with barcode status = NULL or EMPTY or UNKNOWN or ERROR
     '''              AG 06/10/2011 - Added ByRef parameter pCellStatus
     '''              AG 29/05/2012 - Linq syntax has been corrected (previous versions returned always 1 record by position-rotor type + all records with bottle UNKOWN)
+    '''              SA 09/01/2015 - BA-1999 ==> Changed the linq to include also FREE Positions with BarcodeStatus = UNKNOWN
     ''' </remarks>
     Private Function IsPositionFree(ByVal pRingNumber As Integer, ByVal pCellNumber As Integer, Optional ByRef pCellBarcodeStatus As String = "", _
                                     Optional ByRef pCellBarcodeInfo As String = "") As Boolean
@@ -4832,8 +4822,7 @@ Public Class IWSRotorPositions
                          Where a.RotorType = myRotorTypeForm _
                        AndAlso a.RingNumber = pRingNumber _
                        AndAlso a.CellNumber = pCellNumber _
-                       AndAlso ((a.Status = "FREE" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus = "EMPTY" OrElse a.BarcodeStatus = "ERROR")) _
-                         OrElse (a.Status = "NO_INUSE" AndAlso (Not a.IsBarcodeStatusNull AndAlso a.BarcodeStatus = "UNKNOWN"))) _
+                       AndAlso (a.Status = "FREE" AndAlso (a.IsBarcodeStatusNull OrElse a.BarcodeStatus = "EMPTY" OrElse a.BarcodeStatus = "ERROR" OrElse a.BarcodeStatus = "UNKNOWN")) _
                         Select a).ToList()
 
                 If (query1.Count > 0 AndAlso Not query1.First.IsBarcodeStatusNull) Then pCellBarcodeStatus = query1.First.BarcodeStatus
@@ -5579,6 +5568,8 @@ Public Class IWSRotorPositions
     '''               AG 03/02/2012 - Changes for saving new field Status in table tparVirtualRotorPositions
     '''               SA 09/02/2012 - Removed last changes for saving new field Status: it is not needed to search value in DB again; information
     '''                               is already obtained when calling function GetPositionContent for NOT IN USE positions
+    '''               SA 09/01/2015 - BA-1999 ==> Changed the linq used to get NOT EMPTY cells in the Rotor to get also positions with Status FREE but 
+    '''                                           Barcode Status ERROR or UNKNOWN
     ''' </remarks>
     Private Sub GenerateAndSaveVRotorPositionDS(ByVal myFormRotorContentByPositionDSObj As WSRotorContentByPositionDS, ByVal pRotorType As String, _
                                                 ByVal pVirtualRotorID As Integer, ByVal pVirtualRotorName As String)
@@ -5587,11 +5578,13 @@ Public Class IWSRotorPositions
                 Dim myGlobalDataTO As New GlobalDataTO
                 Dim myVirtualRotorPosititionsDS As New VirtualRotorPosititionsDS
 
-                'Get only not FREE positions from the Rotor
+                'Get only not FREE positions from the Rotor 
+                'BA-1999: Get also positions with Status FREE but BarcodeStatus ERROR or UNKNOWN
                 Dim lstRotorPositions As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                 lstRotorPositions = (From a As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
                                     Where a.RotorType = pRotorType _
-                                  AndAlso a.Status <> "FREE" _
+                                  AndAlso (a.Status <> "FREE" _
+                                   OrElse (Not a.IsBarcodeStatusNull AndAlso (a.BarcodeStatus = "UNKNOWN" OrElse a.BarcodeStatus = "ERROR"))) _
                                    Select a).ToList()
 
                 Dim myWSRequiredElementsDS As WSRequiredElementsDS
@@ -5676,8 +5669,8 @@ Public Class IWSRotorPositions
                                     myVirtualRotorPosititionsRow.PredilutionFactor = myWSRequiredElementsDS.twksWSRequiredElements(0).PredilutionFactor
                                 End If
 
-                                'Status of cells marked as DEPLETED or with FEW volume has to be preserved
-                                If (myRow.IsStatusNull OrElse (myRow.Status <> "DEPLETED" AndAlso String.Compare(myRow.Status, "FEW", False) <> 0)) Then
+                                'Status of cells marked as DEPLETED or FEW has to be preserved
+                                If (myRow.IsStatusNull OrElse (myRow.Status <> "DEPLETED" AndAlso myRow.Status <> "FEW")) Then
                                     myVirtualRotorPosititionsRow.SetStatusNull()
                                 Else
                                     myVirtualRotorPosititionsRow.Status = myRow.Status
@@ -5750,7 +5743,8 @@ Public Class IWSRotorPositions
                                     myVirtualRotorPosititionsRow.PredilutionFactor = myNoInUsePos.tparVirtualRotorPosititions(0).PredilutionFactor
                                 End If
 
-                                If (myNoInUsePos.tparVirtualRotorPosititions(0).IsStatusNull) Then
+                                If (myNoInUsePos.tparVirtualRotorPosititions(0).IsStatusNull OrElse _
+                                   (myNoInUsePos.tparVirtualRotorPosititions(0).Status <> "DEPLETED" AndAlso myNoInUsePos.tparVirtualRotorPosititions(0).Status <> "FEW")) Then
                                     myVirtualRotorPosititionsRow.SetStatusNull()
                                 Else
                                     'Status of Not In Use Positions marked as DEPLETED or FEW is preserved
@@ -6297,6 +6291,7 @@ Public Class IWSRotorPositions
     '''              XB 23/05/2014 - BT #1639 ==> Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
     '''              XB 27/05/2014 - BT #1638 ==> ISE_NEW_TEST_LOCKED msg is anulled
     '''              SA 18/12/2014 - Changed declaration of String list AffectedISEElectrodes to remove a build warning: it is now declared as New List (Of String)
+    '''              XB 08/01/2015 - Pumps Calibration do not lock ISE preparations during Running (even Pause) - BA-2187
     ''' </remarks>
     Private Sub CreateWSExecutions()
         Try
@@ -6340,16 +6335,25 @@ Public Class IWSRotorPositions
                                     Dim isNeeded As Boolean = CBool(resultData.SetDatos)
                                     If isNeeded Then
 
-                                        ' XB 23/05/2014 - BT #1639
-                                        If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
-                                           (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                        ' XB 08/01/2015 - BA-2187
+                                        '' XB 23/05/2014 - BT #1639
+                                        'If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
+                                        '   (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
+                                        '    iseModuleReady = False
+                                        'End If
+
+                                        If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                                            Debug.Print("STANDBY ____________________________________________________________")
+                                            Debug.Print("LOCK ISE (1) ____________________________________________________________")
                                             iseModuleReady = False
                                         End If
-                                        ' XB 23/05/2014 - BT #1639
+                                        '' XB 23/05/2014 - BT #1639
+                                        ' XB 08/01/2015 - BA-2187
 
                                         ' XB 28/10/2013
                                         ' showISELockedMessage = True
                                         If mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                            Debug.Print("RUNNING ____________________________________________________________")
                                             ' Check if ISE Pumps calibration is required
                                             Dim PumpsCalibrationRequired As Boolean = False
                                             resultData = mdiAnalyzerCopy.ISE_Manager.CheckPumpsCalibrationIsNeeded
@@ -6359,6 +6363,44 @@ Public Class IWSRotorPositions
                                             If PumpsCalibrationRequired Then
                                                 showISELockedMessage = True
                                             End If
+
+                                            ' XB 08/01/2015 - BA-2187
+                                            If iseModuleReady Then
+                                                If mdiAnalyzerCopy.AllowScanInRunning Then
+                                                    ' PAUSE mode 
+                                                    Debug.Print("PAUSE ____________________________________________________________")
+
+                                                    ' Check if ISE Electrodes calibration is required
+                                                    Dim ElectrodesCalibrationRequired As Boolean = False
+                                                    resultData = mdiAnalyzerCopy.ISE_Manager.CheckElectrodesCalibrationIsNeeded
+                                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                        ElectrodesCalibrationRequired = CType(resultData.SetDatos, Boolean)
+                                                    End If
+
+                                                    ' Check if ISE Bubble calibration is required
+                                                    Dim BubbleCalibrationRequired As Boolean = False
+                                                    resultData = mdiAnalyzerCopy.ISE_Manager.CheckBubbleCalibrationIsNeeded
+                                                    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                                        BubbleCalibrationRequired = CType(resultData.SetDatos, Boolean)
+                                                    End If
+
+                                                    iseModuleReady = (Not ElectrodesCalibrationRequired) And (Not BubbleCalibrationRequired)
+                                                    If Not iseModuleReady Then Debug.Print("LOCK ISE (2) ____________________________________________________________")
+
+                                                Else
+                                                    Debug.Print("NOT IN PAUSE ____________________________________________________________")
+                                                    ' USUAL Running
+                                                End If
+
+                                                If iseModuleReady Then
+                                                    If mdiAnalyzerCopy.LockISE Then
+                                                        Debug.Print("LOCK ISE (3) ____________________________________________________________")
+                                                        iseModuleReady = False
+                                                    End If
+                                                End If
+
+                                            End If
+                                            ' XB 08/01/2015 - BA-2187
                                         End If
                                         ' XB 28/10/2013
                                     End If

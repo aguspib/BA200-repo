@@ -512,6 +512,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If myISECommand.ISEMode <> GlobalEnumerates.ISEModes.None Then
 
                             ' XB 12/11/2014 - BA-1872
+                            SetTimeISEOffsetFirstTime = False
                             If Not MyClass.sendingRepetitions Then
                                 MyClass.numRepetitionsTimeout = 0
                             End If

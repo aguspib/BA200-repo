@@ -40,8 +40,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private SYSTEM_TIME_OFFSET As Integer = 20 'Additional time (courtesy)    XB 04/06/2014 - BT #1656
         Private WAITING_TIME_DEFAULT As Integer = 12 'SECONDS Default time before ask again (if Ax00 is not ready and do not tell us any time estimation)
         Private WAITING_TIME_FAST As Integer = 1 'SECONDS Default timeout considered
-        Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECCONDS waiting time for ISE module timeout (E:61) - BA-1872
-        Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECCONDS waiting time for ISE repetitions - BA-1872
+        Private WAITING_TIME_ISE_FAST As Integer = 5 ' SECONDS waiting time for ISE module timeout (E:61) - BA-1872
+        Private WAITING_TIME_ISE_OFFSET As Integer = 60 ' SECONDS waiting time for ISE repetitions - BA-1872
+        Private SetTimeISEOffsetFirstTime As Boolean = False ' Just set the ISE offset time the first time when receives T=0 by Firmware - BA-1872
         ' XB 09/12/2014 - Parametizers all these values - BA-1872
 
         'Class variables to inform the presentation layer about UI refresh after instruction receptions
@@ -349,6 +350,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ' XB 29/01/2014 - Task #1438
         Private BarcodeStartInstrExpectedAttr As Boolean
 
+        ' XB 07/01/2014 - Create these new Attributes - BA-1178
+        Private ShutDownisPendingAttr As Boolean = False
+        Private StartSessionisPendingAttr As Boolean = False
+
+        ' XB 09/01/2014 - Create this new Attribute - BA-2187
+        Private LockISEAttr As Boolean = False
 #End Region
 
 #Region "Properties"
@@ -1217,6 +1224,36 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Get
             Set(ByVal value As Boolean)
                 BarcodeStartInstrExpectedAttr = value
+            End Set
+        End Property
+
+        ' XB 07/01/2014 - Create these new Properties - BA-1178
+        Public Property ShutDownisPending As Boolean
+            Get
+                Return ShutDownisPendingAttr
+            End Get
+            Set(value As Boolean)
+                ShutDownisPendingAttr = value
+            End Set
+        End Property
+
+        Public Property StartSessionisPending As Boolean
+            Get
+                Return StartSessionisPendingAttr
+            End Get
+            Set(value As Boolean)
+                StartSessionisPendingAttr = value
+            End Set
+        End Property
+        ' XB 07/01/2014 - BA-1178
+
+        ' XB 09/01/2014 - Create this new Property - BA-2187
+        Public Property LockISE As Boolean
+            Get
+                Return LockISEAttr
+            End Get
+            Set(value As Boolean)
+                LockISEAttr = value
             End Set
         End Property
 
@@ -2816,6 +2853,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             ' XB 03/04/2014 
 
                                             ' XB 26/09/2014 - BA-1872
+                                            SetTimeISEOffsetFirstTime = False
                                             If Not MyClass.sendingRepetitions Then
                                                 MyClass.numRepetitionsTimeout = 0
                                             End If

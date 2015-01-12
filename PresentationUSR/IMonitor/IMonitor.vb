@@ -1854,12 +1854,16 @@ Public Class IMonitor
     End Sub
 
     ''' <summary>
-    ''' get status description on current language
+    ''' Get the Status translation depending on the selected language.
     ''' </summary>
-    ''' <param name="pItemID"></param>
+    ''' <param name="pItemID">Item Id</param>
     ''' <param name="pBarcodeStatus"></param>
-    ''' <returns></returns>
-    ''' <remarks></remarks>
+    ''' <returns>The status name on the application language.</returns>
+    ''' <remarks>
+    ''' Created by:  
+    ''' Modified by: AG 06/10/2011 - Add pBarCodeStatus parameter for show new status due Barcode Error
+    '''              SA 09/01/2014 - BA-1999 ==> If BarcodeStatus is UNKNOWN the position is shown also as NOT IN USE
+    ''' </remarks>
     Private Function GetStatusDescOnCurrentLanguage(ByVal pItemID As String, ByVal pBarcodeStatus As String) As String
         Dim myResult As String = ""
         Try
@@ -1876,9 +1880,9 @@ Public Class IMonitor
                     Exit Select
             End Select
 
-            'AG 06/10/2011 - add barcode status information (by now if error barcode show NO IN USE)
-            If String.Equals(pBarcodeStatus, "ERROR") Then myItemID = "NO_INUSE"
-            'AG 06/10/2011
+            'AG 06/10/2011 - Add Barcode Status information (by now, if Barcode Status is ERROR, status to shown will be NOT IN USE)
+            'BA-1999: If BarcodeStatus is UNKNOWN the position is shown also as NOT IN USE
+            If (pBarcodeStatus = "ERROR" OrElse pBarcodeStatus = "UNKNOWN") Then myItemID = "NO_INUSE"
 
             Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
             Dim myGlobalDataTO As New GlobalDataTO
@@ -1893,8 +1897,8 @@ Public Class IMonitor
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetStatusLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusDescOnCurrentLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".GetStatusDescOnCurrentLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
     End Function

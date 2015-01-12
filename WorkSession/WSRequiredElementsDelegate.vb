@@ -707,19 +707,17 @@ Namespace Biosystems.Ax00.BL
         End Function
 
         ''' <summary>
-        ''' On loading a Virtual Rotor we need related all busy ring-cell with one (or none) required elements in
-        ''' current worksession
+        ''' On loading a Virtual Rotor we need related all busy ring-cell with one (or none) required elements in current WorkSession
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pWorkSessionID">Work Session Identifier</param>
         ''' <param name="pRotorType">Rotor Type</param>
-        ''' <param name="pRotorLoadedDS">Typed DataSet VirtualRotorPosititionsDS containing all positions in the Virtual
-        '''                              Rotor to load</param>
-        ''' <param name="pOnlyRotorPosition">Optional parameter. If this parameter is true, return only rows where the ElementID 
-        '''                                  is not Null; when it is False return all rows</param> 
-        ''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentsByPositionDS with the list of rotor positions
-        '''          with the information updated according if the content corresponds or not to a required Work Session Element</returns>
+        ''' <param name="pRotorLoadedDS">Typed DataSet VirtualRotorPosititionsDS containing all positions in the Virtual Rotor to load</param>
+        ''' <param name="pOnlyRotorPosition">Optional parameter. If this parameter is true, return only rows where the ElementID is not Null; 
+        '''                                  when it is False return all rows</param> 
+        ''' <returns>GlobalDataTO containing a typed DataSet WSRotorContentsByPositionDS with the list of rotor positions with the information 
+        '''          updated according if the content corresponds or not to a required Work Session Element</returns>
         ''' <remarks>
         ''' Created by:  AG 01/12/2009
         ''' Modified by: VR 09/12/2009 - To fix the error after changed the return data to GlobalDataTo in the function GetPatientElements
@@ -741,7 +739,10 @@ Namespace Biosystems.Ax00.BL
         '''              SA 08/02/2012 - When the Status of the tube/bottle placed in a Position is Depleted, then the Status of the correspondent
         '''                              Element is set to NOPOS (for Samples). For Reagents is set to POS due to the real Status has to be calculated later 
         '''                              based in the total volume needed and in the quantity of positioned volume 
-        '''              XB 07/10/2014 - Add log traces to catch NULL wrong assignment on RealVolume field - BA-1978
+        '''              XB 07/10/2014 - BA-1978 ==> Added log traces to catch NULL wrong assignment on RealVolume field 
+        '''              SA 09/01/2015 - BA-1999 ==> If the TubeContent is not informed for the Position but it has a Barcode with Status UNKNOWN or ERROR,  
+        '''                                          the Position Status is set to FREE
+        '''              SA 12/01/2015 - BA-1999 ==> For IN USE and NOT IN USE Reagents, calculate the Number of Tests that can be executed with the available Bottle Volume
         ''' </remarks>
         Public Function FindElementIDRelatedWithRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                               ByVal pRotorType As String, ByVal pRotorLoadedDS As VirtualRotorPosititionsDS, _
@@ -756,6 +757,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         Dim returnDS As New WSRotorContentByPositionDS
                         Dim commandDAO As New twksWSRequiredElementsDAO
+                        Dim rcpDelegate As New WSRotorContentByPositionDelegate
 
                         Dim elementID As Integer = -1
                         Dim contentIsBottle As Boolean = False
@@ -776,117 +778,117 @@ Namespace Biosystems.Ax00.BL
 
                             'Find ElementID depending on TubeContent field
                             newReturnRow = returnDS.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
-                            If (rowDS.IsTubeContentNull) Then
-                                newReturnRow.Status = "FREE"
 
-                            ElseIf (rowDS.TubeContent = "REAGENT") Then
-                                contentIsBottle = True
+                            'BA-1999: Extracted code executed when TubeContent is informed. Process for positions with TubeContent not informed is 
+                            '         executed later
+                            If (Not rowDS.IsTubeContentNull) Then
+                                If (rowDS.TubeContent = "REAGENT") Then
+                                    contentIsBottle = True
 
-                                If (Not rowDS.IsReagentIDNull) Then
-                                    resultData = commandDAO.GetReagentElementID(dbConnection, pWorkSessionID, rowDS.ReagentID, rowDS.MultiItemNumber)
+                                    If (Not rowDS.IsReagentIDNull) Then
+                                        resultData = commandDAO.GetReagentElementID(dbConnection, pWorkSessionID, rowDS.ReagentID, rowDS.MultiItemNumber)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                            If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
+                                        Else
+                                            Exit For
+                                        End If
+                                    End If
+
+                                ElseIf (rowDS.TubeContent = "SPEC_SOL") Then
+                                    contentIsBottle = True
+
+                                    resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "SPEC_SOL", rowDS.SolutionCode)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                         myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
                                         If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
                                     Else
                                         Exit For
                                     End If
-                                End If
 
-                            ElseIf (rowDS.TubeContent = "SPEC_SOL") Then
-                                contentIsBottle = True
+                                ElseIf (rowDS.TubeContent = "WASH_SOL") Then
+                                    contentIsBottle = True
 
-                                resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "SPEC_SOL", rowDS.SolutionCode)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                Else
-                                    Exit For
-                                End If
-
-                            ElseIf (rowDS.TubeContent = "WASH_SOL") Then
-                                contentIsBottle = True
-
-                                resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "WASH_SOL", rowDS.SolutionCode)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                Else
-                                    Exit For
-                                End If
-
-                            ElseIf (rowDS.TubeContent = "TUBE_SPEC_SOL") Then
-                                resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "TUBE_SPEC_SOL", rowDS.SolutionCode)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                Else
-                                    Exit For
-                                End If
-
-                            ElseIf (rowDS.TubeContent = "TUBE_WASH_SOL") Then
-                                resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "TUBE_WASH_SOL", rowDS.SolutionCode)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                Else
-                                    Exit For
-                                End If
-
-                            ElseIf (rowDS.TubeContent = "CALIB") Then
-                                resultData = commandDAO.GetCalibratorElementID(dbConnection, pWorkSessionID, rowDS.CalibratorID, rowDS.MultiItemNumber)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                Else
-                                    Exit For
-                                End If
-
-                            ElseIf (rowDS.TubeContent = "CTRL") Then
-                                resultData = commandDAO.GetControlElementID(dbConnection, pWorkSessionID, rowDS.ControlID)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                Else
-                                    Exit For
-                                End If
-
-                            ElseIf (rowDS.TubeContent = "PATIENT") Then
-                                patientRow = patient.OrderTestsDetails.NewOrderTestsDetailsRow
-                                patientRow.SampleType = rowDS.SampleType
-
-                                If (Not rowDS.IsOrderIDNull) Then
-                                    patientRow.OrderID = rowDS.OrderID
-                                ElseIf (Not rowDS.IsPatientIDNull) Then
-                                    'Verify if the PatientID in the Virtual Rotor position corresponds to an existing Patient 
-                                    resultData = myPatientDelegate.GetPatientData(dbConnection, rowDS.PatientID)
+                                    resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "WASH_SOL", rowDS.SolutionCode)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                        patientDataDS = DirectCast(resultData.SetDatos, PatientsDS)
-                                        If (patientDataDS.tparPatients.Rows.Count = 1) Then
-                                            'It is an exiting PatientID, field PatientID is informed
-                                            patientRow.PatientID = rowDS.PatientID
+                                        myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                        If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
+                                    Else
+                                        Exit For
+                                    End If
+
+                                ElseIf (rowDS.TubeContent = "TUBE_SPEC_SOL") Then
+                                    resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "TUBE_SPEC_SOL", rowDS.SolutionCode)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                        If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
+                                    Else
+                                        Exit For
+                                    End If
+
+                                ElseIf (rowDS.TubeContent = "TUBE_WASH_SOL") Then
+                                    resultData = commandDAO.GetAddittionalSolutionElementID(dbConnection, pWorkSessionID, "TUBE_WASH_SOL", rowDS.SolutionCode)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                        If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
+                                    Else
+                                        Exit For
+                                    End If
+
+                                ElseIf (rowDS.TubeContent = "CALIB") Then
+                                    resultData = commandDAO.GetCalibratorElementID(dbConnection, pWorkSessionID, rowDS.CalibratorID, rowDS.MultiItemNumber)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                        If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
+                                    Else
+                                        Exit For
+                                    End If
+
+                                ElseIf (rowDS.TubeContent = "CTRL") Then
+                                    resultData = commandDAO.GetControlElementID(dbConnection, pWorkSessionID, rowDS.ControlID)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                        If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
+                                    Else
+                                        Exit For
+                                    End If
+
+                                ElseIf (rowDS.TubeContent = "PATIENT") Then
+                                    patientRow = patient.OrderTestsDetails.NewOrderTestsDetailsRow
+                                    patientRow.SampleType = rowDS.SampleType
+
+                                    If (Not rowDS.IsOrderIDNull) Then
+                                        patientRow.OrderID = rowDS.OrderID
+                                    ElseIf (Not rowDS.IsPatientIDNull) Then
+                                        'Verify if the PatientID in the Virtual Rotor position corresponds to an existing Patient 
+                                        resultData = myPatientDelegate.GetPatientData(dbConnection, rowDS.PatientID)
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                            patientDataDS = DirectCast(resultData.SetDatos, PatientsDS)
+                                            If (patientDataDS.tparPatients.Rows.Count = 1) Then
+                                                'It is an exiting PatientID, field PatientID is informed
+                                                patientRow.PatientID = rowDS.PatientID
+                                            Else
+                                                'It is not an existing PatientID, field SampleID is informed
+                                                patientRow.SampleID = rowDS.PatientID
+                                            End If
                                         Else
-                                            'It is not an existing PatientID, field SampleID is informed
-                                            patientRow.SampleID = rowDS.PatientID
+                                            'Error verifying if the Patient exists in Patients table in DB 
+                                            Exit For
+                                        End If
+                                    End If
+
+                                    If (Not rowDS.IsPredilutionFactorNull) Then patientRow.PredilutionFactor = rowDS.PredilutionFactor
+                                  
+                                    resultData = commandDAO.GetPatientElements(dbConnection, pWorkSessionID, patientRow)
+                                    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                        myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
+                                        If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then
+                                            If (Not myWSRequiredElemDS.twksWSRequiredElements(0).IsElementIDNull) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
                                         End If
                                     Else
-                                        'Error verifying if the Patient exists in Patients table in DB 
                                         Exit For
                                     End If
                                 End If
-
-                                If (Not rowDS.IsPredilutionFactorNull) Then patientRow.PredilutionFactor = rowDS.PredilutionFactor
-                                'patient.OrderTestsDetails.AddOrderTestsDetailsRow(patientRow)
-
-                                resultData = commandDAO.GetPatientElements(dbConnection, pWorkSessionID, patientRow)
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    myWSRequiredElemDS = DirectCast(resultData.SetDatos, WSRequiredElementsDS)
-                                    If (myWSRequiredElemDS.twksWSRequiredElements.Rows.Count > 0) Then
-                                        If (Not myWSRequiredElemDS.twksWSRequiredElements(0).IsElementIDNull) Then elementID = myWSRequiredElemDS.twksWSRequiredElements(0).ElementID
-                                    End If
-                                Else
-                                    Exit For
-                                End If
-
                             End If
 
                             'Transform VirtualRotorPositionDS into WSRotorContentPositionDS
@@ -901,11 +903,6 @@ Namespace Biosystems.Ax00.BL
                             If (Not rowDS.IsTubeTypeNull) Then newReturnRow.TubeType = rowDS.TubeType Else newReturnRow.SetTubeTypeNull()
                             If (Not rowDS.IsRealVolumeNull) Then newReturnRow.RealVolume = rowDS.RealVolume Else newReturnRow.SetRealVolumeNull()
 
-                            If rowDS.IsRealVolumeNull AndAlso pRotorType = "REAGENTS" Then
-                                Dim myLogAccionesAux As New ApplicationLogManager()
-                                myLogAccionesAux.CreateLogActivity("Caution !! RealVolume is assigned to NULL !!!", "WSRequiredElementsDelegate.FindElementIDRelatesWithRotorPosition", EventLogEntryType.Error, False)
-                            End If
-
                             If (Not rowDS.IsBarcodeStatusNull) Then newReturnRow.BarcodeStatus = rowDS.BarcodeStatus Else newReturnRow.SetBarcodeStatusNull()
                             If (Not rowDS.IsBarcodeInfoNull) Then newReturnRow.BarCodeInfo = rowDS.BarcodeInfo Else newReturnRow.SetBarCodeInfoNull()
                             If (Not rowDS.IsScannedPositionNull) Then newReturnRow.ScannedPosition = rowDS.ScannedPosition Else newReturnRow.SetScannedPositionNull()
@@ -914,18 +911,24 @@ Namespace Biosystems.Ax00.BL
                             If (elementID <> -1) Then
                                 newReturnRow.ElementID = elementID
 
-                                If (Not contentIsBottle) Then
+                                If (contentIsBottle) Then
                                     'Reagents and Additional Solutions
-                                    newReturnRow.Status = "PENDING"
+                                    newReturnRow.Status = "INUSE"
                                     newReturnRow.ElementStatus = "POS"
 
                                     If (Not rowDS.IsRealVolumeNull) Then
                                         'Assign the Bottle Volume
                                         newReturnRow.RealVolume = rowDS.RealVolume
+
+                                        'BA-1999: For IN USE Reagents, calculate the number of tests that can be executed with the available Bottle Volume
+                                        If (rowDS.TubeContent = "REAGENT") Then
+                                            resultData = CalculateRemainingTests(dbConnection, pWorkSessionID, elementID, rowDS.RealVolume, rowDS.TubeType)
+                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then newReturnRow.RemainingTestsNumber = CType(resultData.SetDatos, Integer)
+                                        End If
                                     End If
                                 Else
                                     'Patient Samples, Controls, Calibrators and Additional Solutions in Tube
-                                    newReturnRow.Status = "INUSE"
+                                    newReturnRow.Status = "PENDING"
                                     newReturnRow.ElementStatus = "POS"
                                 End If
 
@@ -940,8 +943,17 @@ Namespace Biosystems.Ax00.BL
                             ElseIf (Not rowDS.IsTubeContentNull) Then
                                 'If ElementID not found but TubeContent is not null:  Status = NO_INUSE
                                 newReturnRow.Status = "NO_INUSE"
+
+                                'BA-1999: For NOT IN USE Reagents, calculate the number of tests that can be executed with the available Bottle Volume
+                                If (rowDS.TubeContent = "REAGENT") Then
+                                    If (Not rowDS.IsReagentIDNull AndAlso Not rowDS.IsMultiItemNumberNull AndAlso Not rowDS.IsRealVolumeNull AndAlso Not rowDS.IsTubeTypeNull) Then
+                                        resultData = rcpDelegate.CalculateRemainingTestNotInUseReagent(dbConnection, pWorkSessionID, rowDS.ReagentID, rowDS.MultiItemNumber, _
+                                                                                                       rowDS.RealVolume, rowDS.TubeType)
+
+                                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then newReturnRow.RemainingTestsNumber = CType(resultData.SetDatos, Integer)
+                                    End If
+                                End If
                             Else
-                                'If ElementID not found AND TubeContent is also NULL:  Status = FREE
                                 newReturnRow.Status = "FREE"
                             End If
 

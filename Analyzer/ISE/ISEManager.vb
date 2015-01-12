@@ -7855,7 +7855,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by XBC 04/04/2012
-        ''' AG + XBC 28/09/2012 - Returns GlobalDataTo (SetDatos as boolean, TRUE any instruction sent, FALSE no instructin sent)
+        ''' Modified by AG + XBC 28/09/2012 - Returns GlobalDataTo (SetDatos as boolean, TRUE any instruction sent, FALSE no instructin sent)
+        '''                   XB 07/01/2015 - Do not save consumptions when Start Session or Shutdown operations are processing - BA-1178
         ''' </remarks>
         Public Function SaveConsumptions() As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -7866,52 +7867,56 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' And Reagents Pack Ready (Has Distributor Code Ok and Installed)
                 If MyClass.IsISEInitiatedOKAttr And MyClass.IsReagentsPackReady Then
 
-                    If MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    '  XB 07/01/2015 - BA-1178
+                    If Not MyClass.myAnalyzerManager.ShutDownisPending And Not MyClass.myAnalyzerManager.StartSessionisPending Then
 
-                        If MyClass.IsCalAUpdateRequired Then 'update cal A consumption
+                        If MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
 
-                            MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
+                            If MyClass.IsCalAUpdateRequired Then 'update cal A consumption
 
-                            ' Save it into Dallas Xip
-                            resultData = SaveConsumptionCalToDallasData("A")
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
-                                Debug.Print("Guardant Consum Cal A ...")
+                                MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
 
-                                resultData = MyClass.SendISECommand()
-                                If Not resultData.HasError Then
-                                    instructionSentFlag = True  'AG + XBC 28/09/2012
-                                    MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION
-                                    Debug.Print("Canvi d'estat a WRITE_CALA_CONSUMPTION ...")
-                                Else
-                                    Debug.Print("Cal A ... No entra !")
+                                ' Save it into Dallas Xip
+                                resultData = SaveConsumptionCalToDallasData("A")
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
+                                    Debug.Print("Guardant Consum Cal A ...")
+
+                                    resultData = MyClass.SendISECommand()
+                                    If Not resultData.HasError Then
+                                        instructionSentFlag = True  'AG + XBC 28/09/2012
+                                        MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALA_CONSUMPTION
+                                        Debug.Print("Canvi d'estat a WRITE_CALA_CONSUMPTION ...")
+                                    Else
+                                        Debug.Print("Cal A ... No entra !")
+                                    End If
+
+                                End If
+
+                            ElseIf MyClass.IsCalBUpdateRequired Then 'update calB consumption
+
+                                MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
+
+                                ' Save it into Dallas Xip
+                                resultData = SaveConsumptionCalToDallasData("B")
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
+                                    Debug.Print("Guardant Consum Cal B ...")
+
+                                    resultData = MyClass.SendISECommand()
+                                    If Not resultData.HasError Then
+                                        instructionSentFlag = True  'AG + XBC 28/09/2012
+                                        MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION
+                                        Debug.Print("Canvi d'estat a WRITE_CALB_CONSUMPTION ...")
+                                    Else
+                                        Debug.Print("Cal B ... No entra !")
+                                    End If
                                 End If
 
                             End If
-
-                        ElseIf MyClass.IsCalBUpdateRequired Then 'update calB consumption
-
-                            MyClass.CurrentProcedure = ISEProcedures.WriteConsumption
-
-                            ' Save it into Dallas Xip
-                            resultData = SaveConsumptionCalToDallasData("B")
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                MyClass.CurrentCommandTO = CType(resultData.SetDatos, ISECommandTO)
-                                Debug.Print("Guardant Consum Cal B ...")
-
-                                resultData = MyClass.SendISECommand()
-                                If Not resultData.HasError Then
-                                    instructionSentFlag = True  'AG + XBC 28/09/2012
-                                    MyClass.CurrentCommandTOAttr.ISECommandID = ISECommands.WRITE_CALB_CONSUMPTION
-                                    Debug.Print("Canvi d'estat a WRITE_CALB_CONSUMPTION ...")
-                                Else
-                                    Debug.Print("Cal B ... No entra !")
-                                End If
-                            End If
-
                         End If
-                    End If
 
+                    End If
                 End If
                 resultData.SetDatos = instructionSentFlag 'AG + XBC 28/09/2012
 
