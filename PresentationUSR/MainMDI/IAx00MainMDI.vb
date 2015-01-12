@@ -129,7 +129,12 @@ Partial Public Class IAx00MainMDI
     Private StartSessionisBMCLsent As Boolean = False
     Private isStartInstrumentActivating As Boolean = False
     Private executeSTD As Boolean = False
-    Private LockISE As Boolean = False
+
+    ' XB 09/01/2014 - Replace this variable as Attribute - BA-2187
+    'Private LockISE As Boolean = False
+    Private LockISEAttribute As Boolean = False
+    ' XB 09/01/2014 - BA-2187
+
     Private SkipCALB As Boolean = False
     Private SkipPMCL As Boolean = False
     Private SkipBMCL As Boolean = False
@@ -526,6 +531,19 @@ Partial Public Class IAx00MainMDI
         End Set
     End Property
     ' XB 07/01/2014 - BA-1178
+
+    ' XB 09/01/2014 - Create this new property - BA-2187
+    Public Property LockISE As Boolean
+        Get
+            Return LockISEAttribute
+        End Get
+        Set(value As Boolean)
+            LockISEAttribute = value
+            If (Not MDIAnalyzerManager Is Nothing) Then
+                MDIAnalyzerManager.LockISE = value
+            End If
+        End Set
+    End Property
 
 #End Region
 
@@ -4944,7 +4962,7 @@ Partial Public Class IAx00MainMDI
             End If
 
             If Not myGlobal.HasError AndAlso userAnswer = DialogResult.Yes Then
-                If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
+                If Not MDIAnalyzerManager.ISE_Manager Is Nothing AndAlso MDIAnalyzerManager.ISE_Manager.IsISEModuleReady Then
 
                     'SGM 01/10/2012 - If no calibration is needed set ISE preparations as PENDING
                     'Dim myOrderTestsDelegate As New OrderTestsDelegate
