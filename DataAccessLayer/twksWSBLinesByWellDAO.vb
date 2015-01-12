@@ -863,7 +863,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pWorkSessionID"></param>
         ''' <param name="pIDToDelete"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 19/12/2014 BA-2181 (1)</remarks>
+        ''' <remarks>AG 19/12/2014 BA-2182 (1)</remarks>
         Public Function DeleteByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIDToDelete As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
@@ -903,7 +903,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' <param name="pCurrentID"></param>
         ''' <param name="pNewID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 19/12/2014 BA-2181 (1)</remarks>
+        ''' <remarks>AG 19/12/2014 BA-2182 (1)</remarks>
         Public Function UpdateByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pCurrentID As Integer, ByVal pNewID As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 

@@ -472,8 +472,8 @@ Namespace Biosystems.Ax00.BL
         ''' Reset WS business for dynamic base line functionality:
         ''' 1) Delete all the STATIC records, except the max baseLineID of each well (NOTE: the max baselineID can be STATIC or DYNAMIC)
         ''' 2) Delete all the DYNAMIC records, except the max baselineID of each well (max baselineID for DYNAMIC)
-        ''' 3) Rename the remaining DYNAMIC records to BaseLineID = 1
-        ''' 4) Rename the remaining STATIC records with BaseLineID = 2
+        ''' 3) Update the remaining DYNAMIC records to BaseLineID = 1
+        ''' 4) Update the remaining STATIC records with BaseLineID = 2
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
@@ -516,12 +516,12 @@ Namespace Biosystems.Ax00.BL
                                         resultData = myDAO.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString, Nothing, maxDynamicBaseLineID)
 
                                         If Not resultData.HasError Then
-                                            '3) Rename the remaining DYNAMIC records to BaseLineID = 1
+                                            '3) Update the remaining DYNAMIC records to BaseLineID = 1
                                             resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, pWorkSessionID, 1, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
                                         End If
 
                                         If Not resultData.HasError Then
-                                            '4) Rename the remaining STATIC records with BaseLineID = 2
+                                            '4) Update the remaining STATIC records with BaseLineID = 2
                                             resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, pWorkSessionID, 2, GlobalEnumerates.BaseLineType.STATIC.ToString)
                                         End If
                                     End If
@@ -771,7 +771,7 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pCurrentID"></param>
         ''' <param name="pNewID"></param>
         ''' <returns></returns>
-        ''' <remarks>AG 19/12/2014 BA-2181 (1)</remarks>
+        ''' <remarks>AG 19/12/2014 BA-2182 (1)</remarks>
         Public Function UpdateByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pCurrentID As Integer, ByVal pNewID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing

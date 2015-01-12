@@ -371,14 +371,20 @@ Namespace Biosystems.Ax00.BL
 
                 ' Rename Pages
                 ' Rename Page 1
+                Dim sheetName As String = String.Empty
+                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "BL with ADJUSTMENT", "BaseLine").ToString 'AG 12/01/2015 BA-2182 (3)
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {1})
-                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"BL with ADJUSTMENT"}) 'AG 23/12/2014 BA-2182 rename sheet '{"BaseLine"})
+                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
                 ' Rename page 2
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
-                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Dynamic BL by well"}) 'AG 23/12/2014 BA-2182 rename sheet '{"Dynamic Base Line by Well"}) 'BA-2067
+                If (pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString) Then 'AG 12/01/2015 BA-2182 (3)
+                    sheetName = "Dynamic BL by well"
+                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
+                    myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
+                End If
                 ' Rename page 3
+                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Static BL by well", "Base Line by Well").ToString 'AG 12/01/2015 BA-2182 (3)
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
-                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Static BL by well"}) 'AG 23/12/2014 BA-2182 rename sheet '{"Base Line by Well"})
+                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
                 ' Rename page 4
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Counts"})
@@ -392,13 +398,14 @@ Namespace Biosystems.Ax00.BL
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Results"})
 
-                'IT 03/11/2014: INI BA-2067
-                'Visibilty of Pages
-                If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
-                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
-                    myPage.GetType.InvokeMember("Visible", BindingFlags.SetProperty, Nothing, myPage, New Object() {False})
-                End If
-                'IT 03/11/2014: END BA-2067
+                'AG 12/01/2015 BA-2182 comment this code. Only the required sheets are created
+                ''IT 03/11/2014: INI BA-2067
+                ''Visibilty of Pages
+                'If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                '    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
+                '    myPage.GetType.InvokeMember("Visible", BindingFlags.SetProperty, Nothing, myPage, New Object() {False})
+                'End If
+                ''IT 03/11/2014: END BA-2067
 
             Catch ex As Exception 'General Error
                 resultdata.HasError = True
