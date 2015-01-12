@@ -489,6 +489,12 @@
     <Content Include="Images\CompactPrint.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\DynamicBaseLineEmpty.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\DynamicBaseLineRead.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\LEG_BINPROCESS.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

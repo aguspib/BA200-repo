@@ -133,7 +133,10 @@ Namespace Biosystems.Ax00.App
         ''' </remarks>
         Public Function ChangeRotorStartProcess() As Boolean
             Try
-                _rotorChangeServices = New RotorChangeServices(Analyzer)
+                If (_rotorChangeServices Is Nothing) Then
+                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                End If
+
                 Return _rotorChangeServices.StartProcess()
             Catch ex As Exception
                 Throw ex

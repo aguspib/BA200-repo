@@ -37,6 +37,7 @@ Namespace Biosystems.Ax00.Core.Services
         Private _currentStep As RotorChangeStepsEnum
         Private _forceEmptyAndFinalize As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
+        Private _dynamicBaseLineValid As Boolean = False
 
 #End Region
 
@@ -49,12 +50,15 @@ Namespace Biosystems.Ax00.Core.Services
         Public Sub OnProcessFlagEvent(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags) Handles _analyzer.ProcessFlagEventHandler
             Select Case pFlagCode
                 Case AnalyzerManagerFlags.BaseLine
-                    _staticBaseLineFinished = True
+                    ProcessStaticBaseLine()
 
                 Case AnalyzerManagerFlags.DynamicBL_Fill,
-                    AnalyzerManagerFlags.DynamicBL_Read,
                     AnalyzerManagerFlags.DynamicBL_Empty
                     ValidateProcess()
+
+                Case AnalyzerManagerFlags.DynamicBL_Read
+                    ProcessDynamicBaseLine()
+
             End Select
         End Sub
 
@@ -70,6 +74,8 @@ Namespace Biosystems.Ax00.Core.Services
         Public Function StartProcess() As Boolean
             Dim resultData As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
+            Initialize()
 
             If _analyzer.ExistBottleAlarms Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
@@ -149,7 +155,13 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <remarks></remarks>
         Public Sub RepeatDynamicBaseLineReadStep()
+
             _analyzer.DynamicBaselineInitializationFailures = 0
+
+            If _analyzer.Alarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                _analyzer.Alarms.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+            End If
+
             RestartProcess()
             ExecuteDynamicBaseLineReadStep()
         End Sub
@@ -205,29 +217,33 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
 
                 Case RotorChangeStepsEnum.StaticBaseLine
-                    If ((_analyzer.CheckIfWashingIsPossible()) And (IsValidStaticBaseLine())) Then
-                        RestartProcess()
-                        ExecuteStaticBaseLineStep()
+                    If (Not _staticBaseLineFinished) Then
+                        If (_analyzer.CheckIfWashingIsPossible()) Then
+                            RestartProcess()
+                            ExecuteStaticBaseLineStep()
+                        Else
+                            CancelStaticBaseLineStep()
+                        End If
                     Else
-                        CancelStaticBaseLineStep()
                         If (Not IsValidStaticBaseLine()) Then
+                            CancelStaticBaseLineStep()
                             FinalizeProcess()
                         End If
                     End If
 
+
                 Case RotorChangeStepsEnum.DynamicBaseLineFill
-                    If (_analyzer.CheckIfWashingIsPossible()) Then
-                        RestartProcess()
-                        ExecuteDynamicBaseLineFillStep()
-                    Else
-                        CancelDynamicBaseLineFillStep()
-                    End If
+                        If (_analyzer.CheckIfWashingIsPossible()) Then
+                            RestartProcess()
+                            ExecuteDynamicBaseLineFillStep()
+                        Else
+                            CancelDynamicBaseLineFillStep()
+                        End If
 
                 Case RotorChangeStepsEnum.DynamicBaseLineRead
-                    ExecuteDynamicBaseLineReadStep()
+                        ExecuteDynamicBaseLineReadStep()
 
                 Case RotorChangeStepsEnum.DynamicBaseLineEmpty
-
                     If (IsEmptyingAllowed()) Then
                         If (_analyzer.CheckIfWashingIsPossible()) Then
                             RestartProcess()
@@ -322,14 +338,14 @@ Namespace Biosystems.Ax00.Core.Services
                     If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED") Then
                         Return RotorChangeStepsEnum.StaticBaseLine
                     End If
-                End If
 
-                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
-                    Return RotorChangeStepsEnum.DynamicBaseLineFill
-                End If
+                    If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
+                        Return RotorChangeStepsEnum.DynamicBaseLineFill
+                    End If
 
-                If ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
-                    Return RotorChangeStepsEnum.DynamicBaseLineEmpty
+                    If ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
+                        Return RotorChangeStepsEnum.DynamicBaseLineEmpty
+                    End If
                 End If
 
             End If
@@ -344,7 +360,7 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <returns></returns>
         ''' <remarks></remarks>
         Private Function IsEmptyingAllowed()
-            Return (_analyzer.ProcessFlightReadAction() Or _forceEmptyAndFinalize)
+            Return (_dynamicBaseLineValid Or _forceEmptyAndFinalize)
         End Function
 
         ''' <summary>
@@ -365,8 +381,9 @@ Namespace Biosystems.Ax00.Core.Services
             If (_staticBaseLineFinished) Then
                 Return (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) <> "CANCELED")
             Else
-                Return True
+                Return False
             End If
+
         End Function
 
         ''' <summary>
@@ -455,6 +472,8 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.CurrentInstructionAction = InstructionActions.FlightReading
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
             _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+
+            _dynamicBaseLineValid = False
 
         End Sub
 
@@ -583,6 +602,7 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
 
                 _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR, 1, True)
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.Alarms.BASELINE_INIT_ERR, 1, True)
 
                 'Update analyzer session flags into DataBase
                 If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
@@ -636,6 +656,40 @@ Namespace Biosystems.Ax00.Core.Services
             End If
 
         End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub Initialize()
+
+            _forceEmptyAndFinalize = False
+            _staticBaseLineFinished = False
+            _dynamicBaseLineValid = False
+            _analyzer.DynamicBaselineInitializationFailures = 0
+
+            If _analyzer.Alarms.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then
+                _analyzer.Alarms.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+            End If
+
+        End Sub
+
+        Private Sub ProcessStaticBaseLine()
+            _staticBaseLineFinished = True
+
+            If (_analyzer.BaseLineTypeForCalculations <> BaseLineType.DYNAMIC) Then
+                ValidateProcess()
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Private Sub ProcessDynamicBaseLine()
+            _dynamicBaseLineValid = _analyzer.ProcessFlightReadAction()
+        End Sub
+
 
 #End Region
 

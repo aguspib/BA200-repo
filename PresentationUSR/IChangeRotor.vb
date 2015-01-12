@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.App
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class IChangeRotor
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -36,6 +37,7 @@ Public Class IChangeRotor
     ''' <remarks>
     ''' Created by:  DL 21/06/2011
     ''' Modified by: DL 28/02/2012 - Added code to get Icons for the final result of the Rotor change process: OK or ERROR
+    '''              IT 12/01/2015 - BA-2143
     ''' </remarks>
     Private Sub PrepareButtons()
         Try
@@ -60,6 +62,16 @@ Public Class IChangeRotor
 
             auxIconName = GetIconName("CANCELF")
             If (auxIconName <> String.Empty) Then WRONGIconName = iconPath & auxIconName
+
+            'BA-2143 - INI
+            'Flight Read Button
+            auxIconName = GetIconName("BTN_DBL_READ")
+            If (auxIconName <> String.Empty) Then bsChangeRotorReadButton.Image = Image.FromFile(iconPath & auxIconName)
+            'Flight Empty & Finalize Button
+            auxIconName = GetIconName("BTN_DBL_EMPTY")
+            If (auxIconName <> String.Empty) Then bsChangeRotorFinalizeButton.Image = Image.FromFile(iconPath & auxIconName)
+            'BA-2143 - END
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -71,6 +83,7 @@ Public Class IChangeRotor
     ''' </summary>
     ''' <remarks>
     ''' Created by:  DL 21/06/2011
+    ''' Modified by: IT 12/01/2015 - BA-2143
     ''' </remarks>
     Private Sub GetScreenLabels()
         Try
@@ -82,11 +95,15 @@ Public Class IChangeRotor
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ChangeRotor", currentLanguage)
             bsChangeRotorLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RISINGUP", currentLanguage)
             bsNewAdjLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ADJUSTROTOR", currentLanguage)
+            bsRepeatReadLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DYNAMICBASELINE_READ", currentLanguage) 'BA-2143
+            bsEmptyAndFinalizeLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_DYNAMICBASELINE_EMPTY", currentLanguage) 'BA-2143
 
             'For Tooltips...
             bsScreenToolTips.SetToolTip(bsChangeRotortButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
             bsScreenToolTips.SetToolTip(bsContinueButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
             bsScreenToolTips.SetToolTip(bsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            bsScreenToolTips.SetToolTip(bsChangeRotorReadButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_DBL_READ", currentLanguage)) 'BA-2143
+            bsScreenToolTips.SetToolTip(bsChangeRotorFinalizeButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_DBL_EMPTY", currentLanguage)) 'BA-2143
 
             'RH 14/02/2012
             MSG_StartInstrument = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_StartInstrument", currentLanguage)
@@ -182,6 +199,9 @@ Public Class IChangeRotor
                 Else
                     bsChangeRotortButton.Enabled = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
                 End If
+
+                ConfigureDynamicBaselineArea() 'BA-2143
+
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".EnableButtons " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -289,6 +309,33 @@ Public Class IChangeRotor
         End Try
 
     End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    '''  Created by: IT 12/01/2015
+    ''' </remarks>
+    Private Sub ConfigureDynamicBaselineArea()
+
+        If (AnalyzerController.Instance.Analyzer.BaseLineTypeForCalculations = BaseLineType.DYNAMIC) Then
+            bsRepeatReadLabel.Show()
+            bsEmptyAndFinalizeLabel.Show()
+            bsChangeRotorFinalizeButton.Show()
+            bsChangeRotorReadButton.Show()
+            bsPoint3Label.Show()
+            bsPoint4Label.Show()
+        Else
+            bsRepeatReadLabel.Hide()
+            bsEmptyAndFinalizeLabel.Hide()
+            bsChangeRotorFinalizeButton.Hide()
+            bsChangeRotorReadButton.Hide()
+            bsPoint3Label.Hide()
+            bsPoint4Label.Hide()
+        End If
+
+    End Sub
+
 #End Region
 
 #Region "Public Methods"
