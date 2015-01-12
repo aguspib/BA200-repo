@@ -3958,7 +3958,7 @@ Namespace Biosystems.Ax00.BL
 #End Region
 
 #Region "Private Functions"
-        ''' <summary>
+       ''' <summary>
         ''' Get all non free positions in the Reagents Rotor and save them in the internal Virtual Rotor. If this special
         ''' Virtual Rotor does not exist, then it is created 
         ''' </summary>
@@ -3970,8 +3970,6 @@ Namespace Biosystems.Ax00.BL
         ''' Created by:  SA    19/04/2011
         ''' Modified by: AG/SA 06/02/2012 - Before save the non free positions in the Internal Reagents Virtual Rotor, for cells having Status 
         '''                                 DEPLETED or FEW, save also the status; for the rest of positions, save Status as NULL
-        '''              SA    08/01/2015 - BA-1999 ==> For cells having Status LOCKED, save also this Status. Remove from the loop to set Status NULL
-        '''                                             all cells having Status NULL or having Status DEPLETED, FEW or LOCKED
         ''' </remarks>
         Private Function SaveReagentsRotorPositions(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                                     ByVal pWorkSessionID As String) As GlobalDataTO
@@ -4009,7 +4007,6 @@ Namespace Biosystems.Ax00.BL
                                                                                                                    Where Not a.IsStatusNull() _
                                                                                                                      AndAlso a.Status <> "DEPLETED" _
                                                                                                                      AndAlso a.Status <> "FEW" _
-                                                                                                                     AndAlso a.Status <> "LOCKED" _
                                                                                                                       Select a).ToList
 
                                     For Each element As VirtualRotorPosititionsDS.tparVirtualRotorPosititionsRow In linqRes

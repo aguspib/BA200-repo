@@ -740,8 +740,8 @@ Namespace Biosystems.Ax00.BL
         '''                              Element is set to NOPOS (for Samples). For Reagents is set to POS due to the real Status has to be calculated later 
         '''                              based in the total volume needed and in the quantity of positioned volume 
         '''              XB 07/10/2014 - BA-1978 ==> Added log traces to catch NULL wrong assignment on RealVolume field 
-        '''              SA 08/01/2015 - BA-1999 ==> If the TubeContent is not informed for the Position but it has a Barcode with Status UNKNOWN, the 
-        '''                                          Position Status is set to NOT IN USE instead of to FREE
+        '''              SA 09/01/2015 - BA-1999 ==> If the TubeContent is not informed for the Position but it has a Barcode with Status UNKNOWN or ERROR,  
+        '''                                          the Position Status is set to FREE
         ''' </remarks>
         Public Function FindElementIDRelatedWithRotorPosition(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                                               ByVal pRotorType As String, ByVal pRotorLoadedDS As VirtualRotorPosititionsDS, _
@@ -937,13 +937,7 @@ Namespace Biosystems.Ax00.BL
                                 'If ElementID not found but TubeContent is not null:  Status = NO_INUSE
                                 newReturnRow.Status = "NO_INUSE"
                             Else
-                                'BA-1999: If the TubeContent is not informed for the Position but it has a Barcode with Status UNKNOWN, the Position Status
-                                '         is set to NOT IN USE instead of to FREE
-                                If (Not rowDS.IsBarcodeInfoNull AndAlso Not rowDS.IsBarcodeStatusNull AndAlso rowDS.BarcodeStatus = "UNKONWN") Then
-                                    newReturnRow.Status = "NO_INUSE"
-                                Else
-                                    newReturnRow.Status = "FREE"
-                                End If
+                                newReturnRow.Status = "FREE"
                             End If
 
                             'Add new row
