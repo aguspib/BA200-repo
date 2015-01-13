@@ -531,7 +531,8 @@ Namespace Biosystems.Ax00.Core.Services
             Dim resultData As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
-            If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) <> "CANCELED") Then
+            If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) <> "PAUSED") Or
+                (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) <> "CANCELED") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
 

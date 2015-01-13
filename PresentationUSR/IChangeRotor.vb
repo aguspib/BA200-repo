@@ -27,6 +27,8 @@ Public Class IChangeRotor
     Private DefaultLightAdjustTime As Integer
     Private ExistBaseLineInitError As Boolean = False
     Private statusMDIChangedFlag As Boolean = False
+    Private _processIsPaused As Boolean = False
+
 #End Region
 
 #Region "Methods"
@@ -472,6 +474,17 @@ Public Class IChangeRotor
             'AG 12/03/2012
 
             If (AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 1) Then bsChangeRotortButton.Enabled = False 'DL 25/09/2012
+
+            'BA-2143 - INI
+            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
+                _processIsPaused = True
+            ElseIf (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
+                If _processIsPaused Then
+                    StartProgressBar()
+                End If
+            End If
+            'BA-2143 - END
+
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".RefreshScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -604,62 +617,7 @@ Public Class IChangeRotor
 
                     IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
                     statusMDIChangedFlag = True
-
-                    'DL 28/02/2012. Begin
-                    dxProgressBar.Position = 0
-                    dxProgressBar.Visible = True
-                    dxProgressBar.Show()
-
-                    Dim Dt1 As DateTime = DateTime.Now
-                    Dim Dt2 As DateTime
-                    Dim Span As TimeSpan
-
-                    bsContinueButton.Enabled = False
-
-                    While ScreenWorkingProcess
-                        Dt2 = DateTime.Now
-                        Span = Dt2.Subtract(Dt1)
-
-                        If Span.TotalSeconds > DefaultLightAdjustTime Then
-                            dxProgressBar.Position = DefaultLightAdjustTime
-                        Else
-                            dxProgressBar.Position = CInt(Span.TotalSeconds)
-                        End If
-
-                        dxProgressBar.Show()
-                        Application.DoEvents()
-
-                        If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
-                    End While
-
-                    dxProgressBar.Position = dxProgressBar.Properties.Maximum
-                    dxProgressBar.Show()
-                    Application.DoEvents()
-
-                    'dl 26/09/2012
-                    If Not AnalyzerController.Instance.Analyzer.Connected Then
-                        IAx00MainMDI.EnableButtonAndMenus(False)
-                    Else
-                        IAx00MainMDI.EnableButtonAndMenus(True)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
-                    End If
-
-                    If Not ExistBaseLineInitError Then
-                        bsStatusImage.Visible = True
-                        bsStatusImage.Image = Image.FromFile(OKIconName)
-
-                    Else
-                        bsStatusImage.Visible = True
-                        bsStatusImage.Image = Image.FromFile(WRONGIconName)
-                    End If
-
-                    'DL 26/09/2012. begin
-                    If Not AnalyzerController.Instance.Analyzer.Connected Then
-                        dxProgressBar.Visible = False
-                        bsStatusImage.Visible = False
-                        '   bsCancelButton.Enabled = True
-                    End If
-                    'DL 26/09/2012. end
+                    StartProgressBar() 'BA-2143 
 
                 End If
             Catch ex As Exception
@@ -725,6 +683,81 @@ Public Class IChangeRotor
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotorFinalizeButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsChangeRotorFinalizeButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 13/01/2015 - BA-2143
+    ''' </remarks>
+    Private Sub StartProgressBar()
+        'DL 28/02/2012. Begin
+        Dim secondsInPause As Integer = 0
+
+        If (Not _processIsPaused) Then
+            dxProgressBar.Position = 0
+        Else
+            secondsInPause = dxProgressBar.Position
+            _processIsPaused = False
+        End If
+
+        dxProgressBar.Visible = True
+        dxProgressBar.Show()
+
+        Dim Dt1 As DateTime = DateTime.Now
+        Dim Dt2 As DateTime
+        Dim Span As TimeSpan
+
+        bsContinueButton.Enabled = False
+
+        While ScreenWorkingProcess And (Not _processIsPaused)
+            Dt2 = DateTime.Now
+            Span = Dt2.Subtract(Dt1)
+
+            If (Span.TotalSeconds + secondsInPause) > DefaultLightAdjustTime Then
+                dxProgressBar.Position = DefaultLightAdjustTime
+            Else
+                dxProgressBar.Position = CInt(Span.TotalSeconds + secondsInPause)
+            End If
+
+            dxProgressBar.Show()
+            Application.DoEvents()
+
+            If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
+        End While
+
+        If (Not _processIsPaused) Then
+            dxProgressBar.Position = dxProgressBar.Properties.Maximum
+            dxProgressBar.Show()
+            Application.DoEvents()
+
+            'dl 26/09/2012
+            If Not AnalyzerController.Instance.Analyzer.Connected Then
+                IAx00MainMDI.EnableButtonAndMenus(False)
+            Else
+                IAx00MainMDI.EnableButtonAndMenus(True)
+                IAx00MainMDI.SetActionButtonsEnableProperty(True)
+            End If
+
+            If Not ExistBaseLineInitError Then
+                bsStatusImage.Visible = True
+                bsStatusImage.Image = Image.FromFile(OKIconName)
+
+            Else
+                bsStatusImage.Visible = True
+                bsStatusImage.Image = Image.FromFile(WRONGIconName)
+            End If
+
+            'DL 26/09/2012. begin
+            If Not AnalyzerController.Instance.Analyzer.Connected Then
+                dxProgressBar.Visible = False
+                bsStatusImage.Visible = False
+                '   bsCancelButton.Enabled = True
+            End If
+            'DL 26/09/2012. end
+        End If
+
     End Sub
 
 #End Region
