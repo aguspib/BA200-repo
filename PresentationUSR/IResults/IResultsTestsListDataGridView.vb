@@ -74,6 +74,8 @@ Partial Class IResults
     '''              SA 26/01/2011 - Besides the TestType Icon, inform also the Code in the correspondent hidden column
     '''              RH 02/02/2011 - Removed the hidden column for storing the code of the TestType
     '''              XB 28/11/2014 - Sort the CALC tests behind ISE anf OFFS too - BA-1867
+    '''              WE 13/01/2015 - BA-2153: Note that the sequence of elements of array 'TestType' must always be in-sync
+    '''                                       with the ImageList 'TestTypeIconList' in Sub PrepareButtons (Class IResults).
     ''' </remarks>
     Private Sub UpdateTestsListDataGrid()
         Try

@@ -2474,6 +2474,8 @@ Public Class IResults
     '''              SA 20/01/2011 - Load Icon for new button for opening screen of results for Off-System Order Tests;
     '''                              control the availability of this new button when the screen is loaded
     '''              SA 19/09/2014 - BA-1927 ==> Call new function SendManRepButtonEnabled to get the availability of button for Send Manual Reruns
+    '''              WE 13/01/2015 - BA-2153: •	Changed the initialization order of the ImageList 'TestTypeIconList'. Note that this sequence must always
+    '''                                         be in-sync with array 'TestType' in Sub UpdateTestsListDataGrid (Class IResultsTestsListDataGridView).
     ''' </remarks>
     Private Sub PrepareButtons()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2655,15 +2657,16 @@ Public Class IResults
             'IMAGES FOR Tests TreeView
             TestTypeIconList = New ImageList()
 
+            ' WE 13/01/2015 (BA-2153) - Sync order of Test Types with array 'TestType' in Sub UpdateTestsListDataGrid (Class IResultsTestsListDataGridView).
             auxIconName = GetIconName("TESTICON") 'STD Tests Icon
             If (auxIconName <> String.Empty) Then
                 AddIconToImageList(TestTypeIconList, auxIconName)
             End If
 
-            auxIconName = GetIconName("TCALC") 'CALC Tests Icon
-            If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
-            End If
+            'auxIconName = GetIconName("TCALC") 'CALC Tests Icon
+            'If (auxIconName <> String.Empty) Then
+            '    TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+            'End If
 
             auxIconName = GetIconName("TISE_SYS") 'ISE Tests Icon
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
@@ -2674,6 +2677,12 @@ Public Class IResults
             If (auxIconName <> String.Empty) Then
                 TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
             End If
+
+            auxIconName = GetIconName("TCALC") 'CALC Tests Icon
+            If (auxIconName <> String.Empty) Then
+                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+            End If
+            ' WE 13/01/2015 (BA-2153) - End.
 
             auxIconName = GetIconName("INC_SENT_REP")
             If (auxIconName <> String.Empty) Then
