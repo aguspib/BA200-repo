@@ -2663,6 +2663,7 @@ Public Class IWSTestSelectionAuxScreen
     '''                              (needed to verify ISE Controls partially selected)
     '''              XB 27/07/2012 - ISE Tests Disabled by volume not enough functionallity is canceled
     '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
+    '''              XB 14/01/2015 - Add management when unselect tests for ISE tests included on CALC test - BA-1867
     ''' </remarks>
     Private Sub FillAndMarkISETestListGridView(ByVal pISETestsDS As ISETestsDS)
         Try
@@ -2743,10 +2744,25 @@ Public Class IWSTestSelectionAuxScreen
                                     iseTestROW.OTStatus = selTestRow.OTStatus
                                 End If
 
-                                If (Not selTestRow.IsTestProfileIDNull) Then
-                                    iseTestROW.TestProfileID = selTestRow.TestProfileID
-                                    iseTestROW.TestProfileName = selTestRow.TestProfileName
+                                ' XB - 14/01/2015 - BA-1867
+                                'If (Not selTestRow.IsTestProfileIDNull) Then
+                                '    iseTestROW.TestProfileID = selTestRow.TestProfileID
+                                '    iseTestROW.TestProfileName = selTestRow.TestProfileName
+                                'End If
+
+                                'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
+                                If (SampleClassAttribute = "PATIENT") Then
+                                    If (Not selTestRow.IsTestProfileIDNull) Then
+                                        iseTestROW.TestProfileID = selTestRow.TestProfileID
+                                        iseTestROW.TestProfileName = selTestRow.TestProfileName
+                                    End If
+
+                                    If (Not selTestRow.IsCalcTestIDsNull) Then
+                                        iseTestROW.CalcTestIDs = selTestRow.CalcTestIDs
+                                        iseTestROW.CalcTestNames = selTestRow.CalcTestNames
+                                    End If
                                 End If
+                                ' XB - 14/01/2015 - BA-1867
 
                                 Dim markAsSelected As Boolean = True
                                 If (SampleClassAttribute = "CTRL") Then
@@ -2834,6 +2850,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' Created by:  DL 29/11/2010
     '''              RH 12/03/2012 - Introduce COLUMN_COUNT const
     '''              SG 13/03/2013 - Set OTStatus = "LISLOCK" if the Test was requested by LIS
+    '''              XB 14/01/2015 - Add management when unselect tests for OFFS tests included on CALC test - BA-1867
     ''' </remarks>
     Private Sub FillAndMarkOffSystemTestListGridView(ByVal pOffSystemTestsDS As OffSystemTestsDS)
         Try
@@ -2910,10 +2927,25 @@ Public Class IWSTestSelectionAuxScreen
                                     offsystemTestROW.OTStatus = selTestRow.OTStatus
                                 End If
 
-                                If (Not selTestRow.IsTestProfileIDNull) Then
-                                    offsystemTestROW.TestProfileID = selTestRow.TestProfileID
-                                    offsystemTestROW.TestProfileName = selTestRow.TestProfileName
+                                ' XB 14/01/2015 - BA-1867
+                                'If (Not selTestRow.IsTestProfileIDNull) Then
+                                '    offsystemTestROW.TestProfileID = selTestRow.TestProfileID
+                                '    offsystemTestROW.TestProfileName = selTestRow.TestProfileName
+                                'End If
+                                
+                                'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
+                                If (SampleClassAttribute = "PATIENT") Then
+                                    If (Not selTestRow.IsTestProfileIDNull) Then
+                                        offsystemTestROW.TestProfileID = selTestRow.TestProfileID
+                                        offsystemTestROW.TestProfileName = selTestRow.TestProfileName
+                                    End If
+
+                                    If (Not selTestRow.IsCalcTestIDsNull) Then
+                                        offsystemTestROW.CalcTestIDs = selTestRow.CalcTestIDs
+                                        offsystemTestROW.CalcTestNames = selTestRow.CalcTestNames
+                                    End If
                                 End If
+                                ' XB 14/01/2015 - BA-1867
 
                                 If (selTestRow.OTStatus = "OPEN" AndAlso Not selTestRow.LISRequest) Then
                                     'Change the Background Color and the Foreground Color to indicate that this Test is selected
