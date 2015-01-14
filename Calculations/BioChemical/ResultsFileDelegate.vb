@@ -1920,6 +1920,7 @@ Namespace Biosystems.Ax00.BL
         '''' Modified By: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         '''' Modified by AG 23/12/2014 BA-2182 rename
         '''' Modified by AG 07/01/2015 BA-2182 When pBaseLineType is dynamic the ID cannot be read from executions tables, we had to read them from twksWSBLinesByWell
+        ''''             AG 14/01/2015 BA-2182 (3) header informs patientID (for patients) (for calibrators and controls leave "" do not inform the element name) / (for blanks leave "" too)
         '''' </remarks>
         Private Function SheetResultsByReplicates(ByVal pDBConnection As SqlConnection, _
                                          ByVal pAnalyzerDS As WSAnalyzersDS, _
@@ -1989,10 +1990,12 @@ Namespace Biosystems.Ax00.BL
                         Dim ExecutionRows As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
                         Dim SampleClasses() As String = {"PATIENT", "CALIB", "CTRL", "BLANK"}
                         Dim Filter As String
+                        Dim headerPatientID As String 'AG 14/01/2015 BA-2182
                         Dim previousRow As ExecutionsDS.vwksWSExecutionsResultsRow = Nothing
 
                         For Each SampleClass In SampleClasses
                             Filter = String.Empty
+                            headerPatientID = String.Empty 'AG 14/01/2015 BA-2182
 
                             ExecutionRows = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                              Where row.SampleClass = SampleClass _
@@ -2007,8 +2010,20 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     Filter = String.Format("{0}{1}", row.OrderTestID, row.RerunNumber)
-                                    SetCellValue(XlsPage, "A" & CurrentXlsPageRow, _
-                                                 String.Format("OrderTest: {0} ({1}) Test {2} Rerun Number {3}", row.OrderTestID, SampleClass, row.TestName, row.RerunNumber))
+
+                                    'AG 14/01/2015 BA-2182 (3) inform the patientID (for patients)
+                                    Select Case SampleClass
+                                        Case "PATIENT"
+                                            If Not row.IsPatientIDNull Then headerPatientID = row.PatientID Else headerPatientID = String.Empty
+                                            SetCellValue(XlsPage, "A" & CurrentXlsPageRow, _
+                                                         String.Format("OrderTest: {0} - {4} ({1}) Test {2} Rerun Number {3}", row.OrderTestID, SampleClass, row.TestName, row.RerunNumber, headerPatientID))
+
+                                        Case Else
+                                            SetCellValue(XlsPage, "A" & CurrentXlsPageRow, _
+                                                         String.Format("OrderTest: {0} - ({1}) Test {2} Rerun Number {3}", row.OrderTestID, SampleClass, row.TestName, row.RerunNumber))
+                                    End Select
+                                    'AG 14/01/2015 BA-2182
+
                                     XlsPageRange = String.Format("A{0}:K{0}", CurrentXlsPageRow)
                                     SetCellColor(XlsPage, XlsPageRange, 6)
                                     MergeCells(XlsPage, XlsPageRange)
