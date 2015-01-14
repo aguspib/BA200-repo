@@ -126,6 +126,7 @@
     <Compile Include="BarcodePositionsWithNoRequestsDelegate.vb" />
     <Compile Include="ExportDelegate.vb" />
     <Compile Include="ImportErrorsLogDelegate.vb" />
+    <Compile Include="OperateCalculatedTestDelegate.vb" />
     <Compile Include="OrderTestsLISInfoDelegate.vb" />
     <Compile Include="PreparationTestDataDelegate.vb" />
     <Compile Include="ReactionsRotorDelegate.vb" />

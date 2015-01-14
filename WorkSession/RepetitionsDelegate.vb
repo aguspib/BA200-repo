@@ -11,8 +11,8 @@ Imports Biosystems.Ax00.Types.ExecutionsDS
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 
-Namespace Biosystems.Ax00.Calculations
-    Partial Public Class RepetitionsDelegate
+Namespace Biosystems.Ax00.BL
+    Public Class RepetitionsDelegate
 
 #Region "Private Structures"
 

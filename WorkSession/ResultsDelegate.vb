@@ -1,13 +1,14 @@
 ﻿Option Strict On
 Option Explicit On
 
+Imports System.Text
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.Global.TO
+Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports System.Text
-Imports Biosystems.Ax00.Global.TO 'AG 22/09/2014 - BA-1940
 
 Namespace Biosystems.Ax00.BL
     Public Class ResultsDelegate
@@ -69,11 +70,9 @@ Namespace Biosystems.Ax00.BL
         ''' </summary>
         ''' <remarks>TR 26/06/2013</remarks>
         Public Sub ClearLastExportedResults()
-
             SyncLock lockThis
                 lastExportedResultsDSAttribute.Clear()
             End SyncLock
-
         End Sub
 
         ''' <summary>
@@ -1254,7 +1253,8 @@ Namespace Biosystems.Ax00.BL
         '''              SA 25/06/2012 - Inform AnalyzerID and WorkSessionID when the result is added to the ResultsDS dataset. Call function Create
         '''                              instead of InsertResult (both in twksResultsDAO) 
         '''              SA 31/10/2012 - When a result for an OffSystem Test is created, set field ExportStatus to NOTSENT instead of to NULL
-        '''              AG 16/1/2014 BA-2011 inform the proper value for the ExportStatus
+        '''              AG 16/01/2014 - BA-2011 ==> Inform the proper value for the ExportStatus
+        '''              SA 14/01/2015 - BA-2153 ==> For each saved OFFS Test, verify if there are affected Calculated Tests that have to be recalculated 
         ''' </remarks>
         Public Function SaveOffSystemResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pOffSystemTestResultsDS As OffSystemTestsResultsDS, _
                                              ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
@@ -1266,8 +1266,9 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim newOrderTestStatus As String
-                        Dim ignoreOffSystemTest As Boolean
+                        Dim ignoreOffSystemTest As Boolean = False
+                        Dim newOrderTestStatus As String = String.Empty
+                        Dim updatedExportStatusValue As String = String.Empty
 
                         Dim myResultsDS As New ResultsDS
                         Dim myResultRow As ResultsDS.twksResultsRow
@@ -1282,7 +1283,12 @@ Namespace Biosystems.Ax00.BL
                         Dim mytwksResultDAO As New twksResultsDAO()
                         Dim myOrderTestsDelegate As New OrderTestsDelegate
                         Dim myResultAlarmsDelegate As New ResultAlarmsDelegate
-                        Dim updatedExportStatusValue As String = String.Empty 'AG 16/10/2014 BA-2011
+
+                        'BA-2153: Declare OperateCalculatedTestDelegate needed to verify if there are Calculated Tests that have to be recalculated due to 
+                        '         the result of OFFS Tests included in their Formulas have been changed. Inform the Delegate properties: AnalyzerID and WorkSessionID
+                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        myCalcTestsDelegate.AnalyzerID = pAnalyzerID
+                        myCalcTestsDelegate.WorkSessionID = pWorkSessionID
 
                         For Each offSystemTestResult As OffSystemTestsResultsDS.OffSystemTestsResultsRow In pOffSystemTestResultsDS.OffSystemTestsResults
                             'Verify if the Result for the OffSystem Test already exists...
@@ -1321,13 +1327,12 @@ Namespace Biosystems.Ax00.BL
                                     If (Not offSystemTestResult.IsResultValueNull) Then
                                         'New OffSystem Test result; add it
                                         ignoreOffSystemTest = False
-                                        'resultData = mytwksResultDAO.InsertResult(dbConnection, myResultsDS)
                                         resultData = mytwksResultDAO.Create(dbConnection, myResultsDS)
                                     End If
                                 Else
-                                    'AG 16/10/2014 BA-2011 -assign new value for ExportStatus
-                                    updatedExportStatusValue = "NOTSENT" 'defaul value
-                                    If Not myTempResultsDS.twksResults(0).IsExportStatusNull AndAlso myTempResultsDS.twksResults(0).ExportStatus = "SENT" Then
+                                    'AG 16/10/2014 BA-2011- Assign new value for ExportStatus
+                                    updatedExportStatusValue = "NOTSENT"  'Defaul value
+                                    If (Not myTempResultsDS.twksResults(0).IsExportStatusNull AndAlso myTempResultsDS.twksResults(0).ExportStatus = "SENT") Then
                                         updatedExportStatusValue = "UPDATED"
                                     End If
                                     'AG 16/10/2014 BA-2011
@@ -1368,8 +1373,7 @@ Namespace Biosystems.Ax00.BL
 
                                 If (Not ignoreOffSystemTest) Then
                                     If (Not resultData.HasError) Then
-                                        'If Reference Ranges have been defined for the Test/SampleType, validate if the informed result
-                                        'is inside the limits
+                                        'If Reference Ranges have been defined for the Test/SampleType, validate if the informed result is inside the limits
                                         If (Not offSystemTestResult.IsActiveRangeTypeNull) Then
                                             'Delete all Alarms that exists currently for the Order Test result (if any)
                                             resultData = myResultAlarmsDelegate.DeleteAll(dbConnection, offSystemTestResult.OrderTestID, 1, 1)
@@ -1394,18 +1398,16 @@ Namespace Biosystems.Ax00.BL
                                                             myResultAlarmRow.OrderTestID = offSystemTestResult.OrderTestID
                                                             myResultAlarmRow.RerunNumber = 1
                                                             myResultAlarmRow.MultiPointNumber = 1
-                                                            'myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+
                                                             'TR 19/07/2012 -Validate the result value to set the corresponding alarm
-                                                            If (Convert.ToSingle(offSystemTestResult.ResultValue) < _
-                                                                myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) Then
-                                                                'set lower alarm value.
+                                                            If (Convert.ToSingle(offSystemTestResult.ResultValue) < myTestRefRangesDS.tparTestRefRanges(0).NormalLowerLimit) Then
+                                                                'Set lower alarm value
                                                                 myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
-                                                            ElseIf (Convert.ToSingle(offSystemTestResult.ResultValue) > _
-                                                                    myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
-                                                                'set hight alarm value.
+                                                            ElseIf (Convert.ToSingle(offSystemTestResult.ResultValue) > myTestRefRangesDS.tparTestRefRanges(0).NormalUpperLimit) Then
+                                                                'Set hight alarm value
                                                                 myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
                                                             End If
-                                                            'TR 19/07/2012 -END
+
                                                             myResultAlarmRow.AlarmDateTime = Now
                                                             myResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(myResultAlarmRow)
 
@@ -1420,20 +1422,22 @@ Namespace Biosystems.Ax00.BL
                                             End If
                                         End If
 
-                                        'TR 28/06/2013 -Send parameter pOrderTest = true to implement functionality.
                                         'Close the Order Test due to it has a result
                                         resultData = myOrderTestsDelegate.UpdateStatusByOrderTestID(dbConnection, offSystemTestResult.OrderTestID, newOrderTestStatus, True)
                                         If (resultData.HasError) Then Exit For
 
+                                        'BA-2153: Verify if there are Calculated Tests that have to be recalculated due to the result of OFFS Tests included in their
+                                        '         Formulas have been changed
+                                        resultData = myCalcTestsDelegate.ExecuteCalculatedTest(dbConnection, offSystemTestResult.OrderTestID, False)
+                                        If (resultData.HasError) Then Exit For
+
                                         'OnLine Export to LIMS
-                                        If (newOrderTestStatus = "CLOSED" AndAlso pAnalyzerID.Trim <> "" AndAlso pWorkSessionID.Trim <> "") Then
+                                        If (newOrderTestStatus = "CLOSED" AndAlso pAnalyzerID.Trim <> String.Empty AndAlso pWorkSessionID.Trim <> String.Empty) Then
                                             resultData = myExport.ManageLISExportation(dbConnection, pAnalyzerID, pWorkSessionID, offSystemTestResult.OrderTestID, True)
                                             If (resultData.HasError) Then Exit For
-                                            'TR 28/06/2013
-                                            'TODO: Here has to manage the Results to send to LIS
-                                            AddIntoLastExportedResults(DirectCast(resultData.SetDatos, ExecutionsDS))
-                                            'TR 28/06/2013 -END.
 
+                                            'TR 28/06/2013
+                                            AddIntoLastExportedResults(DirectCast(resultData.SetDatos, ExecutionsDS))
                                         End If
                                     Else
                                         'Error adding/updating/deleting the result for the OffSystem Test 

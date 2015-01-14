@@ -2865,8 +2865,11 @@ Public Class IResults
     ''' </summary>
     ''' <remarks>
     ''' Created by:  SA 20/01/2011
-    ''' Modified by: AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
-    '''              XB 28/11/2014 - recalculates calculated tests also for OFFS tests - BA-1867
+    ''' Modified by: AG 30/09/2014 - BA-1440 ==> Inform that is an automatic exportation when call method InvokeUploadResultsLIS
+    '''              XB 28/11/2014 - BA-1867 ==> Recalculates calculated tests also for OFFS tests
+    '''              SA 14/01/2015 - BA-2153 ==> Undo changes made for BA-1867. Recalculation of affected Calculated Tests is moved to function 
+    '''                                          SaveOffSystemResults to execute it also when results of OffSystem Tests are saved from WS Samples  
+    '''                                          Requests Screen  
     ''' </remarks>
     Private Sub OpenOffSystemResultsScreen()
         Try
@@ -2890,18 +2893,18 @@ Public Class IResults
                         Dim myResultsDelegate As New ResultsDelegate(MyBase.AnalyzerModel)
                         resultData = myResultsDelegate.SaveOffSystemResults(Nothing, myOffSystemTestsResultsDS, AnalyzerIDField, WorkSessionIDField)
 
-                        ' XB 28/11/2014 - BA-1867
-                        Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
-                        ' recalculate calculated tests
-                        For Each offSystemTestResult As OffSystemTestsResultsDS.OffSystemTestsResultsRow In myOffSystemTestsResultsDS.OffSystemTestsResults
-                            myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
-                            myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
-                            resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, offSystemTestResult.OrderTestID, True)
-                        Next
-                        ' XB 28/11/2014 - BA-1867
+                        ' ''XB 28/11/2014 - BA-1867
+                        'Dim myCalcTestsDelegate As New OperateCalculatedTestDelegate
+                        '' recalculate calculated tests
+                        'For Each offSystemTestResult As OffSystemTestsResultsDS.OffSystemTestsResultsRow In myOffSystemTestsResultsDS.OffSystemTestsResults
+                        '    myCalcTestsDelegate.AnalyzerID = AnalyzerIDField
+                        '    myCalcTestsDelegate.WorkSessionID = WorkSessionIDField
+                        '    resultData = myCalcTestsDelegate.ExecuteCalculatedTest(Nothing, offSystemTestResult.OrderTestID, True)
+                        'Next
+                        ''XB 28/11/2014 - BA-1867
 
 
-                        'TR 28/06/2013 -Prepare and send results to LIS.
+                        'TR 28/06/2013 - Prepare and send results to LIS.
                         If (Not resultData.HasError) Then
                             If myResultsDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                                 CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".OpenOffSystemResultsScreen ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
