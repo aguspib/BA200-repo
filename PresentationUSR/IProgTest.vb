@@ -839,7 +839,8 @@ Public Class IProgTest
 
             'Find changes for all sample types defined
             If qtestSample.Count > 0 Then
-                For i As Integer = 0 To qtestSample.Count - 1
+                For i2 As Integer = 0 To qtestSample.Count - 1
+                    Dim i = i2  'LINQ safeness usage.
                     If qtestSample.Item(i).SampleVolume.ToString.Trim <> SampleVolUpDown.Value.ToString.Trim Then
                         codeToReturn = 2
                     End If
@@ -868,7 +869,7 @@ Public Class IProgTest
                     End If
 
                     If codeToReturn = 2 Then Exit For
-                Next i
+                Next
             End If
 
         Catch ex As Exception
@@ -3484,14 +3485,15 @@ Public Class IProgTest
             'DL 13/01/2012. Begin
             Dim qSelectedSample As New List(Of TestSamplesDS.tparTestSamplesRow)
             For i As Integer = 0 To SampleTypeCheckList.Items.Count - 1
+                Dim aux_i = i
                 qSelectedSample = (From a In SelectedTestSamplesDS.tparTestSamples _
-                                   Where a.SampleType = SampleTypeCheckList.Items(i).ToString _
+                                   Where a.SampleType = SampleTypeCheckList.Items(aux_i).ToString _
                                    Select a).ToList()
 
                 If qSelectedSample.Count > 0 Then
-                    SampleTypeCheckList.SetItemChecked(i, True)
+                    SampleTypeCheckList.SetItemChecked(aux_i, True)
                 Else
-                    SampleTypeCheckList.SetItemChecked(i, False)
+                    SampleTypeCheckList.SetItemChecked(aux_i, False)
                 End If
 
             Next i

@@ -292,13 +292,14 @@ Public Class IResultsSummaryTable
                 bsPatientListDataGridView("FirstName", i).Value = sample.patient.firstName
                 bsPatientListDataGridView("LastName", i).Value = sample.patient.lastName
 
-                For j As Integer = 0 To TestNames.Count - 1
+                For j = 0 To TestNames.Count - 1
+                    Dim auxJ = j
                     TestsList = (From row In AverageResultsDS.vwksResults _
                                      Where String.Compare(row.PatientID, sample.patientId, False) = 0 _
                                      AndAlso row.SampleType = sample.sampleType _
-                                     AndAlso row.TestID = TestNames.ElementAt(j).TestId _
-                                     AndAlso row.SampleType = TestNames.ElementAt(j).SampleType.Name _
-                                     AndAlso row.TestType = TestNames.ElementAt(j).TestType _
+                                     AndAlso row.TestID = TestNames.ElementAt(auxJ).TestId _
+                                     AndAlso row.SampleType = TestNames.ElementAt(auxJ).SampleType.Name _
+                                     AndAlso row.TestType = TestNames.ElementAt(auxJ).TestType _
                                      AndAlso row.AcceptedResultFlag _
                                      Select row).ToList()
 
@@ -327,7 +328,7 @@ Public Class IResultsSummaryTable
                         concentration = "-"
                     End If
 
-                    columnName = String.Format("{0} ({1})", TestNames.ElementAt(j).TestName, TestNames.ElementAt(j).SampleType.Name)
+                    columnName = String.Format("{0} ({1})", TestNames.ElementAt(auxJ).TestName, TestNames.ElementAt(auxJ).SampleType.Name)
                     bsPatientListDataGridView(columnName, i).Value = concentration
                 Next
             Next

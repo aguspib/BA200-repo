@@ -906,7 +906,8 @@ Namespace Biosystems.Ax00.BL
                                               Group a By OrderTest_ID = a.OrderTestID Into Group _
                                               Select OrderTest_ID).ToList
 
-                        For indexExecutionGroup As Integer = 0 To qExecutionsGrouped.Count - 1
+                        For executionGroup As Integer = 0 To qExecutionsGrouped.Count - 1
+                            Dim indexExecutionGroup = executionGroup
                             Dim myOrderTestData As New OrderTestsDelegate
                             Dim myTestID As Integer
                             resultdata = myOrderTestData.GetTestID(pDBConnection, qExecutionsGrouped.Item(indexExecutionGroup)) 'myExecutionDS.twksWSExecutions(0).OrderTestID)
@@ -920,7 +921,7 @@ Namespace Biosystems.Ax00.BL
                             ' Get test data
                             Dim myTestsData As New TestsDelegate
                             Dim myTestsDS As New TestsDS
-                            
+
 
                             resultdata = myTestsData.Read(pDBConnection, myTestID)
                             If Not resultdata.HasError And Not resultdata.SetDatos Is Nothing Then myTestsDS = CType(resultdata.SetDatos, TestsDS)
@@ -1087,7 +1088,7 @@ Namespace Biosystems.Ax00.BL
                                             Dim FirstCycle As Integer = -1
                                             Dim SecondCycle As Integer = -1
 
-                                            
+
 
                                             If Not myTestsDS.tparTests.Item(0).IsFirstReadingCycleNull Then FirstCycle = myTestsDS.tparTests.First.FirstReadingCycle
                                             If Not myTestsDS.tparTests.Item(0).IsSecondReadingCycleNull Then SecondCycle = myTestsDS.tparTests.First.SecondReadingCycle
@@ -1155,7 +1156,7 @@ Namespace Biosystems.Ax00.BL
                                 Next rerunPointer
                             End If 'If qExecutionInfo.Count > 0 Then
 
-                        Next indexExecutionGroup
+                        Next
                     End If
 
                 Next myRowAnalyzer
@@ -1573,7 +1574,8 @@ Namespace Biosystems.Ax00.BL
                                               Group a By OrderTest_ID = a.OrderTestID Into Group _
                                               Select OrderTest_ID).ToList
                         Dim MaxRowGroup As Integer
-                        For indexExecutionGroup As Integer = 0 To qExecutionsGrouped.Count - 1
+                        For ExecutionGroup As Integer = 0 To qExecutionsGrouped.Count - 1
+                            Dim indexExecutionGroup = ExecutionGroup
                             Dim myOrderTestData As New OrderTestsDelegate
                             Dim myTestID As Integer
                             resultdata = myOrderTestData.GetTestID(pDBConnection, qExecutionsGrouped.Item(indexExecutionGroup))
@@ -1594,24 +1596,6 @@ Namespace Biosystems.Ax00.BL
                             Dim myTestName As String = myTestsDS.tparTests.Item(0).TestName
                             Dim myheadcell1 As String = ""
 
-                            'DL 12/01/2012. Substitute OrderTestID by SampleID. Begin 
-                            'Dim myOrdersDelegate As New OrdersDelegate
-                            'Dim Orderdata As New GlobalDataTO   'Call the Order to get the patient id or the Sample ID
-                            'Dim mySampleID As String = ""
-
-                            'Orderdata = myOrdersDelegate.GetSampleIDbyOrderTestID(pDBConnection, CType(qExecutionsGrouped(indexExecutionGroup).ToString, Integer))
-                            'If Not Orderdata.HasError Then
-                            '    Dim myOrdersDS As New OrderTestsDetailsDS
-                            '    myOrdersDS = DirectCast(Orderdata.SetDatos, OrderTestsDetailsDS)
-
-                            '    If myOrdersDS.OrderTestsDetails.Rows.Count > 0 Then
-                            '        If Not myOrdersDS.OrderTestsDetails.First.IsSampleIDNull Then
-                            '            mySampleID = myOrdersDS.OrderTestsDetails.First.SampleID     'Set the patienID if not null
-                            '        ElseIf Not myOrdersDS.OrderTestsDetails.First.IsPatientIDNull Then
-                            '            mySampleID = myOrdersDS.OrderTestsDetails.First.PatientID     'Set the sampleID if not null
-                            '        End If
-                            '    End If
-                            'End If
 
                             Dim Orderdata As New GlobalDataTO   'Call the Order to get the patient id or the Sample ID
 
@@ -1900,7 +1884,7 @@ Namespace Biosystems.Ax00.BL
                                 Next rerunPointer
                             End If 'If qExecutionInfo.Count > 0 Then
 
-                        Next indexExecutionGroup
+                        Next
 
                     End If
                 Next myRowAnalyzer
@@ -2675,17 +2659,19 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             For i As Integer = 0 To pExecutions.Count - 1
+                                Dim aux_i = i
                                 resultData = GetReadingAbsorbancesByExecution( _
-                                                dbConnection, pExecutions(i).ExecutionID, pExecutions(i).AnalyzerID, _
-                                                pExecutions(i).WorkSessionID, False) 'AG 09/03/2011 - change True for False
+                                                dbConnection, pExecutions(aux_i).ExecutionID, pExecutions(aux_i).AnalyzerID, _
+                                                pExecutions(aux_i).WorkSessionID, False) 'AG 09/03/2011 - change True for False
 
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     myAbsorbancesDS = CType(resultData.SetDatos, AbsorbanceDS)
 
-                                    For x As Integer = 0 To myAbsorbancesDS.twksAbsorbances.Count - 1
+                                    For x = 0 To myAbsorbancesDS.twksAbsorbances.Count - 1
+                                        Dim auxX = x
                                         myCycleRow = ReplicateDS.tReplicates.NewtReplicatesRow()
 
-                                        If String.Compare(pExecutions(i).ReadingMode, "BIC", False) = 0 Then
+                                        If String.Compare(pExecutions(aux_i).ReadingMode, "BIC", False) = 0 Then
                                             myWavelengthPos = String.Empty
 
                                             'resultData = myTestsData.Read(dbConnection, pExecutions(i).TestID)
@@ -2694,7 +2680,7 @@ Namespace Biosystems.Ax00.BL
                                             'myTestsDS = CType(resultData.SetDatos, TestsDS)
 
                                             myTestsRow = (From row As TestsDS.tparTestsRow In myTestsDS.tparTests _
-                                                          Where row.TestID = pExecutions(i).TestID _
+                                                          Where row.TestID = pExecutions(aux_i).TestID _
                                                           Select row).ToList().First()
 
                                             'resultData = GetWaveLength(dbConnection, _
@@ -2705,7 +2691,7 @@ Namespace Biosystems.Ax00.BL
 
                                             myAnalyzerLedPositionsList = _
                                                     (From row As AnalyzerLedPositionsDS.tcfgAnalyzerLedPositionsRow In myAnalyzerLedPositionsDS.tcfgAnalyzerLedPositions _
-                                                     Where row.LedPosition = myAbsorbancesDS.twksAbsorbances(x).WavelengthPos _
+                                                     Where row.LedPosition = myAbsorbancesDS.twksAbsorbances(auxX).WavelengthPos _
                                                      Select row).ToList()
 
                                             'If Not resultData.HasError Then
@@ -2721,31 +2707,31 @@ Namespace Biosystems.Ax00.BL
                                                 Select Case myWavelengthPos
                                                     Case "M"
                                                         With myAbsorbancesDS
-                                                            If .twksAbsorbances(x).Absorbance = -1 Then
+                                                            If .twksAbsorbances(auxX).Absorbance = -1 Then
                                                                 'AG 15/10/2012
                                                                 'myCycleRow.Abs1 = "Error"
                                                                 myCycleRow.Abs1 = GlobalConstants.ABSORBANCE_INVALID_VALUE.ToString 'Error
                                                             Else
-                                                                myCycleRow.Abs1 = .twksAbsorbances(x).Absorbance.ToStringWithDecimals(pAllowDecimals)
+                                                                myCycleRow.Abs1 = .twksAbsorbances(auxX).Absorbance.ToStringWithDecimals(pAllowDecimals)
                                                             End If
 
-                                                            If x > 0 AndAlso .twksAbsorbances(x - 1).WaveLength <> .twksAbsorbances(x).WaveLength Then
-                                                                If .twksAbsorbances(x).Absorbance <> -1 AndAlso .twksAbsorbances(x - 1).Absorbance <> -1 Then
+                                                            If auxX > 0 AndAlso .twksAbsorbances(auxX - 1).WaveLength <> .twksAbsorbances(auxX).WaveLength Then
+                                                                If .twksAbsorbances(auxX).Absorbance <> -1 AndAlso .twksAbsorbances(auxX - 1).Absorbance <> -1 Then
                                                                     'ToDo: Check how to show this value, in Abs value or the original signed value
                                                                     'myCycleRow.Diff = Math.Abs(.twksAbsorbances(x).Absorbance - .twksAbsorbances(x - 1).Absorbance).ToStringWithDecimals(pAllowDecimals)
 
-                                                                    myCycleRow.Diff = (.twksAbsorbances(x).Absorbance - .twksAbsorbances(x - 1).Absorbance).ToStringWithDecimals(pAllowDecimals)
+                                                                    myCycleRow.Diff = (.twksAbsorbances(auxX).Absorbance - .twksAbsorbances(auxX - 1).Absorbance).ToStringWithDecimals(pAllowDecimals)
                                                                 End If
                                                             End If
                                                         End With
 
                                                     Case "R"
-                                                        If myAbsorbancesDS.twksAbsorbances(x).Absorbance = -1 Then
+                                                        If myAbsorbancesDS.twksAbsorbances(auxX).Absorbance = -1 Then
                                                             'AG 15/10/2012
                                                             'myCycleRow.Abs2 = "Error"
                                                             myCycleRow.Abs2 = GlobalConstants.ABSORBANCE_INVALID_VALUE.ToString 'Error
                                                         Else
-                                                            myCycleRow.Abs2 = myAbsorbancesDS.twksAbsorbances(x).Absorbance.ToStringWithDecimals(pAllowDecimals)
+                                                            myCycleRow.Abs2 = myAbsorbancesDS.twksAbsorbances(auxX).Absorbance.ToStringWithDecimals(pAllowDecimals)
                                                         End If
 
                                                 End Select
@@ -2753,24 +2739,24 @@ Namespace Biosystems.Ax00.BL
 
                                             'End If
 
-                                        ElseIf String.Compare(pExecutions(i).ReadingMode, "MONO", False) = 0 Then
+                                        ElseIf String.Compare(pExecutions(aux_i).ReadingMode, "MONO", False) = 0 Then
 
-                                            If myAbsorbancesDS.twksAbsorbances(x).Absorbance = -1 Then
+                                            If myAbsorbancesDS.twksAbsorbances(auxX).Absorbance = -1 Then
                                                 'AG 15/10/2012
                                                 'myCycleRow.Abs1 = "Error"
                                                 myCycleRow.Abs1 = GlobalConstants.ABSORBANCE_INVALID_VALUE.ToString 'Error
                                             Else
-                                                myCycleRow.Abs1 = myAbsorbancesDS.twksAbsorbances(x).Absorbance.ToStringWithDecimals(pAllowDecimals)
+                                                myCycleRow.Abs1 = myAbsorbancesDS.twksAbsorbances(auxX).Absorbance.ToStringWithDecimals(pAllowDecimals)
                                             End If
 
                                         End If
 
-                                        myCycleRow.Replicate = pExecutions(i).ReplicateNumber
-                                        myCycleRow.Cycle = myAbsorbancesDS.twksAbsorbances(x).ReadingNumber
-                                        myCycleRow.ExecutionID = pExecutions(i).ExecutionID
+                                        myCycleRow.Replicate = pExecutions(aux_i).ReplicateNumber
+                                        myCycleRow.Cycle = myAbsorbancesDS.twksAbsorbances(auxX).ReadingNumber
+                                        myCycleRow.ExecutionID = pExecutions(aux_i).ExecutionID
                                         '//Changes for TASK + BUGS Tracking  #1331
                                         '// CF - Added the Pause Column to the dataset
-                                        myCycleRow.Pause = myAbsorbancesDS.twksAbsorbances(x).Pause
+                                        myCycleRow.Pause = myAbsorbancesDS.twksAbsorbances(auxX).Pause
                                         ReplicateDS.tReplicates.Rows.Add(myCycleRow)
                                     Next x
 

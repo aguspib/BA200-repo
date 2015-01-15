@@ -300,6 +300,7 @@ Partial Class IResults
             'AG 22/09/2014 - BA-1940
 
             For i As Integer = 0 To 1
+                Dim aux_i = i
                 'AG 22/09/2014 - BA-1940 clear lists and dictionary when changes the priority
                 addedPatients.Clear()
                 patientIDSpecimensList.Clear()
@@ -307,7 +308,7 @@ Partial Class IResults
 
                 SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where row.SampleClass = "PATIENT" _
-                               AndAlso row.StatFlag = StatFlag(i) _
+                               AndAlso row.StatFlag = StatFlag(aux_i) _
                                AndAlso row.RerunNumber = 1 _
                                Select row).ToList()
 
@@ -336,7 +337,7 @@ Partial Class IResults
                         RowIndex += 1
                         If RowIndex = dgv.Rows.Count Then dgv.Rows.Add()
 
-                        dgv("STAT", RowIndex).Value = SampleIconList.Images(i)
+                        dgv("STAT", RowIndex).Value = SampleIconList.Images(aux_i)
 
                         'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
                         '           fields and shown only the PatientID
@@ -429,34 +430,34 @@ Partial Class IResults
                         End If
                         'AG 22/09/2014 - BA-1940
 
-                        End If
+                    End If
 
-                        'Update Report Print available and HIS export icons
-                        If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
-                            'Print available
-                            If sampleRow.PrintAvailable Then
-                                'DL 09/11/2010
-                                dgv("Print", RowIndex).Value = PrintImage
-                                dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
-                            Else
-                                dgv("Print", RowIndex).Value = NoImage
-                                dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
-                            End If
-
-                            'HIS sent
-                            If sampleRow.HIS_Sent Then
-                                dgv("HISExport", RowIndex).Value = OKImage
-                                dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
-                            Else
-                                dgv("HISExport", RowIndex).Value = NoImage
-                                dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
-                            End If
+                    'Update Report Print available and HIS export icons
+                    If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
+                        'Print available
+                        If sampleRow.PrintAvailable Then
+                            'DL 09/11/2010
+                            dgv("Print", RowIndex).Value = PrintImage
+                            dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
                         Else
                             dgv("Print", RowIndex).Value = NoImage
-                            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
+                            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
+                        End If
+
+                        'HIS sent
+                        If sampleRow.HIS_Sent Then
+                            dgv("HISExport", RowIndex).Value = OKImage
+                            dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
+                        Else
                             dgv("HISExport", RowIndex).Value = NoImage
                             dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
                         End If
+                    Else
+                        dgv("Print", RowIndex).Value = NoImage
+                        dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
+                        dgv("HISExport", RowIndex).Value = NoImage
+                        dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
+                    End If
                 Next sampleRow
 
                 'AG 22/09/2014 - BA-1940 finally complete the tooltip in list with (PatID) - pat name
@@ -465,7 +466,7 @@ Partial Class IResults
                 Next
                 'AG 22/09/2014 - BA-1940
 
-            Next i
+            Next
             Debug.Print("IResults.UpdateSamplesListDataGrid (Update patient list): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
 
             'AG 22/09/2014 - BA-1940 - release memory

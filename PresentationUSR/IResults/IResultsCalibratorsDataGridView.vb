@@ -737,6 +737,7 @@ Partial Class IResults
             Dim MaxRerunNumber As Integer = calibAvgResults.Count
 
             For RerunNumber As Integer = 1 To MaxRerunNumber
+                Dim auxRerunNumber = RerunNumber
                 Dim IsAverageDone As New Dictionary(Of Integer, Boolean)
 
                 Dim itempoint As Integer = TheoreticalConcList.Count + 1
@@ -749,7 +750,7 @@ Partial Class IResults
                                      Where row.OrderTestID = pOrderTestID _
                                      AndAlso row.TheoricalConcentration = myTheoreticalConc _
                                      AndAlso row.MultiPointNumber = itempoint _
-                                     AndAlso row.RerunNumber = RerunNumber _
+                                     AndAlso row.RerunNumber = auxRerunNumber _
                                      Select row).ToList()
 
                     'END AG 08/08/2010
