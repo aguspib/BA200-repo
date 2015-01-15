@@ -740,6 +740,7 @@ Public Class TestCrearScripts
                 Return ""
             End If
 
+            Return ""
         Catch ex As Exception
             MessageBox.Show(ex.Message)
             Return ""
