@@ -754,6 +754,7 @@ Namespace Biosystems.Ax00.Global
 
             BL_DYNAMIC_SD 'AG 26/11/2014 BA-2081
             FLIGHT_INIT_FAILURES 'Number of failures of baseline initializations (FLIGHT)
+            RDI_CUMULATE_ALL_BASELINES 'AG 15/01/2015 BA-2212
         End Enum
 
 

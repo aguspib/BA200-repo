@@ -403,6 +403,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
         ''' AG 16/11/2014 BA-2065 rename method from ResetAdjustsBLines to ResetBLinesValues
         ''' AG 21/11/2014 BA-2062 when Reset the ALIGHT results reset also the table twksWSBLinesByWell
+        ''' AG 15/01/2015 BA-2212 skip the business of this method when parameter RDI_CUMULATE_ALL_BASELINES = 1
         ''' </remarks>
         Public Function ResetBLinesValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
@@ -414,24 +415,43 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myExecDel As New ExecutionsDelegate
-                        resultData = myExecDel.CountExecutionsUsingAdjustBaseLine(dbConnection, pAnalyzerID, pWorkSessionID)
+                        'AG 15/01/2015 BA-2212
+                        Dim myParams As New SwParametersDelegate
+                        resultData = myParams.ReadByParameterName(dbConnection, GlobalEnumerates.SwParameters.RDI_CUMULATE_ALL_BASELINES.ToString, Nothing)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            Dim auxDataSet As ParametersDS
+                            Dim skipBaseLinesDeletion As Integer = 0
+                            auxDataSet = DirectCast(resultData.SetDatos, ParametersDS)
+                            If auxDataSet.tfmwSwParameters.Rows.Count > 0 AndAlso Not auxDataSet.tfmwSwParameters.First.IsValueNumericNull Then
+                                skipBaseLinesDeletion = CInt(auxDataSet.tfmwSwParameters.First.ValueNumeric)
+                            End If
 
-                        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                            Dim counter As Integer = CType(resultData.SetDatos, Integer)
-                            If (counter = 0) Then
-                                'Remove ALIGHT/FLIGHT results (or both) only when no executions are using these adjust base line identifiers
-                                Dim myDAO As New twksWSBLinesDAO
-                                resultData = myDAO.ResetBLinesValues(dbConnection, pAnalyzerID, pType)
+                            'When value = 1 skip the process that evaluates if previous baselines can be deleted or not
+                            If skipBaseLinesDeletion <> 1 Then
+                                'AG 15/01/2015 BA-2212
 
-                                'AG 21/11/2014 BA-2062 if pType = "" (ALL) also delete the twksWSBLinesByWell table (inform the model is not required then)
-                                If Not resultData.HasError AndAlso pType = "" Then
-                                    Dim myBLByWellDlgte As New WSBLinesByWellDelegate
-                                    resultData = myBLByWellDlgte.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, "", True)
+
+                                Dim myExecDel As New ExecutionsDelegate
+                                resultData = myExecDel.CountExecutionsUsingAdjustBaseLine(dbConnection, pAnalyzerID, pWorkSessionID)
+
+                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                    Dim counter As Integer = CType(resultData.SetDatos, Integer)
+                                    If (counter = 0) Then
+                                        'Remove ALIGHT/FLIGHT results (or both) only when no executions are using these adjust base line identifiers
+                                        Dim myDAO As New twksWSBLinesDAO
+                                        resultData = myDAO.ResetBLinesValues(dbConnection, pAnalyzerID, pType)
+
+                                        'AG 21/11/2014 BA-2062 if pType = "" (ALL) also delete the twksWSBLinesByWell table (inform the model is not required then)
+                                        If Not resultData.HasError AndAlso pType = "" Then
+                                            Dim myBLByWellDlgte As New WSBLinesByWellDelegate
+                                            resultData = myBLByWellDlgte.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, "", True)
+                                        End If
+
+                                    End If
                                 End If
 
-                            End If
-                        End If
+                            End If 'AG 15/01/2015 BA-2212
+                        End If 'AG 15/01/2015 BA-2212
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
