@@ -40,6 +40,16 @@ Namespace Biosystems.Ax00.BL
                                   "IA", "IB", "IC", "ID", "IE", "IF", "IG", "IH", "II", "IJ", "IK", "IL", "IM", "IN", "IO", "IP", "IQ", "IR", "IS", "IT", "IU", "IV"}
 
         Private ReadOnly XlsSingleFormat As String = "0{0}0###" 'RH 15/02/2012
+
+        'AG 12/01/2015 BA-2182 (3) - sheets numbers by contents
+        Private sheetADJUSTBL_ID As Integer = 1
+        Private sheetDYNAMICBL_ID As Integer = 2
+        Private sheetSTATICWELLBL_ID As Integer = 3
+        Private sheetCOUNTS_ID As Integer = 4
+        Private sheetABSORBANCES_ID As Integer = 5
+        Private sheetCOMPLETE_ID As Integer = 6
+        Private sheetRESULTS_ID As Integer = 7
+
 #End Region
 
 #Region "Main Public Methods"
@@ -111,13 +121,13 @@ Namespace Biosystems.Ax00.BL
 
                                     'BA-2067
                                     If pBaseLineType = BaseLineType.DYNAMIC.ToString() Then
-                                        resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, 2, BaseLineType.DYNAMIC.ToString())
+                                        resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, sheetDYNAMICBL_ID, BaseLineType.DYNAMIC.ToString())
                                     End If
 
                                     If Not resultdata.HasError AndAlso myWorkSessionsDS.twksWorkSessions.Rows.Count > 0 Then
 
                                         If Not resultdata.HasError Then
-                                            resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, 3, BaseLineType.STATIC.ToString()) 'BA-2067
+                                            resultdata = SheetBaseLinebyWell(dbConnection, myAnalyzerDS, myWorkSessionsDS, myWorkSheets, sheetSTATICWELLBL_ID, BaseLineType.STATIC.ToString()) 'BA-2067
                                         Else
                                             'Exit Function
                                             Return resultdata
@@ -326,6 +336,7 @@ Namespace Biosystems.Ax00.BL
         '''' <remarks>
         '''' Created By: DL 08/06/2010
         ''''             IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        ''''             AG 23/12/2014 BA-2182 rename sheets
         '''' </remarks>
         Private Function NewExcelFile(ByVal pFileName As String, _
                                      ByRef ptypeExcel As Type, _
@@ -352,52 +363,79 @@ Namespace Biosystems.Ax00.BL
                 pBook = myWorkbook.GetType.InvokeMember("Add", Reflection.BindingFlags.InvokeMethod, Nothing, myWorkbook, Nothing)
                 pBook.GetType.InvokeMember("SaveAs", Reflection.BindingFlags.InvokeMethod, Nothing, pBook, New Object() {"" & pFileName & ""})
                 pWorkSheets = myWorkbook.GetType().InvokeMember("Worksheets", BindingFlags.GetProperty, Nothing, pBook, Nothing)
+
+                'AG 12/01/2015 BA-2182 (3)
+                Dim sheetName As String = String.Empty
+
                 ' add new pages
                 ' add page absorbances
+                'AG 12/01/2015 BA-2182 (3) Set the proper sheet number. Depeding the base line type the number of worksheets are different
+                If pBaseLineType <> GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                    'Renumber sheets ID
+                    sheetSTATICWELLBL_ID -= 1
+                    sheetCOUNTS_ID -= 1
+                    sheetABSORBANCES_ID -= 1
+                    sheetCOMPLETE_ID -= 1
+                    sheetRESULTS_ID -= 1
+                End If
+
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOUNTS_ID}) 'New Object() {4}
                 ' add page Complete
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {5})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetABSORBANCES_ID}) 'New Object() {5}
 
                 'RH 13/07/2011 Add page Results
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOMPLETE_ID}) 'New Object() {6}
 
                 WorkSheet = pWorkSheets.GetType().InvokeMember("Add", BindingFlags.GetProperty, Nothing, pWorkSheets, Nothing)
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetRESULTS_ID}) 'New Object() {7}
                 ' end add pages
+                'AG 12/01/2015 BA-2182
 
                 ' Rename Pages
                 ' Rename Page 1
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {1})
-                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"BaseLine"})
+                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "BL with ADJUSTMENT", "BaseLine").ToString
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetADJUSTBL_ID}) 'New Object() {1}
+                'AG 12/01/2015 BA-2182 (3)
+                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
                 ' Rename page 2
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
-                myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Dynamic Base Line by Well"}) 'BA-2067
+                If (pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString) Then 'AG 12/01/2015 BA-2182 (3)
+                    sheetName = "Dynamic BL by well"
+                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetDYNAMICBL_ID}) 'New Object() {2}
+                    myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
+                End If
+                'AG 12/01/2015 BA-2182
+
                 ' Rename page 3
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {3})
-                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Base Line by Well"})
+                'AG 12/01/2015 BA-2182 (3)
+                sheetName = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Static BL by well", "Base Line by Well").ToString
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetSTATICWELLBL_ID}) 'New Object() {3}
+                'AG 12/01/2015 BA-2182 (3)
+                myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {sheetName})
+
                 ' Rename page 4
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOUNTS_ID}) 'New Object() {4}
                 myPage.GetType().InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Counts"})
                 ' Rename page 5
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {5})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetABSORBANCES_ID}) 'New Object() {5}
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Absorbances"})
                 ' Rename page 6
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOMPLETE_ID}) 'New Object() {6}
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Complete"})
                 'RH 13/07/2011 Rename page 7
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {7})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetRESULTS_ID}) ''New Object() {7}
                 myPage.GetType.InvokeMember("Name", BindingFlags.SetProperty, Nothing, myPage, New Object() {"Results"})
 
-                'IT 03/11/2014: INI BA-2067
-                'Visibilty of Pages
-                If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
-                    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
-                    myPage.GetType.InvokeMember("Visible", BindingFlags.SetProperty, Nothing, myPage, New Object() {False})
-                End If
-                'IT 03/11/2014: END BA-2067
+                'AG 12/01/2015 BA-2182 comment this code. Only the required sheets are created
+                ''IT 03/11/2014: INI BA-2067
+                ''Visibilty of Pages
+                'If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                '    myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {2})
+                '    myPage.GetType.InvokeMember("Visible", BindingFlags.SetProperty, Nothing, myPage, New Object() {False})
+                'End If
+                ''IT 03/11/2014: END BA-2067
 
             Catch ex As Exception 'General Error
                 resultdata.HasError = True
@@ -426,6 +464,7 @@ Namespace Biosystems.Ax00.BL
         ''''           AG 05/09/2011 - also copy AbsValue
         ''''           RH 02/01/2011 - Modify use of SetCellValue(). Pass original numeric value, not the string converted one.
         ''''           IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        ''''           AG 23/12/2014 - BA-2182 rename headers
         '''' </remarks>
         Private Function SheetBaseLinebyWell(ByVal pDBConnection As SqlConnection, _
                                             ByVal pAnalyzerDS As WSAnalyzersDS, _
@@ -446,11 +485,11 @@ Namespace Biosystems.Ax00.BL
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {pSheetNumber})
 
                 'Ini Header 
-                'IT 21/11/2014 BA-2067 Different header depending the base line type
+                'AG 23/12/2014 BA-2182 'IT 21/11/2014 BA-2067 Different header depending the base line type
                 If pBaseLineType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
-                    myHeader = "Base lines by well (without adjustments)"
+                    myHeader = "Static Base lines by well (without adjustments)"
                 Else
-                    myHeader = "Dynamic Base lines (on the fly)"
+                    myHeader = "Dynamic Base lines by well (on the fly)"
                 End If
 
                 SetCellValue(myPage, "A1", myHeader, True)
@@ -647,7 +686,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myWSStatus As String = ""
 
                 ' Selecet base line sheet
-                myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {1})
+                myPage = pWorksheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorksheets, New Object() {sheetADJUSTBL_ID})
 
                 ' Ini Header 
                 'AG 07/11/2014 BA-2067 Different header depending the base line typ
@@ -866,7 +905,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet count sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {4})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOUNTS_ID})
 
                 ' Ini Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1014,7 +1053,7 @@ Namespace Biosystems.Ax00.BL
                                         MergeCells(myPage, myRango)
 
                                         'AG 26/04/2011 - Well and Base lines headers depends on replicate number
-                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "L", pBaseLineType) 'BA-2067
+                                        setReplicatesHeader(pDBConnection, myCellRow, qExecutionInfo, myPage, "L", pBaseLineType) 'BA-2182, BA-2067
 
                                         SetCellValue(myPage, "A" & myCellRow, "COUNTS")
                                         myRango = "A" & myCellRow & ":L" & myCellRow  ' myRango = "A" & myCellRow & ":K" & myCellRow 'DL 12/01/2012
@@ -1132,7 +1171,7 @@ Namespace Biosystems.Ax00.BL
 
                 ' Selecet Absorbance Sheet ( 5 )
                 myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, _
-                                                            Nothing, pWorkSheets, New Object() {5})
+                                                            Nothing, pWorkSheets, New Object() {sheetABSORBANCES_ID})
 
                 ' Write Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1293,7 +1332,7 @@ Namespace Biosystems.Ax00.BL
                                         MergeCells(myPage, myRango)
 
                                         'AG 26/04/2011 - Well and Base lines headers depends on replicate number
-                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "M", pBLType) 'BA-2067
+                                        setReplicatesHeader(pDBConnection, myCellRow, qExecutionInfo, myPage, "M", pBLType) 'BA-2182 BA-2067
 
                                         SetCellValue(myPage, "A" & myCellRow, "ABS")
                                         'DL 12/01/2012. Begin
@@ -1459,7 +1498,7 @@ Namespace Biosystems.Ax00.BL
                 Dim myRango As String
 
                 ' Selecet complete sheet
-                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {6})
+                myPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, Nothing, pWorkSheets, New Object() {sheetCOMPLETE_ID})
 
                 ' Ini Header 
                 myHeader = "Results WorkSessionID " & myWSID & " " & _
@@ -1600,7 +1639,7 @@ Namespace Biosystems.Ax00.BL
                                         MergeCells(myPage, myRango)
 
                                         'AG 26/04/2011 - Well and Base lines headers depends on replicate number
-                                        setReplicatesHeader(myCellRow, qExecutionInfo, myPage, "M", pBLType) 'BA-2067
+                                        setReplicatesHeader(pDBConnection, myCellRow, qExecutionInfo, myPage, "M", pBLType) 'BA-2182, BA-2067
 
 
                                         SetCellValue(myPage, "A" & myCellRow, "COUNTS")
@@ -1879,6 +1918,9 @@ Namespace Biosystems.Ax00.BL
         '''' <remarks>
         '''' Created By:  RH 13/07/2011
         '''' Modified By: IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        '''' Modified by AG 23/12/2014 BA-2182 rename
+        '''' Modified by AG 07/01/2015 BA-2182 When pBaseLineType is dynamic the ID cannot be read from executions tables, we had to read them from twksWSBLinesByWell
+        ''''             AG 14/01/2015 BA-2182 (3) header informs patientID (for patients) (for calibrators and controls leave "" do not inform the element name) / (for blanks leave "" too)
         '''' </remarks>
         Private Function SheetResultsByReplicates(ByVal pDBConnection As SqlConnection, _
                                          ByVal pAnalyzerDS As WSAnalyzersDS, _
@@ -1893,14 +1935,20 @@ Namespace Biosystems.Ax00.BL
                 Dim XlsPageHeader As String
                 Dim XlsPageRange As String
                 Const StrNull As String = "?"
-                Dim titleAdjustBaseLineId = IIf(pBaseLineType = "DYNAMIC", "Dynamic Adjust BaseLineID", "Adjust BaseLineID") 'BA-2067
+                Dim titleAdjustBaseLineId = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Dynamic BL ID", "Adjust BaseLineID") 'AG 23/12/2014 BA-2182 'BA-2067
+                Dim titleReplicateDetails As String = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Static BL ID", "Well BaseLineID").ToString  'AG 23/12/2014 BA-2182
 
                 Dim WSData As WorkSessionsDS.twksWorkSessionsRow = pWorkSessionDS.twksWorkSessions(0)
                 Dim ExecutionsResultsDS As ExecutionsDS
 
+                'AG 07/01/2014 BA-2182
+                Dim myBLinesWellDelg As New WSBLinesByWellDelegate
+                Dim dynamicBLId As Integer
+                'AG 07/01/2014 BA-2182
+
                 ' Select Results By Replicates Sheet ( 7 )
                 XlsPage = pWorkSheets.GetType().InvokeMember("Item", BindingFlags.GetProperty, _
-                                                            Nothing, pWorkSheets, New Object() {7})
+                                                            Nothing, pWorkSheets, New Object() {sheetRESULTS_ID})
 
                 ' Write Header 
                 XlsPageHeader = String.Format("Results WorkSessionID: {0} Creation Date: {1} by {2}", _
@@ -1942,10 +1990,12 @@ Namespace Biosystems.Ax00.BL
                         Dim ExecutionRows As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
                         Dim SampleClasses() As String = {"PATIENT", "CALIB", "CTRL", "BLANK"}
                         Dim Filter As String
+                        Dim headerPatientID As String 'AG 14/01/2015 BA-2182
                         Dim previousRow As ExecutionsDS.vwksWSExecutionsResultsRow = Nothing
 
                         For Each SampleClass In SampleClasses
                             Filter = String.Empty
+                            headerPatientID = String.Empty 'AG 14/01/2015 BA-2182
 
                             ExecutionRows = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                              Where row.SampleClass = SampleClass _
@@ -1960,8 +2010,20 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     Filter = String.Format("{0}{1}", row.OrderTestID, row.RerunNumber)
-                                    SetCellValue(XlsPage, "A" & CurrentXlsPageRow, _
-                                                 String.Format("OrderTest: {0} ({1}) Test {2} Rerun Number {3}", row.OrderTestID, SampleClass, row.TestName, row.RerunNumber))
+
+                                    'AG 14/01/2015 BA-2182 (3) inform the patientID (for patients)
+                                    Select Case SampleClass
+                                        Case "PATIENT"
+                                            If Not row.IsPatientIDNull Then headerPatientID = row.PatientID Else headerPatientID = String.Empty
+                                            SetCellValue(XlsPage, "A" & CurrentXlsPageRow, _
+                                                         String.Format("OrderTest: {0} - {4} ({1}) Test {2} Rerun Number {3}", row.OrderTestID, SampleClass, row.TestName, row.RerunNumber, headerPatientID))
+
+                                        Case Else
+                                            SetCellValue(XlsPage, "A" & CurrentXlsPageRow, _
+                                                         String.Format("OrderTest: {0} - ({1}) Test {2} Rerun Number {3}", row.OrderTestID, SampleClass, row.TestName, row.RerunNumber))
+                                    End Select
+                                    'AG 14/01/2015 BA-2182
+
                                     XlsPageRange = String.Format("A{0}:K{0}", CurrentXlsPageRow)
                                     SetCellColor(XlsPage, XlsPageRange, 6)
                                     MergeCells(XlsPage, XlsPageRange)
@@ -1981,21 +2043,61 @@ Namespace Biosystems.Ax00.BL
                                     WellUsed = row.WellUsed.ToString()
                                 End If
 
-                                If row.IsAdjustBaseLineIDNull Then
-                                    AdjustBaseLineID = StrNull
-                                Else
-                                    AdjustBaseLineID = row.AdjustBaseLineID.ToString()
-                                End If
+                                'AG 07/01/2015 BA-2182 - When pBaseLineType is dynamic the ID cannot be read from executions tables, we had to read them from twksWSBLinesByWell
+                                AdjustBaseLineID = StrNull
+                                BaseLineID = StrNull
+                                If pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                                    dynamicBLId = 0 'Initial value
+                                    If Not row.IsBaseLineIDNull Then
 
-                                If row.IsBaseLineIDNull Then
-                                    BaseLineID = StrNull
-                                Else
-                                    BaseLineID = row.BaseLineID.ToString()
-                                End If
+                                        'Read the dynamic ID in twksWSBLinesByWell previous to BaseLineID (NOTE: previous to BaseLineID not to AdjustBaseLineID!!)
+                                        resultdata = myBLinesWellDelg.GetPreviousBaseLineIDByType(pDBConnection, row.AnalyzerID, row.WorkSessionID, _
+                                                                                                  row.BaseLineID, row.WellUsed, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                                        If Not resultdata.HasError AndAlso Not resultdata.SetDatos Is Nothing Then
+                                            If DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
+                                                dynamicBLId = DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID
+                                                AdjustBaseLineID = dynamicBLId.ToString
+                                            End If
+                                        End If
 
+                                        'Read the static ID in twksWSBLinesByWell previous to BaseLineID
+                                        resultdata = myBLinesWellDelg.GetPreviousBaseLineIDByType(pDBConnection, row.AnalyzerID, row.WorkSessionID, _
+                                                          row.BaseLineID, row.WellUsed, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                                        If Not resultdata.HasError AndAlso Not resultdata.SetDatos Is Nothing Then
+                                            If DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
+                                                'Show the STATIC id only when it is higher than the dynamic. Else (it is the same, write '?'). Minor has no sense and '?' will be shown too
+                                                If (DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID > dynamicBLId) Then
+                                                    BaseLineID = DirectCast(resultdata.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID.ToString
+                                                End If
+                                            End If
+                                        End If
+
+                                    End If
+
+                                Else
+                                    If row.IsAdjustBaseLineIDNull Then
+                                        AdjustBaseLineID = StrNull
+                                    Else
+                                        AdjustBaseLineID = row.AdjustBaseLineID.ToString()
+                                    End If
+
+                                    If row.IsBaseLineIDNull Then
+                                        BaseLineID = StrNull
+                                    Else
+                                        BaseLineID = row.BaseLineID.ToString()
+                                    End If
+
+                                End If
+                                'AG 07/01/2015 BA-2182
+
+                                'AG 23/12/2014 BA-2182 rename
+                                'SetCellValue(XlsPage, "B" & CurrentXlsPageRow, _
+                                '                 String.Format("Replicate number = {0} Well / Rotor = {1} / ? - {4} = {2} - Well BaseLineID = {3}", _
+                                '                               ReplicateNumber, WellUsed, AdjustBaseLineID, BaseLineID, titleAdjustBaseLineId)) 'BA-2067
                                 SetCellValue(XlsPage, "B" & CurrentXlsPageRow, _
-                                                 String.Format("Replicate number = {0} Well / Rotor = {1} / ? - {4} = {2} - Well BaseLineID = {3}", _
-                                                               ReplicateNumber, WellUsed, AdjustBaseLineID, BaseLineID, titleAdjustBaseLineId)) 'BA-2067
+                                                 String.Format("Replicate number = {0} Well / Rotor = {1} / ? - {2} = {3} - {4} = {5}", _
+                                                               ReplicateNumber, WellUsed, titleAdjustBaseLineId, AdjustBaseLineID, titleReplicateDetails, BaseLineID))
+                                'AG 23/12/2014 BA-2182
 
                                 XlsPageRange = String.Format("A{0}:K{0}", CurrentXlsPageRow)
                                 SetCellColor(XlsPage, XlsPageRange, 6)
@@ -3014,6 +3116,7 @@ Namespace Biosystems.Ax00.BL
         ''' <summary>
         ''' 
         ''' </summary>
+        ''' <param name="pDBConnection"></param>
         ''' <param name="pCellRow"></param>
         ''' <param name="pExecutionList"></param>
         ''' <param name="pPage"></param>
@@ -3021,8 +3124,10 @@ Namespace Biosystems.Ax00.BL
         ''' <param name="pBaseLineType"></param>
         ''' <remarks>
         ''' Modified by: IT 25/11/2014 - BA-2067: Dynamic BaseLine
+        ''' Modified by AG 23/12/2014 BA-2182 rename
+        ''' Modified by AG 07/01/2015 BA-2182 new param connection. When pBaseLineType is dynamic the ID cannot be read from executions tables, we had to read them from twksWSBLinesByWell
         ''' </remarks>
-        Private Sub setReplicatesHeader(ByRef pCellRow As Integer, _
+        Private Sub setReplicatesHeader(ByVal pDBConnection As SqlConnection, ByRef pCellRow As Integer, _
                                         ByVal pExecutionList As List(Of ExecutionsDS.twksWSExecutionsRow), _
                                         ByVal pPage As Object, _
                                         ByVal pcolLetter As String,
@@ -3032,7 +3137,14 @@ Namespace Biosystems.Ax00.BL
             pCellRow += 1
             Dim myreplhead As String = ""
             Dim myrango As String = ""
-            Dim titleAdjustBaseLineId = IIf(pBaseLineType = "DYNAMIC", "Dynamic Adjust BaseLineID", "Adjust BaseLineID") 'BA-2067
+            Dim titleAdjustBaseLineId = IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, "Dynamic BL ID", "Adjust BaseLineID") 'AG 23/12/2014 BA-2182 'BA-2067
+
+            'AG 07/01/2014 BA-2182
+            Dim myBLinesWellDelg As New WSBLinesByWellDelegate
+            Dim idValueForHeader As String = String.Empty
+            Dim dynamicBLId As Integer = 0
+            Dim resultData As New GlobalDataTO
+            'AG 07/01/2014 BA-2182
 
             For replicateNumber As Integer = 0 To pExecutionList.Count - 1
                 'DL 12/01/2012. Begin
@@ -3059,18 +3171,71 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 myreplhead &= String.Format(" - {0} = ", titleAdjustBaseLineId) 'BA-2067
-                If Not pExecutionList(replicateNumber).IsAdjustBaseLineIDNull Then
-                    myreplhead &= pExecutionList(replicateNumber).AdjustBaseLineID
-                Else
-                    myreplhead = "?"
-                End If
 
-                myreplhead &= " - Well BaseLineID = "
-                If Not pExecutionList(replicateNumber).IsBaseLineIDNull Then
-                    myreplhead &= pExecutionList(replicateNumber).BaseLineID
+                'AG 07/01/2015 BA-2182 when dynamic the ID cannot be read from executions, we had to read them form twksWSBLinesByWell
+                'If Not pExecutionList(replicateNumber).IsAdjustBaseLineIDNull Then
+                '    myreplhead &= pExecutionList(replicateNumber).AdjustBaseLineID
+                'Else
+                '    myreplhead &= "?"
+                'End If
+                idValueForHeader = "?" 'Dynamic base line ID header
+                If pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                    'Read the dynamic ID in twksWSBLinesByWell previous to BaseLineID (NOTE: previous to BaseLineID not to AdjustBaseLineID!!)
+                    dynamicBLId = 0 'Initial value
+                    If Not pExecutionList(replicateNumber).IsBaseLineIDNull Then
+                        resultData = myBLinesWellDelg.GetPreviousBaseLineIDByType(pDBConnection, pExecutionList(replicateNumber).AnalyzerID, pExecutionList(replicateNumber).WorkSessionID, _
+                                                                                  pExecutionList(replicateNumber).BaseLineID, pExecutionList(replicateNumber).WellUsed, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            If DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
+                                dynamicBLId = DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID
+                                idValueForHeader = dynamicBLId.ToString
+                            End If
+                        End If
+                    End If
                 Else
-                    myreplhead = "?"
+                    'Base line type STATIC
+                    If Not pExecutionList(replicateNumber).IsAdjustBaseLineIDNull Then
+                        idValueForHeader = pExecutionList(replicateNumber).AdjustBaseLineID.ToString
+                    End If
                 End If
+                myreplhead &= idValueForHeader 'Add the proper baseline ID value to the header string
+                'AG 07/01/2015 BA-2182
+
+                'AG 23/12/2014 BA-2182
+                'myreplhead &= " - Well BaseLineID = "
+                myreplhead &= IIf(pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString, " - Static BL ID = ", " - Well BaseLineID = ").ToString
+                'AG 23/12/2014 BA-2182
+
+                'AG 07/01/2015 BA-2182
+                'If Not pExecutionList(replicateNumber).IsBaseLineIDNull Then
+                '    myreplhead &= pExecutionList(replicateNumber).BaseLineID
+                'Else
+                '    myreplhead &= "?"
+                'End If
+
+                idValueForHeader = "?" 'Static base line ID header
+                If pBaseLineType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                    'Read the static ID in twksWSBLinesByWell previous to BaseLineID
+                    If Not pExecutionList(replicateNumber).IsBaseLineIDNull Then
+                        resultData = myBLinesWellDelg.GetPreviousBaseLineIDByType(pDBConnection, pExecutionList(replicateNumber).AnalyzerID, pExecutionList(replicateNumber).WorkSessionID, _
+                                                                                  pExecutionList(replicateNumber).BaseLineID, pExecutionList(replicateNumber).WellUsed, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            If DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines.Rows.Count > 0 Then
+                                'Show the STATIC id only when it is higher than the dynamic. Else (it is the same, write '?'). Minor has no sense and '?' will be shown too
+                                If (DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID > dynamicBLId) Then
+                                    idValueForHeader = DirectCast(resultData.SetDatos, BaseLinesDS).twksWSBaseLines(0).BaseLineID.ToString
+                                End If
+                            End If
+                        End If
+                    End If
+                Else
+                    'Base line type STATIC
+                    If Not pExecutionList(replicateNumber).IsBaseLineIDNull Then
+                        idValueForHeader = pExecutionList(replicateNumber).BaseLineID.ToString
+                    End If
+                End If
+                myreplhead &= idValueForHeader 'Add the proper baseline ID value to the header string
+                'AG 07/01/2015 BA-2182
 
                 SetCellValue(pPage, "B" & pCellRow, myreplhead)
                 myrango = "A" & pCellRow & ":" & pcolLetter & pCellRow      'myrango = "A" & pCellRow & ":K" & pCellRow 'dl 12/01/2012

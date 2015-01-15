@@ -282,7 +282,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If pType <> "" Then
                             cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
 
-                            If pType = "DYNAMIC" Then
+                            If pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
                                 cmdText &= " AND Wavelength = " & pLed
                             End If
 
@@ -480,7 +480,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If pType <> "" Then
                             cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
 
-                            If pType = "DYNAMIC" Then
+                            If pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
                                 cmdText &= " AND WellUsed = " & pWellUsed
                             End If
                         End If
@@ -631,7 +631,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                           " AND BL.Wavelength = BLW.Wavelenght " & vbCrLf
 
                         'AG 29/10/2014 BA-2062
-                        If pType = "DYNAMIC" Then
+                        If pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
                             cmdText &= " AND BL.WellUsed = BLW.WellUsed " & vbCrLf
                         End If
                         'AG 29/10/2014 BA-2062

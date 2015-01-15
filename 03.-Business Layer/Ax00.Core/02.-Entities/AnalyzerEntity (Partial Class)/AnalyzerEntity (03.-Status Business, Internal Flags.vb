@@ -570,7 +570,8 @@ Namespace Biosystems.Ax00.Core.Entities
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
         '''             AG 14/11/2014 - BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
         '''             IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
-        '''             IT 19/12/2014 - Ba-2143
+        '''             AG 11/12/2014 - BA-2170 use new value "MIDDLE" for flag DynamicBL_Read
+        '''             IT 19/12/2014 - BA-2143
         ''' </remarks>
         Private Function ManageStandByStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO

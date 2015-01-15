@@ -436,42 +436,17 @@ Namespace Biosystems.Ax00.BL
                             resultData = myDAO.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID)
 
                         ElseIf BaseLineTypeForWellReject = GlobalEnumerates.BaseLineType.DYNAMIC Then
-                            'Get the max baseLineID of each well (all STATIC and DYNAMIC)
-                            resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, "")
-
-                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                'Delete all the STATIC records, except the max baseLineID of each well
-                                Dim auxDataSet As New BaseLinesDS
-                                auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
-                                resultData = myDAO.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, auxDataSet)
-
-                                'Renumerate the existing STATIC BaseLineID as the maximum DYNAMIC value + 1
-                                resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
-                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                    auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
-                                    Dim newBaseLineID As Integer = 0
-                                    If auxDataSet.twksWSBaseLines.Rows.Count > 0 Then
-                                        newBaseLineID = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDataSet.twksWSBaseLines Select a.BaseLineID).Max
-                                    End If
-                                    newBaseLineID += 1
-
-                                    'Update the existing records of STATIC base line to newBaseLineID value
-                                    If Not resultData.HasError Then
-                                        resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, newBaseLineID, GlobalEnumerates.BaseLineType.STATIC.ToString)
-                                    End If
-                                End If
-
-                            End If
+                            resultData = ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID) 'AG 08/01/2015 BA-2182 (step 4) ResetWS for dynamic base line functionality
                         End If
                         'AG 20/11/2014
 
-                            If (Not resultData.HasError) Then
-                                'When the Database Connection was opened locally, then the Commit is executed
-                                If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                            Else
-                                'When the Database Connection was opened locally, then the Rollback is executed
-                                If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                            End If
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
                     End If
                 End If
 
@@ -491,6 +466,99 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+
+        ''' <summary>
+        ''' Reset WS business for dynamic base line functionality:
+        ''' 1) Delete all the STATIC records, except the max baseLineID of each well (NOTE: the max baselineID can be STATIC or DYNAMIC)
+        ''' 2) Delete all the DYNAMIC records, except the max baselineID of each well (max baselineID for DYNAMIC)
+        ''' 3) Update the remaining DYNAMIC records to BaseLineID = 1
+        ''' 4) Update the remaining STATIC records with BaseLineID = 2
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">Work Session Identifier</param>
+        ''' <returns>GlobalDataTO containing sucess/error information</returns>
+        ''' <remarks>
+        ''' AG 08/01/2015 BA-2182 step 4
+        ''' </remarks>
+        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+
+                        Dim myDAO As New twksWSBLinesByWellDAO
+
+                        'Get the max baseLineID of each well (all STATIC and DYNAMIC)
+                        resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, "")
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            Dim auxDataSet As New BaseLinesDS
+                            auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
+
+                            '1) Delete all the STATIC records, except the max baseLineID of each well (NOTE: the max baselineID can be STATIC or DYNAMIC)
+                            resultData = myDAO.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, GlobalEnumerates.BaseLineType.STATIC.ToString, auxDataSet)
+
+                            If Not resultData.HasError Then
+                                'Now read only the last dynamic baselines that still exists
+                                '2) Delete all the DYNAMIC records, except the max baselineID of each well (max baselineID for DYNAMIC)
+                                resultData = myDAO.GetAllWellsLastTurn(dbConnection, pAnalyzerID, pWorkSessionID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    auxDataSet = DirectCast(resultData.SetDatos, BaseLinesDS)
+
+                                    Dim maxDynamicBaseLineID As Integer = 0
+                                    If auxDataSet.twksWSBaseLines.Rows.Count > 0 Then
+                                        maxDynamicBaseLineID = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDataSet.twksWSBaseLines Select a.BaseLineID).Max
+                                        resultData = myDAO.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString, Nothing, maxDynamicBaseLineID)
+
+                                        If Not resultData.HasError Then
+                                            '3) Update the remaining DYNAMIC records to BaseLineID = 1
+                                            resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, pWorkSessionID, 1, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                                        End If
+
+                                        If Not resultData.HasError Then
+                                            '4) Update the remaining STATIC records with BaseLineID = 2
+                                            resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, pWorkSessionID, 2, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                                        End If
+                                    End If
+
+                                End If
+
+                            End If
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesByWellDelegate.ResetWSForDynamicBL", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
 
         ''' <summary>
         ''' Update values of a group of BaseLines by Well
@@ -692,6 +760,159 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' Update all records with pCurrentID to pNewID
+        ''' (before update the method deletes all records (if any) that uses pNewID)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pCurrentID"></param>
+        ''' <param name="pNewID"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 19/12/2014 BA-2182 (1)</remarks>
+        Public Function UpdateByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pCurrentID As Integer, ByVal pNewID As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesByWellDAO
+
+                        'Delete existings records using BaseLineID = pNewID
+                        resultData = myDAO.DeleteByID(dbConnection, pAnalyzerID, pWorkSessionID, pNewID)
+
+                        'Rename all existings records using BaseLineID = pCurrentID to pNewID
+                        resultData = myDAO.UpdateByID(dbConnection, pAnalyzerID, pWorkSessionID, pCurrentID, pNewID)
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            'resultData.SetDatos = <value to return; if any>
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSBLinesByWellDelegate.UpdateByID", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Delete all records using pIDToDelete
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pIDToDelete"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 19/12/2014 BA-2181 (1)</remarks>
+        Public Function DeleteByID(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pIDToDelete As Integer) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesByWellDAO
+                        resultData = myDAO.DeleteByID(dbConnection, pAnalyzerID, pWorkSessionID, pIDToDelete)
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                            'resultData.SetDatos = <value to return; if any>
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSBLinesByWellDelegate.DeleteByID", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Search the last baselineID (minor or equal) than pPreviousID with the same type as pType parameter
+        ''' (this method is created because it is needed for excel results creation with dynamic base line)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pPreviousID"></param>
+        ''' <param name="pWellUsed"></param>
+        ''' <param name="pType"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 07/01/2015 BA-2182</remarks>
+        Public Function GetPreviousBaseLineIDByType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                    ByVal pPreviousID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesByWellDAO
+                        resultData = myDAO.GetPreviousBaseLineIDByType(dbConnection, pAnalyzerID, pWorkSessionID, pPreviousID, pWellUsed, pType)
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSBLinesByWellDelegate.GetPreviousBaseLineIDByType", EventLogEntryType.Error, False)
+
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+
+            End Try
+
+            Return resultData
+        End Function
+
 
 #End Region
 
