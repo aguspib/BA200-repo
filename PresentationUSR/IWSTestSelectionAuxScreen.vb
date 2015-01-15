@@ -1070,11 +1070,13 @@ Public Class IWSTestSelectionAuxScreen
                                 'If the STD Test is linked to other Calculated Tests, verify if they remain selected
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
-                                    For i As Integer = 0 To calcTests.Count - 1
+                                    For i = 0 To calcTests.Count - 1
+                                        ' ReSharper disable once InconsistentNaming
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
@@ -1093,11 +1095,12 @@ Public Class IWSTestSelectionAuxScreen
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     'Get all different selected Calculated Tests to which the Test is linked
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
-                                    For i As Integer = 0 To calcTests.Count - 1
+                                    For i = 0 To calcTests.Count - 1
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'Only if the Calculated Test is currently selected, unselect it but without unselect its components
@@ -1810,7 +1813,8 @@ Public Class IWSTestSelectionAuxScreen
                                 'If the ISE Test is linked to other Calculated Tests, verify if they remain selected
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
-                                    For i As Integer = 0 To calcTests.Count - 1
+                                    For i2 = 0 To calcTests.Count - 1
+                                        Dim i = i2
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
@@ -1823,7 +1827,7 @@ Public Class IWSTestSelectionAuxScreen
                                                 qSelectedTest.First.CalcTestNames = RebuildStringList(qSelectedTest.First.CalcTestNames, lstCalPos.First.TestName)
                                             End If
                                         End If
-                                    Next i
+                                    Next
                                 End If
 
                                 'El Test can be unselected when it is not linked to another selected Calculated Test
@@ -1833,11 +1837,13 @@ Public Class IWSTestSelectionAuxScreen
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     'Get all different selected Calculated Tests to which the Test is linked
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
-                                    For i As Integer = 0 To calcTests.Count - 1
+                                    For i = 0 To calcTests.Count - 1
+                                        ' ReSharper disable once InconsistentNaming
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'Only if the Calculated Test is currently selected, unselect it but without unselect its components
@@ -2113,10 +2119,11 @@ Public Class IWSTestSelectionAuxScreen
                                 If (qSelectedTest.First.CalcTestIDs.Trim <> "") Then
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
                                     For i As Integer = 0 To calcTests.Count - 1
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'If the Calculated Test is currently unselected, remove it from fields CalcTestIDs and CalcTestNames
@@ -2136,10 +2143,11 @@ Public Class IWSTestSelectionAuxScreen
                                     'Get all different selected Calculated Tests to which the Test is linked
                                     Dim calcTests() As String = qSelectedTest.First.CalcTestIDs.Trim.Split(CChar(", "))
                                     For i As Integer = 0 To calcTests.Count - 1
+                                        Dim aux_i = i
                                         'Get position of the Calculated Test in the correspondent array
                                         Dim lstCalPos As List(Of SelectedTestsDS.SelectedTestTableRow)
                                         lstCalPos = (From a In calculatedTestList.SelectedTestTable _
-                                                     Where a.TestID = Convert.ToInt32(calcTests(i).Trim) _
+                                                     Where a.TestID = Convert.ToInt32(calcTests(aux_i).Trim) _
                                                      Select a).ToList()
                                         If (lstCalPos.Count = 1) Then
                                             'Only if the Calculated Test is currently selected, unselect it but without unselect its components
@@ -2147,7 +2155,7 @@ Public Class IWSTestSelectionAuxScreen
                                                 MarkUnMarkCalculatedTestCell(lstCalPos.First.Row, lstCalPos.First.Col, False)
                                             End If
                                         End If
-                                    Next i
+                                    Next
                                     qSelectedTest.First.CalcTestIDs = ""
                                     qSelectedTest.First.CalcTestNames = ""
                                 End If

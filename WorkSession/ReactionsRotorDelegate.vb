@@ -1042,14 +1042,15 @@ Namespace Biosystems.Ax00.BL
                             Dim myRes As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
                             Dim createDS As New ReactionsRotorDS
                             Dim newRow As ReactionsRotorDS.twksWSReactionsRotorRow
-                            For i As Integer = 1 To maxWells
+                            For i = 1 To maxWells
+                                Dim auxI = i
                                 myRes = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In currentReactionsDS.twksWSReactionsRotor _
-                                         Where a.WellNumber = i Select a).ToList
+                                         Where a.WellNumber = auxI Select a).ToList
 
                                 If myRes.Count = 0 Then
                                     newRow = createDS.twksWSReactionsRotor.NewtwksWSReactionsRotorRow
                                     newRow.AnalyzerID = pAnalyzerID
-                                    newRow.WellNumber = i
+                                    newRow.WellNumber = auxI
                                     newRow.RotorTurn = 0
                                     newRow.WellContent = "E"
                                     newRow.WellStatus = "R"

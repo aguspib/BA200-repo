@@ -5168,16 +5168,17 @@ Namespace Biosystems.Ax00.BL
                                         Dim newRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow
                                         Dim existsLnq As List(Of WSPausedOrderTestsDS.twksWSPausedOrderTestsRow)
                                         For i As Integer = 0 To pOrderTestID.Count - 1
-                                            If pOrderTestID.Count >= i OrElse pRerunNumber.Count >= i Then
+                                            Dim aux_i = i
+                                            If pOrderTestID.Count >= aux_i OrElse pRerunNumber.Count >= aux_i Then
                                                 existsLnq = (From a As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In pausedOTsDS.twksWSPausedOrderTests _
-                                                             Where a.OrderTestID = pOrderTestID(i) AndAlso a.RerunNumber = pRerunNumber(i) Select a).ToList
+                                                             Where a.OrderTestID = pOrderTestID(aux_i) AndAlso a.RerunNumber = pRerunNumber(aux_i) Select a).ToList
                                                 If existsLnq.Count = 0 Then 'Add
                                                     'Create new row if ok. in twksWSPausedOrderTests
                                                     newRow = orderTestsToAddDS.twksWSPausedOrderTests.NewtwksWSPausedOrderTestsRow()
                                                     newRow.AnalyzerID = pAnalyzerID
                                                     newRow.WorkSessionID = pWorkSessionID
-                                                    newRow.OrderTestID = pOrderTestID(i)
-                                                    newRow.RerunNumber = pRerunNumber(i)
+                                                    newRow.OrderTestID = pOrderTestID(aux_i)
+                                                    newRow.RerunNumber = pRerunNumber(aux_i)
                                                     orderTestsToAddDS.twksWSPausedOrderTests.AddtwksWSPausedOrderTestsRow(newRow)
                                                 End If
                                             End If
@@ -9189,9 +9190,10 @@ Namespace Biosystems.Ax00.BL
 
                                                                             'Evaluate if the last reagents sent contaminates (HIGH contamination) the first pending to be sent
                                                                             For highIndex As Integer = PreviousReagentsIDList.Count - highContaminationPersitance To PreviousReagentsIDList.Count - 2
-                                                                                If highIndex >= 0 Then 'Avoid overflow
+                                                                                Dim auxHighIndex = highIndex
+                                                                                If auxHighIndex >= 0 Then 'Avoid overflow
                                                                                     existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                                                                                      Where wse.ReagentContaminatorID = PreviousReagentsIDList(highIndex) _
+                                                                                                      Where wse.ReagentContaminatorID = PreviousReagentsIDList(auxHighIndex) _
                                                                                                       AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
                                                                                                       AndAlso Not wse.IsWashingSolutionR1Null _
                                                                                                       Select wse).ToList()
@@ -9208,10 +9210,11 @@ Namespace Biosystems.Ax00.BL
                                                                                                                     Select wse.ReplicateNumber).Max
                                                                                 If newPendingOrderTestMaxReplicates < highContaminationPersitance Then
                                                                                     For i = 1 To highContaminationPersitance - 1
-                                                                                        If i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
+                                                                                        Dim aux_i = i
+                                                                                        If aux_i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
                                                                                             existContamination = (From wse In contaminationsDataDS.tparContaminations _
                                                                                                               Where wse.ReagentContaminatorID = PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) _
-                                                                                                              AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(i).ReagentID _
+                                                                                                              AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(aux_i).ReagentID _
                                                                                                               AndAlso Not wse.IsWashingSolutionR1Null _
                                                                                                               Select wse).ToList()
                                                                                             If existContamination.Count > 0 Then
@@ -9324,23 +9327,24 @@ Namespace Biosystems.Ax00.BL
                                                                 'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
                                                                 'The last reagentID used has the higher indexes
                                                                 Dim maxReplicates As Integer
-                                                                For item As Integer = 0 To OrderTests.Count - 1
+                                                                For item = 0 To OrderTests.Count - 1
+                                                                    Dim itemIndex = item
                                                                     maxReplicates = (From wse In returnDS.twksWSExecutions _
-                                                                                                        Where wse.OrderTestID = OrderTests(item).OrderTestID _
+                                                                                                        Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
                                                                                                         Select wse.ReplicateNumber).Max
 
                                                                     If PreviousReagentsIDList.Count = 0 Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(item).ReagentID)
+                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
                                                                         previousOrderTestMaxReplicatesList.Add(maxReplicates)
 
                                                                         'When reagent changes
-                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(item).ReagentID Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(item).ReagentID)
+                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
+                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
                                                                         previousOrderTestMaxReplicatesList.Add(maxReplicates)
                                                                     End If
 
-                                                                    If item = OrderTests.Count - 1 Then
-                                                                        previousElementLastReagentID = OrderTests(item).ReagentID
+                                                                    If itemIndex = OrderTests.Count - 1 Then
+                                                                        previousElementLastReagentID = OrderTests(itemIndex).ReagentID
                                                                         previousElementLastMaxReplicates = maxReplicates
                                                                     End If
                                                                     'AG 19/12/2011
