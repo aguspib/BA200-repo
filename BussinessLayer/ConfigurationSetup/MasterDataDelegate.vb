@@ -114,7 +114,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     Dim myMasteDataDS As New MasterDataDS()
                     Dim myMasterDataDelegate As New MasterDataDelegate()
-                    Dim qSampleType As New List(Of MasterDataDS.tcfgMasterDataRow)
+                    'Dim qSampleType As New List(Of MasterDataDS.tcfgMasterDataRow)
 
                     resultData = myMasterDataDelegate.GetList(Nothing, "SAMPLE_TYPES")
 

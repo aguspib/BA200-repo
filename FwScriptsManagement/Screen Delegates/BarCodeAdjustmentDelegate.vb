@@ -1244,7 +1244,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' BarCode value (x)
         ''' </remarks>
         Private Function GenerateDataReport(ByVal pTask As String, ByVal pAction As String) As String
-            Dim myResultData As New GlobalDataTO
+            'Dim myResultData As New GlobalDataTO
             Dim returnValue As String = ""
             Try
                 'myResultData = MyClass.GetCultureInfo()

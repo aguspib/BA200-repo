@@ -224,7 +224,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myAdjustments As New tfmwAdjustmentsDAO
+                        'Dim myAdjustments As New tfmwAdjustmentsDAO
                         Dim readAdjustmentsDS As New SRVAdjustmentsDS
 
                         'The current AnalyzerIdAttribute has contents in database? Yes do nothing. No create

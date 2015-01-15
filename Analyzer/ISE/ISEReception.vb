@@ -821,8 +821,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function ProcessISECMDResults(ByVal pISEResult As ISEResultTO, ByVal pAnalyzerID As String, ByVal pBiosystemsValidation As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myEndIndex As Integer
-                Dim myDebugModeOn As Boolean = True
+                'Dim myEndIndex As Integer
+                'Dim myDebugModeOn As Boolean = True
                 Dim myISEResultTO As ISEResultTO
                 Dim myISEResultItemType As ISEResultTO.ISEResultItemTypes = ISEResultTO.ISEResultItemTypes.None
 
@@ -2075,7 +2075,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetDallasSNValues(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities
             Dim myDallasSNData As New ISEDallasSNTO
 
             Try
@@ -2583,7 +2583,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 25/07/2012</remarks>
         Private Function SetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As GlobalDataTO
 
-            Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+            'Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             Dim myGlobal As New GlobalDataTO
 
             Try

@@ -74,7 +74,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <param name="pData">data received</param>
         ''' <remarks>Created by XBC 06/05/2011</remarks>
         Private Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles Me.ReceivedLastFwScriptEvent
-            Dim myGlobal As New GlobalDataTO
+            'Dim myGlobal As New GlobalDataTO
             Try
                 'manage special operations according to the screen characteristics
                 If pResponse = RESPONSE_TYPES.TIMEOUT Or _
@@ -152,7 +152,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Public Function SendNEW_ROTOR() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myParams As New List(Of String)
+            'Dim myParams As New List(Of String)
             Try
 
                 CurrentOperation = OPERATIONS.NEW_ROTOR

@@ -1006,9 +1006,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.CPU_ELEMENTS, String) 'Local structure
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
+                'Dim myElements As New Dictionary(Of GlobalEnumerates.CPU_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -1092,9 +1092,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.MANIFOLD_ELEMENTS, String) 'Local structure
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
+                'Dim myElements As New Dictionary(Of GlobalEnumerates.MANIFOLD_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -1215,9 +1215,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FLUIDICS_ELEMENTS, String) 'Local structure
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
+                'Dim myElements As New Dictionary(Of GlobalEnumerates.FLUIDICS_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -1359,9 +1359,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String) 'Local structure
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
+                'Dim myElements As New Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -1689,8 +1689,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim SwVersion As String = ""
                 Dim FwVersion As String = ""
                 Dim AnalyzerID As String = ""
@@ -1870,8 +1870,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessFwARMDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -1918,8 +1918,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessFwPROBEDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -1968,8 +1968,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessFwROTORDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -2018,8 +2018,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessFwPHOTOMETRICDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -2068,8 +2068,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessFwMANIFOLDDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -2118,8 +2118,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessFwFLUIDICSDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myInstParamTO As New InstructionParameterTO
+                'Dim myUtilities As New Utilities
+                'Dim myInstParamTO As New InstructionParameterTO
                 Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -2873,7 +2873,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function CalculateFwFileCRC32(ByVal pFileStringData As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities
                 Dim myFileBytes As Byte()
 
                 myFileBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(pFileStringData)

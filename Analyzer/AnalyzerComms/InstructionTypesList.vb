@@ -23,7 +23,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function GetInstructionParameterList() As List(Of InstructionParameterTO)
             Dim Instructions As New List(Of InstructionParameterTO)
             Try
-                Dim myInstructionTO As New InstructionParameterTO
+                'Dim myInstructionTO As New InstructionParameterTO
 
                 'TEST INSTRUCTION (Sw -> Fw)
                 GetTESTInstruction(Instructions)

@@ -39,7 +39,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
-                        Dim Cmd As New SqlClient.SqlCommand
+                        'Dim Cmd As New SqlClient.SqlCommand
                         Dim cmdText As String = ""
 
                         cmdText = "SELECT AnalyzerID" & vbCrLf & _

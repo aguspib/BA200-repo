@@ -434,7 +434,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
 
 
-                Dim myHomeScriptList As New List(Of FwScriptQueueItem)
+                'Dim myHomeScriptList As New List(Of FwScriptQueueItem)
 
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO

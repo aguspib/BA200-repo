@@ -1076,7 +1076,7 @@ Public Class BSTestRefRanges
     Public Sub RefUpdateDetailDataGridViewBySampleType(ByVal pTestID As Integer, ByVal pNewSampleType As String)
         Dim NewSampleType As String
         Dim FirstSampleType As String
-        Dim NewDetailedRows As New List(Of DataGridViewRow)
+        'Dim NewDetailedRows As New List(Of DataGridViewRow)
 
         Try
             NewSampleType = pNewSampleType
@@ -1158,7 +1158,7 @@ Public Class BSTestRefRanges
     Public Sub RefUpdateGenericBySampleType(ByVal pTestID As Integer, ByVal pNewSampleType As String)
         Dim NewSampleType As String
         Dim FirstSampleType As String
-        Dim NewDetailedRows As New List(Of DataGridViewRow)
+        'Dim NewDetailedRows As New List(Of DataGridViewRow)
 
         Try
             NewSampleType = pNewSampleType

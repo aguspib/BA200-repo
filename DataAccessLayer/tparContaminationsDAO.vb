@@ -548,7 +548,7 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
-                    Dim myLocalBase As New GlobalBase
+                    'Dim myLocalBase As New GlobalBase
                     Dim cmdText As New StringBuilder
                     'Dim cmdText As String = " SELECT DISTINCT T.Testname as Contaminators, C.WashingSolutionR1 as Step1,  C.WashingSolutionR2 as Step2, " & vbCrLf & _
                     '                                        " MLR1.ResourceText AS Step1Desc, MLR2.ResourceText AS Step2Desc " & vbCrLf & _

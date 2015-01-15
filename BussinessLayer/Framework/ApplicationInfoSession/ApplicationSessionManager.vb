@@ -79,7 +79,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 myApplicationInfoSession.ActivateSystemLog = GlobalBase.WriteToSystemLog
 
                 'Application Setting area
-                Dim myApplicationSetting As New ApplicationSettingDelegate()
+                'Dim myApplicationSetting As New ApplicationSettingDelegate()
                 'myApplicationInfoSession.ApplicationVersion = myApplicationSetting.GetApplicationSettingCurrentValueBySettingID("ApplicationVersion")
                 'myApplicationInfoSession.DatabaseVersion = myApplicationSetting.GetApplicationSettingCurrentValueBySettingID("DatabaseVersion")
 

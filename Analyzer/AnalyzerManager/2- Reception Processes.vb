@@ -3591,7 +3591,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 Dim myExecutionsDS As New ExecutionsDS
-                Dim affectedExecutions As New ExecutionsDS
+                'Dim affectedExecutions As New ExecutionsDS
                 Dim exeDelegate As New ExecutionsDelegate
 
                 'If the Preparation to sent is an ISE one, get all affected Executions (all ISE Tests requested for the same 

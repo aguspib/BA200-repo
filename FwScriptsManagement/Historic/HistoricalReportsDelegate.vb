@@ -1269,7 +1269,7 @@ Public Class HistoricalReportsDelegate
     Private Function GetRecommendations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pResultsRow As SRVResultsServiceDS.srv_thrsResultsServiceRow) As GlobalDataTO
 
         Dim myResultData As New GlobalDataTO
-        Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
+        'Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         Try
             Dim myRecommendationsDAO As New thrsRecommendationsServiceDAO

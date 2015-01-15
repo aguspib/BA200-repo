@@ -158,11 +158,11 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' </remarks>
         Public Sub RefreshFieldsData(ByVal pISEMonitorData As ISEMonitorTO)
             Try
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities
 
-                Me.InitializeFields()
-                Me.InitializeWarnings()
-                Me.InitializeIcons()
+                InitializeFields()
+                InitializeWarnings()
+                InitializeIcons()
 
                 If Not pISEMonitorData Is Nothing AndAlso pISEMonitorData.HasData Then
 

@@ -327,7 +327,7 @@ Partial Public Class tparReagentsDAO
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
-                Dim myGlobalBase As New GlobalBase
+                'Dim myGlobalBase As New GlobalBase
 
                 Dim cmdText As String = ""
                 cmdText = " DELETE FROM tparReagents  "
